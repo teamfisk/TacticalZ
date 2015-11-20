@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="types" elementFormDefault="qualified">
+	<xs:complexType name="Vector">
+		<xs:attribute name="X" type="xs:decimal" default="0.0"/>
+		<xs:attribute name="Y" type="xs:decimal" default="0.0"/>
+		<xs:attribute name="Z" type="xs:decimal" default="0.0"/>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="types" elementFormDefault="qualified">
+	<xs:include schemaLocation="Types/Quaternion.xsd"/>
+	<xs:include schemaLocation="Types/Vector.xsd"/>
+</xs:schema>

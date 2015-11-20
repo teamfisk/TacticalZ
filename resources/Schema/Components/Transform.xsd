@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types" xmlns:meta="../Schema.xsd">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Transform">
+		<xs:annotation>
+			<xs:documentation>It's a transform thingy!</xs:documentation>
+			<xs:appinfo>
+				<meta:allocation>8</meta:allocation>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Position" type="t:Vector" minOccurs="0">
+					<xs:annotation><xs:documentation>The position vector</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Orientation" type="t:Quaternion" minOccurs="0"/>
+				<xs:element name="Scale" type="t:Vector" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

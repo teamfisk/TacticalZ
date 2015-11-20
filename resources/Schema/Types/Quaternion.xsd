@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="types" elementFormDefault="qualified">
+	<xs:complexType name="Quaternion">
+		<xs:attribute name="I" type="xs:decimal" default="0.0"/>
+		<xs:attribute name="J" type="xs:decimal" default="0.0"/>
+		<xs:attribute name="K" type="xs:decimal" default="0.0"/>
+	</xs:complexType>
+</xs:schema>

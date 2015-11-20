@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:c="components">
+	<xs:import schemaLocation="Components.xsd" namespace="components"/>
+
+	<xs:element name="Entity">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Components">
+					<xs:complexType>
+						<xs:all>
+							<xs:element ref="c:Transform" minOccurs="0"/>
+							<xs:element ref="c:Test" minOccurs="0"/>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="Children" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

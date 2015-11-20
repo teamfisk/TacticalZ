@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types" xmlns:meta="../Schema.xsd">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Test">
+		<xs:annotation>
+			<xs:appinfo>
+				<meta:allocation>8</meta:allocation>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Integer" type="xs:integer" minOccurs="0"/>
+				<xs:element name="Float" type="xs:decimal" minOccurs="0"/>
+				<xs:element name="Vector" type="t:Vector" minOccurs="0"/>
+				<xs:element name="Quaternion" type="t:Quaternion" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
