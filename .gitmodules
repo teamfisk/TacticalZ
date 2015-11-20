@@ -1,0 +1,6 @@
+[submodule "assets"]
+	path = assets
+	url = tacticalz@1.drake.imon.nu:TacticalZ-assets
+[submodule "deps"]
+	path = deps
+	url = tacticalz@1.drake.imon.nu:TacticalZ-deps
