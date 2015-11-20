@@ -1,0 +1,6 @@
+# Build Folders
+build/
+bin/
+lib/
+# Because apparently nobody has any self control
+*.orig
