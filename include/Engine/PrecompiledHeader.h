@@ -10,7 +10,7 @@
 #define NOMINMAX
 #include <GLFW/glfw3.h>
 #include <glext.h>
-#include "Core/Util/GLError.h"
+#include "Rendering/Util/GLError.h"
 
 // GLM
 #define GLM_FORCE_RADIANS
