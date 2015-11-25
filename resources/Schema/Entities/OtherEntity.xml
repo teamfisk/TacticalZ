@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd" xmlns:c="components">
+	<Components>
+		<c:Test>
+			<Integer>5555</Integer>
+			<Float>12.34</Float>
+		</c:Test>
+	</Components>
+</Entity>

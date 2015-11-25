@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:c="components">
-	<xs:import schemaLocation="Components.xsd" namespace="components"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:c="components">
+	<xs:import schemaLocation="../Components.xsd" namespace="components"/>
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="../xml.xsd"/>
 
 	<xs:element name="Entity">
 		<xs:complexType>
@@ -23,6 +24,7 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:all>
+			<xs:attribute ref="xml:base"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>
