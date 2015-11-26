@@ -3,4 +3,13 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="types" elementFormDefault="qualified">
 	<xs:include schemaLocation="Types/Quaternion.xsd"/>
 	<xs:include schemaLocation="Types/Vector.xsd"/>
+	<xs:simpleType name="int">
+		<xs:restriction base="xs:integer"></xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="double">
+		<xs:restriction base="xs:decimal"></xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="string">
+		<xs:restriction base="xs:string"></xs:restriction>
+	</xs:simpleType>
 </xs:schema>

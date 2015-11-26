@@ -4,7 +4,7 @@
 	<Components>
 		<c:Test>
 			<Integer>5555</Integer>
-			<Float>12.34</Float>
+			<Double>12.34</Double>
 		</c:Test>
 	</Components>
 </Entity>

@@ -9,7 +9,8 @@
 		</c:Transform>
 		<c:Test>
 			<Integer>12</Integer>
-			<Float>11.11</Float>
+			<Double>11.11</Double>
+			<String>Hello World</String>
 		</c:Test>
 	</Components>
 	<Children>
