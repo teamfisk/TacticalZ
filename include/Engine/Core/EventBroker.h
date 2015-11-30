@@ -3,16 +3,15 @@
 
 #include <typeinfo>
 #include <functional>
-#include <map>
-#include <unordered_map>
 #include <list>
 #include <tuple>
 
+#include "../Common.h"
 #include "Event.h"
 
 #define EVENT_SUBSCRIBE_MEMBER(relay, handler) \
 	relay = decltype(relay)(std::bind(handler, this, std::placeholders::_1)); \
-	EventBroker->Subscribe(relay);
+	m_EventBroker->Subscribe(relay);
 
 class EventBroker;
 

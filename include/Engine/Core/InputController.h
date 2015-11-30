@@ -1,11 +1,11 @@
 #ifndef InputController_h__
 #define InputController_h__
 
-#include <memory>
+#include "../Common.h"
 
 #include "EventBroker.h"
 #include "EMouseMove.h"
-#include "Input/EInputCommand.h"
+#include "../Input/EInputCommand.h"
 
 template <typename EventContext>
 class InputController

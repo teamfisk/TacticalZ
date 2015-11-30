@@ -1,7 +1,7 @@
 #ifndef Events_KeyDown_h__
 #define Events_KeyDown_h__
 
-#include "Core/EventBroker.h"
+#include "EventBroker.h"
 
 namespace Events
 {

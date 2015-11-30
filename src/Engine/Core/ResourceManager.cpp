@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Core/ResourceManager.h"
 
 std::unordered_map<std::string, std::string> ResourceManager::m_CompilerTypenameToResourceType;

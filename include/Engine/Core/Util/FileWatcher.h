@@ -58,8 +58,8 @@ private:
 		std::time_t Timestamp;
 	};
 
-	std::unordered_map<boost::filesystem::path, FileEventCallback_t, BoostPathHash> m_FileCallbacks;
-	std::unordered_map<boost::filesystem::path, FileInfo, BoostPathHash> m_FileInfo;
+	std::unordered_map<boost::filesystem::path, FileEventCallback_t> m_FileCallbacks;
+	std::unordered_map<boost::filesystem::path, FileInfo> m_FileInfo;
 	boost::mutex m_Mutex;
 
 	FileInfo GetFileInfo(boost::filesystem::path path);

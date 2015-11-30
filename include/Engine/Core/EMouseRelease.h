@@ -1,7 +1,7 @@
 #ifndef Events_MouseRelease_h__
 #define Events_MouseRelease_h__
 
-#include "Core/EventBroker.h"
+#include "EventBroker.h"
 
 namespace Events
 {

@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Rendering/Model.h"
 
 Model::Model(std::string fileName)

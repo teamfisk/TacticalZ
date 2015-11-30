@@ -1,12 +1,9 @@
 #ifndef RawModel_h__
 #define RawModel_h__
 
-#include <string>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <vector>
-#include <memory>
 #include <cstdlib>
 #include <stack>
 
@@ -15,9 +12,11 @@
 #include <assimp/postprocess.h>
 #include <boost/filesystem/path.hpp>
 
-#include "Core/ResourceManager.h"
-#include "Rendering/Texture.h"
-#include "Rendering/Skeleton.h"
+#include "../Common.h"
+#include "../GLM.h"
+#include "../Core/ResourceManager.h"
+#include "Texture.h"
+#include "Skeleton.h"
 
 class RawModel : public Resource
 {

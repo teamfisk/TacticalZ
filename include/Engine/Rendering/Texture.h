@@ -1,7 +1,9 @@
 #ifndef Texture_h__
 #define Texture_h__
 
-#include "Rendering/BaseTexture.h"
+#include "../OpenGL.h"
+#include "BaseTexture.h"
+#include "PNG.h"
 
 class Texture : public BaseTexture
 {

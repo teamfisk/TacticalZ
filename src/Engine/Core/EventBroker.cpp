@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Core/EventBroker.h"
 
 BaseEventRelay::~BaseEventRelay()

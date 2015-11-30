@@ -1,7 +1,7 @@
 #ifndef Events_MousePress_h__
 #define Events_MousePress_h__
 
-#include "Core/EventBroker.h"
+#include "EventBroker.h"
 
 namespace Events
 {

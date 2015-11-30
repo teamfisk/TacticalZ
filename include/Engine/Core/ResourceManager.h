@@ -1,13 +1,11 @@
 #ifndef ResourceManager_h__
 #define ResourceManager_h__
 
-#include <string>
 #include <functional>
-#include <vector>
 #include <set>
-#include <unordered_map>
 #include <fstream>
 
+#include "../Common.h"
 #include "Util/UnorderedMapPair.h"
 #include "Util/FileWatcher.h"
 

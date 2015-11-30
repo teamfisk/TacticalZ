@@ -1,7 +1,8 @@
 #ifndef Model_h__
 #define Model_h__
 
-#include "Rendering/RawModel.h"
+#include "RawModel.h"
+#include "../OpenGL.h"
 
 class Model : public RawModel
 {

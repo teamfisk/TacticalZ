@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Rendering/Texture.h"
 
 Texture::Texture(std::string path)

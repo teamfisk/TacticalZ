@@ -5,6 +5,7 @@
 
 #include <png.h>
 
+#include "../Common.h"
 #include "Image.h"
 
 class PNG : public Image

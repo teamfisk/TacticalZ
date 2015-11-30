@@ -1,7 +1,7 @@
 #ifndef Events_GamepadAxis_h__
 #define Events_GamepadAxis_h__
 
-#include "Core/EventBroker.h"
+#include "EventBroker.h"
 
 namespace Gamepad
 {

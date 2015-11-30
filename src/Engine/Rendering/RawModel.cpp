@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Rendering/RawModel.h"
 
 RawModel::RawModel(std::string fileName)

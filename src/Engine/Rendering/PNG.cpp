@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Rendering/PNG.h"
 
 PNG::PNG(std::string path)

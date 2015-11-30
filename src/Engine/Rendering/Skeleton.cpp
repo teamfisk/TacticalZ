@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Rendering/Skeleton.h"
 
 int Skeleton::CreateBone(int ID, int parentID, std::string name, glm::mat4 offsetMatrix)

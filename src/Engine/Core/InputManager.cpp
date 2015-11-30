@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Core/InputManager.h"
 
 void InputManager::Initialize()
@@ -13,7 +12,7 @@ void InputManager::Initialize()
 
 void InputManager::Update(double dt)
 {
-	EventBroker->Process<InputManager>();
+	m_EventBroker->Process<InputManager>();
 
 	m_LastKeyState = m_CurrentKeyState;
 	m_LastMouseState = m_CurrentMouseState;
@@ -28,11 +27,11 @@ void InputManager::Update(double dt)
 			if (m_CurrentKeyState[i]) {
 				Events::KeyDown e;
 				e.KeyCode = i;
-				EventBroker->Publish(e);
+				m_EventBroker->Publish(e);
 			} else {
 				Events::KeyUp e;
 				e.KeyCode = i;
-				EventBroker->Publish(e);
+				m_EventBroker->Publish(e);
 			}
 		}
 	}
@@ -49,13 +48,13 @@ void InputManager::Update(double dt)
 				e.Button = i;
 				e.X = x;
 				e.Y = y;
-				EventBroker->Publish(e);
+				m_EventBroker->Publish(e);
 			} else {
 				Events::MouseRelease e;
 				e.Button = i;
 				e.X = x;
 				e.Y = y;
-				EventBroker->Publish(e);
+				m_EventBroker->Publish(e);
 			}
 		}
 	}
@@ -71,7 +70,7 @@ void InputManager::Update(double dt)
 		e.Y = m_CurrentMouseY;
 		e.DeltaX = m_CurrentMouseDeltaX;
 		e.DeltaY = m_CurrentMouseDeltaY;
-		EventBroker->Publish(e);
+		m_EventBroker->Publish(e);
 	}
 
 	// // Lock mouse while holding LMB
@@ -174,7 +173,7 @@ void InputManager::PublishGamepadAxisIfChanged(int gamepadID, Gamepad::Axis axis
 		e.GamepadID = gamepadID;
 		e.Axis = axis;
 		e.Value = currentValue;
-		EventBroker->Publish(e);
+		m_EventBroker->Publish(e);
 	}
 }
 
@@ -187,12 +186,12 @@ void InputManager::PublishGamepadButtonIfChanged(int gamepadID, Gamepad::Button 
 			Events::GamepadButtonDown e;
 			e.GamepadID = gamepadID;
 			e.Button = button;
-			EventBroker->Publish(e);
+			m_EventBroker->Publish(e);
 		} else {
 			Events::GamepadButtonUp e;
 			e.GamepadID = gamepadID;
 			e.Button = button;
-			EventBroker->Publish(e);
+			m_EventBroker->Publish(e);
 		}
 	}
 }

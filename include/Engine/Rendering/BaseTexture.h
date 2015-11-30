@@ -1,12 +1,7 @@
 #ifndef BaseTexture_h__
 #define BaseTexture_h__
 
-#include <string>
-#include <unordered_map>
-#include <cstdio>
-
-#include "Core/ResourceManager.h"
-#include "Rendering/PNG.h"
+#include "../Core/ResourceManager.h"
 
 class BaseTexture : public Resource
 {

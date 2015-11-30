@@ -2,8 +2,10 @@
 #define InputManager_h__
 
 #include <array>
+#include <GLFW/glfw3.h>
 
-#include "Core/EventBroker.h"
+#include "../Common.h"
+#include "EventBroker.h"
 #include "EKeyDown.h"
 #include "EKeyUp.h"
 #include "EMousePress.h"
@@ -16,9 +18,9 @@
 class InputManager
 {
 public:
-	InputManager(GLFWwindow* window, std::shared_ptr<::EventBroker> eventBroker)
+	InputManager(GLFWwindow* window, EventBroker* eventBroker)
 		: m_GLFWWindow(window)
-		, EventBroker(eventBroker)
+		, m_EventBroker(eventBroker)
 		, m_CurrentKeyState()
 		, m_LastKeyState()
 		, m_CurrentMouseState()
@@ -37,7 +39,7 @@ public:
 
 private:
 	GLFWwindow* m_GLFWWindow;
-	std::shared_ptr<::EventBroker> EventBroker;
+	EventBroker* m_EventBroker;
 
 	EventRelay<InputManager, Events::LockMouse> m_ELockMouse;
 	bool OnLockMouse(const Events::LockMouse &event);

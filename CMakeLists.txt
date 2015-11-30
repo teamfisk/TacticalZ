@@ -34,6 +34,7 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 
+include(cotire)
 add_subdirectory(src/Engine)
 add_subdirectory(src/Game)
 add_subdirectory(src/Tests)

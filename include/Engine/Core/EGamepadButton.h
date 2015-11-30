@@ -1,7 +1,7 @@
 #ifndef Events_GamepadButton_h__
 #define Events_GamepadButton_h__
 
-#include "Core/EventBroker.h"
+#include "EventBroker.h"
 
 namespace Gamepad
 {

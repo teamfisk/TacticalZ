@@ -1,4 +1,3 @@
-#include "PrecompiledHeader.h"
 #include "Core/ConfigFile.h"
 
 ConfigFile::ConfigFile(std::string path)

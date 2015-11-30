@@ -1,7 +1,7 @@
 project(TacticalZ-Engine)
 
 find_package(OpenGL REQUIRED)
-#find_package(GLEW REQUIRED)
+find_package(GLEW REQUIRED)
 find_package(GLFW REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
 find_package(assimp REQUIRED)
@@ -50,10 +50,17 @@ file(GLOB SOURCE_FILES_Rendering
 )
 source_group(Rendering FILES ${SOURCE_FILES_Rendering})
 
+file(GLOB SOURCE_FILES_GUI
+    "${INCLUDE_PATH}/GUI/*.h"
+    "GUI/*.cpp"
+)
+source_group(GUI FILES ${SOURCE_FILES_GUI})
+
 set(SOURCE_FILES
     ${SOURCE_FILES_Core}
     ${SOURCE_FILES_Core_Util}
     #${SOURCE_FILES_Input}
+    ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
 )
 
@@ -78,3 +85,5 @@ add_library(Engine ${SOURCE_FILES})
 target_link_libraries(Engine
     ${LIBRARIES}
 )
+#set_target_properties(Engine PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "${INCLUDE_PATH}/PrecompiledHeader.h")
+#cotire(Engine)

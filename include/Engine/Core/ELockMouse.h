@@ -1,7 +1,7 @@
 #ifndef Events_LockMouse_h__
 #define Events_LockMouse_h__
 
-#include "Core/EventBroker.h"
+#include "EventBroker.h"
 
 namespace Events
 {

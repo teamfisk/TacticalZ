@@ -2,6 +2,8 @@
 #define Skeleton_h__
 
 #include <sstream>
+#include "Common.h"
+#include "../GLM.h"
 
 //struct Bone
 //{
