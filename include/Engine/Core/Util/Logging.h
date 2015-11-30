@@ -1,5 +1,5 @@
-#ifndef Util_Logging_h__
-#define Util_Logging_h__
+#ifndef Logging_h__
+#define Logging_h__
 
 #ifdef _WIN32
 // http://stackoverflow.com/a/2282433
@@ -19,7 +19,7 @@
 #include <cstdio>
 #include <stdarg.h>
 
-enum class LogLevel
+enum _LOG_LEVEL
 {
 	LOG_LEVEL_ERROR,
 	LOG_LEVEL_INFO,

@@ -9,7 +9,6 @@
 #include <fstream>
 
 #include "Util/UnorderedMapPair.h"
-#include "Util/Factory.h"
 #include "Util/FileWatcher.h"
 
 /** Base Resource class.

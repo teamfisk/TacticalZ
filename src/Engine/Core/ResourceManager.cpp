@@ -20,7 +20,6 @@ unsigned int ResourceManager::GetTypeID(std::string resourceType)
 	return m_ResourceTypeIDs[resourceType];
 }
 
-
 void ResourceManager::Reload(std::string resourceName)
 {
 	auto it = m_ResourceFromName.find(resourceName);

@@ -16,7 +16,7 @@
 class InputManager
 {
 public:
-	InputManager(GLFWwindow* window, std::shared_ptr<dd::EventBroker> eventBroker)
+	InputManager(GLFWwindow* window, std::shared_ptr<::EventBroker> eventBroker)
 		: m_GLFWWindow(window)
 		, EventBroker(eventBroker)
 		, m_CurrentKeyState()
@@ -37,7 +37,7 @@ public:
 
 private:
 	GLFWwindow* m_GLFWWindow;
-	std::shared_ptr<dd::EventBroker> EventBroker;
+	std::shared_ptr<::EventBroker> EventBroker;
 
 	EventRelay<InputManager, Events::LockMouse> m_ELockMouse;
 	bool OnLockMouse(const Events::LockMouse &event);
