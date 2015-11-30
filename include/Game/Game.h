@@ -16,7 +16,7 @@ public:
 	Game(int argc, char* argv[]);
 	~Game();
 	
-	bool Running() const { return true; }
+	bool Running() const { return !glfwWindowShouldClose(m_Renderer->Window()); }
 	void Tick();
 
 private:

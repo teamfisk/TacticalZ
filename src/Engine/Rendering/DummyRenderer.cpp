@@ -51,6 +51,8 @@ void DummyRenderer::Initialize()
 
 void DummyRenderer::Draw(RenderQueueCollection& rq)
 {
+	glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glfwSwapBuffers(m_Window);
 }
 
