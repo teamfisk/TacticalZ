@@ -68,8 +68,12 @@ void Renderer::InitializeShaders()
 
 void Renderer::ModelsToDraw()
 {
-	Model *m = ResourceManager::Load<Model>("Models/translation_widget.obj");
+	Model *m = ResourceManager::Load<Model>("Models/ScaleWidget.obj");
 	EnqueueModel(m);
+	Model *m2 = ResourceManager::Load<Model>("Models/TranslationWidget.obj");
+	EnqueueModel(m2);
+	Model *m3 = ResourceManager::Load<Model>("Models/RotationWidget.obj");
+	EnqueueModel(m3);
 }
 
 void Renderer::EnqueueModel(Model* model)
