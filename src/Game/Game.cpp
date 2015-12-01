@@ -3,6 +3,8 @@
 Game::Game(int argc, char* argv[])
 {
 	ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+	ResourceManager::RegisterType<Model>("Model");
+	ResourceManager::RegisterType<Texture>("Texture");
 
 	m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
 	LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -49,6 +51,7 @@ void Game::Tick()
 	m_InputManager->Update(dt);
 	m_EventBroker->Swap();
 
+	//TODO: Render: This is not used, but will be used later when we dont add models to RQ in renderer.
 	RenderQueueCollection rq;
 	m_Renderer->Draw(rq);
 

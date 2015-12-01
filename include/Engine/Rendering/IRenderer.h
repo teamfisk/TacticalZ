@@ -6,6 +6,7 @@
 #include "../Core/Util/Rectangle.h"
 #include "Camera.h"
 #include "RenderQueue.h"
+#include "Model.h"
 
 class IRenderer
 {

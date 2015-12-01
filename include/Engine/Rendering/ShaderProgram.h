@@ -1,17 +1,7 @@
 
-#include <string>
-
-#include "../Core/Util/Logging.h"
-// OpenGL
-#include <GL/glew.h>
-#define GLFW_INCLUDE_GLU
-#include <GLFW/glfw3.h>
-#include <glext.h>
-#include "Util/GLError.h"
-
+#include "../Common.h"
+#include "../OpenGL.h"
 #include <fstream>
-#include <vector>
-
 
 class Shader
 {
