@@ -1,0 +1,7 @@
+class ComponentPool
+{
+public:
+    ComponentPool() { }
+
+
+};
