@@ -13,6 +13,7 @@ void Renderer::Initialize()
 
 	glfwSwapInterval(m_VSYNC);
 	m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
+	m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
 	InitializeShaders();
 	ModelsToDraw();
 }
@@ -65,8 +66,6 @@ void Renderer::InitializeShaders()
 	m_BasicForwardProgram.Link();
 }
 
-
-
 void Renderer::ModelsToDraw()
 {
 	Model *m = ResourceManager::Load<Model>("Models/translation_widget.obj");
@@ -102,6 +101,65 @@ void Renderer::EnqueueModel(Model* model)
 	}
 }
 
+void Renderer::InputUpdate(double dt)
+{
+	glm::vec3 m_Position = m_Camera->Position();
+	if (glfwGetKey(m_Window, GLFW_KEY_O) == GLFW_PRESS)
+	{
+		m_Position = glm::vec3(0.f, 0.f, 5.f);
+	}
+	if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		m_Position += m_Camera->Forward() * m_CameraMoveSpeed * (float)dt;
+	}
+	if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		m_Position -= m_Camera->Forward() * m_CameraMoveSpeed * (float)dt;
+	}
+	if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		m_Position += m_Camera->Right() * m_CameraMoveSpeed * (float)dt;
+	}
+	if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		m_Position -= m_Camera->Right() * m_CameraMoveSpeed * (float)dt;
+	}
+	if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
+		m_CameraMoveSpeed = 5.f;
+	}
+	else {
+		m_CameraMoveSpeed = 0.5f;
+	}
+
+	if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		static double mousePosX, mousePosY;
+
+		glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
+		double deltaX, deltaY;
+		deltaX = mousePosX - (float)Resolution().Width / 2;
+		deltaY = mousePosY - (float)Resolution().Height / 2;
+
+		float rotationY = -deltaY / 300.f;
+		float rotationX = -deltaX / 300.f;
+		glm::quat orientation = m_Camera->Orientation();
+		
+		
+		orientation = orientation * glm::angleAxis<float>(rotationY, glm::vec3(1, 0, 0));
+		orientation = glm::angleAxis<float>(rotationX, glm::vec3(0, 1, 0)) * orientation;
+		
+		m_Camera->SetOrientation(orientation);
+
+		glfwSetCursorPos(m_Window, Resolution().Width / 2, Resolution().Height / 2);
+	}
+	m_Camera->SetPosition(m_Position);
+}
+
+void Renderer::Update(double dt)
+{
+	InputUpdate(dt);
+}
+
 void Renderer::Draw(RenderQueueCollection& rq)
 {
 	//TODO: Render: Clean up draw code
@@ -130,7 +188,7 @@ void Renderer::Draw(RenderQueueCollection& rq)
 				glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
 			} else {
 				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, m_ErrorTexture->m_Texture);
+				glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
 			}
 
 			glBindVertexArray(modelJob->Model->VAO);

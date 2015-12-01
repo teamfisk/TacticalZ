@@ -49,6 +49,7 @@ void Game::Tick()
 
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
+	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
 	//TODO: Render: This is not used, but will be used later when we dont add models to RQ in renderer.

@@ -3,6 +3,7 @@
 
 #include "../Common.h"
 #include "../OpenGL.h"
+#include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
 #include "Camera.h"
 #include "RenderQueue.h"
@@ -29,6 +30,7 @@ public:
 	}
 
 	virtual void Initialize() = 0;
+	virtual void Update(double dt) = 0;
 	virtual void Draw(RenderQueueCollection& rq) = 0;
 
 protected:

@@ -17,6 +17,12 @@ glm::vec3 Camera::Forward()
 {
 	return m_Orientation * glm::vec3(0, 0, -1);
 }
+
+glm::vec3 Camera::Right()
+{
+	return m_Orientation * glm::vec3(1, 0, 0);
+}
+
 //
 //glm::vec3 Camera::Right()
 //{
