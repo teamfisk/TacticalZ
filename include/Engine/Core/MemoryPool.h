@@ -1,6 +1,6 @@
 #ifndef MemoryPool_h__
 #define MemoryPool_h__
-#include <vector>
+#include "Common.h"
 
 template <typename T>
 class MemoryPoolForwardIterator;
@@ -57,18 +57,6 @@ public:
 		, m_LowestAllocatedSlot(m_NumSlots)
 	{ }
 
-	MemoryPool(size_t numMaxElements, size_t stride, char* allocatedMemory)
-		: m_StartAddress(allocatedMemory)
-		, m_SlotIsAllocated(numMaxElements, false)
-		, m_NumSlots(numMaxElements)
-		, m_Stride(stride)
-		, m_NumAllocatedSlots(0)
-		, m_CurrentAllocSlot(0)
-		, m_LowestAllocatedSlot(m_NumSlots)
-	{ }
-
-
-
 	//We may get problems with memory being released 
 	//prematurely, etc. if we allow copies.
 	MemoryPool(const MemoryPool<T>& other) = delete;
@@ -98,11 +86,13 @@ public:
 			//Mark the slot as allocated.
 			m_SlotIsAllocated[m_CurrentAllocSlot] = true;
 			++m_NumAllocatedSlots;
+			//Also increment slot to allocate.
 			return m_StartAddress + m_Stride*m_CurrentAllocSlot++;
 		}
 		else {
 			m_ExtraMemory.push_back((char*)malloc(m_Stride));
-			//TODO: Log this later, we should preferably never enter here, set more memory in constructor instead.
+			//We should preferably not enter here to avoid performance issues. Set more numMaxElements in constructor instead.
+			LOG_WARNING("Allocated slots exceed Pool size, extra memory allocated dynamically. Pool size: %u, dynamic size: %u.", m_NumSlots, m_ExtraMemory.size());
 			return m_ExtraMemory.back();
 		}
 	}
