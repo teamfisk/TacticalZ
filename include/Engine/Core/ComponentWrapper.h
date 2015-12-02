@@ -37,13 +37,13 @@ struct ComponentWrapper
     {
         friend struct ComponentWrapper;
     private:
-        SubscriptProxy(ComponentWrapper* component, std::string& propertyName)
+        SubscriptProxy(ComponentWrapper* component, std::string propertyName)
             : m_Component(component)
             , m_PropertyName(propertyName)
         { }
 
         ComponentWrapper* m_Component;
-        std::string& m_PropertyName;
+        std::string m_PropertyName;
 
     public:
         template <typename T>

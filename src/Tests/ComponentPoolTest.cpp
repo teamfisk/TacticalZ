@@ -22,8 +22,7 @@ BOOST_AUTO_TEST_CASE(ComponentPoolTest)
     int i = 0;
     for (auto& c : pool) {
         BOOST_CHECK(c.EntityID == i);
-        int field = c.Property<int>("Field");
-        BOOST_CHECK(field == i);
+        BOOST_CHECK((int)c["Field"] == i);
         i++;
     }
 }
