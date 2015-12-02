@@ -2,11 +2,12 @@ project(TacticalZ-Tests)
 
 find_package(Boost REQUIRED COMPONENTS chrono thread unit_test_framework)
 
-set(INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include)
+set(INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include/Tests)
 include_directories(
-    ${INCLUDE_PATH}/Engine
-    ${INCLUDE_PATH}/Game
-    ${INCLUDE_PATH}/Tests
+    ${CMAKE_SOURCE_DIR}/deps/include
+    ${CMAKE_SOURCE_DIR}/include/Engine
+    ${CMAKE_SOURCE_DIR}/include/Game
+    ${INCLUDE_PATH}
     ${Boost_INCLUDE_DIRS}
 )
 

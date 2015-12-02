@@ -4,8 +4,8 @@ find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
 
 set(INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include/Game)
 include_directories(
-    ${CMAKE_SOURCE_DIR}/include/Engine
     ${CMAKE_SOURCE_DIR}/deps/include
+    ${CMAKE_SOURCE_DIR}/include/Engine
     ${INCLUDE_PATH}
     ${Boost_INCLUDE_DIRS}
 )
