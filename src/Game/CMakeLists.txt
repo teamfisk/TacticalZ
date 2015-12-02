@@ -12,12 +12,13 @@ include_directories(
 
 file(GLOB SOURCE_FILES
     "${INCLUDE_PATH}/*.h"
-    "*.cpp"
+    #"*.cpp"
 )
 #source_group(Core FILES ${SOURCE_FILES})
 
 set(SOURCE_FILES
     ${SOURCE_FILES}
+    "Game.cpp"
 )
 
 set(LIBRARIES
