@@ -1,4 +1,5 @@
 #include "Core\Collision.h"
+#include <algorithm>
 
 namespace Collision
 {
@@ -34,6 +35,28 @@ bool RayAABBIntr(const Ray& ray, const AABB& box)
         return false;
     }
     return !(abs(c.x*w.y - c.y*w.x) > half.x*v.y + half.y*v.x);
+}
+
+bool RayVsAABB(const Ray& ray, const AABB& box)
+{
+    glm::vec3 invdir = 1.0f / ray.Direction;
+    glm::vec3 bMin = box.MinCorner();
+    glm::vec3 bMax = box.MaxCorner();
+    
+    float t1 = (bMin.x - ray.Origin.x)*invdir.x;
+    float t2 = (bMax.x - ray.Origin.x)*invdir.x;
+    float t3 = (bMin.y - ray.Origin.y)*invdir.y;
+    float t4 = (bMax.y - ray.Origin.y)*invdir.y;
+    float t5 = (bMin.z - ray.Origin.z)*invdir.z;
+    float t6 = (bMax.z - ray.Origin.z)*invdir.z;
+
+    float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
+    float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
+
+    if (tmax < 0 || tmin > tmax)
+        return false;
+
+    return true;
 }
 
 }

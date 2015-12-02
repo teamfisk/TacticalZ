@@ -2,11 +2,13 @@
 #define Collision_h__
 
 #include "../GLM.h"
+#include <algorithm>
 
 namespace Collision
 {
 struct Ray
 {
+public:
     glm::vec3 Origin;
     glm::vec3 Direction;
 };
@@ -29,6 +31,7 @@ private:
 };
 
 bool RayAABBIntr(const Ray& ray, const AABB& box);
+bool RayVsAABB(const Ray& ray, const AABB& box);
 }
 
 #endif
