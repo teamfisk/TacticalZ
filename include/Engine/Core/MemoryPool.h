@@ -32,6 +32,7 @@ public:
 	typedef T value_type;
 	typedef T* pointer;
 	typedef T& reference;
+
 	MemoryPool() 
 		: m_StartAddress(nullptr)
 		, m_SlotIsAllocated()

@@ -2,24 +2,25 @@
 #define Component_h__
 
 #include "../Common.h"
+#include "Entity.h"
 #include "ComponentInfo.h"
 
-struct Component
+struct ComponentWrapper
 {
-    Component(const unsigned int entityID, const ComponentInfo* componentInfo, char* data)
-        : EntityID(entityID)
+    ComponentWrapper(const ComponentInfo& componentInfo, char* data)
+        : EntityID(*reinterpret_cast<::EntityID*>(data))
         , Info(componentInfo)
         , Data(data)
     { }
 
-    const unsigned int EntityID;
-    const ComponentInfo* Info;
+    ::EntityID& EntityID;
+    const ComponentInfo& Info;
     char* Data;
 
     template <typename T>
     T& Property(std::string name)
     {
-        unsigned int offset=Info->FieldOffsets.at(name);
+        unsigned int offset = Info.FieldOffsets.at(name);
         return *reinterpret_cast<T*>(&Data[offset]);
     }
 
@@ -34,14 +35,14 @@ struct Component
 
     struct SubscriptProxy
     {
-        friend struct Component;
+        friend struct ComponentWrapper;
     private:
-        SubscriptProxy(Component* component, std::string& propertyName)
+        SubscriptProxy(ComponentWrapper* component, std::string& propertyName)
             : m_Component(component)
             , m_PropertyName(propertyName)
         { }
 
-        Component* m_Component;
+        ComponentWrapper* m_Component;
         std::string& m_PropertyName;
 
     public:

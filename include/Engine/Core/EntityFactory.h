@@ -28,7 +28,7 @@
 #include <xercesc/framework/XMLValidator.hpp>
 
 #include "Entity.h"
-#include "Component.h"
+#include "ComponentWrapper.h"
 
 class EntityPreprocessorXMLErrorHandler : public xercesc::DOMErrorHandler
 {
@@ -111,17 +111,17 @@ struct ComponentPool
 	char* Data = nullptr;
 
 	// TODO: Iterators
-	Component at(unsigned int index)
+	ComponentWrapper at(unsigned int index)
 	{
 		// TODO: EntityID
-		return Component(0, &Info, Data + (index*Stride));
+		return ComponentWrapper(0, &Info, Data + (index*Stride));
 	}
 };
 
-class EntityParser
+class EntityFactory
 {
 public:
-	EntityParser(std::string entityFile)
+	EntityFactory(std::string entityFile)
 		: m_EntityFile(entityFile)
 	{
 		using namespace xercesc;
@@ -147,7 +147,7 @@ public:
 		m_DOMParser->cacheGrammarFromParse(true);
 	}
 
-	~EntityParser()
+	~EntityFactory()
 	{
 		using namespace xercesc;
 
@@ -344,6 +344,7 @@ private:
 				fieldOffset += getTypeStride(type);
 			}
 
+            compInfo.Meta.Stride = fieldOffset;
 			m_ComponentInfo[compInfo.Name] = compInfo;
 		}
 	}
@@ -476,4 +477,4 @@ private:
 	}
 };
 
-unsigned int EntityParser::InstanceCount = 0;
+unsigned int EntityFactory::InstanceCount = 0;
