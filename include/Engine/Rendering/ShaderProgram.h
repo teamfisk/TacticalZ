@@ -18,7 +18,6 @@ public:
 	std::string GetFileName() const;
 	GLuint GetHandle() const;
 	bool IsCompiled() const;
-
 protected:
 	GLenum m_ShaderType;
 	std::string m_FileName;
@@ -74,6 +73,7 @@ public:
 	GLuint GetHandle();
 	void Bind();
 	void Unbind();
+    void BindFragDataLocation(int index, std::string name);
 
 private:
 	GLuint m_ShaderProgramHandle;

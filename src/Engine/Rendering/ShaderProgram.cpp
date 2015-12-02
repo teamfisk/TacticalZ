@@ -151,3 +151,13 @@ void ShaderProgram::Unbind()
 {
 	glActiveShaderProgram(0, 0);
 }
+
+void ShaderProgram::BindFragDataLocation(int index, std::string name)
+{
+
+    if (m_ShaderProgramHandle == 0)
+        return;
+
+    glBindFragDataLocation(m_ShaderProgramHandle, index, name.c_str());
+}
+
