@@ -7,6 +7,7 @@ find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
 find_package(assimp REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
+find_package(Xerces REQUIRED)
 # Because FindOpenAL is retarded
 #set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/deps/include/AL")
 #find_package(OpenAL REQUIRED)
@@ -23,6 +24,7 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
     ${assimp_INCLUDE_DIRS}
     ${PNG_INCLUDE_DIRS}
+    ${Xerces_INCLUDE_DIRS}
     ${OPENAL_INCLUDE_DIR}
     ${X11_INCLUDE_DIRS}
 )
@@ -78,6 +80,7 @@ set(LIBRARIES
     ${Boost_LIBRARIES}
     ${assimp_LIBRARIES}
     ${PNG_LIBRARIES}
+    ${Xerces_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${X11_LIBRARIES}
 )

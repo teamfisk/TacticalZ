@@ -3,12 +3,11 @@
 
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
-
 #include "Core/EventBroker.h"
 #include "Rendering/Renderer.h"
 #include "Core/InputManager.h"
-
 #include "GUI/Frame.h"
+#include "Core/World.h"
 
 class Game
 {
@@ -26,6 +25,7 @@ private:
 	IRenderer* m_Renderer;
 	InputManager* m_InputManager;
 	GUI::Frame* m_FrameStack;
+    World* m_World;
 };
 
 #endif
