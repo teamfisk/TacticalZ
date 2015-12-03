@@ -45,21 +45,17 @@ private:
 	void InitializeShaders();
     void InitializeTextures();
     void InitializeFrameBuffers();
-	//TODO: Render: Remove ModelsToDraw from Renderer.
+	//TODO: Renderer: Remove ModelsToDraw from Renderer.
 	void ModelsToDraw();
+    //TODO: Renderer: Get EnqueueModel and InputUpdate out of renderer
 	void EnqueueModel(Model* model);
 	void InputUpdate(double dt);
     void PickingPass();
     void DrawScreenQuad(GLuint textureToDraw);
-    glm::vec3 GetClickedPixelData(float x, float y);
     void DrawScene(RenderQueueCollection& rq);
 
-    //--------------------Utility functions----------------//
-    glm::vec3 ScreenCoordsToWorldPos(glm::vec2 screenCoord, float depth);
-    //EntityID ScreenCoordsToEntityID(glm::vec2 screenCoord, float depth);
 
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
-
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram m_BasicForwardProgram;
     ShaderProgram m_PickingProgram;

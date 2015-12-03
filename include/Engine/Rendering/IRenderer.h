@@ -5,6 +5,7 @@
 #include "../OpenGL.h"
 #include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
+#include "Util/ScreenCoords.h"
 #include "Camera.h"
 #include "RenderQueue.h"
 #include "Model.h"
