@@ -27,7 +27,7 @@
 #include <xercesc/framework/psvi/XSValue.hpp>
 #include <xercesc/framework/XMLValidator.hpp>
 
-#include "Entity.h"
+#include "EntityWrapper.h"
 #include "ComponentWrapper.h"
 
 class EntityPreprocessorXMLErrorHandler : public xercesc::DOMErrorHandler
@@ -231,7 +231,7 @@ private:
 	std::map<std::string, ComponentInfo> m_ComponentInfo;
 public:
 	std::map<std::string, ComponentPool> m_ComponentStore;
-	std::vector<Entity*> m_Entities;
+	std::vector<EntityWrapper*> m_Entities;
 private:
 
 	/*
@@ -380,8 +380,8 @@ private:
 			// Calculate component size
 			unsigned int stride = 0;
 			// Reserve space for Entity pointer
-			stride += sizeof(Entity*);
-			std::cout << "    Entity " << " (" << sizeof(Entity*) << " byte)" << std::endl;
+			stride += sizeof(EntityWrapper*);
+			std::cout << "    Entity " << " (" << sizeof(EntityWrapper*) << " byte)" << std::endl;
 			// Add size of fields
 			for (auto& field : ci.FieldTypes) {
 				std::cout << "    " << field.second << " " << field.first << " (" << getTypeStride(field.second) << " byte)" << std::endl;

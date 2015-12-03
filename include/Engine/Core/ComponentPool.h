@@ -9,51 +9,21 @@ class ComponentPoolForwardIterator
 	: public std::iterator<std::forward_iterator_tag, ComponentWrapper>
 {
 public:
-	ComponentPoolForwardIterator(const ComponentInfo& componentInfo, const MemoryPool<char>::iterator begin, const MemoryPool<char>::iterator end)
-		: m_ComponentInfo(componentInfo)
+    ComponentPoolForwardIterator(const ComponentInfo& componentInfo, const MemoryPool<char>::iterator begin, const MemoryPool<char>::iterator end) 
+        : m_ComponentInfo(componentInfo)
         , m_MemoryPoolIterator(begin)
         , m_MemoryPoolEnd(end)
-	{ }
+    { }
 
 	ComponentPoolForwardIterator(const ComponentPoolForwardIterator& other) = default;
 	ComponentPoolForwardIterator(ComponentPoolForwardIterator&& other) = default;
 	~ComponentPoolForwardIterator() = default;
-	ComponentPoolForwardIterator& operator= (const ComponentPoolForwardIterator& other) = default;
-
-	ComponentPoolForwardIterator& operator++()
-	{
-        ++m_MemoryPoolIterator;
-		return *this;
-	}
-
-	ComponentPoolForwardIterator& operator++(int)
-	{
-		ComponentPoolForwardIterator copyIter(*this);
-		operator++();
-		return copyIter;
-	}
-
-	bool operator!= (const ComponentPoolForwardIterator& other) const
-	{
-		return m_MemoryPoolIterator != other.m_MemoryPoolIterator;
-	}
-	
-	bool operator== (const ComponentPoolForwardIterator& other) const
-	{
-		return m_MemoryPoolIterator == other.m_MemoryPoolIterator;
-	}
-
-	ComponentWrapper operator* () const
-	{
-        char* data = &(*m_MemoryPoolIterator);
-        ComponentWrapper wrapper(m_ComponentInfo, data);
-        return wrapper;
-	}
-
-	//ComponentWrapper* operator-> () const
-	//{
-	//	return &(*m_MemoryPoolIterator);
-	//}
+	ComponentPoolForwardIterator& operator=(const ComponentPoolForwardIterator& other) = default;
+	ComponentPoolForwardIterator& operator++();
+	ComponentPoolForwardIterator& operator++(int);
+	bool operator!=(const ComponentPoolForwardIterator& other) const;
+	bool operator==(const ComponentPoolForwardIterator& other) const;
+	ComponentWrapper operator*() const;
 
 private:
     const ComponentInfo& m_ComponentInfo;
@@ -71,55 +41,40 @@ public:
 	typedef ComponentWrapper* pointer;
 	typedef ComponentWrapper& reference;
 
-    ComponentPool(const ComponentInfo& ci)
+    ComponentPool(const ::ComponentInfo& ci) 
         : m_ComponentInfo(ci)
-        , m_Pool(ci.Meta.Allocation, ci.Meta.Stride)
+        , m_Pool(ci.Meta.Allocation, sizeof(EntityID) + ci.Meta.Stride)
     { }
-
 	ComponentPool(const ComponentPool& other) = delete;
 	ComponentPool(const ComponentPool&& other) = delete;
 
-    ComponentWrapper New()
-    {
-        char* data = m_Pool.Allocate();
-        return ComponentWrapper(m_ComponentInfo, data);
-    }
+    const ::ComponentInfo& ComponentInfo() const { return m_ComponentInfo; }
 
-    void Delete(ComponentWrapper& component)
-    {
-        m_Pool.Free(component.Data);
-    }
+    // Allocate space for a component and store which entity it belongs to in internal structure
+    ComponentWrapper Allocate(EntityID entity);
+    // Get the component belonging to a specific entity
+    ComponentWrapper GetByEntity(EntityID ent);
+    // Delete a component and free its memory
+    void Delete(ComponentWrapper& wrapper);
 
-	iterator begin() const
-	{
-		return iterator(m_ComponentInfo, m_Pool.begin(), m_Pool.end());
-	}
-
-	iterator end() const
-	{
-		return iterator(m_ComponentInfo, m_Pool.end(), m_Pool.end());
-	}
+	iterator begin() const;
+	iterator end() const;
 
 	//Dumps information about what the pool memory looks like right now 
 	//into an output stream (e.g. file/std::cout, anything that has an operator<<)
 	//Interpret the data in the memory as InterpretType.
 	template <typename InterpretType = char, typename OutStream>
-	void Dump(OutStream& out) const
-	{
-		m_Pool.Dump<InterpretType>(out);
-	}
+	void Dump(OutStream& out) const;
 
 	//Dumps information about what the pool memory looks like right now 
 	//into std::cout. Interpret the data in the memory as InterpretType.
 	template <typename InterpretType = char>
-	void Dump() const
-	{
-		m_Pool.Dump<InterpretType>();
-	}
+	void Dump() const;
 
 private:
-    const ComponentInfo m_ComponentInfo;
+    ::ComponentInfo m_ComponentInfo;
     MemoryPool<char> m_Pool;
+    std::unordered_map<EntityID, char*> m_EntityToComponent;
 };
 
 #endif

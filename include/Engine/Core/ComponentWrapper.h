@@ -1,20 +1,20 @@
-#ifndef Component_h__
-#define Component_h__
+#ifndef ComponentWrapper_h__
+#define ComponentWrapper_h__
 
 #include "../Common.h"
-#include "Entity.h"
+#include "EntityWrapper.h"
 #include "ComponentInfo.h"
 
 struct ComponentWrapper
 {
     ComponentWrapper(const ComponentInfo& componentInfo, char* data)
-        : EntityID(*reinterpret_cast<::EntityID*>(data))
-        , Info(componentInfo)
-        , Data(data)
+        : Info(componentInfo)
+        , EntityID(*reinterpret_cast<::EntityID*>(data))
+        , Data(data + sizeof(EntityID))
     { }
 
-    ::EntityID& EntityID;
     const ComponentInfo& Info;
+    const ::EntityID EntityID;
     char* Data;
 
     template <typename T>
@@ -25,13 +25,13 @@ struct ComponentWrapper
     }
 
     template <typename T>
-    void SetProperty(std::string name, T& value) { Property<T>(name)=value; }
-    template <typename T>
-    void SetProperty(std::string name, const T value) { Property<T>(name)=value; }
+    void SetProperty(std::string name, const T value) { Property<T>(name) = value; }
+    //template <typename T>
+    //void SetProperty(std::string name, T& value) { Property<T>(name) = value; }
 
     // Specialization for string literals
     template <std::size_t N>
-    void SetProperty(std::string name, const char(&value)[N]) { Property<std::string>(name)=std::string(value); }
+    void SetProperty(std::string name, const char(&value)[N]) { Property<std::string>(name) = std::string(value); }
 
     struct SubscriptProxy
     {
@@ -51,8 +51,9 @@ struct ComponentWrapper
 
         template <typename T>
         void operator=(const T val) { m_Component->SetProperty<T>(m_PropertyName, val); }
-        template <typename T>
-        void operator=(T& val) { m_Component->SetProperty<T>(m_PropertyName, val); }
+        // TODO: Pass by reference and rvalue (universal reference?)
+        //template <typename T>
+        //void operator=(T& val) { m_Component->SetProperty<T>(m_PropertyName, val); }
 
         // Specialization for string literals
         template<std::size_t N>
