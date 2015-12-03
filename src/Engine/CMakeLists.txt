@@ -52,6 +52,7 @@ file(GLOB SOURCE_FILES_Rendering_Util
     "${INCLUDE_PATH}/Rendering/Util/*.h"
     "Rendering/Util/*.cpp"
 )
+
 source_group(Rendering FILES ${SOURCE_FILES_Rendering})
 source_group(Rendering\\Util FILES ${SOURCE_FILES_Rendering_Util})
 
@@ -67,6 +68,7 @@ set(SOURCE_FILES
     #${SOURCE_FILES_Input}
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
+    ${SOURCE_FILES_Rendering_Util}
 )
 
 set(LIBRARIES
