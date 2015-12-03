@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "HardcodedTestWorld.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -29,6 +30,9 @@ Game::Game(int argc, char* argv[])
 	m_FrameStack = new GUI::Frame(m_EventBroker);
 	m_FrameStack->Width = m_Renderer->Resolution().Width;
 	m_FrameStack->Height = m_Renderer->Resolution().Height;
+
+    // Create a TEST WORLD
+    m_World = new HardcodedTestWorld();
 
 	m_LastTime = glfwGetTime();
 }
