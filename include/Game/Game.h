@@ -4,7 +4,7 @@
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
 #include "Core/EventBroker.h"
-#include "Rendering/DummyRenderer.h"
+#include "Rendering/Renderer.h"
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"

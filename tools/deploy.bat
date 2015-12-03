@@ -18,8 +18,6 @@ RMDIR "%DeployLocation%\Schema"
 MKLINK "%DeployLocation%\Schema\" "resources\Schema" /J
 :: Shaders
 RMDIR /S /Q "%DeployLocation%\Shaders"
-MKDIR "%DeployLocation%\Shaders"
-MKLINK "%DeployLocation%\Shaders\" "resources\Shaders" /J
 MKLINK "%DeployLocation%\Shaders\" "resources\Shaders" /J
 :: Configuration files
 MKLINK "%DeployLocation%\DefaultConfig.ini" "resources\DefaultConfig.ini" /H
