@@ -4,6 +4,7 @@
 #include "../Common.h"
 #include "EntityWrapper.h"
 #include "ComponentInfo.h"
+#include "Util/Any.h"
 
 struct ComponentWrapper
 {
@@ -60,6 +61,45 @@ struct ComponentWrapper
         void operator=(const char(&val)[N]) { m_Component->SetProperty<N>(m_PropertyName, val); }
     };
     SubscriptProxy operator[](std::string propertyName) { return SubscriptProxy(this, propertyName); }
+};
+
+// TODO: Move this to Tests once entity importing is finished
+class ComponentWrapperFactory
+{
+public:
+    ComponentWrapperFactory() = default;
+    ComponentWrapperFactory(std::string componentTypeName, std::size_t allocation = 0)
+    {
+        m_ComponentInfo.Name = componentTypeName;
+        m_ComponentInfo.Meta.Allocation = allocation;
+    }
+
+    template <typename T>
+    void AddProperty(std::string fieldName, T defaultValue)
+    {
+        m_DefaultValues.push_back(defaultValue);
+        m_ComponentInfo.FieldTypes[fieldName] = typeid(T).name();
+        m_ComponentInfo.FieldOffsets[fieldName] = m_ComponentInfo.Meta.Stride;
+        m_ComponentInfo.Meta.Stride += sizeof(T);
+    }
+    
+    ComponentInfo& Finalize()
+    {
+        m_ComponentInfo.Defaults = std::shared_ptr<char>(new char[m_ComponentInfo.Meta.Stride]);
+        std::size_t offset = 0;
+        for (auto& val : m_DefaultValues) {
+            memcpy(m_ComponentInfo.Defaults.get() + offset, val.Data.get(), val.Size);
+            offset += val.Size;
+        }
+
+        return m_ComponentInfo;
+    }
+
+    operator ComponentInfo&() { return Finalize(); }
+
+private:
+    ComponentInfo m_ComponentInfo;
+    std::vector<Any> m_DefaultValues;
 };
 
 #endif
