@@ -1,15 +1,9 @@
-#include "Core\Collision.h"
+#include "Core/Collision.h"
+#include "Engine/GLM.h"
 #include <algorithm>
 
 namespace Collision
 {
-
-AABB::AABB(const glm::vec3& minPos, const glm::vec3& maxPos)
-    : m_MinCorner(minPos)
-    , m_MaxCorner(maxPos)
-    , m_Center(0.5f * (maxPos + minPos))
-    , m_HalfSize(0.5f * (maxPos - minPos))
-{ }
 
 bool RayAABBIntr(const Ray& ray, const AABB& box)
 {
@@ -39,6 +33,12 @@ bool RayAABBIntr(const Ray& ray, const AABB& box)
 
 bool RayVsAABB(const Ray& ray, const AABB& box)
 {
+    float dummy;
+    return RayVsAABB(ray, box, dummy);
+}
+
+bool RayVsAABB(const Ray& ray, const AABB& box, float& outDistance)
+{
     glm::vec3 invdir = 1.0f / ray.Direction;
 
     float t1 = (box.MinCorner().x - ray.Origin.x)*invdir.x;
@@ -54,6 +54,7 @@ bool RayVsAABB(const Ray& ray, const AABB& box)
     if (tmax < 0 || tmin > tmax)
         return false;
 
+    outDistance = (tmin > 0) ? tmin : tmax;
     return true;
 }
 
