@@ -161,7 +161,7 @@ void Renderer::InputUpdate(double dt)
     static double mousePosX, mousePosY;
     glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
     if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-        glm::vec3 data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, m_PickingBuffer, m_DepthBuffer);
+        glm::vec3 data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, &m_PickingBuffer, m_DepthBuffer);
         glm::vec2 color = glm::vec2(data);
         float depth = data.z;
         
@@ -169,7 +169,7 @@ void Renderer::InputUpdate(double dt)
       //  glm::vec3 worldPos = glm::vec3(glm::inverse(m_Camera->ViewMatrix()) * glm::vec4(viewPos, 1.f));
 
         //printf("R: %f, G: %f, Depth: %f\n", color.r, color.g, depth);
-        //printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
+        printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
 
         if (color != glm::vec2(0, 0)) {
             const Model* pickModel = m_PickingColorsToModels[color];
@@ -209,8 +209,8 @@ void Renderer::Draw(RenderQueueCollection& rq)
     //TODO: Renderer: Kanske borde vara längst upp i update.
     PickingPass();
     DrawScreenQuad(m_PickingTexture);
-    //DrawScreenQuad(m_DepthBuffer);
-    //DrawScene(rq);
+    
+   // DrawScene(rq);
 	glfwSwapBuffers(m_Window);
 }
 
@@ -298,7 +298,7 @@ void Renderer::PickingPass()
             }
         }
     }
-
+    m_PickingBuffer.Unbind();
 }
 
 

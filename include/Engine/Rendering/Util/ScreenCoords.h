@@ -5,6 +5,7 @@
 #include "../../OpenGL.h"
 #include "../../GLM.h"
 #include "../../Core/Util/Rectangle.h"
+#include "FrameBuffer.h"
 
 class ScreenCoords 
 {
@@ -17,8 +18,8 @@ public:
     static glm::vec3 ToWorldPos(float x, float y, float depth, float screenWidth, float screenHeight, glm::mat4 cameraProjectionMat, glm::mat4 cameraViewMat);
     //Return data from the given buffers at the coordinates given in screenspace. Buffer should probably have a texture that covers the screen.
     //Data is given as R = x, B = y, and 
-    static glm::vec3 ToPixelData(glm::vec2 screenCoord, GLuint PickDataBuffer, GLuint DepthBuffer);
-    static glm::vec3 ToPixelData(float x, float y, GLuint PickDataBuffer, GLuint DepthBuffer);
+    static glm::vec3 ToPixelData(glm::vec2 screenCoord, FrameBuffer* PickDataBuffer, GLuint DepthBuffer);
+    static glm::vec3 ToPixelData(float x, float y, FrameBuffer* PickDataBuffer, GLuint DepthBuffer);
     //Return EntityID of the clicked coordinate in given screenspace coordinates.
     //EntityID ScreenCoordsToEntityID(glm::vec2 screenCoord, float depth);
 
