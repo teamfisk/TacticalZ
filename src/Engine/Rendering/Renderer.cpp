@@ -286,7 +286,7 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
 
 void Renderer::PickingPass()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_PickingBuffer);
+    m_PickingBuffer.Bind();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -356,7 +356,7 @@ void Renderer::DrawScreenQuad(GLuint textureToDraw)
 // Will return a vec3 where RG is the PickColor and B is the Depth
 glm::vec3 Renderer::GetClickedPixelData(float x, float y)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_PickingBuffer);
+    m_PickingBuffer.Bind();
     glm::vec2 pixelData;
     glReadPixels(x, y, 1, 1, GL_RG, GL_FLOAT, &pixelData);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -389,19 +389,8 @@ void Renderer::InitializeFrameBuffers()//TODO: Renderer: Get this to a better lo
     glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Resolution.Width, m_Resolution.Height);
-
-
-    glGenFramebuffers(1, &m_PickingBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_PickingBuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_DepthBuffer);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_PickingTexture, 0);
-    GLenum PickingBufferTextures[] = { GL_COLOR_ATTACHMENT0 };
-    glDrawBuffers(1, PickingBufferTextures);
-
-    if (GLenum fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        LOG_ERROR("m_FbDeferred2 incomplete: 0x%x\n", fbStatus);
-        exit(EXIT_FAILURE);
-    }
-
-
+    
+    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
+    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
+    m_PickingBuffer.Generate();
 }

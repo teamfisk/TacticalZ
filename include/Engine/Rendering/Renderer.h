@@ -8,6 +8,7 @@
 //TODO: Temp resourceManager
 #include "../Core/ResourceManager.h"
 #include "Util/UnorderedMapVec2.h"
+#include "Util/FrameBuffer.h"
 
 class Renderer : public IRenderer
 {
@@ -22,7 +23,7 @@ private:
 	Texture* m_ErrorTexture;
 	Texture* m_WhiteTexture;
 	float m_CameraMoveSpeed;
-    GLuint m_PickingBuffer;
+    FrameBuffer m_PickingBuffer;
     GLuint m_PickingTexture;
     GLuint m_DepthBuffer;
 
