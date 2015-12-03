@@ -52,6 +52,11 @@ private:
     void DrawScreenQuad(GLuint textureToDraw);
     glm::vec3 GetClickedPixelData(float x, float y);
     void DrawScene(RenderQueueCollection& rq);
+
+    //--------------------Utility functions----------------//
+    glm::vec3 ScreenCoordsToWorldPos(glm::vec2 screenCoord, float depth);
+    //EntityID ScreenCoordsToEntityID(glm::vec2 screenCoord, float depth);
+
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram m_BasicForwardProgram;
     ShaderProgram m_PickingProgram;

@@ -80,12 +80,14 @@ void Renderer::InitializeShaders()
 
 void Renderer::ModelsToDraw()
 {
+    
 	m = ResourceManager::Load<Model>("Models/ScaleWidget.obj");
 	EnqueueModel(m);
 	m2 = ResourceManager::Load<Model>("Models/TranslationWidget.obj");
 	EnqueueModel(m2);
 	m3 = ResourceManager::Load<Model>("Models/RotationWidget.obj");
 	EnqueueModel(m3);
+    
 	m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
 	EnqueueModel(m_UnitSphere);
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
@@ -160,17 +162,21 @@ void Renderer::InputUpdate(double dt)
     glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
     if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
         glm::vec3 data = GetClickedPixelData(mousePosX, m_Resolution.Height - mousePosY);
-        glm::vec2 pixelData = glm::vec2(data);
-        float depthData = data.z;
-        printf("R: %f, G: %f, Depth: %f\n", pixelData.r, pixelData.g, depthData);
+        glm::vec2 color = glm::vec2(data);
+        float depth = data.z;
+        
+        glm::vec3 viewPos = ScreenCoordsToWorldPos(glm::vec2(mousePosX, m_Resolution.Height - mousePosY), depth);
+      //  glm::vec3 worldPos = glm::vec3(glm::inverse(m_Camera->ViewMatrix()) * glm::vec4(viewPos, 1.f));
+
+        //printf("R: %f, G: %f, Depth: %f\n", color.r, color.g, depth);
+        printf("view: x: %f, y: %f z: %f, Length: %f\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
 
 
-        if (pixelData != glm::vec2(0, 0)) {
-            const Model* pickModel = m_PickingColorsToModels[pixelData];
+        if (color != glm::vec2(0, 0)) {
+            const Model* pickModel = m_PickingColorsToModels[color];
 
         }
     }
-
 
 	if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 
@@ -194,6 +200,33 @@ void Renderer::InputUpdate(double dt)
 	m_Camera->SetPosition(m_Position);
 }
 
+
+// Utility functions should be moved to a better place
+glm::vec3 Renderer::ScreenCoordsToWorldPos(glm::vec2 screenCoord, float depth)
+{
+    glm::vec4 pos;
+    float near = m_Camera->NearClip();
+    float far = m_Camera->FarClip();
+
+    glm::vec3 ndc;
+    ndc.x = screenCoord.x / m_Resolution.Width;
+    ndc.y = screenCoord.y / m_Resolution.Height;
+    glm::vec4 clipSpace = glm::vec4(glm::vec2(ndc.x, ndc.y) * 2.0f - 1.0f, (depth) * 2.0f - 1.0f, 1.0f);
+
+    glm::vec4 EyeSpace =  glm::inverse(m_Camera->ProjectionMatrix()) * clipSpace;
+    glm::vec4 WorldSpace = glm::inverse(m_Camera->ViewMatrix()) * EyeSpace;
+    WorldSpace = glm::vec4(glm::vec3(WorldSpace) / WorldSpace.w, 1.f);
+    
+    return glm::vec3(WorldSpace);
+
+}
+
+
+//EntityID Renderer::ScreenCoordsToEntityID(glm::vec2 screenCoord, float depth)
+//{
+//
+//}
+
 void Renderer::Update(double dt)
 {
 	InputUpdate(dt);
@@ -204,6 +237,7 @@ void Renderer::Draw(RenderQueueCollection& rq)
     //TODO: Renderer: Kanske borde vara längst upp i update.
     PickingPass();
     DrawScreenQuad(m_PickingTexture);
+    //DrawScreenQuad(m_DepthBuffer);
     //DrawScene(rq);
 	glfwSwapBuffers(m_Window);
 }
