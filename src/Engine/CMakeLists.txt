@@ -48,7 +48,12 @@ file(GLOB SOURCE_FILES_Rendering
     "${INCLUDE_PATH}/Rendering/*.h"
     "Rendering/*.cpp"
 )
+file(GLOB SOURCE_FILES_Rendering_Util
+    "${INCLUDE_PATH}/Rendering/Util/*.h"
+    "Rendering/Util/*.cpp"
+)
 source_group(Rendering FILES ${SOURCE_FILES_Rendering})
+source_group(Rendering\\Util FILES ${SOURCE_FILES_Rendering_Util})
 
 file(GLOB SOURCE_FILES_GUI
     "${INCLUDE_PATH}/GUI/*.h"
