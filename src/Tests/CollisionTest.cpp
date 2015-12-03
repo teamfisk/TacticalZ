@@ -2,6 +2,8 @@
 using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 #include <Engine\Core\Collision.h>
+#include "Engine/Core/AABB.h"
+#include "Engine/Core/Ray.h"
 #include <stdlib.h>//srand
 
 BOOST_AUTO_TEST_SUITE(collisionTests)
@@ -10,8 +12,8 @@ BOOST_AUTO_TEST_CASE(collisionTest)
 {
     //fixed seed
     srand(2);
-    Collision::Ray ray;
-    Collision::AABB someAABB;
+    Ray ray;
+    AABB someAABB;
     glm::vec3 minPos;
     glm::vec3 maxPos;
     bool z;
@@ -31,7 +33,7 @@ BOOST_AUTO_TEST_CASE(collisionTest)
         maxPos.y = rand() % 100;
         maxPos.z = rand() % 100;
 
-        someAABB = Collision::AABB(minPos, maxPos);
+        someAABB = AABB(minPos, maxPos);
         z = Collision::RayVsAABB(ray, someAABB);
         if (z) ++test;
     }
@@ -42,8 +44,8 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
 {
     //fixed seed
     srand(2);
-    Collision::Ray ray;
-    Collision::AABB someAABB;
+    Ray ray;
+    AABB someAABB;
     glm::vec3 minPos;
     glm::vec3 maxPos;
     bool z;
@@ -63,7 +65,7 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
         maxPos.y = rand() % 100;
         maxPos.z = rand() % 100;
 
-        someAABB = Collision::AABB(minPos, maxPos);
+        someAABB = AABB(minPos, maxPos);
         z = Collision::RayAABBIntr(ray, someAABB);
         if (z) ++test;
     }

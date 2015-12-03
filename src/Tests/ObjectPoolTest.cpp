@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
-#include "../wmem/MemPrototype/ObjectPool.h"
+#include "Engine/Core/ObjectPool.h"
 #include <ctime>
 
 struct S

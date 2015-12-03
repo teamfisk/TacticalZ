@@ -33,6 +33,12 @@ bool RayAABBIntr(const Ray& ray, const AABB& box)
 
 bool RayVsAABB(const Ray& ray, const AABB& box)
 {
+    float dummy;
+    return RayVsAABB(ray, box, dummy);
+}
+
+bool RayVsAABB(const Ray& ray, const AABB& box, float& outDistance)
+{
     glm::vec3 invdir = 1.0f / ray.Direction;
 
     float t1 = (box.MinCorner().x - ray.Origin.x)*invdir.x;
@@ -48,6 +54,7 @@ bool RayVsAABB(const Ray& ray, const AABB& box)
     if (tmax < 0 || tmin > tmax)
         return false;
 
+    outDistance = (tmin > 0) ? tmin : tmax;
     return true;
 }
 
