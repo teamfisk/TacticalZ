@@ -1,6 +1,7 @@
 @ECHO off
 
 SET DeployLocation=bin\
+MKDIR %DeployLocation%
 
 ECHO Deploying assets to %DeployLocation%
 :: Asset folders
