@@ -26,7 +26,7 @@ private:
     //start of Collision test, set on check, don't check if set already. Solves duplicate boxes in tree.
     AABB m_Box;
 
-    bool rayCollides(const Ray& ray, Output& data, const OctTree* const tree) const;
+    bool rayCollides(const Ray& ray, Output& data) const;
     inline bool hasChildren() const;
     int childIndexContainingPoint(const glm::vec3& point) const;
 };

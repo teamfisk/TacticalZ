@@ -79,43 +79,45 @@ OctTree::~OctTree()
     }
 }
 
-
 bool OctTree::RayCollides(const Ray& ray, Output& data) const
 {
     data.CollideDistance = -1;
-    return rayCollides(ray, data, this);
+    return rayCollides(ray, data);
 }
 
 //Currently all Nodes must have exactly 0 or 8 children, and objectdata should only exist in the last bottom nodes.
-bool OctTree::rayCollides(const Ray& ray, Output& data, const OctTree* const tree) const
+bool OctTree::rayCollides(const Ray& ray, Output& data) const
 {
     //If the node AABB is missed, everything it contains is missed.
-    if (Collision::RayAABBIntr(ray, tree->m_Box)) {
+    if (Collision::RayAABBIntr(ray, m_Box)) {
         //If the ray shoots the tree, and it is a parent to 8 children :o
-        if (tree->hasChildren()) {
+        if (hasChildren()) {
             //Sort children according to their distance from the ray origin.
             std::vector<ChildInfo> childInfos;
             childInfos.reserve(8);
             for (int i = 0; i < 8; ++i) {
-                childInfos.push_back({ i, glm::distance(ray.Origin, tree->m_Children[i]->m_Box.Center()) });
+                childInfos.push_back({ i, glm::distance(ray.Origin, m_Children[i]->m_Box.Center()) });
             }
             std::sort(childInfos.begin(), childInfos.end(), isFirstLower);
             //Loop through the children, starting with the one closest to the ray origin. I.e the first to be hit.
             for (const ChildInfo& info : childInfos) {
-                if (rayCollides(ray, data, tree->m_Children[info.Index])) {
+                if (m_Children[info.Index]->rayCollides(ray, data)) {
                     return true;
                 }
             }
         } else {
-            ////TODO: Check against objects in the node.
-            //float minDist = INFINITY;
-            //for (const auto& obj : m_ObjectsInBox) {
-            //    float dist = Collide(ray, obj);
-            //    minDist = min(dist, minDist);
-            //}
-            //data.CollideDistance = minDist;
-            //if minDist != Collide()'s non-collide value: return false;
-            return true;
+            //Check against boxes in the node.
+            float minDist = INFINITY;
+            bool intersected = false;
+            for (const auto& objBox : m_ContainingBoxes) {
+                float dist;
+                if (Collision::RayVsAABB(ray, objBox, dist)) {
+                    minDist = std::min(dist, minDist);
+                    intersected = true;
+                }
+            }
+            data.CollideDistance = minDist;
+            return intersected;
         }
     }
     return false;
@@ -138,7 +140,7 @@ void OctTree::AddBox(const AABB& box)
         case 2:                         //Four children.
             bits.flip();
             for (int c = 0; c < 8; ++c) {
-                if ((bits & std::bitset<3>(c))[0]) {
+                if ((bits & std::bitset<3>(c)).any()) {
                     m_Children[c]->AddBox(box);
                 }
             }
