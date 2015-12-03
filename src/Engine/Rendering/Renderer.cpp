@@ -373,16 +373,34 @@ void Renderer::InitializeTextures()
 {
     m_ErrorTexture=ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
     m_WhiteTexture=ResourceManager::Load<Texture>("Textures/Core/Blank.png");
-
+    /*
     glGenTextures(1, &m_PickingTexture);
     glBindTexture(GL_TEXTURE_2D, m_PickingTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, m_Resolution.Width, m_Resolution.Height, 0, GL_RGB, GL_FLOAT, NULL);//TODO: Renderer: Fix the precision and Resolution
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, m_Resolution.Width, m_Resolution.Height, 0, GL_RG, GL_FLOAT, NULL);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("m_PickingTexture initialization failed");
+    */
+
+    GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
+        glm::vec2(m_Resolution.Width, m_Resolution.Height), GL_RG8, GL_RG, GL_FLOAT);
 }
+
+void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
+{
+    glGenTextures(1, texture);
+    glBindTexture(GL_TEXTURE_2D, *texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, NULL);//TODO: Renderer: Fix the precision and Resolution
+    GLERROR("Texture initialization failed");
+}
+
+
 
 void Renderer::InitializeFrameBuffers()//TODO: Renderer: Get this to a better location, as its really big
 {

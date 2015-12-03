@@ -58,6 +58,8 @@ private:
     glm::vec3 ScreenCoordsToWorldPos(glm::vec2 screenCoord, float depth);
     //EntityID ScreenCoordsToEntityID(glm::vec2 screenCoord, float depth);
 
+    void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
+
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram m_BasicForwardProgram;
     ShaderProgram m_PickingProgram;
