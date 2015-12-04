@@ -13,6 +13,8 @@ class Skeleton;
 class Texture;
 class RenderQueue;
 
+//TODO: Render: Remove obsolete RenderJobs and fix standard values on variables.
+
 struct RenderJob
 {
 	friend class RenderQueue;
