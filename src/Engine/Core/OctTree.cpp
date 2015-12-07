@@ -3,6 +3,7 @@
 #include <bitset>
 
 #include "Core/OctTree.h"
+#include "Core/Collision.h"
 
 namespace
 {
@@ -37,7 +38,7 @@ OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
             glm::vec3 minPos, maxPos;
             const glm::vec3& parentMin = m_Box.MinCorner();
             const glm::vec3& parentMax = m_Box.MaxCorner();
-            const glm::vec3& parentCenter = m_Box.MaxCorner();
+            const glm::vec3& parentCenter = m_Box.Center();
             std::bitset<3> bits(i);
             //If child is 4,5,6,7.
             if (bits.test(2)) {
@@ -128,6 +129,8 @@ void OctTree::AddBox(const AABB& box)
     if (hasChildren()) {
         int minInd = childIndexContainingPoint(box.MinCorner());
         int maxInd = childIndexContainingPoint(box.MaxCorner());
+        //Because of the predictable ordering of the child indices, 
+        //the number of bits set when xor:ing the indices will determine the number of children containing the box.
         std::bitset<3> bits(minInd ^ maxInd);
         switch (bits.count()) {
         case 0:                         //Box contained completely in one child.
@@ -138,9 +141,14 @@ void OctTree::AddBox(const AABB& box)
             m_Children[maxInd]->AddBox(box);
             break;
         case 2:                         //Four children.
+            //Bit-hax to calculate the right 4 cildren containing the box.
+            //This works because of the childrens index determine what part of 
+            //the dimensions they are responsible for (which octant).
             bits.flip();
+            //At this point the bits necessarily have exactly one bit set.
             for (int c = 0; c < 8; ++c) {
-                if ((bits & std::bitset<3>(c)).any()) {
+                //If the child index have the same bit set as the bits, add box to it.
+                if (bits.to_ulong() & c) {
                     m_Children[c]->AddBox(box);
                 }
             }
