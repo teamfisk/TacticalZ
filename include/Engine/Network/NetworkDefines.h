@@ -1,7 +1,7 @@
-#ifndef MessageType_h__
-#define MessageType_h__
+#ifndef NetworkDefines_h__
+#define NetworkDefines_h__
 
-#include <boost/asio.hpp>
+#include <boost/asio/ip/udp.hpp>
 #include <queue>
 
 #define BOARDSIZE 16
