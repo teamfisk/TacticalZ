@@ -1,4 +1,6 @@
+//#define BOOST_TEST_MODULE collTest
 #include <boost/test/unit_test.hpp>
+#include <boost/test/execution_monitor.hpp>
 using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 #include <Engine\Core\Collision.h>
@@ -6,10 +8,20 @@ using boost::unit_test_framework::test_case;
 #include "Engine/Core/Ray.h"
 #include <stdlib.h>//srand
 
+//vs memleaks
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+//#define DEBUG_CLIENTBLOCK new( _CLIENT_BLOCK, __FILE__, __LINE__)
+//#define new DEBUG_CLIENTBLOCK
+
 BOOST_AUTO_TEST_SUITE(collisionTests)
 
 BOOST_AUTO_TEST_CASE(collisionTest)
 {
+    //memleak
+    int* globalLeak = new int[5];
+
     //fixed seed
     srand(2);
     Ray ray;
@@ -18,7 +30,7 @@ BOOST_AUTO_TEST_CASE(collisionTest)
     glm::vec3 maxPos;
     bool z;
     int test = 0;
-    for (size_t i = 0; i < 1000000; i++)
+    for (size_t i = 0; i < 10; i++)
     {
         ray.Origin.x = rand() % 100;
         ray.Origin.y = rand() % 100;
@@ -38,6 +50,8 @@ BOOST_AUTO_TEST_CASE(collisionTest)
         if (z) ++test;
     }
     BOOST_CHECK(test >= 0);
+
+    //_CrtDumpMemoryLeaks();
 }
 
 BOOST_AUTO_TEST_CASE(collisionTest2)
