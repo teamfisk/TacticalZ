@@ -21,11 +21,6 @@ public:
     //Returns true if the ray collides with something in the tree. Result is written to [data].
     bool RayCollides(const Ray& ray, Output& data) const;
 
-    //Test Getters.
-    OctTree** Children() { return m_Children; }
-    const AABB& Box() { return m_Box; }
-    const std::vector<AABB>& ContainingBoxes() { return m_ContainingBoxes; }
-
 private:
     OctTree* m_Children[8];
     std::vector<AABB> m_ContainingBoxes;

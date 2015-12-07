@@ -7,6 +7,7 @@ using boost::unit_test_framework::test_case;
 #include "Engine/Core/AABB.h"
 #include "Engine/Core/Ray.h"
 #include <stdlib.h>//srand
+#include "Engine/Core/OctTree.h"
 
 //vs memleaks
 //#define _CRTDBG_MAP_ALLOC
@@ -84,6 +85,18 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
         if (z) ++test;
     }
     BOOST_CHECK(test >= 0);
+}
+
+BOOST_AUTO_TEST_CASE(octTest)
+{
+    glm::vec3 mini = glm::vec3(-1, -1, -1);
+    glm::vec3 maxi = glm::vec3(1, 1, 1);
+    OctTree tree(AABB(mini, maxi), 2);
+    tree.AddBox(AABB(mini, 0.1f*maxi));
+    OctTree::Output data;
+    BOOST_CHECK(tree.RayCollides({ glm::vec3(0, 0, 0), glm::normalize(mini) }, data));
+    tree.ClearBoxes();
+    BOOST_CHECK(!tree.RayCollides({ glm::vec3(0, 0, 0), glm::normalize(mini) }, data));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
