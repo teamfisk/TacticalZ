@@ -140,8 +140,7 @@ private:
             glm::vec3 scale = testTransform["Scale"];
             ComponentWrapper testModel = GetComponent(entityTranslationWidget, "Model");
             std::string file = testModel["ModelFile"];
-            file = "Models/TranslationWidget.obj";
-            testModel["ModelFile"] = file;
+            testModel["ModelFile"] = "Models/TranslationWidget.obj";
             glm::vec4 col = testModel["Color"];
         }
         {
@@ -149,15 +148,11 @@ private:
             AttachComponent(entityScaleWidget, "Transform");
             AttachComponent(entityScaleWidget, "Model");
             ComponentWrapper testTransform = GetComponent(entityScaleWidget, "Transform");
-            glm::vec3 pos = testTransform["Position"];
-            pos = glm::vec3(-1.5f, 0.f, 0.f);
-            testTransform["Position"] = pos;
+            testTransform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
             glm::quat ori = testTransform["Orientation"];
             glm::vec3 scale = testTransform["Scale"];
             ComponentWrapper testModel = GetComponent(entityScaleWidget, "Model");
-            std::string file = testModel["ModelFile"];
-            file = "Models/ScaleWidget.obj";
-            testModel["ModelFile"] = file;
+            testModel["ModelFile"] = "Models/ScaleWidget.obj";
             glm::vec4 col = testModel["Color"];
         }
         {
@@ -165,16 +160,11 @@ private:
             AttachComponent(entityRotationWidget, "Transform");
             AttachComponent(entityRotationWidget, "Model");
             ComponentWrapper testTransform = GetComponent(entityRotationWidget, "Transform");
-            glm::vec3 pos = testTransform["Position"];
-            pos = glm::vec3(1.5f, 0.f, 0.f);
-            testTransform["Position"] = pos;
+            testTransform["Position"] = glm::vec3(1.5f, 0.f, 0.f);
             glm::quat ori = testTransform["Orientation"];
             glm::vec3 scale = testTransform["Scale"];
             ComponentWrapper testModel = GetComponent(entityRotationWidget, "Model");
-            std::string file = testModel["ModelFile"];
-            file = "Models/RotationWidget.obj";
-            testModel["ModelFile"] = file;
-            glm::vec4 col = testModel["Color"];
+            testModel["ModelFile"] = "Models/RotationWidget.obj";
         }
 
 
