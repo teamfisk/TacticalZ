@@ -58,4 +58,20 @@ bool RayVsAABB(const Ray& ray, const AABB& box, float& outDistance)
     return true;
 }
 
+bool AABBVsAABB(const AABB& a, const AABB& b)
+{
+    const glm::vec3& aCenter = a.Center();
+    const glm::vec3& bCenter = b.Center();
+    const glm::vec3& aHSize = a.HalfSize();
+    const glm::vec3& bHSize = b.HalfSize();
+    //Test will probably exit because of the X and Z axes more often, so test them first.
+    if (abs(aCenter[0] - bCenter[0]) > (aHSize[0] + bHSize[0])) {
+        return false;
+    }
+    if (abs(aCenter[2] - bCenter[2]) > (aHSize[2] + bHSize[2])) {
+        return false;
+    }
+    return (abs(aCenter[1] - bCenter[1]) <= (aHSize[1] + bHSize[1]));
+}
+
 }
