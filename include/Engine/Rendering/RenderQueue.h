@@ -82,6 +82,7 @@ struct PointLightJob : RenderJob
 	glm::vec3 SpecularColor = glm::vec3(1, 1, 1);
 	glm::vec3 DiffuseColor = glm::vec3(1, 1, 1);
 	float Radius = 1.f;
+    float Intensity = 0.8f;
 
 	void CalculateHash() override
 	{
@@ -94,18 +95,6 @@ struct FrameJob : SpriteJob
 	Rectangle Scissor;
 	Rectangle Viewport;
 	std::string Name;
-
-	void CalculateHash() override
-	{
-		Hash = 0;
-	}
-};
-
-struct WaterParticleJob : RenderJob
-{
-	glm::vec3 Position;
-	glm::vec4 Color;
-	glm::mat4 ModelMatrix;
 
 	void CalculateHash() override
 	{
@@ -154,25 +143,22 @@ private:
 
 struct RenderQueueCollection
 {
-	RenderQueue Deferred;
 	RenderQueue Forward;
 	RenderQueue Lights;
-	RenderQueue GUI;
+	RenderQueue Sprites;
 
 	void Clear()
 	{
-		Deferred.Clear();
 		Forward.Clear();
 		Lights.Clear();
-		GUI.Clear();
+        Sprites.Clear();
 	}
 
 	void Sort()
 	{
-		Deferred.Sort();
 		Forward.Sort();
 		Lights.Sort();
-		GUI.Sort();
+        Sprites.Sort();
 	}
 };
 

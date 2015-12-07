@@ -19,7 +19,6 @@ public:
 
 private:
 	//----------------------Variables----------------------//
-	RenderQueueCollection m_TempRQ;
 	Texture* m_ErrorTexture;
 	Texture* m_WhiteTexture;
 	float m_CameraMoveSpeed;
@@ -31,11 +30,6 @@ private:
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-    //Temporary
-    Model* m;
-    Model* m2;
-    Model* m3;
-    Model* MapModel;
 
     
     std::unordered_map<glm::vec2, const Model*> m_PickingColorsToModels;
@@ -45,12 +39,9 @@ private:
 	void InitializeShaders();
     void InitializeTextures();
     void InitializeFrameBuffers();
-	//TODO: Renderer: Remove ModelsToDraw from Renderer.
-	void ModelsToDraw();
-    //TODO: Renderer: Get EnqueueModel and InputUpdate out of renderer
-	void EnqueueModel(Model* model);
+    //TODO: Renderer: Get InputUpdate out of renderer
 	void InputUpdate(double dt);
-    void PickingPass();
+    void PickingPass(RenderQueueCollection& rq);
     void DrawScreenQuad(GLuint textureToDraw);
     void DrawScene(RenderQueueCollection& rq);
 

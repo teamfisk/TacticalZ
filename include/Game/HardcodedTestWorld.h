@@ -73,6 +73,13 @@ private:
                     std::make_tuple(sizeof(glm::quat), "Orientation", glm::quat()),
                     std::make_tuple(sizeof(glm::vec3), "Scale", glm::vec3(1.f, 1.f, 1.f))
                 } 
+            },
+            {
+                "Model",
+                {
+                    std::make_tuple(sizeof(std::string), "ModelFile", std::string("Unnamed")),
+                    std::make_tuple(sizeof(glm::vec4), "Color", glm::vec4(1.f, 1.f, 1.f, 1.f)),
+                }
             }
         };
 
@@ -106,19 +113,71 @@ private:
 
     void createTestEntities()
     {
-        EntityID e = CreateEntity();
-        AttachComponent(e, "Test");
-        AttachComponent(e, "Debug");
-        AttachComponent(e, "Transform");
-        ComponentWrapper testComponent = GetComponent(e, "Test");
-        int testValue = testComponent["TestInteger"];
-        float testFloat = testComponent["TestFloat"];
-        ComponentWrapper debugComponent = GetComponent(e, "Debug");
-        std::string name = debugComponent["Name"];
-        glm::vec3 pickingColor = debugComponent["PickingColor"];
-        ComponentWrapper testTransform = GetComponent(e, "Transform");
-        glm::vec3 pos = testTransform["Position"];
-        glm::quat ori = testTransform["Orientation"];
-        glm::vec3 scale = testTransform["Scale"];
+        {
+            EntityID e = CreateEntity();
+            AttachComponent(e, "Test");
+            AttachComponent(e, "Debug");
+            AttachComponent(e, "Transform");
+            ComponentWrapper testComponent = GetComponent(e, "Test");
+            int testValue = testComponent["TestInteger"];
+            float testFloat = testComponent["TestFloat"];
+            ComponentWrapper debugComponent = GetComponent(e, "Debug");
+            std::string name = debugComponent["Name"];
+            glm::vec3 pickingColor = debugComponent["PickingColor"];
+            ComponentWrapper testTransform = GetComponent(e, "Transform");
+            glm::vec3 pos = testTransform["Position"];
+            glm::quat ori = testTransform["Orientation"];
+            glm::vec3 scale = testTransform["Scale"];
+        }
+
+        {
+            EntityID entityTranslationWidget = CreateEntity();
+            AttachComponent(entityTranslationWidget, "Transform");
+            AttachComponent(entityTranslationWidget, "Model");
+            ComponentWrapper testTransform = GetComponent(entityTranslationWidget, "Transform");
+            glm::vec3 pos = testTransform["Position"];
+            glm::quat ori = testTransform["Orientation"];
+            glm::vec3 scale = testTransform["Scale"];
+            ComponentWrapper testModel = GetComponent(entityTranslationWidget, "Model");
+            std::string file = testModel["ModelFile"];
+            file = "Models/TranslationWidget.obj";
+            testModel["ModelFile"] = file;
+            glm::vec4 col = testModel["Color"];
+        }
+        {
+            EntityID entityScaleWidget = CreateEntity();
+            AttachComponent(entityScaleWidget, "Transform");
+            AttachComponent(entityScaleWidget, "Model");
+            ComponentWrapper testTransform = GetComponent(entityScaleWidget, "Transform");
+            glm::vec3 pos = testTransform["Position"];
+            pos = glm::vec3(-1.5f, 0.f, 0.f);
+            testTransform["Position"] = pos;
+            glm::quat ori = testTransform["Orientation"];
+            glm::vec3 scale = testTransform["Scale"];
+            ComponentWrapper testModel = GetComponent(entityScaleWidget, "Model");
+            std::string file = testModel["ModelFile"];
+            file = "Models/ScaleWidget.obj";
+            testModel["ModelFile"] = file;
+            glm::vec4 col = testModel["Color"];
+        }
+        {
+            EntityID entityRotationWidget = CreateEntity();
+            AttachComponent(entityRotationWidget, "Transform");
+            AttachComponent(entityRotationWidget, "Model");
+            ComponentWrapper testTransform = GetComponent(entityRotationWidget, "Transform");
+            glm::vec3 pos = testTransform["Position"];
+            pos = glm::vec3(1.5f, 0.f, 0.f);
+            testTransform["Position"] = pos;
+            glm::quat ori = testTransform["Orientation"];
+            glm::vec3 scale = testTransform["Scale"];
+            ComponentWrapper testModel = GetComponent(entityRotationWidget, "Model");
+            std::string file = testModel["ModelFile"];
+            file = "Models/RotationWidget.obj";
+            testModel["ModelFile"] = file;
+            glm::vec4 col = testModel["Color"];
+        }
+
+
+
     }
 };

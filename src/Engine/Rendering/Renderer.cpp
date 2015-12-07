@@ -15,7 +15,11 @@ void Renderer::Initialize()
 	InitializeShaders();
     InitializeTextures();
     InitializeFrameBuffers();
-	ModelsToDraw();
+
+
+    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
+    m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
+    m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
 }
 
 void Renderer::InitializeWindow()
@@ -76,54 +80,6 @@ void Renderer::InitializeShaders()
     m_DrawScreenQuadProgram.Compile();
     m_DrawScreenQuadProgram.Link();
 
-}
-
-void Renderer::ModelsToDraw()
-{
-    
-	m = ResourceManager::Load<Model>("Models/ScaleWidget.obj");
-	EnqueueModel(m);
-	m2 = ResourceManager::Load<Model>("Models/TranslationWidget.obj");
-	EnqueueModel(m2);
-	m3 = ResourceManager::Load<Model>("Models/RotationWidget.obj");
-	EnqueueModel(m3);
-    
-	m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
-	EnqueueModel(m_UnitSphere);
-    m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
-    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
-
-    MapModel = ResourceManager::Load<Model>("Models/DummyScene.obj");
-    EnqueueModel(MapModel);
-}
-
-void Renderer::EnqueueModel(Model* model)
-{
-	for (auto texGroup : model->TextureGroups)
-	{
-		ModelJob job;
-		job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-		job.DiffuseTexture = texGroup.Texture.get();
-		job.NormalTexture = texGroup.NormalMap.get();
-		job.SpecularTexture = texGroup.SpecularMap.get();
-		job.Model = model;
-		job.StartIndex = texGroup.StartIndex;
-		job.EndIndex = texGroup.EndIndex;
-		job.ModelMatrix =  model->m_Matrix;
-		//job.ModelMatrix = modelMatrix * model->m_Matrix; TODO: Render: Make sure modelMatrix work
-		//job.Color = modelComponent->Color; TODO: Render: Take color from kd in .mtl or a value from modelcomponent.
-		job.Color = glm::vec4(1.f);
-
-		//TODO: Render: Skeleton animations
-		//if (model->m_Skeleton != nullptr && animationComponent != nullptr) {
-		//	job.Skeleton = model->m_Skeleton;
-		//	job.AnimationName = animationComponent->Name;
-		//	job.AnimationTime = animationComponent->Time;
-		//	job.NoRootMotion = animationComponent->NoRootMotion;
-		//}
-
-		m_TempRQ.Forward.Add(job);
-	}
 }
 
 void Renderer::InputUpdate(double dt)
@@ -202,15 +158,16 @@ void Renderer::InputUpdate(double dt)
 void Renderer::Update(double dt)
 {
 	InputUpdate(dt);
+    
 }
 
 void Renderer::Draw(RenderQueueCollection& rq)
 {
     //TODO: Renderer: Kanske borde vara längst upp i update.
-    PickingPass();
+    PickingPass(rq);
     DrawScreenQuad(m_PickingTexture);
     
-   // DrawScene(rq);
+    DrawScene(rq);
 	glfwSwapBuffers(m_Window);
 }
 
@@ -227,14 +184,14 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //TODO: Render: Add code for more jobs than modeljobs.
-    for (auto &job : m_TempRQ.Forward) {
+    for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
         if (modelJob) {
             GLuint ShaderHandle = m_BasicForwardProgram.GetHandle();
 
             m_BasicForwardProgram.Bind();
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1)));
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
 
@@ -256,7 +213,7 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
     }
 }
 
-void Renderer::PickingPass()
+void Renderer::PickingPass(RenderQueueCollection& rq)
 {
     m_PickingBuffer.Bind();
 
@@ -274,7 +231,7 @@ void Renderer::PickingPass()
     GLuint ShaderHandle = m_PickingProgram.GetHandle();
     m_PickingProgram.Bind();
 
-    for (auto &job : m_TempRQ.Forward) {
+    for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
@@ -283,7 +240,7 @@ void Renderer::PickingPass()
 
             //Render picking stuff
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1)));
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
             glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(pickColor));
