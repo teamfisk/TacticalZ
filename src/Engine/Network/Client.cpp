@@ -1,4 +1,4 @@
-#include "Networking\Client.h"
+#include "Network\Client.h"
 
 Client::Client()
 {
