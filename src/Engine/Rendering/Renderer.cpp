@@ -125,10 +125,11 @@ void Renderer::InputUpdate(double dt)
       //  glm::vec3 worldPos = glm::vec3(glm::inverse(m_Camera->ViewMatrix()) * glm::vec4(viewPos, 1.f));
 
         //printf("R: %f, G: %f, Depth: %f\n", color.r, color.g, depth);
-        printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
+        //printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
 
         if (color != glm::vec2(0, 0)) {
-            const Model* pickModel = m_PickingColorsToModels[color];
+            EntityID pickedEntity = m_PickingColorsToEntity[color];
+            printf("Picked Entity: %i", pickedEntity);
 
         }
     }
@@ -237,7 +238,8 @@ void Renderer::PickingPass(RenderQueueCollection& rq)
 
         if (modelJob) {
             glm::vec2 pickColor = glm::vec2(r/255.f, g/255.f);
-            m_PickingColorsToModels[pickColor] = modelJob->Model;
+            m_PickingColorsToEntity[pickColor] = modelJob->Entity;
+            
 
             //Render picking stuff
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms

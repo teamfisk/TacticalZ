@@ -53,6 +53,9 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
            job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
            job.Color = color;
 
+           //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+           job.Entity = modelC.EntityID;
+
            renderQueue->Add(job);
        }
    }

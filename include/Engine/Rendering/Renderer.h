@@ -9,6 +9,7 @@
 #include "../Core/ResourceManager.h"
 #include "Util/UnorderedMapVec2.h"
 #include "Util/FrameBuffer.h"
+#include "../Core/World.h"
 
 class Renderer : public IRenderer
 {
@@ -32,7 +33,7 @@ private:
 
 
     
-    std::unordered_map<glm::vec2, const Model*> m_PickingColorsToModels;
+    std::unordered_map<glm::vec2, EntityID> m_PickingColorsToEntity;
 
 	//----------------------Functions----------------------//
 	void InitializeWindow();

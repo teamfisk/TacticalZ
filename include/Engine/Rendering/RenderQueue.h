@@ -7,6 +7,7 @@
 #include "../Common.h"
 #include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
+#include "../Core/EntityWrapper.h"
 
 class Model;
 class Skeleton;
@@ -36,6 +37,9 @@ struct ModelJob : RenderJob
 {
 	unsigned int ShaderID = 0;
 	unsigned int TextureID = 0;
+
+    //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+    EntityID Entity;
 
 	glm::mat4 ModelMatrix;
 	const Texture* DiffuseTexture;
