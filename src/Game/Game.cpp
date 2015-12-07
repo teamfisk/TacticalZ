@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "HardcodedTestWorld.h"
+#include "Network/Client.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -17,12 +18,12 @@ Game::Game(int argc, char* argv[])
 	m_Renderer = new Renderer();
 	m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
 	m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
-	m_Renderer->SetResolution(Rectangle(
+	m_Renderer->SetResolution(Rectangle::Rectangle(
 		0,
 		0,
 		m_Config->Get<int>("Video.Width", 1280),
 		m_Config->Get<int>("Video.Height", 720)
-	));
+		));
 	m_Renderer->Initialize();
 
 	// Create input manager
@@ -35,6 +36,15 @@ Game::Game(int argc, char* argv[])
 
     // Create a TEST WORLD
     m_World = new HardcodedTestWorld();
+
+	// TEMP: Invoke network
+	std::string inputMessage;
+	std::cout << "Start client or server? (c/s)" << std::endl;
+	std::cin >> inputMessage;
+	if (inputMessage == "c" || inputMessage == "C") {
+		Client client;
+		client.Start();
+	}
 
 	m_LastTime = glfwGetTime();
 }
