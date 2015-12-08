@@ -14,11 +14,7 @@ void Server::Start(World* world)
     m_World = world;
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         m_StopTimes[i] = std::clock();
-        m_PlayerPositions[i].x = -1;
-        m_PlayerPositions[i].y = -1;
     }
-    m_PlayerPositions[0].x = 0;
-    m_PlayerPositions[0].y = 0;
     boost::thread_group threads;
 
     std::cout << "I am Server. BIP BOP\n";
@@ -32,7 +28,7 @@ void Server::Start(World* world)
 
 void Server::DisplayLoop()
 {
-    int lengthOfMsg = -1;
+    int lengthOfMessage = -1;
     std::clock_t previousePingMessage = std::clock();
     std::clock_t previousSnapshotMessage = std::clock();
     std::clock_t timOutTimer = std::clock();
@@ -279,12 +275,13 @@ void Server::Disconnect(int i)
 {
     Broadcast("A player disconnected");
     std::cout << "Player " << i << " disconnected/Timed out" << std::endl;
+
+	// Remove enteties and stuff
     m_PlayerDefinitions[i].Endpoint = boost::asio::ip::udp::endpoint();
-    m_PlayerDefinitions[i].EntityID = -1;
-    m_PlayerDefinitions[i].Name = "Name not Set";
-    // Reset disconnected players position
-    m_PlayerPositions[i].x = -1;
-    m_PlayerPositions[i].y = -1;
+	m_PlayerDefinitions[i].EntityID = -1;
+    m_PlayerDefinitions[i].Name = "";
+
+
 }
 
 void Server::ParseEvent(char * data, size_t length)

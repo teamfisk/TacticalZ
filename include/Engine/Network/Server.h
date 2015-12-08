@@ -23,15 +23,12 @@ private:
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::socket m_Socket;
-  //  boost::asio::ip::udp::endpoint m_Connections[MAXCONNECTIONS];
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
     //Timers
     std::clock_t m_StartPingTime;
     std::clock_t m_StopTimes[8];
     // Game logic
-  //  std::string m_PlayerNames[MAXCONNECTIONS];
-    char m_GameBoard[BOARDSIZE][BOARDSIZE];
-    glm::vec2 m_PlayerPositions[8];
+
     World* m_World;
 
     // Threaded
