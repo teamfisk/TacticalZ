@@ -7,6 +7,7 @@ find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
 find_package(assimp REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
+find_package(Xerces REQUIRED)
 # Because FindOpenAL is retarded
 #set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/deps/include/AL")
 #find_package(OpenAL REQUIRED)
@@ -23,6 +24,7 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
     ${assimp_INCLUDE_DIRS}
     ${PNG_INCLUDE_DIRS}
+    ${Xerces_INCLUDE_DIRS}
     ${OPENAL_INCLUDE_DIR}
     ${X11_INCLUDE_DIRS}
 )
@@ -44,6 +46,12 @@ file(GLOB SOURCE_FILES_Input
 )
 source_group(Input FILES ${SOURCE_FILES_Input})
 
+file(GLOB SOURCE_FILES_Network
+    "${INCLUDE_PATH}/Network/*.h"
+    "Network/*.cpp"
+)
+source_group(Network FILES ${SOURCE_FILES_Network})
+
 file(GLOB SOURCE_FILES_Rendering
     "${INCLUDE_PATH}/Rendering/*.h"
     "Rendering/*.cpp"
@@ -52,6 +60,7 @@ file(GLOB SOURCE_FILES_Rendering_Util
     "${INCLUDE_PATH}/Rendering/Util/*.h"
     "Rendering/Util/*.cpp"
 )
+
 source_group(Rendering FILES ${SOURCE_FILES_Rendering})
 source_group(Rendering\\Util FILES ${SOURCE_FILES_Rendering_Util})
 
@@ -65,8 +74,10 @@ set(SOURCE_FILES
     ${SOURCE_FILES_Core}
     ${SOURCE_FILES_Core_Util}
     #${SOURCE_FILES_Input}
+	${SOURCE_FILES_Network}
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
+    ${SOURCE_FILES_Rendering_Util}
 )
 
 set(LIBRARIES
@@ -76,6 +87,7 @@ set(LIBRARIES
     ${Boost_LIBRARIES}
     ${assimp_LIBRARIES}
     ${PNG_LIBRARIES}
+    ${Xerces_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${X11_LIBRARIES}
 )

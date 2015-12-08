@@ -168,6 +168,7 @@ void OctTree::AddBox(const AABB& box)
 }
 
 //remove the content (boxes) in the tree, but dont rememove the tree-structure
+//TODO: Only clear dynamic boxes, AddDynamic, AddStatic
 void OctTree::ClearBoxes()
 {
     if (hasChildren()) {
