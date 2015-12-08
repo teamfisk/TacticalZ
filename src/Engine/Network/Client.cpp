@@ -157,7 +157,7 @@ void Client::ParseSnapshot(char* data, size_t length)
 			// Someone disconnected
 			// TODO: Insert code here
 		}
-		else {
+		else if (m_PlayerDefinitions[i].Name == "" && tempName == "") {
 			// Not a connected player
 			break;
 		}
