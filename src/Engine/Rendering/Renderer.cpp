@@ -15,7 +15,11 @@ void Renderer::Initialize()
 	InitializeShaders();
     InitializeTextures();
     InitializeFrameBuffers();
-	ModelsToDraw();
+
+
+    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
+    m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
+    m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
 }
 
 void Renderer::InitializeWindow()
@@ -78,54 +82,6 @@ void Renderer::InitializeShaders()
 
 }
 
-void Renderer::ModelsToDraw()
-{
-    
-	m = ResourceManager::Load<Model>("Models/ScaleWidget.obj");
-	EnqueueModel(m);
-	m2 = ResourceManager::Load<Model>("Models/TranslationWidget.obj");
-	EnqueueModel(m2);
-	m3 = ResourceManager::Load<Model>("Models/RotationWidget.obj");
-	EnqueueModel(m3);
-    
-	m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
-	EnqueueModel(m_UnitSphere);
-    m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
-    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
-
-    MapModel = ResourceManager::Load<Model>("Models/DummyScene.obj");
-    EnqueueModel(MapModel);
-}
-
-void Renderer::EnqueueModel(Model* model)
-{
-	for (auto texGroup : model->TextureGroups)
-	{
-		ModelJob job;
-		job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-		job.DiffuseTexture = texGroup.Texture.get();
-		job.NormalTexture = texGroup.NormalMap.get();
-		job.SpecularTexture = texGroup.SpecularMap.get();
-		job.Model = model;
-		job.StartIndex = texGroup.StartIndex;
-		job.EndIndex = texGroup.EndIndex;
-		job.ModelMatrix =  model->m_Matrix;
-		//job.ModelMatrix = modelMatrix * model->m_Matrix; TODO: Render: Make sure modelMatrix work
-		//job.Color = modelComponent->Color; TODO: Render: Take color from kd in .mtl or a value from modelcomponent.
-		job.Color = glm::vec4(1.f);
-
-		//TODO: Render: Skeleton animations
-		//if (model->m_Skeleton != nullptr && animationComponent != nullptr) {
-		//	job.Skeleton = model->m_Skeleton;
-		//	job.AnimationName = animationComponent->Name;
-		//	job.AnimationTime = animationComponent->Time;
-		//	job.NoRootMotion = animationComponent->NoRootMotion;
-		//}
-
-		m_TempRQ.Forward.Add(job);
-	}
-}
-
 void Renderer::InputUpdate(double dt)
 {
 	glm::vec3 m_Position = m_Camera->Position();
@@ -161,7 +117,7 @@ void Renderer::InputUpdate(double dt)
     static double mousePosX, mousePosY;
     glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
     if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-        glm::vec3 data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, m_PickingBuffer, m_DepthBuffer);
+        glm::vec3 data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, &m_PickingBuffer, m_DepthBuffer);
         glm::vec2 color = glm::vec2(data);
         float depth = data.z;
         
@@ -172,7 +128,8 @@ void Renderer::InputUpdate(double dt)
         //printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
 
         if (color != glm::vec2(0, 0)) {
-            const Model* pickModel = m_PickingColorsToModels[color];
+            EntityID pickedEntity = m_PickingColorsToEntity[color];
+            printf("Picked Entity: %i", pickedEntity);
 
         }
     }
@@ -202,15 +159,16 @@ void Renderer::InputUpdate(double dt)
 void Renderer::Update(double dt)
 {
 	InputUpdate(dt);
+    
 }
 
 void Renderer::Draw(RenderQueueCollection& rq)
 {
     //TODO: Renderer: Kanske borde vara längst upp i update.
-    PickingPass();
+    PickingPass(rq);
     DrawScreenQuad(m_PickingTexture);
-    //DrawScreenQuad(m_DepthBuffer);
-    //DrawScene(rq);
+    
+    DrawScene(rq);
 	glfwSwapBuffers(m_Window);
 }
 
@@ -227,16 +185,17 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //TODO: Render: Add code for more jobs than modeljobs.
-    for (auto &job : m_TempRQ.Forward) {
+    for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
         if (modelJob) {
             GLuint ShaderHandle = m_BasicForwardProgram.GetHandle();
 
             m_BasicForwardProgram.Bind();
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1)));
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
+            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
 
             //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
             if (modelJob->DiffuseTexture != nullptr) {
@@ -256,9 +215,9 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
     }
 }
 
-void Renderer::PickingPass()
+void Renderer::PickingPass(RenderQueueCollection& rq)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_PickingBuffer);
+    m_PickingBuffer.Bind();
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -274,16 +233,17 @@ void Renderer::PickingPass()
     GLuint ShaderHandle = m_PickingProgram.GetHandle();
     m_PickingProgram.Bind();
 
-    for (auto &job : m_TempRQ.Forward) {
+    for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
             glm::vec2 pickColor = glm::vec2(r/255.f, g/255.f);
-            m_PickingColorsToModels[pickColor] = modelJob->Model;
+            m_PickingColorsToEntity[pickColor] = modelJob->Entity;
+            
 
             //Render picking stuff
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(glm::mat4(1)));
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
             glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(pickColor));
@@ -298,7 +258,7 @@ void Renderer::PickingPass()
             }
         }
     }
-
+    m_PickingBuffer.Unbind();
 }
 
 
@@ -328,35 +288,42 @@ void Renderer::InitializeTextures()
 {
     m_ErrorTexture=ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
     m_WhiteTexture=ResourceManager::Load<Texture>("Textures/Core/Blank.png");
-
+    /*
     glGenTextures(1, &m_PickingTexture);
     glBindTexture(GL_TEXTURE_2D, m_PickingTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, m_Resolution.Width, m_Resolution.Height, 0, GL_RGB, GL_FLOAT, NULL);//TODO: Renderer: Fix the precision and Resolution
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, m_Resolution.Width, m_Resolution.Height, 0, GL_RG, GL_FLOAT, NULL);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("m_PickingTexture initialization failed");
+    */
+
+    GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
+        glm::vec2(m_Resolution.Width, m_Resolution.Height), GL_RG8, GL_RG, GL_FLOAT);
 }
+
+void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
+{
+    glGenTextures(1, texture);
+    glBindTexture(GL_TEXTURE_2D, *texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, NULL);//TODO: Renderer: Fix the precision and Resolution
+    GLERROR("Texture initialization failed");
+}
+
+
 
 void Renderer::InitializeFrameBuffers()//TODO: Renderer: Get this to a better location, as its really big
 {
     glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Resolution.Width, m_Resolution.Height);
-
-
-    glGenFramebuffers(1, &m_PickingBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_PickingBuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_DepthBuffer);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_PickingTexture, 0);
-    GLenum PickingBufferTextures[] = { GL_COLOR_ATTACHMENT0 };
-    glDrawBuffers(1, PickingBufferTextures);
-
-    if (GLenum fbStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        LOG_ERROR("m_FbDeferred2 incomplete: 0x%x\n", fbStatus);
-        exit(EXIT_FAILURE);
-    }
-
-
+    
+    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
+    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
+    m_PickingBuffer.Generate();
 }

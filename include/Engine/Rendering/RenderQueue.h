@@ -7,6 +7,7 @@
 #include "../Common.h"
 #include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
+#include "../Core/EntityWrapper.h"
 
 class Model;
 class Skeleton;
@@ -36,6 +37,9 @@ struct ModelJob : RenderJob
 {
 	unsigned int ShaderID = 0;
 	unsigned int TextureID = 0;
+
+    //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+    EntityID Entity;
 
 	glm::mat4 ModelMatrix;
 	const Texture* DiffuseTexture;
@@ -82,30 +86,7 @@ struct PointLightJob : RenderJob
 	glm::vec3 SpecularColor = glm::vec3(1, 1, 1);
 	glm::vec3 DiffuseColor = glm::vec3(1, 1, 1);
 	float Radius = 1.f;
-
-	void CalculateHash() override
-	{
-		Hash = 0;
-	}
-};
-
-struct FrameJob : SpriteJob
-{
-	Rectangle Scissor;
-	Rectangle Viewport;
-	std::string Name;
-
-	void CalculateHash() override
-	{
-		Hash = 0;
-	}
-};
-
-struct WaterParticleJob : RenderJob
-{
-	glm::vec3 Position;
-	glm::vec4 Color;
-	glm::mat4 ModelMatrix;
+    float Intensity = 0.8f;
 
 	void CalculateHash() override
 	{
@@ -154,25 +135,19 @@ private:
 
 struct RenderQueueCollection
 {
-	RenderQueue Deferred;
 	RenderQueue Forward;
 	RenderQueue Lights;
-	RenderQueue GUI;
 
 	void Clear()
 	{
-		Deferred.Clear();
 		Forward.Clear();
 		Lights.Clear();
-		GUI.Clear();
 	}
 
 	void Sort()
 	{
-		Deferred.Sort();
 		Forward.Sort();
 		Lights.Sort();
-		GUI.Sort();
 	}
 };
 

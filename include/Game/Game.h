@@ -8,6 +8,7 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
+#include "Rendering/RenderQueueFactory.h"
 
 class Game
 {
@@ -26,6 +27,7 @@ private:
 	InputManager* m_InputManager;
 	GUI::Frame* m_FrameStack;
     World* m_World;
+    RenderQueueFactory* m_RenderQueueFactory;
 };
 
 #endif

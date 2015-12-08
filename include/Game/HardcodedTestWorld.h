@@ -20,6 +20,7 @@ private:
     void registerTestComponents()
     {
         ComponentWrapperFactory f;
+            
 
         f = ComponentWrapperFactory("Test");
         f.AddProperty("TestInteger", 1337);
@@ -74,5 +75,31 @@ private:
             glm::vec3 scale = transform["Scale"];
             std::cout << "Scale: " << scale.x << " " << scale.y << " " << scale.z << std::endl;
         }
+        
+        //Create some test widgets
+        {
+            EntityID entityScaleWidget = world.CreateEntity();
+            ComponentWrapper transform = world.AttachComponent(entityScaleWidget, "Transform");
+            transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
+            ComponentWrapper model = world.AttachComponent(entityScaleWidget, "Model");
+            model["Resource"] = "Models/ScaleWidget.obj";
+        }
+        {
+            EntityID entityRotationWidget = world.CreateEntity();
+            ComponentWrapper transform = world.AttachComponent(entityRotationWidget, "Transform");
+            transform["Position"] = glm::vec3(1.5f, 0.f, 0.f);
+            ComponentWrapper model = world.AttachComponent(entityRotationWidget, "Model");
+            model["Resource"] = "Models/RotationWidget.obj";
+        }
+        {
+            EntityID entityDummyScene = world.CreateEntity();
+            ComponentWrapper transform = world.AttachComponent(entityDummyScene, "Transform");
+            transform["Position"] = glm::vec3(0, 0.f, 0.f);
+            ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
+            model["Resource"] = "Models/DummyScene.obj";
+        }
+
+
+
     }
 };
