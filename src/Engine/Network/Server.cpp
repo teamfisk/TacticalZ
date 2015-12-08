@@ -203,14 +203,19 @@ void Server::Broadcast(char * data, size_t length)
 
 void Server::SendSnapshot()
 {
-    char* data = new char[128];
+    char* data = new char[INPUTSIZE];
     int offset = CreateHeader(MessageType::Snapshot, data);
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-        memcpy(data + offset, &m_PlayerPositions[i].x, sizeof(float));
+		// Pack player pos into data package
+		glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
+        memcpy(data + offset, &playerPos.x, sizeof(float));
         offset += sizeof(float);
-        memcpy(data + offset, &m_PlayerPositions[i].y, sizeof(float));
+        memcpy(data + offset, &playerPos.y, sizeof(float));
         offset += sizeof(float);
+		memcpy(data + offset, &playerPos.z, sizeof(float));
+		offset += sizeof(float);
         // +1 for null terminator
+		// Pack player name into data package
         memcpy(data + offset, m_PlayerDefinitions[i].Name.data(), m_PlayerDefinitions[i].Name.size() + 1);
         offset += (m_PlayerDefinitions[i].Name.size() + 1) * sizeof(char);
     }

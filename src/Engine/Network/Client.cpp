@@ -19,10 +19,11 @@ Client::~Client()
     _CrtDumpMemoryLeaks();
 }
 
-void Client::Start(EventBroker* eventBroker)
+void Client::Start(World* world, EventBroker* eventBroker)
 {
 	// Subscribe to events
 	m_EventBroker = eventBroker;
+	m_World = world;
 	m_EKeyDown = decltype(m_EKeyDown)(std::bind(&Client::OnKeyDown, this, std::placeholders::_1));
 	m_EventBroker->Subscribe(m_EKeyDown);
 	std::cout << "Please enter you name: ";
@@ -34,24 +35,10 @@ void Client::Start(EventBroker* eventBroker)
 
 	boost::thread_group threads;
 
-	for (size_t i = 0; i < BOARDSIZE; i++) {
-		for (size_t j = 0; j < BOARDSIZE; j++) {
-			m_GameBoard[j][i] = ' ';
-		}
-	}
-
-	for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-		m_PlayerPositions[i].x = -1;
-		m_PlayerPositions[i].y = -1;
-		m_PlayerNames[i] = "X";
-	}
-
 	m_Socket.connect(m_ReceiverEndpoint);
 	std::cout << "I am client. BIP BOP\n";
 
-	threads.create_thread(boost::bind(&Client::DisplayLoop, this));
 	threads.create_thread(boost::bind(&Client::ReadFromServer, this));
-	//threads.create_thread(boost::bind(&Client::InputLoop, this));
 
 	threads.join_all();
 }
@@ -61,47 +48,6 @@ void Client::Close()
     Disconnect();
     m_ThreadIsRunning = false;
     m_Socket.close();
-}
-
-void Client::InputLoop()
-{
-	int intervallMs = 33; // ~30 times per second
-	int commandInterval = 200; // for commands like ping and connect, name might be ambigiuos
-	std::clock_t previousInputTime = std::clock();
-	std::clock_t previousCommandTime = std::clock();
-
-	while (m_ThreadIsRunning) {
-
-		std::clock_t currentTime = std::clock();
-		int testTimeShit = (1000 * (currentTime - previousCommandTime) / (double)CLOCKS_PER_SEC);
-		if (commandInterval < (1000 * (currentTime - previousCommandTime) / (double)CLOCKS_PER_SEC)) {
-			SendDebugInput();
-			previousCommandTime = currentTime;
-		}
-
-		int testTimeShit2 = (1000 * (currentTime - previousInputTime) / (double)CLOCKS_PER_SEC);
-		if (intervallMs < (1000 * (currentTime - previousInputTime) / (double)CLOCKS_PER_SEC)) {
-			if (m_PlayerID != -1) {
-				//SendInput();
-			}
-			previousInputTime = currentTime;
-		}
-	}
-}
-
-void Client::DisplayLoop()
-{
-	while (m_ThreadIsRunning) {
-		// Update gameboard
-		for (size_t i = 0; i < BOARDSIZE; i++) {
-			for (size_t j = 0; j < BOARDSIZE; j++) {
-				m_GameBoard[j][i] = ' ';
-			}
-		}
-		if (m_ShouldDrawGameBoard)
-			//DrawBoard();
-		boost::this_thread::sleep(boost::posix_time::millisec(100));
-	}
 }
 
 void Client::ReadFromServer()
@@ -183,7 +129,7 @@ void Client::ParseEventMessage(char* data, size_t length)
 		memcpy(&Id, data, sizeof(int));
 		MoveMessageHead(data, length, sizeof(int));
 		// Sett Player name
-		m_PlayerNames[Id] = command.erase(0, 7);
+		m_PlayerDefinitions[Id].Name = command.erase(0, 7);
 	}
 	else {
 		std::cout << "Event message: " << std::string(data) << std::endl;
@@ -196,40 +142,37 @@ void Client::ParseSnapshot(char* data, size_t length)
 {
 	std::string tempName;
 	for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-		memcpy(&m_PlayerPositions[i].x, data, sizeof(float));
+		// We're checking for empty name for now. This might not be the best way,
+		// but it is to avoid sending redundant data.
+
+		// Read position data
+		glm::vec3 playerPos;
+		memcpy(&playerPos.x, data, sizeof(float));
 		MoveMessageHead(data, length, sizeof(float));
-		memcpy(&m_PlayerPositions[i].y, data, sizeof(float));
+		memcpy(&playerPos.y, data, sizeof(float));
 		MoveMessageHead(data, length, sizeof(float));
+		memcpy(&playerPos.z, data, sizeof(float));
+		MoveMessageHead(data, length, sizeof(float));
+		
 		tempName = std::string(data);
-		m_PlayerNames[i] = tempName;
 		// +1 for null terminator
 		MoveMessageHead(data, length, tempName.size() + 1);
-	}
-}
 
-void Client::DrawBoard()
-{
-	for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-		if (m_PlayerPositions[i].x != -1 && m_PlayerPositions[i].y != -1) {
-			m_GameBoard[static_cast<int>(m_PlayerPositions[i].x)][static_cast<int>(m_PlayerPositions[i].y)] = m_PlayerNames[i][0];
+		// Apply the position data read to the player entity
+		// New player connected on the server side 
+		if (m_PlayerDefinitions[i].Name == "" && tempName != "") { 
+			CreateNewPlayer(i);
 		}
-	}
-
-	system("cls");
-	for (size_t i = 0; i < BOARDSIZE; i++) {
-		std::cout << '_';
-	}
-
-	std::cout << std::endl;
-	for (size_t i = 0; i < BOARDSIZE; i++) {
-		for (size_t j = 0; j < BOARDSIZE; j++) {
-			std::cout << m_GameBoard[j][i];
+		else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
+			// Someone disconnected
+			// TODO: Insert code here
 		}
-		std::cout << std::endl;
-	}
-
-	for (size_t i = 0; i < BOARDSIZE; i++) {
-		std::cout << "^";
+		else {
+			// Not a connected player
+			break;
+		}
+		m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
+		m_PlayerDefinitions[i].Name = tempName;
 	}
 }
 
@@ -288,22 +231,6 @@ void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 	length -= stepSize;
 }
 
-void Client::SendDebugInput()
-{
-	char* dataPackage = new char[INPUTSIZE];
-	if (GetAsyncKeyState('P')) { // Maybe use previous key here
-		int length = CreateMessage(MessageType::ClientPing, "Ping", dataPackage);
-		m_StartPingTime = std::clock();
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			length),
-			m_ReceiverEndpoint, 0);
-	}
-
-	memset(dataPackage, 0, INPUTSIZE);
-	delete[] dataPackage;
-}
-
 bool Client::OnKeyDown(const Events::KeyDown& event)
 {
 	char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
@@ -345,4 +272,12 @@ bool Client::OnKeyDown(const Events::KeyDown& event)
 	memset(dataPackage, 0, INPUTSIZE);
 	delete[] dataPackage;
 	return true;
+}
+
+void Client::CreateNewPlayer(int i)
+{
+	m_PlayerDefinitions[i].EntityID = m_World->CreateEntity();
+	ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Transform");
+	ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Model");
+	model["Resource"] = "Models/Core/UnitSphere.obj";
 }

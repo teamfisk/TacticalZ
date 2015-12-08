@@ -11,7 +11,9 @@
 
 #include "Network/MessageType.h"
 #include "Network/NetworkDefines.h"
+#include "Network/PlayerDefinition.h"
 #include "Network/WinLeakCheck.h"
+#include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Core/EKeyDown.h"
 
@@ -21,14 +23,12 @@ class Client
 public:
 	Client();
 	~Client();
-	void Start(EventBroker* eventBroker);
+	void Start(World* world, EventBroker* eventBroker);
     void Close();
 
 private:
 	// Threaded
-	void DisplayLoop();
 	void ReadFromServer();
-	void InputLoop();
 
 	int Receive(char* data, size_t length);
 	int CreateMessage(MessageType type, std::string message, char* data);
@@ -41,19 +41,19 @@ private:
 	void ParsePing();
 	void ParseServerPing();
 	void ParseSnapshot(char* data, size_t length);
-	//void SendInput();
-	void SendDebugInput();
-	void DrawBoard();
+	void CreateNewPlayer(int i);
 
 	// udp stuff
 	boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
 	boost::asio::io_service m_IOService;
 	boost::asio::ip::udp::socket m_Socket;
 
+	World* m_World;
 	int m_PlayerID = -1;
 	char m_GameBoard[BOARDSIZE][BOARDSIZE];
 	glm::vec2 m_PlayerPositions[MAXCONNECTIONS];
-	std::string m_PlayerNames[MAXCONNECTIONS];
+	//std::string m_PlayerNames[MAXCONNECTIONS];
+	PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
 	std::clock_t m_StartPingTime;
 	double m_DurationOfPingTime;
 	bool m_ShouldDrawGameBoard = true;

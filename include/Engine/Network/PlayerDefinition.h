@@ -3,8 +3,8 @@
 #include <string>
 
 struct PlayerDefinition {
-    unsigned int EntityID;
-    std::string Name;
+    unsigned int EntityID = -1;
+    std::string Name = "";
     boost::asio::ip::udp::endpoint Endpoint;
 };
 
