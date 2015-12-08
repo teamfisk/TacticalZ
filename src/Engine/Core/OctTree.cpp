@@ -166,6 +166,7 @@ void OctTree::AddBox(const AABB& box)
     }
 }
 
+//TODO: Only clear dynamic boxes, AddDynamic, AddStatic
 void OctTree::ClearBoxes()
 {
     if (hasChildren()) {
