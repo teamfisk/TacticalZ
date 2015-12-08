@@ -74,6 +74,7 @@ OctTree::~OctTree()
 {
     for (OctTree*& c : m_Children) {
         if (c != nullptr) {
+            //recursively delete (this calls the deconstructor again)
             delete c;
             c = nullptr;
         }
@@ -166,6 +167,7 @@ void OctTree::AddBox(const AABB& box)
     }
 }
 
+//remove the content (boxes) in the tree, but dont rememove the tree-structure
 void OctTree::ClearBoxes()
 {
     if (hasChildren()) {
