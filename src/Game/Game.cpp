@@ -1,8 +1,11 @@
 #include "Game.h"
+#include "HardcodedTestWorld.h"
 
 Game::Game(int argc, char* argv[])
 {
 	ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+	ResourceManager::RegisterType<Model>("Model");
+	ResourceManager::RegisterType<Texture>("Texture");
 
 	m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
 	LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -10,8 +13,10 @@ Game::Game(int argc, char* argv[])
 	// Create the core event broker
 	m_EventBroker = new EventBroker();
 
+    m_RenderQueueFactory = new RenderQueueFactory();
+
 	// Create the renderer
-	m_Renderer = new DummyRenderer();
+	m_Renderer = new Renderer();
 	m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
 	m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
 	m_Renderer->SetResolution(Rectangle(
@@ -30,6 +35,9 @@ Game::Game(int argc, char* argv[])
 	m_FrameStack->Width = m_Renderer->Resolution().Width;
 	m_FrameStack->Height = m_Renderer->Resolution().Height;
 
+    // Create a TEST WORLD
+    m_World = new HardcodedTestWorld();
+
 	m_LastTime = glfwGetTime();
 }
 
@@ -47,10 +55,12 @@ void Game::Tick()
 
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
+	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
-	RenderQueueCollection rq;
-	m_Renderer->Draw(rq);
+    m_RenderQueueFactory->Update(m_World);
+
+	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
 
 	m_EventBroker->Swap();
 	m_EventBroker->Clear();
