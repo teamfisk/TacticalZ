@@ -12,31 +12,15 @@ public:
     HardcodedTestWorld()
         : World()
     {
-        registerTestComponents();
+        ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+        ResourceManager::Load<EntityXMLFile>("Schema/Entities/Test.xml")->PopulateWorld(this);
+        
         createTestEntities();
     }
 
 private:
-    void registerTestComponents()
-    {
-        ComponentWrapperFactory f;
-            
-        f = ComponentWrapperFactory("Test");
-        f.AddProperty("TestInteger", 1337);
-        f.AddProperty("TestFloat", 13.37f);
-        f.AddProperty("TestString", std::string("Carlito"));
-        RegisterComponent(f);
-
-        f = ComponentWrapperFactory("Debug");
-        f.AddProperty("Name", std::string("Unnamed"));
-        RegisterComponent(f);
-    }
-
     void createTestEntities()
     {
-        ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
-        ResourceManager::Load<EntityXMLFile>("Schema/Entities/Test.xml")->PopulateWorld(this);
-
         //Create some test widgets
         {
             EntityID entityScaleWidget = CreateEntity();
