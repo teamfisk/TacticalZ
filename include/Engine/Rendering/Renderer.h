@@ -8,6 +8,8 @@
 //TODO: Temp resourceManager
 #include "../Core/ResourceManager.h"
 #include "Util/UnorderedMapVec2.h"
+#include "FrameBuffer.h"
+#include "../Core/World.h"
 
 class Renderer : public IRenderer
 {
@@ -18,11 +20,10 @@ public:
 
 private:
 	//----------------------Variables----------------------//
-	RenderQueueCollection m_TempRQ;
 	Texture* m_ErrorTexture;
 	Texture* m_WhiteTexture;
 	float m_CameraMoveSpeed;
-    GLuint m_PickingBuffer;
+    FrameBuffer m_PickingBuffer;
     GLuint m_PickingTexture;
     GLuint m_DepthBuffer;
 
@@ -30,29 +31,23 @@ private:
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-    //Temporary
-    Model* m;
-    Model* m2;
-    Model* m3;
-    Model* MapModel;
 
     
-    std::unordered_map<glm::vec2, const Model*> m_PickingColorsToModels;
+    std::unordered_map<glm::vec2, EntityID> m_PickingColorsToEntity;
 
 	//----------------------Functions----------------------//
 	void InitializeWindow();
 	void InitializeShaders();
     void InitializeTextures();
     void InitializeFrameBuffers();
-	//TODO: Renderer: Remove ModelsToDraw from Renderer.
-	void ModelsToDraw();
-    //TODO: Renderer: Get EnqueueModel and InputUpdate out of renderer
-	void EnqueueModel(Model* model);
+    //TODO: Renderer: Get InputUpdate out of renderer
 	void InputUpdate(double dt);
-    void PickingPass();
+    void PickingPass(RenderQueueCollection& rq);
     void DrawScreenQuad(GLuint textureToDraw);
     void DrawScene(RenderQueueCollection& rq);
 
+
+    void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram m_BasicForwardProgram;
     ShaderProgram m_PickingProgram;

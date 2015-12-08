@@ -8,6 +8,7 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
+#include "Rendering/RenderQueueFactory.h"
 // Network
 #include <boost/thread.hpp>
 #include "Network/Client.h"
@@ -29,7 +30,8 @@ private:
 	InputManager* m_InputManager;
 	GUI::Frame* m_FrameStack;
     World* m_World;
-    // Network viriables
+    RenderQueueFactory* m_RenderQueueFactory;
+    // Network variables
     boost::thread m_NetworkThread;
     Client m_Client;
 
