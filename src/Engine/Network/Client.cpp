@@ -12,7 +12,8 @@ Client::Client() : m_Socket(m_IOService)
 
 Client::~Client()
 {
-
+    // will it work on linux? #if defined (_WIN64) | defined(_WIN32) otherwise.
+    _CrtDumpMemoryLeaks();
 }
 
 void Client::Start()
@@ -25,7 +26,6 @@ void Client::Start()
 	}
 
 	boost::thread_group threads;
-	socket_ptr sock(new udp::socket(m_IOService));
 
 	for (size_t i = 0; i < BOARDSIZE; i++) {
 		for (size_t j = 0; j < BOARDSIZE; j++) {
@@ -53,6 +53,7 @@ void Client::Close()
 {
     Disconnect();
     m_ThreadIsRunning = false;
+    m_Socket.close();
 }
 
 void Client::InputLoop()
@@ -154,15 +155,16 @@ void Client::ParsePing()
 
 void Client::ParseServerPing()
 {
-	char* testMsg = new char[128];
-	int testOffset = CreateMessage(MessageType::ServerPing, "Ping recieved", testMsg);
+	char* testMessage = new char[128];
+	int testOffset = CreateMessage(MessageType::ServerPing, "Ping recieved", testMessage);
 
 	//std::cout << "Parsing ping." << std::endl;
 
 	m_Socket.send_to(boost::asio::buffer(
-		testMsg,
+        testMessage,
 		testOffset),
 		m_ReceiverEndpoint, 0);
+    delete[] testMessage;
 }
 
 void Client::ParseEventMessage(char* data, size_t length)
@@ -250,6 +252,18 @@ int Client::CreateMessage(MessageType type, std::string message, char* data)
 	return offset;
 }
 
+void Client::Connect()
+{
+    char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
+    int length = CreateMessage(MessageType::Connect, m_PlayerName, dataPackage);
+    m_StartPingTime = std::clock();
+    m_Socket.send_to(boost::asio::buffer(
+        dataPackage,
+        length),
+        m_ReceiverEndpoint, 0);
+    delete[] dataPackage;
+}
+
 void Client::Disconnect()
 {
     char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
@@ -258,6 +272,7 @@ void Client::Disconnect()
         dataPackage,
         len),
         m_ReceiverEndpoint, 0);
+    delete[] dataPackage;
 }
 
 void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
@@ -279,16 +294,11 @@ void Client::SendDebugInput()
 	}
 
 	if (GetAsyncKeyState('C')) {
-		int length = CreateMessage(MessageType::Connect, m_PlayerName, dataPackage);
-		m_StartPingTime = std::clock();
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			length),
-			m_ReceiverEndpoint, 0);
+        Connect();
 	}
 
-	if (GetAsyncKeyState('Q')) { // Does not work. Plez fix
-		exit(1);
+	if (GetAsyncKeyState('Q')) { 
+        Disconnect();
 	}
 	memset(dataPackage, 0, INPUTSIZE);
 	delete[] dataPackage;

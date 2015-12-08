@@ -80,4 +80,7 @@ void Game::NetworkFunction()
     if (inputMessage == "c" || inputMessage == "C") {
         m_Client.Start();
     }
+    if (inputMessage == "s" || inputMessage == "S") {
+        m_Server.Start();
+    }
 }
