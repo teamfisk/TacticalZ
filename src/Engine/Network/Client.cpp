@@ -49,6 +49,12 @@ void Client::Start()
 	threads.join_all();
 }
 
+void Client::Close()
+{
+    Disconnect();
+    m_ThreadIsRunning = false;
+}
+
 void Client::InputLoop()
 {
 	int intervallMs = 33; // ~30 times per second
@@ -56,7 +62,7 @@ void Client::InputLoop()
 	std::clock_t previousInputTime = std::clock();
 	std::clock_t previousCommandTime = std::clock();
 
-	while (true) {
+	while (m_ThreadIsRunning) {
 
 		std::clock_t currentTime = std::clock();
 		int testTimeShit = (1000 * (currentTime - previousCommandTime) / (double)CLOCKS_PER_SEC);
@@ -77,7 +83,7 @@ void Client::InputLoop()
 
 void Client::DisplayLoop()
 {
-	while (true) {
+	while (m_ThreadIsRunning) {
 		// Update gameboard
 		for (size_t i = 0; i < BOARDSIZE; i++) {
 			for (size_t j = 0; j < BOARDSIZE; j++) {
@@ -95,7 +101,7 @@ void Client::ReadFromServer()
 	int bytesRead = -1;
 	char readBuf[1024] = { 0 };
 
-	for (;;) {
+	while (m_ThreadIsRunning) {
 		if (m_Socket.available()) {
 			bytesRead = Receive(readBuf, INPUTSIZE);
 			ParseMessageType(readBuf, bytesRead);
@@ -244,6 +250,16 @@ int Client::CreateMessage(MessageType type, std::string message, char* data)
 	return offset;
 }
 
+void Client::Disconnect()
+{
+    char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
+    int len = CreateMessage(MessageType::Disconnect, "+Disconnect", dataPackage);
+    m_Socket.send_to(boost::asio::buffer(
+        dataPackage,
+        len),
+        m_ReceiverEndpoint, 0);
+}
+
 void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 {
 	data += stepSize;
@@ -310,11 +326,7 @@ void Client::SendInput()
 			m_ReceiverEndpoint, 0);
 	}
 	if (GetAsyncKeyState('V')) {
-		int len = CreateMessage(MessageType::Disconnect, "+Disconnect", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
+        Disconnect();
 	}
 
 	memset(dataPackage, 0, INPUTSIZE);

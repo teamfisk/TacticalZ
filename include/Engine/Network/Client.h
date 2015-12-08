@@ -18,6 +18,7 @@ public:
 	Client();
 	~Client();
 	void Start();
+    void Close();
 
 private:
 	// Threaded
@@ -27,6 +28,7 @@ private:
 
 	int Receive(char* data, size_t length);
 	int CreateMessage(MessageType type, std::string message, char* data);
+    void Disconnect();
 	void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
 	void ParseMessageType(char* data, size_t length);
 	void ParseEventMessage(char* data, size_t length);
@@ -51,6 +53,7 @@ private:
 	double m_DurationOfPingTime;
 	bool m_ShouldDrawGameBoard = true;
 	std::string m_PlayerName;
+    bool m_ThreadIsRunning = true;
 };
 
 #endif

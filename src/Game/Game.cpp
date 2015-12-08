@@ -1,6 +1,5 @@
 #include "Game.h"
 #include "HardcodedTestWorld.h"
-#include "Network/Client.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -38,13 +37,7 @@ Game::Game(int argc, char* argv[])
     m_World = new HardcodedTestWorld();
 
 	// TEMP: Invoke network
-	std::string inputMessage;
-	std::cout << "Start client or server? (c/s)" << std::endl;
-	std::cin >> inputMessage;
-	if (inputMessage == "c" || inputMessage == "C") {
-		Client client;
-		client.Start();
-	}
+    boost::thread workerThread(&Game::NetworkFunction, this);
 
 	m_LastTime = glfwGetTime();
 }
@@ -53,6 +46,7 @@ Game::~Game()
 {
 	delete m_FrameStack;
 	delete m_EventBroker;
+    m_Client.Close();
 }
 
 void Game::Tick()
@@ -74,4 +68,14 @@ void Game::Tick()
 	m_EventBroker->Clear();
 
 	glfwPollEvents();
+}
+
+void Game::NetworkFunction()
+{ 
+    std::string inputMessage;
+    std::cout << "Start client or server? (c/s)" << std::endl;
+    std::cin >> inputMessage;
+    if (inputMessage == "c" || inputMessage == "C") {
+        m_Client.Start();
+    }
 }

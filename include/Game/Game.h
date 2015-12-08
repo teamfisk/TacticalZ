@@ -8,6 +8,9 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
+// Network
+#include <boost/thread.hpp>
+#include "Network/Client.h"
 
 class Game
 {
@@ -26,6 +29,13 @@ private:
 	InputManager* m_InputManager;
 	GUI::Frame* m_FrameStack;
     World* m_World;
+    // Network viriables
+    boost::thread m_NetworkThread;
+    Client m_Client;
+
+    // Network methods
+    void NetworkFunction();
+
 };
 
 #endif
