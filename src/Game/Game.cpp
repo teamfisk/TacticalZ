@@ -57,15 +57,16 @@ void Game::Tick()
 	double currentTime = glfwGetTime();
 	double dt = currentTime - m_LastTime;
 	m_LastTime = currentTime;
-	m_EventBroker->Process<Client>();
 
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
-	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
-    m_RenderQueueFactory->Update(m_World);
+	// DO SYSTEM SHIT HERE
+	m_EventBroker->Process<Client>();
 
+	m_Renderer->Update(dt);
+    m_RenderQueueFactory->Update(m_World);
 	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
 
 	m_EventBroker->Swap();

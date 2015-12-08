@@ -51,7 +51,7 @@ void Client::Start(EventBroker* eventBroker)
 
 	threads.create_thread(boost::bind(&Client::DisplayLoop, this));
 	threads.create_thread(boost::bind(&Client::ReadFromServer, this));
-	threads.create_thread(boost::bind(&Client::InputLoop, this));
+	//threads.create_thread(boost::bind(&Client::InputLoop, this));
 
 	threads.join_all();
 }
@@ -82,7 +82,7 @@ void Client::InputLoop()
 		int testTimeShit2 = (1000 * (currentTime - previousInputTime) / (double)CLOCKS_PER_SEC);
 		if (intervallMs < (1000 * (currentTime - previousInputTime) / (double)CLOCKS_PER_SEC)) {
 			if (m_PlayerID != -1) {
-				SendInput();
+				//SendInput();
 			}
 			previousInputTime = currentTime;
 		}
@@ -300,58 +300,49 @@ void Client::SendDebugInput()
 			m_ReceiverEndpoint, 0);
 	}
 
-	if (GetAsyncKeyState('C')) {
-        Connect();
-	}
-
-	if (GetAsyncKeyState('Q')) { 
-        Disconnect();
-	}
-	memset(dataPackage, 0, INPUTSIZE);
-	delete[] dataPackage;
-}
-
-void Client::SendInput()
-{
-	char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
-	if (GetAsyncKeyState('W')) {
-		int len = CreateMessage(MessageType::Event, "+Forward", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
-	}
-	if (GetAsyncKeyState('A')) {
-		int len = CreateMessage(MessageType::Event, "-Right", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
-	}
-	if (GetAsyncKeyState('S')) {
-		int len = CreateMessage(MessageType::Event, "-Forward", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
-	}
-	if (GetAsyncKeyState('D')) {
-		int len = CreateMessage(MessageType::Event, "+Right", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
-	}
-	if (GetAsyncKeyState('V')) {
-        Disconnect();
-	}
-
 	memset(dataPackage, 0, INPUTSIZE);
 	delete[] dataPackage;
 }
 
 bool Client::OnKeyDown(const Events::KeyDown& event)
 {
-	std::cout << event.KeyCode;
+	char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
+	if (event.KeyCode == GLFW_KEY_W) {
+		int len = CreateMessage(MessageType::Event, "+Forward", dataPackage);
+		m_Socket.send_to(boost::asio::buffer(
+			dataPackage,
+			len),
+			m_ReceiverEndpoint, 0);
+	}
+	if (event.KeyCode == GLFW_KEY_A) {
+		int len = CreateMessage(MessageType::Event, "-Right", dataPackage);
+		m_Socket.send_to(boost::asio::buffer(
+			dataPackage,
+			len),
+			m_ReceiverEndpoint, 0);
+	}
+	if (event.KeyCode == GLFW_KEY_S) {
+		int len = CreateMessage(MessageType::Event, "-Forward", dataPackage);
+		m_Socket.send_to(boost::asio::buffer(
+			dataPackage,
+			len),
+			m_ReceiverEndpoint, 0);
+	}
+	if (event.KeyCode == GLFW_KEY_D) {
+		int len = CreateMessage(MessageType::Event, "+Right", dataPackage);
+		m_Socket.send_to(boost::asio::buffer(
+			dataPackage,
+			len),
+			m_ReceiverEndpoint, 0);
+	}
+	if (event.KeyCode == GLFW_KEY_V) {
+		Disconnect();
+	}
+	if (event.KeyCode == GLFW_KEY_C) {
+		Connect();
+	}
+
+	memset(dataPackage, 0, INPUTSIZE);
+	delete[] dataPackage;
 	return true;
 }
