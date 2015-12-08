@@ -39,7 +39,8 @@ Game::Game(int argc, char* argv[])
     m_World = new HardcodedTestWorld();
 
 	// TEMP: Invoke network
-    boost::thread workerThread(&Game::NetworkFunction, this);
+
+	boost::thread workerThread(&Game::NetworkFunction, this);
 
 	m_LastTime = glfwGetTime();
 }
@@ -56,6 +57,7 @@ void Game::Tick()
 	double currentTime = glfwGetTime();
 	double dt = currentTime - m_LastTime;
 	m_LastTime = currentTime;
+	m_EventBroker->Process<Client>();
 
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
@@ -74,10 +76,10 @@ void Game::Tick()
 
 void Game::NetworkFunction()
 { 
-    std::string inputMessage;
-    std::cout << "Start client or server? (c/s)" << std::endl;
-    std::cin >> inputMessage;
-    if (inputMessage == "c" || inputMessage == "C") {
-        m_Client.Start();
-    }
+	std::string inputMessage;
+	std::cout << "Start client or server? (c/s)" << std::endl;
+	std::cin >> inputMessage;
+	if (inputMessage == "c" || inputMessage == "C") {
+		m_Client.Start(m_EventBroker);
+	}
 }

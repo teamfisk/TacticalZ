@@ -5,9 +5,12 @@ using namespace boost::asio::ip;
 
 Client::Client() : m_Socket(m_IOService)
 {
+	//m_EventBroker = eventBroker;
 	// Set up network stream
 	m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
-	//Start(); // All logic happens here
+	
+
+	//EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &Client::OnKeyDown);
 }
 
 Client::~Client()
@@ -15,8 +18,12 @@ Client::~Client()
 
 }
 
-void Client::Start()
+void Client::Start(EventBroker* eventBroker)
 {
+	// Subscribe to events
+	m_EventBroker = eventBroker;
+	m_EKeyDown = decltype(m_EKeyDown)(std::bind(&Client::OnKeyDown, this, std::placeholders::_1));
+	m_EventBroker->Subscribe(m_EKeyDown);
 	std::cout << "Please enter you name: ";
 	std::cin >> m_PlayerName;
 	while (m_PlayerName.size() > 7) {
@@ -91,7 +98,7 @@ void Client::DisplayLoop()
 			}
 		}
 		if (m_ShouldDrawGameBoard)
-			DrawBoard();
+			//DrawBoard();
 		boost::this_thread::sleep(boost::posix_time::millisec(100));
 	}
 }
@@ -331,4 +338,10 @@ void Client::SendInput()
 
 	memset(dataPackage, 0, INPUTSIZE);
 	delete[] dataPackage;
+}
+
+bool Client::OnKeyDown(const Events::KeyDown& event)
+{
+	std::cout << event.KeyCode;
+	return true;
 }

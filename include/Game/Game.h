@@ -37,6 +37,8 @@ private:
 
     // Network methods
     void NetworkFunction();
+	// Network events
+	EventRelay<Client, Events::KeyDown> m_EKeyDown;
 
 };
 
