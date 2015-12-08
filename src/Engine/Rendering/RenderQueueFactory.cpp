@@ -38,9 +38,9 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 {
    for(auto& modelC : world->GetComponents("Model")) {
        ModelJob job;
-       std::string modelFile = modelC["ModelFile"];
+       std::string resource = modelC["Resource"];
        glm::vec4 color = modelC["Color"];
-       Model* model = ResourceManager::Load<Model>(modelFile);
+       Model* model = ResourceManager::Load<Model>(resource);
 
        for (auto texGroup : model->TextureGroups) {
            job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;

@@ -19,13 +19,7 @@ private:
     void registerTestComponents()
     {
         ComponentWrapperFactory f;
-            },
-            {
-                "Model",
-                {
-                    std::make_tuple(sizeof(std::string), "ModelFile", std::string("Unnamed")),
-                    std::make_tuple(sizeof(glm::vec4), "Color", glm::vec4(1.f, 1.f, 1.f, 1.f)),
-                }
+            
 
         f = ComponentWrapperFactory("Test");
         f.AddProperty("TestInteger", 1337);
@@ -86,24 +80,28 @@ private:
             ComponentWrapper debug = world.GetComponent(transform.EntityID, "Debug");
             std::cout << "Name: " << (std::string)debug["Name"] << std::endl;
         }
-            ComponentWrapper testTransform = GetComponent(entityScaleWidget, "Transform");
-            testTransform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
-            glm::quat ori = testTransform["Orientation"];
-            glm::vec3 scale = testTransform["Scale"];
-            ComponentWrapper testModel = GetComponent(entityScaleWidget, "Model");
-            testModel["ModelFile"] = "Models/ScaleWidget.obj";
-            glm::vec4 col = testModel["Color"];
+        
+        //Create some test widgets
+        {
+            EntityID entityScaleWidget = world.CreateEntity();
+            ComponentWrapper transform = world.AttachComponent(entityScaleWidget, "Transform");
+            transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
+            ComponentWrapper model = world.AttachComponent(entityScaleWidget, "Model");
+            model["Resource"] = "Models/ScaleWidget.obj";
         }
         {
-            EntityID entityRotationWidget = CreateEntity();
-            AttachComponent(entityRotationWidget, "Transform");
-            AttachComponent(entityRotationWidget, "Model");
-            ComponentWrapper testTransform = GetComponent(entityRotationWidget, "Transform");
-            testTransform["Position"] = glm::vec3(1.5f, 0.f, 0.f);
-            glm::quat ori = testTransform["Orientation"];
-            glm::vec3 scale = testTransform["Scale"];
-            ComponentWrapper testModel = GetComponent(entityRotationWidget, "Model");
-            testModel["ModelFile"] = "Models/RotationWidget.obj";
+            EntityID entityRotationWidget = world.CreateEntity();
+            ComponentWrapper transform = world.AttachComponent(entityRotationWidget, "Transform");
+            transform["Position"] = glm::vec3(1.5f, 0.f, 0.f);
+            ComponentWrapper model = world.AttachComponent(entityRotationWidget, "Model");
+            model["Resource"] = "Models/RotationWidget.obj";
+        }
+        {
+            EntityID entityDummyScene = world.CreateEntity();
+            ComponentWrapper transform = world.AttachComponent(entityDummyScene, "Transform");
+            transform["Position"] = glm::vec3(0, 0.f, 0.f);
+            ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
+            model["Resource"] = "Models/DummyScene.obj";
         }
 
 
