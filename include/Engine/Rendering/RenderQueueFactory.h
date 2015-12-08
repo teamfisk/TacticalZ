@@ -1,0 +1,28 @@
+#ifndef RenderQueueFactory_h__
+#define RenderQueueFactory_h__
+
+#include "../Core/World.h"
+#include "RenderQueue.h"
+#include "../Core/ResourceManager.h"
+#include "Model.h"
+#include "../GLM.h"
+
+class RenderQueueFactory
+{
+public:
+    RenderQueueFactory();
+    void Update(World* world);
+
+    
+    RenderQueueCollection RenderQueues() const { return m_RenderQueues; }
+private:
+    RenderQueueCollection m_RenderQueues;
+
+    void FillModels(World* world, RenderQueue* renderQueue);
+    void FillLights(World* world, RenderQueue* renderQueue);
+
+    glm::mat4 ModelMatrix(World* world, EntityID entity);
+    glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent);
+};
+
+#endif
