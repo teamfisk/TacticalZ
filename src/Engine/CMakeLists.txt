@@ -46,6 +46,12 @@ file(GLOB SOURCE_FILES_Input
 )
 source_group(Input FILES ${SOURCE_FILES_Input})
 
+file(GLOB SOURCE_FILES_Network
+    "${INCLUDE_PATH}/Network/*.h"
+    "Network/*.cpp"
+)
+source_group(Network FILES ${SOURCE_FILES_Network})
+
 file(GLOB SOURCE_FILES_Rendering
     "${INCLUDE_PATH}/Rendering/*.h"
     "Rendering/*.cpp"
@@ -68,6 +74,7 @@ set(SOURCE_FILES
     ${SOURCE_FILES_Core}
     ${SOURCE_FILES_Core_Util}
     #${SOURCE_FILES_Input}
+	${SOURCE_FILES_Network}
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
     ${SOURCE_FILES_Rendering_Util}
