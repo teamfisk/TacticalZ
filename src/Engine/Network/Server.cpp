@@ -205,7 +205,10 @@ void Server::SendSnapshot()
 {
     char* data = new char[INPUTSIZE];
     int offset = CreateHeader(MessageType::Snapshot, data);
-    for (size_t i = 0; i < MAXCONNECTIONS; i++) {
+	for (size_t i = 0; i < MAXCONNECTIONS; i++) {
+		if (m_PlayerDefinitions[i].EntityID == -1) {
+			continue;
+		}
 		// Pack player pos into data package
 		glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
         memcpy(data + offset, &playerPos.x, sizeof(float));

@@ -5,12 +5,8 @@ using namespace boost::asio::ip;
 
 Client::Client() : m_Socket(m_IOService)
 {
-	//m_EventBroker = eventBroker;
 	// Set up network stream
 	m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
-	
-
-	//EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &Client::OnKeyDown);
 }
 
 Client::~Client()
@@ -32,15 +28,10 @@ void Client::Start(World* world, EventBroker* eventBroker)
 		std::cout << "Please enter you name(No longer than 7 characters): ";
 		std::cin >> m_PlayerName;
 	}
-
-	boost::thread_group threads;
-
 	m_Socket.connect(m_ReceiverEndpoint);
 	std::cout << "I am client. BIP BOP\n";
 
-	threads.create_thread(boost::bind(&Client::ReadFromServer, this));
-
-	threads.join_all();
+    ReadFromServer();
 }
 
 void Client::Close()
@@ -157,7 +148,6 @@ void Client::ParseSnapshot(char* data, size_t length)
 		tempName = std::string(data);
 		// +1 for null terminator
 		MoveMessageHead(data, length, tempName.size() + 1);
-
 		// Apply the position data read to the player entity
 		// New player connected on the server side 
 		if (m_PlayerDefinitions[i].Name == "" && tempName != "") { 
@@ -225,6 +215,21 @@ void Client::Disconnect()
     delete[] dataPackage;
 }
 
+void Client::Ping()
+{ 
+    char* dataPackage = new char[INPUTSIZE];
+    if (GetAsyncKeyState('P')) { // Maybe use previous key here
+        int length = CreateMessage(MessageType::ClientPing, "Ping", dataPackage);
+        m_StartPingTime = std::clock();
+        m_Socket.send_to(boost::asio::buffer(
+            dataPackage,
+            length),
+            m_ReceiverEndpoint, 0);
+    }
+    memset(dataPackage, 0, INPUTSIZE);
+    delete[] dataPackage;
+}
+
 void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 {
 	data += stepSize;
@@ -268,7 +273,9 @@ bool Client::OnKeyDown(const Events::KeyDown& event)
 	if (event.KeyCode == GLFW_KEY_C) {
 		Connect();
 	}
-
+    if (event.KeyCode == GLFW_KEY_P) {
+        Ping();
+    }
 	memset(dataPackage, 0, INPUTSIZE);
 	delete[] dataPackage;
 	return true;
