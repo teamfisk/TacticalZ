@@ -9,8 +9,9 @@ Server::~Server()
 }
 
 
-void Server::Start()
+void Server::Start(World* world)
 {
+    m_World = world;
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         m_StopTimes[i] = std::clock();
         m_PlayerPositions[i].x = -1;
@@ -178,10 +179,10 @@ void Server::Broadcast(std::string message)
     char* data = new char[128];
     int offset = CreateMessage(MessageType::Event, message, data);
     for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() != boost::asio::ip::address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
             m_Socket.send_to(
                 boost::asio::buffer(data, offset),
-                m_Connections[i],
+                m_PlayerDefinitions[i].Endpoint,
                 0);
         }
     }
@@ -191,10 +192,10 @@ void Server::Broadcast(std::string message)
 void Server::Broadcast(char * data, size_t length)
 {
     for (int i = 0; i < MAXCONNECTIONS; ++i) {
-        if (m_Connections[i].address() != boost::asio::ip::address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
             m_Socket.send_to(
                 boost::asio::buffer(data, length),
-                m_Connections[i],
+                m_PlayerDefinitions[i].Endpoint,
                 0);
         }
     }
@@ -210,8 +211,8 @@ void Server::SendSnapshot()
         memcpy(data + offset, &m_PlayerPositions[i].y, sizeof(float));
         offset += sizeof(float);
         // +1 for null terminator
-        memcpy(data + offset, m_PlayerNames[i].data(), m_PlayerNames[i].size() + 1);
-        offset += (m_PlayerNames[i].size() + 1) * sizeof(char);
+        memcpy(data + offset, m_PlayerDefinitions[i].Name.data(), m_PlayerDefinitions[i].Name.size() + 1);
+        offset += (m_PlayerDefinitions[i].Name.size() + 1) * sizeof(char);
     }
     Broadcast(data, offset);
     delete[] data;
@@ -221,7 +222,7 @@ void Server::SendPing()
 {
     // Prints connected players ping
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() != boost::asio::ip::address())
+        if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address())
             std::cout << "Player " << i << "'s ping: " << 1000 * (m_StopTimes[i] - m_StartPingTime)
             / static_cast<double>(CLOCKS_PER_SEC) << std::endl;
     }
@@ -245,14 +246,13 @@ void Server::CheckForTimeOuts()
         / static_cast<double>(CLOCKS_PER_SEC);
 
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() != boost::asio::ip::address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
             int tempStopPing = 1000 * m_StopTimes[i]
                 / static_cast<double>(CLOCKS_PER_SEC);
             if (tempStartPing > tempStopPing + timeOutTimeMs) {
                 std::cout << "player " << i << " timed out!" << std::endl;
                 Disconnect(i);
             }
-
         }
     }
 }
@@ -271,7 +271,9 @@ void Server::Disconnect(int i)
 {
     Broadcast("A player disconnected");
     std::cout << "Player " << i << " disconnected/Timed out" << std::endl;
-    m_Connections[i] = boost::asio::ip::udp::endpoint();
+    m_PlayerDefinitions[i].Endpoint = boost::asio::ip::udp::endpoint();
+    m_PlayerDefinitions[i].EntityID = -1;
+    m_PlayerDefinitions[i].Name = "Name not Set";
     // Reset disconnected players position
     m_PlayerPositions[i].x = -1;
     m_PlayerPositions[i].y = -1;
@@ -281,23 +283,37 @@ void Server::ParseEvent(char * data, size_t length)
 {
     size_t i;
     for (i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() == m_ReceiverEndpoint.address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
             break;
         }
     }
+    // If no player matches the ip return.
+    if (i >= 8)
+        return;
 
-    if ("+Forward" == std::string(data))
-        if (m_PlayerPositions[i].y > 0)
-            m_PlayerPositions[i].y--;
-    if ("-Forward" == std::string(data))
-        if (m_PlayerPositions[i].y < BOARDSIZE - 1)
-            m_PlayerPositions[i].y++;
-    if ("+Right" == std::string(data))
-        if (m_PlayerPositions[i].x < BOARDSIZE - 1)
-            m_PlayerPositions[i].x++;
-    if ("-Right" == std::string(data))
-        if (m_PlayerPositions[i].x > 0)
-            m_PlayerPositions[i].x--;
+    unsigned int entityId = m_PlayerDefinitions[i].EntityID;
+    if ("+Forward" == std::string(data)) {
+        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+        temp.z -= 0.5f;
+        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    }
+    if ("-Forward" == std::string(data)) {
+        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+        temp.z += 0.5f;
+        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    }
+       
+    if ("+Right" == std::string(data)) {
+        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+        temp.x += 0.5f;
+        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    }
+     
+    if ("-Right" == std::string(data)) {
+        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+        temp.x -= 0.5f;
+        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    }
 }
 
 void Server::ParseConnect(char * data, size_t length)
@@ -305,37 +321,47 @@ void Server::ParseConnect(char * data, size_t length)
     std::cout << "Parsing connection." << std::endl;
 
     for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() == m_ReceiverEndpoint.address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
             return;
         }
     }
 
     for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() == boost::asio::ip::address()) {
-            m_Connections[i] = m_ReceiverEndpoint;
+        if (m_PlayerDefinitions[i].Endpoint.address() == boost::asio::ip::address()) {
+            
 
-            m_PlayerNames[i] = std::string(data);
-            m_PlayerPositions[i].x = 0;
-            m_PlayerPositions[i].y = 0;
+            m_PlayerDefinitions[i].EntityID = m_World->CreateEntity();
+            ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Transform");
+            transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
+            ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Model");
+            model["Resource"] = "Models/Core/UnitSphere.obj";
+
+            m_PlayerDefinitions[i].Endpoint = m_ReceiverEndpoint;
+            m_PlayerDefinitions[i].Name = std::string(data);
             m_StopTimes[i] = std::clock();
-            std::cout << "Player \"" << m_PlayerNames[i] << "\" connected on IP: " <<  m_Connections[i].address().to_string() << std::endl;
+
+            std::cout << "Player \"" << m_PlayerDefinitions[i].Name << "\" connected on IP: " << 
+                m_PlayerDefinitions[i].Endpoint.address().to_string() << std::endl;
 
             int offset = 0;
             char* temp = new char[sizeof(int) * 2];
-            int msgType = 0;
-            memcpy(temp, &msgType, sizeof(int));
+            int messagType = 0;
+
+            memcpy(temp, &messagType, sizeof(int));
             offset += sizeof(int);
             memcpy(temp + offset, &i, sizeof(int));
 
             m_Socket.send_to(
                 boost::asio::buffer(temp, sizeof(int) * 2),
-                m_Connections[i],
+                m_PlayerDefinitions[i].Endpoint,
                 0);
+
             // Send notification that a player has connected
-            std::string str = "Player " + m_PlayerNames[i] + " connected on: " + m_ReceiverEndpoint.address().to_string();
+            std::string str = "Player " + m_PlayerDefinitions[i].Name + " connected on: " 
+                + m_PlayerDefinitions[i].Endpoint.address().to_string();
             Broadcast(str);
             // +1 is the null terminator
-            MoveMessageHead(data, length, m_PlayerNames[i].size() + 1);
+            MoveMessageHead(data, length, m_PlayerDefinitions[i].Name.size() + 1);
             delete[] temp;
             break;
         }
@@ -347,7 +373,7 @@ void Server::ParseDisconnect()
     std::cout << "Parsing disconnect. \n";
 
     for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() == m_ReceiverEndpoint.address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
             Disconnect(i);
             break;
         }
@@ -373,7 +399,7 @@ void Server::ParseClientPing()
 void Server::ParseServerPing()
 {
     for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() == m_ReceiverEndpoint.address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
             m_StopTimes[i] = std::clock();
             break;
         }
@@ -385,10 +411,10 @@ void Server::ParseSnapshot(char * data, size_t length)
     // Does no logic. Returns snapshot if client request one
     // The snapshot is not a real snapshot tho...
     for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_Connections[i].address() != boost::asio::ip::address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
             m_Socket.send_to(
                 boost::asio::buffer("I'm sending a snapshot to you guys!"),
-                m_Connections[i],
+                m_PlayerDefinitions[i].Endpoint,
                 0);
         }
     }

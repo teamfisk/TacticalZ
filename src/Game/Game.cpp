@@ -81,6 +81,6 @@ void Game::NetworkFunction()
         m_Client.Start();
     }
     if (inputMessage == "s" || inputMessage == "S") {
-        m_Server.Start();
+        m_Server.Start(m_World);
     }
 }
