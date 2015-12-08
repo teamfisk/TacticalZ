@@ -2,7 +2,7 @@
 #define World_h__
 
 #include "../Common.h"
-#include "EntityWrapper.h"
+#include "Entity.h"
 #include "ObjectPool.h"
 #include "ComponentPool.h"
 
@@ -12,6 +12,7 @@ public:
     World() = default;
     ~World();
 
+    // Create empty entity
     EntityID CreateEntity(EntityID parent = 0);
 
     // Register a component type and allocate space for it

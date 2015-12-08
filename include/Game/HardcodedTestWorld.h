@@ -4,6 +4,7 @@
 #include "GLM.h"
 #include "Core/World.h"
 #include "Core/Util/Any.h"
+#include "Core/EntityXMLFile.h"
 
 class HardcodedTestWorld : public World
 {
@@ -30,11 +31,11 @@ private:
         f.AddProperty("Name", std::string("Unnamed"));
         RegisterComponent(f);
 
-        f = ComponentWrapperFactory("Transform");
-        f.AddProperty("Position", glm::vec3(0.f, 0.f, 0.f));
-        f.AddProperty("Orientation", glm::quat());
-        f.AddProperty("Scale", glm::vec3(1.f, 1.f, 1.f));
-        RegisterComponent(f);
+        //f = ComponentWrapperFactory("Transform");
+        //f.AddProperty("Position", glm::vec3(0.f, 0.f, 0.f));
+        //f.AddProperty("Orientation", glm::quat());
+        //f.AddProperty("Scale", glm::vec3(1.f, 1.f, 1.f));
+        //RegisterComponent(f);
 
         f = ComponentWrapperFactory("Model");
         f.AddProperty("Resource", std::string());
@@ -45,15 +46,13 @@ private:
 
     void createTestEntities()
     {
+        ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+        ResourceManager::Load<EntityXMLFile>("Schema/Entities/Test.xml")->PopulateWorld(this);
+
         World& world = *this;
 
         // Create an entity
         EntityID e = world.CreateEntity();
-
-        // Attach a Debug component
-        ComponentWrapper debug = world.AttachComponent(e, "Debug");
-        // Set the Name field of the Debug component using subscript operator
-        debug["Name"] = "Carlito";
 
         // Attach a Transform component
         world.AttachComponent(e, "Transform");
@@ -74,10 +73,6 @@ private:
             std::cout << "Position: " << pos.x << " " << pos.y << " " << pos.z << std::endl;
             glm::vec3 scale = transform["Scale"];
             std::cout << "Scale: " << scale.x << " " << scale.y << " " << scale.z << std::endl;
-
-            // Fetch the Debug component also present in this entity
-            ComponentWrapper debug = world.GetComponent(transform.EntityID, "Debug");
-            std::cout << "Name: " << (std::string)debug["Name"] << std::endl;
         }
     }
 };
