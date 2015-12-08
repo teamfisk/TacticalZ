@@ -14,6 +14,8 @@ Game::Game(int argc, char* argv[])
 	// Create the core event broker
 	m_EventBroker = new EventBroker();
 
+    m_RenderQueueFactory = new RenderQueueFactory();
+
 	// Create the renderer
 	m_Renderer = new Renderer();
 	m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
@@ -66,9 +68,9 @@ void Game::Tick()
 	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
-	//TODO: Render: This is not used, but will be used later when we dont add models to RQ in renderer.
-	RenderQueueCollection rq;
-	m_Renderer->Draw(rq);
+    m_RenderQueueFactory->Update(m_World);
+
+	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
 
 	m_EventBroker->Swap();
 	m_EventBroker->Clear();

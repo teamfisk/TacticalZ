@@ -29,12 +29,12 @@ glm::vec3 ScreenCoords::ToWorldPos(glm::vec2 screenCoord, float depth, float scr
     return ToWorldPos(screenCoord.x, screenCoord.y, depth, screenWidth, screenHeight, cameraProjectionMat, cameraViewMat);
 }
 
-glm::vec3 ScreenCoords::ToPixelData(float x, float y, GLuint PickDataBuffer, GLuint DepthBuffer)
+glm::vec3 ScreenCoords::ToPixelData(float x, float y, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, PickDataBuffer);
+    PickDataBuffer->Bind();
     glm::vec2 pixelData;
     glReadPixels(x, y, 1, 1, GL_RG, GL_FLOAT, &pixelData);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    PickDataBuffer->Unbind();
 
     glBindFramebuffer(GL_FRAMEBUFFER, DepthBuffer);
     float depthData;
@@ -44,7 +44,7 @@ glm::vec3 ScreenCoords::ToPixelData(float x, float y, GLuint PickDataBuffer, GLu
     return glm::vec3(pixelData, depthData);
 }
 
-glm::vec3 ScreenCoords::ToPixelData(glm::vec2 screenCoord, GLuint PickDataBuffer, GLuint DepthBuffer)
+glm::vec3 ScreenCoords::ToPixelData(glm::vec2 screenCoord, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
 {
     return ToPixelData(screenCoord.x, screenCoord.y, PickDataBuffer, DepthBuffer);
 }
