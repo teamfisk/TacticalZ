@@ -9,9 +9,12 @@
 #include "GUI/Frame.h"
 #include "Core/World.h"
 #include "Rendering/RenderQueueFactory.h"
+
 // Network
 #include <boost/thread.hpp>
+#include "Network/Server.h"
 #include "Network/Client.h"
+
 
 class Game
 {
@@ -33,8 +36,8 @@ private:
     RenderQueueFactory* m_RenderQueueFactory;
     // Network variables
     boost::thread m_NetworkThread;
+    Server m_Server;
     Client m_Client;
-
     // Network methods
     void NetworkFunction();
 	// Network events

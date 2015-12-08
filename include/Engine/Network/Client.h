@@ -10,6 +10,7 @@
 
 #include "Network/MessageType.h"
 #include "Network/NetworkDefines.h"
+#include "Network/WinLeakCheck.h"
 #include "Core/EventBroker.h"
 #include "Core/EKeyDown.h"
 
@@ -30,6 +31,7 @@ private:
 
 	int Receive(char* data, size_t length);
 	int CreateMessage(MessageType type, std::string message, char* data);
+    void Connect();
     void Disconnect();
 	void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
 	void ParseMessageType(char* data, size_t length);
