@@ -19,7 +19,6 @@ private:
     RenderQueueCollection m_RenderQueues;
 
     void FillModels(World* world, RenderQueue* renderQueue);
-    void FillSprites(World* world, RenderQueue* renderQueue);
     void FillLights(World* world, RenderQueue* renderQueue);
 
     glm::mat4 ModelMatrix(World* world, EntityID entity);

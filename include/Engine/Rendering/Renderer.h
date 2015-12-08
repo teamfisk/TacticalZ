@@ -8,7 +8,7 @@
 //TODO: Temp resourceManager
 #include "../Core/ResourceManager.h"
 #include "Util/UnorderedMapVec2.h"
-#include "Util/FrameBuffer.h"
+#include "FrameBuffer.h"
 #include "../Core/World.h"
 
 class Renderer : public IRenderer

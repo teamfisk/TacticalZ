@@ -1,5 +1,5 @@
 
-#include "Rendering/Util/FrameBuffer.h"
+#include "Rendering/FrameBuffer.h"
 
 
 BufferResource::BufferResource(GLuint* resourceHandle, GLenum resourceType, GLenum attachment)

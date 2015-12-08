@@ -1,8 +1,8 @@
 #ifndef FrameBuffer_h__
 #define FrameBuffer_h__
 
-#include "OpenGL.h"
-#include "GLError.h"
+#include "../OpenGL.h"
+#include "Util/GLError.h"
 
 class BufferResource
 {

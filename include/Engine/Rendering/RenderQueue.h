@@ -94,18 +94,6 @@ struct PointLightJob : RenderJob
 	}
 };
 
-struct FrameJob : SpriteJob
-{
-	Rectangle Scissor;
-	Rectangle Viewport;
-	std::string Name;
-
-	void CalculateHash() override
-	{
-		Hash = 0;
-	}
-};
-
 class RenderQueue
 {
 public:
@@ -149,20 +137,17 @@ struct RenderQueueCollection
 {
 	RenderQueue Forward;
 	RenderQueue Lights;
-	RenderQueue Sprites;
 
 	void Clear()
 	{
 		Forward.Clear();
 		Lights.Clear();
-        Sprites.Clear();
 	}
 
 	void Sort()
 	{
 		Forward.Sort();
 		Lights.Sort();
-        Sprites.Sort();
 	}
 };
 

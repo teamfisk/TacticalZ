@@ -10,7 +10,6 @@ void RenderQueueFactory::Update(World* world)
 {
     m_RenderQueues.Clear();
     FillModels(world, &m_RenderQueues.Forward);
-    FillSprites(world, &m_RenderQueues.Sprites);
     FillLights(world, &m_RenderQueues.Lights);
 }
 
@@ -59,11 +58,6 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
            renderQueue->Add(job);
        }
    }
-}
-
-void RenderQueueFactory::FillSprites(World* world, RenderQueue* renderQueue)
-{
-    
 }
 
 void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)
