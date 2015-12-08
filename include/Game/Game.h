@@ -40,6 +40,8 @@ private:
     Client m_Client;
     // Network methods
     void NetworkFunction();
+	// Network events
+	EventRelay<Client, Events::KeyDown> m_EKeyDown;
 
 };
 

@@ -7,10 +7,13 @@
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <glm/common.hpp>
+#include <GLFW/glfw3.h> // For input event
 
 #include "Network/MessageType.h"
 #include "Network/NetworkDefines.h"
 #include "Network/WinLeakCheck.h"
+#include "Core/EventBroker.h"
+#include "Core/EKeyDown.h"
 
 
 class Client
@@ -18,7 +21,7 @@ class Client
 public:
 	Client();
 	~Client();
-	void Start();
+	void Start(EventBroker* eventBroker);
     void Close();
 
 private:
@@ -38,7 +41,7 @@ private:
 	void ParsePing();
 	void ParseServerPing();
 	void ParseSnapshot(char* data, size_t length);
-	void SendInput();
+	//void SendInput();
 	void SendDebugInput();
 	void DrawBoard();
 
@@ -56,6 +59,11 @@ private:
 	bool m_ShouldDrawGameBoard = true;
 	std::string m_PlayerName;
     bool m_ThreadIsRunning = true;
+
+	// Events
+	EventBroker* m_EventBroker;
+	EventRelay<Client, Events::KeyDown> m_EKeyDown;
+	bool OnKeyDown(const Events::KeyDown &e);
 };
 
 #endif

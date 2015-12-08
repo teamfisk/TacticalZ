@@ -39,7 +39,8 @@ Game::Game(int argc, char* argv[])
     m_World = new HardcodedTestWorld();
 
 	// TEMP: Invoke network
-    boost::thread workerThread(&Game::NetworkFunction, this);
+
+	boost::thread workerThread(&Game::NetworkFunction, this);
 
 	m_LastTime = glfwGetTime();
 }
@@ -59,11 +60,13 @@ void Game::Tick()
 
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
-	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
-    m_RenderQueueFactory->Update(m_World);
+	// DO SYSTEM SHIT HERE
+	m_EventBroker->Process<Client>();
 
+	m_Renderer->Update(dt);
+    m_RenderQueueFactory->Update(m_World);
 	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
 
 	m_EventBroker->Swap();
@@ -74,12 +77,12 @@ void Game::Tick()
 
 void Game::NetworkFunction()
 { 
-    std::string inputMessage;
-    std::cout << "Start client or server? (c/s)" << std::endl;
-    std::cin >> inputMessage;
-    if (inputMessage == "c" || inputMessage == "C") {
-        m_Client.Start();
-    }
+	std::string inputMessage;
+	std::cout << "Start client or server? (c/s)" << std::endl;
+	std::cin >> inputMessage;
+	if (inputMessage == "c" || inputMessage == "C") {
+		m_Client.Start(m_EventBroker);
+	}
     if (inputMessage == "s" || inputMessage == "S") {
         m_Server.Start(m_World);
     }
