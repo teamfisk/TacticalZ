@@ -330,11 +330,13 @@ void EntityXMLFile::parseEntityGraph()
 std::size_t EntityXMLFile::getTypeStride(std::string typeName)
 {
     std::map<std::string, size_t> typeStrides{
+        { "bool", sizeof(bool) },
         { "int", sizeof(int) },
         { "double", sizeof(double) },
         { "string", sizeof(std::string) },
         { "Vector", sizeof(glm::vec3) },
         { "Quaternion", sizeof(glm::quat) },
+        { "Color", sizeof(glm::vec4) }
     };
 
     auto it = typeStrides.find(typeName);
