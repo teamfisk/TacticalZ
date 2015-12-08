@@ -266,73 +266,31 @@ void EntityXMLFile::parseDefaults()
             if (dataType == XSValue::DataType::dt_MAXCOUNT) {
                 if (fieldType == "Vector") {
                     glm::vec3 vec;
-
-                    XSValue::Status status;
-                    XSValue* val;
-                    
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("X")), XSValue::DataType::dt_float, status);
-                    vec.x = val->fData.fValue.f_float;
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("Y")), XSValue::DataType::dt_float, status);
-                    vec.y = val->fData.fValue.f_float;
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("Z")), XSValue::DataType::dt_float, status);
-                    vec.z = val->fData.fValue.f_float;
-
+                    vec.x = getFloatAttribute(fieldElement, "X");
+                    vec.y = getFloatAttribute(fieldElement, "Y");
+                    vec.z = getFloatAttribute(fieldElement, "Z");
                     memcpy(ci.second.Defaults.get() + fieldOffset, reinterpret_cast<char*>(&vec), getTypeStride(fieldType));
                 } else if (fieldType == "Color") {
                     glm::vec4 vec;
-
-                    XSValue::Status status;
-                    XSValue* val;
-
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("R")), XSValue::DataType::dt_float, status);
-                    vec.r = val->fData.fValue.f_float;
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("G")), XSValue::DataType::dt_float, status);
-                    vec.g = val->fData.fValue.f_float;
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("B")), XSValue::DataType::dt_float, status);
-                    vec.b = val->fData.fValue.f_float;
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("A")), XSValue::DataType::dt_float, status);
-                    vec.a = val->fData.fValue.f_float;
-
+                    vec.r = getFloatAttribute(fieldElement, "R");
+                    vec.g = getFloatAttribute(fieldElement, "G");
+                    vec.b = getFloatAttribute(fieldElement, "B");
+                    vec.a = getFloatAttribute(fieldElement, "A");
                     memcpy(ci.second.Defaults.get() + fieldOffset, reinterpret_cast<char*>(&vec), getTypeStride(fieldType));
                 } else if (fieldType == "Quaternion") {
                     glm::quat q;
-
-                    XSValue::Status status;
-                    XSValue* val;
-
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("X")), XSValue::DataType::dt_float, status);
-                    if (val == nullptr) {
-                        LOG_ERROR("Default field \"%s\" for component \"%s\" missing \"%s\" attribute!", fieldName.c_str(), componentName.c_str(), "X");
-                    } else {
-                        q.x = val->fData.fValue.f_float;
-                    }
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("Y")), XSValue::DataType::dt_float, status);
-                    if (val == nullptr) {
-                        LOG_ERROR("Default field \"%s\" for component \"%s\" missing \"%s\" attribute!", fieldName.c_str(), componentName.c_str(), "Y");
-                    } else {
-                        q.y = val->fData.fValue.f_float;
-                    }
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("Z")), XSValue::DataType::dt_float, status);
-                    if (val == nullptr) {
-                        LOG_ERROR("Default field \"%s\" for component \"%s\" missing \"%s\" attribute!", fieldName.c_str(), componentName.c_str(), "Z");
-                    } else {
-                        q.z = val->fData.fValue.f_float;
-                    }
-                    val = XSValue::getActualValue(fieldElement->getAttribute(XSTR("W")), XSValue::DataType::dt_float, status);
-                    if (val == nullptr) {
-                        LOG_ERROR("Default field \"%s\" for component \"%s\" missing \"%s\" attribute!", fieldName.c_str(), componentName.c_str(), "W");
-                    } else {
-                        q.w = val->fData.fValue.f_float;
-                    }
-
+                    q.x = getFloatAttribute(fieldElement, "X");
+                    q.y = getFloatAttribute(fieldElement, "Y");
+                    q.z = getFloatAttribute(fieldElement, "Z");
+                    q.w = getFloatAttribute(fieldElement, "W");
                     memcpy(ci.second.Defaults.get() + fieldOffset, reinterpret_cast<char*>(&q), getTypeStride(fieldType));
                 }
             } else if (dataType == XSValue::DataType::dt_string) {
                 char* str = XMLString::transcode(fieldElement->getTextContent());
                 std::string standardString(str);
-                new (ci.second.Defaults.get() + fieldOffset) std::string(str);
+                //new (ci.second.Defaults.get() + fieldOffset) std::string(str);
                 XMLString::release(&str);
-                //memcpy(ci.second.Defaults.get() + fieldOffset, &standardString, getTypeStride(fieldType));
+                memcpy(ci.second.Defaults.get() + fieldOffset, &standardString, getTypeStride(fieldType));
             } else {
                 XSValue::Status status;
                 XSValue* val = XSValue::getActualValue(fieldElement->getTextContent(), dataType, status);
@@ -373,14 +331,6 @@ void EntityXMLFile::predictComponentAllocation()
             stride += getTypeStride(field.second);
         }
         std::cout << "  Stride: " << ci.Meta.Stride << std::endl;
-
-        // TODO: ALLOCATE HERE
-        /*ComponentPool cs;
-        cs.ComponentName = ci.Name;
-        cs.Stride = stride;
-        cs.Info = ci;
-        cs.Data = new char[stride*ci.Meta.Allocation];
-        m_ComponentStore[cs.ComponentName] = cs;*/
     }
 }
 
@@ -462,4 +412,17 @@ std::size_t EntityXMLFile::getTypeStride(std::string typeName)
 
     auto it = typeStrides.find(typeName);
     return (it != typeStrides.end()) ? it->second : 0;
+}
+
+float EntityXMLFile::getFloatAttribute(const xercesc::DOMElement* element, const char* attribute) const
+{
+    using namespace xercesc;
+    XSValue::Status status;
+    XSValue* val = XSValue::getActualValue(element->getAttribute(XSTR(attribute)), xercesc::XSValue::DataType::dt_float, status);
+    if (val == nullptr) {
+        LOG_ERROR("Element \"%s\" doesn't have an \"%s\" attribute!", XSTR(element->getTagName()), attribute);
+        return 0.f;
+    } else {
+        return val->fData.fValue.f_float;
+    }
 }

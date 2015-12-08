@@ -134,6 +134,7 @@ private:
     void predictComponentAllocation();
     void parseEntityGraph();
     std::size_t getTypeStride(std::string typeName);
+    float getFloatAttribute(const xercesc::DOMElement* element, const char* attribute) const;
 };
 
 #endif
