@@ -47,6 +47,12 @@ const ComponentPool* World::GetComponents(std::string componentType)
     return (it != m_ComponentPools.end()) ? it->second : nullptr;
 }
 
+
+EntityID World::GetParent(EntityID entity)
+{
+    return m_EntityParents.at(entity);
+}
+
 EntityID World::generateEntityID()
 {
     // TODO: Make EntityID generation smarter

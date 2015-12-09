@@ -65,8 +65,8 @@ void Game::Tick()
 	m_EventBroker->Swap();
 
     testTick(dt);
-    m_RenderQueueFactory->Update(m_World);
 
+    m_RenderQueueFactory->Update(m_World);
 	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
 
 	m_EventBroker->Swap();

@@ -21,16 +21,15 @@ glm::mat4 RenderQueueFactory::ModelMatrix(World* world, EntityID entity)
     ComponentWrapper transformComponent = world->GetComponent(entity, "Transform");
     glm::vec3 position = transformComponent["Position"];
     glm::vec3 scale = transformComponent["Scale"];
-    glm::quat oritentation = transformComponent["Orientation"];
+    glm::vec3 oritentation = transformComponent["Orientation"];
 
-    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(oritentation) * glm::scale(scale);
-    return modelMatrix;
-}
-
-glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent)
-{
-  //  positionComponent.EntityID
-    return glm::vec3();
+    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(glm::quat(oritentation)) * glm::scale(scale);
+    EntityID parent = world->GetParent(entity);
+    if (parent != 0) {
+        return ModelMatrix(world, parent) * modelMatrix;
+    } else {
+        return modelMatrix;
+    }
 }
 
 void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
