@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "MayaIncludes.h"
+#include "Material.h"
 // Qt
 #pragma comment(lib, "QtCore4")
 #pragma comment(lib, "QtGui4")
@@ -46,7 +47,7 @@ public:
 	~Menu();
 
 	void GetMeshData(MObject object);
-	void exportMaterial(MObject object);
+	void GetMaterialData();
 
 private slots:
 	void ExportSelected(bool checked);
@@ -74,6 +75,7 @@ private:
 	QFileDialog* fileDialog;
 	QDialog* dialogPointer;
 
+	Material* MaterialHandler;
 };
 
 #endif

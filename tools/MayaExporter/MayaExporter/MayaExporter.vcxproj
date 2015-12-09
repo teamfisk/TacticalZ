@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_Menu.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -213,6 +214,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath);$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
     <ClInclude Include="GeneratedFiles\ui_MayaExporter.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="MayaIncludes.h" />
   </ItemGroup>
   <ItemGroup>

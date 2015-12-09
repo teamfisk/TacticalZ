@@ -141,9 +141,9 @@ void Menu::CancelClicked(bool)
 void Menu::Button1Clicked(bool)
 {
 	if(exportAnimationsButton->isChecked())
-		cout << "1 checked!" << endl;
+		MGlobal::displayInfo("1 checked!");
 	else
-		cout << "1 unchecked!" << endl;
+		MGlobal::displayInfo("1 unchecked!");
 }
 
 void Menu::Button2Clicked(bool)
@@ -222,11 +222,16 @@ void Menu::GetMeshData(MObject object)
 	
 }
 
-void Menu::exportMaterial(MObject object)
+void Menu::GetMaterialData()
 {
-	MItDependencyNodes matIt(MFn::kLambert);
+	this->MaterialHandler = new Material();
 
+	// Traverse scene and return vector with all materials
+	std::vector<MaterialNode>* AllMaterials = MaterialHandler->DoIt();
 
+	// Access the colorR component of one material (example)
+	cout << AllMaterials->at(0).Color[0] << endl;
+	MGlobal::displayInfo(MString() +  AllMaterials->at(0).Color[0]);
 }
 
 Menu::~Menu()
@@ -236,4 +241,5 @@ Menu::~Menu()
 	//delete exportPath;
 	//delete fileDialog;
 	fileDialog->~QFileDialog();
+	delete MaterialHandler;
 }

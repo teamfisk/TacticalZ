@@ -50,6 +50,9 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="leeeeel.qrc">
@@ -68,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_MayaExporter.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

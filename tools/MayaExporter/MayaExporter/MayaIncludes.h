@@ -30,6 +30,7 @@
 #include <maya/MItDependencyNodes.h>
 #include <maya/MFnNurbsCurve.h>
 #include <maya/MCommandMessage.h>
+#include <maya/MPlug.h>
 
 
 // Wrappers
