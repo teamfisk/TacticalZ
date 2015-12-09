@@ -42,6 +42,11 @@ private:
         f.AddProperty("Color", glm::vec4(1.f, 1.f, 1.f, 1.f));
         f.AddProperty("Visible", true);
         RegisterComponent(f);
+
+        f = ComponentWrapperFactory("Collision");
+        f.AddProperty("BoxCenter", glm::vec3(0.f, 0.f, 0.f));
+        f.AddProperty("BoxSize", glm::vec3(1.f, 1.f, 1.f));
+        RegisterComponent(f);
     }
 
     void createTestEntities()
@@ -102,6 +107,37 @@ private:
             transform["Position"] = glm::vec3(0, 0.f, 0.f);
             ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
             model["Resource"] = "Models/DummyScene.obj";
+        }
+        {
+            EntityID entityCollisionBox = world.CreateEntity();
+            ComponentWrapper transform = world.AttachComponent(entityCollisionBox, "Transform");
+            transform["Position"] = glm::vec3(0.f, 2.f, 0.f);
+            ComponentWrapper model = world.AttachComponent(entityCollisionBox, "Model");
+            model["Resource"] = "Models/Core/UnitBox.obj";
+
+            ComponentWrapper collision = world.AttachComponent(entityCollisionBox, "Collision");
+            glm::vec3 pos = transform["Position"];
+            glm::vec3 scale = transform["Scale"];
+            glm::quat ori = transform["Orientation"];
+            Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
+
+            //WTODO: This only works for objects that never moves/scales/rotates since modelMatrix don't change.
+            //For dynamic objects, should save a collision box in modelspace and transform box with modelMatrix per collision check.
+            glm::mat4 modelMatrix = modelRes->m_Matrix * glm::translate(glm::mat4(), pos) * glm::toMat4(ori) * glm::scale(scale);
+
+            glm::vec3 mini = glm::vec3(INFINITY, INFINITY, INFINITY);
+            glm::vec3 maxi = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
+            for (const auto& v : modelRes->m_Vertices) {
+                const auto& wPos =  modelMatrix * glm::vec4(v.Position.x, v.Position.y, v.Position.z, 1);
+                maxi.x = std::max(wPos.x, maxi.x);
+                maxi.y = std::max(wPos.y, maxi.y);
+                maxi.z = std::max(wPos.z, maxi.z);
+                mini.x = std::min(wPos.x, mini.x);
+                mini.y = std::min(wPos.y, mini.y);
+                mini.z = std::min(wPos.z, mini.z);
+            }
+            collision["BoxCenter"] = 0.5f * (maxi + mini);
+            collision["BoxSize"] = maxi - mini;
         }
 
 
