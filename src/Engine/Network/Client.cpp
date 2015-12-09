@@ -206,11 +206,20 @@ void Client::ParseSnapshot(char* data, size_t length)
 
 int Client::Receive(char* data, size_t length)
 {
-	int bytesReceived = m_Socket.receive_from(boost
-		::asio::buffer((void*)data, length),
-		m_ReceiverEndpoint,
-		0);
-	return bytesReceived;
+
+    try {
+        int bytesReceived = m_Socket.receive_from(boost
+            ::asio::buffer((void*)data, length),
+            m_ReceiverEndpoint,
+            0);
+        return bytesReceived;
+    } catch (const std::exception& err) {
+        // To not spam "socket closed messages"
+        //if (std::string(err.what()).find("forcefully closed") != std::string::npos) {
+        std::cout << "Read from client crashed: " << err.what();
+        //}
+    }
+    return 0;
 }
 
 int Client::CreateMessage(MessageType type, std::string message, char* data)

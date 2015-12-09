@@ -48,8 +48,8 @@ Game::Game(int argc, char* argv[])
 Game::~Game()
 {
     // Call before to ensure that thread closes correctly.
-    m_Client.Close();
-    m_Server.Close();
+    //m_Client.Close();
+    //m_Server.Close();
 
 	delete m_FrameStack;
 	delete m_EventBroker;
@@ -84,9 +84,11 @@ void Game::NetworkFunction()
 	std::cout << "Start client or server? (c/s)" << std::endl;
 	std::cin >> inputMessage;
 	if (inputMessage == "c" || inputMessage == "C") {
+        Client m_Client;
 		m_Client.Start(m_World, m_EventBroker);
 	}
     if (inputMessage == "s" || inputMessage == "S") {
+        Server m_Server;
         m_Server.Start(m_World);
     }
 }

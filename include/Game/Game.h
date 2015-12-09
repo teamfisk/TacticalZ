@@ -36,8 +36,6 @@ private:
     RenderQueueFactory* m_RenderQueueFactory;
     // Network variables
     boost::thread m_NetworkThread;
-    Server m_Server;
-    Client m_Client;
     // Network methods
     void NetworkFunction();
 	// Network events
