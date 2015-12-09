@@ -35,32 +35,37 @@ glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent)
 
 void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 {
-   for(auto& modelC : world->GetComponents("Model")) {
-       std::string resource = modelC["Resource"];
-       if (resource.empty()) {
-           continue;
-       }
-       glm::vec4 color = modelC["Color"];
-       Model* model = ResourceManager::Load<Model>(resource);
+    auto models = world->GetComponents("Model");
+    if (models == nullptr) {
+        return;
+    }
 
-       for (auto texGroup : model->TextureGroups) {
-           ModelJob job;
-           job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-           job.DiffuseTexture = texGroup.Texture.get();
-           job.NormalTexture = texGroup.NormalMap.get();
-           job.SpecularTexture = texGroup.SpecularMap.get();
-           job.Model = model;
-           job.StartIndex = texGroup.StartIndex;
-           job.EndIndex = texGroup.EndIndex;
-           job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
-           job.Color = color;
+    for (auto& modelC : *models) {
+        std::string resource = modelC["Resource"];
+        if (resource.empty()) {
+            continue;
+        }
+        glm::vec4 color = modelC["Color"];
+        Model* model = ResourceManager::Load<Model>(resource);
 
-           //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
-           job.Entity = modelC.EntityID;
+        for (auto texGroup : model->TextureGroups) {
+            ModelJob job;
+            job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
+            job.DiffuseTexture = texGroup.Texture.get();
+            job.NormalTexture = texGroup.NormalMap.get();
+            job.SpecularTexture = texGroup.SpecularMap.get();
+            job.Model = model;
+            job.StartIndex = texGroup.StartIndex;
+            job.EndIndex = texGroup.EndIndex;
+            job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+            job.Color = color;
 
-           renderQueue->Add(job);
-       }
-   }
+            //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+            job.Entity = modelC.EntityID;
+
+            renderQueue->Add(job);
+        }
+    }
 }
 
 void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)

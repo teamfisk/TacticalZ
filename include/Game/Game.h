@@ -9,6 +9,8 @@
 #include "GUI/Frame.h"
 #include "Core/World.h"
 #include "Rendering/RenderQueueFactory.h"
+#include "Core/EKeyDown.h"
+#include "Core/EntityXMLFile.h"
 
 class Game
 {
@@ -28,6 +30,12 @@ private:
 	GUI::Frame* m_FrameStack;
     World* m_World;
     RenderQueueFactory* m_RenderQueueFactory;
+
+    EventRelay<Game, Events::KeyUp> m_EKeyUp;
+    bool testOnKeyUp(const Events::KeyUp& e);
+
+    void testIntialize();
+    void testTick(double dt);
 };
 
 #endif

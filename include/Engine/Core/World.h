@@ -22,7 +22,7 @@ public:
     // Get a component of an entity
     ComponentWrapper GetComponent(EntityID entity, std::string componentType);
     // Get all components of the specified type
-    const ComponentPool& GetComponents(std::string componentType);
+    const ComponentPool* GetComponents(std::string componentType);
 
 private:
     EntityID m_CurrentEntityID = 1;

@@ -1,11 +1,11 @@
 #include "Game.h"
-#include "HardcodedTestWorld.h"
 
 Game::Game(int argc, char* argv[])
 {
 	ResourceManager::RegisterType<ConfigFile>("ConfigFile");
 	ResourceManager::RegisterType<Model>("Model");
 	ResourceManager::RegisterType<Texture>("Texture");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
 
 	m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
 	LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -35,10 +35,12 @@ Game::Game(int argc, char* argv[])
 	m_FrameStack->Width = m_Renderer->Resolution().Width;
 	m_FrameStack->Height = m_Renderer->Resolution().Height;
 
-    // Create a TEST WORLD
-    m_World = new HardcodedTestWorld();
+    // Create a world
+    m_World = new World();
 
 	m_LastTime = glfwGetTime();
+
+    testIntialize();
 }
 
 Game::~Game()
@@ -58,6 +60,7 @@ void Game::Tick()
 	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
+    testTick(dt);
     m_RenderQueueFactory->Update(m_World);
 
 	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
@@ -66,4 +69,27 @@ void Game::Tick()
 	m_EventBroker->Clear();
 
 	glfwPollEvents();
+}
+
+
+bool Game::testOnKeyUp(const Events::KeyUp& e)
+{
+    if (e.KeyCode == GLFW_KEY_R) {
+        delete m_World;
+        m_World = new World();
+        ResourceManager::Release("EntityXMLFile", "Schema/Entities/Test.xml");
+        ResourceManager::Load<EntityXMLFile>("Schema/Entities/Test.xml")->PopulateWorld(m_World);
+    }
+
+    return false;
+}
+
+void Game::testIntialize()
+{
+    EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &Game::testOnKeyUp);
+}
+
+void Game::testTick(double dt)
+{
+    m_EventBroker->Process<Game>();
 }
