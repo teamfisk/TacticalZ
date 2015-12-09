@@ -25,9 +25,6 @@ public:
     OctTree(const OctTree&& other) = delete;
     OctTree& operator= (const OctTree& other) = delete;
 
-    //Collision test function. WTODO: Probably remove or relocate elsewhere, Collision system?
-    void Update(float dt, World* world, Camera* cam);
-
     void AddDynamicObject(const AABB& box);
     void AddStaticObject(const AABB& box);
 
@@ -36,10 +33,13 @@ public:
     void ClearObjects();
     void ClearDynamicObjects();
 
+    //Collision test function. WTODO: Probably remove or relocate elsewhere, Collision system?
+    void Update(float dt, World* world, Camera* cam);
     //Returns true if the ray collides with something in the tree. Result is written to [data].
     bool RayCollides(const Ray& ray, Output& data) const;
     //Returns true if the box collides with something in the tree. 
     //On collision with a box, that box is written to [outBoxIntersected].
+    //Note: More efficient than calling BoxesInSameRegion from outside and testing there.
     bool BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const;
 
 private:
@@ -47,11 +47,10 @@ private:
     //WTODO: Do -derived class from AABB- struct containing AABB, with a bool Tested, falsify at 
     //start of Collision test, set on check, don't check if set already. Solves duplicate boxes in tree. 
     //Store indices in the struct, pointing to grand ancestor list of boxes, need the same AABB not copies to save Tested.
-    //WTODO: Boxes collide with themselves? Fix somehow, maybe float epsilon stuff.
     std::vector<AABB> m_StaticObjects;
     std::vector<AABB> m_DynamicObjects;
     AABB m_Box;
-
+                                                                                                                   
     bool m_UpdatedOnce;
     unsigned int m_BoxID;
     glm::vec3 m_PrevPos;

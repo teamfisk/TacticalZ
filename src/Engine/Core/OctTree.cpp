@@ -21,6 +21,16 @@ bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
     return first.Distance < second.Distance;
 }
 
+bool isSameBoxProbably(const AABB& first, const AABB& second)
+{
+    const float EPS = 0.0001f;
+    const auto& ma = first.MaxCorner();
+    const auto& mi = first.MinCorner();
+    return (std::abs(ma.x - mi.x) < EPS) &&
+        (std::abs(ma.z - mi.z) < EPS) &&
+        (std::abs(ma.y - mi.y) < EPS);
+}
+
 }
 
 OctTree::OctTree()
@@ -131,16 +141,18 @@ bool OctTree::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
                 return true;
         }
     } else {
-        std::vector<std::vector<AABB>> objVectors = {
-            m_StaticObjects,
-            m_DynamicObjects
-        };
-        for (const auto& objVector : objVectors) {
-            for (const auto& obj : objVector) {
-                if (Collision::AABBVsAABB(boxToTest, obj)) {
-                    outBoxIntersected = obj;
-                    return true;
-                }
+        for (const auto& obj : m_StaticObjects) {
+            if (Collision::AABBVsAABB(boxToTest, obj)) {
+                outBoxIntersected = obj;
+                return true;
+            }
+        }
+        for (const auto& obj : m_DynamicObjects) {
+            //If there is a collision and it is not testing against itself.
+            if (!isSameBoxProbably(boxToTest, obj) && 
+                Collision::AABBVsAABB(boxToTest, obj)) {
+                outBoxIntersected = obj;
+                return true;
             }
         }
     }
@@ -170,17 +182,18 @@ bool OctTree::RayCollides(const Ray& ray, Output& data) const
             //Check against boxes in the node.
             float minDist = INFINITY;
             bool intersected = false;
-            std::vector<std::vector<AABB>> objVectors = {
-                m_StaticObjects,
-                m_DynamicObjects
-            };
-            for (const auto& objVector : objVectors) {
-                for (const auto& obj : objVector) {
-                    float dist;
-                    if (Collision::RayVsAABB(ray, obj, dist)) {
-                        minDist = std::min(dist, minDist);
-                        intersected = true;
-                    }
+            for (const auto& obj : m_StaticObjects) {
+                float dist;
+                if (Collision::RayVsAABB(ray, obj, dist)) {
+                    minDist = std::min(dist, minDist);
+                    intersected = true;
+                }
+            }
+            for (const auto& obj : m_DynamicObjects) {
+                float dist;
+                if (Collision::RayVsAABB(ray, obj, dist)) {
+                    minDist = std::min(dist, minDist);
+                    intersected = true;
                 }
             }
 
