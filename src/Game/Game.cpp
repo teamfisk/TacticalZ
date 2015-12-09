@@ -41,15 +41,16 @@ Game::Game(int argc, char* argv[])
 	// TEMP: Invoke network
 
 	boost::thread workerThread(&Game::NetworkFunction, this);
-
 	m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
+    // Call before to ensure that thread closes correctly.
+    m_Client.Close();
+
 	delete m_FrameStack;
 	delete m_EventBroker;
-    m_Client.Close();
 }
 
 void Game::Tick()

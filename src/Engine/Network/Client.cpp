@@ -18,10 +18,11 @@ Client::~Client()
 void Client::Start(World* world, EventBroker* eventBroker)
 {
 	// Subscribe to events
-	m_EventBroker = eventBroker;
+    m_WasStarted = true;
+    m_EventBroker = eventBroker;
 	m_World = world;
 	m_EKeyDown = decltype(m_EKeyDown)(std::bind(&Client::OnKeyDown, this, std::placeholders::_1));
-	m_EventBroker->Subscribe(m_EKeyDown);
+    m_EventBroker->Subscribe(m_EKeyDown);
 	std::cout << "Please enter you name: ";
 	std::cin >> m_PlayerName;
 	while (m_PlayerName.size() > 7) {
@@ -30,15 +31,16 @@ void Client::Start(World* world, EventBroker* eventBroker)
 	}
 	m_Socket.connect(m_ReceiverEndpoint);
 	std::cout << "I am client. BIP BOP\n";
-
     ReadFromServer();
 }
 
 void Client::Close()
 {
-    Disconnect();
-    m_ThreadIsRunning = false;
-    m_Socket.close();
+    if (m_WasStarted) {
+        Disconnect();
+        m_ThreadIsRunning = false;
+        m_EventBroker->Unsubscribe(m_EKeyDown);
+    }
 }
 
 void Client::ReadFromServer()

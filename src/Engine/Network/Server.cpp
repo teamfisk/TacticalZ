@@ -28,36 +28,11 @@ void Server::Start(World* world)
 
 void Server::DisplayLoop()
 {
-    int lengthOfMessage = -1;
-    std::clock_t previousePingMessage = std::clock();
-    std::clock_t previousSnapshotMessage = std::clock();
-    std::clock_t timOutTimer = std::clock();
-    int intervallMs = 1000;
-    int snapshotInterval = 50;
-    int timeToCheckTimeOutTime = 100;
-    char* data;
+
 
     for (;;) {
 
-        std::clock_t currentTime = std::clock();
-        // int tempTestRemovePlz = (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC);
-        // Send snapshot
-        if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-            SendSnapshot();
-            previousSnapshotMessage = currentTime;
-        }
-
-        // Send pings each 
-        if (intervallMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
-            SendPing();
-            previousePingMessage = currentTime;
-        }
-
-        // Time out logic
-        if (timeToCheckTimeOutTime < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
-            CheckForTimeOuts();
-            timOutTimer = currentTime;
-        }
+    
     }
 }
 
@@ -65,6 +40,14 @@ void Server::ReadFromClients()
 {
     char readBuf[1024] = { 0 };
     int bytesRead = 0;
+    // time for previouse message
+    std::clock_t previousePingMessage = std::clock();
+    std::clock_t previousSnapshotMessage = std::clock();
+    std::clock_t timOutTimer = std::clock();
+    // How offen we send messages (milliseconds)
+    int intervallMs = 1000;
+    int snapshotInterval = 50;
+    int timeToCheckTimeOutTime = 100;
 
     for (;;) {
         if (m_Socket.available()) {
@@ -76,6 +59,26 @@ void Server::ReadFromClients()
                 //if (std::string(err.what()).find("forcefully closed") != std::string::npos) {
                 std::cout << "Read from client crashed: " << err.what();
                 //}
+            }
+            
+            std::clock_t currentTime = std::clock();
+            // int tempTestRemovePlz = (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC);
+            // Send snapshot
+            if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+                SendSnapshot();
+                previousSnapshotMessage = currentTime;
+            }
+
+            // Send pings each 
+            if (intervallMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+                SendPing();
+                previousePingMessage = currentTime;
+            }
+
+            // Time out logic
+            if (timeToCheckTimeOutTime < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
+                CheckForTimeOuts();
+                timOutTimer = currentTime;
             }
         }
     }
@@ -299,24 +302,24 @@ void Server::ParseEvent(char * data, size_t length)
     unsigned int entityId = m_PlayerDefinitions[i].EntityID;
     if ("+Forward" == std::string(data)) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.z -= 0.5f;
+        temp.z -= 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
     if ("-Forward" == std::string(data)) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.z += 0.5f;
+        temp.z += 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
        
     if ("+Right" == std::string(data)) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.x += 0.5f;
+        temp.x += 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
      
     if ("-Right" == std::string(data)) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.x -= 0.5f;
+        temp.x -= 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
 }
@@ -340,6 +343,7 @@ void Server::ParseConnect(char * data, size_t length)
             transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
             ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Model");
             model["Resource"] = "Models/Core/UnitSphere.obj";
+            model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
 
             m_PlayerDefinitions[i].Endpoint = m_ReceiverEndpoint;
             m_PlayerDefinitions[i].Name = std::string(data);

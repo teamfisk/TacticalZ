@@ -23,7 +23,6 @@ public:
 	~Client();
 	void Start(World* world, EventBroker* eventBroker);
     void Close();
-
 private:
 	// Threaded
 	void ReadFromServer();
@@ -50,12 +49,14 @@ private:
 	World* m_World;
 	int m_PlayerID = -1;
 	glm::vec2 m_PlayerPositions[MAXCONNECTIONS];
-	//std::string m_PlayerNames[MAXCONNECTIONS];
 	PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
 	std::clock_t m_StartPingTime;
 	double m_DurationOfPingTime;
 	std::string m_PlayerName;
     bool m_ThreadIsRunning = true;
+    // Use to check if we should send disconnect message
+    // if game is turned of by closing window.
+    bool m_WasStarted = false;
 
 	// Events
 	EventBroker* m_EventBroker;
