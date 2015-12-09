@@ -14,28 +14,10 @@ struct Frustum {
 	Plane Planes[4];
 };
 
-layout (std430, binding = 1) buffer FrustumBuffer
+layout (std430, binding = 0) buffer FrustumBuffer
 {
-	Frustum Data[80*45];
+	Frustum Data[3600];
 } Frustums;
-
-
-struct PlaneNormals {
-	vec3 Normal1;
-	float pad1;
-	vec3 Normal2;
-	float Pad2;
-};
-
-struct FrustumNormals {
-	PlaneNormals Planes[4];
-};
-
-layout (std430, binding = 2) buffer PlaneNormalBuffer
-{
-	FrustumNormals Data[80*45];
-} FrustumNorm;
-
 
 vec4 ConvertToView(vec4 ScreenCoords)
 {
@@ -75,33 +57,6 @@ void main ()
 			ViewVectors[i] = vec3(ConvertToView(ScreenCoords[i]));
 		}
 	
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[0].Normal1 = (ViewVectors[2]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[0].Normal2 = (ViewVectors[0]);
-
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[1].Normal1 = (ViewVectors[1]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[1].Normal2 = (ViewVectors[3]);
-
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[2].Normal1 = (ViewVectors[0]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[2].Normal2 = (ViewVectors[1]);
-
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[3].Normal1 = (ViewVectors[3]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[3].Normal2 = (ViewVectors[2]);
-	/*
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[0].Normal1 = vec3(ScreenCoords[2]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[0].Normal2 = vec3(ScreenCoords[0]);
-
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[1].Normal1 = vec3(ScreenCoords[1]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[1].Normal2 = vec3(ScreenCoords[3]);
-
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[2].Normal1 = vec3(ScreenCoords[0]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[2].Normal2 = vec3(ScreenCoords[1]);
-
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[3].Normal1 = vec3(ScreenCoords[3]);
-		FrustumNorm.Data[gl_GlobalInvocationID.x + (80 * gl_GlobalInvocationID.y)].Planes[3].Normal2 = vec3(ScreenCoords[2]);
-
-*/
-
-
 		vec3 EyePos = vec3(0,0,0);
 
 		Frustum f;

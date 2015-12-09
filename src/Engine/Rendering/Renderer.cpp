@@ -90,9 +90,9 @@ void Renderer::InitializeShaders()
     m_CalculateFrustumProgram.Compile();
     m_CalculateFrustumProgram.Link();
 
-    m_CalculateFrustumProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
-    m_CalculateFrustumProgram.Compile();
-    m_CalculateFrustumProgram.Link();
+    m_LightCullProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
+    m_LightCullProgram.Compile();
+    m_LightCullProgram.Link();
 }
 
 void Renderer::InputUpdate(double dt)
@@ -357,9 +357,11 @@ void Renderer::InitializeFrameBuffers()//TODO: Renderer: Get this to a better lo
 
 void Renderer::InitializeSSBOs()
 {
+    printf("Size: %i\n", sizeof(m_Frustums));
     glGenBuffers(1, &m_FrustumSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_FrustumSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Frustums), &m_Frustums, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     GLERROR("m_FrustumSSBO");
@@ -367,6 +369,7 @@ void Renderer::InitializeSSBOs()
     glGenBuffers(1, &m_LightSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_PointLights), &m_PointLights, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     GLERROR("m_LightSSBO");
@@ -375,6 +378,7 @@ void Renderer::InitializeSSBOs()
     glGenBuffers(1, &m_LightGridSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     GLERROR("m_LightGridSSBO");
@@ -383,6 +387,7 @@ void Renderer::InitializeSSBOs()
     glGenBuffers(1, &m_LightOffsetSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     GLERROR("m_LightOffsetSSBO");
@@ -391,6 +396,7 @@ void Renderer::InitializeSSBOs()
     glGenBuffers(1, &m_LightIndexSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     GLERROR("m_LightIndexSSBO");
@@ -399,12 +405,18 @@ void Renderer::InitializeSSBOs()
 
 void Renderer::CalculateFrustum()
 {
+    GLERROR("CalculateFrustum Error-1");
     m_CalculateFrustumProgram.Bind();
+    
+    GLERROR("CalculateFrustum Error1");
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
+    GLERROR("CalculateFrustum Error2");
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram.GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
+    GLERROR("CalculateFrustum Error3");
     glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram.GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
-    glDispatchCompute(m_Resolution.Width / TILE_SIZE, m_Resolution.Height / TILE_SIZE, 1);
-    GLERROR("CalculateFrustum Error");
+    GLERROR("CalculateFrustum Error4");
+    glDispatchCompute(5, 3, 1);
+    GLERROR("CalculateFrustum Error5");
 
 }
 

@@ -63,15 +63,12 @@ private:
     void CalculateFrustum();
     void CullLights();
     //Frustum
-    struct Plane
-    {
+    struct Plane {
         glm::vec3 Normal;
         float d;
     };
-
-    struct Frustum
-    {
-        Plane plane[4];
+    struct Frustum {
+        Plane Planes[4];
     };
     Frustum m_Frustums[80*45]; //TODO: Renderer: Make this change with resolution
 
@@ -100,11 +97,11 @@ private:
     int m_LightIndex[80*45*200];
 
     //-------------------------SSBO------------------------//
-    GLuint m_FrustumSSBO;
-    GLuint m_LightSSBO;
-    GLuint m_LightGridSSBO;
-    GLuint m_LightOffsetSSBO;
-    GLuint m_LightIndexSSBO;
+    GLuint m_FrustumSSBO = 0;
+    GLuint m_LightSSBO = 1;
+    GLuint m_LightGridSSBO = 2;
+    GLuint m_LightOffsetSSBO = 3;
+    GLuint m_LightIndexSSBO = 4;
 
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
