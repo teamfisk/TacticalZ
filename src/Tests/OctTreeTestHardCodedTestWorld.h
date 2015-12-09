@@ -128,7 +128,7 @@ private:
             //auto min1 = someOctTree.m_Children[i]->m_Box.MinCorner();
             //auto max1 = someOctTree.m_Children[i]->m_Box.MaxCorner();
 
-            float boxDrawFactor = 1.05f;
+            float boxDrawFactor = 1.00f;
             auto halfSizeFactor = 0.0f;
             halfSizeFactor = someAABB.HalfSize().x;
 
@@ -137,10 +137,10 @@ private:
 
             ComponentWrapper transform = world.AttachComponent(entityDummyScene, "Transform");
             transform["Position"] = someAABB.Center()*1.0f;
-            transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*halfSizeFactor*boxDrawFactor;
+            transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*halfSizeFactor*boxDrawFactor*2.0f;
 
             ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
-            model["Resource"] = "Models/Core/UnitBox.obj";
+            model["Resource"] = "Models/Core/UnitBox2.obj";
             model["Color"] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
             //just draw the first 8 children - looks nicer in code if i split it this way
@@ -153,10 +153,10 @@ private:
                 
                 ComponentWrapper transform = world.AttachComponent(entityDummyScene, "Transform");
                 transform["Position"] = cen1*1.0f;
-                transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*0.97f*halfSizeFactor*boxDrawFactor;
+                transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*halfSizeFactor*boxDrawFactor*2.0f;
 
                 ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
-                model["Resource"] = "Models/Core/UnitBox.obj";
+                model["Resource"] = "Models/Core/UnitBox2.obj";
                 model["Color"] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
                 //OutputDebugStringA((std::to_string(cen1.x) + std::to_string(cen1.y) + std::to_string(cen1.z)).c_str());
@@ -164,28 +164,28 @@ private:
             }
             
             //then draw the childrens children
-            //for (size_t j = 0; j < 8; j++)
-            //{
-            //    auto someChild = someOctTree.m_Children[j];
+            for (size_t j = 0; j < 8; j++)
+            {
+                auto someChild = someOctTree.m_Children[j];
 
-            //    for (size_t i = 0; i < 8; i++)
-            //    {
-            //        auto cen1 = someChild->m_Children[i]->m_Box.Center();
-            //        auto boxScale = someChild->m_Children[i]->m_Box.HalfSize();
+                for (size_t i = 0; i < 8; i++)
+                {
+                    auto cen1 = someChild->m_Children[i]->m_Box.Center();
+                    halfSizeFactor = someChild->m_Children[i]->m_Box.HalfSize().x;
 
-            //        EntityID entityDummyScene = world.CreateEntity();
+                    EntityID entityDummyScene = world.CreateEntity();
 
-            //        ComponentWrapper transform = world.AttachComponent(entityDummyScene, "Transform");
-            //        transform["Position"] = cen1*1.0f;
-            //        transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*0.97f*boxScale*boxDrawFactor;
+                    ComponentWrapper transform = world.AttachComponent(entityDummyScene, "Transform");
+                    transform["Position"] = cen1*1.0f;
+                    transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*halfSizeFactor*boxDrawFactor*2.0f;
 
-            //        ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
-            //        model["Resource"] = "Models/Core/UnitBox.obj";
-            //        model["Color"] = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-            //        //OctTreeEntityIdSaved = entityDummyScene;
-            //    }
+                    ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
+                    model["Resource"] = "Models/Core/UnitBox2.obj";
+                    model["Color"] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+                    //OctTreeEntityIdSaved = entityDummyScene;
+                }
 
-            //}
+            }
 
 
         }
