@@ -44,6 +44,7 @@ void Client::Close()
         Disconnect();
         m_ThreadIsRunning = false;
         m_EventBroker->Unsubscribe(m_EKeyDown);
+        m_EventBroker->Unsubscribe(m_EKeyUp);
     }
 }
 
@@ -78,6 +79,7 @@ void Client::SendToServer()
 			dataPackage,
 			len),
 			m_ReceiverEndpoint, 0);
+        delete[] dataPackage;
 	}
 	if (m_NextSnapshot.inputRight != "") {
 		char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
@@ -86,6 +88,7 @@ void Client::SendToServer()
 			dataPackage,
 			len),
 			m_ReceiverEndpoint, 0);
+        delete[] dataPackage;
 	}
 }
 

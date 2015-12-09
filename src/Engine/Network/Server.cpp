@@ -26,14 +26,14 @@ void Server::Start(World* world)
     threads.join_all();
 }
 
+void Server::Close()
+{ 
+    m_ThreadIsRunning = false;
+}
+
 void Server::DisplayLoop()
 {
 
-
-    for (;;) {
-
-    
-    }
 }
 
 void Server::ReadFromClients()
@@ -49,8 +49,11 @@ void Server::ReadFromClients()
     int snapshotInterval = 50;
     int timeToCheckTimeOutTime = 100;
 
-    for (;;) {
-        if (m_Socket.available()) {
+    while(m_ThreadIsRunning) {
+        // m_ThreadIsRunning might be unnecessary but the 
+        // program crashed if it executed m_Socket.available()
+        // when closing the program. 
+        if (m_ThreadIsRunning && m_Socket.available()) {
             try {
                 bytesRead = Receive(readBuf, INPUTSIZE);
                 ParseMessageType(readBuf, bytesRead);
@@ -89,7 +92,7 @@ void Server::InputLoop()
     char inputBuffer[INPUTSIZE] = { 0 };
     std::string inputMessage;
 
-    for (;;) {
+    while (m_ThreadIsRunning) {
         std::cin.getline(inputBuffer, INPUTSIZE);
         inputMessage = (std::string)inputBuffer;
 
@@ -283,8 +286,6 @@ void Server::Disconnect(int i)
     m_PlayerDefinitions[i].Endpoint = boost::asio::ip::udp::endpoint();
 	m_PlayerDefinitions[i].EntityID = -1;
     m_PlayerDefinitions[i].Name = "";
-
-
 }
 
 void Server::ParseEvent(char * data, size_t length)

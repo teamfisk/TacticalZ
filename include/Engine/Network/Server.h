@@ -19,6 +19,7 @@ public:
     Server();
     ~Server();
     void Start(World* m_world);
+    void Close();
 
 private:
     // udp stuff
@@ -30,13 +31,14 @@ private:
     std::clock_t m_StartPingTime;
     std::clock_t m_StopTimes[8];
     // Game logic
-
     World* m_World;
-
+    // Close logic
+    bool m_ThreadIsRunning = true;
     // Threaded
     void DisplayLoop();
     void ReadFromClients();
     void InputLoop();
+
 
 
     int  Receive(char* data, size_t length);

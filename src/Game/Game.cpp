@@ -49,6 +49,7 @@ Game::~Game()
 {
     // Call before to ensure that thread closes correctly.
     m_Client.Close();
+    m_Server.Close();
 
 	delete m_FrameStack;
 	delete m_EventBroker;
