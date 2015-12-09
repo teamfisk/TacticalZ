@@ -1,0 +1,15 @@
+{
+  "name": "Live Textureing RAMDisk",
+  "version": "1.0.0",
+  "description": "Send image from Photoshop",
+  "main": "main.js",
+  "generator-core-version": "~3",
+  "license": "Public Domain",
+  "readmeFilename": "",
+  "scripts": {
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

@@ -4,3 +4,7 @@ bin/
 lib/
 # Because apparently nobody has any self control
 *.orig
+
+tools/LiveTexturing/mayaPluginRTT/mayaPluginRTT/x64/Debug/
+tools/LiveTexturing/mayaPluginRTT/x64/Debug/
+*.suo
