@@ -30,6 +30,9 @@ private:
     GUI::Frame* m_FrameStack;
     HardcodedTestWorld* m_World;
     RenderQueueFactory* m_RenderQueueFactory;
+
+    int frameCounter = 0;
+    glm::vec3 minPos = glm::vec3(-0.2f, 0.2f, 0.3f);
 };
 
 #endif

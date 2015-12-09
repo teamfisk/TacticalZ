@@ -16,9 +16,9 @@ using boost::unit_test_framework::test_case;
 //#define DEBUG_CLIENTBLOCK new( _CLIENT_BLOCK, __FILE__, __LINE__)
 //#define new DEBUG_CLIENTBLOCK
 
-BOOST_AUTO_TEST_SUITE(collisionTests)
+BOOST_AUTO_TEST_SUITE(cTest)
 
-BOOST_AUTO_TEST_CASE(collisionTest)
+BOOST_AUTO_TEST_CASE(cTest)
 {
     //memleak
     int* globalLeak = new int[5];
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(collisionTest)
     //_CrtDumpMemoryLeaks();
 }
 
-BOOST_AUTO_TEST_CASE(collisionTest2)
+BOOST_AUTO_TEST_CASE(cTest2)
 {
     //fixed seed
     srand(2);

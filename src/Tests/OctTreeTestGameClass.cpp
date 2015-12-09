@@ -58,8 +58,19 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     //movement
+    minPos.x += 0.001f;
+    //frameCounter++;
+    //if (frameCounter > 50) {
+    //    m_World->createTestEntities(AABB(minPos, glm::vec3(0.1f, 0.4f, 0.6f)));
+    //    frameCounter = 0;
+    //}
     //auto transf = m_World->GetComponent(m_World->OctTreeEntityIdSaved, "Transform");
     //((glm::vec3&)transf["Position"]).x += 0.001f;
+
+    //for (auto oneModel : m_World->allModels)
+    //{
+
+    //}
 
     m_RenderQueueFactory->Update(m_World);
 
