@@ -10,6 +10,8 @@
 #include "Core/World.h"
 #include "Rendering/RenderQueueFactory.h"
 
+class OctTree;
+
 class Game
 {
 public:
@@ -28,6 +30,7 @@ private:
 	GUI::Frame* m_FrameStack;
     World* m_World;
     RenderQueueFactory* m_RenderQueueFactory;
+    OctTree* m_OctTree;
 };
 
 #endif

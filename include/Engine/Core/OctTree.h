@@ -4,6 +4,8 @@
 #include "Core/AABB.h"
 
 struct Ray;
+class World;
+class Camera;
 
 class OctTree
 {
@@ -22,6 +24,9 @@ public:
     OctTree(const OctTree& other) = delete;
     OctTree(const OctTree&& other) = delete;
     OctTree& operator= (const OctTree& other) = delete;
+
+    //Collision test function. WTODO: Probably remove or relocate elsewhere, Collision system?
+    void Update(float dt, World* world, Camera* cam);
 
     void AddDynamicObject(const AABB& box);
     void AddStaticObject(const AABB& box);
@@ -46,6 +51,11 @@ private:
     std::vector<AABB> m_StaticObjects;
     std::vector<AABB> m_DynamicObjects;
     AABB m_Box;
+
+    bool m_UpdatedOnce;
+    unsigned int m_BoxID;
+    glm::vec3 m_PrevPos;
+    glm::quat m_PrevOri;
 
     inline bool hasChildren() const;
     int childIndexContainingPoint(const glm::vec3& point) const;

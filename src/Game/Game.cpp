@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "HardcodedTestWorld.h"
+#include "Core/OctTree.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -38,6 +39,10 @@ Game::Game(int argc, char* argv[])
     // Create a TEST WORLD
     m_World = new HardcodedTestWorld();
 
+    //WTODO: Current worldsize is temp.
+    glm::vec3 worldSize = glm::vec3(50, 50, 50);
+    m_OctTree = new OctTree(AABB(-0.5f*worldSize, 0.5f*worldSize), 2);
+
 	m_LastTime = glfwGetTime();
 }
 
@@ -45,6 +50,7 @@ Game::~Game()
 {
 	delete m_FrameStack;
 	delete m_EventBroker;
+    delete m_OctTree;
 }
 
 void Game::Tick()
@@ -56,6 +62,9 @@ void Game::Tick()
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
 	m_Renderer->Update(dt);
+    
+    m_OctTree->Update(dt, m_World, m_Renderer->Camera());
+
 	m_EventBroker->Swap();
 
     m_RenderQueueFactory->Update(m_World);
