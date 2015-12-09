@@ -11,6 +11,7 @@
 #include "Rendering/RenderQueueFactory.h"
 
 #include "OctTreeTestHardCodedTestWorld.h"
+#include "Core\Collision.h"
 
 class Game
 {
@@ -31,8 +32,20 @@ private:
     HardcodedTestWorld* m_World;
     RenderQueueFactory* m_RenderQueueFactory;
 
+    //Test1
     int frameCounter = 0;
-    glm::vec3 minPos = glm::vec3(-0.2f, 0.2f, 0.3f);
+    glm::vec3 minPos = glm::vec3(0.1f, 0.1f, 0.1f);
+    glm::vec3 maxPos = glm::vec3(0.2f, 0.2f, 0.2f);
+
+    //Test2
+    bool m_UpdatedOnce = false;
+    unsigned int m_BoxID;
+    glm::vec3 m_PrevPos;
+    glm::quat m_PrevOri;
+
+    glm::vec3 worldSize = glm::vec3(50, 50, 50);
+    OctTree someOctTree;
+
 };
 
 #endif

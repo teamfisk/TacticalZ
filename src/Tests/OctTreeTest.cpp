@@ -32,33 +32,17 @@ BOOST_AUTO_TEST_CASE(octTreeTest)
     //simple OctTree constructor check
     OctTree someOctTree(someAABB, 5);
     BOOST_CHECK(someOctTree.m_Children[0] != nullptr);
-    //TODO: a check so it split the tree properly
-
-
-
-
-    //advanced AddBox check
-    //add a boxcontainer - which crosses the mid-split
-    auto someAABB2 = AABB(glm::vec3(0.45f, 0.45f, 0.45f), glm::vec3(0.55f, 0.55f, 0.55f));
-    someOctTree.AddDynamicObject(someAABB2);
-    //clear the boxcontainer
-    //need to check so it added the box properly
-
-    someOctTree.ClearDynamicObjects();
-    //add a boxcontainer
-    someOctTree.AddDynamicObject(someAABB2);
-
 
     //simple destructor check in the end, just look for memleaks, then it didnt clear the AABB structure
 }
 
 BOOST_AUTO_TEST_CASE(octTreeTest2)
 {
+    //octtree ritningen osv
     Game game(0, nullptr);
     while (game.Running()) {
         game.Tick();
     }
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

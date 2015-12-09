@@ -5,9 +5,6 @@
 #include "Core/World.h"
 #include "Core/Util/Any.h"
 
-//octTree
-//#include <windows.h>
-
 #include <vector>
 //last!
 #define private public
@@ -18,18 +15,26 @@ class HardcodedTestWorld : public World
 public:
     struct LinkOctTreeAndModel {
         EntityID entId;
+        OctTree* child;
+        glm::vec3 posxyz;
+        LinkOctTreeAndModel(EntityID eId, OctTree* ch, glm::vec3 pos)
+        {
+            entId = eId;
+            child = ch;
+            posxyz = pos;
+        }
     };
-    EntityID OctTreeEntityIdSaved;
-    //std::vector<ComponentWrapper> allModels;
-    //ComponentWrapper moveModel;
-    //OctTree* someOctTreePointer;
+    EntityID anotherBoxTransformId;
+    std::vector<LinkOctTreeAndModel> linkOM;
+    OctTree someOctTree;
 
     //constructor
     HardcodedTestWorld()
         : World()
+        , someOctTree(AABB(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)), 2)
     {
         registerTestComponents();
-        createTestEntities(AABB(glm::vec3(-0.2f, 0.2f, 0.3f), glm::vec3(0.1f, 0.4f, 0.6f)));
+        //createTestEntities();
     }
 
 private:
@@ -61,58 +66,69 @@ private:
         RegisterComponent(f);
     }
 
-    void createTestEntities(AABB anotherBox)
+    void createTestEntities()
     {
         World& world = *this;
-        
+        EntityID tempId;
         //add octTree
         {
+            //copy of mainbox
             auto someAABB = AABB(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-            OctTree someOctTree(someAABB, 2);
-            //add a box
-            //auto anotherBox = AABB(glm::vec3(-0.2f, 0.2f, 0.3f), glm::vec3(0.1f, 0.4f, 0.6f));
+
+            //draw main box first
+            AddBoxModel(someAABB.Center(), someAABB.HalfSize().x, &someOctTree, tempId);
+
+            //add anotherbox in octTree
+            auto anotherBox = AABB(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.2f, 0.2f, 0.2f));
             //note: have to delete the box in the tree first, since were trying to move the box
-            someOctTree.ClearDynamicObjects();
             someOctTree.AddDynamicObject(anotherBox);
 
-            //the main box first
-            AddBoxModel(someAABB.Center(), someAABB.HalfSize().x, someOctTree.m_DynamicObjects.size());
-
-            //draw anotherbox
-            AddBoxModel(anotherBox.Center(), anotherBox.HalfSize().x, 0);
+            //draw anotherbox and save it in anotherBoxTransformId
+            AddBoxModel(anotherBox.Center(), anotherBox.HalfSize().x, &someOctTree, anotherBoxTransformId);
 
             //draw the octTree
             for (size_t j = 0; j < 8; j++)
             {
                 AddBoxModel(someOctTree.m_Children[j]->m_Box.Center(),
-                    someOctTree.m_Children[j]->m_Box.HalfSize().x, someOctTree.m_Children[j]->m_DynamicObjects.size());
+                    someOctTree.m_Children[j]->m_Box.HalfSize().x, someOctTree.m_Children[j], tempId);
 
                 auto someChild = someOctTree.m_Children[j];
 
                 for (size_t i = 0; i < 8; i++)
                 {
                     AddBoxModel(someChild->m_Children[i]->m_Box.Center(),
-                        someChild->m_Children[i]->m_Box.HalfSize().x, someChild->m_Children[i]->m_DynamicObjects.size());
+                        someChild->m_Children[i]->m_Box.HalfSize().x, someChild->m_Children[i], tempId);
                 }
             }
         }
     }//end CreateEnt
 
-    void AddBoxModel(const glm::vec3 &center, const float &halfSize, const int &contBoxes) {
+    void AddBoxModel(const glm::vec3 &center, const float &halfSize, OctTree* child, EntityID &outEntityId) {
         World& world = *this;
 
         EntityID entityDummyScene = world.CreateEntity();
-
+        outEntityId = entityDummyScene;
         ComponentWrapper transform = world.AttachComponent(entityDummyScene, "Transform");
         transform["Position"] = center;
-        transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*halfSize*2.0f;
+        transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*halfSize*2.0f*0.97f;
         ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
-        model["Resource"] = "Models/Core/UnitBox2.obj";
+        model["Resource"] = "Models/Core/UnitBox.obj";
         model["Color"] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-        if (contBoxes != 0)
+        if (child->m_DynamicObjects.size() != 0)
             model["Color"] = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
+        linkOM.emplace_back(entityDummyScene, child, center);
         //extra
         //allModels.push_back(model);
+    }
+    void createTestEntitiesTest2()
+    {
+        World& world = *this;
+
+        EntityID entityCollisionBox = world.CreateEntity();
+        ComponentWrapper transform = world.AttachComponent(entityCollisionBox, "Transform");
+        transform["Position"] = glm::vec3(0.f, 2.f, 0.f);
+        ComponentWrapper model = world.AttachComponent(entityCollisionBox, "Model");
+        model["Resource"] = "Models/Core/UnitBox.obj";
     }
 };
