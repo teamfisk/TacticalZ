@@ -38,9 +38,10 @@ Game::Game(int argc, char* argv[])
     // Create a TEST WORLD
     m_World = new HardcodedTestWorld();
 
-	// TEMP: Invoke network
-
-	boost::thread workerThread(&Game::NetworkFunction, this);
+	
+	// Invoke network
+	if(m_Config->Get<bool>("Networking.StartNetwork", false) == true)
+		boost::thread workerThread(&Game::NetworkFunction, this);
 
 	m_LastTime = glfwGetTime();
 }
