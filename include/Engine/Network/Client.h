@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h> // For input event
 
 #include "Network/MessageType.h"
-#include "Network/NetworkDefines.h"
+#include "Network/NetworkDefinitions.h"
 #include "Network/PlayerDefinition.h"
 #include "Network/WinLeakCheck.h"
 #include "Core/World.h"
