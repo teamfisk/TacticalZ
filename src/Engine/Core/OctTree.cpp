@@ -7,17 +7,17 @@
 
 namespace
 {
-//To be able to sort nodes based on distance to ray origin.
-struct ChildInfo
-{
-    int Index;
-    float Distance;
-};
+    //To be able to sort nodes based on distance to ray origin.
+    struct ChildInfo
+    {
+        int Index;
+        float Distance;
+    };
 
-bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
-{
-    return first.Distance < second.Distance;
-}
+    bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
+    {
+        return first.Distance < second.Distance;
+    }
 
 }
 
@@ -32,28 +32,31 @@ OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
         for (OctTree*& c : m_Children) {
             c = nullptr;
         }
-    } else {
+    }
+    else {
         --subDivisions;
+        const glm::vec3& parentMin = m_Box.MinCorner();
+        const glm::vec3& parentMax = m_Box.MaxCorner();
+        const glm::vec3& parentCenter = m_Box.Center();
         for (int i = 0; i < 8; ++i) {
             glm::vec3 minPos, maxPos;
-            const glm::vec3& parentMin = m_Box.MinCorner();
-            const glm::vec3& parentMax = m_Box.MaxCorner();
-            const glm::vec3& parentCenter = m_Box.Center();
             std::bitset<3> bits(i);
             //If child is 4,5,6,7.
             if (bits.test(2)) {
                 minPos.x = parentCenter.x;
                 maxPos.x = parentMax.x;
-            } else {
+            }
+            else {
                 minPos.x = parentMin.x;
                 maxPos.x = parentCenter.x;
             }
-            
+
             //If child is 2,3,6,7
             if (bits.test(1)) {
                 minPos.y = parentCenter.y;
                 maxPos.y = parentMax.y;
-            } else {
+            }
+            else {
                 minPos.y = parentMin.y;
                 maxPos.y = parentCenter.y;
             }
@@ -61,7 +64,8 @@ OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
             if (bits.test(0)) {
                 minPos.z = parentCenter.z;
                 maxPos.z = parentMax.z;
-            } else {
+            }
+            else {
                 minPos.z = parentMin.z;
                 maxPos.z = parentCenter.z;
             }
@@ -107,7 +111,8 @@ bool OctTree::rayCollides(const Ray& ray, Output& data) const
                     return true;
                 }
             }
-        } else {
+        }
+        else {
             //Check against boxes in the node.
             float minDist = INFINITY;
             bool intersected = false;
@@ -162,7 +167,8 @@ void OctTree::AddBox(const AABB& box)
         default:
             break;
         }
-    } else {
+    }
+    else {
         m_ContainingBoxes.push_back(box);
     }
 }
@@ -175,7 +181,8 @@ void OctTree::ClearBoxes()
         for (OctTree*& c : m_Children) {
             c->ClearBoxes();
         }
-    } else {
+    }
+    else {
         m_ContainingBoxes.clear();
     }
 }

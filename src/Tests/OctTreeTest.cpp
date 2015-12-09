@@ -2,6 +2,7 @@
 using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 #include <stdlib.h>//srand
+#include "OctTreeTestGameClass.h"
 //HACK! Needed for white box testing
 //else we would have to "open up" the octTree class more with get/sets, public methods, etc. which is not good encapsulation-wise
 //friend class and refactoringIntoNewClass is some extra work and needs to be updated when the original class is updated, and can contain bugs that
@@ -10,7 +11,6 @@ using boost::unit_test_framework::test_case;
 //http://stackoverflow.com/questions/6778496/how-to-do-unit-testing-on-private-members-and-methods-of-c-classes
 //http://stackoverflow.com/questions/3676664/unit-testing-of-private-methods
 #define private public
-
 #include <Engine\Core\OctTree.h>
 
 BOOST_AUTO_TEST_SUITE(octTreeTests)
@@ -55,6 +55,10 @@ BOOST_AUTO_TEST_CASE(octTreeTest)
 
 BOOST_AUTO_TEST_CASE(octTreeTest2)
 {
+    Game game(0, nullptr);
+    while (game.Running()) {
+        game.Tick();
+    }
 
 }
 
