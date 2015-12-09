@@ -25,7 +25,7 @@ public:
     const ComponentPool& GetComponents(std::string componentType);
 
 private:
-    EntityID m_CurrentEntityID = 0;
+    EntityID m_CurrentEntityID = 1;
 
     std::unordered_map<EntityID, EntityID> m_EntityParents;
     std::unordered_multimap<EntityID, EntityID> m_EntityChildren;
