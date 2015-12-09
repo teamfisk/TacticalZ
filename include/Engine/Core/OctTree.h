@@ -16,8 +16,21 @@ public:
     ~OctTree();
     //For the root OctTree, [octTreeBounds] should be a box containing the entire level.
     OctTree(const AABB& octTreeBounds, int subDivisions);
-    void AddBox(const AABB& box);
-    void ClearBoxes();
+
+    //We should only ever need one OctTree in the game, and it should not need to be copied.
+    //Define these if the OctTree suddenly needs to be copied, think of the children OctTree* ptrs. 
+    OctTree(const OctTree& other) = delete;
+    OctTree(const OctTree&& other) = delete;
+    OctTree& operator= (const OctTree& other) = delete;
+
+    void AddDynamicObject(const AABB& box);
+    void AddStaticObject(const AABB& box);
+
+    void BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const;
+
+    void ClearObjects();
+    void ClearDynamicObjects();
+
     //Returns true if the ray collides with something in the tree. Result is written to [data].
     bool RayCollides(const Ray& ray, Output& data) const;
     //Returns true if the box collides with something in the tree. 
@@ -26,10 +39,12 @@ public:
 
 private:
     OctTree* m_Children[8];
-    //TODO: Do derived class from AABB with a bool Tested, falsify at 
-    //start of Collision test, set on check, don't check if set already. Solves duplicate boxes in tree.
-    //TODO: Boxes collide with themselves? Fix somehow, maybe float epsilon stuff.
-    std::vector<AABB> m_ContainingBoxes;
+    //WTODO: Do -derived class from AABB- struct containing AABB, with a bool Tested, falsify at 
+    //start of Collision test, set on check, don't check if set already. Solves duplicate boxes in tree. 
+    //Store indices in the struct, pointing to grand ancestor list of boxes, need the same AABB not copies to save Tested.
+    //WTODO: Boxes collide with themselves? Fix somehow, maybe float epsilon stuff.
+    std::vector<AABB> m_StaticObjects;
+    std::vector<AABB> m_DynamicObjects;
     AABB m_Box;
 
     inline bool hasChildren() const;

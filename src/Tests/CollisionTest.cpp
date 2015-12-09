@@ -92,12 +92,14 @@ BOOST_AUTO_TEST_CASE(octTest)
     glm::vec3 mini = glm::vec3(-1, -1, -1);
     glm::vec3 maxi = glm::vec3(1, 1, 1);
     OctTree tree(AABB(mini, maxi), 2);
-    tree.AddBox(AABB(mini, -0.9f*maxi));
+    tree.AddDynamicObject(AABB(mini, -0.9f*maxi));
     OctTree::Output data;
     glm::vec3 origin = 3.0f * mini;
-    BOOST_CHECK(tree.RayCollides({origin , glm::normalize(mini - origin) }, data));
-    tree.ClearBoxes();
-    BOOST_CHECK(!tree.RayCollides({ origin , glm::normalize(mini - origin) }, data));
+    bool rayIntersected = tree.RayCollides({ origin , glm::normalize(mini - origin) }, data);
+    BOOST_CHECK(rayIntersected);
+    tree.ClearDynamicObjects();
+    rayIntersected = tree.RayCollides({ origin , glm::normalize(mini - origin) }, data);
+    BOOST_CHECK(!rayIntersected);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
