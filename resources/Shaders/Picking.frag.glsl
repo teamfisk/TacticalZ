@@ -13,7 +13,7 @@ out vec4 TextureFragment;
 
 void main()
 {
-	TextureFragment = vec4(PickingColor, 0, 1);
+	TextureFragment = vec4(PickingColor/255, 0, 1);
 }
 
 
