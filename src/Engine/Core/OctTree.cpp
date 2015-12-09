@@ -7,17 +7,17 @@
 
 namespace
 {
-    //To be able to sort nodes based on distance to ray origin.
-    struct ChildInfo
-    {
-        int Index;
-        float Distance;
-    };
+//To be able to sort nodes based on distance to ray origin.
+struct ChildInfo
+{
+    int Index;
+    float Distance;
+};
 
-    bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
-    {
-        return first.Distance < second.Distance;
-    }
+bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
+{
+    return first.Distance < second.Distance;
+}
 
 }
 
@@ -32,21 +32,19 @@ OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
         for (OctTree*& c : m_Children) {
             c = nullptr;
         }
-    }
-    else {
+    } else {
         --subDivisions;
-        const glm::vec3& parentMin = m_Box.MinCorner();
-        const glm::vec3& parentMax = m_Box.MaxCorner();
-        const glm::vec3& parentCenter = m_Box.Center();
         for (int i = 0; i < 8; ++i) {
             glm::vec3 minPos, maxPos;
+            const glm::vec3& parentMin = m_Box.MinCorner();
+            const glm::vec3& parentMax = m_Box.MaxCorner();
+            const glm::vec3& parentCenter = m_Box.Center();
             std::bitset<3> bits(i);
             //If child is 4,5,6,7.
             if (bits.test(2)) {
                 minPos.x = parentCenter.x;
                 maxPos.x = parentMax.x;
-            }
-            else {
+            } else {
                 minPos.x = parentMin.x;
                 maxPos.x = parentCenter.x;
             }
@@ -55,8 +53,7 @@ OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
             if (bits.test(1)) {
                 minPos.y = parentCenter.y;
                 maxPos.y = parentMax.y;
-            }
-            else {
+            } else {
                 minPos.y = parentMin.y;
                 maxPos.y = parentCenter.y;
             }
@@ -64,8 +61,7 @@ OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
             if (bits.test(0)) {
                 minPos.z = parentCenter.z;
                 maxPos.z = parentMax.z;
-            }
-            else {
+            } else {
                 minPos.z = parentMin.z;
                 maxPos.z = parentCenter.z;
             }
@@ -78,7 +74,6 @@ OctTree::~OctTree()
 {
     for (OctTree*& c : m_Children) {
         if (c != nullptr) {
-            //recursively delete (this calls the deconstructor again)
             delete c;
             c = nullptr;
         }
@@ -93,10 +88,16 @@ bool OctTree::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
                 return true;
         }
     } else {
-        for (const auto& objBox : m_ContainingBoxes) {
-            if (Collision::AABBVsAABB(boxToTest, objBox)) {
-                outBoxIntersected = objBox;
-                return true;
+        std::vector<std::vector<AABB>> objVectors = {
+            m_StaticObjects,
+            m_DynamicObjects
+        };
+        for (const auto& objVector : objVectors) {
+            for (const auto& obj : objVector) {
+                if (Collision::AABBVsAABB(boxToTest, obj)) {
+                    outBoxIntersected = obj;
+                    return true;
+                }
             }
         }
     }
@@ -122,18 +123,24 @@ bool OctTree::RayCollides(const Ray& ray, Output& data) const
                     return true;
                 }
             }
-        }
-        else {
+        } else {
             //Check against boxes in the node.
             float minDist = INFINITY;
             bool intersected = false;
-            for (const auto& objBox : m_ContainingBoxes) {
-                float dist;
-                if (Collision::RayVsAABB(ray, objBox, dist)) {
-                    minDist = std::min(dist, minDist);
-                    intersected = true;
+            std::vector<std::vector<AABB>> objVectors = {
+                m_StaticObjects,
+                m_DynamicObjects
+            };
+            for (const auto& objVector : objVectors) {
+                for (const auto& obj : objVector) {
+                    float dist;
+                    if (Collision::RayVsAABB(ray, obj, dist)) {
+                        minDist = std::min(dist, minDist);
+                        intersected = true;
+                    }
                 }
             }
+
             data.CollideDistance = minDist;
             return intersected;
         }
@@ -141,29 +148,61 @@ bool OctTree::RayCollides(const Ray& ray, Output& data) const
     return false;
 }
 
-void OctTree::AddBox(const AABB& box)
+
+void OctTree::AddDynamicObject(const AABB& box)
 {
     if (hasChildren()) {
         for (auto i : childIndicesContainingBox(box)) {
-            m_Children[i]->AddBox(box);
+            m_Children[i]->AddDynamicObject(box);
         }
-    }
-    else {
-        m_ContainingBoxes.push_back(box);
+    } else {
+        m_DynamicObjects.push_back(box);
     }
 }
 
-//remove the content (boxes) in the tree, but dont rememove the tree-structure
-//TODO: Only clear dynamic boxes, AddDynamic, AddStatic
-void OctTree::ClearBoxes()
+void OctTree::AddStaticObject(const AABB& box)
+{
+    if (hasChildren()) {
+        for (auto i : childIndicesContainingBox(box)) {
+            m_Children[i]->AddStaticObject(box);
+        }
+    } else {
+        m_StaticObjects.push_back(box);
+    }
+}
+
+void OctTree::BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const
+{
+    if (hasChildren()) {
+        for (auto i : childIndicesContainingBox(box)) {
+            m_Children[i]->BoxesInSameRegion(box, outBoxes);
+        }
+    } else {
+        outBoxes.insert(outBoxes.end(), m_StaticObjects.begin(), m_StaticObjects.end());
+        outBoxes.insert(outBoxes.end(), m_DynamicObjects.begin(), m_DynamicObjects.end());
+    }
+}
+
+void OctTree::ClearObjects()
 {
     if (hasChildren()) {
         for (OctTree*& c : m_Children) {
-            c->ClearBoxes();
+            c->ClearObjects();
         }
+    } else {
+        m_DynamicObjects.clear();
+        m_StaticObjects.clear();
     }
-    else {
-        m_ContainingBoxes.clear();
+}
+
+void OctTree::ClearDynamicObjects()
+{
+    if (hasChildren()) {
+        for (OctTree*& c : m_Children) {
+            c->ClearObjects();
+        }
+    } else {
+        m_DynamicObjects.clear();
     }
 }
 
@@ -203,7 +242,7 @@ std::vector<int> OctTree::childIndicesContainingBox(const AABB& box) const
     case 2:
     {
         std::vector<int> ret;
-        //Bit-hax to calculate the right 4 cildren containing the box.
+        //Bit-hax to calculate the correct 4 children containing the box.
         //This works because of the childrens index determine what part of 
         //the dimensions they are responsible for (which octant).
         bits.flip();
