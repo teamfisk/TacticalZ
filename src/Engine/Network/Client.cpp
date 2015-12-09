@@ -7,6 +7,8 @@ Client::Client() : m_Socket(m_IOService)
 {
 	// Set up network stream
 	m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
+	m_NextSnapshot.inputForward = "";
+	m_NextSnapshot.inputRight = "";
 }
 
 Client::~Client()
@@ -72,7 +74,7 @@ void Client::ReadFromServer()
 
 void Client::SendToServer()
 {
-	if (m_NextSnapshot.inputForward != "") {
+	if (m_NextSnapshot.inputForward != "" && m_NextSnapshot.inputForward[0] != '\0') {
 		char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
 		int len = CreateMessage(MessageType::Event, m_NextSnapshot.inputForward, dataPackage);
 		m_Socket.send_to(boost::asio::buffer(
@@ -81,7 +83,7 @@ void Client::SendToServer()
 			m_ReceiverEndpoint, 0);
         delete[] dataPackage;
 	}
-	if (m_NextSnapshot.inputRight != "") {
+	if (m_NextSnapshot.inputRight != "" && m_NextSnapshot.inputRight[0] != '\0') {
 		char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
 		int len = CreateMessage(MessageType::Event, m_NextSnapshot.inputRight, dataPackage);
 		m_Socket.send_to(boost::asio::buffer(
@@ -97,6 +99,12 @@ void Client::ParseMessageType(char* data, size_t length)
 	int messageType = -1;
 	memcpy(&messageType, data, sizeof(int)); // Read what type off message was sent from server
 	MoveMessageHead(data, length, sizeof(int)); // Move the message head to know where to read from
+
+	// Read packet ID 
+	m_PreviousPacketID = m_PacketID;
+	memcpy(&m_PacketID, data, sizeof(int)); 
+	MoveMessageHead(data, length, sizeof(int)); 
+	IdentifyPacketLoss();
 
 	switch (static_cast<MessageType>(messageType)) {
 	case MessageType::Connect:
@@ -323,4 +331,16 @@ void Client::CreateNewPlayer(int i)
 	ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Transform");
 	ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Model");
 	model["Resource"] = "Models/Core/UnitSphere.obj";
+}
+
+void Client::IdentifyPacketLoss()
+{
+	// if no packets lost, difference should be equal to 1
+	int difference = m_PacketID - m_PreviousPacketID;
+	if (difference != 1) {
+		for (int i = m_PreviousPacketID + 1; i < m_PacketID; i++)
+		{
+			LOG_INFO("Packet %i was lost...", i);
+		}
+	}
 }

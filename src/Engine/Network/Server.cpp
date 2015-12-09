@@ -162,10 +162,15 @@ int Server::CreateMessage(MessageType type, std::string message, char * data)
     // Message type
     memcpy(data + offset, &type, sizeof(int));
     offset += sizeof(int);
+	// Packet ID
+	m_PacketID = m_PacketCounter % 10;
+	memcpy(data + offset, &m_PacketID, sizeof(int));
+	offset += sizeof(int);
     // Message, add one extra byte for null terminator
     memcpy(data + offset, message.data(), (lengthOfMessage + 1) * sizeof(char));
     offset += (lengthOfMessage + 1) * sizeof(char);
 
+	m_PacketCounter++;
     return offset;
 }
 
@@ -273,6 +278,9 @@ int Server::CreateHeader(MessageType type, char * data)
     int offset = 0;
     memcpy(data, &messageType, sizeof(int));
     offset += sizeof(int);
+	m_PacketID = m_PacketCounter % 10;
+	memcpy(data + offset, &m_PacketID, sizeof(int));
+	offset += sizeof(int);
 
     return offset;
 }
@@ -360,6 +368,10 @@ void Server::ParseConnect(char * data, size_t length)
             memcpy(temp, &messagType, sizeof(int));
             offset += sizeof(int);
             memcpy(temp + offset, &i, sizeof(int));
+
+			memcpy(temp, &m_PacketID, sizeof(int));
+			offset += sizeof(int);
+			m_PacketCounter++;
 
             m_Socket.send_to(
                 boost::asio::buffer(temp, sizeof(int) * 2),
