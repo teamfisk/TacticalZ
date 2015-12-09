@@ -29,7 +29,7 @@ public:
         : World()
     {
         registerTestComponents();
-        //createTestEntities();
+        createTestEntities(AABB(glm::vec3(-0.2f, 0.2f, 0.3f), glm::vec3(0.1f, 0.4f, 0.6f)));
     }
 
 private:
@@ -68,15 +68,15 @@ private:
         //add octTree
         {
             auto someAABB = AABB(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-            OctTree someOctTree = OctTree(someAABB, 2);
+            OctTree someOctTree(someAABB, 2);
             //add a box
             //auto anotherBox = AABB(glm::vec3(-0.2f, 0.2f, 0.3f), glm::vec3(0.1f, 0.4f, 0.6f));
             //note: have to delete the box in the tree first, since were trying to move the box
-            someOctTree.ClearBoxes();
-            someOctTree.AddBox(anotherBox);
+            someOctTree.ClearDynamicObjects();
+            someOctTree.AddDynamicObject(anotherBox);
 
             //the main box first
-            AddBoxModel(someAABB.Center(), someAABB.HalfSize().x, someOctTree.m_ContainingBoxes.size());
+            AddBoxModel(someAABB.Center(), someAABB.HalfSize().x, someOctTree.m_DynamicObjects.size());
 
             //draw anotherbox
             AddBoxModel(anotherBox.Center(), anotherBox.HalfSize().x, 0);
@@ -85,14 +85,14 @@ private:
             for (size_t j = 0; j < 8; j++)
             {
                 AddBoxModel(someOctTree.m_Children[j]->m_Box.Center(),
-                    someOctTree.m_Children[j]->m_Box.HalfSize().x, someOctTree.m_Children[j]->m_ContainingBoxes.size());
+                    someOctTree.m_Children[j]->m_Box.HalfSize().x, someOctTree.m_Children[j]->m_DynamicObjects.size());
 
                 auto someChild = someOctTree.m_Children[j];
 
                 for (size_t i = 0; i < 8; i++)
                 {
                     AddBoxModel(someChild->m_Children[i]->m_Box.Center(),
-                        someChild->m_Children[i]->m_Box.HalfSize().x, someChild->m_Children[i]->m_ContainingBoxes.size());
+                        someChild->m_Children[i]->m_Box.HalfSize().x, someChild->m_Children[i]->m_DynamicObjects.size());
                 }
             }
         }
