@@ -1,15 +1,17 @@
 #ifndef Server_h__
 #define Server_h__
+
 #include <string>
 #include <ctime>
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <glm/common.hpp>
-#include "NetworkDefines.h"
-#include "MessageType.h"
-#include "Core/World.h"
+
+#include "Network/MessageType.h"
+#include "Network/NetworkDefinitions.h"
 #include "Network/PlayerDefinition.h"
+#include "Core/World.h"
 
 class Server
 {

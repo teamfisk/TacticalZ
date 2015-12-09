@@ -8,12 +8,14 @@
 #include <GLFW/glfw3.h> // For input event
 
 #include "Network/MessageType.h"
-#include "Network/NetworkDefines.h"
+#include "Network/NetworkDefinitions.h"
 #include "Network/PlayerDefinition.h"
+#include "Network/SnapshotDefinitions.h"
 #include "Network/WinLeakCheck.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Core/EKeyDown.h"
+#include "Core/EKeyUp.h"
 
 
 class Client
@@ -24,8 +26,8 @@ public:
 	void Start(World* world, EventBroker* eventBroker);
     void Close();
 private:
-	// Threaded
 	void ReadFromServer();
+	void SendToServer();
 
 	int Receive(char* data, size_t length);
 	int CreateMessage(MessageType type, std::string message, char* data);
@@ -50,6 +52,7 @@ private:
 	int m_PlayerID = -1;
 	glm::vec2 m_PlayerPositions[MAXCONNECTIONS];
 	PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
+	SnapshotDefinitions m_NextSnapshot;
 	std::clock_t m_StartPingTime;
 	double m_DurationOfPingTime;
 	std::string m_PlayerName;
@@ -61,7 +64,9 @@ private:
 	// Events
 	EventBroker* m_EventBroker;
 	EventRelay<Client, Events::KeyDown> m_EKeyDown;
-	bool OnKeyDown(const Events::KeyDown &e);
+	bool OnKeyDown(const Events::KeyDown &e);	
+	EventRelay<Client, Events::KeyUp> m_EKeyUp;
+	bool OnKeyUp(const Events::KeyUp &e);
 };
 
 #endif

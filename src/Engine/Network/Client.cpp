@@ -17,12 +17,16 @@ Client::~Client()
 
 void Client::Start(World* world, EventBroker* eventBroker)
 {
-	// Subscribe to events
     m_WasStarted = true;
     m_EventBroker = eventBroker;
 	m_World = world;
+	
+	// Subscribe to events
 	m_EKeyDown = decltype(m_EKeyDown)(std::bind(&Client::OnKeyDown, this, std::placeholders::_1));
     m_EventBroker->Subscribe(m_EKeyDown);
+	m_EKeyUp = decltype(m_EKeyUp)(std::bind(&Client::OnKeyUp, this, std::placeholders::_1));
+	m_EventBroker->Subscribe(m_EKeyUp);
+	
 	std::cout << "Please enter you name: ";
 	std::cin >> m_PlayerName;
 	while (m_PlayerName.size() > 7) {
@@ -48,11 +52,40 @@ void Client::ReadFromServer()
 	int bytesRead = -1;
 	char readBuf[1024] = { 0 };
 
+	int snapshotInterval = 33;
+	std::clock_t previousSnapshotMessage = std::clock();
+
 	while (m_ThreadIsRunning) {
 		if (m_Socket.available()) {
 			bytesRead = Receive(readBuf, INPUTSIZE);
 			ParseMessageType(readBuf, bytesRead);
 		}
+		std::clock_t currentTime = std::clock();
+		if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+			SendToServer();
+			previousSnapshotMessage = currentTime;
+		}
+		
+	}
+}
+
+void Client::SendToServer()
+{
+	if (m_NextSnapshot.inputForward != "") {
+		char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
+		int len = CreateMessage(MessageType::Event, m_NextSnapshot.inputForward, dataPackage);
+		m_Socket.send_to(boost::asio::buffer(
+			dataPackage,
+			len),
+			m_ReceiverEndpoint, 0);
+	}
+	if (m_NextSnapshot.inputRight != "") {
+		char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
+		int len = CreateMessage(MessageType::Event, m_NextSnapshot.inputRight, dataPackage);
+		m_Socket.send_to(boost::asio::buffer(
+			dataPackage,
+			len),
+			m_ReceiverEndpoint, 0);
 	}
 }
 
@@ -242,33 +275,18 @@ bool Client::OnKeyDown(const Events::KeyDown& event)
 {
 	char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
 	if (event.KeyCode == GLFW_KEY_W) {
-		int len = CreateMessage(MessageType::Event, "+Forward", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
+		m_NextSnapshot.inputForward = "+Forward";
 	}
 	if (event.KeyCode == GLFW_KEY_A) {
-		int len = CreateMessage(MessageType::Event, "-Right", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
+		m_NextSnapshot.inputRight = "-Right";
 	}
 	if (event.KeyCode == GLFW_KEY_S) {
-		int len = CreateMessage(MessageType::Event, "-Forward", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
+		m_NextSnapshot.inputForward = "-Forward";
 	}
 	if (event.KeyCode == GLFW_KEY_D) {
-		int len = CreateMessage(MessageType::Event, "+Right", dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
+		m_NextSnapshot.inputRight = "+Right";
 	}
+
 	if (event.KeyCode == GLFW_KEY_V) {
 		Disconnect();
 	}
@@ -281,6 +299,19 @@ bool Client::OnKeyDown(const Events::KeyDown& event)
 	memset(dataPackage, 0, INPUTSIZE);
 	delete[] dataPackage;
 	return true;
+}
+
+bool Client::OnKeyUp(const Events::KeyUp & e)
+{
+	if (e.KeyCode == GLFW_KEY_W || e.KeyCode == GLFW_KEY_S) {
+		m_NextSnapshot.inputForward = "";
+		return true;
+	}
+	if (e.KeyCode == GLFW_KEY_A || e.KeyCode == GLFW_KEY_D) {
+		m_NextSnapshot.inputRight = "";
+		return true;
+	}
+	return false;
 }
 
 void Client::CreateNewPlayer(int i)
