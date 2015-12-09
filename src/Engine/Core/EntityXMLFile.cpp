@@ -67,7 +67,8 @@ void EntityXMLFile::PopulateWorld(World* world)
     }
 
     // 4. Parse entity hierarchy
-    //parseEntityGraph();
+    auto root = m_DOMDocument->getDocumentElement();
+    parseEntityGraph(world, root, 0);
 }
 
 
@@ -261,41 +262,7 @@ void EntityXMLFile::parseDefaults()
 
             std::string fieldType = ci.second.FieldTypes.at(fieldName);
             unsigned int fieldOffset = ci.second.FieldOffsets.at(fieldName);
-
-            XSValue::DataType dataType = XSValue::getDataType(XSTR(fieldType.c_str()));
-            if (dataType == XSValue::DataType::dt_MAXCOUNT) {
-                if (fieldType == "Vector") {
-                    glm::vec3 vec;
-                    vec.x = getFloatAttribute(fieldElement, "X");
-                    vec.y = getFloatAttribute(fieldElement, "Y");
-                    vec.z = getFloatAttribute(fieldElement, "Z");
-                    memcpy(ci.second.Defaults.get() + fieldOffset, reinterpret_cast<char*>(&vec), getTypeStride(fieldType));
-                } else if (fieldType == "Color") {
-                    glm::vec4 vec;
-                    vec.r = getFloatAttribute(fieldElement, "R");
-                    vec.g = getFloatAttribute(fieldElement, "G");
-                    vec.b = getFloatAttribute(fieldElement, "B");
-                    vec.a = getFloatAttribute(fieldElement, "A");
-                    memcpy(ci.second.Defaults.get() + fieldOffset, reinterpret_cast<char*>(&vec), getTypeStride(fieldType));
-                } else if (fieldType == "Quaternion") {
-                    glm::quat q;
-                    q.x = getFloatAttribute(fieldElement, "X");
-                    q.y = getFloatAttribute(fieldElement, "Y");
-                    q.z = getFloatAttribute(fieldElement, "Z");
-                    q.w = getFloatAttribute(fieldElement, "W");
-                    memcpy(ci.second.Defaults.get() + fieldOffset, reinterpret_cast<char*>(&q), getTypeStride(fieldType));
-                }
-            } else if (dataType == XSValue::DataType::dt_string) {
-                char* str = XMLString::transcode(fieldElement->getTextContent());
-                std::string standardString(str);
-                //new (ci.second.Defaults.get() + fieldOffset) std::string(str);
-                XMLString::release(&str);
-                memcpy(ci.second.Defaults.get() + fieldOffset, &standardString, getTypeStride(fieldType));
-            } else {
-                XSValue::Status status;
-                XSValue* val = XSValue::getActualValue(fieldElement->getTextContent(), dataType, status);
-                memcpy(ci.second.Defaults.get() + fieldOffset, reinterpret_cast<char*>(&val->fData.fValue), getTypeStride(fieldType));
-            }
+            writeData(fieldElement, fieldType, ci.second.Defaults.get() + fieldOffset);
         }
     }
 }
@@ -334,11 +301,56 @@ void EntityXMLFile::predictComponentAllocation()
     }
 }
 
-void EntityXMLFile::parseEntityGraph()
+void EntityXMLFile::parseEntityGraph(World* world, xercesc::DOMElement* element, EntityID parentEntity)
 {
-    //using namespace xercesc;
+    using namespace xercesc;
 
-    //auto root = m_DOMDocument->getDocumentElement();
+    // Create entity
+    EntityID entity = world->CreateEntity(parentEntity);
+    LOG_DEBUG("Created entity %i, parent %i", entity, parentEntity);
+
+    // Add components
+    auto components = m_DOMDocument->evaluate(XSTR("Components/*"), element, nullptr,  DOMXPathResult::ORDERED_NODE_SNAPSHOT_TYPE, nullptr);
+    for (int i = 0; i < components->getSnapshotLength(); i++) {
+        components->snapshotItem(i);
+        auto componentElement = dynamic_cast<DOMElement*>(components->getNodeValue());
+        std::string componentName = XSTR(componentElement->getLocalName());
+        auto& ci = m_ComponentInfo.at(componentName);
+
+        // Attach the component
+        auto c = world->AttachComponent(entity, componentName);
+        LOG_DEBUG("Attached %s component", componentName.c_str());
+
+        // Write field data
+        auto fields = componentElement->getChildNodes();
+        for (int j = 0; j < fields->getLength(); ++j) {
+            auto fieldNode = fields->item(j);
+            auto nodeType = fieldNode->getNodeType();
+            if (nodeType != DOMNode::ELEMENT_NODE) {
+                continue;
+            }
+            auto field = dynamic_cast<DOMElement*>(fields->item(j));
+            //const XMLCh* value = fields->item(j)->getTextContent();
+            std::string fieldName(XSTR(field->getLocalName()));
+            if (ci.FieldTypes.find(fieldName) == ci.FieldTypes.end()) {
+                std::cout << "Warning: Component \"" << componentName << "\" contains invalid field \"" << fieldName << "\". Skipping." << std::endl;
+                continue;
+            }
+
+            std::string fieldType = ci.FieldTypes.at(fieldName);
+            unsigned int fieldOffset = ci.FieldOffsets.at(fieldName);
+            std::string fieldValue(XSTR(field->getTextContent()));
+            LOG_DEBUG("    %s %s = %s", fieldType.c_str(), fieldName.c_str(), fieldValue.c_str());
+            writeData(field, fieldType, c.Data + fieldOffset);
+        }
+    }
+
+    // Recurse children
+    auto children = m_DOMDocument->evaluate(XSTR("Children/Entity"), element, nullptr, DOMXPathResult::ORDERED_NODE_SNAPSHOT_TYPE, nullptr);
+    for (int i = 0; i < children->getSnapshotLength(); i++) {
+        children->snapshotItem(i);
+        parseEntityGraph(world, dynamic_cast<DOMElement*>(children->getNodeValue()), entity);
+    }
 
     //auto components = m_DOMDocument->getElementsByTagNameNS(XSTR("components"), XSTR("*"));
     //for (int i = 0; i < components->getLength(); ++i) {
@@ -426,3 +438,44 @@ float EntityXMLFile::getFloatAttribute(const xercesc::DOMElement* element, const
         return val->fData.fValue.f_float;
     }
 }
+
+void EntityXMLFile::writeData(const xercesc::DOMElement* element, std::string typeName, char* outData)
+{
+    using namespace xercesc;
+
+    XSValue::DataType dataType = XSValue::getDataType(XSTR(typeName.c_str()));
+    if (dataType == XSValue::DataType::dt_MAXCOUNT) {
+        if (typeName == "Vector") {
+            glm::vec3 vec;
+            vec.x = getFloatAttribute(element, "X");
+            vec.y = getFloatAttribute(element, "Y");
+            vec.z = getFloatAttribute(element, "Z");
+            memcpy(outData, reinterpret_cast<char*>(&vec), getTypeStride(typeName));
+        } else if (typeName == "Color") {
+            glm::vec4 vec;
+            vec.r = getFloatAttribute(element, "R");
+            vec.g = getFloatAttribute(element, "G");
+            vec.b = getFloatAttribute(element, "B");
+            vec.a = getFloatAttribute(element, "A");
+            memcpy(outData, reinterpret_cast<char*>(&vec), getTypeStride(typeName));
+        } else if (typeName == "Quaternion") {
+            glm::quat q;
+            q.x = getFloatAttribute(element, "X");
+            q.y = getFloatAttribute(element, "Y");
+            q.z = getFloatAttribute(element, "Z");
+            q.w = getFloatAttribute(element, "W");
+            memcpy(outData, reinterpret_cast<char*>(&q), getTypeStride(typeName));
+        }
+    } else if (dataType == XSValue::DataType::dt_string) {
+        char* str = XMLString::transcode(element->getTextContent());
+        std::string standardString(str);
+        new (outData) std::string(str);
+        XMLString::release(&str);
+        //memcpy(outData, reinterpret_cast<char*>(&standardString), getTypeStride(typeName));
+    } else {
+        XSValue::Status status;
+        XSValue* val = XSValue::getActualValue(element->getTextContent(), dataType, status);
+        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue), getTypeStride(typeName));
+    }
+}
+

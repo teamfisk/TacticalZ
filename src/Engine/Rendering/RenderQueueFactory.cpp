@@ -36,12 +36,15 @@ glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent)
 void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 {
    for(auto& modelC : world->GetComponents("Model")) {
-       ModelJob job;
        std::string resource = modelC["Resource"];
+       if (resource.empty()) {
+           continue;
+       }
        glm::vec4 color = modelC["Color"];
        Model* model = ResourceManager::Load<Model>(resource);
 
        for (auto texGroup : model->TextureGroups) {
+           ModelJob job;
            job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
            job.DiffuseTexture = texGroup.Texture.get();
            job.NormalTexture = texGroup.NormalMap.get();

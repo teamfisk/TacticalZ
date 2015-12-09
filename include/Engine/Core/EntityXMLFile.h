@@ -132,9 +132,10 @@ private:
     void parseComponentInfo();
     void parseDefaults();
     void predictComponentAllocation();
-    void parseEntityGraph();
+    void parseEntityGraph(World* world, xercesc::DOMElement* parent, EntityID parentEntity);
     std::size_t getTypeStride(std::string typeName);
     float getFloatAttribute(const xercesc::DOMElement* element, const char* attribute) const;
+    void writeData(const xercesc::DOMElement* element, std::string typeName, char* outData);
 };
 
 #endif
