@@ -37,6 +37,10 @@ Game::Game(int argc, char* argv[])
 
     // Create a world
     m_World = new World();
+    std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
+    if (!mapToLoad.empty()) {
+        ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
+    }
 
 	m_LastTime = glfwGetTime();
 
@@ -75,10 +79,13 @@ void Game::Tick()
 bool Game::testOnKeyUp(const Events::KeyUp& e)
 {
     if (e.KeyCode == GLFW_KEY_R) {
-        delete m_World;
-        m_World = new World();
-        ResourceManager::Release("EntityXMLFile", "Schema/Entities/Test.xml");
-        ResourceManager::Load<EntityXMLFile>("Schema/Entities/Test.xml")->PopulateWorld(m_World);
+        std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
+        if (!mapToLoad.empty()) {
+            delete m_World;
+            m_World = new World();
+            ResourceManager::Release("EntityXMLFile", mapToLoad);
+            ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
+        }
     }
 
     return false;
