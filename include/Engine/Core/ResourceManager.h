@@ -81,6 +81,8 @@ public:
 	 	@param resourceName Fully qualified name of the resource to reload.
 	*/
     static void Reload(std::string resourceName);
+    
+    static void Release(std::string resourceType, std::string resourceName);
 
 	static void Update();
 
