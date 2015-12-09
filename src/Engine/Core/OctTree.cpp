@@ -85,14 +85,25 @@ OctTree::~OctTree()
     }
 }
 
-bool OctTree::RayCollides(const Ray& ray, Output& data) const
+bool OctTree::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
 {
-    data.CollideDistance = -1;
-    return rayCollides(ray, data);
+    if (hasChildren()) {
+        for (int i : childIndicesContainingBox(boxToTest)) {
+            if (m_Children[i]->BoxCollides(boxToTest, outBoxIntersected))
+                return true;
+        }
+    } else {
+        for (const auto& objBox : m_ContainingBoxes) {
+            if (Collision::AABBVsAABB(boxToTest, objBox)) {
+                outBoxIntersected = objBox;
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
-//Currently all Nodes must have exactly 0 or 8 children, and objectdata should only exist in the last bottom nodes.
-bool OctTree::rayCollides(const Ray& ray, Output& data) const
+bool OctTree::RayCollides(const Ray& ray, Output& data) const
 {
     //If the node AABB is missed, everything it contains is missed.
     if (Collision::RayAABBIntr(ray, m_Box)) {
@@ -107,7 +118,7 @@ bool OctTree::rayCollides(const Ray& ray, Output& data) const
             std::sort(childInfos.begin(), childInfos.end(), isFirstLower);
             //Loop through the children, starting with the one closest to the ray origin. I.e the first to be hit.
             for (const ChildInfo& info : childInfos) {
-                if (m_Children[info.Index]->rayCollides(ray, data)) {
+                if (m_Children[info.Index]->RayCollides(ray, data)) {
                     return true;
                 }
             }
@@ -133,39 +144,8 @@ bool OctTree::rayCollides(const Ray& ray, Output& data) const
 void OctTree::AddBox(const AABB& box)
 {
     if (hasChildren()) {
-        int minInd = childIndexContainingPoint(box.MinCorner());
-        int maxInd = childIndexContainingPoint(box.MaxCorner());
-        //Because of the predictable ordering of the child indices, 
-        //the number of bits set when xor:ing the indices will determine the number of children containing the box.
-        std::bitset<3> bits(minInd ^ maxInd);
-        switch (bits.count()) {
-        case 0:                         //Box contained completely in one child.
-            m_Children[minInd]->AddBox(box);
-            break;
-        case 1:                         //Two children.
-            m_Children[minInd]->AddBox(box);
-            m_Children[maxInd]->AddBox(box);
-            break;
-        case 2:                         //Four children.
-            //Bit-hax to calculate the right 4 cildren containing the box.
-            //This works because of the childrens index determine what part of 
-            //the dimensions they are responsible for (which octant).
-            bits.flip();
-            //At this point the bits necessarily have exactly one bit set.
-            for (int c = 0; c < 8; ++c) {
-                //If the child index have the same bit set as the bits, add box to it.
-                if (bits.to_ulong() & c) {
-                    m_Children[c]->AddBox(box);
-                }
-            }
-            break;
-        case 3:                         //Eight children.
-            for (OctTree*& c : m_Children) {
-                c->AddBox(box);
-            }
-            break;
-        default:
-            break;
+        for (auto i : childIndicesContainingBox(box)) {
+            m_Children[i]->AddBox(box);
         }
     }
     else {
@@ -203,6 +183,44 @@ int OctTree::childIndexContainingPoint(const glm::vec3& point) const
 {
     const glm::vec3& c = m_Box.Center();
     return (1 << 2) * (point.x >= c.x) | (1 << 1) * (point.y >= c.y) | (point.z >= c.z);
+}
+
+std::vector<int> OctTree::childIndicesContainingBox(const AABB& box) const
+{
+    int minInd = childIndexContainingPoint(box.MinCorner());
+    int maxInd = childIndexContainingPoint(box.MaxCorner());
+    //Because of the predictable ordering of the child indices, 
+    //the number of bits set when xor:ing the indices will determine the number of children containing the box.
+    std::bitset<3> bits(minInd ^ maxInd);
+    switch (bits.count()) {
+        //Box contained completely in one child.
+    case 0:
+        return{ minInd };
+        //Two children.
+    case 1:
+        return{ minInd, maxInd };
+        //Four children.
+    case 2:
+    {
+        std::vector<int> ret;
+        //Bit-hax to calculate the right 4 cildren containing the box.
+        //This works because of the childrens index determine what part of 
+        //the dimensions they are responsible for (which octant).
+        bits.flip();
+        //At this point the bits necessarily have exactly one bit set.
+        for (int c = 0; c < 8; ++c) {
+            //If the child index have the same bit set as the bits, add box to it.
+            if (bits.to_ulong() & c) {
+                ret.push_back(c);
+            }
+        }
+        return ret;
+    }
+    case 3:                         //Eight children.
+        return{ 0,1,2,3,4,5,6,7 };
+    default:
+        return std::vector<int>();
+    }
 }
 
 inline bool OctTree::hasChildren() const
