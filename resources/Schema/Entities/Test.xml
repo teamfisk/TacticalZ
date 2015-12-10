@@ -3,18 +3,114 @@
 <Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd" xmlns:c="components">
 	<Components>
 		<c:Transform>
-			<Position X="1.02" Y="3.123123" Z="41.123"/>
-			<Orientation I="1.234" J="1.234" K="1.234"/>
-			<Scale X="1.02" Y="3.123123" Z="41.123"/>
+			<Orientation X="0" Y="0" Z="0"/>
 		</c:Transform>
-		<c:Test>
-			<Integer>12</Integer>
-			<Double>11.11</Double>
-			<String>Hello World</String>
-		</c:Test>
+		<c:Model>
+			<Resource>Models/DummyScene.obj</Resource>
+		</c:Model>
 	</Components>
 	<Children>
-		<xi:include href="OtherEntity.xml"/>
-		<xi:include href="OtherEntity.xml"/>
+		<Entity>
+			<Components>
+				<c:Transform>
+					<Position X="-1.5"/>
+					<Scale X="1" Y="1" Z="1"/>
+				</c:Transform>
+				<c:Model>
+					<Resource>Models/ScaleWidget.obj</Resource>
+				</c:Model>
+			</Components>
+		</Entity>
+		<Entity>
+			<Components>
+				<c:Transform>
+					<Position X="1.5"/>
+				</c:Transform>
+				<c:Model>
+					<Resource>Models/RotationWidget.obj</Resource>
+				</c:Model>
+			</Components>
+		</Entity>
+		<Entity>
+			<Components>
+				<c:Transform>
+					<Position X="0" Y="-0"/>
+					<Scale X="1" Y="1" Z="1"/>
+				</c:Transform>
+				<!--<c:Move>
+					<Speed>1</Speed>
+					<Direction X="-1"/>
+					<Rotation Y="3.14"/>
+				</c:Move>-->
+			</Components>
+			<Children>
+				<Entity>
+					<Components>
+						<c:Transform>
+							<Position X="0" Y="0"/>
+							<Orientation X="0.0" Y="0" Z="0.0"/>
+						</c:Transform>
+						<c:Model>
+							<Resource>Models/Core/UnitRaptor.obj</Resource>
+							<Color R="1" G="0.4" B="0.8"/>
+						</c:Model>
+					</Components>
+					<Children>
+						<Entity>
+							<Components>
+								<c:Transform>
+									<Position X="0" Y="0"/>
+									<Orientation X="0" Y="0" Z="0"/>
+								</c:Transform>
+								<c:RaptorCopter>
+									<Speed>20</Speed>
+									<Axis Y="1"/>
+								</c:RaptorCopter>
+							</Components>
+							<Children>
+								<Entity>
+									<Components>
+										<c:Transform>
+											<Position X="0" Y="0.4"/>
+											<Scale X="0.1" Y="0.4" Z="0.1"/>
+										</c:Transform>
+										<c:Model>
+											<Resource>Models/Core/UnitCylinder.obj</Resource>
+											<Color R="1" G="0.4" B="0.8"/>
+										</c:Model>
+									</Components>
+								</Entity>
+								<Entity>
+									<Components>
+										<c:Transform>
+											<Position X="0" Y="0.6"/>
+											<Scale X="1.7" Y="0.03" Z="0.1"/>
+											<Orientation X="0" Y="0" Z="0"/>
+										</c:Transform>
+										<c:Model>
+											<Resource>Models/Core/UnitCube.obj</Resource>
+											<Color R="1" G="0.4" B="0.8"/>
+										</c:Model>
+									</Components>
+								</Entity>
+								<Entity>
+									<Components>
+										<c:Transform>
+											<Position X="0" Y="0.6"/>
+											<Scale X="1.7" Y="0.03" Z="0.1"/>
+											<Orientation X="0" Y="1.57" Z="0"/>
+										</c:Transform>
+										<c:Model>
+											<Resource>Models/Core/UnitCube.obj</Resource>
+											<Color R="1" G="0.4" B="0.8"/>
+										</c:Model>
+									</Components>
+								</Entity>
+							</Children>
+						</Entity>
+					</Children>
+				</Entity>
+			</Children>
+		</Entity>
 	</Children>
 </Entity>

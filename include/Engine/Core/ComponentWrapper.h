@@ -2,7 +2,7 @@
 #define ComponentWrapper_h__
 
 #include "../Common.h"
-#include "EntityWrapper.h"
+#include "Entity.h"
 #include "ComponentInfo.h"
 #include "Util/Any.h"
 
@@ -11,7 +11,7 @@ struct ComponentWrapper
     ComponentWrapper(const ComponentInfo& componentInfo, char* data)
         : Info(componentInfo)
         , EntityID(*reinterpret_cast<::EntityID*>(data))
-        , Data(data + sizeof(EntityID))
+        , Data(data + sizeof(::EntityID))
     { }
 
     const ComponentInfo& Info;

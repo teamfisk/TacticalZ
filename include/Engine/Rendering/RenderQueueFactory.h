@@ -22,7 +22,10 @@ private:
     void FillLights(World* world, RenderQueue* renderQueue);
 
     glm::mat4 ModelMatrix(World* world, EntityID entity);
-    glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent);
+
+    glm::vec3 AbsolutePosition(World* world, EntityID entity);
+    glm::quat AbsoluteOrientation(World* world, EntityID entity);
+    glm::vec3 AbsoluteScale(World* world, EntityID entity);
 };
 
 #endif

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="types" elementFormDefault="qualified">
+	<xs:complexType name="Color">
+		<xs:attribute name="R" type="xs:decimal" default="0.0"/>
+		<xs:attribute name="G" type="xs:decimal" default="0.0"/>
+		<xs:attribute name="B" type="xs:decimal" default="0.0"/>
+		<xs:attribute name="A" type="xs:decimal" default="1.0"/>
+	</xs:complexType>
+</xs:schema>
