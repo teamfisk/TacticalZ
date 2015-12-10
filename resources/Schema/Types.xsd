@@ -3,6 +3,10 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="types" elementFormDefault="qualified">
 	<xs:include schemaLocation="Types/Quaternion.xsd"/>
 	<xs:include schemaLocation="Types/Vector.xsd"/>
+	<xs:include schemaLocation="Types/Color.xsd"/>
+	<xs:simpleType name="bool">
+		<xs:restriction base="xs:boolean"></xs:restriction>
+	</xs:simpleType>
 	<xs:simpleType name="int">
 		<xs:restriction base="xs:integer"></xs:restriction>
 	</xs:simpleType>

@@ -12,7 +12,7 @@
 				<xs:element name="Position" type="t:Vector" minOccurs="0">
 					<xs:annotation><xs:documentation>The position vector</xs:documentation></xs:annotation>
 				</xs:element>
-				<xs:element name="Orientation" type="t:Quaternion" minOccurs="0"/>
+				<xs:element name="Orientation" type="t:Vector" minOccurs="0"/>
 				<xs:element name="Scale" type="t:Vector" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
