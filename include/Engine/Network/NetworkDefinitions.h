@@ -7,7 +7,7 @@
 #define BOARDSIZE 16
 #define MAXCONNECTIONS 8
 #define INPUTSIZE 128
-#define PACKETMODULUS 1000 // How many packets before the number resets
+#define PACKETMODULUS 1000 // How many packets to send before the number resets
 
 typedef boost::shared_ptr<boost::asio::ip::udp::socket> socket_ptr;
 typedef boost::shared_ptr<std::string> string_ptr;
