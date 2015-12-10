@@ -3,7 +3,6 @@
 void Renderer::Initialize()
 {
 	InitializeWindow();
-
 	// Create default camera
 	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
 	m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
@@ -116,26 +115,6 @@ void Renderer::InputUpdate(double dt)
 
     static double mousePosX, mousePosY;
     glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
-    if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-        ScreenCoords::PixelData data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, &m_PickingBuffer, m_DepthBuffer);
-        
-        glm::vec3 viewPos = ScreenCoords::ToWorldPos(mousePosX, m_Resolution.Height - mousePosY, data.Depth, m_Resolution, m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
-      //  glm::vec3 worldPos = glm::vec3(glm::inverse(m_Camera->ViewMatrix()) * glm::vec4(viewPos, 1.f));
-
-        //printf("R: %f, G: %f, Depth: %f\n", data.Color[0], data.Color[1], data.Depth);
-        //printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
-        //printf("\n\n---------------------------\n");
-        auto got = m_PickingColorsToEntity.find(glm::vec2(data.Color[0], data.Color[1]));
-        if (got == m_PickingColorsToEntity.end())
-            printf("Color (R:%f, G:%f) not found.\n", data.Color[0], data.Color[1]);
-        else
-            printf("R:%f G:%f, EntityID: %i\n", got->first.r, got->first.g, got->second);
-        //printf("----\n");
-        //for (auto i : m_PickingColorsToEntity) {
-        //    printf("Entity: %i, Color: R: %f, G: %f\n", i.second, i.first.r, i.first.g);
-        //}
-        //printf("---------------------------\n\n");
-    }
 
 	if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 
@@ -161,7 +140,8 @@ void Renderer::InputUpdate(double dt)
 
 void Renderer::Update(double dt)
 {
-	InputUpdate(dt);
+    m_EventBroker->Process<Renderer>();
+    InputUpdate(dt);
     
 }
 
@@ -275,6 +255,17 @@ void Renderer::PickingPass(RenderQueueCollection& rq)
     }
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
+
+    //Publish pick event every frame with the pick data that can be picked by the event
+    Events::Picking pickEvent = Events::Picking(
+        &m_PickingBuffer, 
+        &m_DepthBuffer, 
+        m_Camera->ProjectionMatrix(), 
+        m_Camera->ViewMatrix(), 
+        m_Resolution, 
+        &m_PickingColorsToEntity);
+
+    m_EventBroker->Publish(pickEvent);
 
 }
 

@@ -16,7 +16,7 @@ Game::Game(int argc, char* argv[])
     m_RenderQueueFactory = new RenderQueueFactory();
 
 	// Create the renderer
-	m_Renderer = new Renderer();
+	m_Renderer = new Renderer(m_EventBroker);
 	m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
 	m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
 	m_Renderer->SetResolution(Rectangle(
@@ -65,12 +65,12 @@ void Game::Tick()
 
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
-	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     testTick(dt);
+    m_Renderer->Update(dt);
 
     m_RenderQueueFactory->Update(m_World);
 	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
