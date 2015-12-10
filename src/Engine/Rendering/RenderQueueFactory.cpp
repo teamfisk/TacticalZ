@@ -15,49 +15,87 @@ void RenderQueueFactory::Update(World* world)
 
 glm::mat4 RenderQueueFactory::ModelMatrix(World* world, EntityID entity)
 {
-    //should really return absolute model matrix based on parents position, scale and orientation
-    //GetAbsolutePosition(World* world, ComponentWrapper transformComponent)
+    glm::vec3 position = AbsolutePosition(world, entity);
+    glm::quat orientation = AbsoluteOrientation(world, entity);
+    glm::vec3 scale = AbsoluteScale(world, entity);
 
-    ComponentWrapper transformComponent = world->GetComponent(entity, "Transform");
-    glm::vec3 position = transformComponent["Position"];
-    glm::vec3 scale = transformComponent["Scale"];
-    glm::quat oritentation = transformComponent["Orientation"];
-
-    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(oritentation) * glm::scale(scale);
+    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(orientation) * glm::scale(scale);
     return modelMatrix;
 }
 
-glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent)
+
+glm::vec3 RenderQueueFactory::AbsolutePosition(World* world, EntityID entity)
 {
-  //  positionComponent.EntityID
-    return glm::vec3();
+    glm::vec3 position;
+
+    do {
+        ComponentWrapper transform = world->GetComponent(entity, "Transform");
+        position += AbsoluteOrientation(world, entity) * (glm::vec3)transform["Position"];
+        entity = world->GetParent(entity);
+    } while (entity != 0);
+   
+    return position;
+}
+
+glm::quat RenderQueueFactory::AbsoluteOrientation(World* world, EntityID entity)
+{
+    glm::quat orientation;
+
+    do {
+        ComponentWrapper transform = world->GetComponent(entity, "Transform");
+        orientation = glm::quat((glm::vec3)transform["Orientation"]) * orientation;
+        entity = world->GetParent(entity);
+    } while (entity != 0);
+    
+    return orientation;
+}
+
+glm::vec3 RenderQueueFactory::AbsoluteScale(World* world, EntityID entity)
+{
+    ComponentWrapper transform = world->GetComponent(entity, "Transform");
+    glm::vec3 scale = (glm::vec3)transform["Scale"];
+
+    EntityID parent = world->GetParent(entity);
+    if (parent != 0) {
+        return AbsoluteScale(world, parent) * scale;
+    } else {
+        return scale;
+    }
 }
 
 void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 {
-   for(auto& modelC : world->GetComponents("Model")) {
-       ModelJob job;
-       std::string resource = modelC["Resource"];
-       glm::vec4 color = modelC["Color"];
-       Model* model = ResourceManager::Load<Model>(resource);
+    auto models = world->GetComponents("Model");
+    if (models == nullptr) {
+        return;
+    }
 
-       for (auto texGroup : model->TextureGroups) {
-           job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-           job.DiffuseTexture = texGroup.Texture.get();
-           job.NormalTexture = texGroup.NormalMap.get();
-           job.SpecularTexture = texGroup.SpecularMap.get();
-           job.Model = model;
-           job.StartIndex = texGroup.StartIndex;
-           job.EndIndex = texGroup.EndIndex;
-           job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
-           job.Color = color;
+    for (auto& modelC : *models) {
+        std::string resource = modelC["Resource"];
+        if (resource.empty()) {
+            continue;
+        }
+        glm::vec4 color = modelC["Color"];
+        Model* model = ResourceManager::Load<Model>(resource);
 
-           //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
-           job.Entity = modelC.EntityID;
+        for (auto texGroup : model->TextureGroups) {
+            ModelJob job;
+            job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
+            job.DiffuseTexture = texGroup.Texture.get();
+            job.NormalTexture = texGroup.NormalMap.get();
+            job.SpecularTexture = texGroup.SpecularMap.get();
+            job.Model = model;
+            job.StartIndex = texGroup.StartIndex;
+            job.EndIndex = texGroup.EndIndex;
+            job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+            job.Color = color;
 
-           renderQueue->Add(job);
-       }
-   }
+            //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+            job.Entity = modelC.EntityID;
+
+            renderQueue->Add(job);
+        }
+    }
 }
 
 void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)
