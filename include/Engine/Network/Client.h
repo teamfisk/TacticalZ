@@ -27,7 +27,7 @@ public:
     void Close();
 private:
 	void ReadFromServer();
-	void SendToServer();
+	void SendSnapshotToServer();
 
 	int Receive(char* data, size_t length);
 	void Send(Package& message);
@@ -66,6 +66,7 @@ private:
     // Use to check if we should send disconnect message
     // if game is turned of by closing window.
     bool m_WasStarted = false;
+    IsWASDKeyDown m_IsWASDKeyDown;
 
 	// Events
 	EventBroker* m_EventBroker;

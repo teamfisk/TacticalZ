@@ -124,11 +124,11 @@ void Game::NetworkFunction()
 	std::cout << "Start client or server? (c/s)" << std::endl;
 	std::cin >> inputMessage;
 	if (inputMessage == "c" || inputMessage == "C") {
-		Client m_Client;
+        Client m_Client;
 		m_Client.Start(m_World, m_EventBroker);
 	}
     if (inputMessage == "s" || inputMessage == "S") {
-		Server m_Server;
+        Server m_Server;
         m_Server.Start(m_World);
     }
 }

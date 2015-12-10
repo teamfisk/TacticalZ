@@ -10,9 +10,12 @@
 #define MAXCONNECTIONS 8
 #define INPUTSIZE 128
 #define PACKETMODULUS 1000 // How many packets to send before the number resets
+#define PLAYERSPEED 0.2f;
 
 typedef boost::shared_ptr<boost::asio::ip::udp::socket> socket_ptr;
 typedef boost::shared_ptr<std::string> string_ptr;
 typedef boost::shared_ptr<std::queue<string_ptr>> messageQueue_ptr;
+
+
 
 #endif
