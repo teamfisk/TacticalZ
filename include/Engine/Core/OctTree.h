@@ -14,19 +14,6 @@ public:
     {
         float CollideDistance;
     };
-    struct ContainedObject
-    {
-        ContainedObject()
-            : Box(AABB())
-            , Checked(false)
-        {}
-        ContainedObject(AABB box)
-            : Box(box)
-            , Checked(false)
-        {}
-        AABB Box;
-        bool Checked;
-    };
 
     OctTree();
     ~OctTree();
@@ -59,7 +46,20 @@ public:
     bool BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected);
 
 private:
-    struct OctChild;
+    struct OctChild;    //Fwd declaration;
+    struct ContainedObject
+    {
+        ContainedObject()
+            : Box(AABB())
+            , Checked(false)
+        {}
+        ContainedObject(AABB box)
+            : Box(box)
+            , Checked(false)
+        {}
+        AABB Box;
+        bool Checked;
+    };
     OctChild* m_Root;
     std::vector<ContainedObject> m_StaticObjects;
     std::vector<ContainedObject> m_DynamicObjects;
