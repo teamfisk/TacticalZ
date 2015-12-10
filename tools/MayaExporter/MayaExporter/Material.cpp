@@ -111,6 +111,8 @@ bool Material::findColorTexture(MaterialNode& material_node, MFnDependencyNode& 
 
 			material_node.ColorMapFile = FullPath.substr(FullPath.find_last_of("/"));
 
+			// Test
+			MGlobal::displayInfo(MString() + "Texture file: " + FullPath.c_str());
 			return true;
 		}
 	}

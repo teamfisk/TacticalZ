@@ -9,3 +9,6 @@ lib/
 *.sdf
 tools/MayaExporter/MayaExporter/x64/Debug/
 tools/MayaExporter/x64/Debug/
+
+tools/MayaExporter/MayaExporter/Debug/
+tools/MayaExporter/MayaExporter/GeneratedFiles/

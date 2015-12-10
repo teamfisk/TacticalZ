@@ -5,6 +5,7 @@
 #include <array>
 #include <algorithm>
 #include <cmath>
+
 #include "MayaIncludes.h"
 
 struct MaterialNode
