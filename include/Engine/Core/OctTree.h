@@ -58,6 +58,7 @@ private:
     glm::quat m_PrevOri;
 
     inline bool hasChildren() const;
+public:
     int childIndexContainingPoint(const glm::vec3& point) const;
     std::vector<int> childIndicesContainingBox(const AABB& box) const;
 };

@@ -109,8 +109,8 @@ void OctTree::Update(float dt, World* world, Camera* cam)
     ComponentWrapper transform = world->GetComponent(m_BoxID, "Transform");
     transform["Position"] = boxPos;
     ComponentWrapper model = world->GetComponent(m_BoxID, "Model");
-    //if (BoxCollides(box, AABB())) {
-    if (Collision::AABBVsAABB(box, aabb)) {
+    if (BoxCollides(box, AABB())) {
+    //if (Collision::AABBVsAABB(box, aabb)) {
         cam->SetPosition(m_PrevPos);
         cam->SetOrientation(m_PrevOri);
         model["Color"] = greenCol;

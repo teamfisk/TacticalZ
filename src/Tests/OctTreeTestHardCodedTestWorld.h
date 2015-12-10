@@ -66,7 +66,7 @@ private:
         RegisterComponent(f);
     }
 
-    void createTestEntities()
+    void createTestEntitiesTest1()
     {
         World& world = *this;
         EntityID tempId;

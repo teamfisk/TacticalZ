@@ -58,7 +58,13 @@ void Game::Tick()
     m_EventBroker->Swap();
 
 #define TEST2
+    //this draws the octTree and you can set the cube inside it and see what boxes in the tree that it belongs to
 #ifdef TEST1
+    if (!m_UpdatedOnce) {
+        m_UpdatedOnce = true;
+        m_World->createTestEntitiesTest1();
+    }
+
     //add/move the trigger box
     auto pos = m_Renderer->Camera()->Forward() + m_Renderer->Camera()->Position();
     AABB boxi;
@@ -103,25 +109,32 @@ void Game::Tick()
     //wireframe
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
+    //this tests AABB vs AABB collision and AABB vs OctTree with AABB in it
 #ifdef TEST2
 
     //only add 1 for now...
     //grey box
-    AABB aabb;
-    aabb.CreateFromCenter(glm::vec3(0.f, 2.f, 0.f), glm::vec3(1.f, 1.f, 1.f));
 
     const glm::vec4 redCol = glm::vec4(1, 0.2f, 0, 1);
     const glm::vec4 greenCol = glm::vec4(0.1f, 1.0f, 0.25f, 1);
     const glm::vec3 boxSize = 0.1f*glm::vec3(1.0f, 1.0f, 1.0f);
+    AABB aabb;
+    aabb.CreateFromCenter(glm::vec3(0, 2.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
+    if (m_UpdatedOnce) {
+        auto test = someOctTree.childIndicesContainingBox(aabb);
+        std::vector<AABB> test2;
+        someOctTree.BoxesInSameRegion(aabb, test2);
+    }
     if (!m_UpdatedOnce) {
+        m_UpdatedOnce = true;
         someOctTree.AddStaticObject(aabb);
+        //create the "small red box"
         m_BoxID = m_World->CreateEntity();
         ComponentWrapper transform = m_World->AttachComponent(m_BoxID, "Transform");
         transform["Scale"] = boxSize;
         ComponentWrapper model = m_World->AttachComponent(m_BoxID, "Model");
         model["Resource"] = "Models/Core/UnitBox.obj";
-        m_UpdatedOnce = true;
         m_World->createTestEntitiesTest2();
     }
 
@@ -132,8 +145,10 @@ void Game::Tick()
     ComponentWrapper transform = m_World->GetComponent(m_BoxID, "Transform");
     transform["Position"] = boxPos;
     ComponentWrapper model = m_World->GetComponent(m_BoxID, "Model");
+    //this checks AABB vs an AABB in the octTree
     if (someOctTree.BoxCollides(redBox, AABB())) {
-    //if (Collision::AABBVsAABB(redBox, aabb)) {
+        //this checks AABB vs AABB
+        //if (Collision::AABBVsAABB(redBox, aabb)) {
         m_Renderer->Camera()->SetPosition(m_PrevPos);
         m_Renderer->Camera()->SetOrientation(m_PrevOri);
         model["Color"] = greenCol;
@@ -144,7 +159,6 @@ void Game::Tick()
 
     m_PrevPos = m_Renderer->Camera()->Position();
     m_PrevOri = m_Renderer->Camera()->Orientation();
-    someOctTree.ClearObjects();
 
     m_RenderQueueFactory->Update(m_World);
 #endif
