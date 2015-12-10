@@ -47,8 +47,11 @@ BOOST_AUTO_TEST_CASE(configFileTest)
     auto getSomething5 = m_Config->Get("Test.4321", 0);
     BOOST_CHECK(getSomething5 == 145);
     
-    //reload,onchildreload unimplemented
+    //***check so outputwindow says: EE: Failed to parse "DefaultConfigTestFailed.ini"
+    //***check so outputwindow says: EE: Failed to parse "ConfigTestFailed.ini":
+    auto m_Config4 = ResourceManager::Load<ConfigFile>("ConfigTestFailed.ini");
 
+    //reload,onchildreload unimplemented
 }
 
 BOOST_AUTO_TEST_SUITE_END()
