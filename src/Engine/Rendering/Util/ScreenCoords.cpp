@@ -29,22 +29,31 @@ glm::vec3 ScreenCoords::ToWorldPos(glm::vec2 screenCoord, float depth, float scr
     return ToWorldPos(screenCoord.x, screenCoord.y, depth, screenWidth, screenHeight, cameraProjectionMat, cameraViewMat);
 }
 
-glm::vec3 ScreenCoords::ToPixelData(float x, float y, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
+ScreenCoords::PixelData ScreenCoords::ToPixelData(float x, float y, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
 {
     PickDataBuffer->Bind();
-    glm::vec2 pixelData;
-    glReadPixels(x, y, 1, 1, GL_RG, GL_FLOAT, &pixelData);
+    unsigned char pdata[2];
+    glReadPixels(x, y, 1, 1, GL_RG, GL_UNSIGNED_BYTE, &pdata);
     PickDataBuffer->Unbind();
+
 
     glBindFramebuffer(GL_FRAMEBUFFER, DepthBuffer);
     float depthData;
     glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depthData);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    return glm::vec3(pixelData, depthData);
+    PixelData p;
+    p.Color[0] = (int)pdata[0];
+    p.Color[1] = (int)pdata[1];
+    p.Depth = depthData;
+
+    GLERROR("ScreenCoords::ToPixelData Error");
+
+    return p;
 }
 
-glm::vec3 ScreenCoords::ToPixelData(glm::vec2 screenCoord, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
+ScreenCoords::PixelData ScreenCoords::ToPixelData(glm::vec2 screenCoord, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
 {
     return ToPixelData(screenCoord.x, screenCoord.y, PickDataBuffer, DepthBuffer);
 }
+
