@@ -85,42 +85,42 @@ OctTree::~OctTree()
 
 void OctTree::Update(float dt, World* world, Camera* cam)
 {
-    AABB aabb;
-    for (ComponentWrapper& c : world->GetComponents("Collision")) {
-        aabb.CreateFromCenter(c["BoxCenter"], c["BoxSize"]);
-        AddStaticObject(aabb);
-    }
-    const glm::vec4 redCol = glm::vec4(1, 0.2f, 0, 1);
-    const glm::vec4 greenCol = glm::vec4(0.1f, 1.0f, 0.25f, 1);
-    const glm::vec3 boxSize = 0.1f*glm::vec3(1.0f, 1.0f, 1.0f);
+    //AABB aabb;
+    //for (ComponentWrapper& c : world->GetComponents("Collision")) {
+    //    aabb.CreateFromCenter(c["BoxCenter"], c["BoxSize"]);
+    //    AddStaticObject(aabb);
+    //}
+    //const glm::vec4 redCol = glm::vec4(1, 0.2f, 0, 1);
+    //const glm::vec4 greenCol = glm::vec4(0.1f, 1.0f, 0.25f, 1);
+    //const glm::vec3 boxSize = 0.1f*glm::vec3(1.0f, 1.0f, 1.0f);
 
-    if (!m_UpdatedOnce) {
-        m_BoxID = world->CreateEntity();
-        ComponentWrapper transform = world->AttachComponent(m_BoxID, "Transform");
-        transform["Scale"] = boxSize;
-        ComponentWrapper model = world->AttachComponent(m_BoxID, "Model");
-        model["Resource"] = "Models/Core/UnitBox.obj";
-        m_UpdatedOnce = true;
-    }
+    //if (!m_UpdatedOnce) {
+    //    m_BoxID = world->CreateEntity();
+    //    ComponentWrapper transform = world->AttachComponent(m_BoxID, "Transform");
+    //    transform["Scale"] = boxSize;
+    //    ComponentWrapper model = world->AttachComponent(m_BoxID, "Model");
+    //    model["Resource"] = "Models/Core/UnitBox.obj";
+    //    m_UpdatedOnce = true;
+    //}
 
-    AABB box;
-    auto boxPos = cam->Position() + 1.2f*cam->Forward();
-    box.CreateFromCenter(boxPos, boxSize);
-    ComponentWrapper transform = world->GetComponent(m_BoxID, "Transform");
-    transform["Position"] = boxPos;
-    ComponentWrapper model = world->GetComponent(m_BoxID, "Model");
-    if (BoxCollides(box, AABB())) {
-    //if (Collision::AABBVsAABB(box, aabb)) {
-        cam->SetPosition(m_PrevPos);
-        cam->SetOrientation(m_PrevOri);
-        model["Color"] = greenCol;
-    } else {
-        model["Color"] = redCol;
-    }
+    //AABB box;
+    //auto boxPos = cam->Position() + 1.2f*cam->Forward();
+    //box.CreateFromCenter(boxPos, boxSize);
+    //ComponentWrapper transform = world->GetComponent(m_BoxID, "Transform");
+    //transform["Position"] = boxPos;
+    //ComponentWrapper model = world->GetComponent(m_BoxID, "Model");
+    //if (BoxCollides(box, AABB())) {
+    ////if (Collision::AABBVsAABB(box, aabb)) {
+    //    cam->SetPosition(m_PrevPos);
+    //    cam->SetOrientation(m_PrevOri);
+    //    model["Color"] = greenCol;
+    //} else {
+    //    model["Color"] = redCol;
+    //}
 
-    m_PrevPos = cam->Position();
-    m_PrevOri = cam->Orientation();
-    ClearObjects();
+    //m_PrevPos = cam->Position();
+    //m_PrevOri = cam->Orientation();
+    //ClearObjects();
 }
 
 bool OctTree::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
