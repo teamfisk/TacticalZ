@@ -2,6 +2,8 @@
 
 Game::Game(int argc, char* argv[])
 {
+    bool steamResult = SteamAPI_Init();
+
 	ResourceManager::RegisterType<ConfigFile>("ConfigFile");
 	ResourceManager::RegisterType<Model>("Model");
 	ResourceManager::RegisterType<Texture>("Texture");
@@ -66,6 +68,8 @@ void Game::Tick()
 	double dt = currentTime - m_LastTime;
 	m_LastTime = currentTime;
 
+    SteamAPI_RunCallbacks();
+
     // Handle input in a weird looking but responsive way
 	m_EventBroker->Swap();
 	m_InputManager->Update(dt);
@@ -108,6 +112,28 @@ bool Game::testOnKeyUp(const Events::KeyUp& e)
 void Game::testIntialize()
 {
     EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &Game::testOnKeyUp);
+
+    {
+        Events::BindOrigin e;
+        e.Origin = "R";
+        e.Command = "DebugReload";
+        e.Value = 1.f;
+        m_EventBroker->Publish(e);
+    }
+    {
+        Events::BindOrigin e;
+        e.Origin = "SteamController";
+        e.Command = "DebugReload";
+        e.Value = 1.f;
+        m_EventBroker->Publish(e);
+    }
+    {
+        Events::BindOrigin e;
+        e.Origin = "X";
+        e.Command = "DebugReload";
+        e.Value = 1.f;
+        m_EventBroker->Publish(e);
+    }
 }
 
 void Game::testTick(double dt)
