@@ -7,6 +7,11 @@ using boost::unit_test_framework::test_case;
 //#define private public
 #include "Engine\Core\ConfigFile.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#define DEBUG_CLIENTBLOCK new( _CLIENT_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_CLIENTBLOCK
+
 BOOST_AUTO_TEST_SUITE(confTest)
 
 BOOST_AUTO_TEST_CASE(configFileTest)
@@ -51,7 +56,13 @@ BOOST_AUTO_TEST_CASE(configFileTest)
     //***check so outputwindow says: EE: Failed to parse "ConfigTestFailed.ini":
     auto m_Config4 = ResourceManager::Load<ConfigFile>("ConfigTestFailed.ini");
 
+    //test to try to fix memleaks - failed, probably something else
+    //ResourceManager::Release(std::string("ConfigFile"), std::string("ConfigTest.ini"));
+    //ResourceManager::Release(std::string("ConfigFile"), std::string("ConfigTestNotExists.ini"));
+    //ResourceManager::Release(std::string("ConfigFile"), std::string("ConfigTest.ini"));
+    //ResourceManager::Release(std::string("ConfigFile"), std::string("ConfigTestFailed.ini"));
     //reload,onchildreload unimplemented
+    _CrtDumpMemoryLeaks();
 }
 
 BOOST_AUTO_TEST_SUITE_END()
