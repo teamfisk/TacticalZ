@@ -17,11 +17,7 @@ void Renderer::Initialize()
     InitializeTextures();
     InitializeFrameBuffers();
     InitializeSSBOs();
-    CalculateFrustum();
-
-
-
-
+    //CalculateFrustum();
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
