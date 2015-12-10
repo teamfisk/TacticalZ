@@ -41,9 +41,16 @@ ComponentWrapper World::GetComponent(EntityID entity, std::string componentType)
     return pool->GetByEntity(entity);
 }
 
-const ComponentPool& World::GetComponents(std::string componentType)
+const ComponentPool* World::GetComponents(std::string componentType)
 {
-    return *m_ComponentPools.at(componentType);
+    auto it = m_ComponentPools.find(componentType);
+    return (it != m_ComponentPools.end()) ? it->second : nullptr;
+}
+
+
+EntityID World::GetParent(EntityID entity)
+{
+    return m_EntityParents.at(entity);
 }
 
 EntityID World::generateEntityID()
