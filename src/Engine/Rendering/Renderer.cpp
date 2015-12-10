@@ -117,21 +117,24 @@ void Renderer::InputUpdate(double dt)
     static double mousePosX, mousePosY;
     glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
     if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-        glm::vec3 data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, &m_PickingBuffer, m_DepthBuffer);
-        glm::vec2 color = glm::vec2(data);
-        float depth = data.z;
+        ScreenCoords::PixelData data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, &m_PickingBuffer, m_DepthBuffer);
         
-        glm::vec3 viewPos = ScreenCoords::ToWorldPos(mousePosX, m_Resolution.Height - mousePosY, depth, m_Resolution, m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
+        glm::vec3 viewPos = ScreenCoords::ToWorldPos(mousePosX, m_Resolution.Height - mousePosY, data.Depth, m_Resolution, m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
       //  glm::vec3 worldPos = glm::vec3(glm::inverse(m_Camera->ViewMatrix()) * glm::vec4(viewPos, 1.f));
 
-        //printf("R: %f, G: %f, Depth: %f\n", color.r, color.g, depth);
+        //printf("R: %f, G: %f, Depth: %f\n", data.Color[0], data.Color[1], data.Depth);
         //printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
-
-        if (color != glm::vec2(0, 0)) {
-            EntityID pickedEntity = m_PickingColorsToEntity[color];
-            printf("Picked Entity: %i", pickedEntity);
-
-        }
+        //printf("\n\n---------------------------\n");
+        auto got = m_PickingColorsToEntity.find(glm::vec2(data.Color[0], data.Color[1]));
+        if (got == m_PickingColorsToEntity.end())
+            printf("Color (R:%f, G:%f) not found.\n", data.Color[0], data.Color[1]);
+        else
+            printf("R:%f G:%f, EntityID: %i\n", got->first.r, got->first.g, got->second);
+        //printf("----\n");
+        //for (auto i : m_PickingColorsToEntity) {
+        //    printf("Entity: %i, Color: R: %f, G: %f\n", i.second, i.first.r, i.first.g);
+        //}
+        //printf("---------------------------\n\n");
     }
 
 	if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -213,10 +216,12 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
             continue;
         }
     }
+    GLERROR("DrawScene Error");
 }
 
 void Renderer::PickingPass(RenderQueueCollection& rq)
 {
+    m_PickingColorsToEntity.clear();
     m_PickingBuffer.Bind();
 
     glEnable(GL_DEPTH_TEST);
@@ -225,7 +230,7 @@ void Renderer::PickingPass(RenderQueueCollection& rq)
 
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    int r = 30;
+    int r = 1;
     int g = 0;
     //TODO: Render: Add code for more jobs than modeljobs.
 
@@ -237,8 +242,18 @@ void Renderer::PickingPass(RenderQueueCollection& rq)
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
-            glm::vec2 pickColor = glm::vec2(r/255.f, g/255.f);
-            m_PickingColorsToEntity[pickColor] = modelJob->Entity;
+            //---------------
+            //TODO: Renderer: IMPORTANT: Fixa detta så det inte loopar igenom listan varje frame.
+            //---------------
+            int pickColor[2] = { r, g };
+            for (auto i : m_PickingColorsToEntity) {
+                if(modelJob->Entity == i.second) {
+                    pickColor[0] = i.first.x;
+                    pickColor[1] = i.first.y;
+                    r -= 1;
+                }
+            }
+            m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
             
 
             //Render picking stuff
@@ -246,19 +261,21 @@ void Renderer::PickingPass(RenderQueueCollection& rq)
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(pickColor));
+            glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
             glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-            r+=50;
+            r += 1;
             if(r > 255) {
                 r = 0;
-                g+=50;
+                g += 1;
             }
         }
     }
     m_PickingBuffer.Unbind();
+    GLERROR("PickingPass Error");
+
 }
 
 
@@ -300,7 +317,7 @@ void Renderer::InitializeTextures()
     */
 
     GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
-        glm::vec2(m_Resolution.Width, m_Resolution.Height), GL_RG8, GL_RG, GL_FLOAT);
+        glm::vec2(m_Resolution.Width, m_Resolution.Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
