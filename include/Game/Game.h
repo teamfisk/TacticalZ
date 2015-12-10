@@ -12,6 +12,7 @@
 #include "Core/EKeyDown.h"
 #include "Core/EntityXMLFile.h"
 #include "Core/SystemPipeline.h"
+#include "RaptorCopterSystem.h"
 
 class Game
 {
