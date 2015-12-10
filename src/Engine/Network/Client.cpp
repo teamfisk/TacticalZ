@@ -75,22 +75,14 @@ void Client::ReadFromServer()
 void Client::SendToServer()
 {
 	if (m_NextSnapshot.inputForward != "" && m_NextSnapshot.inputForward[0] != '\0') {
-		char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
-		int len = CreateMessage(MessageType::Event, m_NextSnapshot.inputForward, dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
-        delete[] dataPackage;
+		Package message(MessageType::Event);
+		message.AddString(m_NextSnapshot.inputForward);
+		Send(message);
 	}
 	if (m_NextSnapshot.inputRight != "" && m_NextSnapshot.inputRight[0] != '\0') {
-		char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
-		int len = CreateMessage(MessageType::Event, m_NextSnapshot.inputRight, dataPackage);
-		m_Socket.send_to(boost::asio::buffer(
-			dataPackage,
-			len),
-			m_ReceiverEndpoint, 0);
-        delete[] dataPackage;
+		Package message(MessageType::Event);
+		message.AddString(m_NextSnapshot.inputRight);
+		Send(message);
 	}
 }
 
@@ -146,16 +138,9 @@ void Client::ParsePing()
 
 void Client::ParseServerPing()
 {
-	char* testMessage = new char[128];
-	int testOffset = CreateMessage(MessageType::ServerPing, "Ping recieved", testMessage);
-
-	//std::cout << "Parsing ping." << std::endl;
-
-	m_Socket.send_to(boost::asio::buffer(
-        testMessage,
-		testOffset),
-		m_ReceiverEndpoint, 0);
-    delete[] testMessage;
+	Package message(MessageType::ServerPing);
+	message.AddString("Ping recieved");
+	Send(message);
 }
 
 void Client::ParseEventMessage(char* data, size_t length)
@@ -223,59 +208,35 @@ int Client::Receive(char* data, size_t length)
 	return bytesReceived;
 }
 
-int Client::CreateMessage(MessageType type, std::string message, char* data)
+void Client::Send(Package& package)
 {
-	int lengthOfMessage = 0;
-	int messageType = static_cast<int>(type);
-	lengthOfMessage = message.size();
-
-	int offset = 0;
-	// Message type
-	memcpy(data + offset, &messageType, sizeof(int));
-	offset += sizeof(int);
-	// Message, add one extra byte for null terminator
-	memcpy(data + offset, message.data(), (lengthOfMessage + 1) * sizeof(char));
-	offset += (lengthOfMessage + 1) * sizeof(char);
-
-	return offset;
+	m_Socket.send_to(boost::asio::buffer(
+		package.Data(),
+		package.Size()),
+		m_ReceiverEndpoint, 0);
 }
 
 void Client::Connect()
 {
-    char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
-    int length = CreateMessage(MessageType::Connect, m_PlayerName, dataPackage);
-    m_StartPingTime = std::clock();
-    m_Socket.send_to(boost::asio::buffer(
-        dataPackage,
-        length),
-        m_ReceiverEndpoint, 0);
-    delete[] dataPackage;
+	Package message(MessageType::Connect);
+	message.AddString(m_PlayerName);
+	m_StartPingTime = std::clock();
+	Send(message);
 }
 
 void Client::Disconnect()
 {
-    char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
-    int len = CreateMessage(MessageType::Disconnect, "+Disconnect", dataPackage);
-    m_Socket.send_to(boost::asio::buffer(
-        dataPackage,
-        len),
-        m_ReceiverEndpoint, 0);
-    delete[] dataPackage;
+	Package message(MessageType::Connect);
+	message.AddString("+Disconnect");
+	Send(message);
 }
 
 void Client::Ping()
 { 
-    char* dataPackage = new char[INPUTSIZE];
-    if (GetAsyncKeyState('P')) { // Maybe use previous key here
-        int length = CreateMessage(MessageType::ClientPing, "Ping", dataPackage);
-        m_StartPingTime = std::clock();
-        m_Socket.send_to(boost::asio::buffer(
-            dataPackage,
-            length),
-            m_ReceiverEndpoint, 0);
-    }
-    memset(dataPackage, 0, INPUTSIZE);
-    delete[] dataPackage;
+	Package message(MessageType::Connect);
+	message.AddString("Ping"); 
+	m_StartPingTime = std::clock();
+	Send(message);
 }
 
 void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)

@@ -47,10 +47,12 @@ private:
 
 
     int  Receive(char* data, size_t length);
+	void Send(Package& package, int playerID);
+	void Send(Package& package);
     int  CreateMessage(MessageType type, std::string message, char * data);
     void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
     void Broadcast(std::string message);
-    void Broadcast(char* data, size_t length);
+    void Broadcast(Package& package);
     void SendSnapshot();
     void SendPing();
     void CheckForTimeOuts();

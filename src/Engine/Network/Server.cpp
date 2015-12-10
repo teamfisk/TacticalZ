@@ -154,6 +154,24 @@ int Server::Receive(char * data, size_t length)
     return length;
 }
 
+void Server::Send(Package& message, int playerID)
+{
+	m_Socket.send_to(
+		boost::asio::buffer(message.Data(), message.Size()),
+		m_PlayerDefinitions[playerID].Endpoint,
+		0);
+}
+
+void Server::Send(Package & package)
+{
+	m_Socket.send_to(
+		boost::asio::buffer(
+			package.Data(),
+			package.Size()),
+		m_ReceiverEndpoint,
+		0);
+}
+
 int Server::CreateMessage(MessageType type, std::string message, char * data)
 {
     int lengthOfMessage = 0;
@@ -183,55 +201,42 @@ void Server::MoveMessageHead(char *& data, size_t & length, size_t stepSize)
 
 void Server::Broadcast(std::string message)
 {
-    std::cout << m_PacketID << ": Broadcast: " << message << std::endl;
-    char* data = new char[128];
-    int offset = CreateMessage(MessageType::Event, message, data);
+	Package package(MessageType::Event);
+	package.AddPrimitive<int>(12); // Input PackageID here
+	package.AddString(message);
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
-            m_Socket.send_to(
-                boost::asio::buffer(data, offset),
-                m_PlayerDefinitions[i].Endpoint,
-                0);
+			Send(package, i);
         }
     }
-    delete[] data;
 }
 
-void Server::Broadcast(char * data, size_t length)
+void Server::Broadcast(Package& package)
 {
     for (int i = 0; i < MAXCONNECTIONS; ++i) {
         if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
-            m_Socket.send_to(
-                boost::asio::buffer(data, length),
-                m_PlayerDefinitions[i].Endpoint,
-                0);
+			Send(package, i);
         }
     }
 }
 
 void Server::SendSnapshot()
 {
-    char* data = new char[INPUTSIZE];
-    int offset = CreateHeader(MessageType::Snapshot, data);
+	Package package(MessageType::Snapshot);
+	package.AddPrimitive<int>(12); // Input PackageID here
 	for (size_t i = 0; i < MAXCONNECTIONS; i++) {
 		if (m_PlayerDefinitions[i].EntityID == -1) {
 			continue;
 		}
 		// Pack player pos into data package
 		glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
-        memcpy(data + offset, &playerPos.x, sizeof(float));
-        offset += sizeof(float);
-        memcpy(data + offset, &playerPos.y, sizeof(float));
-        offset += sizeof(float);
-		memcpy(data + offset, &playerPos.z, sizeof(float));
-		offset += sizeof(float);
-        // +1 for null terminator
-		// Pack player name into data package
-        memcpy(data + offset, m_PlayerDefinitions[i].Name.data(), m_PlayerDefinitions[i].Name.size() + 1);
-        offset += (m_PlayerDefinitions[i].Name.size() + 1) * sizeof(char);
+		package.AddPrimitive<float>(playerPos.x);
+		package.AddPrimitive<float>(playerPos.y);
+		package.AddPrimitive<float>(playerPos.z);
+
+		package.AddString(m_PlayerDefinitions[i].Name);
     }
-    Broadcast(data, offset);
-    delete[] data;
+	Broadcast(package);
 }
 
 void Server::SendPing()
@@ -244,14 +249,13 @@ void Server::SendPing()
     }
 
     // Create ping message
-    char* data = new char[128];
-    int len = CreateMessage(MessageType::ServerPing, "Ping from server", data);
-    // Time message
+	Package package(MessageType::ServerPing);
+	package.AddPrimitive<int>(12); // Input PackageID here
+	package.AddString("Ping from server");
+	// Time message
     m_StartPingTime = std::clock();
     // Send message
-    Broadcast(data, len);
-    delete[] data;
-
+    Broadcast(package);
 }
 
 void Server::CheckForTimeOuts()
@@ -358,35 +362,23 @@ void Server::ParseConnect(char * data, size_t length)
 
             m_PlayerDefinitions[i].Endpoint = m_ReceiverEndpoint;
             m_PlayerDefinitions[i].Name = std::string(data);
+			// +1 is the null terminator
+			MoveMessageHead(data, length, m_PlayerDefinitions[i].Name.size() + 1);
             m_StopTimes[i] = std::clock();
 
             std::cout << m_PacketID << ": Player \"" << m_PlayerDefinitions[i].Name << "\" connected on IP: " <<
                 m_PlayerDefinitions[i].Endpoint.address().to_string() << std::endl;
 
-            int offset = 0;
-            char* temp = new char[sizeof(int) * 2];
-            int messagType = 0;
-
-            memcpy(temp, &messagType, sizeof(int));
-            offset += sizeof(int);
-            memcpy(temp + offset, &i, sizeof(int));
-
-			memcpy(temp, &m_PacketID, sizeof(int));
-			offset += sizeof(int);
-			m_PacketCounter++;
-
-            m_Socket.send_to(
-                boost::asio::buffer(temp, sizeof(int) * 2),
-                m_PlayerDefinitions[i].Endpoint,
-                0);
+			Package package(MessageType::Connect);
+			package.AddPrimitive<int>(12); // Input PackageID here
+			package.AddPrimitive<int>(i); // Player ID
+           
+			Send(package, i);
 
             // Send notification that a player has connected
             std::string str = m_PacketID + "Player " + m_PlayerDefinitions[i].Name + " connected on: " 
                 + m_PlayerDefinitions[i].Endpoint.address().to_string();
             Broadcast(str);
-            // +1 is the null terminator
-            MoveMessageHead(data, length, m_PlayerDefinitions[i].Name.size() + 1);
-            delete[] temp;
             break;
         }
     }
@@ -406,18 +398,12 @@ void Server::ParseDisconnect()
 
 void Server::ParseClientPing()
 {
-    char* testMesssage = new char[128];
-    int testOffset = CreateMessage(MessageType::ClientPing, "Ping recieved", testMesssage);
-
-    std::cout << m_PacketID << ":Parsing ping." << std::endl;
-    // Return ping
-    m_Socket.send_to(
-        boost::asio::buffer(
-            testMesssage,
-            testOffset),
-        m_ReceiverEndpoint,
-        0);
-    delete[] testMesssage;
+	std::cout << m_PacketID << ":Parsing ping." << std::endl;
+	// Return ping
+	Package package(MessageType::ClientPing);
+	package.AddPrimitive<int>(12); // Insert packet ID here
+	package.AddString("Ping received");
+	Send(package);
 }
 
 void Server::ParseServerPing()
@@ -430,6 +416,7 @@ void Server::ParseServerPing()
     }
 }
 
+// NOT USED
 void Server::ParseSnapshot(char * data, size_t length)
 {
     // Does no logic. Returns snapshot if client request one

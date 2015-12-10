@@ -3,6 +3,8 @@
 
 #include <boost/asio/ip/udp.hpp>
 #include <queue>
+#include "Network/Package.h"
+
 
 #define BOARDSIZE 16
 #define MAXCONNECTIONS 8

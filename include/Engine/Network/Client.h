@@ -30,6 +30,7 @@ private:
 	void SendToServer();
 
 	int Receive(char* data, size_t length);
+	void Send(Package& message);
 	int CreateMessage(MessageType type, std::string message, char* data);
     void Connect();
     void Disconnect();
