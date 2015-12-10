@@ -16,7 +16,7 @@ Game::Game(int argc, char* argv[])
     m_RenderQueueFactory = new RenderQueueFactory();
 
 	// Create the renderer
-	m_Renderer = new Renderer();
+	m_Renderer = new Renderer(m_EventBroker);
 	m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
 	m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
 	m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -80,6 +80,7 @@ void Game::Tick()
 	// DO SYSTEM SHIT HERE
 	m_EventBroker->Process<Client>();
     testTick(dt);
+    m_Renderer->Update(dt);
 
     m_RenderQueueFactory->Update(m_World);
 	m_Renderer->Update(dt);
