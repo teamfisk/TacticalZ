@@ -35,6 +35,20 @@ void ResourceManager::Reload(std::string resourceName)
 	}
 }
 
+
+void ResourceManager::Release(std::string resourceType, std::string resourceName)
+{
+    auto key = std::make_pair(resourceType, resourceName);
+    if (m_ResourceCache.find(key) == m_ResourceCache.end()) {
+        return;
+    }
+    auto resource = m_ResourceCache.at(key);
+    m_ResourceCache.erase(key);
+    m_ResourceFromName.erase(resourceName);
+    m_ResourceParents.erase(resource);
+    delete resource;
+}
+
 unsigned int ResourceManager::GetNewResourceID(unsigned int typeID)
 {
 	return m_ResourceCount[typeID]++;
