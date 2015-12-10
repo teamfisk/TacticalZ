@@ -29,6 +29,9 @@ Game::Game(int argc, char* argv[])
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
+    m_InputProxy = new InputProxy(m_EventBroker);
+    m_InputProxy->AddHandler<KeyboardInputHandler>();
+    m_InputProxy->AddHandler<SteamControllerInputHandler>();
 
     // Create the root level GUI frame
     m_FrameStack = new GUI::Frame(m_EventBroker);
@@ -66,8 +69,13 @@ void Game::Tick()
     double dt = currentTime - m_LastTime;
     m_LastTime = currentTime;
 
+    // Handle input in a weird looking but responsive way
     m_EventBroker->Swap();
     m_InputManager->Update(dt);
+    m_EventBroker->Swap();
+    m_InputProxy->Update(dt);
+    m_EventBroker->Swap();
+    m_InputProxy->Process();
     m_EventBroker->Swap();
 
     // Iterate through systems and update world!
