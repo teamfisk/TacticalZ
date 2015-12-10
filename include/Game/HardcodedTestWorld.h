@@ -108,12 +108,15 @@ private:
             ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
             model["Resource"] = "Models/DummyScene.obj";
         }
+        for (int i = 0; i < 16; ++i)
         {
             EntityID entityCollisionBox = world.CreateEntity();
             ComponentWrapper transform = world.AttachComponent(entityCollisionBox, "Transform");
-            transform["Position"] = glm::vec3(0.f, 2.f, 0.f);
+            transform["Position"] = glm::vec3(rand()%11-5, rand() % 11 - 5, rand() % 11 - 5);
             ComponentWrapper model = world.AttachComponent(entityCollisionBox, "Model");
             model["Resource"] = "Models/Core/UnitBox.obj";
+            float sc = 0.20f;
+            transform["Scale"] = glm::vec3(sc, sc, sc);
 
             ComponentWrapper collision = world.AttachComponent(entityCollisionBox, "Collision");
             glm::vec3 pos = transform["Position"];

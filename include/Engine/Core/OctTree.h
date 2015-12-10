@@ -13,7 +13,21 @@ public:
     struct Output
     {
         float CollideDistance;
-    }; 
+    };
+    struct ContainedObject
+    {
+        ContainedObject()
+            : Box(AABB())
+            , Checked(false)
+        {}
+        ContainedObject(AABB box)
+            : Box(box)
+            , Checked(false)
+        {}
+        AABB Box;
+        bool Checked;
+    };
+
     OctTree();
     ~OctTree();
     //For the root OctTree, [octTreeBounds] should be a box containing the entire level.
@@ -24,41 +38,71 @@ public:
     OctTree(const OctTree& other) = delete;
     OctTree(const OctTree&& other) = delete;
     OctTree& operator= (const OctTree& other) = delete;
-
+    //Add a dynamic object (one that moves around) into the tree.
     void AddDynamicObject(const AABB& box);
+    //Add a static object (that does not move) into the tree.
     void AddStaticObject(const AABB& box);
-
-    void BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const;
-
+    //Get the boxes that are in the same area as the input [box], the boxes are put in [outBoxes].
+    void BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes);
+    //Empty the tree of all objects, static and dynamic.
     void ClearObjects();
+    //Empty the tree of all dynamic objects. Static objects remain in the tree.
     void ClearDynamicObjects();
 
     //Collision test function. WTODO: Probably remove or relocate elsewhere, Collision system?
     void Update(float dt, World* world, Camera* cam);
     //Returns true if the ray collides with something in the tree. Result is written to [data].
-    bool RayCollides(const Ray& ray, Output& data) const;
+    bool RayCollides(const Ray& ray, Output& data);
     //Returns true if the box collides with something in the tree. 
     //On collision with a box, that box is written to [outBoxIntersected].
     //Note: More efficient than calling BoxesInSameRegion from outside and testing there.
-    bool BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const;
+    bool BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected);
 
 private:
-    OctTree* m_Children[8];
-    //WTODO: Do -derived class from AABB- struct containing AABB, with a bool Tested, falsify at 
-    //start of Collision test, set on check, don't check if set already. Solves duplicate boxes in tree. 
-    //Store indices in the struct, pointing to grand ancestor list of boxes, need the same AABB not copies to save Tested.
-    std::vector<AABB> m_StaticObjects;
-    std::vector<AABB> m_DynamicObjects;
-    AABB m_Box;
-                                                                                                                   
+    struct OctChild;
+    OctChild* m_Root;
+    std::vector<ContainedObject> m_StaticObjects;
+    std::vector<ContainedObject> m_DynamicObjects;
+
     bool m_UpdatedOnce;
     unsigned int m_BoxID;
     glm::vec3 m_PrevPos;
     glm::quat m_PrevOri;
 
-    inline bool hasChildren() const;
-    int childIndexContainingPoint(const glm::vec3& point) const;
-    std::vector<int> childIndicesContainingBox(const AABB& box) const;
+    void falsifyObjectChecks();
+
+    struct OctChild
+    {
+        ~OctChild();
+        OctChild(const AABB& octTreeBounds, 
+            int subDivisions, 
+            std::vector<OctTree::ContainedObject>& staticObjects, 
+            std::vector<OctTree::ContainedObject>& dynamicObjects);
+        OctChild(const OctChild& other) = delete;
+        OctChild(const OctChild&& other) = delete;
+        OctChild& operator= (const OctChild& other) = delete;
+        void AddDynamicObject(const AABB& box);
+        void AddStaticObject(const AABB& box);
+        void BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const;
+        void ClearObjects();
+        void ClearDynamicObjects();
+        bool RayCollides(const Ray& ray, Output& data) const;
+        bool BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const;
+
+        OctChild* m_Children[8];
+        //Indices into the lists in OctTree.
+        std::vector<int> m_StaticObjIndices;
+        std::vector<int> m_DynamicObjIndices;
+        AABB m_Box;
+        //Reference to the lists in OctTree.
+        std::vector<OctTree::ContainedObject>& m_StaticObjectsRef;
+        std::vector<OctTree::ContainedObject>& m_DynamicObjectsRef;
+
+        inline bool hasChildren() const;
+        int childIndexContainingPoint(const glm::vec3& point) const;
+        std::vector<int> childIndicesContainingBox(const AABB& box) const;
+    };
 };
+
 
 #endif
