@@ -32,6 +32,11 @@ private:
     std::clock_t m_StopTimes[8];
     // Game logic
     World* m_World;
+	// Packet loss logic
+	unsigned int m_PacketCounter = 0;
+	unsigned int m_PacketID = 0;
+	const unsigned int m_PacketModolus = 1000;
+
     // Close logic
     bool m_ThreadIsRunning = true;
     // Threaded

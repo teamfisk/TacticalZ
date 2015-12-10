@@ -7,6 +7,8 @@ Client::Client() : m_Socket(m_IOService)
 {
     // Set up network stream
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
+	m_NextSnapshot.InputForward = "";
+	m_NextSnapshot.InputRight = "";
 }
 
 Client::~Client()
@@ -117,6 +119,12 @@ void Client::ParseMessageType(char* data, size_t length)
     memcpy(&messageType, data, sizeof(int)); // Read what type off message was sent from server
     MoveMessageHead(data, length, sizeof(int)); // Move the message head to know where to read from
 
+	// Read packet ID 
+	m_PreviousPacketID = m_PacketID;
+	memcpy(&m_PacketID, data, sizeof(int)); 
+	MoveMessageHead(data, length, sizeof(int)); 
+	IdentifyPacketLoss();
+
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
         ParseConnect(data, length);
@@ -144,14 +152,15 @@ void Client::ParseMessageType(char* data, size_t length)
 
 void Client::ParseConnect(char* data, size_t len)
 {
-    memcpy(&m_PlayerID, data, sizeof(int));
-    std::cout << "I am player: " << m_PlayerID << std::endl;
+	memcpy(&m_PacketID, data, sizeof(int));
+	m_PreviousPacketID = m_PacketID;
+	std::cout << m_PacketID << ": I am player: " << m_PlayerID << std::endl;
 }
 
 void Client::ParsePing()
 {
     m_DurationOfPingTime = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
-    std::cout << "response time with ctime(ms): " << m_DurationOfPingTime << std::endl;
+	std::cout << m_PacketID << ": response time with ctime(ms): " << m_DurationOfPingTime << std::endl;
 }
 
 void Client::ParseServerPing()
@@ -179,7 +188,7 @@ void Client::ParseEventMessage(char* data, size_t length)
         // Sett Player name
         m_PlayerDefinitions[Id].Name = command.erase(0, 7);
     } else {
-        std::cout << "Event message: " << std::string(data) << std::endl;
+		std::cout << m_PacketID << ": Event message: " << std::string(data) << std::endl;
     }
 
     MoveMessageHead(data, length, std::string(data).size() + 1);
@@ -187,6 +196,7 @@ void Client::ParseEventMessage(char* data, size_t length)
 
 void Client::ParseSnapshot(char* data, size_t length)
 {
+	std::cout << m_PacketID << ": Parsing incoming snapshot." << std::endl;
     std::string tempName;
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         // We're checking for empty name for now. This might not be the best way,
@@ -358,4 +368,16 @@ void Client::CreateNewPlayer(int i)
     ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Transform");
     ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Model");
     model["Resource"] = "Models/Core/UnitSphere.obj";
+}
+
+void Client::IdentifyPacketLoss()
+{
+	// if no packets lost, difference should be equal to 1
+	int difference = m_PacketID - m_PreviousPacketID;
+	if (difference != 1) {
+		for (int i = m_PreviousPacketID + 1; i < m_PacketID; i++)
+		{
+			LOG_INFO("Packet %i was lost...", i);
+		}
+	}
 }

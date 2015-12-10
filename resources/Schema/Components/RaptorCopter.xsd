@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="RaptorCopter">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Speed" type="t:double" minOccurs="0"/>
+				<xs:element name="Axis" type="t:Vector" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

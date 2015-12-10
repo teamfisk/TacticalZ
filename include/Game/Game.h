@@ -9,6 +9,10 @@
 #include "GUI/Frame.h"
 #include "Core/World.h"
 #include "Rendering/RenderQueueFactory.h"
+#include "Core/EKeyDown.h"
+#include "Core/EntityXMLFile.h"
+#include "Core/SystemPipeline.h"
+#include "RaptorCopterSystem.h"
 
 // Network
 #include <boost/thread.hpp>
@@ -33,12 +37,19 @@ private:
 	InputManager* m_InputManager;
 	GUI::Frame* m_FrameStack;
     World* m_World;
+    SystemPipeline* m_SystemPipeline;
     RenderQueueFactory* m_RenderQueueFactory;
     // Network variables
     boost::thread m_NetworkThread;
+
     // Network methods
     void NetworkFunction();
-	// Network events
+
+    EventRelay<Game, Events::KeyUp> m_EKeyUp;
+    bool testOnKeyUp(const Events::KeyUp& e);
+
+    void testIntialize();
+    void testTick(double dt);
 	EventRelay<Client, Events::KeyDown> m_EKeyDown;
 
 };

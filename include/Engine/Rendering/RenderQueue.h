@@ -7,7 +7,7 @@
 #include "../Common.h"
 #include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
-#include "../Core/EntityWrapper.h"
+#include "../Core/Entity.h"
 
 class Model;
 class Skeleton;

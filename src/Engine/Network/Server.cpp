@@ -53,6 +53,8 @@ void Server::ReadFromClients()
         // m_ThreadIsRunning might be unnecessary but the 
         // program crashed if it executed m_Socket.available()
         // when closing the program. 
+
+		// If available message -> Socket.available() = true
         if (m_ThreadIsRunning && m_Socket.available()) {
             try {
                 bytesRead = Receive(readBuf, INPUTSIZE);
@@ -60,30 +62,29 @@ void Server::ReadFromClients()
             } catch (const std::exception& err) {
                 // To not spam "socket closed messages"
                 //if (std::string(err.what()).find("forcefully closed") != std::string::npos) {
-                std::cout << "Read from client crashed: " << err.what();
+                std::cout << m_PacketID << ": Read from client crashed: " << err.what();
                 //}
             }
-            
-            std::clock_t currentTime = std::clock();
-            // int tempTestRemovePlz = (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC);
-            // Send snapshot
-            if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-                SendSnapshot();
-                previousSnapshotMessage = currentTime;
-            }
-
-            // Send pings each 
-            if (intervallMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
-                SendPing();
-                previousePingMessage = currentTime;
-            }
-
-            // Time out logic
-            if (timeToCheckTimeOutTime < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
-                CheckForTimeOuts();
-                timOutTimer = currentTime;
-            }
         }
+		std::clock_t currentTime = std::clock();
+		// int tempTestRemovePlz = (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC);
+		// Send snapshot
+		if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+			SendSnapshot();
+			previousSnapshotMessage = currentTime;
+		}
+
+		// Send pings each 
+		if (intervallMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+			SendPing();
+			previousePingMessage = currentTime;
+		}
+
+		// Time out logic
+		if (timeToCheckTimeOutTime < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
+			CheckForTimeOuts();
+			timOutTimer = currentTime;
+		}
     }
 }
 
@@ -102,7 +103,7 @@ void Server::InputLoop()
                 Broadcast(inputMessage);
 
             } catch (const std::exception& err) {
-                std::cout << "Read from WriteLoop crashed: " << err.what();
+                std::cout << m_PacketID << ": Read from WriteLoop crashed: " << err.what();
             }
         }
         if (inputMessage.find("exit") != std::string::npos)
@@ -162,10 +163,15 @@ int Server::CreateMessage(MessageType type, std::string message, char * data)
     // Message type
     memcpy(data + offset, &type, sizeof(int));
     offset += sizeof(int);
+	// Packet ID
+	m_PacketID = m_PacketCounter % PACKETMODULUS;
+	memcpy(data + offset, &m_PacketID, sizeof(int));
+	offset += sizeof(int);
     // Message, add one extra byte for null terminator
     memcpy(data + offset, message.data(), (lengthOfMessage + 1) * sizeof(char));
     offset += (lengthOfMessage + 1) * sizeof(char);
 
+	m_PacketCounter++;
     return offset;
 }
 
@@ -177,7 +183,7 @@ void Server::MoveMessageHead(char *& data, size_t & length, size_t stepSize)
 
 void Server::Broadcast(std::string message)
 {
-    std::cout << "Broadcast: " << message << std::endl;
+    std::cout << m_PacketID << ": Broadcast: " << message << std::endl;
     char* data = new char[128];
     int offset = CreateMessage(MessageType::Event, message, data);
     for (int i = 0; i < MAXCONNECTIONS; i++) {
@@ -233,7 +239,7 @@ void Server::SendPing()
     // Prints connected players ping
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address())
-            std::cout << "Player " << i << "'s ping: " << 1000 * (m_StopTimes[i] - m_StartPingTime)
+            std::cout << m_PacketID << ": Player " << i << "'s ping: " << 1000 * (m_StopTimes[i] - m_StartPingTime)
             / static_cast<double>(CLOCKS_PER_SEC) << std::endl;
     }
 
@@ -273,6 +279,10 @@ int Server::CreateHeader(MessageType type, char * data)
     int offset = 0;
     memcpy(data, &messageType, sizeof(int));
     offset += sizeof(int);
+	m_PacketID = m_PacketCounter % PACKETMODULUS;
+	memcpy(data + offset, &m_PacketID, sizeof(int));
+	offset += sizeof(int);
+	m_PacketCounter++;
 
     return offset;
 }
@@ -350,7 +360,7 @@ void Server::ParseConnect(char * data, size_t length)
             m_PlayerDefinitions[i].Name = std::string(data);
             m_StopTimes[i] = std::clock();
 
-            std::cout << "Player \"" << m_PlayerDefinitions[i].Name << "\" connected on IP: " << 
+            std::cout << m_PacketID << ": Player \"" << m_PlayerDefinitions[i].Name << "\" connected on IP: " <<
                 m_PlayerDefinitions[i].Endpoint.address().to_string() << std::endl;
 
             int offset = 0;
@@ -361,13 +371,17 @@ void Server::ParseConnect(char * data, size_t length)
             offset += sizeof(int);
             memcpy(temp + offset, &i, sizeof(int));
 
+			memcpy(temp, &m_PacketID, sizeof(int));
+			offset += sizeof(int);
+			m_PacketCounter++;
+
             m_Socket.send_to(
                 boost::asio::buffer(temp, sizeof(int) * 2),
                 m_PlayerDefinitions[i].Endpoint,
                 0);
 
             // Send notification that a player has connected
-            std::string str = "Player " + m_PlayerDefinitions[i].Name + " connected on: " 
+            std::string str = m_PacketID + "Player " + m_PlayerDefinitions[i].Name + " connected on: " 
                 + m_PlayerDefinitions[i].Endpoint.address().to_string();
             Broadcast(str);
             // +1 is the null terminator
@@ -380,7 +394,7 @@ void Server::ParseConnect(char * data, size_t length)
 
 void Server::ParseDisconnect()
 {
-    std::cout << "Parsing disconnect. \n";
+    std::cout << m_PacketID << ":Parsing disconnect. \n";
 
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
@@ -395,7 +409,7 @@ void Server::ParseClientPing()
     char* testMesssage = new char[128];
     int testOffset = CreateMessage(MessageType::ClientPing, "Ping recieved", testMesssage);
 
-    std::cout << "Parsing ping." << std::endl;
+    std::cout << m_PacketID << ":Parsing ping." << std::endl;
     // Return ping
     m_Socket.send_to(
         boost::asio::buffer(
