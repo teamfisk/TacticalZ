@@ -41,6 +41,10 @@ Game::Game(int argc, char* argv[])
     if (!mapToLoad.empty()) {
         ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
     }
+    
+    // Create system pipeline
+    m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    m_SystemPipeline->AddSystem<RaptorCopterSystem>();
 
 	m_LastTime = glfwGetTime();
 
@@ -64,6 +68,8 @@ void Game::Tick()
 	m_Renderer->Update(dt);
 	m_EventBroker->Swap();
 
+    // Iterate through systems and update world!
+    m_SystemPipeline->Update(m_World, dt);
     testTick(dt);
 
     m_RenderQueueFactory->Update(m_World);

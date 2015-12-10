@@ -11,6 +11,8 @@
 #include "Rendering/RenderQueueFactory.h"
 #include "Core/EKeyDown.h"
 #include "Core/EntityXMLFile.h"
+#include "Core/SystemPipeline.h"
+#include "RaptorCopterSystem.h"
 
 class Game
 {
@@ -29,6 +31,7 @@ private:
 	InputManager* m_InputManager;
 	GUI::Frame* m_FrameStack;
     World* m_World;
+    SystemPipeline* m_SystemPipeline;
     RenderQueueFactory* m_RenderQueueFactory;
 
     EventRelay<Game, Events::KeyUp> m_EKeyUp;
