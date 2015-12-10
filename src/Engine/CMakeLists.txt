@@ -73,7 +73,7 @@ source_group(GUI FILES ${SOURCE_FILES_GUI})
 set(SOURCE_FILES
     ${SOURCE_FILES_Core}
     ${SOURCE_FILES_Core_Util}
-    #${SOURCE_FILES_Input}
+    ${SOURCE_FILES_Input}
 	${SOURCE_FILES_Network}
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
