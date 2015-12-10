@@ -21,43 +21,50 @@ glm::mat4 RenderQueueFactory::ModelMatrix(World* world, EntityID entity)
     ComponentWrapper transformComponent = world->GetComponent(entity, "Transform");
     glm::vec3 position = transformComponent["Position"];
     glm::vec3 scale = transformComponent["Scale"];
-    glm::quat oritentation = transformComponent["Orientation"];
+    glm::vec3 oritentation = transformComponent["Orientation"];
 
-    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(oritentation) * glm::scale(scale);
-    return modelMatrix;
-}
-
-glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent)
-{
-  //  positionComponent.EntityID
-    return glm::vec3();
+    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(glm::quat(oritentation)) * glm::scale(scale);
+    EntityID parent = world->GetParent(entity);
+    if (parent != 0) {
+        return ModelMatrix(world, parent) * modelMatrix;
+    } else {
+        return modelMatrix;
+    }
 }
 
 void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 {
-   for(auto& modelC : world->GetComponents("Model")) {
-       ModelJob job;
-       std::string resource = modelC["Resource"];
-       glm::vec4 color = modelC["Color"];
-       Model* model = ResourceManager::Load<Model>(resource);
+    auto models = world->GetComponents("Model");
+    if (models == nullptr) {
+        return;
+    }
 
-       for (auto texGroup : model->TextureGroups) {
-           job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-           job.DiffuseTexture = texGroup.Texture.get();
-           job.NormalTexture = texGroup.NormalMap.get();
-           job.SpecularTexture = texGroup.SpecularMap.get();
-           job.Model = model;
-           job.StartIndex = texGroup.StartIndex;
-           job.EndIndex = texGroup.EndIndex;
-           job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
-           job.Color = color;
+    for (auto& modelC : *models) {
+        std::string resource = modelC["Resource"];
+        if (resource.empty()) {
+            continue;
+        }
+        glm::vec4 color = modelC["Color"];
+        Model* model = ResourceManager::Load<Model>(resource);
 
-           //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
-           job.Entity = modelC.EntityID;
+        for (auto texGroup : model->TextureGroups) {
+            ModelJob job;
+            job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
+            job.DiffuseTexture = texGroup.Texture.get();
+            job.NormalTexture = texGroup.NormalMap.get();
+            job.SpecularTexture = texGroup.SpecularMap.get();
+            job.Model = model;
+            job.StartIndex = texGroup.StartIndex;
+            job.EndIndex = texGroup.EndIndex;
+            job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+            job.Color = color;
 
-           renderQueue->Add(job);
-       }
-   }
+            //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+            job.Entity = modelC.EntityID;
+
+            renderQueue->Add(job);
+        }
+    }
 }
 
 void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)
