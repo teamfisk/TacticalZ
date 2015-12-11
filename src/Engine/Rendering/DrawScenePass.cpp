@@ -10,7 +10,6 @@ DrawScenePass::DrawScenePass(IRenderer* renderer)
 void DrawScenePass::InitializeTextures()
 {
     m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
-
 }
 
 void DrawScenePass::InitializeShaderPrograms()
@@ -24,9 +23,11 @@ void DrawScenePass::InitializeShaderPrograms()
 
 void DrawScenePass::Draw(RenderQueueCollection& rq)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    GLERROR("Renderer::Draw PickingPass");
 
     DrawScenePassState state;
+
 
     //TODO: Render: Add code for more jobs than modeljobs.
     for (auto &job : rq.Forward) {

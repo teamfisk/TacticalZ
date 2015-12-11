@@ -73,8 +73,9 @@ void Game::Tick()
     m_Renderer->Update(dt);
 
     m_RenderQueueFactory->Update(m_World);
+    GLERROR("Game::Tick m_RenderQueueFactory->Update");
 	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
-
+    GLERROR("Game::Tick m_Renderer->Draw");
 	m_EventBroker->Swap();
 	m_EventBroker->Clear();
 

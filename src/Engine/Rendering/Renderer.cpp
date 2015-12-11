@@ -151,58 +151,61 @@ void Renderer::Update(double dt)
 void Renderer::Draw(RenderQueueCollection& rq)
 {
     //TODO: Renderer: Kanske borde vara längst upp i update.
+    GLERROR("Renderer::Draw Pre");
     m_PickingPass->Draw(rq);
+    GLERROR("Renderer::Draw PickingPass");
     //DrawScreenQuad(m_PickingPass->PickingTexture());
     //CullLights();
     
     //DrawScene(rq);
     m_DrawScenePass->Draw(rq);
+    GLERROR("Renderer::Draw m_DrawScenePass->Draw");
 	glfwSwapBuffers(m_Window);
 }
-
-void Renderer::DrawScene(RenderQueueCollection& rq)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    //TODO: Render: Clean up draw code
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //TODO: Render: Add code for more jobs than modeljobs.
-    for (auto &job : rq.Forward) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-        if (modelJob) {
-            GLuint ShaderHandle = m_BasicForwardProgram.GetHandle();
-
-            m_BasicForwardProgram.Bind();
-            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
-            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
-
-            //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
-            if (modelJob->DiffuseTexture != nullptr) {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
-            } else {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-            }
-
-            glBindVertexArray(modelJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-
-            continue;
-        }
-    }
-    GLERROR("DrawScene Error");
-}
+//
+//void Renderer::DrawScene(RenderQueueCollection& rq)
+//{
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//
+//    //TODO: Render: Clean up draw code
+//    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
+//
+//    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//
+//    //TODO: Render: Add code for more jobs than modeljobs.
+//    for (auto &job : rq.Forward) {
+//        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+//        if (modelJob) {
+//            GLuint ShaderHandle = m_BasicForwardProgram.GetHandle();
+//
+//            m_BasicForwardProgram.Bind();
+//            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
+//            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
+//            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
+//            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
+//            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
+//
+//            //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
+//            if (modelJob->DiffuseTexture != nullptr) {
+//                glActiveTexture(GL_TEXTURE0);
+//                glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
+//            } else {
+//                glActiveTexture(GL_TEXTURE0);
+//                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+//            }
+//
+//            glBindVertexArray(modelJob->Model->VAO);
+//            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+//            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
+//
+//            continue;
+//        }
+//    }
+//    GLERROR("DrawScene Error");
+//}
 
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
 {
@@ -304,8 +307,8 @@ void Renderer::InitializeSSBOs()
 
 void Renderer::InitializeRenderPasses()
 {
-    m_PickingPass = new PickingPass(this, m_EventBroker);
     m_DrawScenePass = new DrawScenePass(this);
+    m_PickingPass = new PickingPass(this, m_EventBroker);
 }
 
 void Renderer::CalculateFrustum()

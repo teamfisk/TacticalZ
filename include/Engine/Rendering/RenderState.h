@@ -14,9 +14,10 @@ public:
     bool CullFace(GLenum GlFaceToCull);
     bool ClearColor(glm::vec4 color);
     bool Clear(GLbitfield mask);
+    bool BindBuffer(GLint buffer);
 private:
     std::vector<GLenum> m_Enables;
     float m_preClearColor[4];
-    GLenum m_preCullFace;
+    int m_preBuffer;
 };
 #endif

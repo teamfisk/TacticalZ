@@ -6,10 +6,10 @@
 class PickingPassState : public RenderState
 {
 public:
-    PickingPassState();
+    PickingPassState(GLuint frameBuffer);
     ~PickingPassState();
-private:
 
+private:
 };
 
 #endif

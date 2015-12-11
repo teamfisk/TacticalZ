@@ -52,8 +52,8 @@ private:
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-    PickingPass* m_PickingPass;
     DrawScenePass* m_DrawScenePass;
+    PickingPass* m_PickingPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();

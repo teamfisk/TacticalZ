@@ -44,13 +44,11 @@ void PickingPass::InitializeShaderPrograms()
 void PickingPass::Draw(RenderQueueCollection& rq)
 {
     m_PickingColorsToEntity.clear();
-    m_PickingBuffer.Bind();
-    PickingPassState state;
+    PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
     int r = 1;
     int g = 0;
     //TODO: Render: Add code for more jobs than modeljobs.
-
 
     GLuint ShaderHandle = m_PickingProgram.GetHandle();
     m_PickingProgram.Bind();
