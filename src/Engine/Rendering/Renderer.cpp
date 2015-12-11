@@ -69,16 +69,17 @@ void Renderer::InitializeShaders()
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
 
     m_DrawScreenQuadProgram = ResourceManager::Load<ShaderProgram>("#DrawScreenQuadProgram");
-
     m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
     m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
     m_DrawScreenQuadProgram->Compile();
     m_DrawScreenQuadProgram->Link();
 
+    //m_CalculateFrustumProgram = ResourceManager::Load<ShaderProgram>("#CalculateFrustumProgram");
     //m_CalculateFrustumProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
     //m_CalculateFrustumProgram.Compile();
     //m_CalculateFrustumProgram.Link();
 
+    //m_LightCullProgram = ResourceManager::Load<ShaderProgram>("#LightCullProgram");
     //m_LightCullProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
     //m_LightCullProgram.Compile();
     //m_LightCullProgram.Link();
@@ -144,67 +145,18 @@ void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
     InputUpdate(dt);
-    
 }
 
 void Renderer::Draw(RenderQueueCollection& rq)
 {
-    //TODO: Renderer: Kanske borde vara längst upp i update.
-    GLERROR("Renderer::Draw Pre");
     m_PickingPass->Draw(rq);
-    GLERROR("Renderer::Draw PickingPass");
     //DrawScreenQuad(m_PickingPass->PickingTexture());
     //CullLights();
     
-    //DrawScene(rq);
     m_DrawScenePass->Draw(rq);
     GLERROR("Renderer::Draw m_DrawScenePass->Draw");
 	glfwSwapBuffers(m_Window);
 }
-//
-//void Renderer::DrawScene(RenderQueueCollection& rq)
-//{
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//
-//    //TODO: Render: Clean up draw code
-//    glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
-//
-//    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//
-//    //TODO: Render: Add code for more jobs than modeljobs.
-//    for (auto &job : rq.Forward) {
-//        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-//        if (modelJob) {
-//            GLuint ShaderHandle = m_BasicForwardProgram.GetHandle();
-//
-//            m_BasicForwardProgram.Bind();
-//            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-//            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
-//            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
-//            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
-//            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
-//
-//            //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
-//            if (modelJob->DiffuseTexture != nullptr) {
-//                glActiveTexture(GL_TEXTURE0);
-//                glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
-//            } else {
-//                glActiveTexture(GL_TEXTURE0);
-//                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-//            }
-//
-//            glBindVertexArray(modelJob->Model->VAO);
-//            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-//            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-//
-//            continue;
-//        }
-//    }
-//    GLERROR("DrawScene Error");
-//}
 
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
 {
@@ -243,17 +195,6 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, NULL);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("Texture initialization failed");
-}
-
-void Renderer::InitializeFrameBuffers()//TODO: Renderer: Get this to a better location, as its really big
-{
-    //glGenRenderbuffers(1, &m_DepthBuffer);
-    //glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Resolution.Width, m_Resolution.Height);
-    //
-    //m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
-    //m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
-    //m_PickingBuffer.Generate();
 }
 
 void Renderer::InitializeSSBOs()
