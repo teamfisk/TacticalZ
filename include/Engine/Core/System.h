@@ -14,12 +14,12 @@ public:
         : m_EventBroker(eventBroker)
         , m_ComponentType(componentType)
     { }
-	
+
     virtual void Update(World* world, ComponentWrapper& component, double dt) = 0;
 
 protected:
     std::string m_ComponentType;
-	EventBroker* m_EventBroker;
+    EventBroker* m_EventBroker;
 };
 
 #endif
