@@ -3,6 +3,7 @@
 
 PickingPassState::PickingPassState()
 {
+
     Enable(GL_DEPTH_TEST);
     Enable(GL_CULL_FACE);
     CullFace(GL_BACK);
@@ -12,3 +13,7 @@ PickingPassState::PickingPassState()
     Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+PickingPassState::~PickingPassState()
+{
+
+}

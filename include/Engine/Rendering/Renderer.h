@@ -10,6 +10,8 @@
 #include "Util/UnorderedMapVec2.h"
 #include "FrameBuffer.h"
 #include "../Core/World.h"
+#include "PickingPass.h"
+
 
 #define TILE_SIZE 16 
 #define NUM_LIGHTS 3
@@ -35,17 +37,12 @@ private:
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
     float m_CameraMoveSpeed;
-    FrameBuffer m_PickingBuffer;
-    GLuint m_PickingTexture;
-    GLuint m_DepthBuffer;
 
     Model* m_ScreenQuad;
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-
-
-    std::unordered_map<glm::vec2, EntityID> m_PickingColorsToEntity;
+    PickingPass* m_PickingPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
@@ -53,9 +50,10 @@ private:
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeSSBOs();
+    void InitializeRenderPasses();
     //TODO: Renderer: Get InputUpdate out of renderer
     void InputUpdate(double dt);
-    void PickingPass(RenderQueueCollection& rq);
+    //void PickingPass(RenderQueueCollection& rq);
     void DrawScreenQuad(GLuint textureToDraw);
     void DrawScene(RenderQueueCollection& rq);
 
@@ -106,7 +104,6 @@ private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram m_BasicForwardProgram;
-    ShaderProgram m_PickingProgram;
     ShaderProgram m_DrawScreenQuadProgram;
     ShaderProgram m_CalculateFrustumProgram;
     ShaderProgram m_LightCullProgram;

@@ -1,3 +1,5 @@
+#ifndef ShaderProgram_h__
+#define ShaderProgram_h__
 
 #include "../Common.h"
 #include "../OpenGL.h"
@@ -79,3 +81,5 @@ private:
 	GLuint m_ShaderProgramHandle;
 	std::vector<std::shared_ptr<Shader>> m_Shaders;
 };
+
+#endif

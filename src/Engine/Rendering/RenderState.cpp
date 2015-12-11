@@ -32,7 +32,7 @@ bool RenderState::CullFace(GLenum GLCullFace)
     glGetIntegerv(GL_CULL_FACE_MODE, &a);
     if(a == GL_BACK)
     {
-        LOG_INFO("Setting Cullface to back, unessesary since this is already default.");
+        //LOG_INFO("Setting Cullface to back, unessesary since this is already default.");
     }
     m_preCullFace = a;
     glCullFace(GLCullFace);
