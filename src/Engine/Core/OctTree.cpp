@@ -300,7 +300,7 @@ void OctTree::OctChild::AddDynamicObject(const AABB& box)
         }
     } else {
         //Since it hasn't been added yet to the real object list, the index is after the last =size.
-        m_DynamicObjIndices.push_back(m_DynamicObjectsRef.size());
+        m_DynamicObjIndices.push_back((int)m_DynamicObjectsRef.size());
     }
 }
 
@@ -312,7 +312,7 @@ void OctTree::OctChild::AddStaticObject(const AABB& box)
         }
     } else {
         //Since it hasn't been added yet to the real object list, the index is after the last =size.
-        m_StaticObjIndices.push_back(m_StaticObjectsRef.size());
+        m_StaticObjIndices.push_back((int)m_StaticObjectsRef.size());
     }
 }
 
@@ -323,7 +323,7 @@ void OctTree::OctChild::BoxesInSameRegion(const AABB& box, std::vector<AABB>& ou
             m_Children[i]->BoxesInSameRegion(box, outBoxes);
         }
     } else {
-        int startIndex = outBoxes.size();
+        size_t startIndex = outBoxes.size();
         int numDuplicates = 0;
         outBoxes.resize(outBoxes.size() + m_StaticObjIndices.size() + m_DynamicObjIndices.size());
         for (size_t i = 0; i < m_StaticObjIndices.size(); ++i){

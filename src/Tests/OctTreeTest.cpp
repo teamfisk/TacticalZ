@@ -44,9 +44,9 @@ const int BOXES = 400;
 const int NUM_DYNAMICS = 0;
 const int NUM_STATICS = BOXES - NUM_DYNAMICS;
 const int SEED = 6548;
-const int TEST_FRAMES = 1;          //300
-const int NUM_FUNCTION_LOOPS = 1;   //25
-const int TESTS = 1;                //10
+const int TEST_FRAMES = 300;
+const int NUM_FUNCTION_LOOPS = 25;
+const int TESTS = 0;                //10
 
 template<typename Tree>
 void RegionTest(Tree& tree)
@@ -116,9 +116,6 @@ void TestLoop(TestFunction xTest)
         }
         tree.ClearObjects();
     }
-    int asda = 0;
-    asda = 123;
-    BOOST_CHECK(asda == 123);
 }
 
 BOOST_AUTO_TEST_CASE(octRegionPerfTestWithDuplicates)
