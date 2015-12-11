@@ -25,6 +25,7 @@ public:
         if (e.Command == "Right") {
             float value = std::max(-1.f, std::min(e.Value, 1.f));
             m_Velocity.x = value;
+            LOG_INFO("%f", value);
         }
         if (e.Command == "Forward") {
             float value = std::max(-1.f, std::min(e.Value, 1.f));
@@ -37,12 +38,12 @@ public:
     void Update(double dt)
     {
         if (glm::length2(m_Velocity) > 0) {
-            m_Position += m_Orientation * (glm::normalize(m_Velocity) * m_BaseSpeed);
+            m_Position += (m_Orientation * (m_Velocity * m_BaseSpeed)) * (float)dt;
         }
     }
 
 protected:
     glm::vec3 m_Position = glm::vec3(0, 0, 0);
     glm::vec3 m_Velocity = glm::vec3(0, 0, 0);
-    float m_BaseSpeed = 0.1f;
+    float m_BaseSpeed = 2.0f;
 };

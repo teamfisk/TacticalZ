@@ -25,11 +25,13 @@ MouseInputHandler::MouseInputHandler(EventBroker* eventBroker, InputProxy* input
 
 bool MouseInputHandler::BindOrigin(std::string origin, std::string command, float value)
 {
+    bool result = false;
+
     auto originCode = m_OriginCodes.find(origin);
     if (originCode != m_OriginCodes.end()) {
         int code = originCode->second;
         m_Bindings[code] = std::make_tuple(command, value);
-        return true;
+        result = true;
     }
 
     auto originAxis = m_OriginAxes.find(origin);
@@ -44,10 +46,10 @@ bool MouseInputHandler::BindOrigin(std::string origin, std::string command, floa
             }
         }
         m_Axes[axis] = std::make_tuple(command, value * multiplier);
-        return true;
+        result = true;
     }
 
-    return false;
+    return result;
 }
 
 float MouseInputHandler::GetCommandValue(std::string command)

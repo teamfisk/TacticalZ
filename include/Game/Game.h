@@ -12,6 +12,7 @@
 #include "Input/InputProxy.h"
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
+#include "Input/XboxControllerInputHandler.h"
 #include "Core/EKeyDown.h"
 #include "Core/EntityXMLFile.h"
 #include "Core/SystemPipeline.h"

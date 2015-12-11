@@ -33,7 +33,6 @@ public:
 
 	void Initialize();
 
-	static const short MAX_GAMEPADS = 4;
 
 	void Update(double dt);
 
@@ -50,12 +49,6 @@ private:
 	std::array<int, GLFW_KEY_LAST+1> m_LastKeyState;
 	std::array<int, GLFW_MOUSE_BUTTON_LAST+1> m_CurrentMouseState;
 	std::array<int, GLFW_MOUSE_BUTTON_LAST+1> m_LastMouseState;
-	typedef std::array<float, static_cast<int>(Gamepad::Axis::LAST) + 1> GamepadAxisState;
-	std::array<GamepadAxisState, MAX_GAMEPADS> m_CurrentGamepadAxisState;
-	std::array<GamepadAxisState, MAX_GAMEPADS> m_LastGamepadAxisState;
-	typedef std::array<bool, static_cast<int>(Gamepad::Button::LAST) + 1> GamepadButtonState;
-	std::array<GamepadButtonState, MAX_GAMEPADS> m_CurrentGamepadButtonState;
-	std::array<GamepadButtonState, MAX_GAMEPADS> m_LastGamepadButtonState;
 
 	double m_CurrentMouseX, m_CurrentMouseY;
 	double m_LastMouseX, m_LastMouseY;
@@ -64,6 +57,11 @@ private:
 
 	void PublishGamepadAxisIfChanged(int gamepadID, Gamepad::Axis axis);
 	void PublishGamepadButtonIfChanged(int gamepadID, Gamepad::Button button);
+
+    static void GLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+    {
+        LOG_DEBUG("Click! %i %i %i", button, action, mods);
+    }
 };
 
 #endif

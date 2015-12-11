@@ -8,6 +8,8 @@ void InputManager::Initialize()
 
 	EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &InputManager::OnLockMouse);
 	EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &InputManager::OnUnlockMouse);
+
+    //glfwSetMouseButtonCallback(m_GLFWWindow, &InputManager::GLFWMouseButtonCallback);
 }
 
 void InputManager::Update(double dt)
@@ -73,6 +75,21 @@ void InputManager::Update(double dt)
 		m_EventBroker->Publish(e);
 	}
 
+    // Joysticks
+    //for (int i = 0; i < GLFW_JOYSTICK_LAST; i++) {
+    //    if (glfwJoystickPresent(i) == GL_FALSE) {
+    //        continue;
+    //    }
+
+    //    int count;
+    //    const float* axes = glfwGetJoystickAxes(i, &count);
+    //    LOG_DEBUG("Controller %i NumAxes: %i", i, count);
+    //    m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::LeftX)] = axes[0];
+    //    m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::LeftY)] = axes[1];
+    //    m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::RightX)] = axes[2];
+    //    m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::RightY)] = axes[3];
+    //}
+
 	// // Lock mouse while holding LMB
 	// if (m_CurrentMouseState[GLFW_MOUSE_BUTTON_LEFT])
 	// {
@@ -91,109 +108,46 @@ void InputManager::Update(double dt)
 	// }
 
 	// TODO: Xbox360 controller
-	/*DWORD dwResult;
-	for (int i = 0; i < MAX_GAMEPADS; i++)
-	{
-		XINPUT_STATE state = { 0 };
-		// Simply get the state of the controller from XInput.
-		dwResult = XInputGetState(i, &state);
-		if (dwResult == 0)
-		{
-			if(std::abs(state.Gamepad.sThumbLX) <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-				state.Gamepad.sThumbLX = 0;
-			if(std::abs(state.Gamepad.sThumbLY) <= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-				state.Gamepad.sThumbLY = 0;
-			if(std::abs(state.Gamepad.sThumbRX) <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-				state.Gamepad.sThumbRX = 0;
-			if(std::abs(state.Gamepad.sThumbRY) <= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-				state.Gamepad.sThumbRY = 0;
-			if(std::abs(state.Gamepad.bLeftTrigger) <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
-				state.Gamepad.bLeftTrigger = 0;
-			if(std::abs(state.Gamepad.bRightTrigger) <= XINPUT_GAMEPAD_TRIGGER_THRESHOLD)
-				state.Gamepad.bRightTrigger = 0;
-
-			m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::LeftX)] = state.Gamepad.sThumbLX / 32767.f;
-			m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::LeftY)] = state.Gamepad.sThumbLY / 32767.f;
-			m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::RightX)] = state.Gamepad.sThumbRX / 32767.f;
-			m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::RightY)] = state.Gamepad.sThumbRY / 32767.f;
-			m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::LeftTrigger)] = state.Gamepad.bLeftTrigger / 255.f;
-			m_CurrentGamepadAxisState[i][static_cast<int>(Gamepad::Axis::RightTrigger)] = state.Gamepad.bRightTrigger / 255.f;
-			PublishGamepadAxisIfChanged(i, Gamepad::Axis::LeftX);
-			PublishGamepadAxisIfChanged(i, Gamepad::Axis::LeftY);
-			PublishGamepadAxisIfChanged(i, Gamepad::Axis::RightX);
-			PublishGamepadAxisIfChanged(i, Gamepad::Axis::RightY);
-			PublishGamepadAxisIfChanged(i, Gamepad::Axis::LeftTrigger);
-			PublishGamepadAxisIfChanged(i, Gamepad::Axis::RightTrigger);
-
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::Up)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::Down)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::Left)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::Right)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::Start)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_START);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::Back)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::LeftThumb)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::RightThumb)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::LeftShoulder)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::RightShoulder)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::A)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_A);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::B)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_B);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::X)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_X);
-			m_CurrentGamepadButtonState[i][static_cast<int>(Gamepad::Button::Y)] = static_cast<bool>(state.Gamepad.wButtons & XINPUT_GAMEPAD_Y);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::Up);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::Down);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::Left);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::Right);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::Start);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::Back);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::LeftThumb);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::RightThumb);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::LeftShoulder);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::RightShoulder);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::A);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::B);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::X);
-			PublishGamepadButtonIfChanged(i, Gamepad::Button::Y);
-		}
-	}*/
+	/**/
 
 	m_LastKeyState = m_CurrentKeyState;
 	m_LastMouseState = m_CurrentMouseState;
 	m_LastMouseX = m_CurrentMouseX;
 	m_LastMouseY = m_CurrentMouseY;
-	m_LastGamepadAxisState = m_CurrentGamepadAxisState;
-	m_LastGamepadButtonState = m_CurrentGamepadButtonState;
+	//m_LastGamepadAxisState = m_CurrentGamepadAxisState;
+	//m_LastGamepadButtonState = m_CurrentGamepadButtonState;
 }
 
 void InputManager::PublishGamepadAxisIfChanged(int gamepadID, Gamepad::Axis axis)
 {
-	float currentValue = m_CurrentGamepadAxisState[gamepadID][static_cast<int>(axis)];
-	float lastValue = m_LastGamepadAxisState[gamepadID][static_cast<int>(axis)];
-	if (currentValue != lastValue) {
-		Events::GamepadAxis e;
-		e.GamepadID = gamepadID;
-		e.Axis = axis;
-		e.Value = currentValue;
-		m_EventBroker->Publish(e);
-	}
+	//float currentValue = m_CurrentGamepadAxisState[gamepadID][static_cast<int>(axis)];
+	//float lastValue = m_LastGamepadAxisState[gamepadID][static_cast<int>(axis)];
+	//if (currentValue != lastValue) {
+	//	Events::GamepadAxis e;
+	//	e.GamepadID = gamepadID;
+	//	e.Axis = axis;
+	//	e.Value = currentValue;
+	//	m_EventBroker->Publish(e);
+	//}
 }
 
 void InputManager::PublishGamepadButtonIfChanged(int gamepadID, Gamepad::Button button)
 {
-	bool currentState = m_CurrentGamepadButtonState[gamepadID][static_cast<int>(button)];
-	float lastState = m_LastGamepadButtonState[gamepadID][static_cast<int>(button)];
-	if (currentState != lastState) {
-		if (currentState == true) {
-			Events::GamepadButtonDown e;
-			e.GamepadID = gamepadID;
-			e.Button = button;
-			m_EventBroker->Publish(e);
-		} else {
-			Events::GamepadButtonUp e;
-			e.GamepadID = gamepadID;
-			e.Button = button;
-			m_EventBroker->Publish(e);
-		}
-	}
+	//bool currentState = m_CurrentGamepadButtonState[gamepadID][static_cast<int>(button)];
+	//float lastState = m_LastGamepadButtonState[gamepadID][static_cast<int>(button)];
+	//if (currentState != lastState) {
+	//	if (currentState == true) {
+	//		Events::GamepadButtonDown e;
+	//		e.GamepadID = gamepadID;
+	//		e.Button = button;
+	//		m_EventBroker->Publish(e);
+	//	} else {
+	//		Events::GamepadButtonUp e;
+	//		e.GamepadID = gamepadID;
+	//		e.Button = button;
+	//		m_EventBroker->Publish(e);
+	//	}
+	//}
 }
 
 bool InputManager::OnLockMouse(const Events::LockMouse &event)
