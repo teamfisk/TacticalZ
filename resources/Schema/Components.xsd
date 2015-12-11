@@ -2,5 +2,7 @@
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="components" elementFormDefault="qualified">
 	<xs:include schemaLocation="Components/Transform.xsd"/>
+	<xs:include schemaLocation="Components/Model.xsd"/>
 	<xs:include schemaLocation="Components/Test.xsd"/>
+	<xs:include schemaLocation="Components/RaptorCopter.xsd"/>
 </xs:schema>

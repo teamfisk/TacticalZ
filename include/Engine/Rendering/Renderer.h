@@ -25,15 +25,24 @@ enum lightType
     Area
 };
 
+#include "../Core/EventBroker.h"
+#include "EPicking.h"
+
 class Renderer : public IRenderer
 {
 public:
+    Renderer(EventBroker* eventBroker) 
+        : m_EventBroker(eventBroker)
+    { }
+
     virtual void Initialize() override;
     virtual void Update(double dt) override;
     virtual void Draw(RenderQueueCollection& rq) override;
 
 private:
     //----------------------Variables----------------------//
+    EventBroker* m_EventBroker;
+
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
     float m_CameraMoveSpeed;
