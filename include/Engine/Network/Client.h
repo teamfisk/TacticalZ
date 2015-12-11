@@ -51,8 +51,9 @@ private:
 	boost::asio::ip::udp::socket m_Socket;
 
 	// Packet loss logic
-	unsigned int m_PacketID = 0;
+    unsigned int m_PacketID = 0;
 	unsigned int m_PreviousPacketID = 0;
+    unsigned int m_SendPacketID = 0;
 
 	World* m_World;
 	int m_PlayerID = -1;

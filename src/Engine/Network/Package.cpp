@@ -1,20 +1,20 @@
 #include "Network/Package.h"
 
-Package::Package(MessageType type)
+Package::Package(MessageType type,unsigned int& packageID)
 {
 	// Create message header
 	// Add message type
 	int messageType = static_cast<int>(type);
-	memcpy(m_Data, &messageType, sizeof(int));
-	m_Offset += sizeof(int);
+    Package::AddPrimitive<int>(messageType);
+    packageID = packageID % 1000; // Packet id modulos
+    Package::AddPrimitive<int>(packageID);
+    packageID++;
 }
 
 Package::~Package()
 {
 	delete[] m_Data;
 }
-
-
 
 void Package::AddString(std::string str)
 {

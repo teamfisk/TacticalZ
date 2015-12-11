@@ -6,7 +6,7 @@ using namespace boost::asio::ip;
 Client::Client() : m_Socket(m_IOService)
 {
     // Set up network stream
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
 	m_NextSnapshot.InputForward = "";
 	m_NextSnapshot.InputRight = "";
 }
@@ -68,14 +68,13 @@ void Client::ReadFromServer()
             SendSnapshotToServer();
             previousSnapshotMessage = currentTime;
         }
-
     }
 }
 
 void Client::SendSnapshotToServer()
 {
     // Reset previouse key state in snapshot.
-		Package message(MessageType::Event);
+		Package message(MessageType::Event, m_SendPacketID);
 		message.AddString(m_NextSnapshot.InputForward);
 		Send(message);
     m_NextSnapshot.InputRight = "";
@@ -97,12 +96,12 @@ void Client::SendSnapshotToServer()
     }
 
     if (m_NextSnapshot.InputForward != "") {
-	Package message(MessageType::Event);
+	Package message(MessageType::Event, m_SendPacketID);
 	message.AddString(m_NextSnapshot.InputForward);
 	Send(message);
     }
     if (m_NextSnapshot.InputRight != "") {
-		Package message(MessageType::Event);
+		Package message(MessageType::Event, m_SendPacketID);
 		message.AddString(m_NextSnapshot.InputRight);
 		Send(message);
     }
@@ -115,8 +114,8 @@ void Client::ParseMessageType(char* data, size_t length)
     MoveMessageHead(data, length, sizeof(int)); // Move the message head to know where to read from
 
 	// Read packet ID 
-	m_PreviousPacketID = m_PacketID;
-	memcpy(&m_PacketID, data, sizeof(int)); 
+	m_PreviousPacketID = m_PacketID;    // Set previous packet id
+	memcpy(&m_PacketID, data, sizeof(int)); //Read new packet id
 	MoveMessageHead(data, length, sizeof(int)); 
 	IdentifyPacketLoss();
 
@@ -160,7 +159,7 @@ void Client::ParsePing()
 
 void Client::ParseServerPing()
 {
-	Package message(MessageType::ServerPing);
+	Package message(MessageType::ServerPing, m_SendPacketID);
 	message.AddString("Ping recieved");
 	Send(message);
     //std::cout << "Parsing ping." << std::endl;
@@ -228,8 +227,10 @@ int Client::Receive(char* data, size_t length)
         m_ReceiverEndpoint,
         0, error);
    
-    std::cout << "ReadFromServer crashed: " << error.message();
-    
+    if (error) {
+        std::cout << "ReadFromServer crashed: " << error.message();
+    }
+
     return bytesReceived;
 }
 
@@ -243,7 +244,7 @@ void Client::Send(Package& package)
 
 void Client::Connect()
 {
-	Package message(MessageType::Connect);
+	Package message(MessageType::Connect, m_SendPacketID);
 	message.AddString(m_PlayerName);
 	m_StartPingTime = std::clock();
 	Send(message);
@@ -251,14 +252,14 @@ void Client::Connect()
 
 void Client::Disconnect()
 {
-	Package message(MessageType::Connect);
+	Package message(MessageType::Connect, m_SendPacketID);
 	message.AddString("+Disconnect");
 	Send(message);
 }
 
 void Client::Ping()
 {
-	Package message(MessageType::Connect);
+	Package message(MessageType::Connect, m_SendPacketID);
 	message.AddString("Ping"); 
 	m_StartPingTime = std::clock();
 	Send(message);
@@ -272,22 +273,17 @@ void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 
 bool Client::OnKeyDown(const Events::KeyDown& event)
 {
-    char* dataPackage = new char[INPUTSIZE]; // The package that will be sent to the server, when filled
     if (event.KeyCode == GLFW_KEY_W) {
         m_IsWASDKeyDown.W = true;
-        //m_NextSnapshot.inputForward = "+Forward";
     }
     if (event.KeyCode == GLFW_KEY_A) {
         m_IsWASDKeyDown.A = true;
-        //m_NextSnapshot.inputRight = "-Right";
     }
     if (event.KeyCode == GLFW_KEY_S) {
         m_IsWASDKeyDown.S = true;
-        //m_NextSnapshot.inputForward = "-Forward";
     }
     if (event.KeyCode == GLFW_KEY_D) {
         m_IsWASDKeyDown.D = true;
-        //m_NextSnapshot.inputRight = "+Right";
     }
 
     if (event.KeyCode == GLFW_KEY_V) {
@@ -299,8 +295,6 @@ bool Client::OnKeyDown(const Events::KeyDown& event)
     if (event.KeyCode == GLFW_KEY_P) {
         Ping();
     }
-    memset(dataPackage, 0, INPUTSIZE);
-    delete[] dataPackage;
     return true;
 }
 
@@ -308,7 +302,6 @@ bool Client::OnKeyUp(const Events::KeyUp & e)
 {
     if (e.KeyCode == GLFW_KEY_W) {
         m_IsWASDKeyDown.W = false;
-        //m_NextSnapshot.inputForward = "";
         return true;
     }
     if (e.KeyCode == GLFW_KEY_A){
@@ -321,7 +314,6 @@ bool Client::OnKeyUp(const Events::KeyUp & e)
     }
     if (e.KeyCode == GLFW_KEY_D) {
         m_IsWASDKeyDown.D = false;
-        //m_NextSnapshot.inputRight = "";
         return true;
     }
     return false;

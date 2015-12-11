@@ -32,11 +32,10 @@ private:
     std::clock_t m_StopTimes[8];
     // Game logic
     World* m_World;
-	// Packet loss logic
-	unsigned int m_PacketCounter = 0;
-	unsigned int m_PacketID = 0;
-	const unsigned int m_PacketModolus = 1000;
-
+    // Packet loss logic
+    unsigned int m_PacketID;
+    unsigned int m_PreviousPacketID;
+    unsigned int m_SendPacketID;
     // Close logic
     bool m_ThreadIsRunning = true;
     // Threaded
@@ -45,18 +44,15 @@ private:
     void InputLoop();
 
 
-
     int  Receive(char* data, size_t length);
-	void Send(Package& package, int playerID);
-	void Send(Package& package);
-    int  CreateMessage(MessageType type, std::string message, char * data);
+    void Send(Package& package, int playerID);
+    void Send(Package& package);
     void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
     void Broadcast(std::string message);
     void Broadcast(Package& package);
     void SendSnapshot();
     void SendPing();
     void CheckForTimeOuts();
-    int  CreateHeader(MessageType type, char* data);
     void Disconnect(int i);
     void ParseMessageType(char* data, size_t length);
     void ParseEvent(char* data, size_t length);
@@ -65,6 +61,7 @@ private:
     void ParseClientPing();
     void ParseServerPing();
     void ParseSnapshot(char* data, size_t length);
+    void IdentifyPacketLoss();
 };
 
 #endif

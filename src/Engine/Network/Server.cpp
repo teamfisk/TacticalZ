@@ -119,12 +119,18 @@ void Server::ParseMessageType(char * data, size_t length)
     memcpy(&messageType, data, sizeof(int)); // Read what type off message was sent from server
     MoveMessageHead(data, length, sizeof(int)); // Move the message head to know where to read from
 
+    // Read packet ID 
+    m_PreviousPacketID = m_PacketID;    // Set previous packet id
+    memcpy(&m_PacketID, data, sizeof(int)); //Read new packet id
+    MoveMessageHead(data, length, sizeof(int));
+    IdentifyPacketLoss();
+
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
         ParseConnect(data, length);
         break;
     case MessageType::ClientPing:
-        ParseClientPing();
+        //ParseClientPing();
         break;
     case MessageType::ServerPing:
         ParseServerPing();
@@ -172,27 +178,6 @@ void Server::Send(Package & package)
 		0);
 }
 
-int Server::CreateMessage(MessageType type, std::string message, char * data)
-{
-    int lengthOfMessage = 0;
-    int offset = 0;
-
-    lengthOfMessage = message.size();
-    // Message type
-    memcpy(data + offset, &type, sizeof(int));
-    offset += sizeof(int);
-	// Packet ID
-	m_PacketID = m_PacketCounter % PACKETMODULUS;
-	memcpy(data + offset, &m_PacketID, sizeof(int));
-	offset += sizeof(int);
-    // Message, add one extra byte for null terminator
-    memcpy(data + offset, message.data(), (lengthOfMessage + 1) * sizeof(char));
-    offset += (lengthOfMessage + 1) * sizeof(char);
-
-	m_PacketCounter++;
-    return offset;
-}
-
 void Server::MoveMessageHead(char *& data, size_t & length, size_t stepSize)
 {
     data += stepSize;
@@ -201,8 +186,7 @@ void Server::MoveMessageHead(char *& data, size_t & length, size_t stepSize)
 
 void Server::Broadcast(std::string message)
 {
-	Package package(MessageType::Event);
-	package.AddPrimitive<int>(12); // Input PackageID here
+	Package package(MessageType::Event, m_SendPacketID);
 	package.AddString(message);
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
@@ -222,8 +206,7 @@ void Server::Broadcast(Package& package)
 
 void Server::SendSnapshot()
 {
-	Package package(MessageType::Snapshot);
-	package.AddPrimitive<int>(12); // Input PackageID here
+	Package package(MessageType::Snapshot, m_SendPacketID);
 	for (size_t i = 0; i < MAXCONNECTIONS; i++) {
 		if (m_PlayerDefinitions[i].EntityID == -1) {
 			continue;
@@ -249,8 +232,7 @@ void Server::SendPing()
     }
 
     // Create ping message
-	Package package(MessageType::ServerPing);
-	package.AddPrimitive<int>(12); // Input PackageID here
+	Package package(MessageType::ServerPing, m_SendPacketID);
 	package.AddString("Ping from server");
 	// Time message
     m_StartPingTime = std::clock();
@@ -275,20 +257,6 @@ void Server::CheckForTimeOuts()
             }
         }
     }
-}
-
-int Server::CreateHeader(MessageType type, char * data)
-{
-    int messageType = static_cast<int>(type);
-    int offset = 0;
-    memcpy(data, &messageType, sizeof(int));
-    offset += sizeof(int);
-	m_PacketID = m_PacketCounter % PACKETMODULUS;
-	memcpy(data + offset, &m_PacketID, sizeof(int));
-	offset += sizeof(int);
-	m_PacketCounter++;
-
-    return offset;
 }
 
 void Server::Disconnect(int i)
@@ -369,8 +337,7 @@ void Server::ParseConnect(char * data, size_t length)
             std::cout << m_PacketID << ": Player \"" << m_PlayerDefinitions[i].Name << "\" connected on IP: " <<
                 m_PlayerDefinitions[i].Endpoint.address().to_string() << std::endl;
 
-			Package package(MessageType::Connect);
-			package.AddPrimitive<int>(12); // Input PackageID here
+			Package package(MessageType::Connect, m_SendPacketID);
 			package.AddPrimitive<int>(i); // Player ID
            
 			Send(package, i);
@@ -400,10 +367,9 @@ void Server::ParseClientPing()
 {
 	std::cout << m_PacketID << ":Parsing ping." << std::endl;
 	// Return ping
-	Package package(MessageType::ClientPing);
-	package.AddPrimitive<int>(12); // Insert packet ID here
+	Package package(MessageType::ClientPing, m_SendPacketID);
 	package.AddString("Ping received");
-	Send(package);
+	Send(package); // This dosen't work for multiple users
 }
 
 void Server::ParseServerPing()
@@ -427,6 +393,17 @@ void Server::ParseSnapshot(char * data, size_t length)
                 boost::asio::buffer("I'm sending a snapshot to you guys!"),
                 m_PlayerDefinitions[i].Endpoint,
                 0);
+        }
+    }
+}
+
+void Server::IdentifyPacketLoss()
+{
+    // if no packets lost, difference should be equal to 1
+    int difference = m_PacketID - m_PreviousPacketID;
+    if (difference != 1) {
+        for (int i = m_PreviousPacketID + 1; i < m_PacketID; i++) {
+            LOG_INFO("Packet %i was lost...", i);
         }
     }
 }
