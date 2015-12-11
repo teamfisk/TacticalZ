@@ -15,6 +15,9 @@ void Renderer::Initialize()
     InitializeTextures();
     InitializeFrameBuffers();
 
+    m_TextRenderer = new TextRenderer();
+    m_TextRenderer->Initialize();
+
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
@@ -142,6 +145,7 @@ void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
     InputUpdate(dt);
+    m_TextRenderer->Update();
     
 }
 
@@ -149,9 +153,10 @@ void Renderer::Draw(RenderQueueCollection& rq)
 {
     //TODO: Renderer: Kanske borde vara längst upp i update.
     PickingPass(rq);
-    DrawScreenQuad(m_PickingTexture);
+   // DrawScreenQuad(m_PickingTexture);
     
     DrawScene(rq);
+    m_TextRenderer->Draw(m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
 	glfwSwapBuffers(m_Window);
 }
 
