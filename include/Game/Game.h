@@ -38,11 +38,11 @@ private:
     SystemPipeline* m_SystemPipeline;
     RenderQueueFactory* m_RenderQueueFactory;
 
-    EventRelay<Game, Events::KeyUp> m_EKeyUp;
-    bool testOnKeyUp(const Events::KeyUp& e);
+    EventRelay<Game, Events::InputCommand> m_EInputCommand;
+    bool debugOnInputCommand(const Events::InputCommand& e);
 
-    void testIntialize();
-    void testTick(double dt);
+    void debugInitialize();
+    void debugTick(double dt);
 };
 
 #endif

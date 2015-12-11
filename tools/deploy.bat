@@ -21,6 +21,7 @@ RMDIR /S /Q "%DeployLocation%\Shaders"
 MKLINK "%DeployLocation%\Shaders\" "resources\Shaders" /J
 :: Configuration files
 MKLINK "%DeployLocation%\DefaultConfig.ini" "resources\DefaultConfig.ini" /H
+MKLINK "%DeployLocation%\DefaultInput.ini" "resources\DefaultInput.ini" /H
 
 :: Platform specific binaries
 IF "%~1"=="" GOTO :EOF
