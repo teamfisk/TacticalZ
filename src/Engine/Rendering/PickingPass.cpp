@@ -1,8 +1,10 @@
 #include "Rendering/PickingPass.h"
 
-PickingPass::PickingPass(IRenderer* renderer)
+PickingPass::PickingPass(IRenderer* renderer, EventBroker* eb)
 {
     m_Renderer = renderer;
+    m_EventBroker = eb;
+
     InitializeTextures();
     InitializeFrameBuffers();
     InitializeShaderPrograms();
@@ -89,6 +91,17 @@ void PickingPass::Draw(RenderQueueCollection& rq)
     }
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
+
+    //Publish pick event every frame with the pick data that can be picked by the event
+    Events::Picking pickEvent = Events::Picking(
+        &m_PickingBuffer,
+        &m_DepthBuffer,
+        m_Renderer->Camera()->ProjectionMatrix(),
+        m_Renderer->Camera()->ViewMatrix(),
+        m_Renderer->Resolution(),
+        &m_PickingColorsToEntity);
+
+    m_EventBroker->Publish(pickEvent);
 }
 
 void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const

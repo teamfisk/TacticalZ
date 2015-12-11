@@ -263,16 +263,6 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
     //m_PickingBuffer.Unbind();
     //GLERROR("PickingPass Error");
 
-    //Publish pick event every frame with the pick data that can be picked by the event
-    Events::Picking pickEvent = Events::Picking(
-        &m_PickingBuffer, 
-        &m_DepthBuffer, 
-        m_Camera->ProjectionMatrix(), 
-        m_Camera->ViewMatrix(), 
-        m_Resolution, 
-        &m_PickingColorsToEntity);
-
-    m_EventBroker->Publish(pickEvent);
 
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
 {
@@ -384,7 +374,7 @@ void Renderer::InitializeSSBOs()
 
 void Renderer::InitializeRenderPasses()
 {
-    m_PickingPass = new PickingPass(this);
+    m_PickingPass = new PickingPass(this, m_EventBroker);
 }
 
 void Renderer::CalculateFrustum()

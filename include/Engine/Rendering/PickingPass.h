@@ -6,11 +6,13 @@
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
+#include "../Core/EventBroker.h"
+#include "EPicking.h"
 
 class PickingPass
 {
 public:
-    PickingPass(IRenderer* renderer);
+    PickingPass(IRenderer* renderer, EventBroker* eb);
     ~PickingPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -29,6 +31,8 @@ public:
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
+
+    EventBroker* m_EventBroker;
 
     const IRenderer* m_Renderer;
 
