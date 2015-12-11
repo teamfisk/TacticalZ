@@ -13,8 +13,9 @@ public:
         , m_InputProxy(inputProxy)
     { }
 
-    virtual void Update(double dt) { }
     virtual bool BindOrigin(std::string origin, std::string command, float value) = 0;
+    virtual void Update(double dt) { }
+    virtual float GetCommandValue(std::string command) = 0;
 
 protected:
     EventBroker* m_EventBroker;

@@ -20,13 +20,17 @@ public:
     void Process();
     template <typename T>
     void AddHandler();
-    void Publish(const Events::InputCommand& e);
 
 protected:
     EventBroker* m_EventBroker;
     std::vector<InputHandler*> m_Handlers;
+    std::map<std::string, std::set<InputHandler*>> m_CommandHandlers;
+    
     // Represents every unique command (has of PlayerID & Command) and all values reported for that command this frame
-    std::map<std::pair<unsigned int, std::string>, std::vector<float>> m_CommandQueue;
+    //std::map<std::pair<unsigned int, std::string>, std::vector<float>> m_CommandQueue;
+
+    std::map<std::string, float> m_CurrentCommandValues;
+    std::map<std::string, float> m_LastCommandValues;
 
 	EventRelay<InputProxy, Events::BindOrigin> m_EBindOrigin;
 	bool OnBindOrigin(const Events::BindOrigin& e);

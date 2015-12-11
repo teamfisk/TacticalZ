@@ -146,10 +146,10 @@ bool KeyboardInputHandler::OnKeyDown(const Events::KeyDown& e)
         return false;
     }
 
-    Events::InputCommand ic;
-    ic.PlayerID = 0;
-    std::tie(ic.Command, ic.Value) = it->second;
-    m_InputProxy->Publish(ic);
+    std::string command;
+    float value;
+    std::tie(command, value) = it->second;
+    m_CommandValues[command] += value;
 
     return true;
 }
@@ -161,12 +161,21 @@ bool KeyboardInputHandler::OnKeyUp(const Events::KeyUp& e)
         return false;
     }
 
-    Events::InputCommand ic;
-    ic.PlayerID = 0;
-    std::tie(ic.Command, std::ignore) = it->second;
-    ic.Value = 0;
-    m_InputProxy->Publish(ic);
+    std::string command;
+    float value;
+    std::tie(command, value) = it->second;
+    m_CommandValues[command] -= value;
 
     return true;
+}
+
+float KeyboardInputHandler::GetCommandValue(std::string command)
+{
+    auto it = m_CommandValues.find(command);
+    if (it != m_CommandValues.end()) {
+        return m_CommandValues[command];
+    } else {
+        return 0.f;
+    }
 }
 
