@@ -31,6 +31,7 @@ Game::Game(int argc, char* argv[])
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
     m_InputProxy = new InputProxy(m_EventBroker);
     m_InputProxy->AddHandler<KeyboardInputHandler>();
+    m_InputProxy->AddHandler<MouseInputHandler>();
     m_InputProxy->LoadBindings("Input.ini");
 
     // Create the root level GUI frame

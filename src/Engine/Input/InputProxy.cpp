@@ -46,7 +46,7 @@ void InputProxy::Process()
         for (auto& value : pair.second) {
             e.Value += value;
         }
-        e.Value = std::max(-1.f, std::min(e.Value, 1.f));
+        //e.Value = std::max(-1.f, std::min(e.Value, 1.f));
         m_EventBroker->Publish(e);
         LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
     }
