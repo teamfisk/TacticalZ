@@ -7,11 +7,13 @@
 	<xs:element name="Entity">
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="Components">
+				<xs:element name="Components" minOccurs="0">
 					<xs:complexType>
 						<xs:all>
 							<xs:element ref="c:Transform" minOccurs="0"/>
+							<xs:element ref="c:Model" minOccurs="0"/>
 							<xs:element ref="c:Test" minOccurs="0"/>
+							<xs:element ref="c:RaptorCopter" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

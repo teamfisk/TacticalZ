@@ -56,3 +56,4 @@ ScreenCoords::PixelData ScreenCoords::ToPixelData(glm::vec2 screenCoord, FrameBu
 {
     return ToPixelData(screenCoord.x, screenCoord.y, PickDataBuffer, DepthBuffer);
 }
+
