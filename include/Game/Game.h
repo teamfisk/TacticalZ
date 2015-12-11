@@ -13,6 +13,7 @@
 #include "Core/EntityXMLFile.h"
 #include "Core/SystemPipeline.h"
 #include "RaptorCopterSystem.h"
+#include "PlayerSystem.h"
 
 // Network
 #include <boost/thread.hpp>
