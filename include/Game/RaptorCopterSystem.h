@@ -4,7 +4,7 @@
 class RaptorCopterSystem : public System
 {
 public:
-    RaptorCopterSystem(const EventBroker* eventBroker)
+    RaptorCopterSystem(EventBroker* eventBroker)
         : System(eventBroker, "RaptorCopter")
     { }
 

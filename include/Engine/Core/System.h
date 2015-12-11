@@ -10,16 +10,17 @@ class System
     friend class SystemPipeline;
 
 public:
-    System(const EventBroker* eventBroker, std::string componentType)
+    System(EventBroker* eventBroker, std::string componentType)
         : m_EventBroker(eventBroker)
         , m_ComponentType(componentType)
     { }
-
+	
+	virtual void Initialize();
     virtual void Update(World* world, ComponentWrapper& component, double dt) = 0;
 
 private:
-    const EventBroker* m_EventBroker;
     std::string m_ComponentType;
+	EventBroker* m_EventBroker;
 };
 
 #endif

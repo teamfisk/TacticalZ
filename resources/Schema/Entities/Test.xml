@@ -34,6 +34,16 @@
 		<Entity>
 			<Components>
 				<c:Transform>
+					<Position X="2.5"/>
+				</c:Transform>
+				<c:Model>
+					<Resource>Models/Core/UnitCube.obj</Resource>
+				</c:Model>
+			</Components>
+		</Entity>
+		<Entity>
+			<Components>
+				<c:Transform>
 					<Position X="0" Y="-0"/>
 					<Scale X="1" Y="1" Z="1"/>
 				</c:Transform>
