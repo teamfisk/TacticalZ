@@ -22,7 +22,7 @@ public:
 
 
     //Getters
-    const ShaderProgram& PickingProgram() const { return m_PickingProgram; }
+    const ShaderProgram& PickingProgram() const { return *m_PickingProgram; }
     const std::unordered_map<glm::vec2, EntityID>& PickingColorsToEntity() const { return m_PickingColorsToEntity; }
     GLuint PickingTexture() const { return m_PickingTexture; }
     GLuint DepthBuffer() const { return m_DepthBuffer; }
@@ -36,7 +36,7 @@ private:
 
     const IRenderer* m_Renderer;
 
-    ShaderProgram m_PickingProgram;
+    ShaderProgram* m_PickingProgram;
 
     std::unordered_map<glm::vec2, EntityID> m_PickingColorsToEntity;
 

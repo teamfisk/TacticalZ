@@ -34,11 +34,13 @@ void PickingPass::InitializeFrameBuffers()
 
 void PickingPass::InitializeShaderPrograms()
 {
-    m_PickingProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Picking.vert.glsl")));
-    m_PickingProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Picking.frag.glsl")));
-    m_PickingProgram.Compile();
-    m_PickingProgram.BindFragDataLocation(0, "TextureFragment");
-    m_PickingProgram.Link();
+    m_PickingProgram = ResourceManager::Load<ShaderProgram>("#PickingProgram");
+
+    m_PickingProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Picking.vert.glsl")));
+    m_PickingProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Picking.frag.glsl")));
+    m_PickingProgram->Compile();
+    m_PickingProgram->BindFragDataLocation(0, "TextureFragment");
+    m_PickingProgram->Link();
 }
 
 void PickingPass::Draw(RenderQueueCollection& rq)
@@ -50,8 +52,8 @@ void PickingPass::Draw(RenderQueueCollection& rq)
     int g = 0;
     //TODO: Render: Add code for more jobs than modeljobs.
 
-    GLuint ShaderHandle = m_PickingProgram.GetHandle();
-    m_PickingProgram.Bind();
+    GLuint ShaderHandle = m_PickingProgram->GetHandle();
+    m_PickingProgram->Bind();
 
     for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);

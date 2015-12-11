@@ -114,10 +114,10 @@ private:
 
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
-	ShaderProgram m_BasicForwardProgram;
-    ShaderProgram m_DrawScreenQuadProgram;
-    ShaderProgram m_CalculateFrustumProgram;
-    ShaderProgram m_LightCullProgram;
+	ShaderProgram* m_BasicForwardProgram;
+    ShaderProgram* m_DrawScreenQuadProgram;
+    ShaderProgram* m_CalculateFrustumProgram;
+    ShaderProgram* m_LightCullProgram;
 
 };
 

@@ -66,15 +66,14 @@ void Renderer::InitializeWindow()
 
 void Renderer::InitializeShaders()
 {
-	m_BasicForwardProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/BasicForward.vert.glsl")));
-	m_BasicForwardProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/BasicForward.frag.glsl")));
-	m_BasicForwardProgram.Compile();
-	m_BasicForwardProgram.Link();
+    m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
 
-    m_DrawScreenQuadProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
-    m_DrawScreenQuadProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
-    m_DrawScreenQuadProgram.Compile();
-    m_DrawScreenQuadProgram.Link();
+    m_DrawScreenQuadProgram = ResourceManager::Load<ShaderProgram>("#DrawScreenQuadProgram");
+
+    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
+    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
+    m_DrawScreenQuadProgram->Compile();
+    m_DrawScreenQuadProgram->Link();
 
     //m_CalculateFrustumProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
     //m_CalculateFrustumProgram.Compile();
@@ -218,7 +217,7 @@ void Renderer::DrawScreenQuad(GLuint textureToDraw)
     glClear(GL_COLOR_BUFFER_BIT);
 
 
-    m_DrawScreenQuadProgram.Bind();
+    m_DrawScreenQuadProgram->Bind();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureToDraw);
 
@@ -314,14 +313,14 @@ void Renderer::InitializeRenderPasses()
 void Renderer::CalculateFrustum()
 {
     GLERROR("CalculateFrustum Error-1");
-    m_CalculateFrustumProgram.Bind();
+    m_CalculateFrustumProgram->Bind();
     
     GLERROR("CalculateFrustum Error1");
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     GLERROR("CalculateFrustum Error2");
-    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram.GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
     GLERROR("CalculateFrustum Error3");
-    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram.GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
+    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
     GLERROR("CalculateFrustum Error4");
     glDispatchCompute(5, 3, 1);
     GLERROR("CalculateFrustum Error5");
@@ -338,7 +337,7 @@ void Renderer::TEMPCreateLights()
 
 void Renderer::CullLights()
 {
-    m_LightCullProgram.Bind();
+    m_LightCullProgram->Bind();
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);

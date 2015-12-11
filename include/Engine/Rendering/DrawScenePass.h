@@ -29,7 +29,7 @@ private:
 
     const IRenderer* m_Renderer;
 
-    ShaderProgram m_BasicForwardProgram;
+    ShaderProgram* m_BasicForwardProgram;
 
 };
 

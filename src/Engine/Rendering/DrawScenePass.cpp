@@ -15,10 +15,14 @@ void DrawScenePass::InitializeTextures()
 void DrawScenePass::InitializeShaderPrograms()
 {
     //Gör så att shaders är en resource, tex som texture classen. Konstruktorn måste vara privat.
-    m_BasicForwardProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/BasicForward.vert.glsl")));
-    m_BasicForwardProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/BasicForward.frag.glsl")));
-    m_BasicForwardProgram.Compile();
-    m_BasicForwardProgram.Link();
+    m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#BasicForwardProgram");
+
+    m_BasicForwardProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/BasicForward.vert.glsl")));
+    m_BasicForwardProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/BasicForward.frag.glsl")));
+    m_BasicForwardProgram->Compile();
+    m_BasicForwardProgram->Link();
+
+
 }
 
 void DrawScenePass::Draw(RenderQueueCollection& rq)
@@ -33,9 +37,9 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
     for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
         if (modelJob) {
-            GLuint ShaderHandle = m_BasicForwardProgram.GetHandle();
+            GLuint ShaderHandle = m_BasicForwardProgram->GetHandle();
 
-            m_BasicForwardProgram.Bind();
+            m_BasicForwardProgram->Bind();
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ViewMatrix()));
