@@ -17,7 +17,8 @@ public:
 
 	virtual void Initialize()
 	{
-		EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &InputController::OnCommand);
+		EVENT_SUBSCRIBE_MEMBER(
+            _EInputCommand, &InputController::OnCommand);
 		EVENT_SUBSCRIBE_MEMBER(m_EMouseMove, &InputController::OnMouseMove);
 	}
 
