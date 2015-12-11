@@ -11,6 +11,8 @@ RMDIR "%DeployLocation%\Textures"
 MKLINK "%DeployLocation%\Textures\" "assets\Textures\" /J
 RMDIR "%DeployLocation%\Audio"
 MKLINK "%DeployLocation%\Audio\" "assets\Audio\" /J
+RMDIR "%DeployLocation%\Fonts"
+MKLINK "%DeployLocation%\Fonts\" "assets\Fonts\" /J
 
 ECHO Deploying resources to %DeployLocation%
 :: Schemas
