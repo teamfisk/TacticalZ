@@ -66,6 +66,27 @@ void InputProxy::Process()
             m_LastCommandValues[command] = currentValue;
         }
     }
+
+    // Accumulate the input values of all unique commands published by input handlers
+    for (auto& pair : m_CommandQueue) {
+        Events::InputCommand e;
+        e.PlayerID = pair.first.first;
+        e.Command = pair.first.second;
+        e.Value = 0;
+        for (auto& value : pair.second) {
+            e.Value += value;
+        }
+        //e.Value = std::max(-1.f, std::min(e.Value, 1.f));
+        m_EventBroker->Publish(e);
+        LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+    }
+    m_CommandQueue.clear();
+}
+
+void InputProxy::Publish(const Events::InputCommand& e)
+{
+    auto key = std::make_pair(e.PlayerID, e.Command);
+    m_CommandQueue[key].push_back(e.Value);
 }
 
 bool InputProxy::OnBindOrigin(const Events::BindOrigin& e)

@@ -50,6 +50,16 @@ bool MouseInputHandler::BindOrigin(std::string origin, std::string command, floa
     return false;
 }
 
+float MouseInputHandler::GetCommandValue(std::string command)
+{
+    auto it = m_CommandValues.find(command);
+    if (it != m_CommandValues.end()) {
+        return m_CommandValues[command];
+    } else {
+        return 0.f;
+    }
+}
+
 bool MouseInputHandler::OnMousePress(const Events::MousePress& e)
 {
     auto it = m_Bindings.find(e.Button);
@@ -57,10 +67,10 @@ bool MouseInputHandler::OnMousePress(const Events::MousePress& e)
         return false;
     }
 
-    Events::InputCommand ic;
-    ic.PlayerID = 0;
-    std::tie(ic.Command, ic.Value) = it->second;
-    m_InputProxy->Publish(ic);
+    std::string command;
+    float value;
+    std::tie(command, value) = it->second;
+    m_CommandValues[command] += value;
 
     return true;
 }
@@ -72,11 +82,10 @@ bool MouseInputHandler::OnMouseRelease(const Events::MouseRelease& e)
         return false;
     }
 
-    Events::InputCommand ic;
-    ic.PlayerID = 0;
-    std::tie(ic.Command, std::ignore) = it->second;
-    ic.Value = 0;
-    m_InputProxy->Publish(ic);
+    std::string command;
+    float value;
+    std::tie(command, value) = it->second;
+    m_CommandValues[command] -= value;
 
     return true;
 }
@@ -87,7 +96,7 @@ bool MouseInputHandler::OnMouseMove(const Events::MouseMove& e)
         auto it = m_Axes.find('X');
         if (it != m_Axes.end()) {
             Events::InputCommand ic;
-            ic.PlayerID = 0;
+            ic.PlayerID = -1;
             std::tie(ic.Command, ic.Value) = it->second;
             ic.Value *= e.DeltaX;
             m_InputProxy->Publish(ic);
@@ -98,7 +107,7 @@ bool MouseInputHandler::OnMouseMove(const Events::MouseMove& e)
         auto it = m_Axes.find('Y');
         if (it != m_Axes.end()) {
             Events::InputCommand ic;
-            ic.PlayerID = 0;
+            ic.PlayerID = -1;
             std::tie(ic.Command, ic.Value) = it->second;
             ic.Value *= e.DeltaY;
             m_InputProxy->Publish(ic);
@@ -118,4 +127,3 @@ bool MouseInputHandler::hasOrigin(std::string origin)
     }
     return true;
 }
-

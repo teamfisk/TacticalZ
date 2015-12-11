@@ -71,6 +71,7 @@ void Game::Tick()
     m_LastTime = currentTime;
 
     // Handle input in a weird looking but responsive way
+    m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
     m_InputManager->Update(dt);
     m_EventBroker->Swap();
