@@ -16,7 +16,7 @@ void PlayerSystem::Update(World * world, ComponentWrapper & player, double dt)
 
 bool PlayerSystem::OnKeyDown(const Events::KeyDown & event)
 {
-	if (event.KeyCode == GLFW_KEY_P) {
+	if (event.KeyCode == GLFW_KEY_UP) {
 		m_Direction.z == -1;
 	}
 	if (event.KeyCode == GLFW_KEY_LEFT) {

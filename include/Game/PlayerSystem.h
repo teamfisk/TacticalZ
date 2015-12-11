@@ -17,13 +17,12 @@ public:
 		: System(eventBroker, "Player")
 	{ }
 
-	void Initialize();
+	virtual void Initialize();
 	virtual void Update(World* world, ComponentWrapper& player, double dt) override;
 
 private:
 	float m_Speed;
 	glm::vec3 m_Direction;
-	EventBroker* m_EventBroker;
 
 	EventRelay<PlayerSystem, Events::KeyDown> m_EKeyDown;
 	bool OnKeyDown(const Events::KeyDown &event);

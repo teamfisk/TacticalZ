@@ -47,9 +47,13 @@ Game::Game(int argc, char* argv[])
 	m_SystemPipeline->AddSystem<RaptorCopterSystem>();
 	m_SystemPipeline->AddSystem<PlayerSystem>();
 
+
+
 	m_LastTime = glfwGetTime();
 
     testIntialize();
+
+	m_SystemPipeline->Initialize();
 }
 
 Game::~Game()
