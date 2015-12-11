@@ -116,11 +116,8 @@ void Renderer::InputUpdate(double dt)
 		m_CameraMoveSpeed = 0.5f;
 	}
 
-
     static double mousePosX, mousePosY;
     glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
-    //    //}
-    //    //printf("---------------------------\n\n");
 
 	if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS) {
 
@@ -158,7 +155,8 @@ void Renderer::Draw(RenderQueueCollection& rq)
     //DrawScreenQuad(m_PickingPass->PickingTexture());
     //CullLights();
     
-    DrawScene(rq);
+    //DrawScene(rq);
+    m_DrawScenePass->Draw(rq);
 	glfwSwapBuffers(m_Window);
 }
 
@@ -206,64 +204,6 @@ void Renderer::DrawScene(RenderQueueCollection& rq)
     GLERROR("DrawScene Error");
 }
 
-//void Renderer::PickingPass(RenderQueueCollection& rq)
-//{
-    //m_PickingColorsToEntity.clear();
-    //m_PickingBuffer.Bind();
-
-    //glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-
-    //glClearColor(0.f, 0.f, 0.f, 1.f);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //int r = 1;
-    //int g = 0;
-    ////TODO: Render: Add code for more jobs than modeljobs.
-
-
-    //GLuint ShaderHandle = m_PickingProgram.GetHandle();
-    //m_PickingProgram.Bind();
-
-    //for (auto &job : rq.Forward) {
-    //    auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-
-    //    if (modelJob) {
-    //        //---------------
-    //        //TODO: Renderer: IMPORTANT: Fixa detta så det inte loopar igenom listan varje frame.
-    //        //---------------
-    //        int pickColor[2] = { r, g };
-    //        for (auto i : m_PickingColorsToEntity) {
-    //            if(modelJob->Entity == i.second) {
-    //                pickColor[0] = i.first.x;
-    //                pickColor[1] = i.first.y;
-    //                r -= 1;
-    //            }
-    //        }
-    //        m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
-    //        
-
-    //        //Render picking stuff
-    //        //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-    //        glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
-    //        glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
-    //        glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
-    //        glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
-
-    //        glBindVertexArray(modelJob->Model->VAO);
-    //        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-    //        glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-    //        r += 1;
-    //        if(r > 255) {
-    //            r = 0;
-    //            g += 1;
-    //        }
-    //    }
-    //}
-    //m_PickingBuffer.Unbind();
-    //GLERROR("PickingPass Error");
-
-
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -289,16 +229,6 @@ void Renderer::InitializeTextures()
 {
     m_ErrorTexture=ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
     m_WhiteTexture=ResourceManager::Load<Texture>("Textures/Core/Blank.png");
-    /*
-    glGenTextures(1, &m_PickingTexture);
-    glBindTexture(GL_TEXTURE_2D, m_PickingTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, m_Resolution.Width, m_Resolution.Height, 0, GL_RG, GL_FLOAT, NULL);//TODO: Renderer: Fix the precision and Resolution
-    GLERROR("m_PickingTexture initialization failed");
-    */
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
@@ -375,6 +305,7 @@ void Renderer::InitializeSSBOs()
 void Renderer::InitializeRenderPasses()
 {
     m_PickingPass = new PickingPass(this, m_EventBroker);
+    m_DrawScenePass = new DrawScenePass(this);
 }
 
 void Renderer::CalculateFrustum()

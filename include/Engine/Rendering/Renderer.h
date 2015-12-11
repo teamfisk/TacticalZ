@@ -11,6 +11,7 @@
 #include "FrameBuffer.h"
 #include "../Core/World.h"
 #include "PickingPass.h"
+#include "DrawScenePass.h"
 
 
 #define TILE_SIZE 16 
@@ -52,6 +53,7 @@ private:
     Model* m_UnitSphere;
 
     PickingPass* m_PickingPass;
+    DrawScenePass* m_DrawScenePass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
