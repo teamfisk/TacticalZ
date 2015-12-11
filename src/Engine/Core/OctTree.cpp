@@ -163,7 +163,7 @@ OctTree::OctChild::~OctChild()
 
 void OctTree::Update(float dt, World* world, Camera* cam)
 {
-    for (ComponentWrapper& c : world->GetComponents("Collision")) {
+    for (ComponentWrapper& c : *world->GetComponents("Collision")) {
         AABB aabb;
         aabb.CreateFromCenter(c["BoxCenter"], c["BoxSize"]);
         AddDynamicObject(aabb);
