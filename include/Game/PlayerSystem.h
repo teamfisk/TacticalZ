@@ -23,9 +23,11 @@ class PlayerSystem : public System
 public:
 	PlayerSystem(EventBroker* eventBroker)
 		: System(eventBroker, "Player")
-	{ }
+	{ 
+		EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &PlayerSystem::OnKeyDown);
+		EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &PlayerSystem::OnKeyUp);
+	}
 
-	virtual void Initialize();
 	virtual void Update(World* world, ComponentWrapper& player, double dt) override;
 
 private:

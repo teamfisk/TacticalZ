@@ -21,16 +21,6 @@ public:
         }
     }
 
-	void Initialize()
-	{
-		for (auto& pair : m_Systems) {
-			auto& systems = pair.second;
-			for (auto& system : systems) {
-				system->Initialize();
-			}
-		}
-	}
-
     template <typename T, typename... Arguments>
     void AddSystem(Arguments... args)
     {

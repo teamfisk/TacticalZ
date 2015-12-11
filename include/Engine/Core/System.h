@@ -15,7 +15,6 @@ public:
         , m_ComponentType(componentType)
     { }
 	
-	virtual void Initialize() { }
     virtual void Update(World* world, ComponentWrapper& component, double dt) = 0;
 
 protected:

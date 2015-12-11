@@ -52,8 +52,6 @@ Game::Game(int argc, char* argv[])
 	m_LastTime = glfwGetTime();
 
     testIntialize();
-
-	m_SystemPipeline->Initialize();
 }
 
 Game::~Game()

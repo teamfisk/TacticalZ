@@ -1,10 +1,5 @@
 #include "PlayerSystem.h"
 
-void PlayerSystem::Initialize()
-{
-	EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &PlayerSystem::OnKeyDown);
-	EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &PlayerSystem::OnKeyUp);
-}
 
 void PlayerSystem::Update(World * world, ComponentWrapper & player, double dt)
 {
