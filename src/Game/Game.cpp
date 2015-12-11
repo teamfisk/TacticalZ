@@ -76,6 +76,7 @@ void Game::Tick()
     m_EventBroker->Swap();
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
+    m_EventBroker->Clear();
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
