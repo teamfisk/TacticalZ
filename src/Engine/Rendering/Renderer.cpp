@@ -15,7 +15,6 @@ void Renderer::Initialize()
 	glfwSwapInterval(m_VSYNC);
 	InitializeShaders();
     InitializeTextures();
-    InitializeFrameBuffers();
     InitializeSSBOs();
     //CalculateFrustum();
 

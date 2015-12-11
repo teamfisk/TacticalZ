@@ -59,14 +59,12 @@ private:
     void InitializeWindow();
     void InitializeShaders();
     void InitializeTextures();
-    void InitializeFrameBuffers();
     void InitializeSSBOs();
     void InitializeRenderPasses();
     //TODO: Renderer: Get InputUpdate out of renderer
     void InputUpdate(double dt);
     //void PickingPass(RenderQueueCollection& rq);
     void DrawScreenQuad(GLuint textureToDraw);
-    void DrawScene(RenderQueueCollection& rq);
 
     //----------------------Forward+-----------------------//
     void CalculateFrustum();
