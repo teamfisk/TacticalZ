@@ -6,7 +6,6 @@
 	<xs:element name="Player">
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="Speed" type="t:double" minOccurs="0"/>
 				<xs:element name="Velocity" type="t:Vector" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>

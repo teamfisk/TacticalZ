@@ -33,6 +33,9 @@
 		</Entity>
 		<Entity>
 			<Components>
+				<c:Player>
+					<Velocity X="0" Y="0" Z="0"/>
+				</c:Player>
 				<c:Transform>
 					<Position X="2.5"/>
 				</c:Transform>
