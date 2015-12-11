@@ -4,9 +4,11 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H  
 
-#include "OpenGL.h"
-#include "GLM.h"
+#include "../OpenGL.h"
+#include "../GLM.h"
 #include "ShaderProgram.h"
+#include "Font.h"
+#include "../Core/ResourceManager.h"
 
 class TextRenderer
 {
@@ -17,17 +19,7 @@ public:
     void Draw(glm::mat4 projection, glm::mat4 view);
 
 private:
-    
-
-    struct Character {
-        GLuint     TextureID;  // ID handle of the glyph texture
-        glm::ivec2 Size;       // Size of glyph
-        glm::ivec2 Bearing;    // Offset from baseline to left/top of glyph
-        GLuint     Advance;    // Offset to advance to next glyph
-    };
-
-    std::map<GLchar, Character> Characters;
-
+    Font* font;
    
     GLuint VAO, VBO;
 

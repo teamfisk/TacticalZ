@@ -13,6 +13,7 @@
 #include "Core/EntityXMLFile.h"
 #include "Core/SystemPipeline.h"
 #include "RaptorCopterSystem.h"
+#include "Rendering/Font.h"
 
 class Game
 {

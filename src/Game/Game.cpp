@@ -6,6 +6,7 @@ Game::Game(int argc, char* argv[])
 	ResourceManager::RegisterType<Model>("Model");
 	ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<Font>("FontFile");
 
 	m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
 	LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
