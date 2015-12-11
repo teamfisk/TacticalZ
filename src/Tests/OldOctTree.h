@@ -36,7 +36,7 @@ public:
     void ClearObjects();
     void ClearDynamicObjects();
 
-    //Collision test function. WTODO: Probably remove or relocate elsewhere, Collision system?
+    //Collision test function.
     void Update(float dt, World* world, Camera* cam);
     //Returns true if the ray collides with something in the tree. Result is written to [data].
     bool RayCollides(const Ray& ray, Output& data) const;
@@ -47,9 +47,6 @@ public:
 
 private:
     OctTree* m_Children[8];
-    //WTODO: Do -derived class from AABB- struct containing AABB, with a bool Tested, falsify at 
-    //start of Collision test, set on check, don't check if set already. Solves duplicate boxes in tree. 
-    //Store indices in the struct, pointing to grand ancestor list of boxes, need the same AABB not copies to save Tested.
     std::vector<AABB> m_StaticObjects;
     std::vector<AABB> m_DynamicObjects;
     AABB m_Box;
