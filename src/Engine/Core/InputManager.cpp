@@ -1,6 +1,7 @@
 #include "Core/InputManager.h"
 
-std::vector<unsigned int> InputManager::CharCallbackQueue;
+std::vector<unsigned int> InputManager::GLFWCharCallbackQueue;
+std::vector<std::pair<double, double>> InputManager::GLFWScrollCallbackQueue;
 
 void InputManager::Initialize()
 {
@@ -8,6 +9,7 @@ void InputManager::Initialize()
 	//m_LastGamepadAxisState = std::array<GamepadAxisState, XUSER_MAX_COUNT>();
 	//m_LastGamepadButtonState = std::array<GamepadButtonState, XUSER_MAX_COUNT>();
     glfwSetCharCallback(m_GLFWWindow, &InputManager::GLFWCharCallback);
+    glfwSetScrollCallback(m_GLFWWindow, &InputManager::GLFWScrollCallback);
 
 	EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &InputManager::OnLockMouse);
 	EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &InputManager::OnUnlockMouse);
@@ -38,6 +40,15 @@ void InputManager::Update(double dt)
 			}
 		}
 	}
+
+    // Keyboard text input
+    for (unsigned int& c : GLFWCharCallbackQueue) {
+        Events::KeyboardChar e;
+        e.Timestamp = glfwGetTime();
+        e.Char = c;
+        m_EventBroker->Publish(e);
+    }
+    GLFWCharCallbackQueue.clear();
 
 	// Mouse buttons
 	for (int i = 0; i <= GLFW_MOUSE_BUTTON_LAST; ++i) {
@@ -76,13 +87,13 @@ void InputManager::Update(double dt)
 		m_EventBroker->Publish(e);
 	}
 
-    for (unsigned int& c : CharCallbackQueue) {
-        Events::KeyboardChar e;
-        e.Timestamp = glfwGetTime();
-        e.Char = c;
+    // Mouse scroll
+    for (auto& pair : GLFWScrollCallbackQueue) {
+        Events::MouseScroll e;
+        std::tie(e.DeltaX, e.DeltaY) = pair;
         m_EventBroker->Publish(e);
     }
-    CharCallbackQueue.clear();
+    GLFWScrollCallbackQueue.clear();
 
 	// // Lock mouse while holding LMB
 	// if (m_CurrentMouseState[GLFW_MOUSE_BUTTON_LEFT])
@@ -209,7 +220,13 @@ void InputManager::PublishGamepadButtonIfChanged(int gamepadID, Gamepad::Button 
 
 void InputManager::GLFWCharCallback(GLFWwindow* window, unsigned int c)
 {
-    CharCallbackQueue.push_back(c);
+    GLFWCharCallbackQueue.push_back(c);
+}
+
+
+void InputManager::GLFWScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    GLFWScrollCallbackQueue.push_back(std::make_pair(xoffset, yoffset));
 }
 
 bool InputManager::OnLockMouse(const Events::LockMouse &event)
