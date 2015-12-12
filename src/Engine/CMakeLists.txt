@@ -78,6 +78,9 @@ set(SOURCE_FILES
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
     ${SOURCE_FILES_Rendering_Util}
+	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui.cpp
+	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_draw.cpp
+	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_demo.cpp
 )
 
 set(LIBRARIES
