@@ -1,10 +1,13 @@
 #include "Core/InputManager.h"
 
+std::vector<unsigned int> InputManager::CharCallbackQueue;
+
 void InputManager::Initialize()
 {
 	// TODO: Gamepad
 	//m_LastGamepadAxisState = std::array<GamepadAxisState, XUSER_MAX_COUNT>();
 	//m_LastGamepadButtonState = std::array<GamepadButtonState, XUSER_MAX_COUNT>();
+    glfwSetCharCallback(m_GLFWWindow, &InputManager::GLFWCharCallback);
 
 	EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &InputManager::OnLockMouse);
 	EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &InputManager::OnUnlockMouse);
@@ -72,6 +75,14 @@ void InputManager::Update(double dt)
 		e.DeltaY = m_CurrentMouseDeltaY;
 		m_EventBroker->Publish(e);
 	}
+
+    for (unsigned int& c : CharCallbackQueue) {
+        Events::KeyboardChar e;
+        e.Timestamp = glfwGetTime();
+        e.Char = c;
+        m_EventBroker->Publish(e);
+    }
+    CharCallbackQueue.clear();
 
 	// // Lock mouse while holding LMB
 	// if (m_CurrentMouseState[GLFW_MOUSE_BUTTON_LEFT])
@@ -194,6 +205,11 @@ void InputManager::PublishGamepadButtonIfChanged(int gamepadID, Gamepad::Button 
 			m_EventBroker->Publish(e);
 		}
 	}
+}
+
+void InputManager::GLFWCharCallback(GLFWwindow* window, unsigned int c)
+{
+    CharCallbackQueue.push_back(c);
 }
 
 bool InputManager::OnLockMouse(const Events::LockMouse &event)

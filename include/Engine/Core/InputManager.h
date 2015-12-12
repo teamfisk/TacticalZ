@@ -8,6 +8,7 @@
 #include "EventBroker.h"
 #include "EKeyDown.h"
 #include "EKeyUp.h"
+#include "EKeyboardChar.h"
 #include "EMousePress.h"
 #include "EMouseRelease.h"
 #include "EMouseMove.h"
@@ -64,6 +65,9 @@ private:
 
 	void PublishGamepadAxisIfChanged(int gamepadID, Gamepad::Axis axis);
 	void PublishGamepadButtonIfChanged(int gamepadID, Gamepad::Button button);
+
+    static std::vector<unsigned int> CharCallbackQueue;
+    static void GLFWCharCallback(GLFWwindow* window, unsigned int c);
 };
 
 #endif
