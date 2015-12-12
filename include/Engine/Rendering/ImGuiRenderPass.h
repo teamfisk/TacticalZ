@@ -23,7 +23,7 @@ private:
     EventBroker* m_EventBroker;
 
     GLFWwindow* g_Window;
-    double g_Time = 0.0;
+    double g_DeltaTime = 0.0;
     float g_MouseWheel = 0.f;
     GLuint g_FontTexture;
     int g_ShaderHandle;
@@ -55,4 +55,6 @@ private:
 
     bool createDeviceObjects();
     bool createFontsTexture();
+
+    void newFrame();
 };

@@ -27,17 +27,6 @@ ImGuiRenderPass::ImGuiRenderPass(IRenderer* renderer, EventBroker* eventBroker)
     io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
     io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-    //io.RenderDrawListsFn = ImGui_ImplGlfwGL3_RenderDrawLists;       // Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-    //io.SetClipboardTextFn = ImGui_ImplGlfwGL3_SetClipboardText;
-    //io.GetClipboardTextFn = ImGui_ImplGlfwGL3_GetClipboardText;
-
-    //if (install_callbacks) {
-    //    glfwSetMouseButtonCallback(window, ImGui_ImplGlfwGL3_MouseButtonCallback);
-    //    glfwSetScrollCallback(window, ImGui_ImplGlfwGL3_ScrollCallback);
-    //    glfwSetKeyCallback(window, ImGui_ImplGlfwGL3_KeyCallback);
-    //    glfwSetCharCallback(window, ImGui_ImplGlfwGL3_CharCallback);
-    //}
-
     createDeviceObjects();
     
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &ImGuiRenderPass::OnMousePress);
@@ -47,35 +36,14 @@ ImGuiRenderPass::ImGuiRenderPass(IRenderer* renderer, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &ImGuiRenderPass::OnKeyDown);
     EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &ImGuiRenderPass::OnKeyUp);
     EVENT_SUBSCRIBE_MEMBER(m_EKeyboardChar, &ImGuiRenderPass::OnKeyboardChar);
+
+    // Prime the first frame
+    newFrame();
 }
 
 void ImGuiRenderPass::Update(double dt)
 {
-    ImGuiIO& io = ImGui::GetIO();
-
-    // Setup display size (every frame to accommodate for window resizing)
-    int w, h;
-    int display_w, display_h;
-    glfwGetWindowSize(g_Window, &w, &h);
-    glfwGetFramebufferSize(g_Window, &display_w, &display_h);
-    io.DisplaySize = ImVec2((float)w, (float)h);
-    io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
-
-    io.DeltaTime = dt;
-
-    io.KeyCtrl = glfwGetKey(g_Window, GLFW_KEY_LEFT_CONTROL) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_CONTROL);
-    io.KeyShift = glfwGetKey(g_Window, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_SHIFT);
-    io.KeyAlt = glfwGetKey(g_Window, GLFW_KEY_LEFT_ALT) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_ALT);
-
-    io.MouseWheel = g_MouseWheel;
-    g_MouseWheel = 0;
-
-    ImGui::NewFrame();
-
-    static float val = 0.f;
-    ImGui::ShowTestWindow();
-    //ImGui::LabelText("Label test", "Hi");
-    ImGui::SliderFloat("float", &val, 0.f, 100.f);
+    g_DeltaTime = dt;
 }
 
 void ImGuiRenderPass::Draw()
@@ -164,6 +132,9 @@ void ImGuiRenderPass::Draw()
     if (last_enable_depth_test) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
     if (last_enable_scissor_test) glEnable(GL_SCISSOR_TEST); else glDisable(GL_SCISSOR_TEST);
     glViewport(last_viewport[0], last_viewport[1], (GLsizei)last_viewport[2], (GLsizei)last_viewport[3]);
+
+    // Start next frame
+    newFrame();
 }
 
 bool ImGuiRenderPass::OnMousePress(const Events::MousePress& e)
@@ -326,5 +297,29 @@ bool ImGuiRenderPass::createFontsTexture()
     glBindTexture(GL_TEXTURE_2D, last_texture);
 
     return true;
+}
+
+void ImGuiRenderPass::newFrame()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Setup display size (every frame to accommodate for window resizing)
+    int w, h;
+    int display_w, display_h;
+    glfwGetWindowSize(g_Window, &w, &h);
+    glfwGetFramebufferSize(g_Window, &display_w, &display_h);
+    io.DisplaySize = ImVec2((float)w, (float)h);
+    io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
+
+    io.DeltaTime = g_DeltaTime;
+
+    io.KeyCtrl = glfwGetKey(g_Window, GLFW_KEY_LEFT_CONTROL) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_CONTROL);
+    io.KeyShift = glfwGetKey(g_Window, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_SHIFT);
+    io.KeyAlt = glfwGetKey(g_Window, GLFW_KEY_LEFT_ALT) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_ALT);
+
+    io.MouseWheel = g_MouseWheel;
+    g_MouseWheel = 0;
+
+    ImGui::NewFrame();
 }
 
