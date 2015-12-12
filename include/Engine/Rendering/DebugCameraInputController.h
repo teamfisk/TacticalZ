@@ -25,7 +25,6 @@ public:
         if (e.Command == "Right") {
             float value = std::max(-1.f, std::min(e.Value, 1.f));
             m_Velocity.x = value;
-            LOG_INFO("%f", value);
         }
         if (e.Command == "Forward") {
             float value = std::max(-1.f, std::min(e.Value, 1.f));
