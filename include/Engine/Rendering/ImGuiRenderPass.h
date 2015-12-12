@@ -5,6 +5,7 @@
 #include "../Core/EMousePress.h"
 #include "../Core/EMouseRelease.h"
 #include "../Core/EMouseMove.h"
+#include "../Core/EMouseScroll.h"
 #include "../Core/EKeyDown.h"
 #include "../Core/EKeyUp.h"
 #include "../Core/EKeyboardChar.h"
@@ -23,6 +24,7 @@ private:
 
     GLFWwindow* g_Window;
     double g_Time = 0.0;
+    float g_MouseWheel = 0.f;
     GLuint g_FontTexture;
     int g_ShaderHandle;
     int g_VertHandle;
@@ -42,6 +44,8 @@ private:
     bool OnMouseRelease(const Events::MouseRelease& e);
     EventRelay<ImGuiRenderPass, Events::MouseMove> m_EMouseMove;
     bool OnMouseMove(const Events::MouseMove& e);
+    EventRelay<ImGuiRenderPass, Events::MouseScroll> m_EMouseScroll;
+    bool OnMouseScroll(const Events::MouseScroll& e);
     EventRelay<ImGuiRenderPass, Events::KeyDown> m_EKeyDown;
     bool OnKeyDown(const Events::KeyDown& e);
     EventRelay<ImGuiRenderPass, Events::KeyUp> m_EKeyUp;

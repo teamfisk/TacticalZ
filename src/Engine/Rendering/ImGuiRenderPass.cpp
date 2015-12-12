@@ -43,6 +43,7 @@ ImGuiRenderPass::ImGuiRenderPass(IRenderer* renderer, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &ImGuiRenderPass::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &ImGuiRenderPass::OnMouseRelease);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseMove, &ImGuiRenderPass::OnMouseMove);
+    EVENT_SUBSCRIBE_MEMBER(m_EMouseScroll, &ImGuiRenderPass::OnMouseScroll);
     EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &ImGuiRenderPass::OnKeyDown);
     EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &ImGuiRenderPass::OnKeyUp);
     EVENT_SUBSCRIBE_MEMBER(m_EKeyboardChar, &ImGuiRenderPass::OnKeyboardChar);
@@ -65,6 +66,9 @@ void ImGuiRenderPass::Update(double dt)
     io.KeyCtrl = glfwGetKey(g_Window, GLFW_KEY_LEFT_CONTROL) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_CONTROL);
     io.KeyShift = glfwGetKey(g_Window, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_SHIFT);
     io.KeyAlt = glfwGetKey(g_Window, GLFW_KEY_LEFT_ALT) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_ALT);
+
+    io.MouseWheel = g_MouseWheel;
+    g_MouseWheel = 0;
 
     ImGui::NewFrame();
 
@@ -181,6 +185,12 @@ bool ImGuiRenderPass::OnMouseMove(const Events::MouseMove& e)
     ImGuiIO& io = ImGui::GetIO();
     io.MousePos.x = e.X;
     io.MousePos.y = e.Y;
+    return true;
+}
+
+bool ImGuiRenderPass::OnMouseScroll(const Events::MouseScroll& e)
+{
+    g_MouseWheel += (float)e.DeltaY;
     return true;
 }
 
