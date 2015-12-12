@@ -68,6 +68,8 @@ Game::~Game()
 
 void Game::Tick()
 {
+    glfwPollEvents();
+
     double currentTime = glfwGetTime();
     double dt = currentTime - m_LastTime;
     m_LastTime = currentTime;
@@ -94,8 +96,6 @@ void Game::Tick()
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-
-    glfwPollEvents();
 }
 
 
