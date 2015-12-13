@@ -144,6 +144,10 @@ void Renderer::Draw(RenderQueueCollection& rq)
 	glfwSwapBuffers(m_Window);
 }
 
+    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
