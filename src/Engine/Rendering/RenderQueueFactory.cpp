@@ -77,6 +77,9 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
         }
         glm::vec4 color = modelC["Color"];
         Model* model = ResourceManager::Load<Model>(resource);
+        if (model == nullptr) {
+            model = ResourceManager::Load<Model>("Models/Core/Error.obj");
+        }
 
         for (auto texGroup : model->TextureGroups) {
             ModelJob job;
