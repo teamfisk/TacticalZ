@@ -14,9 +14,11 @@ public:
 
     virtual bool OnCommand(const Events::InputCommand& e) override
     {
+        ImGuiIO& io = ImGui::GetIO();
+
         if (e.Command == "PrimaryFire") {
             if (e.Value > 0) {
-                if (!ImGui::IsMouseHoveringAnyWindow()) {
+                if (!io.WantCaptureMouse) {
                     LockMouse();
                 }
             } else {
@@ -25,7 +27,7 @@ public:
             return false;
         }
 
-        if (m_MouseLocked || e.Value == 0) {
+        if (!io.WantCaptureKeyboard) {
             if (e.Command == "Right") {
                 float value = std::max(-1.f, std::min(e.Value, 1.f));
                 m_Velocity.x = value;
