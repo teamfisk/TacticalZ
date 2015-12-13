@@ -59,7 +59,7 @@ bool ComponentPool::KnowsEntity(EntityID ent)
 void ComponentPool::Delete(ComponentWrapper& wrapper)
 {
     m_EntityToComponent.erase(wrapper.EntityID);
-    m_Pool.Free(wrapper.Data);
+    m_Pool.Free(wrapper.Data - sizeof(EntityID));
 }
 
 ComponentPool::iterator ComponentPool::begin() const
