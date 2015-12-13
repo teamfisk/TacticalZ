@@ -23,19 +23,22 @@ void EditorSystem::Update(World* world, double dt)
     }
 
     if (m_Selection != 0) {
-        auto selectionTransform = world->GetComponent(m_Selection, "Transform");
-        auto widgetTransform = world->GetComponent(m_Widget, "Transform");
+        if (world->HasComponent(m_Selection, "Transform")) {
+            glm::vec3 pos = RenderQueueFactory::AbsolutePosition(world, m_Selection);
+            auto widgetTransform = world->GetComponent(m_Widget, "Transform");
+            widgetTransform["Position"] = pos;
+        } else {
+            m_Selection = 0;
+        }
+    } 
 
-        widgetTransform["Position"] = (glm::vec3)selectionTransform["Position"];
-    }
-    
     drawUI(world, dt);
 }
 
 bool EditorSystem::OnMousePress(const Events::MousePress& e)
 {
     if (e.Button == GLFW_MOUSE_BUTTON_RIGHT) {
-        m_PickingQueue.push_back(glm::vec2(e.X, e.Y));
+        m_PickingQueue.push_back(glm::vec2((int)e.X, (int)e.Y));
     }
     return true;
 }
@@ -53,7 +56,7 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
 
 void EditorSystem::drawUI(World* world, double dt)
 {
-    //ImGui::ShowTestWindow();
+    ImGui::ShowTestWindow();
     //ImGui::ShowStyleEditor();
 
     if (ImGui::BeginMainMenuBar()) {
@@ -88,7 +91,7 @@ void EditorSystem::drawUI(World* world, double dt)
         ImGui::EndMainMenuBar();
     }
 
-    if (ImGui::Begin("Properties")) {
+    if (ImGui::Begin("Components")) {
         if (m_Selection != 0) {
             auto& pools = world->GetComponentPools();
 
@@ -136,11 +139,19 @@ void EditorSystem::drawUI(World* world, double dt)
                         if (type == "Vector") {
                             auto& val = component.Property<glm::vec3>(field);
                             if (field == "Scale") {
-                                ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, 0.f, 9999.f);
+                                ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
                             } else if (field == "Orientation") {
-                                ImGui::SliderFloat3(field.c_str(), glm::value_ptr(val), 0.f, glm::pi<float>());
+                                glm::vec3 times = val / glm::vec3(glm::pi<float>());
+                                times.x = std::floor(times.x);
+                                times.y = std::floor(times.y);
+                                times.z = std::floor(times.z);
+                                glm::vec3 tempVal = val - (times*glm::pi<float>());
+                                if (ImGui::SliderFloat3(field.c_str(), glm::value_ptr(tempVal), 0.f, glm::pi<float>())) {
+                                    val = tempVal;
+                                }
                             } else {
-                                ImGui::InputFloat3(field.c_str(), glm::value_ptr(val));
+                                //ImGui::InputFloat3(field.c_str(), glm::value_ptr(val));
+                                ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
                             }
                         } else if (type == "Color") {
                             auto& val = component.Property<glm::vec4>(field);
@@ -164,6 +175,34 @@ void EditorSystem::drawUI(World* world, double dt)
             }
         }
 
+    }
+    ImGui::End();
+
+    if (ImGui::Begin("Entitites")) {
+        auto entityChildren = world->GetEntityChildren();
+        std::function<void(EntityID)> recurse = [&](EntityID parent) {
+            auto range = entityChildren.equal_range(parent);
+            for (auto it = range.first; it != range.second; it++) {
+                ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
+                if (ImGui::TreeNode((std::string("#") + std::to_string(it->second)).c_str())) {
+                    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
+                        m_Selection = it->second;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Add")) {
+                        EntityID entity = world->CreateEntity(it->second);
+                        world->AttachComponent(entity, "Transform");
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Delete")) {
+                        world->DeleteEntity(it->second);
+                    }
+                    recurse(it->second);
+                    ImGui::TreePop();
+                }
+            }
+        };
+        recurse(0);
     }
     ImGui::End();
 }
