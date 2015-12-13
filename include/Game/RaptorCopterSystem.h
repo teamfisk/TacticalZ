@@ -1,16 +1,14 @@
 #include "Common.h"
 #include "Core/System.h"
 
-class RaptorCopterSystem : public System
+class RaptorCopterSystem : public PureSystem
 {
 public:
     RaptorCopterSystem(EventBroker* eventBroker)
-        : System(eventBroker, "RaptorCopter")
+        : PureSystem(eventBroker, "RaptorCopter")
     { }
 
-	virtual void Initialize() { }
-
-    virtual void Update(World* world, ComponentWrapper& raptorCopter, double dt) override
+    virtual void UpdateComponent(World* world, ComponentWrapper& raptorCopter, double dt) override
     {
         ComponentWrapper& transform = world->GetComponent(raptorCopter.EntityID, "Transform");
         (glm::vec3&)transform["Orientation"] += (float)(double)raptorCopter["Speed"] * (float)dt * (glm::vec3)raptorCopter["Axis"];
