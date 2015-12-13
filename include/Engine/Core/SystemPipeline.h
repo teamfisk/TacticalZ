@@ -25,6 +25,7 @@ public:
     void AddSystem(Arguments... args)
     {
         System* system = new T(m_EventBroker, args...);
+        m_Systems[typeid(T).name()] = system;
 
         if (std::is_base_of<PureSystem, T>::value) {
             PureSystem* pureSystem = static_cast<PureSystem*>(system);
@@ -32,9 +33,6 @@ public:
                 m_PureSystems[pureSystem->m_ComponentType].push_back(pureSystem);
             } else {
                 LOG_ERROR("Failed to add pure system \"%s\": Missing component type!", typeid(T).name());
-                if (std::is_base_of<ImpureSystem, T>::value) {
-                    delete system;
-                }
             }
         }
 
@@ -46,6 +44,12 @@ public:
 
     void Update(World* world, double dt)
     {
+        // Process events
+        for (auto& pair : m_Systems) {
+            m_EventBroker->Process(pair.first);
+        }
+
+        // Update
         for (auto& pair : m_PureSystems) {
             const std::string& componentName = pair.first;
             auto& systems = pair.second;
@@ -66,7 +70,8 @@ public:
 
 private:
     EventBroker* m_EventBroker;
-    std::unordered_map<std::string, std::vector<PureSystem*>> m_PureSystems;
+    std::map<std::string, System*> m_Systems;
+    std::map<std::string, std::vector<PureSystem*>> m_PureSystems;
     std::vector<ImpureSystem*> m_ImpureSystems;
 };
 
