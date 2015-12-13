@@ -21,10 +21,14 @@ public:
     ComponentWrapper AttachComponent(EntityID entity, std::string componentType);
     // Get a component of an entity
     ComponentWrapper GetComponent(EntityID entity, std::string componentType);
+    // Delete a component off an entity
+    void DeleteComponent(EntityID entity, std::string componentType);
     // Get all components of the specified type
     const ComponentPool* GetComponents(std::string componentType);
     // Get entity parent
     EntityID GetParent(EntityID entity);
+    // Get all component pools
+    const std::unordered_map<std::string, ComponentPool*>& GetComponentPools() const { return m_ComponentPools; }
 
 private:
     EntityID m_CurrentEntityID = 1;

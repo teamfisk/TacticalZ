@@ -27,6 +27,21 @@ ImGuiRenderPass::ImGuiRenderPass(IRenderer* renderer, EventBroker* eventBroker)
     io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
     io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Alpha = 1.f;
+    style.WindowPadding = ImVec2(8.f, 7.f);
+    style.WindowRounding = 4.f;
+    style.ChildWindowRounding = 0.f;
+    style.FramePadding = ImVec2(4.f, 2.f);
+    style.FrameRounding = 2.f;
+    style.ItemSpacing = ImVec2(6.f, 2.f);
+    style.ItemInnerSpacing = ImVec2(3.f, 4.f);
+    style.IndentSpacing = 16.f;
+    style.ScrollbarSize = 12;
+    style.ScrollbarRounding = 2.f;
+    style.GrabMinSize = 13.f;
+    style.GrabRounding = 3.f;
+
     createDeviceObjects();
     
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &ImGuiRenderPass::OnMousePress);
@@ -319,6 +334,8 @@ void ImGuiRenderPass::newFrame()
 
     io.MouseWheel = g_MouseWheel;
     g_MouseWheel = 0;
+
+    m_EventBroker->Process<ImGuiRenderPass>();
 
     ImGui::NewFrame();
 }

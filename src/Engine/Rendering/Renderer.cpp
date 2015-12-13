@@ -129,7 +129,6 @@ void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
     InputUpdate(dt);
-    m_EventBroker->Process<ImGuiRenderPass>();
     m_ImGuiRenderPass->Update(dt);
 }
 
