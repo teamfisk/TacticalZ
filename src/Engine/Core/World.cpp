@@ -41,6 +41,14 @@ ComponentWrapper World::GetComponent(EntityID entity, std::string componentType)
     return pool->GetByEntity(entity);
 }
 
+
+void World::DeleteComponent(EntityID entity, std::string componentType)
+{
+    ComponentPool* pool = m_ComponentPools.at(componentType);
+    ComponentWrapper c = pool->GetByEntity(entity);
+    return pool->Delete(c);
+}
+
 const ComponentPool* World::GetComponents(std::string componentType)
 {
     auto it = m_ComponentPools.find(componentType);
