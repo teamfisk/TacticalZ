@@ -54,6 +54,8 @@ public:
     ComponentWrapper Allocate(EntityID entity);
     // Get the component belonging to a specific entity
     ComponentWrapper GetByEntity(EntityID ent);
+    // Returns true if the pool contains a component for the specified entity
+    bool KnowsEntity(EntityID ent);
     // Delete a component and free its memory
     void Delete(ComponentWrapper& wrapper);
 
