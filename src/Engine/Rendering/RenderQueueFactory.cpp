@@ -75,6 +75,10 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
     }
 
     for (auto& modelC : *models) {
+        bool visible = modelC["Visible"];
+        if (!visible) {
+            continue;
+        }
         std::string resource = modelC["Resource"];
         if (resource.empty()) {
             continue;
