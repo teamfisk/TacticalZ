@@ -40,15 +40,17 @@ public:
     {
         PickData pickData;
 
+        // Invert screen y coordinate
+        screenCoord.y = Resolution.Height - screenCoord.y;
         ScreenCoords::PixelData data = ScreenCoords::ToPixelData(screenCoord, PickingBuffer, *DepthBuffer);
 
         auto it = PickingColorsToEntity->find(glm::vec2(data.Color[0], data.Color[1]));
         if (it != PickingColorsToEntity->end()) {
             pickData.Entity = it->second;
         } else {
-            pickData.Entity = -1;
+            pickData.Entity = 0;
         }
-        pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, Resolution.Width - screenCoord.y, data.Depth, Resolution, ProjectionMatrix, ViewMatrix);
+        pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, Resolution, ProjectionMatrix, ViewMatrix);
 
         return pickData;
     }

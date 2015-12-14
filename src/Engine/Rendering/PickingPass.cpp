@@ -93,12 +93,15 @@ void PickingPass::Draw(RenderQueueCollection& rq)
     GLERROR("PickingPass Error");
 
     //Publish pick event every frame with the pick data that can be picked by the event
+    int fbWidth;
+    int fbHeight;
+    glfwGetFramebufferSize(m_Renderer->Window(), &fbWidth, &fbHeight);
     Events::Picking pickEvent = Events::Picking(
         &m_PickingBuffer,
         &m_DepthBuffer,
         m_Renderer->Camera()->ProjectionMatrix(),
         m_Renderer->Camera()->ViewMatrix(),
-        m_Renderer->Resolution(),
+        Rectangle(fbWidth, fbHeight),
         &m_PickingColorsToEntity);
 
     m_EventBroker->Publish(pickEvent);

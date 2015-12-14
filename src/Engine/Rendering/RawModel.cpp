@@ -8,7 +8,7 @@ RawModel::RawModel(std::string fileName)
 	if (scene == nullptr) {
 		LOG_ERROR("Failed to load model \"%s\"", fileName.c_str());
 		LOG_ERROR("Assimp error: %s", importer.GetErrorString());
-		return;
+        throw std::runtime_error("Failed to open model file.");
 	}
 
 	auto m = scene->mRootNode->mTransformation;

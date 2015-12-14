@@ -15,8 +15,12 @@ public:
     RenderQueueFactory(EventBroker* eventBroker);
     void Update(World* world);
 
-    
     RenderQueueCollection RenderQueues() const { return m_RenderQueues; }
+
+    static glm::vec3 AbsolutePosition(World* world, EntityID entity);
+    static glm::quat AbsoluteOrientation(World* world, EntityID entity);
+    static glm::vec3 AbsoluteScale(World* world, EntityID entity);
+
 private:
     EventBroker* m_EventBroker;
     RenderQueueCollection m_RenderQueues;
@@ -25,10 +29,6 @@ private:
     void FillLights(World* world, RenderQueue* renderQueue);
 
     glm::mat4 ModelMatrix(World* world, EntityID entity);
-
-    glm::vec3 AbsolutePosition(World* world, EntityID entity);
-    glm::quat AbsoluteOrientation(World* world, EntityID entity);
-    glm::vec3 AbsoluteScale(World* world, EntityID entity);
 
     EntityID m_CurrentCamera;
 

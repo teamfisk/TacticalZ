@@ -50,10 +50,16 @@ ComponentWrapper ComponentPool::GetByEntity(EntityID ent)
     return ComponentWrapper(m_ComponentInfo, m_EntityToComponent.at(ent));
 }
 
+
+bool ComponentPool::KnowsEntity(EntityID ent)
+{
+    return m_EntityToComponent.find(ent) != m_EntityToComponent.end();
+}
+
 void ComponentPool::Delete(ComponentWrapper& wrapper)
 {
     m_EntityToComponent.erase(wrapper.EntityID);
-    m_Pool.Free(wrapper.Data);
+    m_Pool.Free(wrapper.Data - sizeof(EntityID));
 }
 
 ComponentPool::iterator ComponentPool::begin() const

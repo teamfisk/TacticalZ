@@ -1,7 +1,6 @@
 #include "PlayerSystem.h"
 
-
-void PlayerSystem::Update(World * world, ComponentWrapper & player, double dt)
+void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, double dt)
 {
     if (input.Forward) {
         m_Direction.z = -1;

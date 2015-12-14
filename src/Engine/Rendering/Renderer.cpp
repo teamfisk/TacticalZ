@@ -23,6 +23,8 @@ void Renderer::Initialize()
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
+
+    m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
 }
 
 void Renderer::InitializeWindow()
@@ -98,6 +100,7 @@ void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
     InputUpdate(dt);
+    m_ImGuiRenderPass->Update(dt);
 }
 
 void Renderer::Draw(RenderQueueCollection& rq)
@@ -106,8 +109,13 @@ void Renderer::Draw(RenderQueueCollection& rq)
     //DrawScreenQuad(m_PickingPass->PickingTexture());
     //CullLights();
     
+    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     m_DrawScenePass->Draw(rq);
     GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
 }
 
