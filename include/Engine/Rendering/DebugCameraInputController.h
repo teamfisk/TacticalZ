@@ -1,3 +1,4 @@
+#include <imgui/imgui.h>
 #include "../Input/FirstPersonInputController.h"
 
 template <typename EventContext>
@@ -13,22 +14,35 @@ public:
 
     virtual bool OnCommand(const Events::InputCommand& e) override
     {
+        ImGuiIO& io = ImGui::GetIO();
+
         if (e.Command == "PrimaryFire") {
             if (e.Value > 0) {
-                LockMouse();
+                if (!io.WantCaptureMouse) {
+                    LockMouse();
+                }
             } else {
                 UnlockMouse();
             }
             return false;
         }
 
-        if (e.Command == "Right") {
-            float value = std::max(-1.f, std::min(e.Value, 1.f));
-            m_Velocity.x = value;
-        }
-        if (e.Command == "Forward") {
-            float value = std::max(-1.f, std::min(e.Value, 1.f));
-            m_Velocity.z = -value;
+        if (!io.WantCaptureKeyboard) {
+            if (e.Command == "Right") {
+                float value = std::max(-1.f, std::min(e.Value, 1.f));
+                m_Velocity.x = value;
+            }
+            if (e.Command == "Forward") {
+                float value = std::max(-1.f, std::min(e.Value, 1.f));
+                m_Velocity.z = -value;
+            }
+            if (e.Command == "Sprint") {
+                if (e.Value > 0.f) {
+                    m_Speed = m_BaseSpeed * 2.f * (e.Value);
+                } else {
+                    m_Speed = m_BaseSpeed;
+                }
+            }
         }
 
         return FirstPersonInputController::OnCommand(e);
@@ -37,12 +51,13 @@ public:
     void Update(double dt)
     {
         if (glm::length2(m_Velocity) > 0) {
-            m_Position += m_Orientation * (glm::normalize(m_Velocity) * m_BaseSpeed);
+            m_Position += m_Orientation * (glm::normalize(m_Velocity) * m_Speed * (float)dt);
         }
     }
 
 protected:
     glm::vec3 m_Position = glm::vec3(0, 0, 0);
     glm::vec3 m_Velocity = glm::vec3(0, 0, 0);
-    float m_BaseSpeed = 0.1f;
+    float m_BaseSpeed = 2.0f;
+    float m_Speed = m_BaseSpeed;
 };
