@@ -6,7 +6,7 @@ using namespace boost::asio::ip;
 Client::Client() : m_Socket(m_IOService)
 {
     // Set up network stream
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
 }

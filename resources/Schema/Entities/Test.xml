@@ -31,7 +31,7 @@
 				</c:Model>
 			</Components>
 		</Entity>
-		<Entity>
+		<!--<Entity>
 			<Components>
 				<c:Player>
 					<Velocity X="0" Y="0" Z="0"/>
@@ -43,7 +43,7 @@
 					<Resource>Models/Core/UnitCube.obj</Resource>
 				</c:Model>
 			</Components>
-		</Entity>
+		</Entity>-->
 		<Entity>
 			<Components>
 				<c:Transform>
