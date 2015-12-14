@@ -33,6 +33,19 @@
 		</Entity>
 		<Entity>
 			<Components>
+				<c:Player>
+					<Velocity X="0" Y="0" Z="0"/>
+				</c:Player>
+				<c:Transform>
+					<Position X="2.5"/>
+				</c:Transform>
+				<c:Model>
+					<Resource>Models/Core/UnitCube.obj</Resource>
+				</c:Model>
+			</Components>
+		</Entity>
+		<Entity>
+			<Components>
 				<c:Transform>
 					<Position X="0" Y="-0"/>
 					<Scale X="1" Y="1" Z="1"/>
@@ -48,7 +61,7 @@
 					<Components>
 						<c:Transform>
 							<Position X="0" Y="0"/>
-							<Orientation X="0.0" Y="0" Z="0.0"/>
+							<Orientation X="0.0" Y="0" Z="1.0"/>
 						</c:Transform>
 						<c:Model>
 							<Resource>Models/Core/UnitRaptor.obj</Resource>
@@ -59,8 +72,8 @@
 						<Entity>
 							<Components>
 								<c:Transform>
-									<Position X="0" Y="0"/>
-									<Orientation X="0" Y="0" Z="0"/>
+									<Position X="-0.01" Y="0.55"/>
+									<Orientation X="0" Y="0" Z="-1"/>
 								</c:Transform>
 								<c:RaptorCopter>
 									<Speed>20</Speed>
@@ -71,19 +84,7 @@
 								<Entity>
 									<Components>
 										<c:Transform>
-											<Position X="0" Y="0.4"/>
-											<Scale X="0.1" Y="0.4" Z="0.1"/>
-										</c:Transform>
-										<c:Model>
-											<Resource>Models/Core/UnitCylinder.obj</Resource>
-											<Color R="1" G="0.4" B="0.8"/>
-										</c:Model>
-									</Components>
-								</Entity>
-								<Entity>
-									<Components>
-										<c:Transform>
-											<Position X="0" Y="0.6"/>
+											<Position X="0" Y="0"/>
 											<Scale X="1.7" Y="0.03" Z="0.1"/>
 											<Orientation X="0" Y="0" Z="0"/>
 										</c:Transform>
@@ -96,7 +97,7 @@
 								<Entity>
 									<Components>
 										<c:Transform>
-											<Position X="0" Y="0.6"/>
+											<Position X="0" Y="0"/>
 											<Scale X="1.7" Y="0.03" Z="0.1"/>
 											<Orientation X="0" Y="1.57" Z="0"/>
 										</c:Transform>
