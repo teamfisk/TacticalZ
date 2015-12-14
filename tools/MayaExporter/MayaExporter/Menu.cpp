@@ -183,6 +183,11 @@ void Menu::GetMaterialData()
 	MGlobal::displayInfo(MString() +  AllMaterials->at(0).Color[0]);
 }
 
+void Menu::GetSkeletonData()
+{
+
+}
+
 Menu::~Menu()
 {
 	//delete exportSelectedButton;

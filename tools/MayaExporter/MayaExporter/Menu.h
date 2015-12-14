@@ -42,6 +42,7 @@ public:
 	~Menu();
 
 	void GetMaterialData();
+	void GetSkeletonData();
 
 private slots:
 	void ExportSelected(bool checked);
