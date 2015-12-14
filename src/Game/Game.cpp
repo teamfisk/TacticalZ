@@ -26,6 +26,7 @@ Game::Game(int argc, char* argv[])
         m_Config->Get<int>("Video.Height", 720)
         ));
     m_Renderer->Initialize();
+    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
