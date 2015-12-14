@@ -141,12 +141,8 @@ void EditorSystem::drawUI(World* world, double dt)
                             if (field == "Scale") {
                                 ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
                             } else if (field == "Orientation") {
-                                glm::vec3 times = val / glm::vec3(glm::pi<float>());
-                                times.x = std::floor(times.x);
-                                times.y = std::floor(times.y);
-                                times.z = std::floor(times.z);
-                                glm::vec3 tempVal = val - (times*glm::pi<float>());
-                                if (ImGui::SliderFloat3(field.c_str(), glm::value_ptr(tempVal), 0.f, glm::pi<float>())) {
+                                glm::vec3 tempVal = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
+                                if (ImGui::SliderFloat3(field.c_str(), glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
                                     val = tempVal;
                                 }
                             } else {

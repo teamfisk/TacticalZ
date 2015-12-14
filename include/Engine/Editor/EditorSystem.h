@@ -1,4 +1,5 @@
 #include <imgui/imgui.h>
+#include <glm/gtx/common.hpp>
 #include "../Core/System.h"
 #include "../Core/EMousePress.h"
 #include "../Rendering/EPicking.h"
