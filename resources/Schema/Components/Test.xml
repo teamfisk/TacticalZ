@@ -1,6 +1,0 @@
-<c:Test>
-	<Integer>1</Integer>
-	<Float>1.333</Float>
-	<Vector X="1.33333" Y="2.33333" Z="3.33333"/>
-	<Quaternion X="1.33333" Y="2.33333" Z="3.33333" W="4.44444"/>
-</c:Test>
