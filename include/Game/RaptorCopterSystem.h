@@ -4,9 +4,11 @@
 class RaptorCopterSystem : public System
 {
 public:
-    RaptorCopterSystem(const EventBroker* eventBroker)
+    RaptorCopterSystem(EventBroker* eventBroker)
         : System(eventBroker, "RaptorCopter")
     { }
+
+	virtual void Initialize() { }
 
     virtual void Update(World* world, ComponentWrapper& raptorCopter, double dt) override
     {

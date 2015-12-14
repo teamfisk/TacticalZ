@@ -2,39 +2,40 @@
 
 Game::Game(int argc, char* argv[])
 {
-	ResourceManager::RegisterType<ConfigFile>("ConfigFile");
-	ResourceManager::RegisterType<Model>("Model");
-	ResourceManager::RegisterType<Texture>("Texture");
+    ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+    ResourceManager::RegisterType<Model>("Model");
+    ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
 
-	m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
-	LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
+    m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+    LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
 
-	// Create the core event broker
-	m_EventBroker = new EventBroker();
+    // Create the core event broker
+    m_EventBroker = new EventBroker();
 
     m_RenderQueueFactory = new RenderQueueFactory();
 
-	// Create the renderer
-	m_Renderer = new Renderer(m_EventBroker);
-	m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
-	m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
-	m_Renderer->SetResolution(Rectangle(
-		0,
-		0,
-		m_Config->Get<int>("Video.Width", 1280),
-		m_Config->Get<int>("Video.Height", 720)
-	));
-	m_Renderer->Initialize();
+    // Create the renderer
+    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
+    m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
+    m_Renderer->SetResolution(Rectangle(
+        0,
+        0,
+        m_Config->Get<int>("Video.Width", 1280),
+        m_Config->Get<int>("Video.Height", 720)
+        ));
+    m_Renderer->Initialize();
+    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
-	// Create input manager
-	m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
+    // Create input manager
+    m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
 
-	// Create the root level GUI frame
-	m_FrameStack = new GUI::Frame(m_EventBroker);
-	m_FrameStack->Width = m_Renderer->Resolution().Width;
-	m_FrameStack->Height = m_Renderer->Resolution().Height;
+    // Create the root level GUI frame
+    m_FrameStack = new GUI::Frame(m_EventBroker);
+    m_FrameStack->Width = m_Renderer->Resolution().Width;
+    m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
     m_World = new World();
@@ -42,31 +43,34 @@ Game::Game(int argc, char* argv[])
     if (!mapToLoad.empty()) {
         ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
     }
-    
+
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
+    m_SystemPipeline->AddSystem<PlayerSystem>();
 
-	m_LastTime = glfwGetTime();
+
+
+    m_LastTime = glfwGetTime();
 
     testIntialize();
 }
 
 Game::~Game()
 {
-	delete m_FrameStack;
-	delete m_EventBroker;
+    delete m_FrameStack;
+    delete m_EventBroker;
 }
 
 void Game::Tick()
 {
-	double currentTime = glfwGetTime();
-	double dt = currentTime - m_LastTime;
-	m_LastTime = currentTime;
+    double currentTime = glfwGetTime();
+    double dt = currentTime - m_LastTime;
+    m_LastTime = currentTime;
 
-	m_EventBroker->Swap();
-	m_InputManager->Update(dt);
-	m_EventBroker->Swap();
+    m_EventBroker->Swap();
+    m_InputManager->Update(dt);
+    m_EventBroker->Swap();
 
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
@@ -75,12 +79,12 @@ void Game::Tick()
 
     m_RenderQueueFactory->Update(m_World);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
-	m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
+    m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
     GLERROR("Game::Tick m_Renderer->Draw");
-	m_EventBroker->Swap();
-	m_EventBroker->Clear();
+    m_EventBroker->Swap();
+    m_EventBroker->Clear();
 
-	glfwPollEvents();
+    glfwPollEvents();
 }
 
 
