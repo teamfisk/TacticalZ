@@ -5,12 +5,25 @@
 EditorSystem::EditorSystem(EventBroker* eventBroker) 
     : ImpureSystem(eventBroker)
 {
+    auto config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_Enabled = config->Get<bool>("Debug.EditorEnabled", false);
+    m_Visible = m_Enabled;
+
+    if (!m_Enabled) {
+        return;
+    }
+
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &EditorSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorSystem::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EPicking, &EditorSystem::OnPicking);
 }
 
 void EditorSystem::Update(World* world, double dt)
 {
+    if (!m_Enabled) {
+        return;
+    }
+
     if (m_Widget == 0) {
         m_Widget = world->CreateEntity();
         world->AttachComponent(m_Widget, "Transform");
@@ -22,6 +35,8 @@ void EditorSystem::Update(World* world, double dt)
         
     }
 
+    auto& widgetModel = world->GetComponent(m_Widget, "Model");
+    widgetModel["Visible"] = m_Visible;
     if (m_Selection != 0) {
         if (world->HasComponent(m_Selection, "Transform")) {
             glm::vec3 pos = RenderQueueFactory::AbsolutePosition(world, m_Selection);
@@ -30,9 +45,22 @@ void EditorSystem::Update(World* world, double dt)
         } else {
             m_Selection = 0;
         }
-    } 
+    }
+
+    if (!m_Visible) {
+        return;
+    }
 
     drawUI(world, dt);
+}
+
+
+bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
+{
+    if (e.Command == "ToggleEditor" && e.Value > 0) {
+        m_Visible = !m_Visible;
+    }
+    return true;
 }
 
 bool EditorSystem::OnMousePress(const Events::MousePress& e)
@@ -146,7 +174,6 @@ void EditorSystem::drawUI(World* world, double dt)
                                     val = tempVal;
                                 }
                             } else {
-                                //ImGui::InputFloat3(field.c_str(), glm::value_ptr(val));
                                 ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
                             }
                         } else if (type == "Color") {
@@ -165,6 +192,9 @@ void EditorSystem::drawUI(World* world, double dt)
                             if (ImGui::InputFloat(field.c_str(), &tempVal, 0.01f, 1.f)) {
                                 component.SetProperty(field, static_cast<double>(tempVal));
                             }
+                        } else if (type == "bool") {
+                            auto& val = component.Property<bool>(field);
+                            ImGui::Checkbox(field.c_str(), &val);
                         }
                     }
                 }
