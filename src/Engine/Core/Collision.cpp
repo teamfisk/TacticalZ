@@ -119,11 +119,12 @@ bool RayVsModel(const Ray& ray,
         glm::vec3 e2 = modelVertices[modelIndices[++i]].Position - v0;		//v2 - v0
         glm::vec3 m = ray.Origin - v0;
         glm::vec3 MxE1 = glm::cross(m, e1);
-        glm::vec3 DxE2 = glm::cross(ray.Direction, e2);
+        glm::vec3 DxE2 = glm::cross(ray.Direction, e2);//pVec
         float DetInv = glm::dot(e1, DxE2);
         if (std::abs(DetInv) < FLT_EPSILON) {
             continue;
         }
+        DetInv = 1.0f / DetInv;
         float dist = glm::dot(e2, MxE1) * DetInv;
         if (dist >= outDistance) {
             continue;

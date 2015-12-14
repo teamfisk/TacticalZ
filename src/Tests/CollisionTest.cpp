@@ -127,7 +127,8 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
     maxPos = glm::vec3(0.5f, 0.5f, 0.5f);
     someAABB = AABB(minPos, maxPos);
     ResourceManager::RegisterType<RawModel>("RawModel");
-    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitBox.obj");
+    //auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitBox.obj");
+    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitCube.obj");
     BOOST_CHECK(unitBox != nullptr);
 
     for (size_t i = 0; i < 1000000; i++)
