@@ -9,6 +9,9 @@
 #include "GUI/Frame.h"
 #include "Core/World.h"
 #include "Rendering/RenderQueueFactory.h"
+#include "Input/InputProxy.h"
+#include "Input/KeyboardInputHandler.h"
+#include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
 #include "Core/EntityXMLFile.h"
 #include "Core/SystemPipeline.h"
@@ -30,16 +33,17 @@ private:
 	EventBroker* m_EventBroker;
 	IRenderer* m_Renderer;
 	InputManager* m_InputManager;
+    InputProxy* m_InputProxy;
 	GUI::Frame* m_FrameStack;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
     RenderQueueFactory* m_RenderQueueFactory;
 
-    EventRelay<Game, Events::KeyUp> m_EKeyUp;
-    bool testOnKeyUp(const Events::KeyUp& e);
+    EventRelay<Game, Events::InputCommand> m_EInputCommand;
+    bool debugOnInputCommand(const Events::InputCommand& e);
 
-    void testIntialize();
-    void testTick(double dt);
+    void debugInitialize();
+    void debugTick(double dt);
 };
 
 #endif

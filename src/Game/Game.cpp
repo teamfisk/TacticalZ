@@ -31,6 +31,10 @@ Game::Game(int argc, char* argv[])
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
+    m_InputProxy = new InputProxy(m_EventBroker);
+    m_InputProxy->AddHandler<KeyboardInputHandler>();
+    m_InputProxy->AddHandler<MouseInputHandler>();
+    m_InputProxy->LoadBindings("Input.ini");
 
     // Create the root level GUI frame
     m_FrameStack = new GUI::Frame(m_EventBroker);
@@ -53,7 +57,7 @@ Game::Game(int argc, char* argv[])
 
     m_LastTime = glfwGetTime();
 
-    testIntialize();
+    debugInitialize();
 }
 
 Game::~Game()
@@ -68,13 +72,20 @@ void Game::Tick()
     double dt = currentTime - m_LastTime;
     m_LastTime = currentTime;
 
+    // Handle input in a weird looking but responsive way
+    m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
     m_InputManager->Update(dt);
+    m_EventBroker->Swap();
+    m_InputProxy->Update(dt);
+    m_EventBroker->Swap();
+    m_EventBroker->Clear();
+    m_InputProxy->Process();
     m_EventBroker->Swap();
 
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
-    testTick(dt);
+    debugTick(dt);
     m_Renderer->Update(dt);
 
     m_RenderQueueFactory->Update(m_World);
@@ -88,9 +99,9 @@ void Game::Tick()
 }
 
 
-bool Game::testOnKeyUp(const Events::KeyUp& e)
+bool Game::debugOnInputCommand(const Events::InputCommand& e)
 {
-    if (e.KeyCode == GLFW_KEY_R) {
+    if (e.Command == "DebugReload" && e.Value == 1) {
         std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
         if (!mapToLoad.empty()) {
             delete m_World;
@@ -103,12 +114,12 @@ bool Game::testOnKeyUp(const Events::KeyUp& e)
     return false;
 }
 
-void Game::testIntialize()
+void Game::debugInitialize()
 {
-    EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &Game::testOnKeyUp);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
 }
 
-void Game::testTick(double dt)
+void Game::debugTick(double dt)
 {
     m_EventBroker->Process<Game>();
 }
