@@ -39,7 +39,7 @@ void EditorSystem::Update(World* world, double dt)
     widgetModel["Visible"] = m_Visible;
     if (m_Selection != 0) {
         if (world->HasComponent(m_Selection, "Transform")) {
-            glm::vec3 pos = RenderQueueFactory::AbsolutePosition(world, m_Selection);
+            glm::vec3 pos = RenderSystem::AbsolutePosition(world, m_Selection);
             auto widgetTransform = world->GetComponent(m_Widget, "Transform");
             widgetTransform["Position"] = pos;
         } else {

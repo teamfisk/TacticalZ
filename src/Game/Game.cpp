@@ -14,8 +14,6 @@ Game::Game(int argc, char* argv[])
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-    m_RenderQueueFactory = new RenderQueueFactory(m_EventBroker);
-
     // Create a world
     m_World = new World();
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
@@ -49,12 +47,13 @@ Game::Game(int argc, char* argv[])
     m_FrameStack->Height = m_Renderer->Resolution().Height;
 
    
-
+    m_RenderQueues = new RenderQueueCollection();
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
     m_SystemPipeline->AddSystem<EditorSystem>();
+    m_SystemPipeline->AddSystem<RenderSystem>(m_RenderQueues);
 
     m_LastTime = glfwGetTime();
 
@@ -90,9 +89,8 @@ void Game::Tick()
     debugTick(dt);
     m_Renderer->Update(dt);
 
-    m_RenderQueueFactory->Update(m_World);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
-    m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
+    m_Renderer->Draw(*m_RenderQueues);
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();

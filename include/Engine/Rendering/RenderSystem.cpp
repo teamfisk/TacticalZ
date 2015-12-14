@@ -1,30 +1,19 @@
-#include "Rendering/RenderQueueFactory.h"
+#include "RenderSystem.h"
 
-
-RenderQueueFactory::RenderQueueFactory(EventBroker* eventBroker)
+RenderSystem::RenderSystem(EventBroker* eventBrokerer, RenderQueueCollection* renderQueues)
+    :ImpureSystem(eventBrokerer)
 {
-    m_RenderQueues = RenderQueueCollection();
-    m_EventBroker = eventBroker;
+    m_RenderQueues = renderQueues;
+    Initialize();
 }
 
-void RenderQueueFactory::Update(World* world)
+
+void RenderSystem::Initialize()
 {
-    m_RenderQueues.Clear();
-    FillModels(world, &m_RenderQueues.Forward);
-    FillLights(world, &m_RenderQueues.Lights);
+
 }
 
-glm::mat4 RenderQueueFactory::ModelMatrix(World* world, EntityID entity)
-{
-    glm::vec3 position = AbsolutePosition(world, entity);
-    glm::quat orientation = AbsoluteOrientation(world, entity);
-    glm::vec3 scale = AbsoluteScale(world, entity);
-
-    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(orientation) * glm::scale(scale);
-    return modelMatrix;
-}
-
-glm::vec3 RenderQueueFactory::AbsolutePosition(World* world, EntityID entity)
+glm::vec3 RenderSystem::AbsolutePosition(World* world, EntityID entity)
 {
     glm::vec3 position;
 
@@ -38,11 +27,11 @@ glm::vec3 RenderQueueFactory::AbsolutePosition(World* world, EntityID entity)
         }
         entity = parent;
     } while (entity != 0);
-   
+
     return position;
 }
 
-glm::quat RenderQueueFactory::AbsoluteOrientation(World* world, EntityID entity)
+glm::quat RenderSystem::AbsoluteOrientation(World* world, EntityID entity)
 {
     glm::quat orientation;
 
@@ -51,11 +40,11 @@ glm::quat RenderQueueFactory::AbsoluteOrientation(World* world, EntityID entity)
         orientation = glm::quat((glm::vec3)transform["Orientation"]) * orientation;
         entity = world->GetParent(entity);
     } while (entity != 0);
-    
+
     return orientation;
 }
 
-glm::vec3 RenderQueueFactory::AbsoluteScale(World* world, EntityID entity)
+glm::vec3 RenderSystem::AbsoluteScale(World* world, EntityID entity)
 {
     glm::vec3 scale(1.f);
 
@@ -68,7 +57,17 @@ glm::vec3 RenderQueueFactory::AbsoluteScale(World* world, EntityID entity)
     return scale;
 }
 
-void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
+glm::mat4 RenderSystem::ModelMatrix(World* world, EntityID entity)
+{
+    glm::vec3 position = AbsolutePosition(world, entity);
+    glm::quat orientation = AbsoluteOrientation(world, entity);
+    glm::vec3 scale = AbsoluteScale(world, entity);
+
+    glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(orientation) * glm::scale(scale);
+    return modelMatrix;
+}
+
+void RenderSystem::FillModels(World* world, RenderQueue* renderQueue)
 {
     auto models = world->GetComponents("Model");
     if (models == nullptr) {
@@ -127,14 +126,15 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
                 renderQueue->Add(job);
             }
 
-            
-            
+
+
         }
     }
 }
 
-void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)
+
+void RenderSystem::Update(World* world, double dt)
 {
-
+    m_RenderQueues->Clear();
+    FillModels(world, &m_RenderQueues->Forward);
 }
-

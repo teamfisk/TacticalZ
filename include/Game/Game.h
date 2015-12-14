@@ -8,7 +8,6 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
-#include "Rendering/RenderQueueFactory.h"
 #include "Input/InputProxy.h"
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
@@ -18,6 +17,7 @@
 #include "RaptorCopterSystem.h"
 #include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
+#include "Rendering/RenderSystem.h"
 
 class Game
 {
@@ -38,7 +38,7 @@ private:
 	GUI::Frame* m_FrameStack;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    RenderQueueFactory* m_RenderQueueFactory;
+    RenderQueueCollection* m_RenderQueues;
 
     EventRelay<Game, Events::InputCommand> m_EInputCommand;
     bool debugOnInputCommand(const Events::InputCommand& e);

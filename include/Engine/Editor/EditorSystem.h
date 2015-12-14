@@ -5,7 +5,7 @@
 #include "../Core/ConfigFile.h"
 #include "../Input/EInputCommand.h"
 #include "../Rendering/EPicking.h"
-#include "../Rendering/RenderQueueFactory.h"
+#include "../Rendering/RenderSystem.h"
 
 class EditorSystem : public ImpureSystem
 {
