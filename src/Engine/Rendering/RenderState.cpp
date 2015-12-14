@@ -9,7 +9,6 @@ bool RenderState::Enable(GLenum GLEnable)
 {
     if(glIsEnabled(GLEnable))
     {
-        LOG_WARNING("Trying to enable somthing that is already enabled.");
         return false;
     }
     m_Enables.push_back(GLEnable);
