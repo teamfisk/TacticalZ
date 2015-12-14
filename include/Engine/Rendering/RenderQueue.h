@@ -8,6 +8,7 @@
 #include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
 #include "../Core/Entity.h"
+#include "Font.h"
 
 class Model;
 class Skeleton;
@@ -80,6 +81,19 @@ struct SpriteJob : RenderJob
 	}
 };
 
+struct TextJob : RenderJob
+{
+    glm::mat4 ModelMatrix;
+    glm::vec4 Color;
+    std::string Content;
+    Font* Resource;
+
+    void CalculateHash() override
+    {
+        Hash = 0;
+    }
+};
+
 struct PointLightJob : RenderJob
 {
 	glm::vec3 Position;
@@ -137,17 +151,20 @@ struct RenderQueueCollection
 {
 	RenderQueue Forward;
 	RenderQueue Lights;
+    RenderQueue Text;
 
 	void Clear()
 	{
 		Forward.Clear();
 		Lights.Clear();
+        Text.Clear();
 	}
 
 	void Sort()
 	{
 		Forward.Sort();
 		Lights.Sort();
+        Text.Sort();
 	}
 };
 

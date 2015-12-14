@@ -11,6 +11,7 @@ void RenderQueueFactory::Update(World* world)
     m_RenderQueues.Clear();
     FillModels(world, &m_RenderQueues.Forward);
     FillLights(world, &m_RenderQueues.Lights);
+    FillText(world, &m_RenderQueues.Text);
 }
 
 glm::mat4 RenderQueueFactory::ModelMatrix(World* world, EntityID entity)
@@ -71,6 +72,9 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
     }
 
     for (auto& modelC : *models) {
+       
+
+
         std::string resource = modelC["Resource"];
         if (resource.empty()) {
             continue;
@@ -101,5 +105,34 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)
 {
 
+}
+
+void RenderQueueFactory::FillText(World* world, RenderQueue* renderQueue)
+{
+    auto texts = world->GetComponents("Text");
+    if (texts == nullptr) {
+        return;
+    }
+
+    for (auto& textC : *texts) {
+        
+
+        std::string resource = textC["Resource"];
+        if (resource.empty()) {
+            continue;
+        }
+        Font* font = ResourceManager::Load<Font>(resource);
+
+        glm::vec4 color = textC["Color"];
+        std::string content = textC["Content"];
+        
+        TextJob job;
+        job.Color = color;
+        job.Content = content;
+        job.Resource = font;
+        job.ModelMatrix = ModelMatrix(world, textC.EntityID);
+
+        renderQueue->Add(job);
+    }
 }
 

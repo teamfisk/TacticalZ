@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Text">
+		<xs:annotation>
+			<xs:documentation>A visible font loaded from disk</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Content" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>the content of the string printed</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Resource" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>font file</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Color" type="t:Color" minOccurs="0">
+					<xs:annotation><xs:documentation>Color</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Visible" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Wether the text is visible or not</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

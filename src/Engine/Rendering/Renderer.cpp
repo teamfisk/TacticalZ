@@ -156,7 +156,7 @@ void Renderer::Draw(RenderQueueCollection& rq)
    // DrawScreenQuad(m_PickingTexture);
     
     DrawScene(rq);
-    m_TextRenderer->Draw(m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
+    m_TextRenderer->Draw(rq.Text,m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
 	glfwSwapBuffers(m_Window);
 }
 
@@ -272,6 +272,7 @@ void Renderer::PickingPass(RenderQueueCollection& rq)
 
     m_EventBroker->Publish(pickEvent);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 

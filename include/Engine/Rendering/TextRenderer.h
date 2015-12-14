@@ -9,6 +9,7 @@
 #include "ShaderProgram.h"
 #include "Font.h"
 #include "../Core/ResourceManager.h"
+#include "RenderQueue.h"
 
 class TextRenderer
 {
@@ -16,14 +17,14 @@ public:
     TextRenderer();
     void Initialize();
     void Update();
-    void Draw(glm::mat4 projection, glm::mat4 view);
+    void Draw(RenderQueue &rq, glm::mat4 projection, glm::mat4 view);
 
 private:
     Font* font;
    
     GLuint VAO, VBO;
 
-    void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color, glm::mat4 projection, glm::mat4 view);
+    void RenderText(std::string text, Font* font, GLfloat scale, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 
     ShaderProgram m_TextProgram;
 

@@ -24,6 +24,17 @@
 		<Entity>
 			<Components>
 				<c:Transform>
+					<Scale X="1" Y="1" Z="1"/>
+				</c:Transform>
+				<c:Text>
+					<Resource>Fonts/arial.ttf</Resource>
+					<Content>Hej I am component text</Content>
+				</c:Text>
+			</Components>
+		</Entity>
+		<Entity>
+			<Components>
+				<c:Transform>
 					<Position X="1.5"/>
 				</c:Transform>
 				<c:Model>

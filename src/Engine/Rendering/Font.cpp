@@ -27,7 +27,7 @@ Font::Font(std::string path)
         if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
             continue;
         }
-        printf("Char: %c\n", c);
+
         //Generate texture
         GLuint texture;
         glGenTextures(1, &texture);
