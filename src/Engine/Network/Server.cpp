@@ -121,7 +121,7 @@ void Server::ParseMessageType(char * data, size_t length)
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     memcpy(&m_PacketID, data, sizeof(int)); //Read new packet id
     MoveMessageHead(data, length, sizeof(int));
-    IdentifyPacketLoss();
+    //IdentifyPacketLoss(); // crashed when it started to spam!
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
@@ -400,8 +400,6 @@ void Server::IdentifyPacketLoss()
     // if no packets lost, difference should be equal to 1
     int difference = m_PacketID - m_PreviousPacketID;
     if (difference != 1) {
-        for (int i = m_PreviousPacketID + 1; i < m_PacketID; i++) {
-            LOG_INFO("Packet %i was lost...", i);
-        }
+        LOG_INFO("%i Packet(s) were lost...", difference);
     }
 }
