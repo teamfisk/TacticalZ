@@ -1,6 +1,7 @@
 #include <imgui/imgui.h>
 #include "../OpenGL.h"
 #include "IRenderer.h"
+#include "RenderState.h"
 #include "../Core/EventBroker.h"
 #include "../Core/EMousePress.h"
 #include "../Core/EMouseRelease.h"
@@ -9,6 +10,22 @@
 #include "../Core/EKeyDown.h"
 #include "../Core/EKeyUp.h"
 #include "../Core/EKeyboardChar.h"
+
+class ImGuiRenderState : public RenderState
+{
+public:
+    ImGuiRenderState()
+        : RenderState()
+    {
+        BindFramebuffer(0);
+        Enable(GL_BLEND);
+        BlendEquation(GL_FUNC_ADD);
+        BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        Disable(GL_CULL_FACE);
+        Disable(GL_DEPTH_TEST);
+        Enable(GL_SCISSOR_TEST);
+    }
+};
 
 class ImGuiRenderPass
 {
