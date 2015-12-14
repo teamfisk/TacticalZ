@@ -6,7 +6,7 @@ using namespace boost::asio::ip;
 Client::Client() : m_Socket(m_IOService)
 {
     // Set up network stream
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
 }
@@ -77,19 +77,19 @@ void Client::SendSnapshotToServer()
     Package message(MessageType::Event, m_SendPacketID);
     message.AddString(m_NextSnapshot.InputForward);
     Send(message);
-    m_NextSnapshot.InputRight = "";
+    m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
     // See if any movement keys are down
     // We dont care if it's overwritten by later
     // if statement. Watcha gonna do, right!
     if (m_IsWASDKeyDown.W) {
-        m_NextSnapshot.InputRight = "+Forward";
+        m_NextSnapshot.InputForward = "+Forward";
     }
     if (m_IsWASDKeyDown.A) {
         m_NextSnapshot.InputRight = "-Right";
     }
     if (m_IsWASDKeyDown.S) {
-        m_NextSnapshot.InputRight = "-Forward";
+        m_NextSnapshot.InputForward = "-Forward";
     }
     if (m_IsWASDKeyDown.D) {
         m_NextSnapshot.InputRight = "+Right";
@@ -148,6 +148,9 @@ void Client::ParseConnect(char* data, size_t len)
 {
     memcpy(&m_PacketID, data, sizeof(int));
     m_PreviousPacketID = m_PacketID;
+    MoveMessageHead(data, len, sizeof(int));
+    memcpy(&m_PlayerID, data, sizeof(int));
+    MoveMessageHead(data, len, sizeof(int));
     std::cout << m_PacketID << ": I am player: " << m_PlayerID << std::endl;
 }
 
@@ -332,8 +335,6 @@ void Client::IdentifyPacketLoss()
     // if no packets lost, difference should be equal to 1
     int difference = m_PacketID - m_PreviousPacketID;
     if (difference != 1) {
-        for (int i = m_PreviousPacketID + 1; i < m_PacketID; i++) {
-            LOG_INFO("Packet %i was lost...", i);
-        }
+			LOG_INFO("%i Packet(s) were lost...", difference);
     }
 }
