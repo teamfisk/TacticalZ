@@ -1,6 +1,7 @@
+#include <algorithm>
+
 #include "Core/Collision.h"
 #include "Engine/GLM.h"
-#include <algorithm>
 
 namespace Collision
 {
@@ -72,6 +73,78 @@ bool AABBVsAABB(const AABB& a, const AABB& b)
         return false;
     }
     return (abs(aCenter[1] - bCenter[1]) <= (aHSize[1] + bHSize[1]));
+}
+
+bool RayVsModel(const Ray& ray, 
+    const std::vector<RawModel::Vertex>& modelVertices, 
+    const std::vector<unsigned int>& modelIndices)
+{
+    for (int i = 0; i < modelIndices.size(); ++i) {
+        glm::vec3 v0 = modelVertices[modelIndices[i]].Position;
+        glm::vec3 e1 = modelVertices[modelIndices[++i]].Position - v0;		//v1 - v0
+        glm::vec3 e2 = modelVertices[modelIndices[++i]].Position - v0;		//v2 - v0
+        glm::vec3 m = ray.Origin - v0;
+        glm::vec3 MxE1 = glm::cross(m, e1);
+        glm::vec3 DxE2 = glm::cross(ray.Direction, e2);
+        float DetInv = 1.0f / glm::dot(e1, DxE2);
+        float u = glm::dot(m, DxE2) * DetInv;
+        float v = glm::dot(ray.Direction, MxE1) * DetInv;
+        if (u < 0 && v < 0 && 1 < u + v) {
+            continue;
+        }
+        //Here, u and v are positive, u+v <= 1, and if distance is positive - triangle is hit.
+        if (0 <= glm::dot(e2, MxE1) * DetInv) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool RayVsModel(const Ray& ray,
+    const std::vector<RawModel::Vertex>& modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    float& outDistance,
+    float& outUCoord,
+    float& outVCoord)
+{
+    outDistance = INFINITY;
+    bool hit = false;
+    for (int i = 0; i < modelIndices.size(); ++i) {
+        glm::vec3 v0 = modelVertices[modelIndices[i]].Position;
+        glm::vec3 e1 = modelVertices[modelIndices[++i]].Position - v0;		//v1 - v0
+        glm::vec3 e2 = modelVertices[modelIndices[++i]].Position - v0;		//v2 - v0
+        glm::vec3 m = ray.Origin - v0;
+        glm::vec3 MxE1 = glm::cross(m, e1);
+        glm::vec3 DxE2 = glm::cross(ray.Direction, e2);
+        float DetInv = 1.0f / glm::dot(e1, DxE2);
+        float dist = glm::dot(e2, MxE1) * DetInv;
+        if (dist >= outDistance) {
+            continue;
+        }
+        float u = glm::dot(m, DxE2) * DetInv;
+        float v = glm::dot(ray.Direction, MxE1) * DetInv;
+        //If u and v are positive, u+v <= 1, dist is positive, and less than closest.
+        if (0 <= u && 0 <= v && u + v <= 1 && 0 <= dist) {
+            outDistance = dist;
+            outUCoord = u;
+            outVCoord = v;
+            hit = true;
+        }
+    }
+    return hit;
+}
+
+bool RayVsModel(const Ray& ray,
+    const std::vector<RawModel::Vertex>& modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    glm::vec3& outHitPosition)
+{
+    float u;
+    float v;
+    float dist;
+    bool hit = RayVsModel(ray, modelVertices, modelIndices, dist, u, v);
+    outHitPosition = ray.Origin + dist * ray.Direction;
+    return hit;
 }
 
 }
