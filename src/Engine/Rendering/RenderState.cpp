@@ -9,7 +9,7 @@ bool RenderState::Enable(GLenum GLEnable)
 {
     if(glIsEnabled(GLEnable))
     {
-        LOG_WARNING("Trying to enable somthing that is already enabled.");
+        //LOG_WARNING("Trying to enable somthing that is already enabled.");
         return false;
     }
     m_Enables.push_back(GLEnable);
@@ -25,17 +25,11 @@ bool RenderState::CullFace(GLenum GLCullFace)
 {
     if(!glIsEnabled(GL_CULL_FACE))
     {
-        LOG_ERROR("Setting GL_CULL_FACE without enabling it.");
-        return false;
+        //LOG_ERROR("Setting GL_CULL_FACE without enabling it.");
+        Enable(GL_CULL_FACE);
     }
     
-    GLint a;
-    glGetIntegerv(GL_CULL_FACE_MODE, &a);
-    if(a != GL_BACK)
-    {
-        //LOG_INFO("Setting Cullface to back, unessesary since this is already default.");
-        glCullFace(GLCullFace);
-    }
+    glCullFace(GLCullFace);
     if (GLERROR("RenderState::CullFace"))
     {
         return false;
