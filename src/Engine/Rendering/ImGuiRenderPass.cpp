@@ -288,8 +288,8 @@ bool ImGuiRenderPass::createFontsTexture()
     ImGuiIO& io = ImGui::GetIO();
 
     io.Fonts->AddFontFromFileTTF("Fonts/DroidSans.ttf", 13.f);
-    io.Fonts->AddFontFromFileTTF("Fonts/ProggyClean.ttf", 13.f);
-    io.Fonts->AddFontFromFileTTF("Fonts/ProggyTiny.ttf", 10.f);
+    //io.Fonts->AddFontFromFileTTF("Fonts/ProggyClean.ttf", 13.f);
+    //io.Fonts->AddFontFromFileTTF("Fonts/ProggyTiny.ttf", 10.f);
     //io.Fonts->AddFontFromFileTTF("Fonts/Karla-Regular.ttf", 15.0f);
 
     unsigned char* pixels;
