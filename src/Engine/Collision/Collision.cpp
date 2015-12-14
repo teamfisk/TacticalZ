@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "Core/Collision.h"
+#include "Collision/Collision.h"
 #include "Engine/GLM.h"
 
 namespace Collision
