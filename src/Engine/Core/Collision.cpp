@@ -86,10 +86,14 @@ bool RayVsModel(const Ray& ray,
         glm::vec3 m = ray.Origin - v0;
         glm::vec3 MxE1 = glm::cross(m, e1);
         glm::vec3 DxE2 = glm::cross(ray.Direction, e2);
-        float DetInv = 1.0f / glm::dot(e1, DxE2);
+        float DetInv = glm::dot(e1, DxE2);
+        if (std::abs(DetInv) < FLT_EPSILON) {
+            continue;
+        }
+        DetInv = 1.0f / DetInv;
         float u = glm::dot(m, DxE2) * DetInv;
         float v = glm::dot(ray.Direction, MxE1) * DetInv;
-        if (u < 0 && v < 0 && 1 < u + v) {
+        if (u < 0 || v < 0 || 1 < u + v) {
             continue;
         }
         //Here, u and v are positive, u+v <= 1, and if distance is positive - triangle is hit.
@@ -116,7 +120,10 @@ bool RayVsModel(const Ray& ray,
         glm::vec3 m = ray.Origin - v0;
         glm::vec3 MxE1 = glm::cross(m, e1);
         glm::vec3 DxE2 = glm::cross(ray.Direction, e2);
-        float DetInv = 1.0f / glm::dot(e1, DxE2);
+        float DetInv = glm::dot(e1, DxE2);
+        if (std::abs(DetInv) < FLT_EPSILON) {
+            continue;
+        }
         float dist = glm::dot(e2, MxE1) * DetInv;
         if (dist >= outDistance) {
             continue;
