@@ -14,10 +14,17 @@ Game::Game(int argc, char* argv[])
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-    m_RenderQueueFactory = new RenderQueueFactory();
+    m_RenderQueueFactory = new RenderQueueFactory(m_EventBroker);
+
+    // Create a world
+    m_World = new World();
+    std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
+    if (!mapToLoad.empty()) {
+        ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
+    }
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_World);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle(
@@ -27,7 +34,7 @@ Game::Game(int argc, char* argv[])
         m_Config->Get<int>("Video.Height", 720)
         ));
     m_Renderer->Initialize();
-    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
@@ -41,12 +48,7 @@ Game::Game(int argc, char* argv[])
     m_FrameStack->Width = m_Renderer->Resolution().Width;
     m_FrameStack->Height = m_Renderer->Resolution().Height;
 
-    // Create a world
-    m_World = new World();
-    std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
-    if (!mapToLoad.empty()) {
-        ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
-    }
+   
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);

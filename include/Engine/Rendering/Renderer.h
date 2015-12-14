@@ -32,8 +32,9 @@ enum lightType
 class Renderer : public IRenderer
 {
 public:
-    Renderer(EventBroker* eventBroker) 
+    Renderer(EventBroker* eventBroker, World* world) 
         : m_EventBroker(eventBroker)
+        , m_World(world)
     { }
 
     virtual void Initialize() override;
@@ -43,6 +44,7 @@ public:
 private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
+    World* m_World;
 
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;

@@ -32,6 +32,7 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
 
     DrawScenePassState state;
 
+    rq.Forward.Jobs.sort(DrawScenePass::DepthSort);
 
     //TODO: Render: Add code for more jobs than modeljobs.
     for (auto &job : rq.Forward) {

@@ -1,9 +1,10 @@
 #include "Rendering/RenderQueueFactory.h"
 
 
-RenderQueueFactory::RenderQueueFactory()
+RenderQueueFactory::RenderQueueFactory(EventBroker* eventBroker)
 {
     m_RenderQueues = RenderQueueCollection();
+    m_EventBroker = eventBroker;
 }
 
 void RenderQueueFactory::Update(World* world)
@@ -79,21 +80,44 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
         Model* model = ResourceManager::Load<Model>(resource);
 
         for (auto texGroup : model->TextureGroups) {
-            ModelJob job;
-            job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-            job.DiffuseTexture = texGroup.Texture.get();
-            job.NormalTexture = texGroup.NormalMap.get();
-            job.SpecularTexture = texGroup.SpecularMap.get();
-            job.Model = model;
-            job.StartIndex = texGroup.StartIndex;
-            job.EndIndex = texGroup.EndIndex;
-            job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
-            job.Color = color;
 
-            //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
-            job.Entity = modelC.EntityID;
+            if (color.a < 1.0f || texGroup.Transparency < 1.0f) {
+                //transparent stuffs
+                TransparentModelJob job;
+                job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
+                job.DiffuseTexture = texGroup.Texture.get();
+                job.NormalTexture = texGroup.NormalMap.get();
+                job.SpecularTexture = texGroup.SpecularMap.get();
+                job.Model = model;
+                job.StartIndex = texGroup.StartIndex;
+                job.EndIndex = texGroup.EndIndex;
+                job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+                job.Color = color;
 
-            renderQueue->Add(job);
+                job.Entity = modelC.EntityID;
+                job.Depth = 10.f; //insert real viewspace depth here
+
+                renderQueue->Add(job);
+            } else {
+                ModelJob job;
+                job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
+                job.DiffuseTexture = texGroup.Texture.get();
+                job.NormalTexture = texGroup.NormalMap.get();
+                job.SpecularTexture = texGroup.SpecularMap.get();
+                job.Model = model;
+                job.StartIndex = texGroup.StartIndex;
+                job.EndIndex = texGroup.EndIndex;
+                job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+                job.Color = color;
+
+                //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+                job.Entity = modelC.EntityID;
+
+                renderQueue->Add(job);
+            }
+
+            
+            
         }
     }
 }

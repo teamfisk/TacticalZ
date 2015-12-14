@@ -10,6 +10,7 @@ void Renderer::Initialize()
 	if (m_Camera == nullptr) {
 		m_Camera = m_DefaultCamera;
 	}
+    
     TEMPCreateLights();
     InitializeRenderPasses();
 
@@ -88,36 +89,6 @@ void Renderer::InitializeShaders()
 void Renderer::InputUpdate(double dt)
 {
     static DebugCameraInputController<Renderer> firstPersonInputController(m_EventBroker, -1);
-
-	glm::vec3 m_Position = m_Camera->Position();
-	if (glfwGetKey(m_Window, GLFW_KEY_O) == GLFW_PRESS)
-	{
-		m_Position = glm::vec3(0.f, 0.f, 5.f);
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		m_Position += m_Camera->Forward() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		m_Position -= m_Camera->Forward() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		m_Position += m_Camera->Right() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		m_Position -= m_Camera->Right() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-	{
-		m_CameraMoveSpeed = 5.f;
-	}
-	else {
-		m_CameraMoveSpeed = 0.5f;
-	}
-
     firstPersonInputController.Update(dt);
     m_Camera->SetOrientation(firstPersonInputController.Orientation());
 	m_Camera->SetPosition(firstPersonInputController.Position());
@@ -237,7 +208,6 @@ void Renderer::CalculateFrustum()
 {
     GLERROR("CalculateFrustum Error-1");
     m_CalculateFrustumProgram->Bind();
-    
     GLERROR("CalculateFrustum Error1");
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     GLERROR("CalculateFrustum Error2");

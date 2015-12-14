@@ -63,6 +63,37 @@ struct ModelJob : RenderJob
 	}
 };
 
+struct TransparentModelJob : RenderJob
+{
+    unsigned int ShaderID = 0;
+    unsigned int TextureID = 0;
+
+    //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+    EntityID Entity;
+
+    glm::mat4 ModelMatrix;
+    const Texture* DiffuseTexture;
+    const Texture* NormalTexture;
+    const Texture* SpecularTexture;
+    float Shininess = 0.f;
+    glm::vec4 Color;
+    const Model* Model = nullptr;
+    unsigned int StartIndex = 0;
+    unsigned int EndIndex = 0;
+
+    // Animation
+    Skeleton* Skeleton = nullptr;
+    bool NoRootMotion = true;
+    std::string AnimationName;
+    double AnimationTime = 0;
+
+    void CalculateHash() override
+    {
+        Hash = TextureID;
+    }
+};
+
+
 struct SpriteJob : RenderJob
 {
 	unsigned int ShaderID = 0;

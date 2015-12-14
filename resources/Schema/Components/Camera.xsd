@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Camera">
+		<xs:annotation>
+			<xs:documentation>It's a camera thingy!</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="AspectRatio" type="t:double" minOccurs="0"/>
+				<xs:element name="FOV" type="t:double" minOccurs="0"/>
+				<xs:element name="NearClip" type="t:double" minOccurs="0"/>
+				<xs:element name="FarClip" type="t:double" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
