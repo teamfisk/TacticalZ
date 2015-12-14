@@ -6,6 +6,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -88,8 +89,9 @@ void Game::Tick()
     m_Renderer->Update(dt);
 
     m_RenderQueueFactory->Update(m_World);
+    GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
-
+    GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
 
