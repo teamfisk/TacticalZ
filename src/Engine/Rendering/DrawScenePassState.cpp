@@ -4,7 +4,7 @@
 DrawScenePassState::DrawScenePassState()
 {
     GLERROR("---");
-    BindBuffer(0);
+    BindFramebuffer(0);
     GLERROR("---");
     Enable(GL_DEPTH_TEST);
     Enable(GL_CULL_FACE);
