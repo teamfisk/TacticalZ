@@ -23,15 +23,19 @@ glm::mat4 RenderQueueFactory::ModelMatrix(World* world, EntityID entity)
     return modelMatrix;
 }
 
-
 glm::vec3 RenderQueueFactory::AbsolutePosition(World* world, EntityID entity)
 {
     glm::vec3 position;
 
     do {
         ComponentWrapper transform = world->GetComponent(entity, "Transform");
-        position += (glm::vec3)transform["Position"];
-        entity = world->GetParent(entity);
+        EntityID parent = world->GetParent(entity);
+        if (parent != 0) {
+            position += AbsoluteOrientation(world, parent) * (glm::vec3)transform["Position"];
+        } else {
+            position += (glm::vec3)transform["Position"];
+        }
+        entity = parent;
     } while (entity != 0);
    
     return position;
@@ -52,15 +56,15 @@ glm::quat RenderQueueFactory::AbsoluteOrientation(World* world, EntityID entity)
 
 glm::vec3 RenderQueueFactory::AbsoluteScale(World* world, EntityID entity)
 {
-    ComponentWrapper transform = world->GetComponent(entity, "Transform");
-    glm::vec3 scale = (glm::vec3)transform["Scale"];
+    glm::vec3 scale(1.f);
 
-    EntityID parent = world->GetParent(entity);
-    if (parent != 0) {
-        return AbsoluteScale(world, parent) * scale;
-    } else {
-        return scale;
-    }
+    do {
+        ComponentWrapper transform = world->GetComponent(entity, "Transform");
+        scale *= (glm::vec3)transform["Scale"];
+        entity = world->GetParent(entity);
+    } while (entity != 0);
+
+    return scale;
 }
 
 void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
@@ -71,12 +75,19 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
     }
 
     for (auto& modelC : *models) {
+        bool visible = modelC["Visible"];
+        if (!visible) {
+            continue;
+        }
         std::string resource = modelC["Resource"];
         if (resource.empty()) {
             continue;
         }
         glm::vec4 color = modelC["Color"];
         Model* model = ResourceManager::Load<Model>(resource);
+        if (model == nullptr) {
+            model = ResourceManager::Load<Model>("Models/Core/Error.obj");
+        }
 
         for (auto texGroup : model->TextureGroups) {
             ModelJob job;

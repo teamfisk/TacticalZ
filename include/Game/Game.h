@@ -17,6 +17,7 @@
 #include "Core/SystemPipeline.h"
 #include "RaptorCopterSystem.h"
 #include "PlayerSystem.h"
+#include "Editor/EditorSystem.h"
 
 // Network
 #include <boost/thread.hpp>

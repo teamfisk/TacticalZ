@@ -32,10 +32,9 @@ glm::vec3 ScreenCoords::ToWorldPos(glm::vec2 screenCoord, float depth, float scr
 ScreenCoords::PixelData ScreenCoords::ToPixelData(float x, float y, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
 {
     PickDataBuffer->Bind();
-    unsigned char pdata[2];
-    glReadPixels(x, y, 1, 1, GL_RG, GL_UNSIGNED_BYTE, &pdata);
+    unsigned char pdata[3];
+    glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &pdata);
     PickDataBuffer->Unbind();
-
 
     glBindFramebuffer(GL_FRAMEBUFFER, DepthBuffer);
     float depthData;

@@ -48,26 +48,31 @@ void PickingPass::Draw(RenderQueueCollection& rq)
     m_PickingColorsToEntity.clear();
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
-    int r = 1;
+    int r = 0;
     int g = 0;
     //TODO: Render: Add code for more jobs than modeljobs.
 
     GLuint ShaderHandle = m_PickingProgram->GetHandle();
     m_PickingProgram->Bind();
 
+    std::map<EntityID, glm::vec2> entityColors;
+
     for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
-            //---------------
-            //TODO: Renderer: IMPORTANT: Fixa detta så det inte loopar igenom listan varje frame.
-            //---------------
             int pickColor[2] = { r, g };
-            for (auto i : m_PickingColorsToEntity) {
-                if (modelJob->Entity == i.second) {
-                    pickColor[0] = i.first.x;
-                    pickColor[1] = i.first.y;
-                    r -= 1;
+            auto color = entityColors.find(modelJob->Entity);
+            if (color != entityColors.end()) {
+                pickColor[0] = color->second[0];
+                pickColor[1] = color->second[1];
+            } else {
+                entityColors[modelJob->Entity] = glm::vec2(pickColor[0], pickColor[1]);
+                if (r + 10 > 255) {
+                    r = 0;
+                    g += 1;
+                } else {
+                    r += 1;
                 }
             }
             m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
@@ -82,26 +87,26 @@ void PickingPass::Draw(RenderQueueCollection& rq)
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
             glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
-            r += 1;
-            if (r > 255) {
-                r = 0;
-                g += 1;
-            }
         }
     }
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
 
     //Publish pick event every frame with the pick data that can be picked by the event
+    int fbWidth;
+    int fbHeight;
+    glfwGetFramebufferSize(m_Renderer->Window(), &fbWidth, &fbHeight);
     Events::Picking pickEvent = Events::Picking(
         &m_PickingBuffer,
         &m_DepthBuffer,
         m_Renderer->Camera()->ProjectionMatrix(),
         m_Renderer->Camera()->ViewMatrix(),
-        m_Renderer->Resolution(),
+        Rectangle(fbWidth, fbHeight),
         &m_PickingColorsToEntity);
 
     m_EventBroker->Publish(pickEvent);
+
+    delete state;
 }
 
 void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const

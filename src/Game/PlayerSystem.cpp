@@ -1,7 +1,6 @@
 #include "PlayerSystem.h"
 
-
-void PlayerSystem::Update(World * world, ComponentWrapper & player, double dt)
+void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, double dt)
 {
     //if (player["Forward"]) {
     //    ((glm::vec3&)player["Velocity"]).z = m_Speed * float(dt) * -1;

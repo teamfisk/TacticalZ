@@ -60,7 +60,6 @@ file(GLOB SOURCE_FILES_Rendering_Util
     "${INCLUDE_PATH}/Rendering/Util/*.h"
     "Rendering/Util/*.cpp"
 )
-
 source_group(Rendering FILES ${SOURCE_FILES_Rendering})
 source_group(Rendering\\Util FILES ${SOURCE_FILES_Rendering_Util})
 
@@ -70,6 +69,12 @@ file(GLOB SOURCE_FILES_GUI
 )
 source_group(GUI FILES ${SOURCE_FILES_GUI})
 
+file(GLOB SOURCE_FILES_Editor
+	"${INCLUDE_PATH}/Editor/*.h"
+	"Editor/*.cpp"
+)
+source_group(Editor FILES ${SOURCE_FILES_Editor})
+
 set(SOURCE_FILES
     ${SOURCE_FILES_Core}
     ${SOURCE_FILES_Core_Util}
@@ -78,6 +83,10 @@ set(SOURCE_FILES
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
     ${SOURCE_FILES_Rendering_Util}
+	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui.cpp
+	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_draw.cpp
+	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_demo.cpp
+	${SOURCE_FILES_Editor}
 )
 
 set(LIBRARIES

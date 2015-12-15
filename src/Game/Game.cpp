@@ -52,7 +52,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
-
+    m_SystemPipeline->AddSystem<EditorSystem>();
 	// Invoke network
 	if(m_Config->Get<bool>("Networking.StartNetwork", false) == true)
 		boost::thread workerThread(&Game::NetworkFunction, this);
@@ -73,6 +73,8 @@ Game::~Game()
 
 void Game::Tick()
 {
+    glfwPollEvents();
+
     double currentTime = glfwGetTime();
     double dt = currentTime - m_LastTime;
     m_LastTime = currentTime;
@@ -84,7 +86,6 @@ void Game::Tick()
     m_EventBroker->Swap();
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
-    m_EventBroker->Clear();
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
@@ -100,8 +101,6 @@ void Game::Tick()
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-
-    glfwPollEvents();
 }
 
 
