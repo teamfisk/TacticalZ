@@ -6,7 +6,7 @@ using namespace boost::asio::ip;
 Client::Client() : m_Socket(m_IOService)
 {
     // Set up network stream
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
 }
@@ -61,7 +61,8 @@ void Client::ReadFromServer()
     while (m_ThreadIsRunning) {
         if (m_Socket.available()) {
             bytesRead = Receive(readBuf, INPUTSIZE);
-            ParseMessageType(readBuf, bytesRead);
+            Package package(readBuf,bytesRead);
+            ParseMessageType(package);
         }
         std::clock_t currentTime = std::clock();
         if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
@@ -107,21 +108,17 @@ void Client::SendSnapshotToServer()
     }
 }
 
-void Client::ParseMessageType(char* data, size_t length)
+void Client::ParseMessageType(Package& package)
 {
-    int messageType = -1;
-    memcpy(&messageType, data, sizeof(int)); // Read what type off message was sent from server
-    MoveMessageHead(data, length, sizeof(int)); // Move the message head to know where to read from
-
+    int messageType = package.PopFrontPrimitive<int>();
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
-    memcpy(&m_PacketID, data, sizeof(int)); //Read new packet id
-    MoveMessageHead(data, length, sizeof(int));
+    m_PacketID = package.PopFrontPrimitive<int>(); //Read new packet id
     IdentifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
-        ParseConnect(data, length);
+        ParseConnect(package);
         break;
     case MessageType::ClientPing:
         ParsePing();
@@ -132,19 +129,19 @@ void Client::ParseMessageType(char* data, size_t length)
     case MessageType::Message:
         break;
     case MessageType::Snapshot:
-        ParseSnapshot(data, length);
+        ParseSnapshot(package);
         break;
     case MessageType::Disconnect:
         break;
     case MessageType::Event:
-        ParseEventMessage(data, length);
+        ParseEventMessage(package);
         break;
     default:
         break;
     }
 }
 
-void Client::ParseConnect(char* data, size_t len)
+void Client::ParseConnect(Package& package)
 {
     memcpy(&m_PacketID, data, sizeof(int));
     m_PreviousPacketID = m_PacketID;
@@ -168,7 +165,7 @@ void Client::ParseServerPing()
     //std::cout << "Parsing ping." << std::endl;
 }
 
-void Client::ParseEventMessage(char* data, size_t length)
+void Client::ParseEventMessage(Package& package)
 {
     int Id = -1;
     std::string command = std::string(data);
@@ -187,7 +184,7 @@ void Client::ParseEventMessage(char* data, size_t length)
 
 void Client::ParseSnapshot(char* data, size_t length)
 {
-    std::cout << m_PacketID << ": Parsing incoming snapshot." << std::endl;
+    //std::cout << m_PacketID << ": Parsing incoming snapshot." << std::endl;
     std::string tempName;
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         // We're checking for empty name for now. This might not be the best way,

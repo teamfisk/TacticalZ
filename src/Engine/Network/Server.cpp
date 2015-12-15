@@ -56,7 +56,8 @@ void Server::ReadFromClients()
         if (m_ThreadIsRunning && m_Socket.available()) {
             try {
                 bytesRead = Receive(readBuf, INPUTSIZE);
-                ParseMessageType(readBuf, bytesRead);
+                Package package(readBuf, bytesRead);
+                ParseMessageType(package);
             } catch (const std::exception& err) {
                 // To not spam "socket closed messages"
                 //if (std::string(err.what()).find("forcefully closed") != std::string::npos) {
@@ -111,21 +112,18 @@ void Server::InputLoop()
     }
 }
 
-void Server::ParseMessageType(char * data, size_t length)
+void Server::ParseMessageType(Package& package)
 {
-    int messageType = -1;
-    memcpy(&messageType, data, sizeof(int)); // Read what type off message was sent from server
-    MoveMessageHead(data, length, sizeof(int)); // Move the message head to know where to read from
+    int messageType = package.PopFrontPrimitive<int>(); // Read what type off message was sent from server
 
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
-    memcpy(&m_PacketID, data, sizeof(int)); //Read new packet id
-    MoveMessageHead(data, length, sizeof(int));
+    m_PacketID = package.PopFrontPrimitive<int>(); //Read new packet id
     //IdentifyPacketLoss(); // crashed when it started to spam!
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
-        ParseConnect(data, length);
+        ParseConnect(package);
         break;
     case MessageType::ClientPing:
         //ParseClientPing();
@@ -136,13 +134,13 @@ void Server::ParseMessageType(char * data, size_t length)
     case MessageType::Message:
         break;
     case MessageType::Snapshot:
-        ParseSnapshot(data, length);
+        ParseSnapshot(package);
         break;
     case MessageType::Disconnect:
         ParseDisconnect();
         break;
     case MessageType::Event:
-        ParseEvent(data, length);
+        ParseEvent(package);
         break;
     default:
         break;
@@ -268,7 +266,7 @@ void Server::Disconnect(int i)
     m_PlayerDefinitions[i].Name = "";
 }
 
-void Server::ParseEvent(char * data, size_t length)
+void Server::ParseEvent(Package& package)
 {
     size_t i;
     for (i = 0; i < MAXCONNECTIONS; i++) {
@@ -281,31 +279,32 @@ void Server::ParseEvent(char * data, size_t length)
         return;
 
     unsigned int entityId = m_PlayerDefinitions[i].EntityID;
-    if ("+Forward" == std::string(data)) {
+    std::string eventString = package.PopFrontString();
+    if ("+Forward" == eventString) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
         temp.z -= 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
-    if ("-Forward" == std::string(data)) {
+    if ("-Forward" == eventString) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
         temp.z += 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
 
-    if ("+Right" == std::string(data)) {
+    if ("+Right" == eventString) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
         temp.x += 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
 
-    if ("-Right" == std::string(data)) {
+    if ("-Right" == eventString) {
         glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
         temp.x -= 0.1f;
         m_World->GetComponent(entityId, "Transform")["Position"] = temp;
     }
 }
 
-void Server::ParseConnect(char * data, size_t length)
+void Server::ParseConnect(Package& package)
 {
     std::cout << "Parsing connection." << std::endl;
     // Check if player is already connected
@@ -327,9 +326,8 @@ void Server::ParseConnect(char * data, size_t length)
             model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
 
             m_PlayerDefinitions[i].Endpoint = m_ReceiverEndpoint;
-            m_PlayerDefinitions[i].Name = std::string(data);
-            // +1 is the null terminator
-            MoveMessageHead(data, length, m_PlayerDefinitions[i].Name.size() + 1);
+            m_PlayerDefinitions[i].Name = package.PopFrontString();
+
             m_StopTimes[i] = std::clock();
 
             std::cout << m_PacketID << ": Player \"" << m_PlayerDefinitions[i].Name << "\" connected on IP: " <<
@@ -381,7 +379,7 @@ void Server::ParseServerPing()
 }
 
 // NOT USED
-void Server::ParseSnapshot(char * data, size_t length)
+void Server::ParseSnapshot(Package& package)
 {
     // Does no logic. Returns snapshot if client request one
     // The snapshot is not a real snapshot tho...
