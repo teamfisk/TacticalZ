@@ -69,6 +69,7 @@ private:
     //----------------------Forward+-----------------------//
     void CalculateFrustum();
     void CullLights();
+    void DrawForwardPlus(RenderQueueCollection& rq);
     //Frustum
     struct Plane {
         glm::vec3 Normal;
@@ -116,6 +117,7 @@ private:
     ShaderProgram* m_DrawScreenQuadProgram;
     ShaderProgram* m_CalculateFrustumProgram;
     ShaderProgram* m_LightCullProgram;
+    ShaderProgram* m_ForwardPlusProgram;
 
 };
 

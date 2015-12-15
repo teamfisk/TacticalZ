@@ -16,7 +16,7 @@ void Renderer::Initialize()
 	InitializeShaders();
     InitializeTextures();
     InitializeSSBOs();
-    //CalculateFrustum();
+    CalculateFrustum();
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
@@ -73,15 +73,21 @@ void Renderer::InitializeShaders()
     m_DrawScreenQuadProgram->Compile();
     m_DrawScreenQuadProgram->Link();
 
-    //m_CalculateFrustumProgram = ResourceManager::Load<ShaderProgram>("#CalculateFrustumProgram");
-    //m_CalculateFrustumProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
-    //m_CalculateFrustumProgram.Compile();
-    //m_CalculateFrustumProgram.Link();
+    m_CalculateFrustumProgram = ResourceManager::Load<ShaderProgram>("#CalculateFrustumProgram");
+    m_CalculateFrustumProgram->AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
+    m_CalculateFrustumProgram->Compile();
+    m_CalculateFrustumProgram->Link();
 
-    //m_LightCullProgram = ResourceManager::Load<ShaderProgram>("#LightCullProgram");
-    //m_LightCullProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
-    //m_LightCullProgram.Compile();
-    //m_LightCullProgram.Link();
+    m_LightCullProgram = ResourceManager::Load<ShaderProgram>("#LightCullProgram");
+    m_LightCullProgram->AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
+    m_LightCullProgram->Compile();
+    m_LightCullProgram->Link();
+
+    m_ForwardPlusProgram = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram");
+    m_ForwardPlusProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
+    m_ForwardPlusProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlus.frag.glsl")));
+    m_ForwardPlusProgram->Compile();
+    m_ForwardPlusProgram->Link();
 }
 
 void Renderer::InputUpdate(double dt)
@@ -150,9 +156,10 @@ void Renderer::Draw(RenderQueueCollection& rq)
 {
     m_PickingPass->Draw(rq);
     //DrawScreenQuad(m_PickingPass->PickingTexture());
-    //CullLights();
+    CullLights();
     
-    m_DrawScenePass->Draw(rq);
+    //m_DrawScenePass->Draw(rq);
+    DrawForwardPlus(rq);
     GLERROR("Renderer::Draw m_DrawScenePass->Draw");
 	glfwSwapBuffers(m_Window);
 }
@@ -252,39 +259,86 @@ void Renderer::InitializeRenderPasses()
 
 void Renderer::CalculateFrustum()
 {
-    GLERROR("CalculateFrustum Error-1");
+    GLERROR("CalculateFrustum Error: Pre");
+
     m_CalculateFrustumProgram->Bind();
     
-    GLERROR("CalculateFrustum Error1");
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    GLERROR("CalculateFrustum Error2");
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
-    GLERROR("CalculateFrustum Error3");
     glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
-    GLERROR("CalculateFrustum Error4");
     glDispatchCompute(5, 3, 1);
-    GLERROR("CalculateFrustum Error5");
 
+    GLERROR("CalculateFrustum Error: End");
 }
 
 void Renderer::TEMPCreateLights()
 {
     for (int i = 0; i < NUM_LIGHTS; i++) {
-        m_PointLights[i].Position = glm::vec4(i, 0.f, 0.f, 0.f);
+        m_PointLights[i].Position = glm::vec4(5.f * (i-1), 0.f, 0.f, 1.f);
         m_PointLights[i].Color = glm::vec4(1.f, 0.5f, 0.f + i*0.1f, 1.f);
+        m_PointLights[i].Radius = 10.f;
     }
 }
 
 void Renderer::CullLights()
 {
+    GLERROR("CullLights Error: Pre");
+
     m_LightCullProgram->Bind();
+    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Camera->ViewMatrix()));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
     glDispatchCompute(m_Resolution.Width / TILE_SIZE, m_Resolution.Height / TILE_SIZE, 1);
-    GLERROR("CullLights Error");
 
+    GLERROR("CullLights Error: End");
+
+}
+
+void Renderer::DrawForwardPlus(RenderQueueCollection& rq)
+{
+    GLERROR("Renderer::DrawForwardPlus: Pre");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glClearColor(200.f / 255, 0.f / 255, 200.f / 255, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_ForwardPlusProgram->Bind();
+    GLuint ShaderHandle = m_ForwardPlusProgram->GetHandle();
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
+    //TODO: Render: Add code for more jobs than modeljobs.
+    for (auto &job : rq.Forward) {
+        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+        if (modelJob) {
+
+            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
+            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
+
+            //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
+            if (modelJob->DiffuseTexture != nullptr) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
+            } else {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+            }
+
+            glBindVertexArray(modelJob->Model->VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
+
+            continue;
+        }
+    }
+    GLERROR("Renderer::DrawForwardPlus: End");
 }
 

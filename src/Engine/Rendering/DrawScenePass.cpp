@@ -28,9 +28,10 @@ void DrawScenePass::InitializeShaderPrograms()
 void DrawScenePass::Draw(RenderQueueCollection& rq)
 {
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    GLERROR("Renderer::Draw PickingPass");
+    GLERROR("DrawScenePass::Draw: Pre");
 
     DrawScenePassState state;
+    m_BasicForwardProgram->Bind();
 
 
     //TODO: Render: Add code for more jobs than modeljobs.
@@ -39,7 +40,6 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
         if (modelJob) {
             GLuint ShaderHandle = m_BasicForwardProgram->GetHandle();
 
-            m_BasicForwardProgram->Bind();
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ViewMatrix()));
@@ -62,5 +62,5 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
             continue;
         }
     }
-    GLERROR("DrawScene Error");
+    GLERROR("DrawScenePass::Draw: End");
 }
