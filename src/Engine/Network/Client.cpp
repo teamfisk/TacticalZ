@@ -24,10 +24,6 @@ void Client::Start(World* world, EventBroker* eventBroker)
     m_World = world;
 
     // Subscribe to events
-    m_EKeyDown = decltype(m_EKeyDown)(std::bind(&Client::OnKeyDown, this, std::placeholders::_1));
-    m_EventBroker->Subscribe(m_EKeyDown);
-    m_EKeyUp = decltype(m_EKeyUp)(std::bind(&Client::OnKeyUp, this, std::placeholders::_1));
-    m_EventBroker->Subscribe(m_EKeyUp);
     m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
     m_EventBroker->Subscribe(m_EInputCommand);
     std::cout << "Please enter you name: ";
@@ -60,8 +56,7 @@ void Client::Close()
     if (m_WasStarted) {
         Disconnect();
         m_ThreadIsRunning = false;
-        m_EventBroker->Unsubscribe(m_EKeyDown);
-        m_EventBroker->Unsubscribe(m_EKeyUp);
+        m_EventBroker->Unsubscribe(m_EInputCommand);
     }
 }
 
@@ -300,54 +295,6 @@ void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 {
     data += stepSize;
     length -= stepSize;
-}
-
-bool Client::OnKeyDown(const Events::KeyDown& event)
-{
-    if (event.KeyCode == GLFW_KEY_W) {
-        m_IsWASDKeyDown.W = true;
-    }
-    if (event.KeyCode == GLFW_KEY_A) {
-        m_IsWASDKeyDown.A = true;
-    }
-    if (event.KeyCode == GLFW_KEY_S) {
-        m_IsWASDKeyDown.S = true;
-    }
-    if (event.KeyCode == GLFW_KEY_D) {
-        m_IsWASDKeyDown.D = true;
-    }
-
-    if (event.KeyCode == GLFW_KEY_V) {
-        Disconnect();
-    }
-    if (event.KeyCode == GLFW_KEY_C) {
-        Connect();
-    }
-    if (event.KeyCode == GLFW_KEY_P) {
-        Ping();
-    }
-    return true;
-}
-
-bool Client::OnKeyUp(const Events::KeyUp & e)
-{
-    if (e.KeyCode == GLFW_KEY_W) {
-        m_IsWASDKeyDown.W = false;
-        return true;
-    }
-    if (e.KeyCode == GLFW_KEY_A) {
-        m_IsWASDKeyDown.A = false;
-        return true;
-    }
-    if (e.KeyCode == GLFW_KEY_S) {
-        m_IsWASDKeyDown.S = false;
-        return true;
-    }
-    if (e.KeyCode == GLFW_KEY_D) {
-        m_IsWASDKeyDown.D = false;
-        return true;
-    }
-    return false;
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)

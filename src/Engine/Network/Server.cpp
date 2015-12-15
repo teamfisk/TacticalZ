@@ -303,15 +303,19 @@ void Server::ParseEvent(char * data, size_t length)
 
     if ("+Forward" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Forward"] = true;
+        m_World->GetComponent(entityId, "Player")["Back"] = false;
     } else if ("-Forward" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Forward"] = false;
         m_World->GetComponent(entityId, "Player")["Back"] = true;
     } else if ("0Forward" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Forward"] = false;
         m_World->GetComponent(entityId, "Player")["Back"] = false;
     }
     if ("+Right" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Left"] = false;
         m_World->GetComponent(entityId, "Player")["Right"] = true;
     } else if ("-Right" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Right"] = false;
         m_World->GetComponent(entityId, "Player")["Left"] = true;
     } else if ("0Right" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Right"] = false;

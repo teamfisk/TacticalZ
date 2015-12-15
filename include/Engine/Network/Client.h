@@ -76,10 +76,6 @@ private:
 
 	// Events
 	EventBroker* m_EventBroker;
-	EventRelay<Client, Events::KeyDown> m_EKeyDown;
-	bool OnKeyDown(const Events::KeyDown &e);	
-	EventRelay<Client, Events::KeyUp> m_EKeyUp;
-	bool OnKeyUp(const Events::KeyUp &e);
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand &e);
 };
