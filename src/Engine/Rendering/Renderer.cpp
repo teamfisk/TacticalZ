@@ -283,6 +283,12 @@ void Renderer::TEMPCreateLights()
 void Renderer::CullLights()
 {
     GLERROR("CullLights Error: Pre");
+    m_LightOffset = 0;
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     m_LightCullProgram->Bind();
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Camera->ViewMatrix()));

@@ -67,7 +67,7 @@ shared int GroupLightCount;
 shared int GroupLightIndexStartOffset;
 shared int GroupLightIndex[MAX_LIGHTS_PER_TILE];
 shared Frustum GroupFrustum;
-uint GroupIndex;
+int GroupIndex;
 
 bool SphereInsidePlane(vec3 center, float radius, Plane plane)
 {
@@ -94,9 +94,9 @@ bool SphereInsideFrustrum(vec3 center, float radius, Frustum frustum/*, float zN
  	return result;
 }
 
-void AppendLight(uint li)
+void AppendLight(int li)
 {
-	uint index;
+	int index;
 	index = atomicAdd(GroupLightCount, 1);
 	if( index < MAX_LIGHTS_PER_TILE )
 	{ 
@@ -107,7 +107,7 @@ void AppendLight(uint li)
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 void main ()
 {
-	GroupIndex = gl_WorkGroupID.x + gl_WorkGroupID.y * gl_NumWorkGroups.y;
+	GroupIndex = int(gl_WorkGroupID.x + gl_WorkGroupID.y * gl_NumWorkGroups.y);
 	if(gl_LocalInvocationIndex == 0)
 	{
 		GroupLightCount = 0;
@@ -118,7 +118,7 @@ void main ()
 	memoryBarrierShared();
 	barrier();
 
-	for(uint i = gl_LocalInvocationIndex; i < PointLights.List.length(); i += TILE_SIZE*TILE_SIZE)
+	for(int i = int(gl_LocalInvocationIndex); i < PointLights.List.length(); i += TILE_SIZE*TILE_SIZE)
 	{
 		PointLight light = PointLights.List[i];
 
