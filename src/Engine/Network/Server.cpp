@@ -30,12 +30,12 @@ void Server::Update()
     while (m_PlayersToCreate.size() > 0) {
         unsigned int i = m_PlayersToCreate.size() - 1;
         unsigned int tempID = m_World->CreateEntity();
-        ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Transform");
+        ComponentWrapper transform = m_World->AttachComponent(tempID, "Transform");
         transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
-        ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Model");
+        ComponentWrapper model = m_World->AttachComponent(tempID, "Model");
         model["Resource"] = "Models/Core/UnitSphere.obj";
         model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
-        ComponentWrapper player = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Player");
+        ComponentWrapper player = m_World->AttachComponent(tempID, "Player");
         m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = tempID;
         m_PlayersToCreate.pop_back();
     }
@@ -300,6 +300,11 @@ void Server::ParseEvent(char * data, size_t length)
         return;
 
     unsigned int entityId = m_PlayerDefinitions[i].EntityID;
+    m_World->GetComponent(entityId, "Player")["Forward"] = false;
+    m_World->GetComponent(entityId, "Player")["Left"] = false;
+    m_World->GetComponent(entityId, "Player")["Back"] = false;
+    m_World->GetComponent(entityId, "Player")["Right"] = false;
+
     if ("+Forward" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Forward"] = true;
     }

@@ -46,10 +46,10 @@ void Client::Update()
     while (m_PlayersToCreate.size() > 0) {
         unsigned int i = m_PlayersToCreate.size() - 1;
         unsigned int tempID = m_World->CreateEntity();
-        ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Transform");
-        ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Model");
+        ComponentWrapper transform = m_World->AttachComponent(tempID, "Transform");
+        ComponentWrapper model = m_World->AttachComponent(tempID, "Model");
         model["Resource"] = "Models/Core/UnitSphere.obj";
-        ComponentWrapper player = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Player");
+        ComponentWrapper player = m_World->AttachComponent(tempID, "Player");
         m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = tempID;
         m_PlayersToCreate.pop_back();
     }
