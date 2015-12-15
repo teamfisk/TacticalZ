@@ -25,6 +25,20 @@ void Server::Start(World* world, EventBroker* eventBroker)
     threads.join_all();
 }
 
+void Server::Update()
+{ 
+    while (m_PlayersToCreate.size() > 0) {
+        int i = m_PlayersToCreate.size() - 1;
+        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = m_World->CreateEntity();
+        ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Transform");
+        transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
+        ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Model");
+        model["Resource"] = "Models/Core/UnitSphere.obj";
+        model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
+        m_PlayersToCreate.pop_back();
+    }
+}
+
 void Server::Close()
 {
     m_ThreadIsRunning = false;
@@ -124,7 +138,6 @@ void Server::ParseMessageType(char * data, size_t length)
     memcpy(&m_PacketID, data, sizeof(int)); //Read new packet id
     MoveMessageHead(data, length, sizeof(int));
     //IdentifyPacketLoss(); 
-
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
         ParseConnect(data, length);
@@ -211,9 +224,10 @@ void Server::SendSnapshot()
         if (m_PlayerDefinitions[i].EntityID == -1) {
             continue;
         }
+
         // Pack player pos into data package
-        //glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
-        glm::vec3 playerPos = glm::vec3(1.0f);
+        glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
+        //glm::vec3 playerPos = glm::vec3(1.0f);
         package.AddPrimitive<float>(playerPos.x);
         package.AddPrimitive<float>(playerPos.y);
         package.AddPrimitive<float>(playerPos.z);
@@ -282,29 +296,19 @@ void Server::ParseEvent(char * data, size_t length)
     if (i >= 8)
         return;
 
-    //unsigned int entityId = m_PlayerDefinitions[i].EntityID;
-    //if ("+Forward" == std::string(data)) {
-    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-    //    temp.z -= 0.1f;
-    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    //}
-    //if ("-Forward" == std::string(data)) {
-    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-    //    temp.z += 0.1f;
-    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    //}
-
-    //if ("+Right" == std::string(data)) {
-    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-    //    temp.x += 0.1f;
-    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    //}
-
-    //if ("-Right" == std::string(data)) {
-    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-    //    temp.x -= 0.1f;
-    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    //}
+    unsigned int entityId = m_PlayerDefinitions[i].EntityID;
+    if ("+Forward" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Forward"] = true;
+    }
+    if ("-Forward" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Back"] = true;
+    }
+    if ("+Right" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Right"] = true;
+    }
+    if ("-Right" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Left"] = true;
+    }
 }
 
 void Server::ParseConnect(char * data, size_t length)
@@ -326,13 +330,9 @@ void Server::ParseConnect(char * data, size_t length)
             //e.world = m_World;
             //m_EventBroker->Publish(e);
 
-            //int entityID = m_World->CreateEntity();
-            //ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
-            //transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
-            //ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
-            //model["Resource"] = "Models/Core/UnitSphere.obj";//modelPath; // You fix this :)
-            //model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
-            
+            // Create new player
+            m_PlayersToCreate.push_back(i);
+
             m_PlayerDefinitions[i].Endpoint = m_ReceiverEndpoint;
             m_PlayerDefinitions[i].Name = std::string(data);
             // +1 is the null terminator

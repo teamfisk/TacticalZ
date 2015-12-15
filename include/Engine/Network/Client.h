@@ -25,6 +25,7 @@ public:
 	Client();
 	~Client();
 	void Start(World* world, EventBroker* eventBroker);
+    void Update();
     void Close();
 private:
 	void ReadFromServer();
@@ -55,6 +56,9 @@ private:
     unsigned int m_PacketID = 0;
 	unsigned int m_PreviousPacketID = 0;
     unsigned int m_SendPacketID = 0;
+
+    // Game Logic
+    std::vector<unsigned int> m_PlayersToCreate;
 
 	World* m_World;
 	int m_PlayerID = -1;

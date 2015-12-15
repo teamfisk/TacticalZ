@@ -89,6 +89,9 @@ void Game::Tick()
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
+    // Update network
+    m_IsClient ? m_Client.Update() : m_Server.Update();
+
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     debugTick(dt);
@@ -135,11 +138,11 @@ void Game::NetworkFunction()
 	std::cout << "Start client or server? (c/s)" << std::endl;
 	std::cin >> inputMessage;
 	if (inputMessage == "c" || inputMessage == "C") {
-        Client m_Client;
+        m_IsClient = true;
 		m_Client.Start(m_World, m_EventBroker);
 	}
     if (inputMessage == "s" || inputMessage == "S") {
-        Server m_Server;
+        m_IsClient = false;
         m_Server.Start(m_World, m_EventBroker);
     }
 }

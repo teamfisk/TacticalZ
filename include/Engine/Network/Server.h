@@ -21,6 +21,7 @@ public:
     Server();
     ~Server();
     void Start(World* m_world, EventBroker *eventBroker);
+    void Update();
     void Close();
 
 private:
@@ -35,6 +36,8 @@ private:
     // Game logic
     World* m_World;
     EventBroker* m_EventBroker;
+    // size = players to create, stores playerID
+    std::vector<unsigned int> m_PlayersToCreate;
     // Packet loss logic
     unsigned int m_PacketID;
     unsigned int m_PreviousPacketID;

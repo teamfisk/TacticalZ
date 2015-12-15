@@ -41,6 +41,17 @@ void Client::Start(World* world, EventBroker* eventBroker)
     ReadFromServer();
 }
 
+void Client::Update()
+{ 
+    while (m_PlayersToCreate.size() > 0) {
+        unsigned int i = m_PlayersToCreate.size() - 1;
+        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = m_World->CreateEntity();
+        ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Transform");
+        ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Model");
+        model["Resource"] = "Models/Core/UnitSphere.obj";
+    }
+}
+
 void Client::Close()
 {
     if (m_WasStarted) {
@@ -210,6 +221,7 @@ void Client::ParseSnapshot(char* data, size_t length)
         // New player connected on the server side 
         if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
             //CreateNewPlayer(i);
+            m_PlayersToCreate.push_back(i);
         } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
             // Someone disconnected
             // TODO: Insert code here
@@ -217,8 +229,10 @@ void Client::ParseSnapshot(char* data, size_t length)
             // Not a connected player
             break;
         }
-        //m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
-        m_PlayerDefinitions[i].Name = tempName;
+        if (m_PlayerDefinitions[i].EntityID != -1) {
+            m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
+            m_PlayerDefinitions[i].Name = tempName;
+        }
     }
 }
 
