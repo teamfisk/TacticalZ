@@ -71,12 +71,8 @@ void PickingPass::Draw(RenderQueueCollection& rq)
                 }
             }
             m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
-            
-            //Render picking stuff
-            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ProjectionMatrix()));
+
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "Matrix"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
             glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
             glBindVertexArray(modelJob->Model->VAO);
@@ -96,15 +92,15 @@ void PickingPass::Draw(RenderQueueCollection& rq)
     int fbWidth;
     int fbHeight;
     glfwGetFramebufferSize(m_Renderer->Window(), &fbWidth, &fbHeight);
-    Events::Picking pickEvent = Events::Picking(
+  /*  Events::Picking pickEvent = Events::Picking(
         &m_PickingBuffer,
         &m_DepthBuffer,
         m_Renderer->Camera()->ProjectionMatrix(),
         m_Renderer->Camera()->ViewMatrix(),
         Rectangle(fbWidth, fbHeight),
-        &m_PickingColorsToEntity);
+        &m_PickingColorsToEntity);*/
 
-    m_EventBroker->Publish(pickEvent);
+    //m_EventBroker->Publish(pickEvent);
 }
 
 void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const

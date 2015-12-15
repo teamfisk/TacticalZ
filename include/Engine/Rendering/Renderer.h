@@ -49,7 +49,6 @@ private:
 
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
-    float m_CameraMoveSpeed;
 
     Model* m_ScreenQuad;
     Model* m_UnitQuad;

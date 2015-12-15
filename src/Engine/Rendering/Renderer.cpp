@@ -4,12 +4,6 @@
 void Renderer::Initialize()
 {
 	InitializeWindow();
-	// Create default camera
-	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
-	m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
-	if (m_Camera == nullptr) {
-		m_Camera = m_DefaultCamera;
-	}
     
     TEMPCreateLights();
     InitializeRenderPasses();
@@ -90,10 +84,7 @@ void Renderer::InitializeShaders()
 
 void Renderer::InputUpdate(double dt)
 {
-    static DebugCameraInputController<Renderer> firstPersonInputController(m_EventBroker, -1);
-    firstPersonInputController.Update(dt);
-    m_Camera->SetOrientation(firstPersonInputController.Orientation());
-	m_Camera->SetPosition(firstPersonInputController.Position());
+   
 }
 
 void Renderer::Update(double dt)
@@ -214,17 +205,17 @@ void Renderer::InitializeRenderPasses()
 
 void Renderer::CalculateFrustum()
 {
-    GLERROR("CalculateFrustum Error-1");
-    m_CalculateFrustumProgram->Bind();
-    GLERROR("CalculateFrustum Error1");
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    GLERROR("CalculateFrustum Error2");
-    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
-    GLERROR("CalculateFrustum Error3");
-    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
-    GLERROR("CalculateFrustum Error4");
-    glDispatchCompute(5, 3, 1);
-    GLERROR("CalculateFrustum Error5");
+//     GLERROR("CalculateFrustum Error-1");
+//     m_CalculateFrustumProgram->Bind();
+//     GLERROR("CalculateFrustum Error1");
+//     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
+//     GLERROR("CalculateFrustum Error2");
+//   //  glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
+//     GLERROR("CalculateFrustum Error3");
+//   //  glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
+//     GLERROR("CalculateFrustum Error4");
+//     //glDispatchCompute(5, 3, 1);
+//     GLERROR("CalculateFrustum Error5");
 
 }
 

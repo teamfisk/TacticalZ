@@ -20,16 +20,6 @@ public:
 	void SetFullscreen(bool fullscreen) { m_Fullscreen = fullscreen; }
 	bool VSYNC() const { return m_VSYNC; }
 	void SetVSYNC(bool vsync) { m_VSYNC = vsync; }
-	::Camera* Camera() const { return m_Camera; }
-	void SetCamera(::Camera* camera)
-	{
-		if (camera == nullptr) {
-			m_Camera = m_DefaultCamera;
-		} else {
-			m_Camera = camera;
-		}
-	}
-
 	virtual void Initialize() = 0;
 	virtual void Update(double dt) = 0;
 	virtual void Draw(RenderQueueCollection& rq) = 0;
@@ -40,8 +30,6 @@ protected:
 	bool m_VSYNC = false;
 	int m_GLVersion[2];
 	std::string m_GLVendor;
-	::Camera* m_DefaultCamera;
-	::Camera* m_Camera = nullptr;
 	GLFWwindow* m_Window = nullptr;
 };
 

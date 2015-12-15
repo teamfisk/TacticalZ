@@ -41,7 +41,7 @@ struct ModelJob : RenderJob
     //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
     EntityID Entity;
 
-	glm::mat4 ModelMatrix;
+	glm::mat4 Matrix;
 	const Texture* DiffuseTexture;
 	const Texture* NormalTexture;
 	const Texture* SpecularTexture;
@@ -71,7 +71,7 @@ struct TransparentModelJob : RenderJob
     //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
     EntityID Entity;
 
-    glm::mat4 ModelMatrix;
+    glm::mat4 Matrix;
     const Texture* DiffuseTexture;
     const Texture* NormalTexture;
     const Texture* SpecularTexture;

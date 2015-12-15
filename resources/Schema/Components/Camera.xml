@@ -1,6 +1,6 @@
 <c:Camera>
 	<AspectRatio>1.77</AspectRatio>
-	<FOV>90</FOV>
+	<FOV>60.0</FOV>
 	<NearClip>0.01</NearClip>
 	<FarClip>5000</FarClip>
 </c:Camera>

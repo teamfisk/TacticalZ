@@ -39,13 +39,6 @@ void DummyRenderer::Initialize()
 		exit(EXIT_FAILURE);
 	}
 
-	// Create default camera
-	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
-	m_DefaultCamera->SetPosition(glm::vec3(0, 0, 0));
-	if (m_Camera == nullptr) {
-		m_Camera = m_DefaultCamera;
-	}
-
 	glfwSwapInterval(m_VSYNC);
 }
 

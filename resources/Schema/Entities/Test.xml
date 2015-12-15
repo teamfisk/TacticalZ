@@ -13,8 +13,22 @@
 		<Entity>
 			<Components>
 				<c:Transform>
-					<Scale X="1" Y="1" Z="1"/>
 				</c:Transform>
+				<c:Model>
+					<Resource>Models/Camera.obj</Resource>
+				</c:Model>
+				<c:Camera>
+				</c:Camera>
+			</Components>
+		</Entity>
+		<Entity>
+			<Components>
+				<c:Transform>
+					<Position X="10" Y="5" Z="5"/>
+				</c:Transform>
+				<c:Model>
+					<Resource>Models/Camera.obj</Resource>
+				</c:Model>
 				<c:Camera>
 				</c:Camera>
 			</Components>
