@@ -10,6 +10,7 @@ using boost::unit_test_framework::test_case;
 #include "Engine/Core/OctTree.h"
 //vs model
 #include <sstream>
+#include <string>
 
 //ray vs model
 #include "Engine\Core\ResourceManager.h"
@@ -22,6 +23,22 @@ using boost::unit_test_framework::test_case;
 //#include <crtdbg.h>
 //#define DEBUG_CLIENTBLOCK new( _CLIENT_BLOCK, __FILE__, __LINE__)
 //#define new DEBUG_CLIENTBLOCK
+
+void RayTest(std::string fileName) {
+    //simple box test
+    Ray ray;
+    ray.Origin = glm::vec3(-50, 0, 0);
+    ray.Direction = glm::normalize(glm::vec3(1, 0, 0));
+    //using a rawmodel here, else we have to init the renderingsystem
+    ResourceManager::RegisterType<RawModel>("RawModel");
+    auto unitBox = ResourceManager::Load<RawModel>(fileName);
+    BOOST_CHECK(unitBox != nullptr);
+    bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+    BOOST_CHECK(hit);
+    ray.Direction = glm::normalize(glm::vec3(-1, 0, 0));
+    hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+    BOOST_CHECK(!hit);
+}
 
 BOOST_AUTO_TEST_SUITE(collisionTests)
 
@@ -97,19 +114,7 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
 BOOST_AUTO_TEST_CASE(rayVsModelTest)
 {
     //simple box test
-
-    Ray ray;
-    ray.Origin = glm::vec3(-50, 0, 0);
-    ray.Direction = glm::normalize(glm::vec3(1, 0, 0));
-    //using a rawmodel here, else we have to init the renderingsystem
-    ResourceManager::RegisterType<RawModel>("RawModel");
-    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitBox.obj");
-    BOOST_CHECK(unitBox != nullptr);
-    bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(hit);
-    ray.Direction = glm::normalize(glm::vec3(-1, 0, 0));
-    hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(!hit);
+    RayTest("Models/Core/UnitBox.obj");
 }
 
 BOOST_AUTO_TEST_CASE(rayVsModelTest2)
@@ -194,62 +199,22 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
 
     }
 }
-
 BOOST_AUTO_TEST_CASE(rayVsModelTest3)
 {
     //simple test
-
-    Ray ray;
-    ray.Origin = glm::vec3(-50, 0, 0);
-    //ray.Direction = glm::vec3(-1, 0, 0);
-    ray.Direction = glm::normalize(glm::vec3(1, 0, 0));
-    //using a rawmodel here, else we have to init the renderingsystem
-    ResourceManager::RegisterType<RawModel>("RawModel");
-    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitSphere.obj");
-    BOOST_CHECK(unitBox != nullptr);
-    bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(hit);
-    ray.Direction = glm::normalize(glm::vec3(-1, 0, 0));
-    hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(!hit);
+    RayTest("Models/Core/UnitSphere.obj");
 }
 
 BOOST_AUTO_TEST_CASE(rayVsModelTest4)
 {
     //simple test
-
-    Ray ray;
-    ray.Origin = glm::vec3(-50, 0, 0);
-    //ray.Direction = glm::vec3(-1, 0, 0);
-    ray.Direction = glm::normalize(glm::vec3(1, 0, 0));
-    //using a rawmodel here, else we have to init the renderingsystem
-    ResourceManager::RegisterType<RawModel>("RawModel");
-    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitCylinder.obj");
-    BOOST_CHECK(unitBox != nullptr);
-    bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(hit);
-    ray.Direction = glm::normalize(glm::vec3(-1, 0, 0));
-    hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(!hit);
+    RayTest("Models/Core/UnitCylinder.obj");
 }
 
 BOOST_AUTO_TEST_CASE(rayVsModelTest5)
 {
     //simple test
-
-    Ray ray;
-    ray.Origin = glm::vec3(-50, 0, 0);
-    //ray.Direction = glm::vec3(-1, 0, 0);
-    ray.Direction = glm::normalize(glm::vec3(1, 0, 0));
-    //using a rawmodel here, else we have to init the renderingsystem
-    ResourceManager::RegisterType<RawModel>("RawModel");
-    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitRaptor.obj");
-    BOOST_CHECK(unitBox != nullptr);
-    bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(hit);
-    ray.Direction = glm::normalize(glm::vec3(-1, 0, 0));
-    hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
-    BOOST_CHECK(!hit);
+    RayTest("Models/Core/UnitRaptor.obj");
 }
 BOOST_AUTO_TEST_CASE(octTest)
 {
