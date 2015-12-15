@@ -28,13 +28,15 @@ void Server::Start(World* world, EventBroker* eventBroker)
 void Server::Update()
 { 
     while (m_PlayersToCreate.size() > 0) {
-        int i = m_PlayersToCreate.size() - 1;
-        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = m_World->CreateEntity();
+        unsigned int i = m_PlayersToCreate.size() - 1;
+        unsigned int tempID = m_World->CreateEntity();
         ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Transform");
         transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
         ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Model");
         model["Resource"] = "Models/Core/UnitSphere.obj";
         model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
+        ComponentWrapper player = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Player");
+        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = tempID;
         m_PlayersToCreate.pop_back();
     }
 }
@@ -224,6 +226,7 @@ void Server::SendSnapshot()
         if (m_PlayerDefinitions[i].EntityID == -1) {
             continue;
         }
+
 
         // Pack player pos into data package
         glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];

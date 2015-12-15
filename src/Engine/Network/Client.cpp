@@ -6,7 +6,7 @@ using namespace boost::asio::ip;
 Client::Client() : m_Socket(m_IOService)
 {
     // Set up network stream
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
 }
@@ -45,10 +45,13 @@ void Client::Update()
 { 
     while (m_PlayersToCreate.size() > 0) {
         unsigned int i = m_PlayersToCreate.size() - 1;
-        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = m_World->CreateEntity();
+        unsigned int tempID = m_World->CreateEntity();
         ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Transform");
         ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Model");
         model["Resource"] = "Models/Core/UnitSphere.obj";
+        ComponentWrapper player = m_World->AttachComponent(m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID, "Player");
+        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = tempID;
+        m_PlayersToCreate.pop_back();
     }
 }
 
@@ -215,12 +218,14 @@ void Client::ParseSnapshot(char* data, size_t length)
         MoveMessageHead(data, length, sizeof(float));
 
         tempName = std::string(data);
+
         // +1 for null terminator
         MoveMessageHead(data, length, tempName.size() + 1);
         // Apply the position data read to the player entity
         // New player connected on the server side 
         if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
             //CreateNewPlayer(i);
+            m_PlayerDefinitions[i].Name = tempName;
             m_PlayersToCreate.push_back(i);
         } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
             // Someone disconnected
@@ -230,8 +235,9 @@ void Client::ParseSnapshot(char* data, size_t length)
             break;
         }
         if (m_PlayerDefinitions[i].EntityID != -1) {
-            m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
-            m_PlayerDefinitions[i].Name = tempName;
+            if (m_World->HasComponent(m_PlayerDefinitions[i].EntityID, "Player")) {
+                m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
+            }
         }
     }
 }
