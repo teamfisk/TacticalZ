@@ -19,11 +19,11 @@ struct KeyInput
     bool Right = false;
 };
 
-class PlayerSystem : public System
+class PlayerSystem : public PureSystem
 {
 public:
     PlayerSystem(EventBroker* eventBroker)
-        : System(eventBroker, "Player")
+        : PureSystem(eventBroker, "Player")
     {
         EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &PlayerSystem::OnKeyDown);
         EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &PlayerSystem::OnKeyUp);
@@ -32,7 +32,7 @@ public:
         EVENT_SUBSCRIBE_MEMBER(m_ELeave, &PlayerSystem::OnLeave);
     }
 
-    virtual void Update(World* world, ComponentWrapper& player, double dt) override;
+    virtual void UpdateComponent(World* world, ComponentWrapper& player, double dt) override;
 
 private:
     float m_Speed = 5;

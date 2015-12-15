@@ -8,6 +8,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -28,9 +29,14 @@ Game::Game(int argc, char* argv[])
         m_Config->Get<int>("Video.Height", 720)
         ));
     m_Renderer->Initialize();
+    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
+    m_InputProxy = new InputProxy(m_EventBroker);
+    m_InputProxy->AddHandler<KeyboardInputHandler>();
+    m_InputProxy->AddHandler<MouseInputHandler>();
+    m_InputProxy->LoadBindings("Input.ini");
 
     // Create the root level GUI frame
     m_FrameStack = new GUI::Frame(m_EventBroker);
@@ -50,10 +56,11 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PlayerSystem>();
     m_SystemPipeline->AddSystem<CollisionSystem>();
     m_SystemPipeline->AddSystem<TriggerSystem>();
+    m_SystemPipeline->AddSystem<EditorSystem>();
 
     m_LastTime = glfwGetTime();
 
-    testIntialize();
+    debugInitialize();
 }
 
 Game::~Game()
@@ -64,32 +71,39 @@ Game::~Game()
 
 void Game::Tick()
 {
+    glfwPollEvents();
+
     double currentTime = glfwGetTime();
     double dt = currentTime - m_LastTime;
     m_LastTime = currentTime;
 
+    // Handle input in a weird looking but responsive way
+    m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
     m_InputManager->Update(dt);
+    m_EventBroker->Swap();
+    m_InputProxy->Update(dt);
+    m_EventBroker->Swap();
+    m_InputProxy->Process();
     m_EventBroker->Swap();
 
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
-    testTick(dt);
+    debugTick(dt);
     m_Renderer->Update(dt);
 
     m_RenderQueueFactory->Update(m_World);
+    GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
-
+    GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-
-    glfwPollEvents();
 }
 
 
-bool Game::testOnKeyUp(const Events::KeyUp& e)
+bool Game::debugOnInputCommand(const Events::InputCommand& e)
 {
-    if (e.KeyCode == GLFW_KEY_R) {
+    if (e.Command == "DebugReload" && e.Value == 1) {
         std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
         if (!mapToLoad.empty()) {
             delete m_World;
@@ -102,12 +116,12 @@ bool Game::testOnKeyUp(const Events::KeyUp& e)
     return false;
 }
 
-void Game::testIntialize()
+void Game::debugInitialize()
 {
-    EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &Game::testOnKeyUp);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
 }
 
-void Game::testTick(double dt)
+void Game::debugTick(double dt)
 {
     m_EventBroker->Process<Game>();
 }
