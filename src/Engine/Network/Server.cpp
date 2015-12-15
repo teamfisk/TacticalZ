@@ -26,7 +26,7 @@ void Server::Start(World* world, EventBroker* eventBroker)
 }
 
 void Server::Update()
-{ 
+{
     while (m_PlayersToCreate.size() > 0) {
         unsigned int i = m_PlayersToCreate.size() - 1;
         unsigned int tempID = m_World->CreateEntity();
@@ -80,7 +80,7 @@ void Server::ReadFromClients()
                 std::cout << m_PacketID << ": Read from client crashed: " << err.what();
                 //}
             }
-            
+
         }
         std::clock_t currentTime = std::clock();
         // int tempTestRemovePlz = (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC);
@@ -300,22 +300,22 @@ void Server::ParseEvent(char * data, size_t length)
         return;
 
     unsigned int entityId = m_PlayerDefinitions[i].EntityID;
-    m_World->GetComponent(entityId, "Player")["Forward"] = false;
-    m_World->GetComponent(entityId, "Player")["Left"] = false;
-    m_World->GetComponent(entityId, "Player")["Back"] = false;
-    m_World->GetComponent(entityId, "Player")["Right"] = false;
 
     if ("+Forward" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Forward"] = true;
-    }
-    if ("-Forward" == std::string(data)) {
+    } else if ("-Forward" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Back"] = true;
+    } else if ("0Forward" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Forward"] = false;
+        m_World->GetComponent(entityId, "Player")["Back"] = false;
     }
     if ("+Right" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Right"] = true;
-    }
-    if ("-Right" == std::string(data)) {
+    } else if ("-Right" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Left"] = true;
+    } else if ("0Right" == std::string(data)) {
+        m_World->GetComponent(entityId, "Player")["Right"] = false;
+        m_World->GetComponent(entityId, "Player")["Left"] = false;
     }
 }
 
@@ -331,7 +331,7 @@ void Server::ParseConnect(char * data, size_t length)
 
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == boost::asio::ip::address()) {
-            
+
             //Events::CreatePlayer e;
             //e.entityID = (m_PlayerDefinitions[i].EntityID);
             //e.modelPath = "Models/Core/UnitSphere.obj";

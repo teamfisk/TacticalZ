@@ -111,14 +111,21 @@ void Client::SendSnapshotToServer()
     }
 
     if (m_NextSnapshot.InputForward != "") {
-        Package message(MessageType::Event, m_SendPacketID);
-        message.AddString(m_NextSnapshot.InputForward);
-        Send(message);
+        Package package(MessageType::Event, m_SendPacketID);
+        package.AddString(m_NextSnapshot.InputForward);
+        Send(package);
+    } else {
+        Package package(MessageType::Event, m_SendPacketID);
+        package.AddString("0Forward");
     }
     if (m_NextSnapshot.InputRight != "") {
-        Package message(MessageType::Event, m_SendPacketID);
-        message.AddString(m_NextSnapshot.InputRight);
-        Send(message);
+        Package package(MessageType::Event, m_SendPacketID);
+        package.AddString(m_NextSnapshot.InputRight);
+        Send(package);
+    } else {
+        Package package(MessageType::Event, m_SendPacketID);
+        package.AddString("0Right");
+        Send(package);
     }
 }
 
