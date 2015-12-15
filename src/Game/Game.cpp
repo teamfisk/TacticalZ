@@ -53,9 +53,6 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
 
-
-
-	
 	// Invoke network
 	if(m_Config->Get<bool>("Networking.StartNetwork", false) == true)
 		boost::thread workerThread(&Game::NetworkFunction, this);
@@ -144,6 +141,6 @@ void Game::NetworkFunction()
 	}
     if (inputMessage == "s" || inputMessage == "S") {
         Server m_Server;
-        m_Server.Start(m_World);
+        m_Server.Start(m_World, m_EventBroker);
     }
 }

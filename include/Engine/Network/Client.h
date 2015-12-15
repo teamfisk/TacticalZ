@@ -16,6 +16,7 @@
 #include "Core/EventBroker.h"
 #include "Core/EKeyDown.h"
 #include "Core/EKeyUp.h"
+#include "Input/EInputCommand.h"
 
 
 class Client
@@ -75,6 +76,8 @@ private:
 	bool OnKeyDown(const Events::KeyDown &e);	
 	EventRelay<Client, Events::KeyUp> m_EKeyUp;
 	bool OnKeyUp(const Events::KeyUp &e);
+    EventRelay<Client, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(const Events::InputCommand &e);
 };
 
 #endif

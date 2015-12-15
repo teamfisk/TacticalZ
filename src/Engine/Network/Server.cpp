@@ -7,9 +7,10 @@ Server::~Server()
 { }
 
 
-void Server::Start(World* world)
+void Server::Start(World* world, EventBroker* eventBroker)
 {
     m_World = world;
+    m_EventBroker = eventBroker;
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         m_StopTimes[i] = std::clock();
     }
@@ -42,7 +43,7 @@ void Server::ReadFromClients()
     std::clock_t previousePingMessage = std::clock();
     std::clock_t previousSnapshotMessage = std::clock();
     std::clock_t timOutTimer = std::clock();
-    // How offen we send messages (milliseconds)
+    // How often we send messages (milliseconds)
     int intervallMs = 1000;
     int snapshotInterval = 50;
     int timeToCheckTimeOutTime = 100;
@@ -63,6 +64,7 @@ void Server::ReadFromClients()
                 std::cout << m_PacketID << ": Read from client crashed: " << err.what();
                 //}
             }
+            
         }
         std::clock_t currentTime = std::clock();
         // int tempTestRemovePlz = (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC);
@@ -121,7 +123,7 @@ void Server::ParseMessageType(char * data, size_t length)
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     memcpy(&m_PacketID, data, sizeof(int)); //Read new packet id
     MoveMessageHead(data, length, sizeof(int));
-    //IdentifyPacketLoss(); // crashed when it started to spam!
+    //IdentifyPacketLoss(); 
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
@@ -210,7 +212,8 @@ void Server::SendSnapshot()
             continue;
         }
         // Pack player pos into data package
-        glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
+        //glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
+        glm::vec3 playerPos = glm::vec3(1.0f);
         package.AddPrimitive<float>(playerPos.x);
         package.AddPrimitive<float>(playerPos.y);
         package.AddPrimitive<float>(playerPos.z);
@@ -241,7 +244,6 @@ void Server::SendPing()
 void Server::CheckForTimeOuts()
 {
     int timeOutTimeMs = 5000;
-
     int tempStartPing = 1000 * m_StartPingTime
         / static_cast<double>(CLOCKS_PER_SEC);
 
@@ -276,33 +278,33 @@ void Server::ParseEvent(char * data, size_t length)
             break;
         }
     }
-    // If no player matches the ip return.
+    // If no player matches the address return.
     if (i >= 8)
         return;
 
-    unsigned int entityId = m_PlayerDefinitions[i].EntityID;
-    if ("+Forward" == std::string(data)) {
-        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.z -= 0.1f;
-        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    }
-    if ("-Forward" == std::string(data)) {
-        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.z += 0.1f;
-        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    }
+    //unsigned int entityId = m_PlayerDefinitions[i].EntityID;
+    //if ("+Forward" == std::string(data)) {
+    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+    //    temp.z -= 0.1f;
+    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    //}
+    //if ("-Forward" == std::string(data)) {
+    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+    //    temp.z += 0.1f;
+    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    //}
 
-    if ("+Right" == std::string(data)) {
-        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.x += 0.1f;
-        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    }
+    //if ("+Right" == std::string(data)) {
+    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+    //    temp.x += 0.1f;
+    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    //}
 
-    if ("-Right" == std::string(data)) {
-        glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
-        temp.x -= 0.1f;
-        m_World->GetComponent(entityId, "Transform")["Position"] = temp;
-    }
+    //if ("-Right" == std::string(data)) {
+    //    glm::vec3 temp = m_World->GetComponent(entityId, "Transform")["Position"];
+    //    temp.x -= 0.1f;
+    //    m_World->GetComponent(entityId, "Transform")["Position"] = temp;
+    //}
 }
 
 void Server::ParseConnect(char * data, size_t length)
@@ -317,15 +319,20 @@ void Server::ParseConnect(char * data, size_t length)
 
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == boost::asio::ip::address()) {
+            
+            //Events::CreatePlayer e;
+            //e.entityID = (m_PlayerDefinitions[i].EntityID);
+            //e.modelPath = "Models/Core/UnitSphere.obj";
+            //e.world = m_World;
+            //m_EventBroker->Publish(e);
 
-
-            m_PlayerDefinitions[i].EntityID = m_World->CreateEntity();
-            ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Transform");
-            transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
-            ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Model");
-            model["Resource"] = "Models/Core/UnitSphere.obj";
-            model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
-
+            //int entityID = m_World->CreateEntity();
+            //ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
+            //transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
+            //ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
+            //model["Resource"] = "Models/Core/UnitSphere.obj";//modelPath; // You fix this :)
+            //model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
+            
             m_PlayerDefinitions[i].Endpoint = m_ReceiverEndpoint;
             m_PlayerDefinitions[i].Name = std::string(data);
             // +1 is the null terminator

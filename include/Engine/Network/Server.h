@@ -12,13 +12,15 @@
 #include "Network/NetworkDefinitions.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
+#include "Core/EventBroker.h"
+#include "Game/ECreatePlayer.h"
 
 class Server
 {
 public:
     Server();
     ~Server();
-    void Start(World* m_world);
+    void Start(World* m_world, EventBroker *eventBroker);
     void Close();
 
 private:
@@ -32,6 +34,7 @@ private:
     std::clock_t m_StopTimes[8];
     // Game logic
     World* m_World;
+    EventBroker* m_EventBroker;
     // Packet loss logic
     unsigned int m_PacketID;
     unsigned int m_PreviousPacketID;

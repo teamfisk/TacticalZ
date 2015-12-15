@@ -28,7 +28,8 @@ void Client::Start(World* world, EventBroker* eventBroker)
     m_EventBroker->Subscribe(m_EKeyDown);
     m_EKeyUp = decltype(m_EKeyUp)(std::bind(&Client::OnKeyUp, this, std::placeholders::_1));
     m_EventBroker->Subscribe(m_EKeyUp);
-
+    m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
+    m_EventBroker->Subscribe(m_EInputCommand);
     std::cout << "Please enter you name: ";
     std::cin >> m_PlayerName;
     while (m_PlayerName.size() > 7) {
@@ -74,9 +75,9 @@ void Client::ReadFromServer()
 void Client::SendSnapshotToServer()
 {
     // Reset previouse key state in snapshot.
-    Package message(MessageType::Event, m_SendPacketID);
-    message.AddString(m_NextSnapshot.InputForward);
-    Send(message);
+    //Package message(MessageType::Event, m_SendPacketID);
+    //message.AddString(m_NextSnapshot.InputForward);
+    //Send(message);
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
     // See if any movement keys are down
@@ -208,7 +209,7 @@ void Client::ParseSnapshot(char* data, size_t length)
         // Apply the position data read to the player entity
         // New player connected on the server side 
         if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
-            CreateNewPlayer(i);
+            //CreateNewPlayer(i);
         } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
             // Someone disconnected
             // TODO: Insert code here
@@ -216,7 +217,7 @@ void Client::ParseSnapshot(char* data, size_t length)
             // Not a connected player
             break;
         }
-        m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
+        //m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
         m_PlayerDefinitions[i].Name = tempName;
     }
 }
@@ -322,6 +323,35 @@ bool Client::OnKeyUp(const Events::KeyUp & e)
     return false;
 }
 
+bool Client::OnInputCommand(const Events::InputCommand & e)
+{
+    if (e.Command == "Forward") {
+        if (e.Value > 0) {
+            m_IsWASDKeyDown.W = true;
+        }
+        else if (e.Value < 0) {
+            m_IsWASDKeyDown.S = true;
+        } else {
+            m_IsWASDKeyDown.W = false;
+            m_IsWASDKeyDown.S = false;
+        }
+    }
+    if (e.Command == "Right") {
+        if (e.Value > 0) {
+            m_IsWASDKeyDown.D = true;
+        } else if (e.Value < 0) {
+            m_IsWASDKeyDown.A = true;
+        } else {
+            m_IsWASDKeyDown.A = false;
+            m_IsWASDKeyDown.D = false;
+        }
+    }
+    if (e.Command == "Sprint") { // Temp connect
+        Connect();
+    }
+    return false;
+}
+
 void Client::CreateNewPlayer(int i)
 {
     m_PlayerDefinitions[i].EntityID = m_World->CreateEntity();
@@ -335,6 +365,6 @@ void Client::IdentifyPacketLoss()
     // if no packets lost, difference should be equal to 1
     int difference = m_PacketID - m_PreviousPacketID;
     if (difference != 1) {
-			LOG_INFO("%i Packet(s) were lost...", difference);
+	    LOG_INFO("%i Packet(s) were lost...", difference);
     }
 }
