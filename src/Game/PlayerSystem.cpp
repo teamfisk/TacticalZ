@@ -3,16 +3,16 @@
 void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, double dt)
 {
     (glm::vec3)player["Velocity"] = glm::vec3(0.f, 0.f, 0.f);
-    if (player["Forward"]) {
+    if (static_cast<bool>(player["Forward"])== true) {
         ((glm::vec3&)player["Velocity"]).z = m_Speed * float(dt) * -1;
     }
-    if (player["Left"]) {
+    if (static_cast<bool>(player["Left"]) == true) {
         ((glm::vec3&)player["Velocity"]).x = m_Speed * float(dt) * -1;
     }
-    if (player["Back"]) {
+    if (static_cast<bool>(player["Back"]) == true) {
         ((glm::vec3&)player["Velocity"]).z = m_Speed * float(dt);
     }
-    if (player["Right"]) {
+    if (static_cast<bool>(player["Right"]) == true) {
         ((glm::vec3&)player["Velocity"]).x = m_Speed * float(dt);
     }
 

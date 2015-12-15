@@ -112,7 +112,11 @@ void Client::SendSnapshotToServer()
     } else {
         Package package(MessageType::Event, m_SendPacketID);
         package.AddString("0Forward");
+        Send(package);
     }
+    
+
+
     if (m_NextSnapshot.InputRight != "") {
         Package package(MessageType::Event, m_SendPacketID);
         package.AddString(m_NextSnapshot.InputRight);

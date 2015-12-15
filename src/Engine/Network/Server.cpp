@@ -300,6 +300,7 @@ void Server::ParseEvent(char * data, size_t length)
         return;
 
     unsigned int entityId = m_PlayerDefinitions[i].EntityID;
+    std::string templalala = std::string(data);
 
     if ("+Forward" == std::string(data)) {
         m_World->GetComponent(entityId, "Player")["Forward"] = true;
