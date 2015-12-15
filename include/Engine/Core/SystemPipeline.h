@@ -9,7 +9,7 @@
 class SystemPipeline
 {
 public:
-    SystemPipeline(const EventBroker* eventBroker)
+    SystemPipeline(EventBroker* eventBroker)
         : m_EventBroker(eventBroker)
     { }
     ~SystemPipeline()
@@ -51,7 +51,7 @@ public:
     }
 
 private:
-    const EventBroker* m_EventBroker;
+    EventBroker* m_EventBroker;
     std::unordered_map<std::string, std::vector<System*>> m_Systems;
 };
 

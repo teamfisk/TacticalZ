@@ -15,7 +15,7 @@ Game::Game(int argc, char* argv[]) : someOctTree(AABB(-0.5f*worldSize, 0.5f*worl
     m_RenderQueueFactory = new RenderQueueFactory();
 
     // Create the renderer
-    m_Renderer = new Renderer();
+    m_Renderer = new Renderer(m_EventBroker);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle(

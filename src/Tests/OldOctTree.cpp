@@ -3,7 +3,7 @@
 #include <bitset>
 
 #include "OldOctTree.h"
-#include "Core/Collision.h"
+#include "Collision/Collision.h"
 #include "Core/World.h"
 #include "Rendering/Camera.h"
 

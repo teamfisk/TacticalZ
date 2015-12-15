@@ -30,7 +30,7 @@ glm::vec3 RenderQueueFactory::AbsolutePosition(World* world, EntityID entity)
 
     do {
         ComponentWrapper transform = world->GetComponent(entity, "Transform");
-        position += AbsoluteOrientation(world, entity) * (glm::vec3)transform["Position"];
+        position += (glm::vec3)transform["Position"];
         entity = world->GetParent(entity);
     } while (entity != 0);
    

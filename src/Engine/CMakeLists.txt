@@ -70,6 +70,12 @@ file(GLOB SOURCE_FILES_GUI
 )
 source_group(GUI FILES ${SOURCE_FILES_GUI})
 
+file(GLOB SOURCE_FILES_Collision
+    "${INCLUDE_PATH}/Collision/*.h"
+    "Collision/*.cpp"
+)
+source_group(Collision FILES ${SOURCE_FILES_Collision})
+
 set(SOURCE_FILES
     ${SOURCE_FILES_Core}
     ${SOURCE_FILES_Core_Util}
@@ -78,6 +84,7 @@ set(SOURCE_FILES
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
     ${SOURCE_FILES_Rendering_Util}
+    ${SOURCE_FILES_Collision}
 )
 
 set(LIBRARIES
