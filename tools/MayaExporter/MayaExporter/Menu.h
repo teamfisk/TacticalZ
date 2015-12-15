@@ -33,6 +33,7 @@
 #include "MayaIncludes.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "Skeleton.h"
 
 class Menu : public QWidget
 {
@@ -71,6 +72,7 @@ private:
 	QDialog* m_DialogPointer = nullptr;
 
 	Material* m_MaterialHandler = nullptr;
+	Skeleton* m_SkeletonHandler = nullptr;
 };
 
 #endif

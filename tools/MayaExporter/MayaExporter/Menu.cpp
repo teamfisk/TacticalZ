@@ -145,6 +145,7 @@ void Menu::Button1Clicked(bool)
 {
 	if (m_ExportAnimationsButton->isChecked()) {
 		MGlobal::displayInfo("1 checked!");
+		this->GetSkeletonData();
 	}
 	else {
 		MGlobal::displayInfo("1 unchecked!");
@@ -185,7 +186,20 @@ void Menu::GetMaterialData()
 
 void Menu::GetSkeletonData()
 {
+	this->m_SkeletonHandler = new Skeleton();
 
+	// Traverse scene and return vector with all materials
+	std::vector<SkeletonNode>* AllMaterials = m_SkeletonHandler->DoIt();
+
+	MGlobal::displayInfo(MString() + AllMaterials->size());
+
+	for (int i = 0; i < AllMaterials->size(); i++)
+	{
+		for (int j = 0; j < AllMaterials->at(i).Joints.size(); j++)
+		{
+			MGlobal::displayInfo(MString() + AllMaterials->at(i).Joints.at(j).Name.c_str());
+		}
+	}
 }
 
 Menu::~Menu()
