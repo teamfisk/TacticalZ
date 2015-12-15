@@ -25,7 +25,7 @@ struct TriggerLeave : Event
     EntityID Trigger;
 };
 
-/** Thrown when an entity is completely inside a trigger. */
+/** Thrown once, when an entity is completely inside a trigger. */
 struct TriggerEnter : Event
 {
     /** The id of the entity that entered the trigger. */

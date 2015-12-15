@@ -154,4 +154,18 @@ bool RayVsModel(const Ray& ray,
     return hit;
 }
 
+bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)
+{
+    const glm::vec3& ma1 = first.MaxCorner();
+    const glm::vec3& ma2 = first.MaxCorner();
+    const glm::vec3& mi1 = second.MinCorner();
+    const glm::vec3& mi2 = second.MinCorner();
+    return (std::abs(ma1.x - ma2.x) < epsilon) &&
+        (std::abs(mi1.x - mi2.x) < epsilon) &&
+        (std::abs(ma1.z - ma2.z) < epsilon) &&
+        (std::abs(mi1.z - mi2.z) < epsilon) &&
+        (std::abs(ma1.y - ma2.y) < epsilon) &&
+        (std::abs(mi1.y - mi2.y) < epsilon);
+}
+
 }

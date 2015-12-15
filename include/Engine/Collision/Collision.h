@@ -37,6 +37,7 @@ bool RayVsModel(const Ray& ray,
 
 //Return true if the boxes are intersecting.
 bool AABBVsAABB(const AABB& a, const AABB& b);
+bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon = 0.0001f);
 
 }
 

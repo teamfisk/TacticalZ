@@ -21,16 +21,6 @@ bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
     return first.Distance < second.Distance;
 }
 
-bool isSameBoxProbably(const AABB& first, const AABB& second)
-{
-    const float EPS = 0.0001f;
-    const auto& ma = first.MaxCorner();
-    const auto& mi = first.MinCorner();
-    return (std::abs(ma.x - mi.x) < EPS) &&
-        (std::abs(ma.z - mi.z) < EPS) &&
-        (std::abs(ma.y - mi.y) < EPS);
-}
-
 }
 
 OctTree::OctTree()
@@ -228,7 +218,7 @@ bool OctTree::OctChild::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersect
         for (int i : m_DynamicObjIndices) {
             if (!m_DynamicObjectsRef[i].Checked) {
                 const AABB& objBox = m_DynamicObjectsRef[i].Box;
-                if (!isSameBoxProbably(boxToTest, objBox) &&
+                if (!Collision::IsSameBoxProbably(boxToTest, objBox) &&
                     Collision::AABBVsAABB(boxToTest, objBox)) {
                     outBoxIntersected = objBox;
                     return true;

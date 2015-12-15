@@ -56,3 +56,21 @@ bool PlayerSystem::OnKeyUp(const Events::KeyUp & event)
     }
     return false;
 }
+
+bool PlayerSystem::OnTouch(const Events::TriggerTouch &event)
+{
+    LOG_INFO("Player %i touched widget (entity %i).", event.Entity, event.Trigger);
+    return false;
+}
+
+bool PlayerSystem::OnEnter(const Events::TriggerEnter &event)
+{
+    LOG_INFO("Player %i entered widget (entity %i).", event.Entity, event.Trigger);
+    return false;
+}
+
+bool PlayerSystem::OnLeave(const Events::TriggerLeave &event)
+{
+    LOG_INFO("Player %i left widget (entity %i).", event.Entity, event.Trigger);
+    return false;
+}
