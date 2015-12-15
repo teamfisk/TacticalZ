@@ -7,19 +7,39 @@
 
 class System
 {
+protected:
+    System(EventBroker* eventBroker)
+        : m_EventBroker(eventBroker)
+    { }
+
+    EventBroker* m_EventBroker;
+};
+
+class PureSystem : public System
+{
     friend class SystemPipeline;
 
-public:
-    System(const EventBroker* eventBroker, std::string componentType)
-        : m_EventBroker(eventBroker)
+protected:
+    PureSystem(EventBroker* eventBroker, std::string componentType)
+        : System(eventBroker)
         , m_ComponentType(componentType)
     { }
 
-    virtual void Update(World* world, ComponentWrapper& component, double dt) = 0;
+    const std::string m_ComponentType;
 
-private:
-    const EventBroker* m_EventBroker;
-    std::string m_ComponentType;
+    virtual void UpdateComponent(World* world, ComponentWrapper& component, double dt) = 0;
+};
+
+class ImpureSystem : public System
+{
+    friend class SystemPipeline;
+
+protected:
+    ImpureSystem(EventBroker* eventBroker)
+        : System(eventBroker)
+    { }
+
+    virtual void Update(World* world, double dt) = 0;
 };
 
 #endif

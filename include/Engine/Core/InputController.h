@@ -11,26 +11,23 @@ template <typename EventContext>
 class InputController
 {
 public:
-	InputController(std::shared_ptr<dd::EventBroker> eventBroker)
-		: EventBroker(eventBroker)
+	InputController(EventBroker* eventBroker)
+		: m_EventBroker(eventBroker)
 	{ Initialize(); }
 
 	virtual void Initialize()
 	{
 		EVENT_SUBSCRIBE_MEMBER(
             _EInputCommand, &InputController::OnCommand);
-		EVENT_SUBSCRIBE_MEMBER(m_EMouseMove, &InputController::OnMouseMove);
 	}
 
-	virtual bool OnCommand(const Events::InputCommand &event) { return false; }
-	virtual bool OnMouseMove(const Events::MouseMove &event) { return false; }
+	virtual bool OnCommand(const Events::InputCommand& e) { return false; }
 
 protected:
-	std::shared_ptr<dd::EventBroker> EventBroker;
+	EventBroker* m_EventBroker;
 
 private:
 	EventRelay<EventContext, Events::InputCommand> m_EInputCommand;
-	EventRelay<EventContext, Events::MouseMove> m_EMouseMove;
 };
 
 #endif

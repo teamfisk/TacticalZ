@@ -1,25 +1,29 @@
 #include "Rendering/Renderer.h"
+#include "Rendering/DebugCameraInputController.h"
 
 void Renderer::Initialize()
 {
 	InitializeWindow();
-
 	// Create default camera
 	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
 	m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
 	if (m_Camera == nullptr) {
 		m_Camera = m_DefaultCamera;
 	}
+    TEMPCreateLights();
+    InitializeRenderPasses();
 
 	glfwSwapInterval(m_VSYNC);
 	InitializeShaders();
     InitializeTextures();
-    InitializeFrameBuffers();
-
+    InitializeSSBOs();
+    //CalculateFrustum();
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
+
+    m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
 }
 
 void Renderer::InitializeWindow()
@@ -64,26 +68,29 @@ void Renderer::InitializeWindow()
 
 void Renderer::InitializeShaders()
 {
-	m_BasicForwardProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/BasicForward.vert.glsl")));
-	m_BasicForwardProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/BasicForward.frag.glsl")));
-	m_BasicForwardProgram.Compile();
-	m_BasicForwardProgram.Link();
+    m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
 
-    m_PickingProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Picking.vert.glsl")));
-    m_PickingProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Picking.frag.glsl")));
-    m_PickingProgram.Compile();
-    m_PickingProgram.BindFragDataLocation(0, "TextureFragment");
-    m_PickingProgram.Link();
+    m_DrawScreenQuadProgram = ResourceManager::Load<ShaderProgram>("#DrawScreenQuadProgram");
+    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
+    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
+    m_DrawScreenQuadProgram->Compile();
+    m_DrawScreenQuadProgram->Link();
 
-    m_DrawScreenQuadProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
-    m_DrawScreenQuadProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
-    m_DrawScreenQuadProgram.Compile();
-    m_DrawScreenQuadProgram.Link();
+    //m_CalculateFrustumProgram = ResourceManager::Load<ShaderProgram>("#CalculateFrustumProgram");
+    //m_CalculateFrustumProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
+    //m_CalculateFrustumProgram.Compile();
+    //m_CalculateFrustumProgram.Link();
 
+    //m_LightCullProgram = ResourceManager::Load<ShaderProgram>("#LightCullProgram");
+    //m_LightCullProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
+    //m_LightCullProgram.Compile();
+    //m_LightCullProgram.Link();
 }
 
 void Renderer::InputUpdate(double dt)
 {
+    static DebugCameraInputController<Renderer> firstPersonInputController(m_EventBroker, -1);
+
 	glm::vec3 m_Position = m_Camera->Position();
 	if (glfwGetKey(m_Window, GLFW_KEY_O) == GLFW_PRESS)
 	{
@@ -113,154 +120,33 @@ void Renderer::InputUpdate(double dt)
 		m_CameraMoveSpeed = 0.5f;
 	}
 
-
-    static double mousePosX, mousePosY;
-    glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
-    if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
-        glm::vec3 data = ScreenCoords::ToPixelData(mousePosX, m_Resolution.Height - mousePosY, &m_PickingBuffer, m_DepthBuffer);
-        glm::vec2 color = glm::vec2(data);
-        float depth = data.z;
-        
-        glm::vec3 viewPos = ScreenCoords::ToWorldPos(mousePosX, m_Resolution.Height - mousePosY, depth, m_Resolution, m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
-      //  glm::vec3 worldPos = glm::vec3(glm::inverse(m_Camera->ViewMatrix()) * glm::vec4(viewPos, 1.f));
-
-        //printf("R: %f, G: %f, Depth: %f\n", color.r, color.g, depth);
-        //printf("view: x: %f, y: %f z: %f, Length: %f\n\n", viewPos.x, viewPos.y, viewPos.z, glm::length(viewPos));
-
-        if (color != glm::vec2(0, 0)) {
-            EntityID pickedEntity = m_PickingColorsToEntity[color];
-            printf("Picked Entity: %i", pickedEntity);
-
-        }
-    }
-
-	if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-
-		
-		double deltaX, deltaY;
-		deltaX = mousePosX - (float)Resolution().Width / 2;
-		deltaY = mousePosY - (float)Resolution().Height / 2;
-
-		float rotationY = -deltaY / 300.f;
-		float rotationX = -deltaX / 300.f;
-		glm::quat orientation = m_Camera->Orientation();
-		
-		
-		orientation = orientation * glm::angleAxis<float>(rotationY, glm::vec3(1, 0, 0));
-		orientation = glm::angleAxis<float>(rotationX, glm::vec3(0, 1, 0)) * orientation;
-		
-		m_Camera->SetOrientation(orientation);
-
-		glfwSetCursorPos(m_Window, Resolution().Width / 2, Resolution().Height / 2);
-	}
-	m_Camera->SetPosition(m_Position);
+    firstPersonInputController.Update(dt);
+    m_Camera->SetOrientation(firstPersonInputController.Orientation());
+	m_Camera->SetPosition(firstPersonInputController.Position());
 }
 
 void Renderer::Update(double dt)
 {
-	InputUpdate(dt);
-    
+    m_EventBroker->Process<Renderer>();
+    InputUpdate(dt);
+    m_ImGuiRenderPass->Update(dt);
 }
 
 void Renderer::Draw(RenderQueueCollection& rq)
 {
-    //TODO: Renderer: Kanske borde vara längst upp i update.
-    PickingPass(rq);
-    DrawScreenQuad(m_PickingTexture);
+    m_PickingPass->Draw(rq);
+    //DrawScreenQuad(m_PickingPass->PickingTexture());
+    //CullLights();
     
-    DrawScene(rq);
+    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    m_DrawScenePass->Draw(rq);
+    GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
 }
-
-void Renderer::DrawScene(RenderQueueCollection& rq)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    //TODO: Render: Clean up draw code
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //TODO: Render: Add code for more jobs than modeljobs.
-    for (auto &job : rq.Forward) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-        if (modelJob) {
-            GLuint ShaderHandle = m_BasicForwardProgram.GetHandle();
-
-            m_BasicForwardProgram.Bind();
-            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
-            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
-
-            //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
-            if (modelJob->DiffuseTexture != nullptr) {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
-            } else {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-            }
-
-            glBindVertexArray(modelJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-
-            continue;
-        }
-    }
-}
-
-void Renderer::PickingPass(RenderQueueCollection& rq)
-{
-    m_PickingBuffer.Bind();
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    int r = 30;
-    int g = 0;
-    //TODO: Render: Add code for more jobs than modeljobs.
-
-
-    GLuint ShaderHandle = m_PickingProgram.GetHandle();
-    m_PickingProgram.Bind();
-
-    for (auto &job : rq.Forward) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-
-        if (modelJob) {
-            glm::vec2 pickColor = glm::vec2(r/255.f, g/255.f);
-            m_PickingColorsToEntity[pickColor] = modelJob->Entity;
-            
-
-            //Render picking stuff
-            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Camera->ProjectionMatrix()));
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(pickColor));
-
-            glBindVertexArray(modelJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-            r+=50;
-            if(r > 255) {
-                r = 0;
-                g+=50;
-            }
-        }
-    }
-    m_PickingBuffer.Unbind();
-}
-
 
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
 {
@@ -273,7 +159,7 @@ void Renderer::DrawScreenQuad(GLuint textureToDraw)
     glClear(GL_COLOR_BUFFER_BIT);
 
 
-    m_DrawScreenQuadProgram.Bind();
+    m_DrawScreenQuadProgram->Bind();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureToDraw);
 
@@ -283,24 +169,10 @@ void Renderer::DrawScreenQuad(GLuint textureToDraw)
         , GL_UNSIGNED_INT, 0, m_ScreenQuad->TextureGroups[0].StartIndex);
 }
 
-
 void Renderer::InitializeTextures()
 {
     m_ErrorTexture=ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
     m_WhiteTexture=ResourceManager::Load<Texture>("Textures/Core/Blank.png");
-    /*
-    glGenTextures(1, &m_PickingTexture);
-    glBindTexture(GL_TEXTURE_2D, m_PickingTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, m_Resolution.Width, m_Resolution.Height, 0, GL_RG, GL_FLOAT, NULL);//TODO: Renderer: Fix the precision and Resolution
-    GLERROR("m_PickingTexture initialization failed");
-    */
-
-    GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
-        glm::vec2(m_Resolution.Width, m_Resolution.Height), GL_RG8, GL_RG, GL_FLOAT);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
@@ -315,15 +187,95 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     GLERROR("Texture initialization failed");
 }
 
-
-
-void Renderer::InitializeFrameBuffers()//TODO: Renderer: Get this to a better location, as its really big
+void Renderer::InitializeSSBOs()
 {
-    glGenRenderbuffers(1, &m_DepthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Resolution.Width, m_Resolution.Height);
-    
-    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
-    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
-    m_PickingBuffer.Generate();
+    printf("Size: %i\n", sizeof(m_Frustums));
+    glGenBuffers(1, &m_FrustumSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_FrustumSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Frustums), &m_Frustums, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    GLERROR("m_FrustumSSBO");
+
+    glGenBuffers(1, &m_LightSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_PointLights), &m_PointLights, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    GLERROR("m_LightSSBO");
+
+
+    glGenBuffers(1, &m_LightGridSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    GLERROR("m_LightGridSSBO");
+
+
+    glGenBuffers(1, &m_LightOffsetSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    GLERROR("m_LightOffsetSSBO");
+
+
+    glGenBuffers(1, &m_LightIndexSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    GLERROR("m_LightIndexSSBO");
+
 }
+
+void Renderer::InitializeRenderPasses()
+{
+    m_DrawScenePass = new DrawScenePass(this);
+    m_PickingPass = new PickingPass(this, m_EventBroker);
+}
+
+void Renderer::CalculateFrustum()
+{
+    GLERROR("CalculateFrustum Error-1");
+    m_CalculateFrustumProgram->Bind();
+    
+    GLERROR("CalculateFrustum Error1");
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
+    GLERROR("CalculateFrustum Error2");
+    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
+    GLERROR("CalculateFrustum Error3");
+    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
+    GLERROR("CalculateFrustum Error4");
+    glDispatchCompute(5, 3, 1);
+    GLERROR("CalculateFrustum Error5");
+
+}
+
+void Renderer::TEMPCreateLights()
+{
+    for (int i = 0; i < NUM_LIGHTS; i++) {
+        m_PointLights[i].Position = glm::vec4(i, 0.f, 0.f, 0.f);
+        m_PointLights[i].Color = glm::vec4(1.f, 0.5f, 0.f + i*0.1f, 1.f);
+    }
+}
+
+void Renderer::CullLights()
+{
+    m_LightCullProgram->Bind();
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
+    glDispatchCompute(m_Resolution.Width / TILE_SIZE, m_Resolution.Height / TILE_SIZE, 1);
+    GLERROR("CullLights Error");
+
+}
+

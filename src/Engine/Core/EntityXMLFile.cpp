@@ -415,6 +415,7 @@ std::size_t EntityXMLFile::getTypeStride(std::string typeName)
     std::map<std::string, size_t> typeStrides{
         { "bool", sizeof(bool) },
         { "int", sizeof(int) },
+        { "float", sizeof(float) },
         { "double", sizeof(double) },
         { "string", sizeof(std::string) },
         { "Vector", sizeof(glm::vec3) },
@@ -443,39 +444,52 @@ void EntityXMLFile::writeData(const xercesc::DOMElement* element, std::string ty
 {
     using namespace xercesc;
 
-    XSValue::DataType dataType = XSValue::getDataType(XSTR(typeName.c_str()));
-    if (dataType == XSValue::DataType::dt_MAXCOUNT) {
-        if (typeName == "Vector") {
-            glm::vec3 vec;
-            vec.x = getFloatAttribute(element, "X");
-            vec.y = getFloatAttribute(element, "Y");
-            vec.z = getFloatAttribute(element, "Z");
-            memcpy(outData, reinterpret_cast<char*>(&vec), getTypeStride(typeName));
-        } else if (typeName == "Color") {
-            glm::vec4 vec;
-            vec.r = getFloatAttribute(element, "R");
-            vec.g = getFloatAttribute(element, "G");
-            vec.b = getFloatAttribute(element, "B");
-            vec.a = getFloatAttribute(element, "A");
-            memcpy(outData, reinterpret_cast<char*>(&vec), getTypeStride(typeName));
-        } else if (typeName == "Quaternion") {
-            glm::quat q;
-            q.x = getFloatAttribute(element, "X");
-            q.y = getFloatAttribute(element, "Y");
-            q.z = getFloatAttribute(element, "Z");
-            q.w = getFloatAttribute(element, "W");
-            memcpy(outData, reinterpret_cast<char*>(&q), getTypeStride(typeName));
-        }
-    } else if (dataType == XSValue::DataType::dt_string) {
-        char* str = XMLString::transcode(element->getTextContent());
-        std::string standardString(str);
-        new (outData) std::string(str);
-        XMLString::release(&str);
-        //memcpy(outData, reinterpret_cast<char*>(&standardString), getTypeStride(typeName));
-    } else {
+    if (typeName == "Vector") {
+        glm::vec3 vec;
+        vec.x = getFloatAttribute(element, "X");
+        vec.y = getFloatAttribute(element, "Y");
+        vec.z = getFloatAttribute(element, "Z");
+        memcpy(outData, reinterpret_cast<char*>(&vec), getTypeStride(typeName));
+    } else if (typeName == "Color") {
+        glm::vec4 vec;
+        vec.r = getFloatAttribute(element, "R");
+        vec.g = getFloatAttribute(element, "G");
+        vec.b = getFloatAttribute(element, "B");
+        vec.a = getFloatAttribute(element, "A");
+        memcpy(outData, reinterpret_cast<char*>(&vec), getTypeStride(typeName));
+    } else if (typeName == "Quaternion") {
+        glm::quat q;
+        q.x = getFloatAttribute(element, "X");
+        q.y = getFloatAttribute(element, "Y");
+        q.z = getFloatAttribute(element, "Z");
+        q.w = getFloatAttribute(element, "W");
+        memcpy(outData, reinterpret_cast<char*>(&q), getTypeStride(typeName));
+    } else if (typeName == "float") {
         XSValue::Status status;
-        XSValue* val = XSValue::getActualValue(element->getTextContent(), dataType, status);
-        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue), getTypeStride(typeName));
+        XSValue* val = XSValue::getActualValue(element->getTextContent(), xercesc::XSValue::DataType::dt_float, status);
+        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue.f_float), getTypeStride(typeName));
+    } else if (typeName == "double") {
+        XSValue::Status status;
+        XSValue* val = XSValue::getActualValue(element->getTextContent(), xercesc::XSValue::DataType::dt_double, status);
+        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue.f_double), getTypeStride(typeName));
+    } else if (typeName == "bool") {
+        XSValue::Status status;
+        XSValue* val = XSValue::getActualValue(element->getTextContent(), xercesc::XSValue::DataType::dt_boolean, status);
+        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue.f_bool), getTypeStride(typeName));
+    } else {
+        XSValue::DataType dataType = XSValue::getDataType(XSTR(typeName.c_str()));
+        if (dataType == XSValue::DataType::dt_string) {
+            char* str = XMLString::transcode(element->getTextContent());
+            std::string standardString(str);
+            new (outData) std::string(str);
+            XMLString::release(&str);
+            //memcpy(outData, reinterpret_cast<char*>(&standardString), getTypeStride(typeName));
+        } else {
+            //XSValue::Status status;
+            //XSValue* val = XSValue::getActualValue(element->getTextContent(), dataType, status);
+            //memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue), getTypeStride(typeName));
+            LOG_WARNING("Unknown native data type: %s", typeName.c_str());
+        }
     }
 }
 
