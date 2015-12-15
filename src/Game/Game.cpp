@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Collision/TriggerSystem.h"
+#include "Collision/CollisionSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -47,6 +48,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
+    m_SystemPipeline->AddSystem<CollisionSystem>();
     m_SystemPipeline->AddSystem<TriggerSystem>();
 
     m_LastTime = glfwGetTime();
