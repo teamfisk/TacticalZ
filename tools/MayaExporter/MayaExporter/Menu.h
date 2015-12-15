@@ -33,6 +33,7 @@
 #include "MayaIncludes.h"
 #include "Material.h"
 #include "Mesh.h"
+#include "Var.h"
 
 class Menu : public QWidget
 {
