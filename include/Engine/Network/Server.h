@@ -50,7 +50,7 @@ private:
     void ReadFromClients();
     void InputLoop();
 
-
+    // Network functions
     int  Receive(char* data, size_t length);
     void Send(Package& package, int playerID);
     void Send(Package& package);

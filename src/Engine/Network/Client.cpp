@@ -56,6 +56,7 @@ void Client::Close()
     if (m_WasStarted) {
         Disconnect();
         m_ThreadIsRunning = false;
+        m_IsConnected = false;
         m_EventBroker->Unsubscribe(m_EInputCommand);
     }
 }
@@ -78,7 +79,9 @@ void Client::ReadFromServer()
         }
         std::clock_t currentTime = std::clock();
         if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-            SendSnapshotToServer();
+            if (m_IsConnected) {
+                SendSnapshotToServer();
+            }
             previousSnapshotMessage = currentTime;
         }
     }
@@ -168,6 +171,7 @@ void Client::ParseConnect(Package& package)
     m_PacketID = package.PopFrontPrimitive<int>();
     m_PreviousPacketID = m_PacketID;
     m_PlayerID = package.PopFrontPrimitive<int>();
+    m_IsConnected = true;
     std::cout << m_PacketID << ": I am player: " << m_PlayerID << std::endl;
 }
 
@@ -267,6 +271,7 @@ void Client::Connect()
 
 void Client::Disconnect()
 {
+    m_IsConnected = false;
     Package message(MessageType::Connect, m_SendPacketID);
     message.AddString("+Disconnect");
     Send(message);
