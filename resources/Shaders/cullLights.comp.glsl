@@ -43,8 +43,8 @@ layout (std430, binding = 1) buffer LightBuffer
 } PointLights;
 
 struct LightGrid {
-	int Amount;
-	int Start;
+	float Start;
+	float Amount;
 	vec2 Padding;
 };
 
@@ -60,7 +60,7 @@ layout (std430, binding = 3) buffer LightOffsetBuffer
 
 layout (std430, binding = 4) buffer LightIndexBuffer
 {
-	int LightIndex[];
+	float LightIndex[];
 };
 
 shared int GroupLightCount;
@@ -107,7 +107,7 @@ void AppendLight(int li)
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 void main ()
 {
-	GroupIndex = int(gl_WorkGroupID.x + gl_WorkGroupID.y * gl_NumWorkGroups.y);
+	GroupIndex = int(gl_WorkGroupID.x + (gl_WorkGroupID.y * 80));
 	if(gl_LocalInvocationIndex == 0)
 	{
 		GroupLightCount = 0;
@@ -146,6 +146,15 @@ void main ()
 		LightGrid g;
 		g.Start = GroupLightIndexStartOffset;
 		g.Amount = GroupLightCount;
-		LightGrids.Data[GroupIndex];
+		g.Padding = vec2(1111, 1111);
+		LightGrids.Data[GroupIndex] = g;
+	}
+
+	memoryBarrierShared();
+	barrier();
+
+	for (uint i = gl_LocalInvocationIndex; i < GroupLightCount; i += TILE_SIZE * TILE_SIZE )
+	{
+	    LightIndex[GroupLightIndexStartOffset + i] = GroupLightIndex[i];
 	}
 }

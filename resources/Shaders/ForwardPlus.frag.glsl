@@ -23,8 +23,8 @@ layout (std430, binding = 1) buffer LightBuffer
 } PointLights;
 
 struct LightGrid {
-	int Amount;
-	int Start;
+	float Start;
+	float Amount;
 	vec2 Padding;
 };
 
@@ -35,7 +35,7 @@ layout (std430, binding = 2) buffer LightGridBuffer
 
 layout (std430, binding = 4) buffer LightIndexBuffer
 {
-	int LightIndex[];
+	float LightIndex[];
 };
 
 
@@ -98,11 +98,14 @@ void main()
 
 	LightResult totalLighting;
 	totalLighting.Diffuse = scene_ambient;
-	
+
+
+	int start = int(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Start);
+	int amount = int(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount);
 	//for(int i = 0; i < 3; i++)
-	for(int i = LightGrids.Data[int(tilePos.x + tilePos.y*80)].Start; i < LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount; i++)
+	for(int i = start; i < start + amount; i++)
 	{
-		int l = LightIndex[i];
+		int l = int(LightIndex[i]);
 
 		LightResult result = CalcPointLight(V * PointLights.List[l].Position, PointLights.List[l].Radius, PointLights.List[l].Color, PointLights.List[l].Intensity, viewVec, position, normal);
 
@@ -111,12 +114,15 @@ void main()
 	}
 
 	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
+
 	//fragmentColor = texel * Input.DiffuseColor * Color;
 	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 )
 	{
 		fragmentColor = vec4(0.5, 0, 0, 0);
 	} else {
-		//fragmentColor = vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Start/3600, 0, 0, 1);
+		//fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/3.0, 0, 0, 1);
+
+
 	}
 
 }

@@ -209,44 +209,35 @@ void Renderer::InitializeSSBOs()
     glGenBuffers(1, &m_FrustumSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_FrustumSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Frustums), &m_Frustums, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
     GLERROR("m_FrustumSSBO");
 
     glGenBuffers(1, &m_LightSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_PointLights), &m_PointLights, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
     GLERROR("m_LightSSBO");
+
 
 
     glGenBuffers(1, &m_LightGridSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
     GLERROR("m_LightGridSSBO");
 
 
     glGenBuffers(1, &m_LightOffsetSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
     GLERROR("m_LightOffsetSSBO");
 
 
     glGenBuffers(1, &m_LightIndexSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
     GLERROR("m_LightIndexSSBO");
 
 }
@@ -274,9 +265,9 @@ void Renderer::CalculateFrustum()
 void Renderer::TEMPCreateLights()
 {
     for (int i = 0; i < NUM_LIGHTS; i++) {
-        m_PointLights[i].Position = glm::vec4(5.f * (i-1), 0.f, 0.f, 1.f);
+        m_PointLights[i].Position = glm::vec4(5.f * (i-1), -1.5f, 0.f, 1.f);
         m_PointLights[i].Color = glm::vec4(1.f, 0.5f, 0.f + i*0.1f, 1.f);
-        m_PointLights[i].Radius = 10.f;
+        m_PointLights[i].Radius = 2.f;
     }
 }
 
@@ -287,7 +278,18 @@ void Renderer::CullLights()
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     m_LightCullProgram->Bind();

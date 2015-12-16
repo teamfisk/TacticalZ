@@ -67,7 +67,12 @@ void main ()
 
 
 
-	
-		Frustums.Data[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y*80] = f;	
+		
+		if ( gl_GlobalInvocationID.x < ScreenDimensions.x / TILE_SIZE && gl_GlobalInvocationID.y < ScreenDimensions.y / TILE_SIZE ) { // innanför skärmen?
+	        Frustums.Data[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y*80] = f;	
+
+	    }
+
+		
 	}
 }
