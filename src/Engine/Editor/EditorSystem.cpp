@@ -414,23 +414,62 @@ void EditorSystem::drawUI(World* world, double dt)
     ImGui::End();
 
     if (ImGui::Begin("Entitites")) {
+        static EntityID draggingEntity = 0;
         auto entityChildren = world->GetEntityChildren();
         std::function<void(EntityID)> recurse = [&](EntityID parent) {
             auto range = entityChildren.equal_range(parent);
             for (auto it = range.first; it != range.second; it++) {
+
+                ImVec2 pos = ImGui::GetCursorScreenPos();
+                float width = ImGui::GetContentRegionAvailWidth();
+                ImRect bb(pos + ImVec2(20, 0), pos + ImVec2(width, 13));
+                auto window = ImGui::GetCurrentWindow();
+                if (m_Selection == it->second) {
+                    const ImU32 col = window->Color(ImGuiCol_HeaderActive);
+                    window->DrawList->AddRectFilled(bb.Min, bb.Max, col);
+                }
+                ImGuiID id = window->GetID((std::string("#SelectButton") + std::to_string(it->second)).c_str());
+                bool hovered = false;
+                bool held = false;
+                if (ImGui::ButtonBehavior(bb, id, &hovered, &held)) {
+                    m_Selection = it->second;
+                }
+                if (held) {
+                    ImVec2 entityDragDelta = ImGui::GetMouseDragDelta(0);
+                    if (std::abs(entityDragDelta.x) > 0 && std::abs(entityDragDelta.y) > 0) {
+                        if (draggingEntity == 0) {
+                            draggingEntity = it->second;
+                            LOG_DEBUG("Started drag of entity %i", draggingEntity);
+                        }
+                        ImGui::SetNextWindowPos(ImGui::GetIO().MousePos + ImVec2(20, 0));
+                        ImGui::Begin("Change parent", nullptr, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings);
+                        ImGui::Text("#%i", draggingEntity);
+                        ImGui::End();
+                    }
+                }
+
                 ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
                 if (ImGui::TreeNode((std::string("#") + std::to_string(it->second)).c_str())) {
-                    if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0)) {
-                        m_Selection = it->second;
+                    if (draggingEntity != 0 && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0)) {
+                        LOG_DEBUG("Changed parent of %i to %i", draggingEntity, it->second);
+                        changeParent(draggingEntity, it->second);
+                        draggingEntity = 0;
                     }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Add")) {
-                        EntityID entity = world->CreateEntity(it->second);
-                        world->AttachComponent(entity, "Transform");
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Delete")) {
-                        world->DeleteEntity(it->second);
+
+                    if (ImGui::BeginPopupContextItem("item context menu")) {
+                        if (ImGui::Button("Add")) {
+                            EntityID entity = world->CreateEntity(it->second);
+                            world->AttachComponent(entity, "Transform");
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Delete")) {
+                            world->DeleteEntity(it->second);
+                            ImGui::CloseCurrentPopup();
+                            if (m_Selection == it->second) {
+                                m_Selection = 0;
+                            }
+                        }
+                        ImGui::EndPopup();
                     }
                     recurse(it->second);
                     ImGui::TreePop();
@@ -458,4 +497,21 @@ bool EditorSystem::createDeleteButton(std::string componentType)
     ImU32 col = window->Color((held && hovered) ? ImGuiCol_CloseButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
     window->DrawList->AddCircleFilled(bb.GetCenter(), 7.f, col, 16);
     return pressed;
+}
+
+void EditorSystem::changeParent(EntityID entity, EntityID newParent)
+{
+    if (entity == newParent) {
+        return;
+    }
+
+    // An entity can't be a child to one of its own children
+    auto children = m_World->GetEntityChildren().equal_range(entity);
+    for (auto it = children.first; it != children.second; it++) {
+        if (it->second == newParent) {
+            return;
+        }
+    }
+
+    m_World->SetParent(entity, newParent);
 }

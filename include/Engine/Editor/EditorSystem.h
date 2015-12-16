@@ -67,4 +67,5 @@ private:
     void setWidgetSpace(WidgetSpace space);
     void drawUI(World* world, double dt);
     bool createDeleteButton(std::string componentType);
+    void changeParent(EntityID entity, EntityID newParent);
 };
