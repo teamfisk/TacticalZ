@@ -13,7 +13,7 @@ public:
     // arg2: PackageID for identifying packet loss.
     Package(MessageType type, unsigned int& packageID);
     // Used to create package from already existing data buffer.
-    Package(char* data, int sizeOfPackage);
+    Package(char* data, const int sizeOfPackage);
     ~Package();
     // Add primitive types like int, float, char...
     template<typename T>
@@ -43,7 +43,7 @@ public:
     char* Data() { return m_Data; };
 
 private:
-    char* m_Data = new char[128];
+    char* m_Data;
     unsigned int m_ReturnDataOffset = 0;
     int m_Offset = 0;
 };
