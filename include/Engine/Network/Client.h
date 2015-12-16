@@ -38,12 +38,12 @@ private:
     void Disconnect();
     void Ping();
 	void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
-	void ParseMessageType(char* data, size_t length);
-	void ParseEventMessage(char* data, size_t length);
-	void ParseConnect(char* data, size_t length);
+	void ParseMessageType(Package& package);
+	void ParseEventMessage(Package& package);
+	void ParseConnect(Package& package);
 	void ParsePing();
 	void ParseServerPing();
-	void ParseSnapshot(char* data, size_t length);
+	void ParseSnapshot(Package& package);
 	void CreateNewPlayer(int i);
 	void IdentifyPacketLoss();
 

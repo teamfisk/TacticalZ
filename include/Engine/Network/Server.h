@@ -60,13 +60,13 @@ private:
     void SendPing();
     void CheckForTimeOuts();
     void Disconnect(int i);
-    void ParseMessageType(char* data, size_t length);
-    void ParseEvent(char* data, size_t length);
-    void ParseConnect(char* data, size_t length);
+    void ParseMessageType(Package& package);
+    void ParseEvent(Package& package);
+    void ParseConnect(Package& package);
     void ParseDisconnect();
     void ParseClientPing();
     void ParseServerPing();
-    void ParseSnapshot(char* data, size_t length);
+    void ParseSnapshot(Package& package);
     void IdentifyPacketLoss();
 };
 
