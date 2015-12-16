@@ -61,8 +61,10 @@ void Client::ReadFromServer()
     while (m_ThreadIsRunning) {
         if (m_Socket.available()) {
             bytesRead = Receive(readBuf, INPUTSIZE);
-            Package package(readBuf,bytesRead);
-            ParseMessageType(package);
+            if (bytesRead > 0) {
+                Package package(readBuf, bytesRead);
+                ParseMessageType(package);
+            }
         }
         std::clock_t currentTime = std::clock();
         if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
@@ -75,9 +77,6 @@ void Client::ReadFromServer()
 void Client::SendSnapshotToServer()
 {
     // Reset previouse key state in snapshot.
-    Package message(MessageType::Event, m_SendPacketID);
-    message.AddString(m_NextSnapshot.InputForward);
-    Send(message);
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
     // See if any movement keys are down
@@ -111,6 +110,8 @@ void Client::SendSnapshotToServer()
 void Client::ParseMessageType(Package& package)
 {
     int messageType = package.PopFrontPrimitive<int>();
+    if (messageType == -1)
+        return;
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = package.PopFrontPrimitive<int>(); //Read new packet id
@@ -143,11 +144,9 @@ void Client::ParseMessageType(Package& package)
 
 void Client::ParseConnect(Package& package)
 {
-    memcpy(&m_PacketID, data, sizeof(int));
+    m_PacketID = package.PopFrontPrimitive<int>();
     m_PreviousPacketID = m_PacketID;
-    MoveMessageHead(data, len, sizeof(int));
-    memcpy(&m_PlayerID, data, sizeof(int));
-    MoveMessageHead(data, len, sizeof(int));
+    m_PlayerID = package.PopFrontPrimitive<int>();
     std::cout << m_PacketID << ": I am player: " << m_PlayerID << std::endl;
 }
 
@@ -168,40 +167,25 @@ void Client::ParseServerPing()
 void Client::ParseEventMessage(Package& package)
 {
     int Id = -1;
-    std::string command = std::string(data);
+    std::string command = package.PopFrontString();
     if (command.find("+Player") != std::string::npos) {
-        MoveMessageHead(data, length, command.size() + 1);
-        memcpy(&Id, data, sizeof(int));
-        MoveMessageHead(data, length, sizeof(int));
+        Id = package.PopFrontPrimitive<int>();
         // Sett Player name
         m_PlayerDefinitions[Id].Name = command.erase(0, 7);
     } else {
-        std::cout << m_PacketID << ": Event message: " << std::string(data) << std::endl;
+        std::cout << m_PacketID << ": Event message: " << command << std::endl;
     }
-
-    MoveMessageHead(data, length, std::string(data).size() + 1);
 }
 
-void Client::ParseSnapshot(char* data, size_t length)
+void Client::ParseSnapshot(Package& package)
 {
     //std::cout << m_PacketID << ": Parsing incoming snapshot." << std::endl;
     std::string tempName;
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         // We're checking for empty name for now. This might not be the best way,
         // but it is to avoid sending redundant data.
-
-        // Read position data
-        glm::vec3 playerPos;
-        memcpy(&playerPos.x, data, sizeof(float));
-        MoveMessageHead(data, length, sizeof(float));
-        memcpy(&playerPos.y, data, sizeof(float));
-        MoveMessageHead(data, length, sizeof(float));
-        memcpy(&playerPos.z, data, sizeof(float));
-        MoveMessageHead(data, length, sizeof(float));
-
-        tempName = std::string(data);
-        // +1 for null terminator
-        MoveMessageHead(data, length, tempName.size() + 1);
+        tempName = package.PopFrontString();
+        
         // Apply the position data read to the player entity
         // New player connected on the server side 
         if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
@@ -209,10 +193,17 @@ void Client::ParseSnapshot(char* data, size_t length)
         } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
             // Someone disconnected
             // TODO: Insert code here
+            break;
         } else if (m_PlayerDefinitions[i].Name == "" && tempName == "") {
             // Not a connected player
             break;
         }
+        // Read position data
+        glm::vec3 playerPos;
+        playerPos.x = package.PopFrontPrimitive<float>();
+        playerPos.y = package.PopFrontPrimitive<float>();
+        playerPos.z = package.PopFrontPrimitive<float>();
+        // Move player to server position
         m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
         m_PlayerDefinitions[i].Name = tempName;
     }

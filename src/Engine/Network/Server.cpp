@@ -204,6 +204,10 @@ void Server::SendSnapshot()
 {
     Package package(MessageType::Snapshot, m_SendPacketID);
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
+        
+        // Send an empty name if there is no player connected on this position.
+        package.AddString(m_PlayerDefinitions[i].Name);
+
         if (m_PlayerDefinitions[i].EntityID == -1) {
             continue;
         }
@@ -212,8 +216,6 @@ void Server::SendSnapshot()
         package.AddPrimitive<float>(playerPos.x);
         package.AddPrimitive<float>(playerPos.y);
         package.AddPrimitive<float>(playerPos.z);
-
-        package.AddString(m_PlayerDefinitions[i].Name);
     }
     Broadcast(package);
 }

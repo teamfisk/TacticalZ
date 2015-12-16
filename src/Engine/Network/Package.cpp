@@ -38,7 +38,7 @@ std::string Package::PopFrontString()
         LOG_WARNING("Package PopFrontString(): Oh no! You are trying to remove things outside my memory kingdom");
         return "PopFrontString Failed";
     }   
-
-    m_ReturnDataOffset += returnValue.size();
+    // +1 for null terminator.
+    m_ReturnDataOffset += returnValue.size() + 1;
     return returnValue;
 }
