@@ -65,47 +65,58 @@
     }
 
     var lastSent = 0;
+    var isSaving = false;
     function handleImageChanged(document) {
 
         var start = new Date().getTime();
-        if (start - lastSent > 200) {
+        if (start - lastSent > 100 && !isSaving) {
+            isSaving = true;
+            //console.log("DOC: " + document.id);
             _generator.getDocumentInfo(document.id).then(
             function (document) {
                 // console.log(new Date().getTime() / 1000);
                 // console.log(stringify(document.timeStamp));
-
+                //console.log("HELLO 1");
                 //lastSent = document.timeStamp
                 // console.log(stringify(document));
                 //console.log("Received complete document:", stringify(document));
                 //var str = 'var options = new PNGSaveOptions(); app.activeDocument.saveAs (new File("D:/HejHej.png"),options, false);';
                 var str = 'app.activeDocument.save()';
-                _generator.evaluateJSXString(str).done();
+                
+                _generator.evaluateJSXString(str).then(function () {
+                    isSaving = false;
+                    //console.log("Save succes");
+                    var size = (4 + document.file.length + 1);
+                    var message = new Buffer(size);
 
-                var size = (4 + document.file.length + 1);
-                var message = new Buffer(size);
+                    var offset = 0;
 
-                var offset = 0;
+                    //console.log("document.file.length: " + document.file.length);
+                    //console.log("document.fileName: " + document.file);
 
-                //console.log("document.file.length: " + document.file.length);
-                //console.log("document.fileName: " + document.file);
+                    message.writeInt32LE(document.file.length + 1, offset);
 
-                message.writeInt32LE(document.file.length + 1, offset);
+                    offset += 4;
 
-                offset += 4;
+                    var fileName = document.file.replace(/\\/g, "/");
+                    message.write(fileName, offset, fileName.length, 'utf8');
+                    offset += fileName.length;
+                    message.writeUInt8(0, offset); //Null byte
+                    offset += 1;
 
-                var fileName = document.file.replace(/\\/g, "/");
-                message.write(fileName, offset, fileName.length, 'utf8');
-                offset += fileName.length;
-                message.writeUInt8(0, offset); //Null byte
-                offset += 1;
+                    publisher.send(message);
 
-                publisher.send(message);
-
-                var asd = new Date().getTime();
-                var time = asd - start;
-                console.log(time);
-                lastSent = new Date().getTime();
-                console.log("LastSent: " + lastSent);
+                    var asd = new Date().getTime();
+                    var time = asd - start;
+                    //console.log(time);
+                    lastSent = new Date().getTime();
+                    //console.log("LastSent: " + lastSent);
+                    
+                },
+                function () {
+                    console.log("Save Failure");
+                    isSaving = false;
+                }).done();
             });
         }
     }

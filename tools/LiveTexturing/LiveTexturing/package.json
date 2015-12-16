@@ -1,10 +1,10 @@
 {
-  "name": "Live Textureing RAMDisk",
+  "name": "LiveTexturing",
   "version": "1.0.0",
-  "description": "Send image from Photoshop",
+  "description": "Send image from Photoshop to Maya",
   "main": "main.js",
   "generator-core-version": "~3",
-  "license": "Public Domain",
+  "license": "",
   "readmeFilename": "",
   "scripts": {
   },

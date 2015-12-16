@@ -53,6 +53,8 @@ MThreadRetVal ThreadFunction(void* data)
 	{
 		if (subscriber.recv(&msg, ZMQ_DONTWAIT))
 		{
+			//MGlobal::displayInfo(MString() + "test1: " + msg.size());
+
 			MObject outColorObject;
 			MPlug outColorPlug;
 
@@ -68,8 +70,8 @@ MThreadRetVal ThreadFunction(void* data)
 			PSData.docName = (char*)msg.data() + sizeof(message) - sizeof(char*) - 4;
 			//PSData.pixels = (unsigned char*)msg.data() + sizeof(message) - sizeof(char*) * 2 + 8 + PSData.docNameLength;
 
-			MGlobal::displayInfo(MString() + "docName: " + PSData.docName);
-			MGlobal::displayInfo(MString() + "docNameLength: " + PSData.docNameLength);
+			//MGlobal::displayInfo(MString() + "docName: " + PSData.docName);
+			//MGlobal::displayInfo(MString() + "docNameLength: " + PSData.docNameLength);
 
 			if (textureObject.find(PSData.docName) != textureObject.end())
 			{
@@ -355,7 +357,7 @@ void nodeCreated(MObject& node, void *clientData)
 	if (node.hasFn(MFn::kFileTexture))
 	{
 		MGlobal::displayInfo("FileTextureAdded");
-		MNodeMessage::addAttributeChangedCallback(node, textureChanged);
+		IDArray.append(MNodeMessage::addAttributeChangedCallback(node, textureChanged));
 	}
 }
 
@@ -370,7 +372,7 @@ void timer(float elapsedTime, float lastTime, void *clientData)
 		{
 			MFnDependencyNode depNode(*it);
 			MPlug plug = depNode.findPlug("outColor");
-			MGlobal::displayInfo(MString() + "ANKA: " + plug.name());
+			//MGlobal::displayInfo(MString() + "ANKA: " + plug.name());
 			plug.setMObject(plug.asMObject());
 		}
 		toUpdate.pop_front();
