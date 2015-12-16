@@ -81,6 +81,40 @@ namespace Collision
         return (abs(aCenter[1] - bCenter[1]) <= (aHSize[1] + bHSize[1]));
     }
 
+    bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation)
+    {
+        minimumTranslation = glm::vec3(0, 0, 0);
+        const glm::vec3& aMax = a.MaxCorner();
+        const glm::vec3& bMax = b.MaxCorner();
+        const glm::vec3& aMin = a.MinCorner();
+        const glm::vec3& bMin = b.MinCorner();
+        const glm::vec3& bSize = b.Size();
+        const glm::vec3& aSize = a.Size();
+        float minOffset = INFINITY;
+        float off;
+        auto axisesIntersecting = glm::tvec3<bool, glm::highp>(false, false, false);
+        for (int i = 0; i < 3; ++i) {
+            off = bMax[i] - aMin[i];
+            if (off > 0 && off < bSize[i] + aSize[i]) {
+                if (off < minOffset) {
+                    minimumTranslation = glm::vec3();
+                    minimumTranslation[i] = minOffset = off;
+                }
+                axisesIntersecting[i] = true;
+            }
+            off = aMax[i] - bMin[i];
+            if (off > 0 && off < bSize[i] + aSize[i]) {
+                if (off < minOffset) {
+                    minOffset = off;
+                    minimumTranslation = glm::vec3();
+                    minimumTranslation[i] = -off;
+                }
+                axisesIntersecting[i] = true;
+            }
+        }
+        return glm::all(axisesIntersecting);
+    }
+
     bool RayVsModel(const Ray& ray,
         const std::vector<RawModel::Vertex>& modelVertices,
         const std::vector<unsigned int>& modelIndices)

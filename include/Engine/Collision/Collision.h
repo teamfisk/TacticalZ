@@ -41,6 +41,9 @@ bool RayVsModel(const Ray& ray,
 
 //Return true if the boxes are intersecting.
 bool AABBVsAABB(const AABB& a, const AABB& b);
+//Return true if the boxes are intersecting.
+//Also outputs the minimum translation that box [a] would need in order to resolve collision.
+bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation);
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon = 0.0001f);
 
 //Returns true if the entity has a boundingbox. Outputs the aabb in [outBox].
