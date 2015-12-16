@@ -229,13 +229,14 @@ void Server::SendSnapshot()
             continue;
         }
 
-
-        // Pack player pos into data package
-        glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
-        //glm::vec3 playerPos = glm::vec3(1.0f);
-        package.AddPrimitive<float>(playerPos.x);
-        package.AddPrimitive<float>(playerPos.y);
-        package.AddPrimitive<float>(playerPos.z);
+        //// Pack player pos into data package
+        //glm::vec3 playerPos = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"];
+        ////glm::vec3 playerPos = glm::vec3(1.0f);
+        //package.AddPrimitive<float>(playerPos.x);
+        //package.AddPrimitive<float>(playerPos.y);
+        //package.AddPrimitive<float>(playerPos.z);
+        auto transform = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform");
+        package.AddData(transform.Data, transform.Info.Meta.Stride);        
     }
     Broadcast(package);
 }
