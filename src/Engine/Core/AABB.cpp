@@ -7,6 +7,10 @@ AABB::AABB(const glm::vec3& minPos, const glm::vec3& maxPos)
     , m_HalfSize(0.5f * (maxPos - minPos))
 {}
 
+AABB::AABB(const glm::vec4& minPos, const glm::vec4& maxPos)
+    : AABB(glm::vec3(minPos), glm::vec3(maxPos))
+{}
+
 void AABB::CreateFromCenter(const glm::vec3& center, const glm::vec3& size)
 {
     m_Center = center;
