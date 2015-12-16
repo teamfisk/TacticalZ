@@ -38,7 +38,7 @@ void Client::Start(World* world, EventBroker* eventBroker)
 }
 
 void Client::Update()
-{ 
+{
     while (m_PlayersToCreate.size() > 0) {
         unsigned int i = m_PlayersToCreate.size() - 1;
         unsigned int tempID = m_World->CreateEntity();
@@ -117,7 +117,7 @@ void Client::SendSnapshotToServer()
         package.AddString("0Forward");
         Send(package);
     }
-    
+
 
 
     if (m_NextSnapshot.InputRight != "") {
@@ -168,8 +168,6 @@ void Client::ParseMessageType(Package& package)
 
 void Client::ParseConnect(Package& package)
 {
-    m_PacketID = package.PopFrontPrimitive<int>();
-    m_PreviousPacketID = m_PacketID;
     m_PlayerID = package.PopFrontPrimitive<int>();
     m_IsConnected = true;
     std::cout << m_PacketID << ": I am player: " << m_PlayerID << std::endl;
@@ -210,7 +208,7 @@ void Client::ParseSnapshot(Package& package)
         // We're checking for empty name for now. This might not be the best way,
         // but it is to avoid sending redundant data.
         tempName = package.PopFrontString();
-        
+
 
         // Apply the position data read to the player entity
         // New player connected on the server side 
@@ -225,13 +223,13 @@ void Client::ParseSnapshot(Package& package)
             // Not a connected player
             break;
         }
-        // Read position data
-        glm::vec3 playerPos;
-        playerPos.x = package.PopFrontPrimitive<float>();
-        playerPos.y = package.PopFrontPrimitive<float>();
-        playerPos.z = package.PopFrontPrimitive<float>();
-        // Move player to server position
         if (m_PlayerDefinitions[i].EntityID != -1) {
+            // Read position data
+            glm::vec3 playerPos;
+            playerPos.x = package.PopFrontPrimitive<float>();
+            playerPos.y = package.PopFrontPrimitive<float>();
+            playerPos.z = package.PopFrontPrimitive<float>();
+            // Move player to server position
             m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
         }
     }
@@ -296,8 +294,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
     if (e.Command == "Forward") {
         if (e.Value > 0) {
             m_IsWASDKeyDown.W = true;
-        }
-        else if (e.Value < 0) {
+        } else if (e.Value < 0) {
             m_IsWASDKeyDown.S = true;
         } else {
             m_IsWASDKeyDown.W = false;
@@ -333,6 +330,6 @@ void Client::IdentifyPacketLoss()
     // if no packets lost, difference should be equal to 1
     int difference = m_PacketID - m_PreviousPacketID;
     if (difference != 1) {
-	    LOG_INFO("%i Packet(s) were lost...", difference);
+        LOG_INFO("%i Packet(s) were lost...", difference);
     }
 }
