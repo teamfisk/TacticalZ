@@ -2,6 +2,7 @@
 
 Package::Package(MessageType type, unsigned int& packageID)
 {
+    m_Data = new char[128];
     // Create message header
     // Add message type
     int messageType = static_cast<int>(type);
@@ -12,9 +13,10 @@ Package::Package(MessageType type, unsigned int& packageID)
 }
 
 
-Package::Package(char* data, int sizeOfPackage)
+Package::Package(char* data, const int sizeOfPackage)
 {
     // Create message
+    m_Data = new char[sizeOfPackage];
     memcpy(m_Data, data, sizeOfPackage);
     m_Offset = sizeOfPackage;
 }
