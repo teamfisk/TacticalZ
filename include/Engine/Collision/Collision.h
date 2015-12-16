@@ -6,6 +6,10 @@
 #include "Core/Ray.h"
 #include "Core/AABB.h"
 #include "Engine/Rendering/RawModel.h"
+#include "Core/Entity.h"
+
+class World;
+struct ComponentWrapper;
 
 namespace Collision
 {
@@ -38,6 +42,10 @@ bool RayVsModel(const Ray& ray,
 //Return true if the boxes are intersecting.
 bool AABBVsAABB(const AABB& a, const AABB& b);
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon = 0.0001f);
+
+//Returns true if the entity has a boundingbox. Outputs the aabb in [outBox].
+bool GetEntityBox(World* world, EntityID entity, AABB& outBox, bool forceBoxFromModel = false);
+bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox);
 
 }
 

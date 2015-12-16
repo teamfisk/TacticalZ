@@ -10,23 +10,21 @@
 
 class AABB;
 
-class TriggerSystem : public System
+class TriggerSystem : public PureSystem
 {
 public:
     TriggerSystem(EventBroker* eventBroker)
-        : System(eventBroker, "Trigger")
+        : PureSystem(eventBroker, "Trigger")
     {}
 
-    virtual void Update(World* world, ComponentWrapper& collision, double dt) override;
+    virtual void UpdateComponent(World* world, ComponentWrapper& collision, double dt) override;
 
 private:
     std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesTouchingTrigger;
     std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesCompletelyInTrigger;
 
-    bool getEntityBox(World* world, EntityID id, AABB& outBox);
     //True if leave event was thrown.
     bool throwLeaveIfWasInTrigger(std::unordered_set<EntityID>& triggerSet, EntityID pId, EntityID tId);
-    void attachAABBComponentFromModel(World* world, EntityID id);
     template<typename Event>
     void publish(EntityID pId, EntityID tId)
     {

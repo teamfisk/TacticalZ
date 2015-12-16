@@ -2,6 +2,8 @@
 
 #include "Collision/Collision.h"
 #include "Engine/GLM.h"
+#include "Core/World.h"
+#include "Rendering/Model.h"
 
 namespace Collision
 {
@@ -174,6 +176,61 @@ bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilo
         (std::abs(mi1.z - mi2.z) < epsilon) &&
         (std::abs(ma1.y - ma2.y) < epsilon) &&
         (std::abs(mi1.y - mi2.y) < epsilon);
+}
+
+void attachAABBComponentFromModel(World* world, EntityID id)
+{
+    ComponentWrapper model = world->GetComponent(id, "Model");
+    ComponentWrapper collision = world->AttachComponent(id, "AABB");
+    Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
+
+    glm::mat4 modelMatrix = modelRes->m_Matrix;
+
+    glm::vec3 mini = glm::vec3(INFINITY, INFINITY, INFINITY);
+    glm::vec3 maxi = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
+    for (const auto& v : modelRes->m_Vertices) {
+        const auto& wPos = modelMatrix * glm::vec4(v.Position.x, v.Position.y, v.Position.z, 1);
+        maxi.x = std::max(wPos.x, maxi.x);
+        maxi.y = std::max(wPos.y, maxi.y);
+        maxi.z = std::max(wPos.z, maxi.z);
+        mini.x = std::min(wPos.x, mini.x);
+        mini.y = std::min(wPos.y, mini.y);
+        mini.z = std::min(wPos.z, mini.z);
+    }
+    collision["BoxCenter"] = 0.5f * (maxi + mini);
+    collision["BoxSize"] = maxi - mini;
+}
+
+bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
+{
+    ComponentWrapper& cTrans = world->GetComponent(AABBComponent.EntityID, "Transform");
+    ComponentWrapper model = world->GetComponent(AABBComponent.EntityID, "Model");
+    Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
+    outBox.CreateFromCenter(AABBComponent["BoxCenter"], AABBComponent["BoxSize"]);
+    glm::vec3 mini = outBox.MinCorner();
+    glm::vec3 maxi = outBox.MaxCorner();
+
+    glm::mat4 modelMatrix = modelRes->m_Matrix *
+        glm::translate(glm::mat4(), (glm::vec3)cTrans["Position"]) *
+        glm::scale((glm::vec3)cTrans["Scale"]);
+
+    outBox = AABB(modelMatrix * glm::vec4(mini.x, mini.y, mini.z, 1),
+        modelMatrix * glm::vec4(maxi.x, maxi.y, maxi.z, 1));
+    return true;
+}
+
+bool GetEntityBox(World* world, EntityID entity, AABB& outBox, bool forceBoxFromModel)
+{
+    if (!world->HasComponent(entity, "AABB")) {
+        if (forceBoxFromModel) {
+            attachAABBComponentFromModel(world, entity);
+        } else {
+            return false;
+        }
+    }
+
+    ComponentWrapper& cBox = world->GetComponent(entity, "AABB");
+    return GetEntityBox(world, cBox, outBox);
 }
 
 }

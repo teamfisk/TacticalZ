@@ -16,7 +16,7 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
     } else {
         m_Direction.x = 0;
     }
-    m_EventBroker->Process<PlayerSystem>();
+
     ComponentWrapper& transform = world->GetComponent(player.EntityID, "Transform");
     (glm::vec3&)player["Velocity"] = m_Speed * float(dt) * m_Direction;
     (glm::vec3&)transform["Position"] += (glm::vec3)player["Velocity"];
