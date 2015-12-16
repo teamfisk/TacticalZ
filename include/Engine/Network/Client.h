@@ -17,9 +17,9 @@
 #include "Core/EKeyDown.h"
 #include "Core/EKeyUp.h"
 #include "Input/EInputCommand.h"
+#include "Network/Network.h"
 
-
-class Client
+class Client : public Network
 {
 public:
 	Client();

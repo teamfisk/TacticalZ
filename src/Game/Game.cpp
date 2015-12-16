@@ -20,7 +20,7 @@ Game::Game(int argc, char* argv[])
     m_Renderer = new Renderer(m_EventBroker);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
-	m_Renderer->SetResolution(Rectangle::Rectangle(
+    m_Renderer->SetResolution(Rectangle::Rectangle(
         0,
         0,
         m_Config->Get<int>("Video.Width", 1280),
@@ -53,9 +53,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
     m_SystemPipeline->AddSystem<EditorSystem>();
-	// Invoke network
-	if(m_Config->Get<bool>("Networking.StartNetwork", false) == true)
-		boost::thread workerThread(&Game::NetworkFunction, this);
+    // Invoke network
+    if (m_Config->Get<bool>("Networking.StartNetwork", false) == true)
+        boost::thread workerThread(&Game::NetworkFunction, this);
     m_LastTime = glfwGetTime();
 
     debugInitialize();
@@ -90,7 +90,9 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     // Update network
-    m_IsClient ? m_Client.Update() : m_Server.Update();
+    if (m_IsClientOrServer)
+        m_ClientOrServer->Update();
+
 
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
@@ -133,16 +135,22 @@ void Game::debugTick(double dt)
 }
 
 void Game::NetworkFunction()
-{ 
-	std::string inputMessage;
-	std::cout << "Start client or server? (c/s)" << std::endl;
-	std::cin >> inputMessage;
-	if (inputMessage == "c" || inputMessage == "C") {
-        m_IsClient = true;
-		m_Client.Start(m_World, m_EventBroker);
-	}
-    if (inputMessage == "s" || inputMessage == "S") {
-        m_IsClient = false;
-        m_Server.Start(m_World, m_EventBroker);
+{
+    std::string inputMessage;
+    std::cout << "Start client or server? (c/s)" << std::endl;
+    std::cin >> inputMessage;
+    if (inputMessage == "c" || inputMessage == "C") {
+        m_IsClientOrServer = true;
+        m_ClientOrServer = new Client();
     }
+    if (inputMessage == "s" || inputMessage == "S") {
+        m_IsClientOrServer = true;
+        m_ClientOrServer = new Server();
+    }
+    m_ClientOrServer->Start(m_World, m_EventBroker);
+    // I don't think we are reaching this part of the code right now.
+    // When server or client is done set it to false.
+    m_IsClientOrServer = false;
+    // Destroy it! (with fire)
+    delete m_ClientOrServer;
 }

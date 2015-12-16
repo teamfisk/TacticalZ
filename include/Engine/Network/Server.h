@@ -14,8 +14,9 @@
 #include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Game/ECreatePlayer.h"
+#include "Network/Network.h"
 
-class Server
+class Server : public Network
 {
 public:
     Server();

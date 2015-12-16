@@ -21,6 +21,7 @@
 
 // Network
 #include <boost/thread.hpp>
+#include "Network/Network.h"
 #include "Network/Server.h"
 #include "Network/Client.h"
 
@@ -50,9 +51,8 @@ private:
 
     // Network methods
     void NetworkFunction();
-    Client m_Client;
-    Server m_Server;
-    bool m_IsClient = false;
+    Network* m_ClientOrServer;
+    bool m_IsClientOrServer = false;
 
     EventRelay<Game, Events::InputCommand> m_EInputCommand;
     bool debugOnInputCommand(const Events::InputCommand& e);
