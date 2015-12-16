@@ -4,8 +4,6 @@
 #include "Core/AABB.h"
 
 struct Ray;
-class World;
-class Camera;
 
 class OctTree
 {
@@ -20,8 +18,8 @@ public:
     //For the root OctTree, [octTreeBounds] should be a box containing the entire level.
     OctTree(const AABB& octTreeBounds, int subDivisions);
 
-    //We should only ever need one OctTree in the game, and it should not need to be copied.
-    //Define these if the OctTree suddenly needs to be copied, think of the children OctTree* ptrs. 
+    //We cannot copy the OctTree as of now, because of the recursive dynamic allocation.
+    //Define these if the OctTree suddenly needs to be copied, think of the children OctChild* ptrs. 
     OctTree(const OctTree& other) = delete;
     OctTree(const OctTree&& other) = delete;
     OctTree& operator= (const OctTree& other) = delete;
@@ -36,8 +34,6 @@ public:
     //Empty the tree of all dynamic objects. Static objects remain in the tree.
     void ClearDynamicObjects();
 
-    //Collision test function. WTODO: Probably remove or relocate elsewhere, Collision system?
-    void Update(float dt, World* world, Camera* cam);
     //Returns true if the ray collides with something in the tree. Result is written to [data].
     bool RayCollides(const Ray& ray, Output& data);
     //Returns true if the box collides with something in the tree. 

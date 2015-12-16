@@ -4,8 +4,6 @@
 
 #include "Core/OctTree.h"
 #include "Collision/Collision.h"
-#include "Core/World.h"
-#include "Rendering/Camera.h"
 
 namespace
 {
@@ -149,52 +147,6 @@ OctTree::OctChild::~OctChild()
             c = nullptr;
         }
     }
-}
-
-void OctTree::Update(float dt, World* world, Camera* cam)
-{
-    for (ComponentWrapper& c : *world->GetComponents("Collision")) {
-        AABB aabb;
-        aabb.CreateFromCenter(c["BoxCenter"], c["BoxSize"]);
-        AddDynamicObject(aabb);
-    }
-    const glm::vec4 redCol = glm::vec4(1, 0.2f, 0, 1);
-    const glm::vec4 greenCol = glm::vec4(0.1f, 1.0f, 0.25f, 1);
-    const glm::vec4 blueCol = glm::vec4(0.1f, 0.05f, 0.95f, 1);
-    const glm::vec4 cyanCol = glm::vec4(0.1f, 0.9f, 0.85f, 1);
-    const glm::vec3 boxSize = 0.05f*glm::vec3(1.0f, 1.0f, 1.0f);
-
-    if (!m_UpdatedOnce) {
-        m_BoxID = world->CreateEntity();
-        ComponentWrapper transform = world->AttachComponent(m_BoxID, "Transform");
-        transform["Scale"] = boxSize;
-
-        ComponentWrapper model = world->AttachComponent(m_BoxID, "Model");
-        model["Resource"] = "Models/Core/UnitBox.obj";
-        m_UpdatedOnce = true;
-    }
-
-    AABB box;
-    auto boxPos = cam->Position() + 1.2f*cam->Forward();
-    box.CreateFromCenter(boxPos, boxSize);
-    ComponentWrapper transform = world->GetComponent(m_BoxID, "Transform");
-    transform["Position"] = boxPos;
-    ComponentWrapper model = world->GetComponent(m_BoxID, "Model");
-    bool collBox = BoxCollides(box, AABB());
-    if (collBox) {
-        cam->SetPosition(m_PrevPos);
-        cam->SetOrientation(m_PrevOri);
-        bool collRay = RayCollides({ cam->Position(), cam->Forward() }, Output());
-        model["Color"] = collRay ? cyanCol : greenCol;
-    } else if (RayCollides({ cam->Position(), cam->Forward() }, Output())) {
-        model["Color"] = blueCol;
-    } else {
-        model["Color"] = redCol;
-    }
-
-    m_PrevPos = cam->Position();
-    m_PrevOri = cam->Orientation();
-    ClearDynamicObjects();
 }
 
 bool OctTree::OctChild::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
