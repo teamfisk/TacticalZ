@@ -9,18 +9,18 @@
 #include "Core/EventBroker.h"
 #include "Core/EKeyUp.h"
 
-class CollisionSystem : public System
+class CollisionSystem : public PureSystem
 {
 public:
     CollisionSystem(EventBroker* eventBroker)
-        : System(eventBroker, "AABB")
+        : PureSystem(eventBroker, "AABB")
         , zPress(false)
     {
         //TODO: Debug stuff, remove later.
         EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &CollisionSystem::OnKeyUp);
     }
 
-    virtual void Update(World* world, ComponentWrapper& cAABB, double dt) override;
+    virtual void UpdateComponent(World* world, ComponentWrapper& cAABB, double dt) override;
 
 private:
     bool zPress;
