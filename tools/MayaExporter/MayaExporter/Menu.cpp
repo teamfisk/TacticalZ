@@ -187,17 +187,29 @@ void Menu::GetMaterialData()
 void Menu::GetSkeletonData()
 {
 	this->m_SkeletonHandler = new Skeleton();
+	MTime startFrame = MAnimControl::animationStartTime();
+	MTime endFrame = MAnimControl::animationEndTime();
 
-	// Traverse scene and return vector with all materials
-	std::vector<SkeletonNode>* AllMaterials = m_SkeletonHandler->DoIt();
+	std::vector<std::vector<SkeletonNode>*> AllSkeletons;
 
-	MGlobal::displayInfo(MString() + AllMaterials->size());
-
-	for (int i = 0; i < AllMaterials->size(); i++)
+	for (int i = startFrame.value(); i < endFrame.value();i++)
 	{
-		for (int j = 0; j < AllMaterials->at(i).Joints.size(); j++)
+		MAnimControl::setCurrentTime(MTime(i, MTime::kNTSCField));
+		// Traverse scene and return vector with all materials
+		AllSkeletons.push_back(m_SkeletonHandler->DoIt());
+	}
+
+	MGlobal::displayInfo(MString() + AllSkeletons.size());
+
+	for (int i = 0; i < AllSkeletons.size(); i++)
+	{
+		std::vector<SkeletonNode>*& thisSkeleton = AllSkeletons.at(i);
+		for (int k = 0; k < thisSkeleton->size(); k++)
 		{
-			MGlobal::displayInfo(MString() + AllMaterials->at(i).Joints.at(j).Name.c_str());
+			for (int j = 0; j < thisSkeleton->at(k).Joints.size(); j++)
+			{
+				MGlobal::displayInfo(MString() + thisSkeleton->at(k).Joints.at(j).Name.c_str());
+			}
 		}
 	}
 }

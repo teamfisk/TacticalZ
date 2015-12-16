@@ -31,6 +31,8 @@
 #include <maya/MFnNurbsCurve.h>
 #include <maya/MCommandMessage.h>
 #include <maya/MPlug.h>
+#include <maya/MAnimControl.h>
+#include <maya/MTime.h>
 
 
 // Wrappers
@@ -59,5 +61,6 @@
 #pragma comment(lib,"Foundation.lib")
 #pragma comment(lib,"OpenMaya.lib")
 #pragma comment(lib,"OpenMayaUI.lib")
+#pragma comment (lib, "OpenMayaAnim.lib")
 
 #endif

@@ -59,9 +59,6 @@
     <ClCompile Include="Skeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Var.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="leeeeel.qrc">
@@ -88,9 +85,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Skeleton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Var.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
