@@ -141,7 +141,7 @@ void Client::ParseMessageType(Package& package)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = package.PopFrontPrimitive<int>(); //Read new packet id
-    IdentifyPacketLoss();
+    //IdentifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
