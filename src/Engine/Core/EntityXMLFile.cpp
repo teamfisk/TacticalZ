@@ -71,7 +71,6 @@ void EntityXMLFile::PopulateWorld(World* world)
     parseEntityGraph(world, root, 0);
 }
 
-
 void EntityXMLFile::preprocess(std::string inPath, std::string outPath)
 {
     using namespace xercesc;
@@ -121,7 +120,7 @@ void EntityXMLFile::parseComponentInfo()
     for (unsigned int i = 0; i < topLevelElements->getLength(); ++i) {
         auto element = static_cast<XSElementDeclaration*>(topLevelElements->item(i));
 
-        std::string nameSpace(XSTR(element->getNamespace()));
+        std::string nameSpace = XSTR(element->getNamespace());
         if (nameSpace != "components") {
             continue;
         }
@@ -129,7 +128,7 @@ void EntityXMLFile::parseComponentInfo()
         ComponentInfo compInfo;
 
         // Name
-        compInfo.Name = XSTR(element->getName());
+        compInfo.Name = (std::string)XSTR(element->getName());
         // Annotation
         auto componentAnnotation = element->getAnnotation();
         if (componentAnnotation != nullptr) {
@@ -345,69 +344,27 @@ void EntityXMLFile::parseEntityGraph(World* world, xercesc::DOMElement* element,
         }
     }
 
-    // Recurse children
+    // Recurse children entities
     auto children = m_DOMDocument->evaluate(XSTR("Children/Entity"), element, nullptr, DOMXPathResult::ORDERED_NODE_SNAPSHOT_TYPE, nullptr);
     for (int i = 0; i < children->getSnapshotLength(); i++) {
         children->snapshotItem(i);
         parseEntityGraph(world, dynamic_cast<DOMElement*>(children->getNodeValue()), entity);
     }
 
-    //auto components = m_DOMDocument->getElementsByTagNameNS(XSTR("components"), XSTR("*"));
-    //for (int i = 0; i < components->getLength(); ++i) {
-    //    auto component = dynamic_cast<DOMElement*>(components->item(i));
+    // Recurse children entity references
+    auto refs = m_DOMDocument->evaluate(XSTR("Children/EntityRef"), element, nullptr, DOMXPathResult::ORDERED_NODE_SNAPSHOT_TYPE, nullptr);
+    for (int i = 0; i < refs->getSnapshotLength(); i++) {
+        refs->snapshotItem(i);
+        auto entityRefElement = dynamic_cast<DOMElement*>(refs->getNodeValue());
+        auto attribute = entityRefElement->getAttribute(XSTR("file"));
+        if (attribute == nullptr) {
+            continue;
+        }
 
-    //    std::string componentName = XSTR(component->getLocalName());
-    //    auto& compStore = m_ComponentStore.at(componentName);
-    //    auto& compInfo = compStore.Info;
-
-    //    char* data = &compStore.Data[compStore.Size*compStore.Stride];
-    //    compStore.Size += 1;
-
-    //    auto fields = component->getChildNodes();
-    //    for (int j = 0; j < fields->getLength(); ++j) {
-    //        auto field = fields->item(j);
-    //        auto nodeType = field->getNodeType();
-    //        if (nodeType != DOMNode::ELEMENT_NODE) {
-    //            continue;
-    //        }
-    //        //auto field = dynamic_cast<DOMElement*>(fields->item(j));
-    //        //const XMLCh* value = fields->item(j)->getTextContent();
-    //        std::string fieldName = XSTR(field->getLocalName());
-    //        if (compInfo.FieldTypes.find(fieldName) == compInfo.FieldTypes.end()) {
-    //            std::cout << "Warning: Component \"" << componentName << "\" contains invalid field \"" << fieldName << "\". Skipping." << std::endl;
-    //            continue;
-    //        }
-
-    //        std::string fieldType = compInfo.FieldTypes.at(fieldName);
-    //        unsigned int fieldOffset = compInfo.FieldOffsets.at(fieldName);
-
-    //        XSValue::DataType dataType = XSValue::getDataType(XSTR(fieldType.c_str()));
-    //        if (dataType == XSValue::DataType::dt_MAXCOUNT) {
-    //            // TODO:
-    //            continue;
-    //        }
-    //        if (dataType == XSValue::DataType::dt_string) {
-    //            char* str = XMLString::transcode(field->getTextContent());
-    //            std::string standardString(str);
-    //            XMLString::release(&str);
-    //            memcpy(&data[fieldOffset], reinterpret_cast<char*>(&standardString), getTypeStride(fieldType));
-    //        } else {
-    //            XSValue::Status status;
-    //            XSValue* val = XSValue::getActualValue(field->getTextContent(), dataType, status);
-    //            memcpy(&data[fieldOffset], reinterpret_cast<char*>(&val->fData.fValue), getTypeStride(fieldType));
-    //        }
-    //    }
-    //}
-
-    //auto entities = m_DOMDocument->getElementsByTagName(XSTR("Entity"));
-    //for (int i = 0; i < entities->getLength(); ++i) {
-    //    auto entity = dynamic_cast<DOMElement*>(entities->item(i));
-
-
-    //    //entity->setIdAttribute()
-
-    //    std::cout << "ENTITY " << i + 1 << std::endl;
-    //}
+        std::string file((const char*)XSTR(attribute));
+        boost::filesystem::path absolutePath = boost::filesystem::path(m_EntityFile).parent_path() / file;
+        ResourceManager::Load<EntityXMLFile>(absolutePath.string())->PopulateWorld(world);
+    }
 }
 
 std::size_t EntityXMLFile::getTypeStride(std::string typeName)
@@ -492,4 +449,3 @@ void EntityXMLFile::writeData(const xercesc::DOMElement* element, std::string ty
         }
     }
 }
-

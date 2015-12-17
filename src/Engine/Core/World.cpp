@@ -55,6 +55,7 @@ void World::RegisterComponent(ComponentInfo& ci)
 
 ComponentWrapper World::AttachComponent(EntityID entity, std::string componentType)
 {
+    // TODO: Allocate dynamic pool if component isn't registered
     ComponentPool* pool = m_ComponentPools.at(componentType);
     const ComponentInfo& ci = pool->ComponentInfo();
 

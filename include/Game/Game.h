@@ -14,10 +14,12 @@
 #include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
 #include "Core/EntityXMLFile.h"
+#include "Core/EntityFilePreprocessor.h"
 #include "Core/SystemPipeline.h"
 #include "RaptorCopterSystem.h"
 #include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
+#include "Core/EntityFile.h"
 
 // Network
 #include <boost/thread.hpp>
