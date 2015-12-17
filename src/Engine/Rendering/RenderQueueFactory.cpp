@@ -46,11 +46,9 @@ glm::quat RenderQueueFactory::AbsoluteOrientation(World* world, EntityID entity)
     glm::quat orientation;
 
     do {
-        if (world->HasComponent(entity, "Transform")) {
-            ComponentWrapper transform = world->GetComponent(entity, "Transform");
-            orientation = glm::quat((glm::vec3)transform["Orientation"]) * orientation;
-            entity = world->GetParent(entity);
-        }
+        ComponentWrapper transform = world->GetComponent(entity, "Transform");
+        orientation = glm::quat((glm::vec3)transform["Orientation"]) * orientation;
+        entity = world->GetParent(entity);
     } while (entity != 0);
     
     return orientation;
@@ -61,11 +59,9 @@ glm::vec3 RenderQueueFactory::AbsoluteScale(World* world, EntityID entity)
     glm::vec3 scale(1.f);
 
     do {
-        if (world->HasComponent(entity, "Transform")) {
-            ComponentWrapper transform = world->GetComponent(entity, "Transform");
-            scale *= (glm::vec3)transform["Scale"];
-            entity = world->GetParent(entity);
-        }
+        ComponentWrapper transform = world->GetComponent(entity, "Transform");
+        scale *= (glm::vec3)transform["Scale"];
+        entity = world->GetParent(entity);
     } while (entity != 0);
 
     return scale;
