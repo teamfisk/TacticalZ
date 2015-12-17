@@ -54,9 +54,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
+    m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
     m_SystemPipeline->AddSystem<CollisionSystem>();
     m_SystemPipeline->AddSystem<TriggerSystem>();
-    m_SystemPipeline->AddSystem<EditorSystem>();
 
     m_LastTime = glfwGetTime();
 
