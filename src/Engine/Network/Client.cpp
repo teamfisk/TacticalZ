@@ -5,7 +5,7 @@ using namespace boost::asio::ip;
 
 Client::Client() : m_Socket(m_IOService)
 {
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
     // Set up network stream
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
@@ -225,12 +225,17 @@ void Client::ParseSnapshot(Package& package)
         }
         if (m_PlayerDefinitions[i].EntityID != -1) {
             // Read position data
-            glm::vec3 playerPos;
-            playerPos.x = package.PopFrontPrimitive<float>();
-            playerPos.y = package.PopFrontPrimitive<float>();
-            playerPos.z = package.PopFrontPrimitive<float>();
+        //glm::vec3 playerPos;
+        //playerPos.x = package.PopFrontPrimitive<float>();
+        //playerPos.y = package.PopFrontPrimitive<float>();
+        //playerPos.z = package.PopFrontPrimitive<float>();
+
+        
+
             // Move player to server position
-            m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
+            //m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
+            int dataSize = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Info.Meta.Stride;
+            memcpy(m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Data, package.PopData(dataSize), dataSize);
         }
     }
 }

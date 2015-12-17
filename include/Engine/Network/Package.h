@@ -14,6 +14,7 @@ public:
     Package(MessageType type, unsigned int& packageID);
     // Used to create package from already existing data buffer.
     Package(char* data, const int sizeOfPackage);
+    
     ~Package();
     // Add primitive types like int, float, char...
     template<typename T>
@@ -35,9 +36,13 @@ public:
         m_ReturnDataOffset += sizeof(T);
         return returnValue;
     }
+    // Add a string to the message
     void AddString(std::string str);
+    // Add data to the message
+    void AddData(char* data, int sizeOfData);
     // Pops the first element as if it was a string.
     std::string PopFrontString();
+    char* PopData(int SizeOfData);
 
     int Size() { return m_Offset; };
     char* Data() { return m_Data; };

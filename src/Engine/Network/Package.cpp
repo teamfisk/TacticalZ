@@ -33,6 +33,15 @@ void Package::AddString(std::string str)
     m_Offset += (str.size() + 1) * sizeof(char);
 }
 
+void Package::AddData(char * data, int sizeOfData)
+{ 
+    if (m_Offset + sizeOfData > 128) {
+        LOG_WARNING("Package::AddData(): Data size in package exceeded maximum package size.\n");
+    }
+    memcpy(m_Data + m_Offset, data, sizeOfData);
+    m_Offset += sizeOfData;
+}
+
 std::string Package::PopFrontString()
 {
     std::string returnValue(m_Data + m_ReturnDataOffset);
@@ -43,4 +52,11 @@ std::string Package::PopFrontString()
     // +1 for null terminator.
     m_ReturnDataOffset += returnValue.size() + 1;
     return returnValue;
+}
+
+char * Package::PopData(int SizeOfData)
+{
+    unsigned int oldReturnDataOffset = m_ReturnDataOffset;
+    m_ReturnDataOffset += SizeOfData;
+    return (m_Data + oldReturnDataOffset);
 }
