@@ -17,4 +17,4 @@ Libraries that are too big to be bundled with the project.
 
 | Project                                                    | Version     | License                                                                     | Root folder environment variable (Windows) |
 | ---------------------------------------------------------- | ----------- | --------------------------------------------------------------------------- | ------------------------------------------ |
-| **[Boost](http://www.boost.org)**                          | 1.59.0+     | [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt) | BOOST_ROOT                                 |
+| **[Boost](http://www.boost.org)**                          | 1.60.0+     | [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt) | BOOST_ROOT                                 |
