@@ -5,7 +5,7 @@ void Renderer::Initialize()
 	InitializeWindow();
 	// Create default camera
 	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
-	m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
+	m_DefaultCamera->SetPosition(glm::vec3(0, 1, 10));
 	if (m_Camera == nullptr) {
 		m_Camera = m_DefaultCamera;
 	}
@@ -254,6 +254,8 @@ void Renderer::CalculateFrustum()
 
     m_CalculateFrustumProgram->Bind();
     
+
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
     glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
@@ -264,11 +266,13 @@ void Renderer::CalculateFrustum()
 
 void Renderer::TEMPCreateLights()
 {
-    for (int i = 0; i < NUM_LIGHTS; i++) {
-        m_PointLights[i].Position = glm::vec4(5.f * (i-1), 1.f, 0.f, 1.f);
-        m_PointLights[i].Color = glm::vec4(1.f, 0.5f, 0.f + i*0.1f, 1.f);
-        m_PointLights[i].Radius = 2.f;
-    }
+    for (int z = 0; z < 5; z++)
+        for (int x = 0; x < 5; x++)
+        {
+            m_PointLights[x + z*5].Position = glm::vec4(x*2.f, 0.2f, z * 2.f, 1.f);
+            m_PointLights[x + z*5].Color = glm::vec4(1.f, 0.5f, 1.f, 1.f);
+            m_PointLights[x + z*5].Radius = 0.5f;
+        }
 }
 
 void Renderer::CullLights()
@@ -282,7 +286,7 @@ void Renderer::CullLights()
 
 
     m_LightCullProgram->Bind();
-    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Camera->ViewMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(m_LightCullProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Camera->ViewMatrix()));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);

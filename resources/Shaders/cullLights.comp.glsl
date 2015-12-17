@@ -8,7 +8,7 @@
 
 
 
-#define NUM_LIGHTS 3
+#define NUM_LIGHTS 25
 #define MAX_LIGHTS_PER_TILE 1024
 #define NUM_TILES 3600
 #define TILE_SIZE 16
@@ -71,12 +71,11 @@ int GroupIndex;
 
 bool SphereInsidePlane(vec3 center, float radius, Plane plane)
 {
-	return dot(plane.Normal, center) - plane.d < -radius;
+	return dot(plane.Normal, center) + plane.d > -radius;
 }
 
 bool SphereInsideFrustrum(vec3 center, float radius, Frustum frustum/*, float zNear, float zFar*/)
 {
-	bool result = true;
 
 	//Check depth here
 	//if ( sphere.c.z - sphere.r > zNear || sphere.c.z + sphere.r < zFar )
@@ -84,14 +83,14 @@ bool SphereInsideFrustrum(vec3 center, float radius, Frustum frustum/*, float zN
     //    result = false;
     //}
  
- 	for (int i =0; i < 4 && result; i++)
+ 	for (int i =0; i < 4; i++)
  	{
- 		if(SphereInsidePlane(center, radius, frustum.Planes[i]))
+ 		if(! SphereInsidePlane(center, radius, frustum.Planes[i]))
  		{
- 			result = false;
+ 			return false;
  		}
  	}
- 	return result;
+ 	return true;
 }
 
 void AppendLight(int li)
@@ -115,6 +114,7 @@ void main ()
 	}
 
 	barrier();
+	memoryBarrierShared();
 
 	for(int i = int(gl_LocalInvocationIndex); i < PointLights.List.length(); i += TILE_SIZE*TILE_SIZE)
 	{
@@ -136,6 +136,7 @@ void main ()
 	}
 
 	barrier();
+	memoryBarrierShared();
 
 	if(gl_LocalInvocationIndex == 0)
 	{
@@ -145,6 +146,7 @@ void main ()
 	}
 
 	barrier();
+	
 
 	for (uint i = gl_LocalInvocationIndex; i < GroupLightCount; i += TILE_SIZE * TILE_SIZE )
 	{

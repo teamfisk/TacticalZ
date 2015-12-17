@@ -49,7 +49,7 @@ in VertexData{
 
 out vec4 fragmentColor;
 
-vec4 scene_ambient = vec4(0.0,0.0,0.0,1);
+vec4 scene_ambient = vec4(0.3,0.3,0.3,1);
 
 struct LightResult {
 	vec4 Diffuse;
@@ -115,11 +115,11 @@ void main()
 	}
 
 	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
-	fragmentColor += vec4(LightGrids.Data[currentTile].Amount/3.0, 0, 0, 1);
+	fragmentColor += vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;
 	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 )
 	{
-		//fragmentColor = vec4(0.5, 0, 0, 0);
+		fragmentColor += vec4(0.5, 0, 0, 0);
 	} else {
 		//fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/3.0, 0, 0, 1);
 
