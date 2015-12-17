@@ -31,7 +31,7 @@ void RenderSystem::Initialize()
 
 void RenderSystem::UpdateViewMatrix(ComponentWrapper& cameraTransform)
 {
-    glm::quat orientation = cameraTransform["Orientation"];
+    glm::quat orientation = glm::quat((glm::vec3)cameraTransform["Orientation"]);
     glm::vec3 position = cameraTransform["Position"];
 
     m_ViewMatrix = glm::toMat4(glm::inverse(orientation)) * glm::translate(-position);
@@ -198,7 +198,7 @@ void RenderSystem::Update(World* world, double dt)
             ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
             ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
             
-            firstPersonInputController.SetOrientation((glm::quat)cameraTransform["Orientation"]);
+            firstPersonInputController.SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
             firstPersonInputController.SetPosition((glm::vec3)cameraTransform["Position"]);
         }
     }
@@ -209,7 +209,7 @@ void RenderSystem::Update(World* world, double dt)
         ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
 
         firstPersonInputController.Update(dt);
-        (glm::quat&)cameraTransform["Orientation"] = firstPersonInputController.Orientation();
+        (glm::vec3&)cameraTransform["Orientation"] = glm::eulerAngles(firstPersonInputController.Orientation());
         (glm::vec3&)cameraTransform["Position"] = firstPersonInputController.Position();
 
        
