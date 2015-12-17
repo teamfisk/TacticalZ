@@ -47,26 +47,26 @@ private:
     // Close logic
     bool m_ThreadIsRunning = true;
 
-    // Network functions
-    int  Receive(char* data, size_t length);
-    void ReadFromClients();
-    void Send(Package& package, int playerID);
-    void Send(Package& package);
-    void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
-    void Broadcast(std::string message);
-    void Broadcast(Package& package);
-    void SendSnapshot();
-    void SendPing();
-    void CheckForTimeOuts();
-    void Disconnect(int i);
-    void ParseMessageType(Package& package);
-    void ParseEvent(Package& package);
-    void ParseConnect(Package& package);
-    void ParseDisconnect();
-    void ParseClientPing();
-    void ParseServerPing();
-    void ParseSnapshot(Package& package);
-    void IdentifyPacketLoss();
+    // Private member functions
+    int  receive(char* data, size_t length);
+    void readFromClients();
+    void send(Packet& packet, int playerID);
+    void send(Packet& packet);
+    void moveMessageHead(char*& data, size_t& length, size_t stepSize);
+    void broadcast(std::string message);
+    void broadcast(Packet& packet);
+    void sendSnapshot();
+    void sendPing();
+    void checkForTimeOuts();
+    void disconnect(int i);
+    void parseMessageType(Packet& packet);
+    void parseEvent(Packet& packet);
+    void parseConnect(Packet& packet);
+    void parseDisconnect();
+    void parseClientPing();
+    void parseServerPing();
+    void parseSnapshot(Packet& packet);
+    void identifyPacketLoss();
 };
 
 #endif

@@ -50,7 +50,7 @@ private:
     boost::thread m_NetworkThread;
 
     // Network methods
-    void NetworkFunction();
+    void networkFunction();
     Network* m_ClientOrServer;
     bool m_IsClientOrServer = false;
 

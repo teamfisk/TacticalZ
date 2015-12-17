@@ -3,7 +3,7 @@
 
 #include <boost/asio/ip/udp.hpp>
 #include <queue>
-#include "Network/Package.h"
+#include "Network/Packet.h"
 
 
 #define BOARDSIZE 16

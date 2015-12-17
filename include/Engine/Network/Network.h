@@ -3,7 +3,7 @@
 
 #include "Core/World.h"
 #include "Core/EventBroker.h"
-#include "Network/Package.h"
+#include "Network/Packet.h"
 
 class Network
 {
