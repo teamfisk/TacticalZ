@@ -221,6 +221,9 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
     ComponentWrapper model = world->GetComponent(id, "Model");
     ComponentWrapper collision = world->AttachComponent(id, "AABB");
     Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
+    if (modelRes == nullptr) {
+        return false;
+    }
 
     glm::mat4 modelMatrix = modelRes->m_Matrix;
 
