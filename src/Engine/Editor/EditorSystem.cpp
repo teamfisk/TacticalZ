@@ -153,6 +153,13 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
             glm::vec3& scaleX = m_World->GetComponent(m_WidgetX, "Transform")["Scale"];
             glm::vec3& scaleY = m_World->GetComponent(m_WidgetY, "Transform")["Scale"];
             glm::vec3& scaleZ = m_World->GetComponent(m_WidgetZ, "Transform")["Scale"];
+
+            if (m_WidgetCurrentAxis.x > 0 && m_WidgetCurrentAxis.y > 0 && m_WidgetCurrentAxis.z > 0) {
+                float movementLength = glm::length(movement);
+                float dot = glm::dot((glm::vec3)widgetOrientation, movement);
+                movement = glm::vec3(movementLength) * glm::sign(dot);
+                (glm::vec3&)m_World->GetComponent(m_WidgetOrigin, "Transform")["Scale"] += movement;
+            }
             if (m_WidgetCurrentAxis.x > 0) {
                 scaleX.x += movement.x;
             }
@@ -162,13 +169,18 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
             if (m_WidgetCurrentAxis.z > 0) {
                 scaleZ.z += movement.z;
             }
-            if (m_WidgetCurrentAxis.x > 0 && m_WidgetCurrentAxis.y > 0 && m_WidgetCurrentAxis.z > 0) {
-                float max = glm::max(scaleX.x, glm::max(scaleY.y, scaleZ.z));
-                (glm::vec3&)m_World->GetComponent(m_WidgetOrigin, "Transform")["Scale"] = glm::vec3(max);
-            }
             (glm::vec3&)m_World->GetComponent(m_Selection, "Transform")["Scale"] += movement;
         }
     }
+
+
+    /*LOG_DEBUG("DELTA %f", e.DeltaX);
+    if (e.X < 0) {
+        glfwSetCursorPos(m_Renderer->Window(), width - 1, e.Y);
+    }
+    if (e.X >= width) {
+        glfwSetCursorPos(m_Renderer->Window(), 0, e.Y);
+    }*/
 
     return true;
 }
@@ -287,7 +299,7 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         m_World->GetComponent(m_WidgetOrigin, "Model")["Resource"] = "Models/ScaleWidgetOrigin.obj";
         if (m_Selection != 0) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
-            widgetTransform["Orientation"] = (glm::vec3)selectionTransform["Orientation"];
+            widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
         }
     } else if (newMode == WidgetMode::Rotate) {
         m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/RotationWidgetX.obj";
