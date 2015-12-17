@@ -31,6 +31,8 @@ public:
     const ComponentPool* GetComponents(std::string componentType);
     // Get entity parent
     EntityID GetParent(EntityID entity);
+    // Change the parent of an entity
+    void SetParent(EntityID entity, EntityID parent);
     // Get all component pools
     const std::unordered_map<std::string, ComponentPool*>& GetComponentPools() const { return m_ComponentPools; }
     // Get the entity children map
@@ -40,6 +42,7 @@ private:
     EntityID m_CurrentEntityID = 1;
 
     std::unordered_map<EntityID, EntityID> m_EntityParents;
+    // TODO: This should be a more effective structure
     std::unordered_multimap<EntityID, EntityID> m_EntityChildren;
     std::unordered_map<std::string, ComponentPool*> m_ComponentPools;
 
