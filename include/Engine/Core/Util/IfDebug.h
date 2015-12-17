@@ -1,17 +1,12 @@
-//Example:
-//IF_DEBUG_IS(true) {
-//    //Stuff done only in debug mode.
-//}
-//
-//IF_DEBUG_IS(false) {
-//    //Stuff done only in release mode.
-//} else {
-//    //Stuff only in debug.
-//}
-#ifndef IF_DEBUG_IS
+// Example:
+// DEBUG_IF(condition) {
+//    // This code is executed only in debug mode and if condition is true.
+// }
+// NOTE: condition statement is not executed at all in release mode.
+#ifndef DEBUG_IF
 #ifndef DEBUG
-#define IF_DEBUG_IS(c) if(c)
+#define DEBUG_IF(c) if(c)
 #else
-#define IF_DEBUG_IS(c) if(!c)
+#define DEBUG_IF(c) if(false)
 #endif
 #endif

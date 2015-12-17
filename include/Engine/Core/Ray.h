@@ -11,7 +11,7 @@ public:
         : m_Origin(origin)
         , m_Direction(glm::normalize(dir))
     {
-        IF_DEBUG_IS(true) {
+        DEBUG_IF(true) {
             if (glm::any(glm::isnan(m_Direction))) {
                 LOG_WARNING("Ray Direction was set to the zero-vector, expect unknown side effects and/or crashes.");
             }

@@ -213,8 +213,11 @@ bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilo
         (std::abs(mi1.y - mi2.y) < epsilon);
 }
 
-void attachAABBComponentFromModel(World* world, EntityID id)
+bool attachAABBComponentFromModel(World* world, EntityID id)
 {
+    if (!world->HasComponent(id, "Model")) {
+        return false;
+    }
     ComponentWrapper model = world->GetComponent(id, "Model");
     ComponentWrapper collision = world->AttachComponent(id, "AABB");
     Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
@@ -234,6 +237,7 @@ void attachAABBComponentFromModel(World* world, EntityID id)
     }
     collision["BoxCenter"] = 0.5f * (maxi + mini);
     collision["BoxSize"] = maxi - mini;
+    return true;
 }
 
 bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
@@ -258,7 +262,8 @@ bool GetEntityBox(World* world, EntityID entity, AABB& outBox, bool forceBoxFrom
 {
     if (!world->HasComponent(entity, "AABB")) {
         if (forceBoxFromModel) {
-            attachAABBComponentFromModel(world, entity);
+            if (!attachAABBComponentFromModel(world, entity))
+                return false;
         } else {
             return false;
         }
