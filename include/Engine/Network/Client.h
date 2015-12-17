@@ -42,6 +42,7 @@ private:
     void ParseSnapshot(Package& package);
     void CreateNewPlayer(int i);
     void IdentifyPacketLoss();
+    bool IsConnected();
 
     // UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;

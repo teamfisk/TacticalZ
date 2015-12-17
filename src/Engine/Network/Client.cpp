@@ -78,7 +78,9 @@ void Client::ReadFromServer()
         }
         std::clock_t currentTime = std::clock();
         if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-            SendSnapshotToServer();
+            if (IsConnected()) {
+                SendSnapshotToServer();
+            }
             previousSnapshotMessage = currentTime;
         }
     }
@@ -221,7 +223,8 @@ void Client::ParseSnapshot(Package& package)
             // Not a connected player
             break;
         }
-        // Read position data
+        if (m_PlayerDefinitions[i].EntityID != -1) {
+            // Read position data
         //glm::vec3 playerPos;
         //playerPos.x = package.PopFrontPrimitive<float>();
         //playerPos.y = package.PopFrontPrimitive<float>();
@@ -229,8 +232,7 @@ void Client::ParseSnapshot(Package& package)
 
 
 
-        // Move player to server position
-        if (m_PlayerDefinitions[i].EntityID != -1) {
+            // Move player to server position
             //m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
             int dataSize = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Info.Meta.Stride;
             memcpy(m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Data, package.PopData(dataSize), dataSize);
@@ -293,25 +295,27 @@ void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    ComponentWrapper& player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
-    if (e.Command == "Forward") {
-        if (e.Value > 0) {
-            (bool&)player["Forward"] = true;
-        } else if (e.Value < 0) {
-            (bool&)player["Back"] = true;
-        } else {
-            (bool&)player["Forward"] = false;
-            (bool&)player["Back"] = false;
+    if (m_PlayerID != -1) {
+        ComponentWrapper& player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
+        if (e.Command == "Forward") {
+            if (e.Value > 0) {
+                (bool&)player["Forward"] = true;
+            } else if (e.Value < 0) {
+                (bool&)player["Back"] = true;
+            } else {
+                (bool&)player["Forward"] = false;
+                (bool&)player["Back"] = false;
+            }
         }
-    }
-    if (e.Command == "Right") {
-        if (e.Value > 0) {
-            (bool&)player["Right"] = true;
-        } else if (e.Value < 0) {
-            (bool&)player["Left"] = true;
-        } else {
-            (bool&)player["Left"] = false;
-            (bool&)player["Right"] = false;
+        if (e.Command == "Right") {
+            if (e.Value > 0) {
+                (bool&)player["Right"] = true;
+            } else if (e.Value < 0) {
+                (bool&)player["Left"] = true;
+            } else {
+                (bool&)player["Left"] = false;
+                (bool&)player["Right"] = false;
+            }
         }
     }
     if (e.Command == "Sprint") { // Connect for now
@@ -335,4 +339,14 @@ void Client::IdentifyPacketLoss()
     if (difference != 1) {
         LOG_INFO("%i Packet(s) were lost...", difference);
     }
+}
+
+bool Client::IsConnected()
+{
+    if (m_PlayerID != -1) {
+        if (m_PlayerDefinitions[m_PlayerID].EntityID != -1) {
+            return true;
+        }
+    }
+    return false;
 }
