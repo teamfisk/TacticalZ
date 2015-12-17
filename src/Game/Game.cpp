@@ -52,7 +52,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
-    m_SystemPipeline->AddSystem<EditorSystem>();
+    m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false) == true)
         boost::thread workerThread(&Game::NetworkFunction, this);
@@ -64,8 +64,8 @@ Game::Game(int argc, char* argv[])
 Game::~Game()
 {
     // Call before to ensure that thread closes correctly.
-    //m_Client.Close();
-    //m_Server.Close();
+    //if (m_IsClientOrServer)
+    //  m_ClientOrServer.Close();
 
     delete m_FrameStack;
     delete m_EventBroker;
@@ -149,6 +149,7 @@ void Game::NetworkFunction()
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
     // I don't think we are reaching this part of the code right now.
+    // ~Game() is not called if the game is exited by closing console windows
     // When server or client is done set it to false.
     m_IsClientOrServer = false;
     // Destroy it! (with fire)

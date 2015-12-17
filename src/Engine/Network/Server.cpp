@@ -64,7 +64,7 @@ void Server::ReadFromClients()
                 Package package(readBuffer, bytesRead);
                 ParseMessageType(package);
             } catch (const std::exception& err) {
-                LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
+                //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
             }
 
         }
@@ -96,7 +96,7 @@ void Server::ParseMessageType(Package& package)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = package.PopFrontPrimitive<int>(); //Read new packet id
-    IdentifyPacketLoss();
+    //IdentifyPacketLoss();
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
         ParseConnect(package);

@@ -99,6 +99,22 @@ EntityID World::GetParent(EntityID entity)
     return m_EntityParents.at(entity);
 }
 
+
+void World::SetParent(EntityID entity, EntityID parent)
+{
+    EntityID lastParent = m_EntityParents.at(entity);
+    auto parentChildren = m_EntityChildren.equal_range(lastParent);
+    for (auto it = parentChildren.first; it != parentChildren.second; it++) {
+        if (it->second == entity) {
+            m_EntityChildren.erase(it);
+            break;
+        }
+    }
+
+    m_EntityParents[entity] = parent;
+    m_EntityChildren.insert(std::make_pair(parent, entity));
+}
+
 EntityID World::generateEntityID()
 {
     // TODO: Make EntityID generation smarter

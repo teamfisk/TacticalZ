@@ -196,7 +196,7 @@ void Client::ParseEventMessage(Package& package)
         // Sett Player name
         m_PlayerDefinitions[Id].Name = command.erase(0, 7);
     } else {
-        LOG_INFO("%i: Event message: %s", m_PacketID, command);
+        LOG_INFO("%i: Event message: %s", m_PacketID, command.c_str());
     }
 }
 
@@ -241,7 +241,7 @@ int Client::Receive(char* data, size_t length)
         0, error);
 
     if (error) {
-        LOG_ERROR("ReadFromServer: %s", error.message());
+        //LOG_ERROR("Receive: %s", error.message().c_str());
     }
 
     return bytesReceived;
@@ -313,7 +313,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
             }
         }
     }
-    if (e.Command == "Sprint") { // Connect for now
+    if (e.Command == "ConnectToServer") { // Connect for now
         Connect();
     }
     return false;
