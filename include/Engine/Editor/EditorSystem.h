@@ -1,5 +1,6 @@
 #include <imgui/imgui.h>
 #include <glm/gtx/common.hpp>
+#include <boost/filesystem/path.hpp>
 #include "../Core/System.h"
 #include "../Core/EMousePress.h"
 #include "../Core/EMouseRelease.h"
@@ -8,6 +9,7 @@
 #include "../Input/EInputCommand.h"
 #include "../Rendering/IRenderer.h"
 #include "../Rendering/EPicking.h"
+#include "../Core/EFileDropped.h"
 #include "../Rendering/RenderQueueFactory.h"
 
 class EditorSystem : public ImpureSystem
@@ -41,8 +43,11 @@ private:
 
     EntityID m_Widget = 0;
     EntityID m_WidgetX = 0;
+    EntityID m_WidgetPlaneX = 0;
     EntityID m_WidgetY = 0;
+    EntityID m_WidgetPlaneY = 0;
     EntityID m_WidgetZ = 0;
+    EntityID m_WidgetPlaneZ = 0;
     EntityID m_WidgetOrigin = 0;
     glm::vec3 m_WidgetCurrentAxis;
     float m_WidgetPickingDepth = 0.f;
@@ -50,6 +55,7 @@ private:
     EntityID m_Selection = 0;
     EntityID m_LastSelection = 0;
     glm::vec3 m_Position;
+    std::string m_LastDroppedFile;
 
     EventRelay<EditorSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
@@ -61,6 +67,8 @@ private:
     bool OnMouseMove(const Events::MouseMove& e);
     EventRelay<EditorSystem, Events::Picking> m_EPicking;
     bool OnPicking(const Events::Picking& e);
+    EventRelay<EditorSystem, Events::FileDropped> m_EFileDropped;
+    bool OnFileDropped(const Events::FileDropped& e);
 
     void updateWidget();
     void setWidgetMode(WidgetMode newMode);
