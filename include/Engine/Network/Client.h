@@ -59,7 +59,6 @@ private:
     glm::vec2 m_PlayerPositions[MAXCONNECTIONS];
     std::string m_PlayerName;
     int m_PlayerID = -1;
-    IsWASDKeyDown m_IsWASDKeyDown;
 
     // Network logic
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];

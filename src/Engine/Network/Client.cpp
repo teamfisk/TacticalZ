@@ -5,7 +5,7 @@ using namespace boost::asio::ip;
 
 Client::Client() : m_Socket(m_IOService)
 {
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.6"), 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
     // Set up network stream
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
@@ -89,19 +89,23 @@ void Client::SendSnapshotToServer()
     // Reset previouse key state in snapshot.
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
+
+    auto player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
+
+
     // See if any movement keys are down
     // We dont care if it's overwritten by later
     // if statement. Watcha gonna do, right!
-    if (m_IsWASDKeyDown.W) {
+    if (player["Forward"]) {
         m_NextSnapshot.InputForward = "+Forward";
     }
-    if (m_IsWASDKeyDown.A) {
+    if (player["Left"]) {
         m_NextSnapshot.InputRight = "-Right";
     }
-    if (m_IsWASDKeyDown.S) {
+    if (player["Back"]) {
         m_NextSnapshot.InputForward = "-Forward";
     }
-    if (m_IsWASDKeyDown.D) {
+    if (player["Right"]) {
         m_NextSnapshot.InputRight = "+Right";
     }
 
@@ -114,8 +118,6 @@ void Client::SendSnapshotToServer()
         package.AddString("0Forward");
         Send(package);
     }
-
-
 
     if (m_NextSnapshot.InputRight != "") {
         Package package(MessageType::Event, m_SendPacketID);
@@ -291,24 +293,25 @@ void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
+    ComponentWrapper& player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
     if (e.Command == "Forward") {
         if (e.Value > 0) {
-            m_IsWASDKeyDown.W = true;
+            (bool&)player["Forward"] = true;
         } else if (e.Value < 0) {
-            m_IsWASDKeyDown.S = true;
+            (bool&)player["Back"] = true;
         } else {
-            m_IsWASDKeyDown.W = false;
-            m_IsWASDKeyDown.S = false;
+            (bool&)player["Forward"] = false;
+            (bool&)player["Back"] = false;
         }
     }
     if (e.Command == "Right") {
         if (e.Value > 0) {
-            m_IsWASDKeyDown.D = true;
+            (bool&)player["Right"] = true;
         } else if (e.Value < 0) {
-            m_IsWASDKeyDown.A = true;
+            (bool&)player["Left"] = true;
         } else {
-            m_IsWASDKeyDown.A = false;
-            m_IsWASDKeyDown.D = false;
+            (bool&)player["Left"] = false;
+            (bool&)player["Right"] = false;
         }
     }
     if (e.Command == "Sprint") { // Connect for now
