@@ -199,6 +199,7 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
                     //auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
                     //widgetTransform["Position"] = (glm::vec3)selectionTransform["Position"];
                 } else {
+                    ImGui::SetActiveID(0, nullptr);
                     m_Selection = entity;
                     setWidgetMode(m_WidgetMode);
                 }
