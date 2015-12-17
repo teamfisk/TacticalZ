@@ -7,7 +7,7 @@
 namespace Events
 {
 
-/** Thrown once, when an entity is completely inside a trigger. */
+/** Thrown once, when an entity is only touching a trigger. */
 struct TriggerTouch : Event
 {
     /** The id of the entity that touches the trigger. */
@@ -25,7 +25,7 @@ struct TriggerLeave : Event
     EntityID Trigger;
 };
 
-/** Thrown once, when an entity is completely inside a trigger. */
+/** Thrown once, when an entity is completely contained inside a trigger. */
 struct TriggerEnter : Event
 {
     /** The id of the entity that entered the trigger. */
