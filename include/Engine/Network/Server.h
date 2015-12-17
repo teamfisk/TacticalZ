@@ -4,8 +4,6 @@
 #include <string>
 #include <ctime>
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
 #include <glm/common.hpp>
 
 #include "Network/MessageType.h"
@@ -13,7 +11,6 @@
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"
-#include "Game/ECreatePlayer.h"
 #include "Network/Network.h"
 
 class Server : public Network
@@ -26,32 +23,33 @@ public:
     void Close();
 
 private:
-    // udp stuff
+    // UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::socket m_Socket;
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
+
     //Timers
     std::clock_t m_StartPingTime;
     std::clock_t m_StopTimes[8];
+
     // Game logic
     World* m_World;
     EventBroker* m_EventBroker;
-    // size = players to create, stores playerID
+    // size = ammount of players to create, stores playerID's
     std::vector<unsigned int> m_PlayersToCreate;
+    
     // Packet loss logic
     unsigned int m_PacketID;
     unsigned int m_PreviousPacketID;
     unsigned int m_SendPacketID;
+    
     // Close logic
     bool m_ThreadIsRunning = true;
-    // Threaded
-    void DisplayLoop();
-    void ReadFromClients();
-    void InputLoop();
 
     // Network functions
     int  Receive(char* data, size_t length);
+    void ReadFromClients();
     void Send(Package& package, int playerID);
     void Send(Package& package);
     void MoveMessageHead(char*& data, size_t& length, size_t stepSize);

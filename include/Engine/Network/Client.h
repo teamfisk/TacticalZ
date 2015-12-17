@@ -25,25 +25,6 @@ public:
     void Update();
     void Close();
 private:
-    void ReadFromServer();
-    void SendSnapshotToServer();
-
-    int Receive(char* data, size_t length);
-    void Send(Package& message);
-    void Connect();
-    void Disconnect();
-    void Ping();
-    void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
-    void ParseMessageType(Package& package);
-    void ParseEventMessage(Package& package);
-    void ParseConnect(Package& package);
-    void ParsePing();
-    void ParseServerPing();
-    void ParseSnapshot(Package& package);
-    void CreateNewPlayer(int i);
-    void IdentifyPacketLoss();
-    bool IsConnected();
-
     // UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
@@ -75,6 +56,26 @@ private:
     EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand &e);
+
+    void ReadFromServer();
+    void SendSnapshotToServer();
+
+    int Receive(char* data, size_t length);
+    void Send(Package& message);
+    void Connect();
+    void Disconnect();
+    void Ping();
+    void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
+    void ParseMessageType(Package& package);
+    void ParseEventMessage(Package& package);
+    void ParseConnect(Package& package);
+    void ParsePing();
+    void ParseServerPing();
+    void ParseSnapshot(Package& package);
+    void CreateNewPlayer(int i);
+    void IdentifyPacketLoss();
+    bool IsConnected();
+
 };
 
 #endif

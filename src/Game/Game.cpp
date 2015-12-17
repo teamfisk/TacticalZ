@@ -137,7 +137,7 @@ void Game::debugTick(double dt)
 void Game::NetworkFunction()
 {
     std::string inputMessage;
-    std::cout << "Start client or server? (c/s)" << std::endl;
+    LOG_INFO("Start client or server? (c/s)");
     std::cin >> inputMessage;
     if (inputMessage == "c" || inputMessage == "C") {
         m_IsClientOrServer = true;

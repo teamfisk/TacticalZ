@@ -26,14 +26,15 @@ void Client::Start(World* world, EventBroker* eventBroker)
     // Subscribe to events
     m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
     m_EventBroker->Subscribe(m_EInputCommand);
-    std::cout << "Please enter you name: ";
+
+    LOG_INFO("Please enter your name: ");
     std::cin >> m_PlayerName;
     while (m_PlayerName.size() > 7) {
-        std::cout << "Please enter you name(No longer than 7 characters): ";
+        LOG_INFO("Please enter your name (No longer than 7 characters):");
         std::cin >> m_PlayerName;
     }
     m_Socket.connect(m_ReceiverEndpoint);
-    std::cout << "I am client. BIP BOP\n";
+    LOG_INFO("I am client. BIP BOP");
     ReadFromServer();
 }
 
@@ -170,13 +171,13 @@ void Client::ParseMessageType(Package& package)
 void Client::ParseConnect(Package& package)
 {
     m_PlayerID = package.PopFrontPrimitive<int>();
-    std::cout << m_PacketID << ": I am player: " << m_PlayerID << std::endl;
+    LOG_INFO("%i: I am player: %i", m_PacketID, m_PlayerID);
 }
 
 void Client::ParsePing()
 {
     m_DurationOfPingTime = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
-    std::cout << m_PacketID << ": response time with ctime(ms): " << m_DurationOfPingTime << std::endl;
+    LOG_INFO("%i: response time with ctime(ms): %f", m_PacketID, m_DurationOfPingTime);
 }
 
 void Client::ParseServerPing()
@@ -184,7 +185,6 @@ void Client::ParseServerPing()
     Package message(MessageType::ServerPing, m_SendPacketID);
     message.AddString("Ping recieved");
     Send(message);
-    //std::cout << "Parsing ping." << std::endl;
 }
 
 void Client::ParseEventMessage(Package& package)
@@ -196,13 +196,12 @@ void Client::ParseEventMessage(Package& package)
         // Sett Player name
         m_PlayerDefinitions[Id].Name = command.erase(0, 7);
     } else {
-        std::cout << m_PacketID << ": Event message: " << command << std::endl;
+        LOG_INFO("%i: Event message: %s", m_PacketID, command);
     }
 }
 
 void Client::ParseSnapshot(Package& package)
 {
-    //std::cout << m_PacketID << ": Parsing incoming snapshot." << std::endl;
     std::string tempName;
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         // We're checking for empty name for now. This might not be the best way,
@@ -224,16 +223,8 @@ void Client::ParseSnapshot(Package& package)
             break;
         }
         if (m_PlayerDefinitions[i].EntityID != -1) {
-            // Read position data
-        //glm::vec3 playerPos;
-        //playerPos.x = package.PopFrontPrimitive<float>();
-        //playerPos.y = package.PopFrontPrimitive<float>();
-        //playerPos.z = package.PopFrontPrimitive<float>();
-
-
 
             // Move player to server position
-            //m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform")["Position"] = playerPos;
             int dataSize = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Info.Meta.Stride;
             memcpy(m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Data, package.PopData(dataSize), dataSize);
         }
@@ -250,7 +241,7 @@ int Client::Receive(char* data, size_t length)
         0, error);
 
     if (error) {
-        std::cout << "ReadFromServer crashed: " << error.message();
+        LOG_ERROR("ReadFromServer: %s", error.message());
     }
 
     return bytesReceived;
@@ -295,13 +286,15 @@ void Client::MoveMessageHead(char*& data, size_t& length, size_t stepSize)
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    if (m_PlayerID != -1) {
+    if (IsConnected()) {
         ComponentWrapper& player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
         if (e.Command == "Forward") {
             if (e.Value > 0) {
                 (bool&)player["Forward"] = true;
+                (bool&)player["Back"] = false;
             } else if (e.Value < 0) {
                 (bool&)player["Back"] = true;
+                (bool&)player["Forward"] = false;
             } else {
                 (bool&)player["Forward"] = false;
                 (bool&)player["Back"] = false;
@@ -310,8 +303,10 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
         if (e.Command == "Right") {
             if (e.Value > 0) {
                 (bool&)player["Right"] = true;
+                (bool&)player["Left"] = false;
             } else if (e.Value < 0) {
                 (bool&)player["Left"] = true;
+                (bool&)player["Right"] = false;
             } else {
                 (bool&)player["Left"] = false;
                 (bool&)player["Right"] = false;
