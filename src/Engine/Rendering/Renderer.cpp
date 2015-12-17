@@ -265,7 +265,7 @@ void Renderer::CalculateFrustum()
 void Renderer::TEMPCreateLights()
 {
     for (int i = 0; i < NUM_LIGHTS; i++) {
-        m_PointLights[i].Position = glm::vec4(5.f * (i-1), -1.5f, 0.f, 1.f);
+        m_PointLights[i].Position = glm::vec4(5.f * (i-1), 1.f, 0.f, 1.f);
         m_PointLights[i].Color = glm::vec4(1.f, 0.5f, 0.f + i*0.1f, 1.f);
         m_PointLights[i].Radius = 2.f;
     }
@@ -280,17 +280,6 @@ void Renderer::CullLights()
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     m_LightCullProgram->Bind();
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Camera->ViewMatrix()));

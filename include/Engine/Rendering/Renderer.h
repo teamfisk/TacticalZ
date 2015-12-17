@@ -67,6 +67,7 @@ private:
         glm::vec3 Normal;
         float d;
     };
+
     struct Frustum {
         Plane Planes[4];
     };
@@ -90,6 +91,7 @@ private:
         float Amount;
         glm::vec2 Padding;
     };
+
     LightGrid m_LightGrid[80*45];
 
     int m_LightOffset = 0;

@@ -5,11 +5,18 @@
 		<c:Transform>
 			<Orientation X="0" Y="0" Z="0"/>
 		</c:Transform>
-		<c:Model>
-			<Resource>Models/DummyScene.obj</Resource>
-		</c:Model>
 	</Components>
 	<Children>
+		<Entity>
+			<Components>
+				<c:Transform>
+					<Scale X="100" Y="100" Z="100"/>
+				</c:Transform>
+				<c:Model>
+					<Resource>Models/Core/UnitPlane.obj</Resource>
+				</c:Model>
+			</Components>
+		</Entity>
 		<Entity>
 			<Components>
 				<c:Transform>

@@ -7,6 +7,7 @@ uniform vec4 Color;
 
 uniform sampler2D texture0;
 
+#define TILE_SIZE 16
 
 struct PointLight {
 	vec4 Position;
@@ -48,7 +49,7 @@ in VertexData{
 
 out vec4 fragmentColor;
 
-vec4 scene_ambient = vec4(0.6,0.6,0.6,1);
+vec4 scene_ambient = vec4(0.0,0.0,0.0,1);
 
 struct LightResult {
 	vec4 Diffuse;
@@ -98,10 +99,10 @@ void main()
 
 	LightResult totalLighting;
 	totalLighting.Diffuse = scene_ambient;
+	int currentTile = int(floor(gl_FragCoord.x/TILE_SIZE) + (floor(gl_FragCoord.y/TILE_SIZE) * 80));
 
-
-	int start = int(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Start);
-	int amount = int(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount);
+	int start = int(LightGrids.Data[currentTile].Start);
+	int amount = int(LightGrids.Data[currentTile].Amount);
 	//for(int i = 0; i < 3; i++)
 	for(int i = start; i < start + amount; i++)
 	{
@@ -114,11 +115,11 @@ void main()
 	}
 
 	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
-
+	fragmentColor += vec4(LightGrids.Data[currentTile].Amount/3.0, 0, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;
 	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 )
 	{
-		fragmentColor = vec4(0.5, 0, 0, 0);
+		//fragmentColor = vec4(0.5, 0, 0, 0);
 	} else {
 		//fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/3.0, 0, 0, 1);
 

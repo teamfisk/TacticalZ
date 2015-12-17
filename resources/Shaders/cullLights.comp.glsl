@@ -25,7 +25,7 @@ struct Frustum {
 
 layout (std430, binding = 0) buffer FrustumBuffer
 {
-	Frustum Data[3600];
+	Frustum Data[];
 } Frustums;
 
 struct PointLight {
@@ -111,11 +111,9 @@ void main ()
 	if(gl_LocalInvocationIndex == 0)
 	{
 		GroupLightCount = 0;
-
 		GroupFrustum = Frustums.Data[GroupIndex];
 	}
 
-	memoryBarrierShared();
 	barrier();
 
 	for(int i = int(gl_LocalInvocationIndex); i < PointLights.List.length(); i += TILE_SIZE*TILE_SIZE)
@@ -124,7 +122,7 @@ void main ()
 
 		//if pointlight
 		//Pos i view antagligen
-		if(SphereInsideFrustrum(vec3(V * light.Position), light.Radius, GroupFrustum))
+		if(SphereInsideFrustrum( vec3(V * light.Position), light.Radius, GroupFrustum))
 		{
 			//TODO: Fix transparent and opaque list, and depth test.
 			AppendLight( i );
@@ -137,20 +135,15 @@ void main ()
 
 	}
 
-	memoryBarrierShared();
 	barrier();
 
 	if(gl_LocalInvocationIndex == 0)
 	{
 		GroupLightIndexStartOffset = atomicAdd(LightOffset[0], GroupLightCount);
-		LightGrid g;
-		g.Start = GroupLightIndexStartOffset;
-		g.Amount = GroupLightCount;
-		g.Padding = vec2(1111, 1111);
-		LightGrids.Data[GroupIndex] = g;
+		LightGrids.Data[GroupIndex].Start = GroupLightIndexStartOffset;
+		LightGrids.Data[GroupIndex].Amount = GroupLightCount;
 	}
 
-	memoryBarrierShared();
 	barrier();
 
 	for (uint i = gl_LocalInvocationIndex; i < GroupLightCount; i += TILE_SIZE * TILE_SIZE )
