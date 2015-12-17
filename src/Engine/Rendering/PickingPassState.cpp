@@ -4,7 +4,7 @@
 PickingPassState::PickingPassState(GLuint frameBuffer)
 {
     GLERROR("---2");
-    BindBuffer(frameBuffer);
+    BindFramebuffer(frameBuffer);
     GLERROR("---3");
     Enable(GL_DEPTH_TEST);
     Enable(GL_CULL_FACE);

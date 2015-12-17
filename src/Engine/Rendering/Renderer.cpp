@@ -101,8 +101,6 @@ void Renderer::Draw(RenderQueueCollection& rq)
     //CullLights();
     
     glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_DrawScenePass->Draw(rq);
     GLERROR("Renderer::Draw m_DrawScenePass->Draw");
