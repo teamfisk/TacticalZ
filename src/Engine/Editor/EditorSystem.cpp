@@ -19,6 +19,7 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &EditorSystem::OnMouseRelease);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseMove, &EditorSystem::OnMouseMove);
     EVENT_SUBSCRIBE_MEMBER(m_EPicking, &EditorSystem::OnPicking);
+    EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorSystem::OnFileDropped);
 }
 
 void EditorSystem::Update(World* world, double dt)
@@ -36,6 +37,11 @@ void EditorSystem::Update(World* world, double dt)
     updateWidget();
 
     drawUI(world, dt);
+
+    // Clear drop queue if it wasn't handled by any UI element
+    if (!m_LastDroppedFile.empty()) {
+        m_LastDroppedFile = "";
+    }
 }
 
 bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
@@ -212,6 +218,12 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
     return true;
 };
 
+bool EditorSystem::OnFileDropped(const Events::FileDropped& e)
+{
+    m_LastDroppedFile = boost::filesystem::path(e.Path).lexically_relative(boost::filesystem::current_path()).string();
+    std::replace(m_LastDroppedFile.begin(), m_LastDroppedFile.end(), '\\', '/');
+    return true;
+}
 
 void EditorSystem::updateWidget()
 {
@@ -389,37 +401,53 @@ void EditorSystem::drawUI(World* world, double dt)
                         const std::string& field = pair.first;
                         const std::string& type = pair.second;
                         
+                        ImGui::PushID(field.c_str());
                         if (type == "Vector") {
                             auto& val = component.Property<glm::vec3>(field);
                             if (field == "Scale") {
-                                ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
+                                ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
                             } else if (field == "Orientation") {
                                 glm::vec3 tempVal = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
-                                if (ImGui::SliderFloat3(field.c_str(), glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
+                                if (ImGui::SliderFloat3("", glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
                                     val = tempVal;
                                 }
                             } else {
-                                ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
+                                ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
                             }
                         } else if (type == "Color") {
                             auto& val = component.Property<glm::vec4>(field);
-                            ImGui::ColorEdit4(field.c_str(), glm::value_ptr(val), true);
+                            ImGui::ColorEdit4("", glm::value_ptr(val), true);
                         } else if (type == "string") {
                             std::string& val = component.Property<std::string>(field);
                             char tempString[1024];
                             memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString)));
-                            if (ImGui::InputText(field.c_str(), tempString, sizeof(tempString))) {
+                            if (ImGui::InputText("", tempString, sizeof(tempString))) {
                                 val = std::string(tempString);
                                 LOG_DEBUG("%s::%s changed!", componentType.c_str(), field.c_str());
                             }
+                            // DROP STUFF
+                            if (ImGui::IsItemHovered() && !m_LastDroppedFile.empty()) {
+                                val = m_LastDroppedFile;
+                                m_LastDroppedFile = "";
+                            }
+
                         } else if (type == "double") {
                             float tempVal = static_cast<float>(component.Property<double>(field));
-                            if (ImGui::InputFloat(field.c_str(), &tempVal, 0.01f, 1.f)) {
+                            if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
                                 component.SetProperty(field, static_cast<double>(tempVal));
                             }
                         } else if (type == "bool") {
                             auto& val = component.Property<bool>(field);
-                            ImGui::Checkbox(field.c_str(), &val);
+                            ImGui::Checkbox("", &val);
+                        } else {
+                            ImGui::TextDisabled(type.c_str());
+                        }
+                        ImGui::PopID();
+
+                        ImGui::SameLine();
+                        ImGui::Text(field.c_str());
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::SetTooltip("field annotation goes here");
                         }
                     }
                 }
