@@ -85,6 +85,9 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
         return false;
     }
 
+    if (m_Selection == 0) {
+        return false;
+    }
     auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
     glm::vec3 widgetOrientation = widgetTransform["Orientation"];
 
@@ -207,9 +210,9 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
                 EntityID parent = m_World->GetParent(entity);
                 if (parent == m_Widget) {
                     m_WidgetCurrentAxis = glm::vec3(
-                        (entity == m_WidgetX) || (entity == m_WidgetOrigin),
-                        (entity == m_WidgetY) || (entity == m_WidgetOrigin),
-                        (entity == m_WidgetZ) || (entity == m_WidgetOrigin)
+                        (entity == m_WidgetX) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneY || entity == m_WidgetPlaneZ),
+                        (entity == m_WidgetY) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneX || entity == m_WidgetPlaneZ),
+                        (entity == m_WidgetZ) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneX || entity == m_WidgetPlaneY)
                     );
                     m_WidgetPickingDepth = result.Depth;
 
@@ -245,12 +248,24 @@ void EditorSystem::updateWidget()
         m_WidgetX = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetX, "Transform");
         m_World->AttachComponent(m_WidgetX, "Model");
+        m_WidgetPlaneX = m_World->CreateEntity(m_Widget);
+        m_World->AttachComponent(m_WidgetPlaneX, "Transform");
+        m_World->AttachComponent(m_WidgetPlaneX, "Model");
+        m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/WidgetPlaneX.obj";
         m_WidgetY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetY, "Transform");
         m_World->AttachComponent(m_WidgetY, "Model");
+        m_WidgetPlaneY = m_World->CreateEntity(m_Widget);
+        m_World->AttachComponent(m_WidgetPlaneY, "Transform");
+        m_World->AttachComponent(m_WidgetPlaneY, "Model");
+        m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/WidgetPlaneY.obj";
         m_WidgetZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetZ, "Transform");
         m_World->AttachComponent(m_WidgetZ, "Model");
+        m_WidgetPlaneZ = m_World->CreateEntity(m_Widget);
+        m_World->AttachComponent(m_WidgetPlaneZ, "Transform");
+        m_World->AttachComponent(m_WidgetPlaneZ, "Model");
+        m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/WidgetPlaneZ.obj";
         m_WidgetOrigin = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetOrigin, "Transform");
         m_World->AttachComponent(m_WidgetOrigin, "Model");
@@ -276,15 +291,24 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
     auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
     widgetTransform["Orientation"] = glm::vec3(0.f);
     m_World->GetComponent(m_WidgetX, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetPlaneX, "Model")["Visible"] = false;
     m_World->GetComponent(m_WidgetY, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetPlaneY, "Model")["Visible"] = false;
     m_World->GetComponent(m_WidgetZ, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetPlaneZ, "Model")["Visible"] = false;
     m_World->GetComponent(m_WidgetOrigin, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = false;
 
     if (newMode == WidgetMode::Translate) {
         m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/TranslationWidgetX.obj";
         m_World->GetComponent(m_WidgetY, "Model")["Resource"] = "Models/TranslationWidgetY.obj";
         m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/TranslationWidgetZ.obj";
-        m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = false;
+        // Temporarily disabled for local space until I can figure out what's wrong with the math 
+        if (m_WidgetSpace != WidgetSpace::Local) {
+            m_World->GetComponent(m_WidgetPlaneX, "Model")["Visible"] = true;
+            m_World->GetComponent(m_WidgetPlaneY, "Model")["Visible"] = true;
+            m_World->GetComponent(m_WidgetPlaneZ, "Model")["Visible"] = true;
+        }
         if (m_Selection != 0) {
             if (m_WidgetSpace == WidgetSpace::Local) {
                 auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
@@ -305,7 +329,6 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/RotationWidgetX.obj";
         m_World->GetComponent(m_WidgetY, "Model")["Resource"] = "Models/RotationWidgetY.obj";
         m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/RotationWidgetZ.obj";
-        m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = false;
         if (m_Selection != 0) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
             if (m_WidgetSpace == WidgetSpace::Local) {

@@ -43,8 +43,11 @@ private:
 
     EntityID m_Widget = 0;
     EntityID m_WidgetX = 0;
+    EntityID m_WidgetPlaneX = 0;
     EntityID m_WidgetY = 0;
+    EntityID m_WidgetPlaneY = 0;
     EntityID m_WidgetZ = 0;
+    EntityID m_WidgetPlaneZ = 0;
     EntityID m_WidgetOrigin = 0;
     glm::vec3 m_WidgetCurrentAxis;
     float m_WidgetPickingDepth = 0.f;
