@@ -431,12 +431,12 @@ float EntityXMLFile::getFloatAttribute(const xercesc::DOMElement* element, const
 {
     using namespace xercesc;
     XSValue::Status status;
-    XSValue* val = XSValue::getActualValue(element->getAttribute(XSTR(attribute)), xercesc::XSValue::DataType::dt_float, status);
+    XSValue* val = XSValue::getActualValue(element->getAttribute(XSTR(attribute)), xercesc::XSValue::DataType::dt_double, status);
     if (val == nullptr) {
         LOG_ERROR("Element \"%s\" doesn't have an \"%s\" attribute!", XSTR(element->getTagName()), attribute);
         return 0.f;
     } else {
-        return val->fData.fValue.f_float;
+        return static_cast<float>(val->fData.fValue.f_double);
     }
 }
 

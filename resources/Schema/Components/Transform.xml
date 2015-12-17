@@ -1,5 +1,5 @@
 <c:Transform>
 	<Position X="0" Y="0" Z="0"/>
-	<Orientation X="0" Y="0" Z="0" W="0"/>
+	<Orientation X="0" Y="0" Z="0"/>
 	<Scale X="1" Y="1" Z="1"/>
 </c:Transform>
