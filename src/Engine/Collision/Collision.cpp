@@ -11,9 +11,9 @@ namespace Collision
     //note: this one hasnt been delta adjusted like RayVsAABB has
     bool RayAABBIntr(const Ray& ray, const AABB& box)
     {
-        glm::vec3 w = 75.0f * ray.Direction;
+        glm::vec3 w = 75.0f * ray.Direction();
         glm::vec3 v = glm::abs(w);
-        glm::vec3 c = ray.Origin - box.Center() + w;
+        glm::vec3 c = ray.Origin() - box.Center() + w;
         glm::vec3 half = box.HalfSize();
 
         if (abs(c.x) > v.x + half.x) {
@@ -43,14 +43,15 @@ namespace Collision
 
     bool RayVsAABB(const Ray& ray, const AABB& box, float& outDistance)
     {
-        glm::vec3 invdir = 1.0f / ray.Direction;
+        glm::vec3 invdir = 1.0f / ray.Direction();
+        glm::vec3 origin = ray.Origin();
 
-        float t1 = (box.MinCorner().x - ray.Origin.x)*invdir.x;
-        float t2 = (box.MaxCorner().x - ray.Origin.x)*invdir.x;
-        float t3 = (box.MinCorner().y - ray.Origin.y)*invdir.y;
-        float t4 = (box.MaxCorner().y - ray.Origin.y)*invdir.y;
-        float t5 = (box.MinCorner().z - ray.Origin.z)*invdir.z;
-        float t6 = (box.MaxCorner().z - ray.Origin.z)*invdir.z;
+        float t1 = (box.MinCorner().x - origin.x)*invdir.x;
+        float t2 = (box.MaxCorner().x - origin.x)*invdir.x;
+        float t3 = (box.MinCorner().y - origin.y)*invdir.y;
+        float t4 = (box.MaxCorner().y - origin.y)*invdir.y;
+        float t5 = (box.MinCorner().z - origin.z)*invdir.z;
+        float t6 = (box.MaxCorner().z - origin.z)*invdir.z;
 
         float tmin = std::max(std::max(std::min(t1, t2), std::min(t3, t4)), std::min(t5, t6));
         float tmax = std::min(std::min(std::max(t1, t2), std::max(t3, t4)), std::max(t5, t6));
@@ -123,16 +124,16 @@ namespace Collision
             glm::vec3 v0 = modelVertices[modelIndices[i]].Position;
             glm::vec3 e1 = modelVertices[modelIndices[++i]].Position - v0;		//v1 - v0
             glm::vec3 e2 = modelVertices[modelIndices[++i]].Position - v0;		//v2 - v0
-            glm::vec3 m = ray.Origin - v0;
+            glm::vec3 m = ray.Origin() - v0;
             glm::vec3 MxE1 = glm::cross(m, e1);
-            glm::vec3 DxE2 = glm::cross(ray.Direction, e2);
+            glm::vec3 DxE2 = glm::cross(ray.Direction(), e2);
             float DetInv = glm::dot(e1, DxE2);
             if (std::abs(DetInv) < FLT_EPSILON) {
                 continue;
             }
             DetInv = 1.0f / DetInv;
             float u = glm::dot(m, DxE2) * DetInv;
-            float v = glm::dot(ray.Direction, MxE1) * DetInv;
+            float v = glm::dot(ray.Direction(), MxE1) * DetInv;
             //u,v can be very close to 0 but still negative sometimes. added a deltafactor to compensate for that problem
             if ((u + 0.001f) < 0 || (v + 0.001f) < 0 || 1 < u + v) {
                 continue;
@@ -158,9 +159,9 @@ namespace Collision
             glm::vec3 v0 = modelVertices[modelIndices[i]].Position;
             glm::vec3 e1 = modelVertices[modelIndices[++i]].Position - v0;		//v1 - v0
             glm::vec3 e2 = modelVertices[modelIndices[++i]].Position - v0;		//v2 - v0
-            glm::vec3 m = ray.Origin - v0;
+            glm::vec3 m = ray.Origin() - v0;
             glm::vec3 MxE1 = glm::cross(m, e1);
-            glm::vec3 DxE2 = glm::cross(ray.Direction, e2);//pVec
+            glm::vec3 DxE2 = glm::cross(ray.Direction(), e2);//pVec
             float DetInv = glm::dot(e1, DxE2);
             if (std::abs(DetInv) < FLT_EPSILON) {
                 continue;
@@ -171,7 +172,7 @@ namespace Collision
                 continue;
             }
             float u = glm::dot(m, DxE2) * DetInv;
-            float v = glm::dot(ray.Direction, MxE1) * DetInv;
+            float v = glm::dot(ray.Direction(), MxE1) * DetInv;
 
             //u,v can be very close to 0 but still negative sometimes. added a deltafactor to compensate for that problem
             //If u and v are positive, u+v <= 1, dist is positive, and less than closest.
@@ -194,7 +195,7 @@ namespace Collision
         float v;
         float dist;
         bool hit = RayVsModel(ray, modelVertices, modelIndices, dist, u, v);
-        outHitPosition = ray.Origin + dist * ray.Direction;
+        outHitPosition = ray.Origin() + dist * ray.Direction();
         return hit;
     }
 

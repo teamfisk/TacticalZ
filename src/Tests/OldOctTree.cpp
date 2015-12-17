@@ -172,7 +172,7 @@ bool OctTree::RayCollides(const Ray& ray, Output& data) const
             std::vector<ChildInfo> childInfos;
             childInfos.reserve(8);
             for (int i = 0; i < 8; ++i) {
-                childInfos.push_back({ i, glm::distance(ray.Origin, m_Children[i]->m_Box.Center()) });
+                childInfos.push_back({ i, glm::distance(ray.Origin(), m_Children[i]->m_Box.Center()) });
             }
             std::sort(childInfos.begin(), childInfos.end(), isFirstLower);
             //Loop through the children, starting with the one closest to the ray origin. I.e the first to be hit.

@@ -26,16 +26,14 @@ using boost::unit_test_framework::test_case;
 
 void RayTest(std::string fileName) {
     //simple box test
-    Ray ray;
-    ray.Origin = glm::vec3(-50, 0, 0);
-    ray.Direction = glm::normalize(glm::vec3(1, 0, 0));
+    Ray ray(glm::vec3(-50, 0, 0), glm::vec3(1, 0, 0));
     //using a rawmodel here, else we have to init the renderingsystem
     ResourceManager::RegisterType<RawModel>("RawModel");
     auto unitBox = ResourceManager::Load<RawModel>(fileName);
-    BOOST_CHECK(unitBox != nullptr);
+    BOOST_REQUIRE(unitBox != nullptr);
     bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
     BOOST_CHECK(hit);
-    ray.Direction = glm::normalize(glm::vec3(-1, 0, 0));
+    ray.SetDirection(glm::vec3(-1, 0, 0));
     hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
     BOOST_CHECK(!hit);
 }
@@ -49,7 +47,6 @@ BOOST_AUTO_TEST_CASE(collisionTest)
 
     //fixed seed
     srand(2);
-    Ray ray;
     AABB someAABB;
     glm::vec3 minPos;
     glm::vec3 maxPos;
@@ -57,12 +54,10 @@ BOOST_AUTO_TEST_CASE(collisionTest)
     int test = 0;
     for (size_t i = 0; i < 10; i++)
     {
-        ray.Origin.x = rand() % 100;
-        ray.Origin.y = rand() % 100;
-        ray.Origin.z = rand() % 100;
-        ray.Direction.x = rand() % 100;
-        ray.Direction.y = rand() % 100;
-        ray.Direction.z = rand() % 100;
+        Ray ray(
+            glm::vec3(rand() % 100, rand() % 100, rand() % 100), 
+            glm::vec3(rand() % 100, rand() % 100, rand() % 100)
+        );
         minPos.x = rand() % 100;
         minPos.y = rand() % 100;
         minPos.z = rand() % 100;
@@ -83,7 +78,6 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
 {
     //fixed seed
     srand(2);
-    Ray ray;
     AABB someAABB;
     glm::vec3 minPos;
     glm::vec3 maxPos;
@@ -91,12 +85,10 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
     int test = 0;
     for (size_t i = 0; i < 1000000; i++)
     {
-        ray.Origin.x = rand() % 100;
-        ray.Origin.y = rand() % 100;
-        ray.Origin.z = rand() % 100;
-        ray.Direction.x = rand() % 100;
-        ray.Direction.y = rand() % 100;
-        ray.Direction.z = rand() % 100;
+        Ray ray(
+            glm::vec3(rand() % 100, rand() % 100, rand() % 100),
+            glm::vec3(rand() % 100, rand() % 100, rand() % 100)
+            );
         minPos.x = rand() % 100;
         minPos.y = rand() % 100;
         minPos.z = rand() % 100;
@@ -114,7 +106,7 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
 BOOST_AUTO_TEST_CASE(rayVsModelTest)
 {
     //simple box test
-    RayTest("Models/Core/UnitBox.obj");
+    RayTest("Models/Core/UnitCube.obj");
 }
 
 BOOST_AUTO_TEST_CASE(rayVsModelTest2)
@@ -125,7 +117,6 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
 //    srand(7676462);
 //    srand(7462);
     srand(72);
-    Ray ray;
     AABB someAABB;
     glm::vec3 minPos;
     glm::vec3 maxPos;
@@ -142,19 +133,13 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
 
     for (size_t i = 0; i < 1000000; i++)
     {
-        ray.Origin.x = rand() % 100;
-        ray.Origin.y = rand() % 100;
-        ray.Origin.z = rand() % 100;
-        ray.Direction.x = rand() % 100;
-        ray.Direction.y = rand() % 100;
-        ray.Direction.z = rand() % 100;
-        ray.Origin /= 100;
-        ray.Origin = glm::vec3(-2, 0, 0);
-        ray.Direction /= 100;
+        Ray ray(
+            glm::vec3(-2, 0, 0),
+            glm::vec3(rand() % 100, rand() % 100, rand() % 100)
+            );
         //if we normalize the ray.direction when its 0,0,0 then we get nan,nan,nan - thus we have this check to prevent that
-        if (ray.Direction.x < 0.0001f && ray.Direction.y < 0.0001f && ray.Direction.z < 0.0001f)
+        if (glm::any(glm::isnan(ray.Direction())))
             continue;
-        ray.Direction = glm::normalize(ray.Direction);
 
         z = Collision::RayVsAABB(ray, someAABB);
         if (z) {
@@ -224,10 +209,10 @@ BOOST_AUTO_TEST_CASE(octTest)
     tree.AddDynamicObject(AABB(mini, -0.9f*maxi));
     OctTree::Output data;
     glm::vec3 origin = 3.0f * mini;
-    bool rayIntersected = tree.RayCollides({ origin , glm::normalize(mini - origin) }, data);
+    bool rayIntersected = tree.RayCollides(Ray(origin , mini - origin), data);
     BOOST_CHECK(rayIntersected);
     tree.ClearDynamicObjects();
-    rayIntersected = tree.RayCollides({ origin , glm::normalize(mini - origin) }, data);
+    rayIntersected = tree.RayCollides(Ray(origin, mini - origin), data);
     BOOST_CHECK(!rayIntersected);
 }
 

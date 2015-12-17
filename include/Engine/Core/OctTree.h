@@ -3,7 +3,7 @@
 
 #include "Core/AABB.h"
 
-struct Ray;
+class Ray;
 
 class OctTree
 {

@@ -1,6 +1,10 @@
 #ifndef Collision_h__
 #define Collision_h__
 
+//NOTE: Collision.h needs to be #included before <GLFW/glfw3.h>, 
+//because Collision #includes "RawModel.h", which has "Texture.h", which has "OpenGL.h" which must be #included first
+//or you will get "fatal error C1189: #error:  gl.h included before glew.h"
+
 #include <vector>
 
 #include "Core/Ray.h"
