@@ -17,6 +17,8 @@ Menu::Menu(QDialog* dialog)
 	m_BrowseButton = new QPushButton("&...", this);
 	m_ExportAllButton = new QPushButton("&Export All", this);
 	m_CancelButton = new QPushButton("&Cancel", this);
+	m_AddClipsButton = new QPushButton("&Add Clips", this);
+	m_RemoveClipsButton = new QPushButton("&Remove Latest Clip", this);
 
 	// Option box and checkboxes
 	QGroupBox *optionsBox = new QGroupBox(tr("Options"));
@@ -39,6 +41,8 @@ Menu::Menu(QDialog* dialog)
 	connect(m_BrowseButton, SIGNAL(clicked(bool)), this, SLOT(ExportPathClicked(bool)));
 	connect(m_ExportAllButton, SIGNAL(clicked(bool)), this, SLOT(ExportAll(bool)));
 	connect(m_CancelButton, SIGNAL(clicked(bool)), this, SLOT(CancelClicked(bool)));
+	connect(m_AddClipsButton, SIGNAL(clicked(bool)), this, SLOT(AddClipClicked(bool)));
+	connect(m_RemoveClipsButton, SIGNAL(clicked(bool)), this, SLOT(RemoveClipClicked(bool)));
 
 	connect(m_ExportAnimationsButton, SIGNAL(clicked(bool)), this, SLOT(Button1Clicked(bool)));
 	connect(m_CopyTexturesButton, SIGNAL(clicked(bool)), this, SLOT(Button2Clicked(bool)));
@@ -49,12 +53,25 @@ Menu::Menu(QDialog* dialog)
 	QVBoxLayout* midLayout = new QVBoxLayout;
 	QHBoxLayout* botLayout = new QHBoxLayout;
 	QVBoxLayout* baseLayout = new QVBoxLayout;
+	QHBoxLayout* clipButtonLayout = new QHBoxLayout;
+	QHBoxLayout* startEndLabelLayout = new QHBoxLayout;
+	m_ClipLayout = new QVBoxLayout;
+
+
 
 	m_ExportPath = new QLineEdit;
 	m_FileDialog = new QFileDialog;
 
 	QLabel* exportLabel = new QLabel;
 	exportLabel->setText("Export Path:");
+	QLabel* nameLabel = new QLabel;
+	nameLabel->setText("Name:");
+	QLabel* startLabel = new QLabel;
+	startLabel->setText("Start:");
+	QLabel* endLabel = new QLabel;
+	endLabel->setText("End:");
+
+	//exportLabel->setText("Export Path:");
 	
 	midLayout->addWidget(optionsBox);
 
@@ -66,18 +83,34 @@ Menu::Menu(QDialog* dialog)
 	botLayout->addWidget(m_ExportAllButton);
 	botLayout->addWidget(m_CancelButton);
 
+	startEndLabelLayout->addWidget(nameLabel);
+	startEndLabelLayout->addWidget(startLabel);
+	startEndLabelLayout->addWidget(endLabel);
+
+	clipButtonLayout->addWidget(m_AddClipsButton);
+	clipButtonLayout->addWidget(m_RemoveClipsButton);
+
 	baseLayout->addLayout(topLayout);
 	baseLayout->addLayout(midLayout);
 
 	baseLayout->addSpacing(10);
-	
 	baseLayout->addLayout(botLayout);
+
+	baseLayout->addSpacing(10);
+	baseLayout->addLayout(clipButtonLayout);
+	baseLayout->addLayout(startEndLabelLayout);
+	baseLayout->addLayout(m_ClipLayout);
 	baseLayout->addStretch();
 
 	// Set the layout for our window
 	dialog->setLayout(baseLayout);
 
+	for (unsigned int i = 0; i < 3; i++) {
+		this->AddClipClicked(true);
+	}
+
 }
+
 
 void Menu::ExportSelected(bool checked)
 {
@@ -101,6 +134,11 @@ void Menu::ExportSelected(bool checked)
 	else {
 		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
 	}
+
+	if (m_ExportAnimationsButton->isChecked()) {
+		GetSkeletonData();
+	}
+
 }
 
 void Menu::ExportPathClicked(bool)
@@ -110,6 +148,48 @@ void Menu::ExportPathClicked(bool)
 	m_FileDialog->setOption(QFileDialog::ShowDirsOnly);
 	QString fileName = m_FileDialog->getExistingDirectory(this, "Select", "/home", QFileDialog::ShowDirsOnly);
 	m_ExportPath->setText(fileName);
+}
+
+void Menu::AddClipClicked(bool)
+{
+	QHBoxLayout* tempLayout = new QHBoxLayout;
+
+	QLineEdit* nameLineEdit = new QLineEdit;
+	QLineEdit* startLineEdit = new QLineEdit;
+	QLineEdit* endLineEdit = new QLineEdit;
+
+	m_AnimationClipName.push_back(nameLineEdit);
+	m_StartFrameLines.push_back(startLineEdit);
+	m_EndFrameLines.push_back(endLineEdit);
+
+	tempLayout->addWidget(nameLineEdit);
+	tempLayout->addWidget(startLineEdit);
+	tempLayout->addWidget(endLineEdit);
+
+	m_ClipLayout->addLayout(tempLayout);
+	//m_ClipLayout->update();
+	layouts.push_back(tempLayout);
+}
+
+void Menu::RemoveClipClicked(bool)
+{
+	if (m_StartFrameLines.size() > 0) {
+		QLayoutItem* tempWidget;// = m_ClipLayout->itemAt(0);
+
+		for (unsigned int i = 0; i < layouts.size(); i++) {
+			while ((tempWidget = layouts[layouts.size()-1]->takeAt(0)) != 0) {
+				delete tempWidget->widget();
+				delete tempWidget;
+			}
+		}
+
+		m_ClipLayout->removeItem(tempWidget);
+		m_ClipLayout->update();
+		
+		layouts.pop_back();
+		m_StartFrameLines.pop_back();
+		m_EndFrameLines.pop_back();
+	}
 }
 
 void Menu::ExportAll(bool)
@@ -134,6 +214,9 @@ void Menu::ExportAll(bool)
 	else {
 		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
 	}
+
+	if(m_ExportAnimationsButton->isChecked())
+		GetSkeletonData();
 }
 
 void Menu::CancelClicked(bool)
@@ -145,7 +228,6 @@ void Menu::Button1Clicked(bool)
 {
 	if (m_ExportAnimationsButton->isChecked()) {
 		MGlobal::displayInfo("1 checked!");
-		this->GetSkeletonData();
 	}
 	else {
 		MGlobal::displayInfo("1 unchecked!");
@@ -186,21 +268,34 @@ void Menu::GetMaterialData()
 
 void Menu::GetSkeletonData()
 {
-	this->m_SkeletonHandler = new Skeleton();
-	MTime startFrame = MAnimControl::animationStartTime();
-	MTime endFrame = MAnimControl::animationEndTime();
+	if (MAnimControl::currentTime().unit() != MTime::kNTSCField) {
 
+		MGlobal::displayError(MString() + "Please change to 60 FPS under Preferences/Settings!");
+		return;
+	}
+	
 	std::vector<std::vector<SkeletonNode>> allSkeletons;
 
 	std::vector<BindPoseSkeletonNode> allBindPoses;
 	allBindPoses = m_SkeletonHandler->GetBindPoses();
 
-	for (int i = startFrame.value(); i < endFrame.value();i++)
-	{
-		MAnimControl::setCurrentTime(MTime(i, MTime::kNTSCField));
-		// Traverse scene and return vector with all materials
+	for (unsigned int j = 0; j < m_StartFrameLines.size(); j++) {
+		if (m_StartFrameLines[j]->text().isEmpty() == true || m_StartFrameLines[j]->text().isEmpty() == true) {
+			MGlobal::displayError(MString() + "Empty Animation Clip(s)");
+			return;
+		}
+
+		int startFrame = m_StartFrameLines[j]->text().toInt();
+		int  endFrame = m_EndFrameLines[j]->text().toInt();
+
+		for (int i = startFrame; i < endFrame;++i)
+		{
+			MAnimControl::setCurrentTime(MTime(i, MTime::kNTSCField));
+			MTime time = MAnimControl::currentTime();
+
+			// Traverse scene and return vector with all materials
 		allSkeletons.push_back(m_SkeletonHandler->DoIt());
-	}
+		}
 	
 	//print out all bind poses
 	for (auto aBindPose : allBindPoses)
@@ -219,17 +314,18 @@ void Menu::GetSkeletonData()
 	//Print out all skeletons for all frames
 	MGlobal::displayInfo(MString() + allSkeletons.size());
 	for (auto frameSkeletons : allSkeletons)
-	{
-		for (auto aSkeleton : frameSkeletons)
 		{
+		for (auto aSkeleton : frameSkeletons)
+			{
 			MGlobal::displayInfo(MString() + aSkeleton.Name.c_str());
 			for (auto joint : aSkeleton.Joints)
-			{
+				{
 				//MGlobal::displayInfo(MString() + joint.Translation[0] + " " + joint.Translation[1] + " " + joint.Translation[2]);
 				//MGlobal::displayInfo(MString() + joint.Rotation[0] + " " + joint.Rotation[1] + " " + joint.Rotation[2]);
 				//MGlobal::displayInfo(MString() + joint.Scale[0] + " " + joint.Scale[1] + " " + joint.Scale[2]);
+				}
 			}
-		}
+		}*/
 	}
 }
 
@@ -240,5 +336,6 @@ Menu::~Menu()
 	//delete exportPath;
 	//delete fileDialog;
 	m_FileDialog->~QFileDialog();
+
 	//delete MaterialHandler;
 }

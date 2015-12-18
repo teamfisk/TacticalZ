@@ -29,6 +29,9 @@
 #include <QtGui/qfiledialog.h>
 #include <QtGui/qlineedit.h>
 #include <QtGui/qgroupbox.h>
+#include <QtGui/qlayoutitem.h>
+#include <QtGui/qtabwidget.h>
+
 
 #include "MayaIncludes.h"
 #include "Material.h"
@@ -48,6 +51,8 @@ public:
 private slots:
 	void ExportSelected(bool checked);
 	void ExportPathClicked(bool);
+	void AddClipClicked(bool);
+	void RemoveClipClicked(bool);
 	void ExportAll(bool);
 	void CancelClicked(bool);
 
@@ -58,10 +63,18 @@ private slots:
 
 private:
 	Menu();
+	std::vector<QLineEdit*> m_AnimationClipName;
+	std:: vector<QLineEdit*> m_StartFrameLines;
+	std::vector<QLineEdit*> m_EndFrameLines;
+	std::vector<QHBoxLayout*> layouts;
+	QVBoxLayout* m_ClipLayout;
+
 	QPushButton* m_ExportSelectedButton = nullptr;
 	QPushButton* m_BrowseButton = nullptr;
 	QPushButton* m_ExportAllButton = nullptr;
 	QPushButton* m_CancelButton = nullptr;
+	QPushButton* m_AddClipsButton = nullptr;
+	QPushButton* m_RemoveClipsButton = nullptr;
 
 	QCheckBox* m_ExportAnimationsButton = nullptr;
 	QCheckBox* m_CopyTexturesButton = nullptr;
