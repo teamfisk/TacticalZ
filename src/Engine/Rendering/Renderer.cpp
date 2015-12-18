@@ -218,8 +218,6 @@ void Renderer::InitializeSSBOs()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightSSBO");
 
-
-
     glGenBuffers(1, &m_LightGridSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
@@ -232,7 +230,6 @@ void Renderer::InitializeSSBOs()
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightOffsetSSBO");
-
 
     glGenBuffers(1, &m_LightIndexSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
@@ -254,8 +251,6 @@ void Renderer::CalculateFrustum()
 
     m_CalculateFrustumProgram->Bind();
     
-
-
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
     glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
@@ -283,7 +278,6 @@ void Renderer::CullLights()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
 
     m_LightCullProgram->Bind();
     glUniformMatrix4fv(glGetUniformLocation(m_LightCullProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Camera->ViewMatrix()));

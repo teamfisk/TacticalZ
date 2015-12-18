@@ -8,7 +8,7 @@
 
 
 
-#define MAX_LIGHTS_PER_TILE 1024
+#define MAX_LIGHTS_PER_TILE 200
 #define NUM_TILES 3600
 #define TILE_SIZE 16
 
