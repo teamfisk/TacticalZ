@@ -2,7 +2,7 @@
 
 Packet::Packet(MessageType type, unsigned int& packetID)
 {
-    m_Data = new char[128];
+    m_Data = new char[m_MaxPacketSize];
     // Create message header
     // Add message type
     int messageType = static_cast<int>(type);
