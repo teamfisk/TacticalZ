@@ -15,7 +15,7 @@
 
 
 #define TILE_SIZE 16 
-#define NUM_LIGHTS 5000
+#define NUM_LIGHTS 1000
 
 
 #include "../Core/EventBroker.h"

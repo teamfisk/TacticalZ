@@ -271,7 +271,7 @@ void Renderer::TEMPCreateLights()
         glm::vec3 pos = glm::vec3(cos(i) * i/10.f , 0.5f, sin(i) * i/10.f);
         m_PointLights[i].Position = glm::vec4(pos, 1.f);
         m_PointLights[i].Color = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand()%255 / 255.f, 1.f);
-        m_PointLights[i].Radius = 5.0f;
+        m_PointLights[i].Radius = glm::length(pos) / 5.f;
     }
 }
 
