@@ -114,7 +114,7 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
                 EntityID parent = m_World->GetParent(m_Selection);
                 glm::quat inverseParentOrientation;
                 if (parent != 0) {
-                    inverseParentOrientation = glm::inverse(RenderQueueFactory::AbsoluteOrientation(m_World, parent));
+                    inverseParentOrientation = glm::inverse(RenderSystem::AbsoluteOrientation(m_World, parent));
                 }
                 (glm::vec3&)m_World->GetComponent(m_Selection, "Transform")["Position"] += inverseParentOrientation * movement;
             } else if (m_WidgetSpace == WidgetSpace::Local) {
@@ -130,7 +130,7 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
                 EntityID parent = m_World->GetParent(m_Selection);
                 glm::quat parentOrientation;
                 if (parent != 0) {
-                    parentOrientation = RenderQueueFactory::AbsoluteOrientation(m_World, parent);
+                    parentOrientation = RenderSystem::AbsoluteOrientation(m_World, parent);
                 }
                 glm::vec3& selectionOrientation = m_World->GetComponent(m_Selection, "Transform")["Orientation"];
                 //glm::quat currentOrientation = RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection);
@@ -235,10 +235,10 @@ void EditorSystem::updateWidget()
 
     if (m_Selection != 0) {
         auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
-        glm::vec3 selectionPosition = RenderQueueFactory::AbsolutePosition(m_World, m_Selection);
+        glm::vec3 selectionPosition = RenderSystem::AbsolutePosition(m_World, m_Selection);
         widgetTransform["Position"] = selectionPosition;
         if (m_WidgetSpace == WidgetSpace::Local) {
-            widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
+            widgetTransform["Orientation"] = glm::eulerAngles(RenderSystem::AbsoluteOrientation(m_World, m_Selection));
         }
     }
 }
@@ -264,7 +264,7 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         if (m_Selection != 0) {
             if (m_WidgetSpace == WidgetSpace::Local) {
                 auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
-                widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
+                widgetTransform["Orientation"] = glm::eulerAngles(RenderSystem::AbsoluteOrientation(m_World, m_Selection));
             }
         }
     } else if (newMode == WidgetMode::Scale) {
@@ -285,7 +285,7 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         if (m_Selection != 0) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
             if (m_WidgetSpace == WidgetSpace::Local) {
-                widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
+                widgetTransform["Orientation"] = glm::eulerAngles(RenderSystem::AbsoluteOrientation(m_World, m_Selection));
             }
         }
     }

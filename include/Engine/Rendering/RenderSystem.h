@@ -10,6 +10,7 @@
 #include "Model.h"
 #include "../Core/EKeyDown.h"
 #include "../Input/EInputCommand.h"
+#include "Camera.h"
 
 class RenderSystem : public ImpureSystem
 {
@@ -27,6 +28,7 @@ public:
 private:
     RenderQueueCollection* m_RenderQueues;
     bool m_SwitchCamera = false;
+    Camera* m_Camera = nullptr;
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(const Events::SetCamera &event);

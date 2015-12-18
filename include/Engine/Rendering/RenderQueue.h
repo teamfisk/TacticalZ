@@ -8,6 +8,7 @@
 #include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
 #include "../Core/Entity.h"
+#include "Camera.h"
 
 class Model;
 class Skeleton;
@@ -168,6 +169,7 @@ struct RenderQueueCollection
 {
 	RenderQueue Forward;
 	RenderQueue Lights;
+    Camera* Camera;
 
 	void Clear()
 	{

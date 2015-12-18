@@ -8,6 +8,8 @@ RenderSystem::RenderSystem(EventBroker* eventBrokerer, RenderQueueCollection* re
     Initialize();
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
+
+
 }
 
 

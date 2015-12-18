@@ -14,7 +14,6 @@ Game::Game(int argc, char* argv[])
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-    m_RenderQueueFactory = new RenderQueueFactory();
 
     // Create the renderer
     m_Renderer = new Renderer(m_EventBroker, m_World);
@@ -47,6 +46,8 @@ Game::Game(int argc, char* argv[])
     if (!mapToLoad.empty()) {
         ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
     }
+
+    m_RenderQueues = new RenderQueueCollection();
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
