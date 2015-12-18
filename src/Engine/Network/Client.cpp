@@ -13,8 +13,7 @@ Client::Client() : m_Socket(m_IOService)
 
 Client::~Client()
 {
-    // will it work on linux? #if defined (_WIN64) | defined(_WIN32) otherwise.
-    _CrtDumpMemoryLeaks();
+
 }
 
 void Client::Start(World* world, EventBroker* eventBroker)
@@ -182,9 +181,9 @@ void Client::parsePing()
 
 void Client::parseServerPing()
 {
-    Packet message(MessageType::ServerPing, m_SendPacketID);
-    message.WriteString("Ping recieved");
-    send(message);
+    Packet packet(MessageType::ServerPing, m_SendPacketID);
+    packet.WriteString("Ping recieved");
+    send(packet);
 }
 
 void Client::parseEventMessage(Packet& packet)
@@ -257,25 +256,25 @@ void Client::send(Packet& packet)
 
 void Client::connect()
 {
-    Packet message(MessageType::Connect, m_SendPacketID);
-    message.WriteString(m_PlayerName);
+    Packet packet(MessageType::Connect, m_SendPacketID);
+    packet.WriteString(m_PlayerName);
     m_StartPingTime = std::clock();
-    send(message);
+    send(packet);
 }
 
 void Client::disconnect()
 {
-    Packet message(MessageType::Connect, m_SendPacketID);
-    message.WriteString("+Disconnect");
-    send(message);
+    Packet packet(MessageType::Connect, m_SendPacketID);
+    packet.WriteString("+Disconnect");
+    send(packet);
 }
 
 void Client::ping()
 {
-    Packet message(MessageType::Connect, m_SendPacketID);
-    message.WriteString("Ping");
+    Packet packet(MessageType::Connect, m_SendPacketID);
+    packet.WriteString("Ping");
     m_StartPingTime = std::clock();
-    send(message);
+    send(packet);
 }
 
 void Client::moveMessageHead(char*& data, size_t& length, size_t stepSize)

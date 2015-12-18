@@ -36,7 +36,7 @@ private:
     // Game logic
     World* m_World;
     EventBroker* m_EventBroker;
-    // size = ammount of players to create, stores playerID's
+    // vec.size() = ammount of players to create, stores playerID's
     std::vector<unsigned int> m_PlayersToCreate;
     
     // Packet loss logic

@@ -9,12 +9,4 @@ struct SnapshotDefinitions
     std::string InputRight;
 };
 
-struct IsWASDKeyDown
-{
-    bool W = false;
-    bool A = false;
-    bool S = false;
-    bool D = false;
-};
-
 #endif
