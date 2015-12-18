@@ -25,7 +25,7 @@ public:
     void Update();
     void Close();
 private:
-    // UDP logic
+    // Assio UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::socket m_Socket;
@@ -52,30 +52,29 @@ private:
     // if game is turned of by closing window.
     bool m_WasStarted = false;
 
+    // Private member functions
+    void readFromServer();
+    void sendSnapshotToServer();
+    int receive(char* data, size_t length);
+    void send(Packet& packet);
+    void connect();
+    void disconnect();
+    void ping();
+    void moveMessageHead(char*& data, size_t& length, size_t stepSize);
+    void parseMessageType(Packet& packet);
+    void parseEventMessage(Packet& packet);
+    void parseConnect(Packet& packet);
+    void parsePing();
+    void parseServerPing();
+    void parseSnapshot(Packet& packet);
+    void createNewPlayer(int i);
+    void identifyPacketLoss();
+    bool isConnected();
+
     // Events
     EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand &e);
-
-    void ReadFromServer();
-    void SendSnapshotToServer();
-
-    int Receive(char* data, size_t length);
-    void Send(Package& message);
-    void Connect();
-    void Disconnect();
-    void Ping();
-    void MoveMessageHead(char*& data, size_t& length, size_t stepSize);
-    void ParseMessageType(Package& package);
-    void ParseEventMessage(Package& package);
-    void ParseConnect(Package& package);
-    void ParsePing();
-    void ParseServerPing();
-    void ParseSnapshot(Package& package);
-    void CreateNewPlayer(int i);
-    void IdentifyPacketLoss();
-    bool IsConnected();
-
 };
 
 #endif

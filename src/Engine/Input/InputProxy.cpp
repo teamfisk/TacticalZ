@@ -62,7 +62,7 @@ void InputProxy::Process()
             e.Command = command;
             e.Value = currentValue;
             m_EventBroker->Publish(e);
-            //LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+            LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
             m_LastCommandValues[command] = currentValue;
         }
     }
@@ -78,7 +78,7 @@ void InputProxy::Process()
         }
         //e.Value = std::max(-1.f, std::min(e.Value, 1.f));
         m_EventBroker->Publish(e);
-        //LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+        LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
     }
     m_CommandQueue.clear();
 }

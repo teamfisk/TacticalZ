@@ -54,8 +54,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PlayerSystem>();
     m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
     // Invoke network
-    if (m_Config->Get<bool>("Networking.StartNetwork", false) == true)
-        boost::thread workerThread(&Game::NetworkFunction, this);
+    if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
+        boost::thread workerThread(&Game::networkFunction, this);
+    }
     m_LastTime = glfwGetTime();
 
     debugInitialize();
@@ -90,8 +91,9 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     // Update network
-    if (m_IsClientOrServer)
+    if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
+    }
 
 
     // Iterate through systems and update world!
@@ -134,7 +136,7 @@ void Game::debugTick(double dt)
     m_EventBroker->Process<Game>();
 }
 
-void Game::NetworkFunction()
+void Game::networkFunction()
 {
     std::string inputMessage;
     LOG_INFO("Start client or server? (c/s)");
