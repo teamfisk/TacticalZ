@@ -9,14 +9,11 @@ void Renderer::Initialize()
 	if (m_Camera == nullptr) {
 		m_Camera = m_DefaultCamera;
 	}
-    TEMPCreateLights();
     InitializeRenderPasses();
 
 	glfwSwapInterval(m_VSYNC);
 	InitializeShaders();
     InitializeTextures();
-    InitializeSSBOs();
-    CalculateFrustum();
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
@@ -72,16 +69,6 @@ void Renderer::InitializeShaders()
     m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
     m_DrawScreenQuadProgram->Compile();
     m_DrawScreenQuadProgram->Link();
-
-    m_CalculateFrustumProgram = ResourceManager::Load<ShaderProgram>("#CalculateFrustumProgram");
-    m_CalculateFrustumProgram->AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
-    m_CalculateFrustumProgram->Compile();
-    m_CalculateFrustumProgram->Link();
-
-    m_LightCullProgram = ResourceManager::Load<ShaderProgram>("#LightCullProgram");
-    m_LightCullProgram->AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
-    m_LightCullProgram->Compile();
-    m_LightCullProgram->Link();
 
     m_ForwardPlusProgram = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram");
     m_ForwardPlusProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
@@ -156,7 +143,7 @@ void Renderer::Draw(RenderQueueCollection& rq)
 {
     m_PickingPass->Draw(rq);
     //DrawScreenQuad(m_PickingPass->PickingTexture());
-    CullLights();
+    m_LightCullingPass->CullLights();
     
     //m_DrawScenePass->Draw(rq);
     DrawForwardPlus(rq);
@@ -203,93 +190,11 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     GLERROR("Texture initialization failed");
 }
 
-void Renderer::InitializeSSBOs()
-{
-    printf("Size: %i\n", sizeof(m_Frustums));
-    glGenBuffers(1, &m_FrustumSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_FrustumSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Frustums), &m_Frustums, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    GLERROR("m_FrustumSSBO");
-
-    glGenBuffers(1, &m_LightSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_PointLights), &m_PointLights, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    GLERROR("m_LightSSBO");
-
-    glGenBuffers(1, &m_LightGridSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    GLERROR("m_LightGridSSBO");
-
-
-    glGenBuffers(1, &m_LightOffsetSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    GLERROR("m_LightOffsetSSBO");
-
-    glGenBuffers(1, &m_LightIndexSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    GLERROR("m_LightIndexSSBO");
-
-}
-
 void Renderer::InitializeRenderPasses()
 {
     m_DrawScenePass = new DrawScenePass(this);
     m_PickingPass = new PickingPass(this, m_EventBroker);
-}
-
-void Renderer::CalculateFrustum()
-{
-    GLERROR("CalculateFrustum Error: Pre");
-
-    m_CalculateFrustumProgram->Bind();
-    
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
-    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
-    glDispatchCompute(5, 3, 1);
-
-    GLERROR("CalculateFrustum Error: End");
-}
-
-void Renderer::TEMPCreateLights()
-{
-    for (int i = 0; i < NUM_LIGHTS; i++)
-    {
-        glm::vec3 pos = glm::vec3(cos(i) * i/10.f , 0.5f, sin(i) * i/10.f);
-        m_PointLights[i].Position = glm::vec4(pos, 1.f);
-        m_PointLights[i].Color = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand()%255 / 255.f, 1.f);
-        m_PointLights[i].Radius = glm::length(pos) / 5.f;
-    }
-}
-
-void Renderer::CullLights()
-{
-    GLERROR("CullLights Error: Pre");
-    m_LightOffset = 0;
-
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    m_LightCullProgram->Bind();
-    glUniformMatrix4fv(glGetUniformLocation(m_LightCullProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Camera->ViewMatrix()));
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
-    glDispatchCompute(m_Resolution.Width / TILE_SIZE, m_Resolution.Height / TILE_SIZE, 1);
-
-    GLERROR("CullLights Error: End");
-
+    m_LightCullingPass = new LightCullingPass(this);
 }
 
 void Renderer::DrawForwardPlus(RenderQueueCollection& rq)
@@ -304,9 +209,9 @@ void Renderer::DrawForwardPlus(RenderQueueCollection& rq)
     m_ForwardPlusProgram->Bind();
     GLuint ShaderHandle = m_ForwardPlusProgram->GetHandle();
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightCullingPass->LightSSBO());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());
     //TODO: Render: Add code for more jobs than modeljobs.
     for (auto &job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
