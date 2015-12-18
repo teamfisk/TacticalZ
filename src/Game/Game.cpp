@@ -143,7 +143,7 @@ void Game::networkFunction()
     std::cin >> inputMessage;
     if (inputMessage == "c" || inputMessage == "C") {
         m_IsClientOrServer = true;
-        m_ClientOrServer = new Client();
+        m_ClientOrServer = new Client(m_Config);
     }
     if (inputMessage == "s" || inputMessage == "S") {
         m_IsClientOrServer = true;

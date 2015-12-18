@@ -3,9 +3,12 @@
 using namespace boost::asio::ip;
 
 
-Client::Client() : m_Socket(m_IOService)
+Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 {
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string("192.168.1.2"), 13);
+    // Default is local host
+    std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
+    int port = config->Get<int>("Networking.Port", 13);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
     // Set up network stream
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";

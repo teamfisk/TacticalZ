@@ -6,19 +6,20 @@
 
 #include <glm/common.hpp>
 
+#include "Network/Network.h"
 #include "Network/MessageType.h"
 #include "Network/NetworkDefinitions.h"
 #include "Network/PlayerDefinition.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"
+#include "Core/ConfigFile.h"
 #include "Input/EInputCommand.h"
-#include "Network/Network.h"
 
 class Client : public Network
 {
 public:
-    Client();
+    Client(ConfigFile* config);
     ~Client();
     void Start(World* world, EventBroker* eventBroker);
     void Update();
