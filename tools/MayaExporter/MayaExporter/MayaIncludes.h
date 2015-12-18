@@ -33,6 +33,9 @@
 #include <maya/MPlug.h>
 #include <maya/MAnimControl.h>
 #include <maya/MTime.h>
+#include <maya/MDataHandle.h>
+#include <maya/MTransformationMatrix.h>
+#include <maya/MFnMatrixData.h>
 
 
 // Wrappers

@@ -190,25 +190,44 @@ void Menu::GetSkeletonData()
 	MTime startFrame = MAnimControl::animationStartTime();
 	MTime endFrame = MAnimControl::animationEndTime();
 
-	std::vector<std::vector<SkeletonNode>*> AllSkeletons;
+	std::vector<std::vector<SkeletonNode>> allSkeletons;
+
+	std::vector<BindPoseSkeletonNode> allBindPoses;
+	allBindPoses = m_SkeletonHandler->GetBindPoses();
 
 	for (int i = startFrame.value(); i < endFrame.value();i++)
 	{
 		MAnimControl::setCurrentTime(MTime(i, MTime::kNTSCField));
 		// Traverse scene and return vector with all materials
-		AllSkeletons.push_back(m_SkeletonHandler->DoIt());
+		allSkeletons.push_back(m_SkeletonHandler->DoIt());
+	}
+	
+	//print out all bind poses
+	for (auto aBindPose : allBindPoses)
+	{
+		MGlobal::displayInfo(MString() + "BindPose Skeleton name: " + aBindPose.Name.c_str());
+		for (int i = 0; i < aBindPose.Joints.size(); i++)
+		{
+			//MGlobal::displayInfo(MString() + aBindPose.JointNames[i].c_str());
+			//MGlobal::displayInfo(MString() + aBindPose.ParentIDs[i]);
+			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Translation[0] + " " + aBindPose.Joints[i].Translation[1] + " " + aBindPose.Joints[i].Translation[2]);
+			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Rotation[0] + " " + aBindPose.Joints[i].Rotation[1] + " " + aBindPose.Joints[i].Rotation[2]);
+			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Scale[0] + " " + aBindPose.Joints[i].Scale[1] + " " + aBindPose.Joints[i].Scale[2]);
+		}
 	}
 
-	MGlobal::displayInfo(MString() + AllSkeletons.size());
-
-	for (int i = 0; i < AllSkeletons.size(); i++)
+	//Print out all skeletons for all frames
+	MGlobal::displayInfo(MString() + allSkeletons.size());
+	for (auto frameSkeletons : allSkeletons)
 	{
-		std::vector<SkeletonNode>*& thisSkeleton = AllSkeletons.at(i);
-		for (int k = 0; k < thisSkeleton->size(); k++)
+		for (auto aSkeleton : frameSkeletons)
 		{
-			for (int j = 0; j < thisSkeleton->at(k).Joints.size(); j++)
+			MGlobal::displayInfo(MString() + aSkeleton.Name.c_str());
+			for (auto joint : aSkeleton.Joints)
 			{
-				MGlobal::displayInfo(MString() + thisSkeleton->at(k).Joints.at(j).Name.c_str());
+				//MGlobal::displayInfo(MString() + joint.Translation[0] + " " + joint.Translation[1] + " " + joint.Translation[2]);
+				//MGlobal::displayInfo(MString() + joint.Rotation[0] + " " + joint.Rotation[1] + " " + joint.Rotation[2]);
+				//MGlobal::displayInfo(MString() + joint.Scale[0] + " " + joint.Scale[1] + " " + joint.Scale[2]);
 			}
 		}
 	}
