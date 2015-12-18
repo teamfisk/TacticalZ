@@ -20,7 +20,7 @@ public:
 	~ComponentPoolForwardIterator() = default;
 	ComponentPoolForwardIterator& operator=(const ComponentPoolForwardIterator& other) = default;
 	ComponentPoolForwardIterator& operator++();
-	ComponentPoolForwardIterator& operator++(int);
+	ComponentPoolForwardIterator operator++(int);
 	bool operator!=(const ComponentPoolForwardIterator& other) const;
 	bool operator==(const ComponentPoolForwardIterator& other) const;
 	ComponentWrapper operator*() const;

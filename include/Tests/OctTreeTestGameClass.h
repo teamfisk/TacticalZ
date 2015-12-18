@@ -11,7 +11,8 @@
 #include "Rendering/RenderQueueFactory.h"
 
 #include "OctTreeTestHardCodedTestWorld.h"
-#include "Core\Collision.h"
+#include "Collision/Collision.h"
+
 
 class Game
 {

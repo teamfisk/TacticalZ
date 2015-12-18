@@ -16,7 +16,7 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
     } else {
         m_Direction.x = 0;
     }
-    m_EventBroker->Process<PlayerSystem>();
+
     ComponentWrapper& transform = world->GetComponent(player.EntityID, "Transform");
     (glm::vec3&)player["Velocity"] = m_Speed * float(dt) * m_Direction;
     (glm::vec3&)transform["Position"] += (glm::vec3)player["Velocity"];
@@ -53,5 +53,23 @@ bool PlayerSystem::OnKeyUp(const Events::KeyUp & event)
     if (event.KeyCode == GLFW_KEY_D) {
         input.Right = false;
     }
+    return false;
+}
+
+bool PlayerSystem::OnTouch(const Events::TriggerTouch &event)
+{
+    LOG_INFO("Player entity %i touched widget (entity %i).", event.Entity, event.Trigger);
+    return false;
+}
+
+bool PlayerSystem::OnEnter(const Events::TriggerEnter &event)
+{
+    LOG_INFO("Player entity %i entered widget (entity %i).", event.Entity, event.Trigger);
+    return false;
+}
+
+bool PlayerSystem::OnLeave(const Events::TriggerLeave &event)
+{
+    LOG_INFO("Player entity %i left widget (entity %i).", event.Entity, event.Trigger);
     return false;
 }

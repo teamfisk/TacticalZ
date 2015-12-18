@@ -12,7 +12,7 @@ include_directories(
 )
 
 file(GLOB SOURCE_FILES
-    "${INCLUDE_PATH}/Tests/*.h"
+	"*.h"
     "*.cpp"
 )
 

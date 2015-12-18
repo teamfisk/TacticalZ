@@ -19,8 +19,6 @@
 #include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
 
-class OctTree;
-
 class Game
 {
 public:
@@ -41,7 +39,6 @@ private:
     World* m_World;
     SystemPipeline* m_SystemPipeline;
     RenderQueueFactory* m_RenderQueueFactory;
-    OctTree* m_OctTree;
     EventRelay<Game, Events::InputCommand> m_EInputCommand;
     bool debugOnInputCommand(const Events::InputCommand& e);
 

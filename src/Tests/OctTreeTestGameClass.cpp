@@ -57,7 +57,7 @@ void Game::Tick()
     m_Renderer->Update(dt);
     m_EventBroker->Swap();
 
-#define TEST2
+#define TEST1
     //this draws the octTree and you can set the cube inside it and see what boxes in the tree that it belongs to
 #ifdef TEST1
     if (!m_UpdatedOnce) {
@@ -81,13 +81,13 @@ void Game::Tick()
     //check all children again in the tree if they have a box in them or not, and colormark them if they do
     //contentboxarna får man ut - inte childboxarna!
     std::vector<int> boxIndex;
-    boxIndex = m_World->someOctTree.childIndicesContainingBox(boxi);
+    boxIndex = m_World->someOctTree.m_Root->childIndicesContainingBox(boxi);
 
     for (auto& oneLinkedObject : m_World->linkOM)
     {
         ComponentWrapper model = m_World->GetComponent(oneLinkedObject.entId, "Model");
         model["Color"] = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-        if (oneLinkedObject.child->m_DynamicObjects.size() != 0) {
+        if (oneLinkedObject.child->m_DynamicObjIndices.size() != 0) {
             model["Color"] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         }
 
@@ -95,7 +95,7 @@ void Game::Tick()
         //REQUIRED: childIndicesContainingBox must be public to test this!
         for each (auto someBoxIndex in boxIndex)
         {
-            glm::vec3 pos = m_World->someOctTree.m_Children[someBoxIndex]->m_Box.Center();
+            glm::vec3 pos = m_World->someOctTree.m_Root->m_Children[someBoxIndex]->m_Box.Center();
             if (abs(pos.x - oneLinkedObject.posxyz.x) < 0.005f &&
                 abs(pos.y - oneLinkedObject.posxyz.y) < 0.005f &&
                 abs(pos.z - oneLinkedObject.posxyz.z) < 0.005f) {
@@ -122,7 +122,7 @@ void Game::Tick()
     aabb.CreateFromCenter(glm::vec3(0, 2.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     if (m_UpdatedOnce) {
-        auto test = someOctTree.childIndicesContainingBox(aabb);
+        //auto test = someOctTree.childIndicesContainingBox(aabb);
         std::vector<AABB> test2;
         someOctTree.BoxesInSameRegion(aabb, test2);
     }
