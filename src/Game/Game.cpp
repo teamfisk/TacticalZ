@@ -22,7 +22,7 @@ Game::Game(int argc, char* argv[])
     m_Renderer = new Renderer(m_EventBroker);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
-    m_Renderer->SetResolution(Rectangle(
+    m_Renderer->SetResolution(Rectangle::Rectangle(
         0,
         0,
         m_Config->Get<int>("Video.Width", 1280),
@@ -58,6 +58,11 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CollisionSystem>();
     m_SystemPipeline->AddSystem<TriggerSystem>();
 
+    // Invoke network
+    if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
+        //boost::thread workerThread(&Game::networkFunction, this);
+        networkFunction();
+    }
     m_LastTime = glfwGetTime();
 
     debugInitialize();
@@ -65,6 +70,10 @@ Game::Game(int argc, char* argv[])
 
 Game::~Game()
 {
+    // Call before to ensure that thread closes correctly.
+    //if (m_IsClientOrServer)
+    //  m_ClientOrServer.Close();
+
     delete m_FrameStack;
     delete m_EventBroker;
 }
@@ -87,10 +96,16 @@ void Game::Tick()
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
+    // Update network
+    if (m_IsClientOrServer) {
+        m_ClientOrServer->Update();
+    }
+
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     debugTick(dt);
     m_Renderer->Update(dt);
+    m_EventBroker->Process<Client>();
 
     m_RenderQueueFactory->Update(m_World);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
@@ -112,6 +127,16 @@ bool Game::debugOnInputCommand(const Events::InputCommand& e)
             ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
         }
     }
+    if (e.Command == "SwitchToServer" && e.Value > 0) {
+        m_ClientOrServer = new Server();
+        LOG_INFO("Switching to server");
+        m_ClientOrServer->Start(m_World, m_EventBroker);
+    }
+    if (e.Command == "SwitchToClient" && e.Value > 0) {
+        m_ClientOrServer = new Client(m_Config);
+        m_ClientOrServer->Start(m_World, m_EventBroker);
+        LOG_INFO("Switching to client");
+    }
 
     return false;
 }
@@ -124,4 +149,24 @@ void Game::debugInitialize()
 void Game::debugTick(double dt)
 {
     m_EventBroker->Process<Game>();
+}
+
+void Game::networkFunction()
+{
+    bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
+    if (!isServer) {
+        m_IsClientOrServer = true;
+        m_ClientOrServer = new Client(m_Config);
+    }
+    if (isServer) {
+        m_IsClientOrServer = true;
+        m_ClientOrServer = new Server();
+    }
+    m_ClientOrServer->Start(m_World, m_EventBroker);
+    // I don't think we are reaching this part of the code right now.
+    // ~Game() is not called if the game is exited by closing console windows
+    // When server or client is done set it to false.
+    //m_IsClientOrServer = false;
+    // Destroy it
+    //delete m_ClientOrServer;
 }
