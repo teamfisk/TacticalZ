@@ -6,4 +6,5 @@
 	<xs:include schemaLocation="Components/Test.xsd"/>
 	<xs:include schemaLocation="Components/RaptorCopter.xsd"/>
 	<xs:include schemaLocation="Components/Player.xsd"/>
+	<xs:include schemaLocation="Components/PointLight.xsd"/>
 </xs:schema>
