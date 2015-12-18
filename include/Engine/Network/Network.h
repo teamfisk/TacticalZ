@@ -5,6 +5,9 @@
 #include "Core/EventBroker.h"
 #include "Network/Packet.h"
 
+#define MAXCONNECTIONS 8
+#define INPUTSIZE 128
+
 class Network
 {
 public:

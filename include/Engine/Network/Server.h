@@ -8,7 +8,6 @@
 #include <boost/asio/ip/udp.hpp>
 
 #include "Network/MessageType.h"
-#include "Network/NetworkDefinitions.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"

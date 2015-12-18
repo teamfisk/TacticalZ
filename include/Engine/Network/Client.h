@@ -8,7 +8,6 @@
 #include <boost/asio.hpp>
 
 #include "Network/MessageType.h"
-#include "Network/NetworkDefinitions.h"
 #include "Network/PlayerDefinition.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Network/WinLeakCheck.h"
