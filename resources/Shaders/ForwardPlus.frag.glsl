@@ -57,7 +57,7 @@ struct LightResult {
 };
 
 float CalcAttenuation(float radius, float dist) {
-	return 1.0 - smoothstep(radius * 1.0, radius, dist);
+	return 1.0 - smoothstep(radius * 0.3, radius, dist);
 }
 
 vec4 CalcSpecular(vec4 lightColor, vec4 viewVec,  vec4 lightVec, vec4 normal) {
@@ -115,11 +115,11 @@ void main()
 	}
 
 	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
-	fragmentColor += vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
+	//fragmentColor += vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;
 	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 )
 	{
-		fragmentColor += vec4(0.5, 0, 0, 0);
+		//fragmentColor += vec4(0.5, 0, 0, 0);
 	} else {
 		//fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/3.0, 0, 0, 1);
 

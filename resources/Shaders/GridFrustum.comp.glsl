@@ -24,7 +24,7 @@ vec4 ConvertToView(vec4 ScreenCoords)
 	vec2 normalizedScreenCoords = ScreenCoords.xy / ScreenDimensions;
 	vec4 clipSpace = vec4(  vec2(normalizedScreenCoords.x, normalizedScreenCoords.y) * 2.0 - 1.0, ScreenCoords.z, ScreenCoords.w);
  	vec4 view = inverse(P) * clipSpace;					
- 	//view = view / view.w;
+ 	view = view / view.w;
  	return view;
 }
 
@@ -51,12 +51,14 @@ void main ()
 	ScreenCoords[2] = vec4(gl_GlobalInvocationID.x 		 * TILE_SIZE, 	(gl_GlobalInvocationID.y)	  * TILE_SIZE, 	-1.0, 1.0);
 	ScreenCoords[3] = vec4((gl_GlobalInvocationID.x + 1) * TILE_SIZE, 	(gl_GlobalInvocationID.y) 	  * TILE_SIZE, 	-1.0, 1.0);
 
+
+
 	vec3 ViewVectors[4];
 	for(int i = 0; i < 4; i++) {
 		ViewVectors[i] = vec3(ConvertToView(ScreenCoords[i]));
 	}
 
-	vec3 EyePos = vec3(0,0,0);
+	vec3 EyePos = vec3(0.0, 0.0 ,0.0);
 
 	Frustum f;
 	f.Planes[0] = ComputePlane(EyePos, ViewVectors[2], ViewVectors[0]); // left plane

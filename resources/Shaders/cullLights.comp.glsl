@@ -8,7 +8,6 @@
 
 
 
-#define NUM_LIGHTS 25
 #define MAX_LIGHTS_PER_TILE 1024
 #define NUM_TILES 3600
 #define TILE_SIZE 16
@@ -71,7 +70,7 @@ int GroupIndex;
 
 bool SphereInsidePlane(vec3 center, float radius, Plane plane)
 {
-	return dot(plane.Normal, center) + plane.d > -radius;
+	return dot(plane.Normal, center) - plane.d > -radius;
 }
 
 bool SphereInsideFrustrum(vec3 center, float radius, Frustum frustum/*, float zNear, float zFar*/)

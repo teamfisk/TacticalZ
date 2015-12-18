@@ -10,7 +10,7 @@
 		<Entity>
 			<Components>
 				<c:Transform>
-					<Scale X="100" Y="100" Z="100"/>
+					<Scale X="10000" Y="10000" Z="10000"/>
 				</c:Transform>
 				<c:Model>
 					<Resource>Models/Core/UnitPlane.obj</Resource>

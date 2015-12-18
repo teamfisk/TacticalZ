@@ -4,7 +4,7 @@ void Renderer::Initialize()
 {
 	InitializeWindow();
 	// Create default camera
-	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
+	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(90.0f), 0.01f, 5000.f);
 	m_DefaultCamera->SetPosition(glm::vec3(0, 1, 10));
 	if (m_Camera == nullptr) {
 		m_Camera = m_DefaultCamera;
@@ -266,13 +266,13 @@ void Renderer::CalculateFrustum()
 
 void Renderer::TEMPCreateLights()
 {
-    for (int z = 0; z < 5; z++)
-        for (int x = 0; x < 5; x++)
-        {
-            m_PointLights[x + z*5].Position = glm::vec4(x*2.f, 0.2f, z * 2.f, 1.f);
-            m_PointLights[x + z*5].Color = glm::vec4(1.f, 0.5f, 1.f, 1.f);
-            m_PointLights[x + z*5].Radius = 0.5f;
-        }
+    for (int i = 0; i < NUM_LIGHTS; i++)
+    {
+        glm::vec3 pos = glm::vec3(cos(i) * i/10.f , 0.5f, sin(i) * i/10.f);
+        m_PointLights[i].Position = glm::vec4(pos, 1.f);
+        m_PointLights[i].Color = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand()%255 / 255.f, 1.f);
+        m_PointLights[i].Radius = 5.0f;
+    }
 }
 
 void Renderer::CullLights()
