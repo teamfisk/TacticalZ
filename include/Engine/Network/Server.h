@@ -5,6 +5,7 @@
 #include <ctime>
 
 #include <glm/common.hpp>
+#include <boost/asio/ip/udp.hpp>
 
 #include "Network/MessageType.h"
 #include "Network/NetworkDefinitions.h"
@@ -18,8 +19,8 @@ class Server : public Network
 public:
     Server();
     ~Server();
-    void Start(World* m_world, EventBroker *eventBroker);
-    void Update();
+    void Start(World* m_world, EventBroker *eventBroker) override;
+    void Update() override;
     void Close();
 
 private:

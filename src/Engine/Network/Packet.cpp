@@ -12,14 +12,15 @@ Packet::Packet(MessageType type, unsigned int& packetID)
     packetID++;
 }
 
-
+// Create message
 Packet::Packet(char* data, const int sizeOfPacket)
 {
-    // Create message
-
     // Resize message
-    m_MaxPacketSize = sizeOfPackage;
+    m_MaxPacketSize = sizeOfPacket;
     // Copy data newly allocated memory
+    m_Data = new char[sizeOfPacket];
+    memcpy(m_Data, data, sizeOfPacket);
+    m_Offset = sizeOfPacket;
 }
 
 Packet::~Packet()
@@ -39,7 +40,7 @@ void Packet::WriteString(std::string str)
 }
 
 void Packet::WriteData(char * data, int sizeOfData)
-{ 
+{
     if (m_Offset + sizeOfData > m_MaxPacketSize) {
         LOG_WARNING("Packet::WriteData(): Data size in packet exceeded maximum packet size.\n");
     }
@@ -50,10 +51,10 @@ void Packet::WriteData(char * data, int sizeOfData)
 std::string Packet::ReadString()
 {
     std::string returnValue(m_Data + m_ReturnDataOffset);
-    if (m_Offset < m_ReturnDataOffset + returnValue.size()){
+    if (m_Offset < m_ReturnDataOffset + returnValue.size()) {
         LOG_WARNING("packet ReadString(): Oh no! You are trying to remove things outside my memory kingdom");
         return "PopFrontString Failed";
-    }   
+    }
     // +1 for null terminator.
     m_ReturnDataOffset += returnValue.size() + 1;
     return returnValue;
