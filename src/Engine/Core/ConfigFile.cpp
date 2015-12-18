@@ -27,9 +27,6 @@ ConfigFile::ConfigFile(std::string path)
 			for (auto& topLevelNode : m_PTreeOverrides) {
                 auto& mergedTopLevelNode = m_PTreeMerged.find(topLevelNode.first);
                 for (auto& childOverrideNode : topLevelNode.second) {
-                    //auto ttt = mergedTopLevelNode->second;
-                    //auto ttt2 = childOverrideNode.first;
-                    //auto ttt3 = childOverrideNode.second;
                     mergedTopLevelNode->second.put_child(childOverrideNode.first, childOverrideNode.second);
                 }
 			}

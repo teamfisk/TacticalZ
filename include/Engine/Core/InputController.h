@@ -17,8 +17,7 @@ public:
 
 	virtual void Initialize()
 	{
-		EVENT_SUBSCRIBE_MEMBER(
-            m_EInputCommand, &InputController::OnCommand);
+		EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &InputController::OnCommand);
 	}
 
 	virtual bool OnCommand(const Events::InputCommand& e) { return false; }
