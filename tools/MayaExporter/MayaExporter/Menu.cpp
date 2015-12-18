@@ -215,8 +215,12 @@ void Menu::ExportAll(bool)
 		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
 	}
 
+	m_File.ASCIIFilePath("C:/Users/Nickelodion/Desktop/coolASCII.txt");
+	m_File.binaryFilePath("C:/Users/Nickelodion/Desktop/coolSoptunz.bin");
+
 	if(m_ExportAnimationsButton->isChecked())
 		GetSkeletonData();
+
 }
 
 void Menu::CancelClicked(bool)
@@ -298,8 +302,10 @@ void Menu::GetSkeletonData()
 		}
 	
 	//print out all bind poses
+		m_File.OpenFiles();
 	for (auto aBindPose : allBindPoses)
 	{
+		m_File.writeToFiles(&aBindPose);
 		MGlobal::displayInfo(MString() + "BindPose Skeleton name: " + aBindPose.Name.c_str());
 		for (int i = 0; i < aBindPose.Joints.size(); i++)
 		{
@@ -312,21 +318,25 @@ void Menu::GetSkeletonData()
 	}
 
 	//Print out all skeletons for all frames
+	
 	MGlobal::displayInfo(MString() + allSkeletons.size());
 	for (auto frameSkeletons : allSkeletons)
 		{
 		for (auto aSkeleton : frameSkeletons)
 			{
 			MGlobal::displayInfo(MString() + aSkeleton.Name.c_str());
+			//m_File.writeToFiles(&aSkeleton);
 			for (auto joint : aSkeleton.Joints)
 				{
+					//m_File.writeToFiles(&joint);
 				//MGlobal::displayInfo(MString() + joint.Translation[0] + " " + joint.Translation[1] + " " + joint.Translation[2]);
 				//MGlobal::displayInfo(MString() + joint.Rotation[0] + " " + joint.Rotation[1] + " " + joint.Rotation[2]);
 				//MGlobal::displayInfo(MString() + joint.Scale[0] + " " + joint.Scale[1] + " " + joint.Scale[2]);
 				}
 			}
-		}*/
+		}
 	}
+	m_File.CloseFiles();
 }
 
 Menu::~Menu()

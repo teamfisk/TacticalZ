@@ -37,6 +37,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Skeleton.h"
+#include "WriteToFile.h"
 
 class Menu : public QWidget
 {
@@ -86,6 +87,8 @@ private:
 
 	Material* m_MaterialHandler = nullptr;
 	Skeleton* m_SkeletonHandler = nullptr;
+
+	WriteToFile m_File;
 };
 
 #endif

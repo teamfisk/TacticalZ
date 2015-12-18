@@ -175,6 +175,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Skeleton.cpp" />
+    <ClCompile Include="WriteToFile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="MayaExporter.ui">
@@ -198,7 +199,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="OutputData.h" />
     <ClInclude Include="Skeleton.h" />
+    <ClInclude Include="WriteToFile.h" />
     <CustomBuild Include="Menu.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing Menu.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>

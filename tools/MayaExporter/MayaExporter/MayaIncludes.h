@@ -36,6 +36,7 @@
 #include <maya/MDataHandle.h>
 #include <maya/MTransformationMatrix.h>
 #include <maya/MFnMatrixData.h>
+#include <maya/MItMeshFaceVertex.h>
 
 
 // Wrappers

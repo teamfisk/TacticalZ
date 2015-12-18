@@ -1,5 +1,8 @@
 #include "Skeleton.h"
 
+
+
+
 std::vector<SkeletonNode> Skeleton::DoIt()
 {
 	std::vector<SkeletonNode> m_AllSkeletons;
