@@ -96,7 +96,6 @@ void Game::Tick()
         m_ClientOrServer->Update();
     }
 
-
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     debugTick(dt);
@@ -123,6 +122,16 @@ bool Game::debugOnInputCommand(const Events::InputCommand& e)
             ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
         }
     }
+    if (e.Command == "SwitchToServer" && e.Value > 0) {
+        m_ClientOrServer = new Server();
+        LOG_INFO("Switching to server");
+        m_ClientOrServer->Start(m_World, m_EventBroker);
+    }
+    if (e.Command == "SwitchToClient" && e.Value > 0) {
+        m_ClientOrServer = new Client(m_Config);
+        m_ClientOrServer->Start(m_World, m_EventBroker);
+        LOG_INFO("Switching to client");
+    }
 
     return false;
 }
@@ -139,14 +148,12 @@ void Game::debugTick(double dt)
 
 void Game::networkFunction()
 {
-    std::string inputMessage;
-    LOG_INFO("Start client or server? (c/s)");
-    std::cin >> inputMessage;
-    if (inputMessage == "c" || inputMessage == "C") {
+    bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
+    if (!isServer) {
         m_IsClientOrServer = true;
         m_ClientOrServer = new Client(m_Config);
     }
-    if (inputMessage == "s" || inputMessage == "S") {
+    if (isServer) {
         m_IsClientOrServer = true;
         m_ClientOrServer = new Server();
     }
@@ -155,6 +162,6 @@ void Game::networkFunction()
     // ~Game() is not called if the game is exited by closing console windows
     // When server or client is done set it to false.
     //m_IsClientOrServer = false;
-    // Destroy it! (with fire)
+    // Destroy it
     //delete m_ClientOrServer;
 }

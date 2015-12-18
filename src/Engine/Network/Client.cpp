@@ -10,6 +10,7 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
     int port = config->Get<int>("Networking.Port", 13);
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
     // Set up network stream
+    m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
 }
@@ -29,12 +30,11 @@ void Client::Start(World* world, EventBroker* eventBroker)
     m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
     m_EventBroker->Subscribe(m_EInputCommand);
 
-    LOG_INFO("Please enter your name: ");
-    std::cin >> m_PlayerName;
-    while (m_PlayerName.size() > 7) {
-        LOG_INFO("Please enter your name (No longer than 7 characters):");
-        std::cin >> m_PlayerName;
-    }
+
+    //while (m_PlayerName.size() > 7) {
+    //    LOG_INFO("Please enter your name (No longer than 7 characters):");
+    //    std::cin >> m_PlayerName;
+    //}
     m_Socket.connect(m_ReceiverEndpoint);
     LOG_INFO("I am client. BIP BOP");
 }
