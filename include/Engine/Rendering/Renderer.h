@@ -16,6 +16,7 @@
 
 #include "../Core/EventBroker.h"
 #include "EPicking.h"
+#include "ImGuiRenderPass.h"
 
 class Renderer : public IRenderer
 {
@@ -43,6 +44,7 @@ private:
     DrawScenePass* m_DrawScenePass;
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
+    ImGuiRenderPass* m_ImGuiRenderPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();

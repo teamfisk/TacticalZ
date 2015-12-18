@@ -1,4 +1,5 @@
 #include "Rendering/Renderer.h"
+#include "Rendering/DebugCameraInputController.h"
 
 void Renderer::Initialize()
 {
@@ -18,6 +19,8 @@ void Renderer::Initialize()
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
+
+    m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
 }
 
 void Renderer::InitializeWindow()
@@ -79,6 +82,8 @@ void Renderer::InitializeShaders()
 
 void Renderer::InputUpdate(double dt)
 {
+    static DebugCameraInputController<Renderer> firstPersonInputController(m_EventBroker, -1);
+
 	glm::vec3 m_Position = m_Camera->Position();
 	if (glfwGetKey(m_Window, GLFW_KEY_O) == GLFW_PRESS)
 	{
@@ -108,35 +113,16 @@ void Renderer::InputUpdate(double dt)
 		m_CameraMoveSpeed = 0.5f;
 	}
 
-    static double mousePosX, mousePosY;
-    glfwGetCursorPos(m_Window, &mousePosX, &mousePosY);
-
-	if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-
-		
-		double deltaX, deltaY;
-		deltaX = mousePosX - (float)Resolution().Width / 2;
-		deltaY = mousePosY - (float)Resolution().Height / 2;
-
-		float rotationY = -deltaY / 300.f;
-		float rotationX = -deltaX / 300.f;
-		glm::quat orientation = m_Camera->Orientation();
-		
-		
-		orientation = orientation * glm::angleAxis<float>(rotationY, glm::vec3(1, 0, 0));
-		orientation = glm::angleAxis<float>(rotationX, glm::vec3(0, 1, 0)) * orientation;
-		
-		m_Camera->SetOrientation(orientation);
-
-		glfwSetCursorPos(m_Window, Resolution().Width / 2, Resolution().Height / 2);
-	}
-	m_Camera->SetPosition(m_Position);
+    firstPersonInputController.Update(dt);
+    m_Camera->SetOrientation(firstPersonInputController.Orientation());
+	m_Camera->SetPosition(firstPersonInputController.Position());
 }
 
 void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
     InputUpdate(dt);
+    m_ImGuiRenderPass->Update(dt);
 }
 
 void Renderer::Draw(RenderQueueCollection& rq)
@@ -147,7 +133,9 @@ void Renderer::Draw(RenderQueueCollection& rq)
     
     //m_DrawScenePass->Draw(rq);
     DrawForwardPlus(rq);
+    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
     GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
 }
 

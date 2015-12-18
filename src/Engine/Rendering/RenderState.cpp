@@ -1,105 +1,100 @@
 #include "Rendering/RenderState.h"
 
-RenderState::RenderState()
+bool RenderState::Enable(GLenum cap)
 {
-
-}
-
-bool RenderState::Enable(GLenum GLEnable)
-{
-    if(glIsEnabled(GLEnable))
-    {
+    if (glIsEnabled(cap)) {
         //LOG_WARNING("Trying to enable somthing that is already enabled.");
         return false;
     }
-    m_Enables.push_back(GLEnable);
-    glEnable(GLEnable);
-    if (GLERROR("RenderState::Enable"))
-    {
-        return false;
-    }
-    return true;
+    m_ResetFunctions.push_back(std::bind(glDisable, cap));
+    glEnable(cap);
+    return !GLERROR("RenderState::Enable");
 }
 
-bool RenderState::CullFace(GLenum GLCullFace)
+bool RenderState::Disable(GLenum cap)
 {
-    if(!glIsEnabled(GL_CULL_FACE))
-    {
-        //LOG_ERROR("Setting GL_CULL_FACE without enabling it.");
-        Enable(GL_CULL_FACE);
-    }
-    
-    glCullFace(GLCullFace);
-    if (GLERROR("RenderState::CullFace"))
-    {
+    if (!glIsEnabled(cap)) {
         return false;
     }
-    return true;
+    m_ResetFunctions.push_back(std::bind(glEnable, cap));
+    glDisable(cap);
+    return !GLERROR("RenderState::Disable");
+}
+
+bool RenderState::CullFace(GLenum mode)
+{
+    if (!glIsEnabled(GL_CULL_FACE)) {
+        LOG_ERROR("Setting GL_CULL_FACE without enabling it.");
+        return false;
+    }
+    
+    GLint original;
+    glGetIntegerv(GL_CULL_FACE_MODE, &original);
+    m_ResetFunctions.push_back(std::bind(glCullFace, original));
+    glCullFace(mode);
+    return !GLERROR("RenderState::CullFace");
 }
 
 bool RenderState::ClearColor(glm::vec4 color)
 {
-    glGetFloatv(GL_COLOR_CLEAR_VALUE, &m_preClearColor[0]);
+    GLfloat original[4];
+    glGetFloatv(GL_COLOR_CLEAR_VALUE, &original[0]);
+    m_ResetFunctions.push_back(std::bind(glClearColor, original[0], original[1], original[2], original[3]));
     glClearColor(color.r, color.g, color.b, color.a);
-    if (GLERROR("RenderState::ClearColor")) {
-        return false;
-    }
-    return true;
+    return !GLERROR("RenderState::ClearColor");
 }
 
 bool RenderState::Clear(GLbitfield mask)
 {
     glClear(mask);
-    if (GLERROR("RenderState::Clear")) {
-        return false;
-    }
-    return true;
+    return !GLERROR("RenderState::Clear");
 }
 
-bool RenderState::BindBuffer(GLint buffer)
+bool RenderState::BindFramebuffer(GLint framebuffer)
 {
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_preBuffer);
-    if (buffer == m_preBuffer)
-    {
-        return true;
-    }
-    glBindFramebuffer(GL_FRAMEBUFFER, buffer);
-    if (GLERROR("RenderState::BindBuffer"))
-    {
-        printf("BufferID: %i\npreBufferID: %i\n", buffer, m_preBuffer);
-        return false;
-    }
-    return true;
+    GLint originalRead;
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &originalRead);
+    GLint originalDraw;
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &originalDraw);
+    m_ResetFunctions.push_back([originalRead, originalDraw]() {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, originalRead); 
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, originalDraw); 
+    });
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    return !GLERROR("RenderState::BindBuffer");
+}
+
+
+bool RenderState::BlendEquation(GLenum mode)
+{
+    GLint originalRGB;
+    glGetIntegerv(GL_BLEND_EQUATION_RGB, &originalRGB);
+    GLint originalAlpha;
+    glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &originalAlpha);
+    m_ResetFunctions.push_back(std::bind(glBlendEquationSeparate, originalRGB, originalAlpha));
+    glBlendEquation(mode);
+    return !GLERROR("RenderState::BlendEquation");
+}
+
+bool RenderState::BlendFunc(GLenum sfactor, GLenum dfactor)
+{
+    GLint originalSrcRGB;
+    glGetIntegerv(GL_BLEND_SRC_RGB, &originalSrcRGB);
+    GLint originalSrcAlpha;
+    glGetIntegerv(GL_BLEND_SRC_ALPHA, &originalSrcAlpha);
+    GLint originalDestRGB;
+    glGetIntegerv(GL_BLEND_DST_RGB, &originalDestRGB);
+    GLint originalDestAlpha;
+    glGetIntegerv(GL_BLEND_DST_ALPHA, &originalDestAlpha);
+    m_ResetFunctions.push_back(std::bind(glBlendFuncSeparate, originalSrcRGB, originalSrcAlpha, originalDestRGB, originalDestAlpha));
+    glBlendFunc(sfactor, dfactor);
+    return !GLERROR("RenderState::BlendFunc");
 }
 
 RenderState::~RenderState()
 {
-    GLERROR("RenderState::~RenderState Pre");
-    GLint n_buffer = -1;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &n_buffer);
-
-    //Set cullface to default
-    if (glIsEnabled(GL_CULL_FACE)) {
-        glCullFace(GL_BACK);
+    for (auto& f : m_ResetFunctions) {
+        f();
     }
-    GLERROR("RenderState::~RenderState glCullFace");
-
-    //Set color to default
-    glClearColor(m_preClearColor[0], m_preClearColor[1], m_preClearColor[2], m_preClearColor[3]);
-    GLERROR("RenderState::~RenderState glClearColor");
-
-    //Disable Enables
-    for (auto i : m_Enables)
-    {
-        glDisable(i);
-    }
-    GLERROR("RenderState::~RenderState glDisable");
-
-    if(m_preBuffer != 0)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-    m_Enables.clear();
-    GLERROR("RenderState::~RenderState glBindFramebuffer");
 }
 

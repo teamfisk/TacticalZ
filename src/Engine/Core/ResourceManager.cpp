@@ -100,7 +100,7 @@ Resource* ResourceManager::Load(std::string resourceType, std::string resourceNa
 		LOG_WARNING("Hot-loading resource \"%s\"", resourceName.c_str());
 	}
 
-	return CreateResource(resourceType, resourceName, parent);
+    return CreateResource(resourceType, resourceName, parent);
 }
 
 Resource* ResourceManager::CreateResource(std::string resourceType, std::string resourceName, Resource* parent)
@@ -112,10 +112,16 @@ Resource* ResourceManager::CreateResource(std::string resourceType, std::string 
 	}
 
 	// Call the factory function
-	Resource* resource = facIt->second(resourceName);
-	// Store IDs
-	resource->TypeID = GetTypeID(resourceType);
-	resource->ResourceID = GetNewResourceID(resource->TypeID);
+    Resource* resource;
+    try {
+        resource = facIt->second(resourceName);
+        // Store IDs
+        resource->TypeID = GetTypeID(resourceType);
+        resource->ResourceID = GetNewResourceID(resource->TypeID);
+    } catch (const std::exception& e) {
+        resource = nullptr;
+		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": %s", resourceName.c_str(), resourceType.c_str(), e.what());
+    }
 	// Cache
 	m_ResourceCache[std::make_pair(resourceType, resourceName)] = resource;
 	m_ResourceFromName[resourceName] = resource;

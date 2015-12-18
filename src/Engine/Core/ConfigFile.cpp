@@ -24,8 +24,11 @@ ConfigFile::ConfigFile(std::string path)
 	if (boost::filesystem::exists(m_Path)) {
 		try {
 			boost::property_tree::ini_parser::read_ini(m_Path.string(), m_PTreeOverrides);
-			for (auto& node : m_PTreeOverrides) {
-				m_PTreeMerged.put_child(node.first, node.second);
+			for (auto& topLevelNode : m_PTreeOverrides) {
+                auto& mergedTopLevelNode = m_PTreeMerged.find(topLevelNode.first);
+                for (auto& childOverrideNode : topLevelNode.second) {
+                    mergedTopLevelNode->second.put_child(childOverrideNode.first, childOverrideNode.second);
+                }
 			}
 		} catch (boost::property_tree::ptree_error& e) {
 			LOG_ERROR("Failed to parse \"%s\":\n%s", m_Path.filename().string().c_str(), e.what());
