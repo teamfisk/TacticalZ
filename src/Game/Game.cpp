@@ -1,4 +1,6 @@
 #include "Game.h"
+#include "Collision/TriggerSystem.h"
+#include "Collision/CollisionSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -53,6 +55,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
     m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
+    m_SystemPipeline->AddSystem<CollisionSystem>();
+    m_SystemPipeline->AddSystem<TriggerSystem>();
+
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
         //boost::thread workerThread(&Game::networkFunction, this);
