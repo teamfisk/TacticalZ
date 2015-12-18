@@ -20,6 +20,10 @@ public:
     template<typename T>
     void WritePrimitive(T val)
     {
+        // Check if we are trying to add more than the package can fit.
+        if (m_MaxPacketSize < m_Offset + sizeof(T)) {
+            LOG_WARNING("Packet AddPrimitive(): You are trying to add more than we have allocated for!");
+        }
         memcpy(m_Data + m_Offset, &val, sizeof(T));
         m_Offset += sizeof(T);
     }
@@ -28,7 +32,7 @@ public:
     T ReadPrimitive()
     {
         if (m_Offset < m_ReturnDataOffset + sizeof(T)) {
-            LOG_WARNING("Packaet PopFrontPrimitive(): You are trying to remove more than what exists in this packet!");
+            LOG_WARNING("Packet PopFrontPrimitive(): You are trying to remove more than what exists in this packet!");
             return -1;
         }
         T returnValue;
@@ -51,6 +55,7 @@ private:
     char* m_Data;
     unsigned int m_ReturnDataOffset = 0;
     int m_Offset = 0;
+    unsigned int m_MaxPacketSize = 128;
 };
 
 #endif

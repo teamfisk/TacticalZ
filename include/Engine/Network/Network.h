@@ -5,15 +5,15 @@
 #include "Core/EventBroker.h"
 #include "Network/Packet.h"
 
+#define MAXCONNECTIONS 8
+#define INPUTSIZE 128
+
 class Network
 {
 public:
-    Network();
-    ~Network();
-    virtual void Start(World* m_world, EventBroker *eventBroker);
-    virtual void Update();
-protected:
-
+    virtual ~Network() { };
+    virtual void Start(World* m_world, EventBroker *eventBroker) = 0;
+    virtual void Update() = 0;
 };
 
 #endif
