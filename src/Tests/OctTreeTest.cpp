@@ -39,10 +39,10 @@ BOOST_AUTO_TEST_CASE(octTreeTest)
 BOOST_AUTO_TEST_CASE(octTreeTest2)
 {
     //octtree ritningen osv
-    Game game(0, nullptr);
-    while (game.Running()) {
-        game.Tick();
-    }
+    //Game game(0, nullptr);
+    //while (game.Running()) {
+    //    game.Tick();
+    //}
 }
 
 BOOST_AUTO_TEST_SUITE_END()
