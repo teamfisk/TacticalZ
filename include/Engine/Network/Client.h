@@ -30,6 +30,12 @@ private:
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::socket m_Socket;
 
+    // Sending message to server logic
+    int bytesRead = -1;
+    char readBuf[1024] = { 0 };
+    int snapshotInterval = 33;
+    std::clock_t previousSnapshotMessage = std::clock();
+
     // Packet loss logic
     unsigned int m_PacketID = 0;
     unsigned int m_PreviousPacketID = 0;
@@ -37,8 +43,6 @@ private:
 
     // Game logic
     World* m_World;
-    std::vector<unsigned int> m_PlayersToCreate;
-    glm::vec2 m_PlayerPositions[MAXCONNECTIONS];
     std::string m_PlayerName;
     int m_PlayerID = -1;
 
@@ -67,9 +71,9 @@ private:
     void parsePing();
     void parseServerPing();
     void parseSnapshot(Packet& packet);
-    void createNewPlayer(int i);
     void identifyPacketLoss();
     bool isConnected();
+    EntityID createPlayer();
 
     // Events
     EventBroker* m_EventBroker;

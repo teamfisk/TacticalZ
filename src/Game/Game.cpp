@@ -55,7 +55,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
-        boost::thread workerThread(&Game::networkFunction, this);
+        //boost::thread workerThread(&Game::networkFunction, this);
+        networkFunction();
     }
     m_LastTime = glfwGetTime();
 
@@ -153,7 +154,7 @@ void Game::networkFunction()
     // I don't think we are reaching this part of the code right now.
     // ~Game() is not called if the game is exited by closing console windows
     // When server or client is done set it to false.
-    m_IsClientOrServer = false;
+    //m_IsClientOrServer = false;
     // Destroy it! (with fire)
-    delete m_ClientOrServer;
+    //delete m_ClientOrServer;
 }

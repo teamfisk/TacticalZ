@@ -37,21 +37,11 @@ void Client::Start(World* world, EventBroker* eventBroker)
     }
     m_Socket.connect(m_ReceiverEndpoint);
     LOG_INFO("I am client. BIP BOP");
-    readFromServer();
 }
 
 void Client::Update()
 {
-    while (m_PlayersToCreate.size() > 0) {
-        unsigned int i = m_PlayersToCreate.size() - 1;
-        unsigned int tempID = m_World->CreateEntity();
-        ComponentWrapper transform = m_World->AttachComponent(tempID, "Transform");
-        ComponentWrapper model = m_World->AttachComponent(tempID, "Model");
-        model["Resource"] = "Models/Core/UnitSphere.obj";
-        ComponentWrapper player = m_World->AttachComponent(tempID, "Player");
-        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = tempID;
-        m_PlayersToCreate.pop_back();
-    }
+    readFromServer();
 }
 
 void Client::Close()
@@ -65,27 +55,19 @@ void Client::Close()
 
 void Client::readFromServer()
 {
-    int bytesRead = -1;
-    char readBuf[1024] = { 0 };
-
-    int snapshotInterval = 33;
-    std::clock_t previousSnapshotMessage = std::clock();
-
-    while (m_ThreadIsRunning) {
-        if (m_Socket.available()) {
-            bytesRead = receive(readBuf, INPUTSIZE);
-            if (bytesRead > 0) {
-                Packet packet(readBuf, bytesRead);
-                parseMessageType(packet);
-            }
+    if (m_Socket.available()) {
+        bytesRead = receive(readBuf, INPUTSIZE);
+        if (bytesRead > 0) {
+            Packet packet(readBuf, bytesRead);
+            parseMessageType(packet);
         }
-        std::clock_t currentTime = std::clock();
-        if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-            if (isConnected()) {
-                sendSnapshotToServer();
-            }
-            previousSnapshotMessage = currentTime;
+    }
+    std::clock_t currentTime = std::clock();
+    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+        if (isConnected()) {
+            sendSnapshotToServer();
         }
+        previousSnapshotMessage = currentTime;
     }
 }
 
@@ -215,7 +197,7 @@ void Client::parseSnapshot(Packet& packet)
         // New player connected on the server side 
         if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
             m_PlayerDefinitions[i].Name = tempName;
-            m_PlayersToCreate.push_back(i);
+            m_PlayerDefinitions[i].EntityID = createPlayer();
         } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
             // Someone disconnected
             // TODO: Insert code here
@@ -321,13 +303,6 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
     return false;
 }
 
-void Client::createNewPlayer(int i)
-{
-    m_PlayerDefinitions[i].EntityID = m_World->CreateEntity();
-    ComponentWrapper transform = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Transform");
-    ComponentWrapper model = m_World->AttachComponent(m_PlayerDefinitions[i].EntityID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.obj";
-}
 
 void Client::identifyPacketLoss()
 {
@@ -346,4 +321,14 @@ bool Client::isConnected()
         }
     }
     return false;
+}
+
+EntityID Client::createPlayer()
+{
+    EntityID entityID = m_World->CreateEntity();
+    ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
+    ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
+    model["Resource"] = "Models/Core/UnitSphere.obj";
+    ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
+    return entityID;
 }

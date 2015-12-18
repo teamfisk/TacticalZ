@@ -29,6 +29,18 @@ private:
     boost::asio::ip::udp::socket m_Socket;
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
 
+    // Sending messages to client logic
+    char readBuffer[1024] = { 0 };
+    int bytesRead = 0;
+    // time for previouse message
+    std::clock_t previousePingMessage = std::clock();
+    std::clock_t previousSnapshotMessage = std::clock();
+    std::clock_t timOutTimer = std::clock();
+    // How often we send messages (milliseconds)
+    int intervalMs = 1000;
+    int snapshotInterval = 50;
+    int checkTimeOutInterval = 100;
+
     //Timers
     std::clock_t m_StartPingTime;
     std::clock_t m_StopTimes[8];
@@ -67,6 +79,7 @@ private:
     void parseServerPing();
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
+    EntityID createPlayer();
 };
 
 #endif

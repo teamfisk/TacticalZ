@@ -15,24 +15,11 @@ void Server::Start(World* world, EventBroker* eventBroker)
         m_StopTimes[i] = std::clock();
     }
     LOG_INFO("I am Server. BIP BOP\n");
-
-    readFromClients();
 }
 
 void Server::Update()
 {
-    while (m_PlayersToCreate.size() > 0) {
-        unsigned int i = m_PlayersToCreate.size() - 1;
-        unsigned int tempID = m_World->CreateEntity();
-        ComponentWrapper transform = m_World->AttachComponent(tempID, "Transform");
-        transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
-        ComponentWrapper model = m_World->AttachComponent(tempID, "Model");
-        model["Resource"] = "Models/Core/UnitSphere.obj";
-        model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
-        ComponentWrapper player = m_World->AttachComponent(tempID, "Player");
-        m_PlayerDefinitions[m_PlayersToCreate[i]].EntityID = tempID;
-        m_PlayersToCreate.pop_back();
-    }
+    readFromClients();
 }
 
 void Server::Close()
@@ -42,50 +29,37 @@ void Server::Close()
 
 void Server::readFromClients()
 {
-    char readBuffer[1024] = { 0 };
-    int bytesRead = 0;
-    // time for previouse message
-    std::clock_t previousePingMessage = std::clock();
-    std::clock_t previousSnapshotMessage = std::clock();
-    std::clock_t timOutTimer = std::clock();
-    // How often we send messages (milliseconds)
-    int intervalMs = 1000;
-    int snapshotInterval = 50;
-    int checkTimeOutInterval = 100;
+    // m_ThreadIsRunning might be unnecessary but the 
+    // program crashed if it executed m_Socket.available()
+    // when closing the program. 
 
-    while (m_ThreadIsRunning) {
-        // m_ThreadIsRunning might be unnecessary but the 
-        // program crashed if it executed m_Socket.available()
-        // when closing the program. 
-
-        if (m_ThreadIsRunning && m_Socket.available()) {
-            try {
-                bytesRead = receive(readBuffer, INPUTSIZE);
-                Packet packet(readBuffer, bytesRead);
-                parseMessageType(packet);
-            } catch (const std::exception& err) {
-                //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
-            }
-
-        }
-        std::clock_t currentTime = std::clock();
-        // Send snapshot
-        if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-            sendSnapshot();
-            previousSnapshotMessage = currentTime;
+    if (m_Socket.available()) {
+        try {
+            bytesRead = receive(readBuffer, INPUTSIZE);
+            Packet packet(readBuffer, bytesRead);
+            parseMessageType(packet);
+        } catch (const std::exception& err) {
+            //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
         }
 
-        // Send pings each 
-        if (intervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
-            sendPing();
-            previousePingMessage = currentTime;
-        }
+    }
+    std::clock_t currentTime = std::clock();
+    // Send snapshot
+    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+        sendSnapshot();
+        previousSnapshotMessage = currentTime;
+    }
 
-        // Time out logic
-        if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
-            checkForTimeOuts();
-            timOutTimer = currentTime;
-        }
+    // Send pings each 
+    if (intervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+        sendPing();
+        previousePingMessage = currentTime;
+    }
+
+    // Time out logic
+    if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
+        checkForTimeOuts();
+        timOutTimer = currentTime;
     }
 }
 
@@ -291,8 +265,7 @@ void Server::parseConnect(Packet& packet)
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == boost::asio::ip::address()) {
             // Create new player
-            m_PlayersToCreate.push_back(i);
-
+            m_PlayerDefinitions[i].EntityID = createPlayer();
             m_PlayerDefinitions[i].Endpoint = m_ReceiverEndpoint;
             m_PlayerDefinitions[i].Name = packet.ReadString();
 
@@ -367,4 +340,16 @@ void Server::identifyPacketLoss()
     if (difference != 1) {
         LOG_INFO("%i Packet(s) were lost...", difference);
     }
+}
+
+EntityID Server::createPlayer()
+{
+    EntityID entityID = m_World->CreateEntity();
+    ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
+    transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
+    ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
+    model["Resource"] = "Models/Core/UnitSphere.obj";
+    model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
+    ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
+    return entityID;
 }
