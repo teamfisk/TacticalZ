@@ -69,6 +69,12 @@ file(GLOB SOURCE_FILES_GUI
 )
 source_group(GUI FILES ${SOURCE_FILES_GUI})
 
+file(GLOB SOURCE_FILES_Collision
+    "${INCLUDE_PATH}/Collision/*.h"
+    "Collision/*.cpp"
+)
+source_group(Collision FILES ${SOURCE_FILES_Collision})
+
 file(GLOB SOURCE_FILES_Editor
 	"${INCLUDE_PATH}/Editor/*.h"
 	"Editor/*.cpp"
@@ -83,6 +89,7 @@ set(SOURCE_FILES
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
     ${SOURCE_FILES_Rendering_Util}
+    ${SOURCE_FILES_Collision}
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui.cpp
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_draw.cpp
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_demo.cpp

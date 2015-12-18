@@ -28,7 +28,7 @@
 					<Scale X="2" Y="2" Z="2"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/RotationWidget.obj</Resource>
+					<Resource>Models/RotationWidgetX.obj</Resource>
 				</c:Model>
 				<c:Trigger>
 				</c:Trigger>
