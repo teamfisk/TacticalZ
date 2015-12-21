@@ -226,11 +226,11 @@ std::vector<MaterialNode>* Material::DoIt()
 		else if (matIt.thisNode().hasFn(MFn::kLambert)) {
 			grabLambertProperties(MaterialStorage, MaterialFnDN);
 
-			m_AllMaterials.push_back(MaterialStorage);
-
 			MaterialStorage.Specular.fill(0.0f);
 			MaterialStorage.ReflectionFactor = 0.0f;
 			MaterialStorage.SpecularExponent = 0.0f;
+
+			m_AllMaterials.push_back(MaterialStorage);
 		}
 
 		matIt.next();
