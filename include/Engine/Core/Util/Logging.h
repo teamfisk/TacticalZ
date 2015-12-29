@@ -80,4 +80,27 @@ static void _LOG(_LOG_LEVEL logLevel, const char* file, const char* func, unsign
 #define LOG_DEBUG(format, ...) \
 	LOG(LOG_LEVEL_DEBUG, format, ##__VA_ARGS__)
 
+// Set the log level temporarily for the current scope
+#define LOG_LEVEL_SCOPE(logLevel) \
+    _LOG_LEVEL_SCOPED_HELPER<logLevel> _logLevelScopedHelper;
+
+template <_LOG_LEVEL LEVEL>
+class _LOG_LEVEL_SCOPED_HELPER
+{
+public:
+    _LOG_LEVEL_SCOPED_HELPER()
+    {
+        m_OriginalLogLevel = LOG_LEVEL;
+        LOG_LEVEL = LEVEL;
+    }
+
+    ~_LOG_LEVEL_SCOPED_HELPER()
+    {
+        LOG_LEVEL = m_OriginalLogLevel;
+    }
+
+private:
+    _LOG_LEVEL m_OriginalLogLevel;
+};
+
 #endif // Logging_h__
