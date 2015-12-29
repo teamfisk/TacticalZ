@@ -39,21 +39,25 @@ public:
         };
     }
 
+	static void Consume(const std::string& command)
+	{
+		if (command.empty()) {
+			return;
+		}
+
+		boost::char_separator<char> argumentSeparator(" ");
+		tokenizer tokens(command, argumentSeparator);
+
+		for (tokenizer::const_iterator it = tokens.begin(); it != tokens.end(); it++) {
+			consumeToken(it, tokens.end());
+		}
+	}
+
     static void Consume(std::istream& stream)
     {
         std::string input;
         std::getline(stream, input);
-
-        if (input.empty()) {
-            return;
-        }
-
-        boost::char_separator<char> argumentSeparator(" ");
-        tokenizer tokens(input, argumentSeparator);
-        
-        for (tokenizer::const_iterator it = tokens.begin(); it != tokens.end(); it++) {
-            consumeToken(it, tokens.end());
-        }
+		Consume(input);
 
         /*if (stream.peek() == '\n') {
             printValue(key);
