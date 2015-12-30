@@ -17,10 +17,15 @@ InputProxy::~InputProxy()
 void InputProxy::LoadBindings(std::string file)
 {
     auto config = ResourceManager::Load<ConfigFile>(file);
-    for (auto& origin : config->GetAll<std::string>("Bindings")) {
+	auto section = config->GetSection("Bindings");
+	if (section == nullptr) {
+		return;
+	}
+
+    for (auto& param : *section) {
         Events::BindOrigin e;
-        e.Origin = origin.first;
-        e.Command = origin.second;
+        e.Origin = param.first;
+        e.Command = param.second->get_value();
         e.Value = 1.f;
         if (!e.Command.empty()) {
             char prefix = e.Command.at(0);

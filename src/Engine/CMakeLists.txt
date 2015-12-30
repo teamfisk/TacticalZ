@@ -94,6 +94,7 @@ set(SOURCE_FILES
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui.cpp
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_draw.cpp
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_demo.cpp
+    ${CMAKE_SOURCE_DIR}/deps/include/ini_file/ini_file.cpp
 	${CMAKE_SOURCE_DIR}/deps/include/nativefiledialog/nfd_common.c
 )
 

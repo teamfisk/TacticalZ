@@ -3,10 +3,10 @@
 
 #include <string>
 #include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
 #include <boost/lexical_cast.hpp>
-
+#include <boost/algorithm/string.hpp>
+#include <boost/range/adaptors.hpp>
+#include <ini_file/ini_file.hpp>
 #include "../Common.h"
 #include "ResourceManager.h"
 
@@ -20,46 +20,52 @@ private:
 public:
 	template <typename T>
 	T Get(std::string key, T defaultValue);
-    template <typename T>
-    std::vector<std::pair<std::string, T>> GetAll(std::string key);
 	template <typename T>
 	void Set(std::string key, T value);
+
+	const ini_file::section* GetSection(std::string section);
+	const ini_file::section_map& GetSections() { return m_Merged; }
+	const ini_file::param* GetParam(std::string key);
 
 	void SaveToDisk();
 
 private:
 	boost::filesystem::path m_Path;
-	boost::property_tree::ptree m_PTreeDefaults;
-	boost::property_tree::ptree m_PTreeOverrides;
-	boost::property_tree::ptree m_PTreeMerged;
+	ini_file::section_map m_Defaults;
+	ini_file::section_map m_Overrides;
+	ini_file::section_map m_Merged;
+
+	// Merge ini file section map b into a
+	void mergeINI(ini_file::section_map& a, const ini_file::section_map& b);
+	// Convert an ini key delimited by periods to a section and a param
+	boost::optional<std::pair<std::string, std::string>> tokenizeKey(std::string key);
 };
 
 template <typename T>
 T ConfigFile::Get(std::string key, T defaultValue)
 {
-	return m_PTreeMerged.get<T>(key, defaultValue);
-}
+	auto param = GetParam(key);
+	if (param == nullptr) {
+		return defaultValue;
+	}
 
-template <typename T>
-std::vector<std::pair<std::string, T>> ConfigFile::GetAll(std::string key)
-{
-    std::vector<std::pair<std::string, T>> out;
-    auto parent = m_PTreeMerged.find(key);
-    if (parent == m_PTreeMerged.not_found()) {
-        return out;
-    }
-    for (auto& child : parent->second) {
-        T value = boost::lexical_cast<T>(child.second.data());
-        out.push_back(std::make_pair(child.first, value));
-    }
-    return out;
+	return boost::lexical_cast<T>(param->get_value());
 }
 
 template <typename T>
 void ConfigFile::Set(std::string key, T value)
 {
-	m_PTreeOverrides.put<T>(key, value);
-	m_PTreeMerged.put<T>(key, value);
+	std::string section;
+	std::string param;
+	if (auto tokens = tokenizeKey(key)) {
+		std::tie(section, param) = *tokens;
+	} else {
+		LOG_WARNING("%s: Malformed config key \"%s\"", m_Path.string().c_str(), key.c_str());
+		return;
+	}
+
+	m_Overrides[section][param] = boost::lexical_cast<std::string>(value);
+	m_Merged[section][param] = boost::lexical_cast<std::string>(value);
 }
 
 #endif
