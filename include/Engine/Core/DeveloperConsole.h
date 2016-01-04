@@ -5,7 +5,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include "../Common.h"
-#include "ResourceManager.h"
 #include "ConfigFile.h"
 
 class DeveloperConsole
@@ -15,8 +14,30 @@ public:
 
 	static void MergeConfig(std::string configFile)
 	{
-        auto config = ResourceManager::Load<ConfigFile>(configFile);
-        m_ConfigFiles.push_back(config);
+		auto config = ResourceManager::Load<ConfigFile>("Config.ini");
+		LOG_DEBUG("Debug.LogLevel %i", config->Get<int>("Debug.LogLevel", -1));
+		config->Set("Debug.LogLevel", 8);
+		LOG_DEBUG("Debug.LogLevel %i", config->Get<int>("Debug.LogLevel", -1));
+		config->Set("Test.TesTest.Testies", "Hello");
+		config->SaveToDisk();
+		for (auto& section : config->GetSections()) {
+			for (auto& param : *section.second) {
+				std::cout << "// " << param.second->get_comment() << std::endl;
+				std::cout << section.first << "." << param.first << " " << param.second->get_value() << std::endl;
+			}
+		}
+
+		for (auto& section : config->GetSections()) {
+			for (auto& param : *section.second) {
+				std::string key = section.first + "." + param.first;
+				m_VariableBindingSetters[key] = [config, key](std::string value) {
+					config->Set<std::string>(key, value);
+				};
+				m_VariableBindingGetters[key] = [config, key]() {
+					return config->Get<std::string>(key, "");
+				};
+			}
+		}
 	}
 
     template <typename T>
@@ -83,9 +104,10 @@ public:
 private:
     typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 
-    static std::vector<ConfigFile*> m_ConfigFiles;
-    static std::map<std::string, std::function<void(std::string)>> m_VariableBindingSetters;
-    static std::map<std::string, std::function<std::string()>> m_VariableBindingGetters;
+	static std::map<std::string, std::function<std::string()>> m_VariableBindingGetters;
+	static std::map<std::string, std::function<void(std::string)>> m_VariableBindingSetters;
+	static std::map<std::string, std::function<std::string(std::string)>> m_VariableBindingMappers;
+	static std::map<std::string, std::string> m_VariableDocumentation;
 
     static void consumeToken(tokenizer::iterator& token, const tokenizer::iterator end)
     {
@@ -111,10 +133,6 @@ private:
         }
 
         return;
-
-        for (auto& config : m_ConfigFiles) {
-            value = config->Get<std::string>(key, "");
-        }
 
         if (!value.empty()) {
             std::cout << key << " = " << value << std::endl;

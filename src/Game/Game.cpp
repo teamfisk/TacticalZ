@@ -2,6 +2,7 @@
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
 #include "Game/HealthSystem.h"
+#include "Core/DeveloperConsole.h"
 #include "Core/EntityFileWriter.h"
 
 Game::Game(int argc, char* argv[])
@@ -14,6 +15,14 @@ Game::Game(int argc, char* argv[])
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
+
+    DeveloperConsole::MergeConfig("Config.ini");
+    DeveloperConsole::BindVariable("Debug.LogLevel", LOG_LEVEL);
+    std::string testBind = "Carlito";
+    DeveloperConsole::BindVariable("Test", testBind);
+    while (true) {
+        DeveloperConsole::Consume(std::cin);
+    }
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
