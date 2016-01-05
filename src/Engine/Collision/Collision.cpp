@@ -252,6 +252,9 @@ bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
     glm::vec3 mini = outBox.MinCorner();
     glm::vec3 maxi = outBox.MaxCorner();
 
+    if (modelRes == nullptr) {
+        return false;
+    }
     glm::mat4 modelMatrix = modelRes->m_Matrix *
         glm::translate(glm::mat4(), (glm::vec3)cTrans["Position"]) *
         glm::scale((glm::vec3)cTrans["Scale"]);
