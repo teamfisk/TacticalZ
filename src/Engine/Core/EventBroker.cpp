@@ -3,7 +3,10 @@
 BaseEventRelay::~BaseEventRelay()
 {
 	if (m_Broker != nullptr) {
-		m_Broker->Unsubscribe(*this);
+        //m_ContextRelays has already been destroyed at this point, since,
+        //this BaseEventRelay is called after EventBroker has been deleted
+        //hence there is nothing to unsubscribe
+		//m_Broker->Unsubscribe(*this);
 	}
 }
 
