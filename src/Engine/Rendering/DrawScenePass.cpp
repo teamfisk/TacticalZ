@@ -14,15 +14,12 @@ void DrawScenePass::InitializeTextures()
 
 void DrawScenePass::InitializeShaderPrograms()
 {
-    //Gör så att shaders är en resource, tex som texture classen. Konstruktorn måste vara privat.
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#BasicForwardProgram");
 
     m_BasicForwardProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/BasicForward.vert.glsl")));
     m_BasicForwardProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/BasicForward.frag.glsl")));
     m_BasicForwardProgram->Compile();
     m_BasicForwardProgram->Link();
-
-
 }
 
 void DrawScenePass::Draw(RenderQueueCollection& rq)
@@ -61,6 +58,12 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
 
             continue;
         }
+        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
+        if(spriteJob)
+        {
+            //Hello im a sprite, please draw me.
+        }
+
     }
     GLERROR("DrawScenePass::Draw: End");
 }

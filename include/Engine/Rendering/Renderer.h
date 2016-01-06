@@ -13,6 +13,7 @@
 #include "PickingPass.h"
 #include "DrawScenePass.h"
 #include "LightCullingPass.h"
+#include "DrawFinalPass.h"
 
 #include "../Core/EventBroker.h"
 #include "EPicking.h"
@@ -45,6 +46,7 @@ private:
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
     ImGuiRenderPass* m_ImGuiRenderPass;
+    DrawFinalPass* m_DrawFinalPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
@@ -56,21 +58,10 @@ private:
     //void PickingPass(RenderQueueCollection& rq);
     void DrawScreenQuad(GLuint textureToDraw);
 
-    //----------------------Forward+-----------------------//
-    void DrawForwardPlus(RenderQueueCollection& rq);
-    //Frustum
-    
-
-    //-------------------------SSBO------------------------//
-
-
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram* m_BasicForwardProgram;
     ShaderProgram* m_DrawScreenQuadProgram;
-
-    ShaderProgram* m_ForwardPlusProgram;
-
 };
 
 #endif
