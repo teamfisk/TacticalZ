@@ -144,10 +144,5 @@ void Game::networkFunction()
         m_ClientOrServer = new Server();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
-    // I don't think we are reaching this part of the code right now.
-    // ~Game() is not called if the game is exited by closing console windows
-    // When server or client is done set it to false.
-    //m_IsClientOrServer = false;
-    // Destroy it
-    //delete m_ClientOrServer;
+
 }

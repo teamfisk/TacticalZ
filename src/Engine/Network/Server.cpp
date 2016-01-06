@@ -4,7 +4,9 @@ Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::a
 { }
 
 Server::~Server()
-{ }
+{ 
+
+}
 
 
 void Server::Start(World* world, EventBroker* eventBroker)
@@ -25,6 +27,8 @@ void Server::Update()
 void Server::Close()
 {
     m_ThreadIsRunning = false;
+    m_Socket.close();
+
 }
 
 void Server::readFromClients()
@@ -271,7 +275,7 @@ void Server::parseConnect(Packet& packet)
 
             m_StopTimes[i] = std::clock();
 
-            LOG_INFO("Player \"%s\" connected on IP: %s", m_PlayerDefinitions[i].Name, m_PlayerDefinitions[i].Endpoint.address().to_string());
+            LOG_INFO("Player \"%s\" connected on IP: %s", m_PlayerDefinitions[i].Name.c_str(), m_PlayerDefinitions[i].Endpoint.address().to_string().c_str());
 
             Packet packet(MessageType::Connect, m_SendPacketID);
             packet.WritePrimitive<int>(i); // Player ID
