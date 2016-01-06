@@ -1,5 +1,4 @@
 #include "Rendering/Renderer.h"
-#include "Rendering/DebugCameraInputController.h"
 
 void Renderer::Initialize()
 {
@@ -10,6 +9,7 @@ void Renderer::Initialize()
 	if (m_Camera == nullptr) {
 		m_Camera = m_DefaultCamera;
 	}
+    m_DebugCameraInputController = std::make_shared<DebugCameraInputController<Renderer>>(m_EventBroker, -1);
     TEMPCreateLights();
     InitializeRenderPasses();
 
@@ -89,8 +89,6 @@ void Renderer::InitializeShaders()
 
 void Renderer::InputUpdate(double dt)
 {
-    static DebugCameraInputController<Renderer> firstPersonInputController(m_EventBroker, -1);
-
 	glm::vec3 m_Position = m_Camera->Position();
 	if (glfwGetKey(m_Window, GLFW_KEY_O) == GLFW_PRESS)
 	{
@@ -120,9 +118,9 @@ void Renderer::InputUpdate(double dt)
 		m_CameraMoveSpeed = 0.5f;
 	}
 
-    firstPersonInputController.Update(dt);
-    m_Camera->SetOrientation(firstPersonInputController.Orientation());
-	m_Camera->SetPosition(firstPersonInputController.Position());
+    m_DebugCameraInputController->Update(dt);
+    m_Camera->SetOrientation(m_DebugCameraInputController->Orientation());
+	m_Camera->SetPosition(m_DebugCameraInputController->Position());
 }
 
 void Renderer::Update(double dt)
