@@ -12,6 +12,7 @@
 #include "../Core/World.h"
 #include "PickingPass.h"
 #include "DrawScenePass.h"
+#include "DebugCameraInputController.h"
 #include "LightCullingPass.h"
 #include "DrawFinalPass.h"
 
@@ -33,6 +34,8 @@ public:
 private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
+
+    std::shared_ptr<DebugCameraInputController<Renderer>> m_DebugCameraInputController;
 
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;

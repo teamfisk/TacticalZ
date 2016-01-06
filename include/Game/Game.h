@@ -19,6 +19,13 @@
 #include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
 
+// Network
+#include <boost/thread.hpp>
+#include "Network/Network.h"
+#include "Network/Server.h"
+#include "Network/Client.h"
+
+
 class Game
 {
 public:
@@ -39,12 +46,21 @@ private:
     World* m_World;
     SystemPipeline* m_SystemPipeline;
     RenderQueueFactory* m_RenderQueueFactory;
+    // Network variables
+    boost::thread m_NetworkThread;
+
+    // Network methods
+    void networkFunction();
+    Network* m_ClientOrServer;
+    bool m_IsClientOrServer = false;
 
     EventRelay<Game, Events::InputCommand> m_EInputCommand;
     bool debugOnInputCommand(const Events::InputCommand& e);
 
     void debugInitialize();
     void debugTick(double dt);
+	EventRelay<Client, Events::KeyDown> m_EKeyDown;
+
 };
 
 #endif

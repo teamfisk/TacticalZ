@@ -7,10 +7,13 @@
 
 class System
 {
+    friend class SystemPipeline;
+
 protected:
     System(EventBroker* eventBroker)
         : m_EventBroker(eventBroker)
     { }
+    virtual ~System() = default;
 
     EventBroker* m_EventBroker;
 };
@@ -24,6 +27,7 @@ protected:
         : System(eventBroker)
         , m_ComponentType(componentType)
     { }
+    virtual ~PureSystem() = default;
 
     const std::string m_ComponentType;
 
@@ -38,6 +42,7 @@ protected:
     ImpureSystem(EventBroker* eventBroker)
         : System(eventBroker)
     { }
+    virtual ~ImpureSystem() = default;
 
     virtual void Update(World* world, double dt) = 0;
 };
