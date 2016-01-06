@@ -9,8 +9,9 @@ namespace Events
 
 struct PlayerHealthPickup : Event
 {
-    int HealthAmount;
+    double HealthAmount;
     EntityID HealthPickupID;
+    EntityID playerHealedID;
 };
 
 }

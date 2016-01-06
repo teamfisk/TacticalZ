@@ -9,8 +9,8 @@ namespace Events
 
 struct PlayerDamage : Event
 {
-    int DamageAmount;
-    EntityID PlayerID;
+    double DamageAmount;
+    EntityID PlayerDamagedID;
 };
 
 }

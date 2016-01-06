@@ -10,23 +10,27 @@
 #include "Core\EPlayerHealthPickup.h";
 #include "Core\EPlayerDeath.h";
 
+#include <tuple>
+#include <vector>
+
 class HealthSystem : public PureSystem
 {
 public:
     HealthSystem(EventBroker* eventBroker);
 
-    virtual void UpdateComponent(World* world, ComponentWrapper& player, double dt) override;
-private:
-    float m_Speed = 5;
+    //updatecomponent
+    virtual void UpdateComponent(World* world, ComponentWrapper& health, double dt) override;
 
+private:
     //create the methods which will take care of specific events
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
     bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e);
 
-    int playerDeltaHealth;
-
+    //create the vector which will keep track of health changes
+    std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;
+   
 };
 
 #endif

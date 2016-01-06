@@ -28,7 +28,7 @@ Game::Game(int argc, char* argv[])
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-    ));
+        ));
     m_Renderer->Initialize();
     m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
@@ -60,7 +60,26 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<TriggerSystem>();
     m_SystemPipeline->AddSystem<HealthSystem>();
 
-    // Invoke network
+    //TEMP TEST DEL LATER
+    //skapar entityn som har komponenterna transf,model,player,health i sig. dvs är en spelare
+    EntityID playerID = m_World->CreateEntity();
+    ComponentWrapper transform = m_World->AttachComponent(playerID, "Transform");
+    ComponentWrapper model = m_World->AttachComponent(playerID, "Model");
+    model["Resource"] = "Models/Core/UnitSphere.obj";
+    ComponentWrapper player = m_World->AttachComponent(playerID, "Player");
+    ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
+    Events::PlayerDamage e;
+    e.DamageAmount = 50.0f;
+    e.PlayerDamagedID = 9;
+    m_EventBroker->Publish(e);
+    Events::PlayerHealthPickup e2;
+    e2.HealthAmount = 40.0f;
+    e2.playerHealedID = 9;
+    m_EventBroker->Publish(e2);
+
+    //END TEST
+
+        // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();

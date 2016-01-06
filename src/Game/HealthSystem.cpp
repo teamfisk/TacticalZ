@@ -1,4 +1,5 @@
 #include "HealthSystem.h"
+#include <algorithm>
 
 HealthSystem::HealthSystem(EventBroker* eventBroker)
     : PureSystem(eventBroker, "Health")
@@ -6,33 +7,48 @@ HealthSystem::HealthSystem(EventBroker* eventBroker)
     //subscribe/listenTo playerdamage,healthpickup events with the eventbroker
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &HealthSystem::OnPlayerDamaged);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerHealthPickup, &HealthSystem::OnPlayerHealthPickup);
-    playerDeltaHealth = 0;
 }
-void HealthSystem::UpdateComponent(World * world, ComponentWrapper & player, double dt)
+
+void HealthSystem::UpdateComponent(World * world, ComponentWrapper & health, double dt)
 {
-    //Health is only affected by pickup/shoot events
-    player["Health"] += playerDeltaHealth;
-    playerDeltaHealth = 0;
-    if (player["Health"] < 0) {
-        //sendout/publish death event
+    //if entityID of health is 9 then the players ID is also 9 (player,health are connected to the same entity)
+    ComponentWrapper player = world->GetComponent(health.EntityID, "Player");
+    double currentHealth = (double) world->GetComponent(health.EntityID, "Health")["Health"];
+    double maxHealth = (double)world->GetComponent(health.EntityID, "Health")["MaxHealth"];
+
+    //process the DeltaHealthVector and change the entitys health accordingly
+    for (size_t i = m_DeltaHealthVector.size(); i >0; i--)
+    {
+        auto deltaHP = m_DeltaHealthVector[i-1];
+        if (std::get<0>(deltaHP) == player.EntityID) {
+            //re-read currentHealth for each iteration
+            currentHealth = (double)world->GetComponent(health.EntityID, "Health")["Health"];
+            //get the deltaHP value from the tuple and make sure you dont get more than maxHealth
+            double newHealth = std::min(currentHealth + (double)std::get<1>(deltaHP), maxHealth);
+            health.SetProperty("Health", newHealth);
+            m_DeltaHealthVector.erase(m_DeltaHealthVector.begin()+i-1);
+        }
+    }
+
+    currentHealth = (double)world->GetComponent(health.EntityID, "Health")["Health"];
+    if (currentHealth < 0.0f) {
+        //publish death event
         Events::PlayerDeath e;
         e.PlayerID = player.EntityID;
         m_EventBroker->Publish(e);
     }
 }
+
 bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e)
 {
-    //vem skadades?
-    //antagligen spelaren själv
-    //såna här events skickas av network te spelare som kan lyssna på / kolla på de och tar hand om sina egna +-hp endast
-    //just add that damage to a variable, which will later be taken care of by UpdateComponent
-    playerDeltaHealth -= e.DamageAmount;
-    //ev skicka ut playerdeath event
+    //save the changed HP to a vector. it will be taken care of in UpdateComponent
+    m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerDamagedID, -e.DamageAmount));
     return true;
 }
+
 bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e)
 {
-    //vem tog upp hp?
-    playerDeltaHealth += e.HealthAmount;
+    //save the changed HP to a vector. it will be taken care of in UpdateComponent
+    m_DeltaHealthVector.push_back(std::make_tuple(e.playerHealedID, e.HealthAmount));
     return true;
 }
