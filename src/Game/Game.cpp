@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
+#include "Game/HealthSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -57,6 +58,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
     m_SystemPipeline->AddSystem<CollisionSystem>();
     m_SystemPipeline->AddSystem<TriggerSystem>();
+    m_SystemPipeline->AddSystem<HealthSystem>();
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
