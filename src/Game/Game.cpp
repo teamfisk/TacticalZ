@@ -128,11 +128,15 @@ bool Game::debugOnInputCommand(const Events::InputCommand& e)
         }
     }
     if (e.Command == "SwitchToServer" && e.Value > 0) {
+        m_ClientOrServer->Close(); // memory leak for now, use delete when it works
+        //delete m_ClientOrServer;
         m_ClientOrServer = new Server();
         LOG_INFO("Switching to server");
         m_ClientOrServer->Start(m_World, m_EventBroker);
     }
-    if (e.Command == "SwitchToClient" && e.Value > 0) {
+    else if (e.Command == "SwitchToClient" && e.Value > 0) {
+        m_ClientOrServer->Close(); // memory leak for now, use delete when it works
+        //delete m_ClientOrServer;
         m_ClientOrServer = new Client(m_Config);
         m_ClientOrServer->Start(m_World, m_EventBroker);
         LOG_INFO("Switching to client");
@@ -163,10 +167,5 @@ void Game::networkFunction()
         m_ClientOrServer = new Server();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
-    // I don't think we are reaching this part of the code right now.
-    // ~Game() is not called if the game is exited by closing console windows
-    // When server or client is done set it to false.
-    //m_IsClientOrServer = false;
-    // Destroy it
-    //delete m_ClientOrServer;
+
 }

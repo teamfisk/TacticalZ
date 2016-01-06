@@ -17,7 +17,7 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 
 Client::~Client()
 {
-
+    m_EventBroker->Unsubscribe(m_EInputCommand);
 }
 
 void Client::Start(World* world, EventBroker* eventBroker)
@@ -27,14 +27,10 @@ void Client::Start(World* world, EventBroker* eventBroker)
     m_World = world;
 
     // Subscribe to events
-    m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
-    m_EventBroker->Subscribe(m_EInputCommand);
+    //m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
+    //m_EventBroker->Subscribe(m_EInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
 
-
-    //while (m_PlayerName.size() > 7) {
-    //    LOG_INFO("Please enter your name (No longer than 7 characters):");
-    //    std::cin >> m_PlayerName;
-    //}
     m_Socket.connect(m_ReceiverEndpoint);
     LOG_INFO("I am client. BIP BOP");
 }
@@ -73,7 +69,7 @@ void Client::readFromServer()
 
 void Client::sendSnapshotToServer()
 {
-    // Reset previouse key state in snapshot.
+    // Reset previous key state in snapshot.
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
 
