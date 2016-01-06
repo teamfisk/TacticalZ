@@ -28,7 +28,6 @@ void Server::Close()
 {
     m_ThreadIsRunning = false;
     m_Socket.close();
-
 }
 
 void Server::readFromClients()

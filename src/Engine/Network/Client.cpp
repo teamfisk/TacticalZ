@@ -42,11 +42,10 @@ void Client::Update()
 
 void Client::Close()
 {
-    if (m_WasStarted) {
-        disconnect();
-        m_ThreadIsRunning = false;
-        m_EventBroker->Unsubscribe(m_EInputCommand);
-    }
+    disconnect();
+    m_ThreadIsRunning = false;
+    m_Socket.close();
+    m_EventBroker->Unsubscribe(m_EInputCommand);
 }
 
 void Client::readFromServer()
