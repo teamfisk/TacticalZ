@@ -35,6 +35,7 @@ void SoundSystem::Update()
         EntityID listener = (*it).EntityID;
         auto transform = m_World->GetComponent(listener, "Transform");
         setListenerPos(transform["Position"]);
+        setListenerOri(transform["Orientation"]);
     }
 }
 
