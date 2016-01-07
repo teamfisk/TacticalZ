@@ -15,10 +15,8 @@ public:
     ~SystemPipeline()
     {
         for (UnorderedSystems& group : m_OrderedSystemGroups) {
-            for (auto& pair : group.PureSystems) {
-                for (auto& system : pair.second) {
-                    delete system;
-                }
+            for (auto& pair : group.Systems) {
+                delete pair.second;
             }
         }
     }
