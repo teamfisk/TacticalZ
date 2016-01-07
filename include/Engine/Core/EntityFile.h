@@ -2,6 +2,7 @@
 #define EntityFile_h__
 
 #include <stack>
+#include <boost/lexical_cast.hpp>
 #include <xercesc/util/XercesDefs.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/sax2/SAX2XMLReader.hpp>
@@ -245,58 +246,54 @@ private:
 
 public:
     static std::size_t GetTypeStride(std::string typeName);
-static void WriteElementData(const xercesc::DOMElement* element, std::string typeName, char* outData)
-{
-    using namespace xercesc;
 
-    if (typeName == "Vector") {
-        glm::vec3 vec;
-        vec.x = getFloatAttribute(element, "X");
-        vec.y = getFloatAttribute(element, "Y");
-        vec.z = getFloatAttribute(element, "Z");
-        memcpy(outData, reinterpret_cast<char*>(&vec), GetTypeStride(typeName));
-    } else if (typeName == "Color") {
-        glm::vec4 vec;
-        vec.r = getFloatAttribute(element, "R");
-        vec.g = getFloatAttribute(element, "G");
-        vec.b = getFloatAttribute(element, "B");
-        vec.a = getFloatAttribute(element, "A");
-        memcpy(outData, reinterpret_cast<char*>(&vec), GetTypeStride(typeName));
-    } else if (typeName == "Quaternion") {
-        glm::quat q;
-        q.x = getFloatAttribute(element, "X");
-        q.y = getFloatAttribute(element, "Y");
-        q.z = getFloatAttribute(element, "Z");
-        q.w = getFloatAttribute(element, "W");
-        memcpy(outData, reinterpret_cast<char*>(&q), GetTypeStride(typeName));
-    } else if (typeName == "float") {
-        XSValue::Status status;
-        XSValue* val = XSValue::getActualValue(element->getTextContent(), xercesc::XSValue::DataType::dt_float, status);
-        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue.f_float), GetTypeStride(typeName));
-    } else if (typeName == "double") {
-        XSValue::Status status;
-        XSValue* val = XSValue::getActualValue(element->getTextContent(), xercesc::XSValue::DataType::dt_double, status);
-        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue.f_double), GetTypeStride(typeName));
-    } else if (typeName == "bool") {
-        XSValue::Status status;
-        XSValue* val = XSValue::getActualValue(element->getTextContent(), xercesc::XSValue::DataType::dt_boolean, status);
-        memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue.f_bool), GetTypeStride(typeName));
-    } else {
-        XSValue::DataType dataType = XSValue::getDataType(XS::ToXMLCh(typeName));
-        if (dataType == XSValue::DataType::dt_string) {
-            char* str = XMLString::transcode(element->getTextContent());
-            std::string standardString(str);
-            new (outData) std::string(str);
-            XMLString::release(&str);
-            //memcpy(outData, reinterpret_cast<char*>(&standardString), getTypeStride(typeName));
-        } else {
-            //XSValue::Status status;
-            //XSValue* val = XSValue::getActualValue(element->getTextContent(), dataType, status);
-            //memcpy(outData, reinterpret_cast<char*>(&val->fData.fValue), getTypeStride(typeName));
-            LOG_WARNING("Unknown native data type: %s", typeName.c_str());
+    static void WriteAttributeData(char* outData, const std::string fieldType, const std::map<std::string, std::string>& attributes)
+    {
+        if (fieldType == "Vector") {
+            glm::vec3 vec;
+            vec.x = boost::lexical_cast<float>(attributes.at("X"));
+            vec.y = boost::lexical_cast<float>(attributes.at("Y"));
+            vec.z = boost::lexical_cast<float>(attributes.at("Z"));
+            memcpy(outData, reinterpret_cast<char*>(&vec), EntityFile::GetTypeStride(fieldType));
+        } else if (fieldType == "Color") {
+            glm::vec4 vec;
+            vec.r = boost::lexical_cast<float>(attributes.at("R"));
+            vec.g = boost::lexical_cast<float>(attributes.at("G"));
+            vec.b = boost::lexical_cast<float>(attributes.at("B"));
+            vec.a = boost::lexical_cast<float>(attributes.at("A"));
+            memcpy(outData, reinterpret_cast<char*>(&vec), EntityFile::GetTypeStride(fieldType));
+        } else if (fieldType == "Quaternion") {
+            glm::quat q;
+            q.x = boost::lexical_cast<float>(attributes.at("X"));
+            q.y = boost::lexical_cast<float>(attributes.at("Y"));
+            q.z = boost::lexical_cast<float>(attributes.at("Z"));
+            q.w = boost::lexical_cast<float>(attributes.at("W"));
+            memcpy(outData, reinterpret_cast<char*>(&q), EntityFile::GetTypeStride(fieldType));
+        } else if (!attributes.empty()) {
+            LOG_WARNING("%i attributes not handled by any type conversion!", attributes.size());
         }
     }
-}
+
+    static void WriteValueData(char* outData, const std::string fieldType, const char* valueData)
+    {
+        if (fieldType == "int") {
+            int value = boost::lexical_cast<int>(valueData);
+            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
+        } else if (fieldType == "float") {
+            float value = boost::lexical_cast<float>(valueData);
+            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
+        } else if (fieldType == "double") {
+            double value = boost::lexical_cast<double>(valueData);
+            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
+        } else if (fieldType == "bool") {
+            bool value = (valueData[0] == 't'); // Lazy bool evaluation
+            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
+        } else if (fieldType == "string") {
+            new (outData) std::string(valueData);
+        } else {
+            LOG_WARNING("Unknown value data type: %s", fieldType.c_str());
+        }
+    }
 
     void Parse(const EntityFileHandler* handler);
     //const std::map<std::string, ::ComponentInfo>& ComponentInfo() const { return m_ComponentInfo; }

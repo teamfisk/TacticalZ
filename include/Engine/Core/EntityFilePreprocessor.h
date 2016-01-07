@@ -174,53 +174,72 @@ private:
         }
     }
 
-void parseDefaults()
-{
-    using namespace xercesc;
+    void parseDefaults()
+    {
+        using namespace xercesc;
 
-    for (auto& ci : m_ComponentInfo) {
-        // Allocate memory for default values
-        ci.second.Defaults = std::shared_ptr<char>(new char[ci.second.Meta.Stride]);
-        memset(ci.second.Defaults.get(), 0, ci.second.Meta.Stride);
+        for (auto& ci : m_ComponentInfo) {
+            // Allocate memory for default values
+            ci.second.Defaults = std::shared_ptr<char>(new char[ci.second.Meta.Stride]);
+            memset(ci.second.Defaults.get(), 0, ci.second.Meta.Stride);
 
-        XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager);
-        //parser.setErrorHandler(m_ErrorHandler);
+            XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager);
+            //parser.setErrorHandler(m_ErrorHandler);
 
-        std::string componentName = ci.first;
-        LOG_DEBUG("Parsing defaults for component %s", componentName.c_str());
-        boost::filesystem::path defaultsFile = "Schema/Components/" + componentName + ".xml";
+            std::string componentName = ci.first;
+            LOG_DEBUG("Parsing defaults for component %s", componentName.c_str());
+            boost::filesystem::path defaultsFile = "Schema/Components/" + componentName + ".xml";
 
-        parser.parse(defaultsFile.string().c_str());
-        auto doc = parser.getDocument();
-        if (doc == nullptr) {
-            LOG_ERROR("%s not found! Skipping.", defaultsFile.string().c_str());
-            continue;
-        }
-
-        // Find the node in the components namespace matching the component name
-        std::string tagName = "c:" + componentName;
-        auto rootNodes = doc->getElementsByTagName(XS::ToXMLCh(tagName));
-        if (rootNodes->getLength() == 0) {
-            LOG_ERROR("Couldn't find defaults for component \"%s\"! Skipping.", componentName.c_str());
-            continue;
-        }
-        auto componentElement = dynamic_cast<DOMElement*>(rootNodes->item(0));
-       
-        // Fill the default value buffer with values
-        for (auto& field : ci.second.FieldOffsets) {
-            std::string fieldName = field.first;
-            auto fieldNodes = componentElement->getElementsByTagName(XS::ToXMLCh(fieldName));
-            auto fieldNode = fieldNodes->item(0);
-            if (fieldNode == nullptr) {
-                LOG_ERROR("Defaults for component \"%s\" is missing field \"%s\"!", componentName.c_str(), fieldName.c_str());
+            parser.parse(defaultsFile.string().c_str());
+            auto doc = parser.getDocument();
+            if (doc == nullptr) {
+                LOG_ERROR("%s not found! Skipping.", defaultsFile.string().c_str());
                 continue;
             }
-            auto fieldElement = dynamic_cast<DOMElement*>(fieldNode);
 
-            std::string fieldType = ci.second.FieldTypes.at(fieldName);
-            unsigned int fieldOffset = ci.second.FieldOffsets.at(fieldName);
-            EntityFile::WriteElementData(fieldElement, fieldType, ci.second.Defaults.get() + fieldOffset);
+            // Find the node in the components namespace matching the component name
+            std::string tagName = "c:" + componentName;
+            auto rootNodes = doc->getElementsByTagName(XS::ToXMLCh(tagName));
+            if (rootNodes->getLength() == 0) {
+                LOG_ERROR("Couldn't find defaults for component \"%s\"! Skipping.", componentName.c_str());
+                continue;
+            }
+            auto componentElement = dynamic_cast<DOMElement*>(rootNodes->item(0));
+
+            // Fill the default value buffer with values
+            for (auto& field : ci.second.FieldOffsets) {
+                std::string fieldName = field.first;
+                auto fieldNodes = componentElement->getElementsByTagName(XS::ToXMLCh(fieldName));
+                auto fieldNode = fieldNodes->item(0);
+                if (fieldNode == nullptr) {
+                    LOG_ERROR("Defaults for component \"%s\" is missing field \"%s\"!", componentName.c_str(), fieldName.c_str());
+                    continue;
+                }
+                auto fieldElement = dynamic_cast<DOMElement*>(fieldNode);
+
+                std::string fieldType = ci.second.FieldTypes.at(fieldName);
+                unsigned int fieldOffset = ci.second.FieldOffsets.at(fieldName);
+                char* data = ci.second.Defaults.get() + fieldOffset;
+
+                // Handle potential field attributes
+                if (fieldElement->hasAttributes()) {
+                    std::map<std::string, std::string> attributes;
+                    auto attributeMap = fieldElement->getAttributes();
+                    for (int i = 0; i < attributeMap->getLength(); ++i) {
+                        auto attribItem = attributeMap->item(i);
+                        attributes[XS::ToString(attribItem->getNodeName())] = XS::ToString(attribItem->getNodeValue());
+                    }
+                    EntityFile::WriteAttributeData(data, fieldType, attributes);
+                }
+
+                // Handle potential field values
+                auto childNode = fieldElement->getFirstChild();
+                if (childNode != nullptr && childNode->getNodeType() == DOMNode::TEXT_NODE) {
+                    char* cstrValue = XMLString::transcode(childNode->getNodeValue());
+                    EntityFile::WriteValueData(data, fieldType, cstrValue);
+                    XMLString::release(&cstrValue);
+                }
+            }
         }
     }
-}
 };
