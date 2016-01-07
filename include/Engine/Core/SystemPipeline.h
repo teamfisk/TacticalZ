@@ -14,10 +14,8 @@ public:
     { }
     ~SystemPipeline()
     {
-        for (auto& pair : m_PureSystems) {
-            for (auto& system : pair.second) {
-                delete system;
-            }
+        for (auto& pair : m_Systems) {
+            delete pair.second;
         }
     }
 

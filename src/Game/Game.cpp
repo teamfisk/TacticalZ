@@ -27,7 +27,7 @@ Game::Game(int argc, char* argv[])
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-        ));
+    ));
     m_Renderer->Initialize();
     m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
@@ -64,17 +64,17 @@ Game::Game(int argc, char* argv[])
         networkFunction();
     }
     m_LastTime = glfwGetTime();
-
-    debugInitialize();
 }
 
 Game::~Game()
 {
-    // Call before to ensure that thread closes correctly.
-    //if (m_IsClientOrServer)
-    //  m_ClientOrServer.Close();
-
+    delete m_SystemPipeline;
+    delete m_World;
     delete m_FrameStack;
+    delete m_InputProxy;
+    delete m_InputManager;
+    delete m_Renderer;
+    delete m_RenderQueueFactory;
     delete m_EventBroker;
 }
 
@@ -103,7 +103,6 @@ void Game::Tick()
 
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
-    debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
 
@@ -113,37 +112,6 @@ void Game::Tick()
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-}
-
-
-bool Game::debugOnInputCommand(const Events::InputCommand& e)
-{
-    if (e.Command == "DebugReload" && e.Value == 1) {
-        std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
-        if (!mapToLoad.empty()) {
-            delete m_World;
-            m_World = new World();
-            ResourceManager::Release("EntityXMLFile", mapToLoad);
-            ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
-        }
-    }
-    if (e.Command == "SwitchToServer" && e.Value > 0) {
-        m_ClientOrServer = new Server();
-        LOG_INFO("Switching to server");
-        m_ClientOrServer->Start(m_World, m_EventBroker);
-    }
-    if (e.Command == "SwitchToClient" && e.Value > 0) {
-        m_ClientOrServer = new Client(m_Config);
-        m_ClientOrServer->Start(m_World, m_EventBroker);
-        LOG_INFO("Switching to client");
-    }
-
-    return false;
-}
-
-void Game::debugInitialize()
-{
-    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
 }
 
 void Game::debugTick(double dt)
