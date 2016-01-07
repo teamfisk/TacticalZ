@@ -237,6 +237,35 @@ private:
     }
 };
 
+class EntityFileXMLErrorHandler : public xercesc::ErrorHandler
+{
+public:
+	void warning(const xercesc::SAXParseException& e) override
+	{
+		reportParseException("Warning", e);
+	}
+	void error(const xercesc::SAXParseException& e) override
+	{
+		reportParseException("Error", e);
+	}
+	void fatalError(const xercesc::SAXParseException& e) override
+	{
+		reportParseException("FATAL ERROR", e);
+	}
+	void resetErrors() override { }
+
+private:
+	void reportParseException(std::string type, const xercesc::SAXParseException& e)
+	{
+		char* message = xercesc::XMLString::transcode(e.getMessage());
+		char* systemID = xercesc::XMLString::transcode(e.getSystemId());
+		std::cerr << systemID << ":" << e.getLineNumber() << ":" << e.getColumnNumber() << std::endl;
+		std::cerr << type << ": " << message << std::endl;
+		xercesc::XMLString::release(&systemID);
+		xercesc::XMLString::release(&message);
+	}
+};
+
 class EntityFile : public Resource
 {
     friend class ResourceManager;
