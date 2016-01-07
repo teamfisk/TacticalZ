@@ -45,7 +45,7 @@ Game::Game(int argc, char* argv[]) : someOctTree(AABB(-0.5f*worldSize, 0.5f*worl
     m_World = new HardcodedTestWorld();
 
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    m_SystemPipeline->AddSystem<PlayerSystem>();
+    m_SystemPipeline->AddSystem<PlayerSystem>(0);
 
     m_LastTime = glfwGetTime();
 }
