@@ -37,15 +37,21 @@ public:
     // @param EntityID The parent of the entity
     typedef std::function<void(EntityID, EntityID)> OnStartEntityCallback;
     void SetStartEntityCallback(OnStartEntityCallback c) { m_OnStartEntityCallback = c; }
+    // @param EntityID The entity the component corresponds to
     // @param std::string Type name of the component
-    typedef std::function<void(std::string)> OnStartComponentCallback;
+    typedef std::function<void(EntityID, std::string)> OnStartComponentCallback;
     void SetStartComponentCallback(OnStartComponentCallback c) { m_OnStartComponentCallback = c; }
+    // @param EntityID Entity 
+    // @param std::string Component name 
     // @param std::string Field name
-    // @param std::string Field type
-    typedef std::function<void(std::string, std::string)> OnStartFieldCallback;
+    // @param std::map<std::string, std::string> Field attribute names and values
+    typedef std::function<void(EntityID, std::string, std::string, std::map<std::string, std::string>)> OnStartFieldCallback;
     void SetStartFieldCallback(OnStartFieldCallback c) { m_OnStartFieldCallback = c; }
+    // @param EntityID Entity 
+    // @param std::string Component name 
+    // @param std::string Field name
     // @param char* Field data
-    typedef std::function<void(char*)> OnStartFieldDataCallback;
+    typedef std::function<void(EntityID, std::string, std::string, const char*)> OnStartFieldDataCallback;
     void SetStartFieldDataCallback(OnStartFieldDataCallback c) { m_OnStartFieldDataCallback = c; }
 
 private:
@@ -72,15 +78,16 @@ public:
     {
         // 0 is imaginary world entity
         m_EntityStack.push(0);
+        m_StateStack.push(State::Unknown);
     }
 
     void startElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname, const xercesc::Attributes& attrs) override
     {
         std::string name = XS::ToString(_localName);
 
-        if (m_CurrentScope == State::Unknown) {
+        if (m_StateStack.top() == State::Unknown || m_StateStack.top() == State::Entity) {
             if (name == "Entity") {
-                m_CurrentScope = State::Entity;
+                m_StateStack.push(State::Entity);
                 onStartEntity(attrs);
                 return;
             }
@@ -91,16 +98,16 @@ public:
         }
 
         std::string uri = XS::ToString(_uri);
-        if (m_CurrentScope == State::Entity) {
+        if (m_StateStack.top() == State::Entity) {
             if (uri == "components") {
-                m_CurrentScope = State::Component;
+                m_StateStack.push(State::Component);
                 onStartComponent(name);
                 return;
             }
         }
         
-        if (m_CurrentScope == State::Component) {
-            m_CurrentScope = State::ComponentField;
+        if (m_StateStack.top() == State::Component) {
+            m_StateStack.push(State::ComponentField);
             onStartComponentField(name, attrs);
             return;
         }
@@ -108,7 +115,7 @@ public:
 
     void characters(const XMLCh* const chars, const XMLSize_t length) override
     {
-        if (m_CurrentScope == State::ComponentField) {
+        if (m_StateStack.top() == State::ComponentField) {
             char* transcoded = xercesc::XMLString::transcode(chars);
             onFieldData(transcoded);
         }
@@ -117,25 +124,25 @@ public:
     void endElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname) override
     {
         std::string name = XS::ToString(_localName);
-        if (m_CurrentScope == State::Entity) {
+        if (m_StateStack.top() == State::Entity) {
             if (name == "Entity") {
-                m_CurrentScope = State::Unknown;
+                m_StateStack.pop();
                 onEndEntity();
                 return;
             }
         }
         
         std::string uri = XS::ToString(_uri);
-        if (m_CurrentScope == State::Component) {
+        if (m_StateStack.top() == State::Component) {
             //if (uri == "components") {
-                m_CurrentScope = State::Entity;
+                m_StateStack.pop();
                 onEndComponent(name);
                 return;
             //}
         }
 
-        if (m_CurrentScope == State::ComponentField) {
-            m_CurrentScope = State::Component;
+        if (m_StateStack.top() == State::ComponentField) {
+            m_StateStack.pop();
             onEndComponentField(name);
             return;
         }
@@ -150,10 +157,14 @@ public:
 
 private:
     const EntityFileHandler* m_Handler;
+    xercesc::XMLGrammarPool* m_GrammarPool;
     xercesc::SAX2XMLReader* m_Reader;
-    State m_CurrentScope = State::Unknown;
+    //State m_CurrentScope = State::Unknown;
+    std::stack<State> m_StateStack;
     unsigned int m_NextEntityID = 1;
     std::stack<EntityID> m_EntityStack;
+    std::string m_CurrentComponent;
+    std::string m_CurrentField;
     std::map<std::string, std::string> m_CurrentAttributes;
 
     void onStartEntity(const xercesc::Attributes& attrs) 
@@ -189,41 +200,36 @@ private:
     void onStartComponent(std::string name)
     {
         //LOG_DEBUG("    Component: %s", name.c_str());
-
+        m_CurrentComponent = name;
         if (m_Handler->m_OnStartComponentCallback) {
-            m_Handler->m_OnStartComponentCallback(name);
+            m_Handler->m_OnStartComponentCallback(m_EntityStack.top(), name);
         }
     }
-    void onEndComponent(std::string name)
-    {
-    }
+    void onEndComponent(std::string name) { }
     void onStartComponentField(std::string field, const xercesc::Attributes& attrs) 
     {
         //LOG_DEBUG("        Field: %s", field.c_str());
-
+        m_CurrentField = field;
+        m_CurrentAttributes.clear();
         for (int i = 0; i < attrs.getLength(); i++) {
             auto name = attrs.getQName(i);
             auto value = attrs.getValue(name);
-
             //LOG_DEBUG("            %s = %s", (char*)XS::ToString(name), (char*)XS::ToString(value));
             m_CurrentAttributes[XS::ToString(name).operator std::string()] = XS::ToString(value).operator std::string();
         }
 
         if (m_Handler->m_OnStartFieldCallback) {
-            m_Handler->m_OnStartFieldCallback(field, "comment?");
+            m_Handler->m_OnStartFieldCallback(m_EntityStack.top(), m_CurrentComponent, field, m_CurrentAttributes);
         }
     }
-    void onEndComponentField(std::string field)
-    {
-
-    }
+    void onEndComponentField(std::string field) { }
 
     void onFieldData(char* data)
     {
         //LOG_DEBUG("            Data: %s", data);
 
         if (m_Handler->m_OnStartFieldDataCallback) {
-            m_Handler->m_OnStartFieldDataCallback(data);
+            m_Handler->m_OnStartFieldDataCallback(m_EntityStack.top(), m_CurrentComponent, m_CurrentField, data);
         }
 
         xercesc::XMLString::release(&data);

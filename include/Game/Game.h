@@ -20,6 +20,7 @@
 #include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
+#include "Core/EntityFileParser.h"
 
 // Network
 #include <boost/thread.hpp>

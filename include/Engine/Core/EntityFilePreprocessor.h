@@ -21,7 +21,7 @@ public:
     {
         m_EntityFile = ResourceManager::Load<EntityFile>(path);
         EntityFileHandler handler;
-		handler.SetStartComponentCallback(std::bind(&EntityFilePreprocessor::onStartComponent, this, std::placeholders::_1));
+		handler.SetStartComponentCallback(std::bind(&EntityFilePreprocessor::onStartComponent, this, std::placeholders::_1, std::placeholders::_2));
         m_EntityFile->Parse(&handler);
 
         LOG_DEBUG("___ COMPONENT DEFINITIONS ___");
@@ -57,7 +57,7 @@ private:
     std::map<std::string, unsigned int> m_ComponentCounts;
 	std::map<std::string, ComponentInfo> m_ComponentInfo;
 
-	void onStartComponent(std::string type)
+	void onStartComponent(EntityID entity, std::string type)
 	{
 		//LOG_DEBUG("Component: %s", type.c_str());
         m_ComponentCounts[type]++;

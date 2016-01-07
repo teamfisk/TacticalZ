@@ -49,9 +49,11 @@ Game::Game(int argc, char* argv[])
     m_World = new World();
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
-        //ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
-        EntityFilePreprocessor fp(mapToLoad);
-        fp.RegisterComponents(m_World);
+        auto file = ResourceManager::Load<EntityFile>(mapToLoad);
+        EntityFilePreprocessor fpp(mapToLoad);
+        fpp.RegisterComponents(m_World);
+        EntityFileParser fp(file);
+        fp.MergeEntities(m_World);
     }
 
     // Create system pipeline
