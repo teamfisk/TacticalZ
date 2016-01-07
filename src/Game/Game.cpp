@@ -22,12 +22,12 @@ Game::Game(int argc, char* argv[])
     m_Renderer = new Renderer(m_EventBroker);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
-    m_Renderer->SetResolution(Rectangle(
+    m_Renderer->SetResolution(Rectangle::Rectangle(
         0,
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-        ));
+    ));
     m_Renderer->Initialize();
     m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
@@ -64,14 +64,23 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
 
+    // Invoke network
+    if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
+        //boost::thread workerThread(&Game::networkFunction, this);
+        networkFunction();
+    }
     m_LastTime = glfwGetTime();
-
-    debugInitialize();
 }
 
 Game::~Game()
 {
+    delete m_SystemPipeline;
+    delete m_World;
     delete m_FrameStack;
+    delete m_InputProxy;
+    delete m_InputManager;
+    delete m_Renderer;
+    delete m_RenderQueueFactory;
     delete m_EventBroker;
 }
 
@@ -93,10 +102,15 @@ void Game::Tick()
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
+    // Update network
+    if (m_IsClientOrServer) {
+        m_ClientOrServer->Update();
+    }
+
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
-    debugTick(dt);
     m_Renderer->Update(dt);
+    m_EventBroker->Process<Client>();
 
     m_RenderQueueFactory->Update(m_World);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
@@ -106,28 +120,27 @@ void Game::Tick()
     m_EventBroker->Clear();
 }
 
-
-bool Game::debugOnInputCommand(const Events::InputCommand& e)
-{
-    if (e.Command == "DebugReload" && e.Value == 1) {
-        std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
-        if (!mapToLoad.empty()) {
-            delete m_World;
-            m_World = new World();
-            ResourceManager::Release("EntityXMLFile", mapToLoad);
-            ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
-        }
-    }
-
-    return false;
-}
-
-void Game::debugInitialize()
-{
-    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
-}
-
 void Game::debugTick(double dt)
 {
     m_EventBroker->Process<Game>();
+}
+
+void Game::networkFunction()
+{
+    bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
+    if (!isServer) {
+        m_IsClientOrServer = true;
+        m_ClientOrServer = new Client(m_Config);
+    }
+    if (isServer) {
+        m_IsClientOrServer = true;
+        m_ClientOrServer = new Server();
+    }
+    m_ClientOrServer->Start(m_World, m_EventBroker);
+    // I don't think we are reaching this part of the code right now.
+    // ~Game() is not called if the game is exited by closing console windows
+    // When server or client is done set it to false.
+    //m_IsClientOrServer = false;
+    // Destroy it
+    //delete m_ClientOrServer;
 }

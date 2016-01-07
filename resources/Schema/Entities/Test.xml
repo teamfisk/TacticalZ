@@ -34,7 +34,7 @@
 				</c:Trigger>
 			</Components>
 		</Entity>
-		<Entity>
+		<!--<Entity>
 			<Components>
 				<c:Player>
 					<Velocity X="0" Y="0" Z="0"/>
@@ -48,7 +48,7 @@
 				<c:AABB>
 				</c:AABB>
 			</Components>
-		</Entity>
+		</Entity>-->
 		<Entity>
 			<Components>
 				<c:Transform>

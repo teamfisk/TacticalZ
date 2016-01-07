@@ -35,7 +35,7 @@ public:
 	virtual void Draw(RenderQueueCollection& rq) = 0;
 
 protected:
-	Rectangle m_Resolution = Rectangle(1280, 720);
+	Rectangle m_Resolution = Rectangle::Rectangle(1280, 720);
 	bool m_Fullscreen = false;
 	bool m_VSYNC = false;
 	int m_GLVersion[2];
