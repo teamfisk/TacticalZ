@@ -52,15 +52,17 @@ Game::Game(int argc, char* argv[])
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    unsigned int updateOrderPriority = 0;
-    m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderPriority);
-    m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderPriority);
-    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderPriority, m_Renderer);
+
+    //All systems with orderlevel 0 will be updated first.
+    unsigned int updateOrderLevel = 0;
+    m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
 
     //Collision and TriggerSystem should update after player.
-    ++updateOrderPriority;
-    m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderPriority);
-    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderPriority);
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
 
     m_LastTime = glfwGetTime();
 

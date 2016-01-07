@@ -24,12 +24,13 @@ public:
     }
 
     template <typename T, typename... Arguments>
-    void AddSystem(int updateOrderPriority, Arguments... args)
+    //All systems with orderlevel 0 will be updated first, then 1, 2, etc.
+    void AddSystem(int updateOrderLevel, Arguments... args)
     {
-        if (updateOrderPriority + 1 > m_OrderedSystemGroups.size()) {
-            m_OrderedSystemGroups.resize(updateOrderPriority + 1);
+        if (updateOrderLevel + 1 > m_OrderedSystemGroups.size()) {
+            m_OrderedSystemGroups.resize(updateOrderLevel + 1);
         }
-        UnorderedSystems& group = m_OrderedSystemGroups[updateOrderPriority];
+        UnorderedSystems& group = m_OrderedSystemGroups[updateOrderLevel];
         System* system = new T(m_EventBroker, args...);
         group.Systems[typeid(T).name()] = system;
 
