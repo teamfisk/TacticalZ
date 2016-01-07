@@ -8,7 +8,6 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<Texture>("Texture");
-    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
 
@@ -50,7 +49,7 @@ Game::Game(int argc, char* argv[])
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
-        EntityFilePreprocessor fpp(mapToLoad);
+        EntityFilePreprocessor fpp(file);
         fpp.RegisterComponents(m_World);
         EntityFileParser fp(file);
         fp.MergeEntities(m_World);

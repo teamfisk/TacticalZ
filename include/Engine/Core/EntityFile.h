@@ -275,60 +275,12 @@ private:
 
 public:
     static std::size_t GetTypeStride(std::string typeName);
-
-    static void WriteAttributeData(char* outData, const std::string fieldType, const std::map<std::string, std::string>& attributes)
-    {
-        if (fieldType == "Vector") {
-            glm::vec3 vec;
-            vec.x = boost::lexical_cast<float>(attributes.at("X"));
-            vec.y = boost::lexical_cast<float>(attributes.at("Y"));
-            vec.z = boost::lexical_cast<float>(attributes.at("Z"));
-            memcpy(outData, reinterpret_cast<char*>(&vec), EntityFile::GetTypeStride(fieldType));
-        } else if (fieldType == "Color") {
-            glm::vec4 vec;
-            vec.r = boost::lexical_cast<float>(attributes.at("R"));
-            vec.g = boost::lexical_cast<float>(attributes.at("G"));
-            vec.b = boost::lexical_cast<float>(attributes.at("B"));
-            vec.a = boost::lexical_cast<float>(attributes.at("A"));
-            memcpy(outData, reinterpret_cast<char*>(&vec), EntityFile::GetTypeStride(fieldType));
-        } else if (fieldType == "Quaternion") {
-            glm::quat q;
-            q.x = boost::lexical_cast<float>(attributes.at("X"));
-            q.y = boost::lexical_cast<float>(attributes.at("Y"));
-            q.z = boost::lexical_cast<float>(attributes.at("Z"));
-            q.w = boost::lexical_cast<float>(attributes.at("W"));
-            memcpy(outData, reinterpret_cast<char*>(&q), EntityFile::GetTypeStride(fieldType));
-        } else if (!attributes.empty()) {
-            LOG_WARNING("%i attributes not handled by any type conversion!", attributes.size());
-        }
-    }
-
-    static void WriteValueData(char* outData, const std::string fieldType, const char* valueData)
-    {
-        if (fieldType == "int") {
-            int value = boost::lexical_cast<int>(valueData);
-            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-        } else if (fieldType == "float") {
-            float value = boost::lexical_cast<float>(valueData);
-            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-        } else if (fieldType == "double") {
-            double value = boost::lexical_cast<double>(valueData);
-            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-        } else if (fieldType == "bool") {
-            bool value = (valueData[0] == 't'); // Lazy bool evaluation
-            memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-        } else if (fieldType == "string") {
-            new (outData) std::string(valueData);
-        } else {
-            LOG_WARNING("Unknown value data type: %s", fieldType.c_str());
-        }
-    }
-
-    void Parse(const EntityFileHandler* handler);
-    //const std::map<std::string, ::ComponentInfo>& ComponentInfo() const { return m_ComponentInfo; }
-    //const std::vector<std::string>& EntityReferences() const { return m_EntityReferences; }
+    static void WriteAttributeData(char* outData, const std::string fieldType, const std::map<std::string, std::string>& attributes);
+    static void WriteValueData(char* outData, const std::string fieldType, const char* valueData);
 
     xercesc::XMLGrammarPool* GrammarPool() const { return m_GrammarPool; }
+
+    void Parse(const EntityFileHandler* handler) const;
 
 private:
     boost::filesystem::path m_FilePath;
@@ -336,18 +288,6 @@ private:
     xercesc::SAX2XMLReader* m_SAX2XMLReader;
 	//std::map<std::string, ::ComponentInfo> m_ComponentInfo;
     //std::vector<std::string> m_EntityReferences;
-static float getFloatAttribute(const xercesc::DOMElement* element, const char* attribute)
-{
-    using namespace xercesc;
-    XSValue::Status status;
-    XSValue* val = XSValue::getActualValue(element->getAttribute(XS::ToXMLCh(attribute)), xercesc::XSValue::DataType::dt_double, status);
-    if (val == nullptr) {
-        LOG_ERROR("Element \"%s\" doesn't have an \"%s\" attribute!", ((std::string)XS::ToString(element->getTagName())).c_str(), attribute);
-        return 0.f;
-    } else {
-        return static_cast<float>(val->fData.fValue.f_double);
-    }
-}
 };
 
 #endif
