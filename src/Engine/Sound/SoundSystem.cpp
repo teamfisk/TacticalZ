@@ -1,8 +1,9 @@
 #include "Sound/SoundSystem.h"
 
-SoundSystem::SoundSystem(EventBroker* eventBroker)
+SoundSystem::SoundSystem(World* world, EventBroker* eventBroker)
 {
     m_EventBroker = eventBroker;
+    m_World = world;
     // Initialize OpenAL
     m_ALCdevice = alcOpenDevice(nullptr);
     if (m_ALCdevice != nullptr) {
@@ -16,20 +17,29 @@ SoundSystem::SoundSystem(EventBroker* eventBroker)
     alDistanceModel(AL_INVERSE_DISTANCE);
 
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySound, &SoundSystem::OnPlaySound);
-    //m_EPlaySound = decltype(m_EPlaySound)(std::bind(&SoundSystem::OnPlaySound, this, std::placeholders::_1));
-    //m_EventBroker->Subscribe(m_EPlaySound);
 }
 
 SoundSystem::~SoundSystem()
-{ 
+{
     alcDestroyContext(m_ALCcontext);
     alcCloseDevice(m_ALCdevice);
     delete m_ALCcontext;
     delete m_ALCdevice;
 }
 
+void SoundSystem::Update()
+{
+    // Should only be one listener.
+    auto listenerComponents = m_World->GetComponents("Listener");
+    for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
+        EntityID listener = (*it).EntityID;
+        auto transform = m_World->GetComponent(listener, "Transform");
+        setListenerPos(transform["Position"]);
+    }
+}
+
 ALuint SoundSystem::createSource()
-{ 
+{
     ALuint source;
     alGenSources((ALuint)1, &source);
     alSourcei(source, AL_REFERENCE_DISTANCE, 1.0);
@@ -60,7 +70,6 @@ bool SoundSystem::OnPlaySound(const Events::PlaySound & e)
     sauce.ALsource = source;
     sauce.SoundResource = sound;
     playSound(sauce);
-    LOG_INFO("You are playing an imaginary sound now! :D");
     return false;
 }
 

@@ -65,7 +65,14 @@ Game::Game(int argc, char* argv[])
         networkFunction();
     }
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
-    m_SoundSystem = new SoundSystem(m_EventBroker);
+    m_SoundSystem = new SoundSystem(m_World, m_EventBroker);
+
+    auto soundListenerCube = m_World->CreateEntity();
+    m_World->AttachComponent(soundListenerCube, "Listener");
+    m_World->AttachComponent(soundListenerCube, "Transform");
+    auto model = m_World->AttachComponent(soundListenerCube, "Model");
+    model["Resource"] = "Models/Core/UnitCube.obj";
+    model["Color"] = glm::vec4(1, 0, 0, 1);
 
     m_LastTime = glfwGetTime();
 }

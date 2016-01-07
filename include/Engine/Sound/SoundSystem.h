@@ -22,9 +22,9 @@ class SoundSystem
 {
 public:
     SoundSystem() { }
-    SoundSystem(EventBroker* eventBroker);
+    SoundSystem(World* world, EventBroker* eventBroker);
     ~SoundSystem();
-    void Update() { } // Update emitters
+    void Update(); // Update emitters
 private:
     // Private setters and getters for working with glm
     void setListenerPos(glm::vec3 pos) { alListener3f(AL_POSITION, pos.x, pos.y, pos.z); };
