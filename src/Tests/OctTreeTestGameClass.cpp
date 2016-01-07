@@ -5,6 +5,8 @@ Game::Game(int argc, char* argv[]) : someOctTree(AABB(-0.5f*worldSize, 0.5f*worl
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<Texture>("Texture");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -25,9 +27,14 @@ Game::Game(int argc, char* argv[]) : someOctTree(AABB(-0.5f*worldSize, 0.5f*worl
         m_Config->Get<int>("Video.Height", 720)
         ));
     m_Renderer->Initialize();
+    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
+    m_InputProxy = new InputProxy(m_EventBroker);
+    m_InputProxy->AddHandler<KeyboardInputHandler>();
+    m_InputProxy->AddHandler<MouseInputHandler>();
+    m_InputProxy->LoadBindings("Input.ini");
 
     // Create the root level GUI frame
     m_FrameStack = new GUI::Frame(m_EventBroker);
@@ -36,6 +43,9 @@ Game::Game(int argc, char* argv[]) : someOctTree(AABB(-0.5f*worldSize, 0.5f*worl
 
     // Create a TEST WORLD
     m_World = new HardcodedTestWorld();
+
+    m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    m_SystemPipeline->AddSystem<PlayerSystem>();
 
     m_LastTime = glfwGetTime();
 }
@@ -52,9 +62,14 @@ void Game::Tick()
     double dt = currentTime - m_LastTime;
     m_LastTime = currentTime;
 
+    // Handle input in a weird looking but responsive way
+    m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
     m_InputManager->Update(dt);
-    m_Renderer->Update(dt);
+    m_EventBroker->Swap();
+    m_InputProxy->Update(dt);
+    m_EventBroker->Swap();
+    m_InputProxy->Process();
     m_EventBroker->Swap();
 
 #define TEST1
@@ -70,7 +85,7 @@ void Game::Tick()
     AABB boxi;
     boxi.CreateFromCenter(pos, maxPos - minPos);
     frameCounter++;
-    if (frameCounter > 50) {
+    if (frameCounter > 1) {
         m_World->someOctTree.ClearDynamicObjects();
         m_World->someOctTree.AddDynamicObject(boxi);
         frameCounter = 0;
@@ -149,8 +164,8 @@ void Game::Tick()
     if (someOctTree.BoxCollides(redBox, AABB())) {
         //this checks AABB vs AABB
         //if (Collision::AABBVsAABB(redBox, aabb)) {
-        m_Renderer->Camera()->SetPosition(m_PrevPos);
-        m_Renderer->Camera()->SetOrientation(m_PrevOri);
+        //m_Renderer->Camera()->SetPosition(m_PrevPos);
+        //m_Renderer->Camera()->SetOrientation(m_PrevOri);
         model["Color"] = greenCol;
     }
     else {
@@ -163,8 +178,14 @@ void Game::Tick()
     m_RenderQueueFactory->Update(m_World);
 #endif
 
-    m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
+    // Iterate through systems and update world!
+    m_SystemPipeline->Update(m_World, dt);
+    m_Renderer->Update(dt);
 
+    m_RenderQueueFactory->Update(m_World);
+    GLERROR("Game::Tick m_RenderQueueFactory->Update");
+    m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
+    GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
 
