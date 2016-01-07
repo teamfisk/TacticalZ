@@ -13,8 +13,7 @@ void HealthSystem::UpdateComponent(World *world, ComponentWrapper &health, doubl
 {
     //if entityID of health is 9 then the players ID is also 9 (player,health are connected to the same entity)
     ComponentWrapper player = world->GetComponent(health.EntityID, "Player");
-    double currentHealth;
-    double maxHealth = (double)world->GetComponent(health.EntityID, "Health")["MaxHealth"];
+    double maxHealth = (double)health["MaxHealth"];
 
     //process the DeltaHealthVector and change the entitys health accordingly
     for (size_t i = m_DeltaHealthVector.size(); i > 0; i--)
@@ -22,18 +21,15 @@ void HealthSystem::UpdateComponent(World *world, ComponentWrapper &health, doubl
         auto deltaHP = m_DeltaHealthVector[i - 1];
         //if we have a healthchange for the current player, then apply it
         if (std::get<0>(deltaHP) == player.EntityID) {
-            //re-read currentHealth for each iteration
-            currentHealth = (double)world->GetComponent(health.EntityID, "Health")["Health"];
             //get the deltaHP value from the tuple and make sure you dont get more than maxHealth
-            double newHealth = std::min(currentHealth + (double)std::get<1>(deltaHP), maxHealth);
-            health.SetProperty("Health", newHealth);
+            double newHealth = std::min((double)health["Health"] + (double)std::get<1>(deltaHP), maxHealth);
+            health["Health"] = newHealth;
             m_DeltaHealthVector.erase(m_DeltaHealthVector.begin() + i - 1);
         }
     }
 
-    currentHealth = (double)world->GetComponent(health.EntityID, "Health")["Health"];
     //check if health is <= 0
-    if (currentHealth <= 0.0f) {
+    if ((double)health["Health"] <= 0.0f) {
         //publish death event
         Events::PlayerDeath e;
         e.PlayerID = player.EntityID;
