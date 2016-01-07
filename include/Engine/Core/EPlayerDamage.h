@@ -11,6 +11,8 @@ struct PlayerDamage : Event
 {
     double DamageAmount;
     EntityID PlayerDamagedID;
+    //optional TypeOfDamage
+    std::string TypeOfDamage;
 };
 
 }

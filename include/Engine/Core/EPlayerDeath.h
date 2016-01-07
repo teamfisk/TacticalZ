@@ -9,8 +9,10 @@ namespace Events
 
 struct PlayerDeath : Event
 {
-    std::string KilledBy;
+    //KilledBy,KilledByWhat is optional for now. It might be used later in the playerlog-system
+    EntityID KilledBy;
     EntityID PlayerID;
+    std::string KilledByWhat;
 };
 
 }

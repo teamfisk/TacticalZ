@@ -22,13 +22,13 @@ public:
     virtual void UpdateComponent(World* world, ComponentWrapper& health, double dt) override;
 
 private:
-    //create the methods which will take care of specific events
+    //methods which will take care of specific events
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
     bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e);
 
-    //create the vector which will keep track of health changes
+    //vector which will keep track of health changes
     std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;
    
 };
