@@ -8,4 +8,6 @@
 	<xs:include schemaLocation="Components/Player.xsd"/>
 	<xs:include schemaLocation="Components/AABB.xsd"/>
 	<xs:include schemaLocation="Components/Trigger.xsd"/>
+	<xs:include schemaLocation="Components/Listener.xsd"/>
+	<xs:include schemaLocation="Components/SoundEmitter.xsd"/>
 </xs:schema>

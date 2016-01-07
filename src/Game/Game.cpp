@@ -5,6 +5,7 @@
 Game::Game(int argc, char* argv[])
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+    ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
@@ -63,6 +64,9 @@ Game::Game(int argc, char* argv[])
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();
     }
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
+    m_SoundSystem = new SoundSystem(m_EventBroker);
+
     m_LastTime = glfwGetTime();
 }
 
@@ -103,15 +107,27 @@ void Game::Tick()
 
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
+    debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-
+    m_EventBroker->Process<SoundSystem>();
+    m_SoundSystem->Update();
     m_RenderQueueFactory->Update(m_World);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
+}
+
+bool Game::debugOnInputCommand(const Events::InputCommand & e)
+{
+    if (e.Command == "PlaySound" && e.Value > 0) {
+        Events::PlaySound e;
+        e.FilePath = "Audio/crosscounter.wav";
+        m_EventBroker->Publish(e);
+    }
+    return true;
 }
 
 void Game::debugTick(double dt)

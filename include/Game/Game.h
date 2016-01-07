@@ -25,6 +25,10 @@
 #include "Network/Server.h"
 #include "Network/Client.h"
 
+// Sound
+#include "Sound/SoundSystem.h"
+#include "Sound/EPlaySound.h"
+
 
 class Game
 {
@@ -53,6 +57,9 @@ private:
     void networkFunction();
     Network* m_ClientOrServer;
     bool m_IsClientOrServer = false;
+
+    // Sound
+    SoundSystem* m_SoundSystem;
 
     EventRelay<Game, Events::InputCommand> m_EInputCommand;
     bool debugOnInputCommand(const Events::InputCommand& e);

@@ -9,8 +9,8 @@ find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Xerces REQUIRED)
 # Because FindOpenAL is retarded
-#set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/deps/include/AL")
-#find_package(OpenAL REQUIRED)
+set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/deps/include/OpenAL")
+find_package(OpenAL REQUIRED)
 if(UNIX)
     find_package(X11 REQUIRED)
 endif()
@@ -52,6 +52,12 @@ file(GLOB SOURCE_FILES_Network
 )
 source_group(Network FILES ${SOURCE_FILES_Network})
 
+file(GLOB SOURCE_FILES_Sound
+    "${INCLUDE_PATH}/Sound/*.h"
+    "Sound/*.cpp"
+)
+source_group(Sound FILES ${SOURCE_FILES_Sound})
+
 file(GLOB SOURCE_FILES_Rendering
     "${INCLUDE_PATH}/Rendering/*.h"
     "Rendering/*.cpp"
@@ -86,6 +92,7 @@ set(SOURCE_FILES
     ${SOURCE_FILES_Core_Util}
     ${SOURCE_FILES_Input}
 	${SOURCE_FILES_Network}
+	${SOURCE_FILES_Sound}
     ${SOURCE_FILES_GUI}
     ${SOURCE_FILES_Rendering}
     ${SOURCE_FILES_Rendering_Util}
