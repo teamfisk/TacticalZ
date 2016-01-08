@@ -3,4 +3,5 @@
 	<Radius>1.0</Radius>
 	<Intensity>0.8</Intensity>
 	<Falloff>0.3</Falloff>
+	<Visible>true</Visible>
 </c:PointLight>

@@ -5,7 +5,7 @@
 
 	<xs:element name="PointLight">
 		<xs:annotation>
-			<xs:documentation>It's a point light!</xs:documentation>
+			<xs:documentation>A pointlight that lights up geometry in a radius.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
@@ -13,6 +13,7 @@
 				<xs:element name="Radius" type="t:double" minOccurs="0"/>
 				<xs:element name="Intensity" type="t:double" minOccurs="0"/>
 				<xs:element name="Falloff" type="t:double" minOccurs="0"/>
+				<xs:element name="Visible" type="t:bool" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
