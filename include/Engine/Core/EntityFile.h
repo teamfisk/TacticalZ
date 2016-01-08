@@ -162,7 +162,7 @@ private:
     xercesc::SAX2XMLReader* m_Reader;
     //State m_CurrentScope = State::Unknown;
     std::stack<State> m_StateStack;
-    unsigned int m_NextEntityID = 1;
+    unsigned int m_NextEntityID = 0;
     std::stack<EntityID> m_EntityStack;
     std::string m_CurrentComponent;
     std::string m_CurrentField;

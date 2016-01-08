@@ -39,7 +39,7 @@ public:
     const std::unordered_multimap<EntityID, EntityID>& GetEntityChildren() const { return m_EntityChildren; }
 
 private:
-    EntityID m_CurrentEntityID = 1;
+    EntityID m_CurrentEntityID = 0;
 
     std::unordered_map<EntityID, EntityID> m_EntityParents;
     // TODO: This should be a more effective structure

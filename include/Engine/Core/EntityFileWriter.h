@@ -25,6 +25,7 @@ public:
     }
 
     void WriteWorld(World* world);
+    void WriteEntity(World* world, EntityID entity);
 
 private:
     boost::filesystem::path m_FilePath;

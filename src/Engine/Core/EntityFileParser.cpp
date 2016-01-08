@@ -27,7 +27,7 @@ void EntityFileParser::onStartEntity(EntityID entity, EntityID parent)
 void EntityFileParser::onStartComponent(EntityID entity, std::string component)
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
-    m_World->AttachComponent(entity, component);
+    m_World->AttachComponent(realEntity, component);
     LOG_DEBUG("Attached component of type \"%s\" to entity #%i (%i)", component.c_str(), entity, realEntity);
 }
 

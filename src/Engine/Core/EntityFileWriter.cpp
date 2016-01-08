@@ -4,6 +4,11 @@
 
 void EntityFileWriter::WriteWorld(World* world)
 {
+    WriteEntity(world, 0);
+}
+
+void EntityFileWriter::WriteEntity(World* world, EntityID entity)
+{
     using namespace xercesc;
     DOMDocument* doc = m_DOMImplementation->createDocument(nullptr, X("Entity"), nullptr);
     DOMElement* root = doc->getDocumentElement();
@@ -13,16 +18,18 @@ void EntityFileWriter::WriteWorld(World* world)
     
     DOMElement* componentsElement = doc->createElement(X("Components"));
     root->appendChild(componentsElement);
-    appentEntityComponents(componentsElement, world, 0);
+    appentEntityComponents(componentsElement, world, entity);
 
     DOMElement* childrenElement = doc->createElement(X("Children"));
     root->appendChild(childrenElement);
-    appendEntityChildren(childrenElement, world, 0);
+    appendEntityChildren(childrenElement, world, entity);
 
     XMLFormatTarget* target = new StdOutFormatTarget();
     DOMLSOutput* output = static_cast<DOMImplementationLS*>(m_DOMImplementation)->createLSOutput();
     output->setByteStream(target);
     m_DOMLSSerializer->write(doc, output);
+
+    doc->release();
 }
 
 void EntityFileWriter::appendEntityChildren(xercesc::DOMElement* parentElement, const World* world, EntityID entity)

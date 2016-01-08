@@ -10,11 +10,14 @@ World::~World()
 EntityID World::CreateEntity(EntityID parent /*= 0*/)
 {
     EntityID newEntity = generateEntityID();
-    m_EntityParents[newEntity] = parent;
-    m_EntityChildren.insert(std::make_pair(parent, newEntity));
+    if (newEntity != parent) {
+        m_EntityParents[newEntity] = parent;
+        m_EntityChildren.insert(std::make_pair(parent, newEntity));
+    } else {
+        LOG_WARNING("Attempted to create an entity with itself as parent! Entity#%i with parent #%i", newEntity, parent);
+    }
     return newEntity;
 }
-
 
 void World::DeleteEntity(EntityID entity)
 {
