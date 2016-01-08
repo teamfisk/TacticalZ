@@ -3,16 +3,16 @@
 
 #include "../Core/EventBroker.h"
 #include "../Core/Entity.h"
+#include <string.h>
 
 namespace Events
 {
 
-/** Thrown Every frame, use functions to pick*/
 struct SetCamera : Event
 {
 public:
     SetCamera() { };
-    EntityID Entity;
+    std::string Name;
 
 private:
 

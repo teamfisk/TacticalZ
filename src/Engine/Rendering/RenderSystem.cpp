@@ -1,29 +1,56 @@
 #include "Rendering/RenderSystem.h"
 #include "Rendering/DebugCameraInputController.h"
 
-RenderSystem::RenderSystem(EventBroker* eventBrokerer, RenderQueueCollection* renderQueues)
+RenderSystem::RenderSystem(EventBroker* eventBrokerer, RenderFrame* renderFrame)
     :ImpureSystem(eventBrokerer)
 {
-    m_RenderQueues = renderQueues;
+    m_RenderFrame = renderFrame;
     Initialize();
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
 
-
+    m_DefaultCamera = new Camera(1.77f /* should be based on width and height */, glm::radians(45.f), 0.01f, 5000.f);
+    m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
+    if (m_Camera == nullptr) {
+        m_Camera = m_DefaultCamera;
+    }
 }
 
 
 bool RenderSystem::OnSetCamera(const Events::SetCamera &event)
 {
-    m_CurrentCamera = event.Entity;
+    auto cameras = m_World->GetComponents("Camera");
+
+    if (cameras != nullptr) {
+        for (auto it = cameras->begin(); it != cameras->end(); it++) {
+            if ((std::string)(*it)["Name"] == event.Name) {
+                SwitchCamera((*it).EntityID);
+            }
+        }
+    }
+
     return true;
 }
 
 void RenderSystem::SwitchCamera(EntityID entity)
 {
-    m_CurrentCamera = entity;
-    m_SwitchCamera = false;
-    LOG_INFO("Switched to camera %i", m_CurrentCamera);
+    if(m_World->HasComponent(entity, "Camera")) {
+        if (m_World->HasComponent(m_CurrentCamera, "Model")) {
+            m_World->GetComponent(m_CurrentCamera, "Model")["Visible"] = true;
+        }
+
+        if (m_World->HasComponent(entity, "Model")) {
+            m_World->GetComponent(entity, "Model")["Visible"] = false;
+        }
+
+        m_CurrentCamera = entity;
+        m_SwitchCamera = false;
+
+        LOG_INFO("Switched to %s", m_World->GetComponent(m_CurrentCamera, "Camera")["Name"]);
+    } else {
+        LOG_ERROR("Entity %i does not have a CameraComponent", entity);
+        m_SwitchCamera = false;
+    }
 }
 
 void RenderSystem::Initialize()
@@ -31,24 +58,21 @@ void RenderSystem::Initialize()
     
 }
 
-void RenderSystem::UpdateViewMatrix(ComponentWrapper& cameraTransform)
-{
-    glm::quat orientation = glm::quat((glm::vec3)cameraTransform["Orientation"]);
-    glm::vec3 position = cameraTransform["Position"];
-
-    m_ViewMatrix = glm::toMat4(glm::inverse(orientation)) * glm::translate(-position);
-}
-
 void RenderSystem::UpdateProjectionMatrix(ComponentWrapper& cameraComponent)
 {
-    double fov = (double&)cameraComponent["FOV"];
-    double aspectRatio = (double&)cameraComponent["AspectRatio"];
-    double nearClip = (double&)cameraComponent["NearClip"];
-    double farClip = (double&)cameraComponent["FarClip"];
+    double fov = cameraComponent["FOV"];
+    double aspectRatio = cameraComponent["AspectRatio"];
+    double nearClip = cameraComponent["NearClip"];
+    double farClip = cameraComponent["FarClip"];
 
     double fovY = atan(tan(glm::radians(fov)/2.0) * aspectRatio) * 2.0;
     m_ProjectionMatrix = glm::perspective(fovY, aspectRatio, nearClip, farClip);
-    
+
+    m_Camera->SetFOV(fovY);
+    m_Camera->SetAspectRatio(aspectRatio);
+    m_Camera->SetNearClip(nearClip);
+    m_Camera->SetFarClip(farClip);
+    m_Camera->UpdateProjectionMatrix();
 }
 
 glm::vec3 RenderSystem::AbsolutePosition(World* world, EntityID entity)
@@ -95,20 +119,19 @@ glm::vec3 RenderSystem::AbsoluteScale(World* world, EntityID entity)
     return scale;
 }
 
-
-glm::mat4 RenderSystem::ModelMatrix(World* world, EntityID entity)
+glm::mat4 RenderSystem::ModelMatrix(EntityID entity)
 {
-    glm::vec3 position = AbsolutePosition(world, entity);
-    glm::quat orientation = AbsoluteOrientation(world, entity);
-    glm::vec3 scale = AbsoluteScale(world, entity);
+    glm::vec3 position = AbsolutePosition(m_World, entity);
+    glm::quat orientation = AbsoluteOrientation(m_World, entity);
+    glm::vec3 scale = AbsoluteScale(m_World, entity);
 
     glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(orientation) * glm::scale(scale);
     return modelMatrix;
 }
 
-void RenderSystem::FillModels(World* world, RenderQueue* renderQueue)
+void RenderSystem::FillModels(RenderQueue* renderQueue)
 {
-    auto models = world->GetComponents("Model");
+    auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
         return;
     }
@@ -140,7 +163,7 @@ void RenderSystem::FillModels(World* world, RenderQueue* renderQueue)
                 job.Model = model;
                 job.StartIndex = texGroup.StartIndex;
                 job.EndIndex = texGroup.EndIndex;
-                job.Matrix = m_ProjectionMatrix * m_ViewMatrix * (model->m_Matrix * ModelMatrix(world, modelC.EntityID));
+                job.Matrix = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * (model->m_Matrix * ModelMatrix(modelC.EntityID));
                 job.Color = color;
                 job.Entity = modelC.EntityID;
 
@@ -156,7 +179,7 @@ void RenderSystem::FillModels(World* world, RenderQueue* renderQueue)
                 job.Model = model;
                 job.StartIndex = texGroup.StartIndex;
                 job.EndIndex = texGroup.EndIndex;
-                job.Matrix = m_ProjectionMatrix * m_ViewMatrix * (model->m_Matrix * ModelMatrix(world, modelC.EntityID));
+                job.Matrix = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * (model->m_Matrix * ModelMatrix(modelC.EntityID));
                 job.Color = color;
                 job.Entity = modelC.EntityID;
 
@@ -176,9 +199,10 @@ bool RenderSystem::OnInputCommand(const Events::InputCommand& e)
     }
 }
 
-
 void RenderSystem::Update(World* world, double dt)
 {
+    m_World = world;
+
     m_EventBroker->Process<RenderSystem>();
     static DebugCameraInputController<RenderSystem> firstPersonInputController(m_EventBroker, -1);
 
@@ -201,34 +225,42 @@ void RenderSystem::Update(World* world, double dt)
             ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
             
             firstPersonInputController.SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
-            firstPersonInputController.SetPosition((glm::vec3)cameraTransform["Position"]);
+            firstPersonInputController.SetPosition(cameraTransform["Position"]);
         }
     }
     
     if(world->HasComponent(m_CurrentCamera, "Camera") && world->HasComponent(m_CurrentCamera, "Transform")) {
-
         ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
         ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
 
-        firstPersonInputController.Update(dt);
-        (glm::vec3&)cameraTransform["Orientation"] = glm::eulerAngles(firstPersonInputController.Orientation());
-        (glm::vec3&)cameraTransform["Position"] = firstPersonInputController.Position();
+        if(world->GetParent(m_CurrentCamera) == 1) { // world is entity 1, is this ok?
+            firstPersonInputController.Update(dt);
+            (glm::vec3&)cameraTransform["Orientation"] = glm::eulerAngles(firstPersonInputController.Orientation());
+            (glm::vec3&)cameraTransform["Position"] = firstPersonInputController.Position();
+        }
 
+        glm::vec3 position = AbsolutePosition(world, m_CurrentCamera);
+        glm::quat orientation = AbsoluteOrientation(world, m_CurrentCamera);
        
+        m_Camera->SetPosition(position);
+        m_Camera->SetOrientation(orientation);
+
         UpdateProjectionMatrix(cameraComponent);
-        UpdateViewMatrix(cameraTransform);
+        m_Camera->UpdateViewMatrix();
     } else {
-        m_ProjectionMatrix = glm::perspective(glm::radians(40.f), 1.77f, 0.05f, 5000.f);
-        m_ViewMatrix = glm::mat4();
+        m_Camera = m_DefaultCamera;
 
         auto cameras = world->GetComponents("Camera");
-
         if (cameras != nullptr) {
             ComponentWrapper& cameraC = *cameras->begin();
-            m_CurrentCamera = cameraC.EntityID;
+            SwitchCamera(cameraC.EntityID);
+            world->GetComponent(m_CurrentCamera, "Model")["Visible"] = false;
         }
     }
 
-    m_RenderQueues->Clear();
-    FillModels(world, &m_RenderQueues->Forward);
+    m_RenderFrame->Clear();
+    RenderScene* rs = new RenderScene();
+    rs->Camera = m_Camera;
+    FillModels(&rs->Forward);
+    m_RenderFrame->Add(*rs);
 }

@@ -43,7 +43,7 @@ void PickingPass::InitializeShaderPrograms()
     m_PickingProgram->Link();
 }
 
-void PickingPass::Draw(RenderQueueCollection& rq)
+void PickingPass::Draw(RenderFrame& rf)
 {
     m_PickingColorsToEntity.clear();
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
@@ -57,34 +57,38 @@ void PickingPass::Draw(RenderQueueCollection& rq)
 
     std::map<EntityID, glm::vec2> entityColors;
 
-    for (auto &job : rq.Forward) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+    for(auto scene : rf.RenderScenes)
+    {
+        for (auto &job : scene->Forward) {
+            auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
-        if (modelJob) {
-            int pickColor[2] = { r, g };
-            auto color = entityColors.find(modelJob->Entity);
-            if (color != entityColors.end()) {
-                pickColor[0] = color->second[0];
-                pickColor[1] = color->second[1];
-            } else {
-                entityColors[modelJob->Entity] = glm::vec2(pickColor[0], pickColor[1]);
-                if (r + 10 > 255) {
-                    r = 0;
-                    g += 1;
+            if (modelJob) {
+                int pickColor[2] = { r, g };
+                auto color = entityColors.find(modelJob->Entity);
+                if (color != entityColors.end()) {
+                    pickColor[0] = color->second[0];
+                    pickColor[1] = color->second[1];
                 } else {
-                    r += 1;
+                    entityColors[modelJob->Entity] = glm::vec2(pickColor[0], pickColor[1]);
+                    if (r + 10 > 255) {
+                        r = 0;
+                        g += 1;
+                    } else {
+                        r += 1;
+                    }
                 }
+                m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
+
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "Matrix"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+                glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glBindVertexArray(modelJob->Model->VAO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+                glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
             }
-            m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
-
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "Matrix"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
-
-            glBindVertexArray(modelJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
         }
     }
+    
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
 
@@ -92,15 +96,15 @@ void PickingPass::Draw(RenderQueueCollection& rq)
     int fbWidth;
     int fbHeight;
     glfwGetFramebufferSize(m_Renderer->Window(), &fbWidth, &fbHeight);
-  /*  Events::Picking pickEvent = Events::Picking(
+    Events::Picking pickEvent = Events::Picking(
         &m_PickingBuffer,
         &m_DepthBuffer,
         m_Renderer->Camera()->ProjectionMatrix(),
         m_Renderer->Camera()->ViewMatrix(),
         Rectangle(fbWidth, fbHeight),
-        &m_PickingColorsToEntity);*/
+        &m_PickingColorsToEntity);
 
-    //m_EventBroker->Publish(pickEvent);
+    m_EventBroker->Publish(pickEvent);
 
     delete state;
 }

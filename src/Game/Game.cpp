@@ -47,14 +47,14 @@ Game::Game(int argc, char* argv[])
         ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
     }
 
-    m_RenderQueues = new RenderQueueCollection();
+    m_RenderFrame = new RenderFrame();
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>();
     m_SystemPipeline->AddSystem<PlayerSystem>();
     m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
-    m_SystemPipeline->AddSystem<RenderSystem>(m_RenderQueues);
+    m_SystemPipeline->AddSystem<RenderSystem>(m_RenderFrame);
 
     m_LastTime = glfwGetTime();
 
@@ -91,7 +91,7 @@ void Game::Tick()
     m_Renderer->Update(dt);
 
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
-    m_Renderer->Draw(*m_RenderQueues);
+    m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();

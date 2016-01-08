@@ -18,6 +18,7 @@
 					<Resource>Models/Camera.obj</Resource>
 				</c:Model>
 				<c:Camera>
+					<Name>MainCamera</Name>
 				</c:Camera>
 			</Components>
 		</Entity>
@@ -30,6 +31,7 @@
 					<Resource>Models/Camera.obj</Resource>
 				</c:Model>
 				<c:Camera>
+					<Name>ActionCamera</Name>
 				</c:Camera>
 			</Components>
 		</Entity>

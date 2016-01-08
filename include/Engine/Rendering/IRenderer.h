@@ -31,7 +31,7 @@ public:
     }
 	virtual void Initialize() = 0;
 	virtual void Update(double dt) = 0;
-	virtual void Draw(RenderQueueCollection& rq) = 0;
+	virtual void Draw(RenderFrame& rq) = 0;
 
 protected:
 	Rectangle m_Resolution = Rectangle(1280, 720);

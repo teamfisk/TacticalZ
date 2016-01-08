@@ -12,10 +12,11 @@
 #include "../Input/EInputCommand.h"
 #include "Camera.h"
 
+
 class RenderSystem : public ImpureSystem
 {
 public:
-    RenderSystem(EventBroker* eventBrokerer, RenderQueueCollection* renderQueues);
+    RenderSystem(EventBroker* eventBrokerer, RenderFrame* renderFrame);
     
     virtual void Update(World* world, double dt) override;
 
@@ -26,9 +27,14 @@ public:
     
 
 private:
-    RenderQueueCollection* m_RenderQueues;
+    World* m_World = nullptr;
+
+    RenderFrame* m_RenderFrame;
     bool m_SwitchCamera = false;
     Camera* m_Camera = nullptr;
+    Camera* m_DefaultCamera = nullptr;
+    
+    std::list<ComponentWrapper> m_CameraComponents;
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(const Events::SetCamera &event);
@@ -37,13 +43,12 @@ private:
     void SwitchCamera(EntityID entity);
 
     void Initialize();
-    void UpdateViewMatrix(ComponentWrapper& cameraTransform);
     void UpdateProjectionMatrix(ComponentWrapper& cameraComponent);
     glm::mat4 m_ViewMatrix;
     glm::mat4 m_ProjectionMatrix;
     
-    glm::mat4 ModelMatrix(World* world, EntityID entity);
-    void FillModels(World* world, RenderQueue* renderQueue);
+    glm::mat4 ModelMatrix(EntityID entity);
+    void FillModels(RenderQueue* renderQueue);
 
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);

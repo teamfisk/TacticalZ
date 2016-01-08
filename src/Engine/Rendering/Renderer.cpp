@@ -90,14 +90,14 @@ void Renderer::Update(double dt)
     m_ImGuiRenderPass->Update(dt);
 }
 
-void Renderer::Draw(RenderQueueCollection& rq)
+void Renderer::Draw(RenderFrame& rf)
 {
-    m_PickingPass->Draw(rq);
-    //DrawScreenQuad(m_PickingPass->PickingTexture());
+    m_Camera = (*rf.begin())->Camera;
+    m_PickingPass->Draw(rf);
     
     glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
 
-    m_DrawScenePass->Draw(rq);
+    m_DrawScenePass->Draw(rf);
     GLERROR("Renderer::Draw m_DrawScenePass->Draw");
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);

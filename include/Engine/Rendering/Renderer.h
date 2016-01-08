@@ -27,7 +27,7 @@ public:
 
     virtual void Initialize() override;
     virtual void Update(double dt) override;
-    virtual void Draw(RenderQueueCollection& rq) override;
+    virtual void Draw(RenderFrame& rf) override;
 
 private:
     //----------------------Variables----------------------//

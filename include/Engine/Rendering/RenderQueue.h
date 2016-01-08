@@ -39,9 +39,7 @@ struct ModelJob : RenderJob
 	unsigned int ShaderID = 0;
 	unsigned int TextureID = 0;
 
-    //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
     EntityID Entity;
-
 	glm::mat4 Matrix;
 	const Texture* DiffuseTexture;
 	const Texture* NormalTexture;
@@ -165,7 +163,7 @@ private:
 	int m_Size = 0;
 };
 
-struct RenderQueueCollection
+struct RenderScene
 {
 	RenderQueue Forward;
 	RenderQueue Lights;
@@ -182,6 +180,40 @@ struct RenderQueueCollection
 		Forward.Sort();
 		Lights.Sort();
 	}
+};
+
+class RenderFrame
+{
+public:
+
+    void Add(RenderScene &scene)
+    {
+        RenderScenes.push_back(std::shared_ptr<RenderScene>(new RenderScene(scene)));
+        m_Size++;
+    }
+
+    void Clear()
+    {
+        RenderScenes.clear();
+        m_Size = 0;
+    }
+
+    int Size() const { return m_Size; }
+    std::list<std::shared_ptr<RenderScene>>::const_iterator begin()
+    {
+        return RenderScenes.begin();
+    }
+
+    std::list<std::shared_ptr<RenderScene>>::const_iterator end()
+    {
+        return RenderScenes.end();
+    }
+
+    std::list<std::shared_ptr<RenderScene>> RenderScenes;
+
+
+private:
+    int m_Size = 0;
 };
 
 #endif

@@ -9,6 +9,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
+				<xs:element name="Name" type="t:string" minOccurs="0"/>
 				<xs:element name="AspectRatio" type="t:double" minOccurs="0"/>
 				<xs:element name="FOV" type="t:double" minOccurs="0"/>
 				<xs:element name="NearClip" type="t:double" minOccurs="0"/>

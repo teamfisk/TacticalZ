@@ -38,7 +38,7 @@ private:
 	GUI::Frame* m_FrameStack;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    RenderQueueCollection* m_RenderQueues;
+    RenderFrame* m_RenderFrame;
 
     EventRelay<Game, Events::InputCommand> m_EInputCommand;
     bool debugOnInputCommand(const Events::InputCommand& e);

@@ -25,40 +25,40 @@ void DrawScenePass::InitializeShaderPrograms()
 
 }
 
-void DrawScenePass::Draw(RenderQueueCollection& rq)
+void DrawScenePass::Draw(RenderFrame& rf)
 {
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLERROR("Renderer::Draw PickingPass");
 
     DrawScenePassState state;
+    for (auto scene : rf.RenderScenes) {
+        scene->Forward.Jobs.sort(DrawScenePass::DepthSort);
 
-    rq.Forward.Jobs.sort(DrawScenePass::DepthSort);
+        for (auto &job : scene->Forward) {
+            auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+            if (modelJob) {
+                GLuint ShaderHandle = m_BasicForwardProgram->GetHandle();
 
-    //TODO: Render: Add code for more jobs than modeljobs.
-    for (auto &job : rq.Forward) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-        if (modelJob) {
-            GLuint ShaderHandle = m_BasicForwardProgram->GetHandle();
+                m_BasicForwardProgram->Bind();
+                //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "Matrix"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+                glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
 
-            m_BasicForwardProgram->Bind();
-            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "Matrix"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
+                //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
+                if (modelJob->DiffuseTexture != nullptr) {
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
+                } else {
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                }
 
-            //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
-            if (modelJob->DiffuseTexture != nullptr) {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
-            } else {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                glBindVertexArray(modelJob->Model->VAO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+                glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
+
+                continue;
             }
-
-            glBindVertexArray(modelJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-
-            continue;
         }
     }
     GLERROR("DrawScene Error");
