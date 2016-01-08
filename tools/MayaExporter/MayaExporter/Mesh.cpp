@@ -34,7 +34,6 @@ void Mesh::GetMeshData(MObject object)
 	mesh.getTangents(biTangents, MSpace::kObject, NULL);
 	mesh.getBinormals(biNormals, MSpace::kObject, NULL);
 
-	MGlobal::displayInfo("Befor Loop");
 	MItMeshFaceVertex faceVert(object);
 	int intDummy = 0;
 	for (MItMeshPolygon meshPolyIter(object); !meshPolyIter.isDone(); meshPolyIter.next()) {
@@ -43,10 +42,10 @@ void Mesh::GetMeshData(MObject object)
 
 		meshPolyIter.getTriangles(dummy, triangleList);
 		UINT indexOffset = verticesData.size();
-		MGlobal::displayInfo("Befor Second Loop");
+		//MGlobal::displayInfo("Befor Second Loop");
 		for (UINT i = 0; i < vertices.length(); i++) {
 			faceVert.setIndex(meshPolyIter.index(), i, intDummy, intDummy);
-			MGlobal::displayInfo("In Second Loop");
+			//MGlobal::displayInfo("In Second Loop");
 			faceVert.position().get(thisVertex.Pos);
 			faceVert.getNormal(normal);
 			thisVertex.Normal[0] = normal[0];
@@ -73,13 +72,13 @@ void Mesh::GetMeshData(MObject object)
 			verticesData.push_back(thisVertex);
 			localVertexToGlobalIndex.push_back(vertexIndex);
 
-			cout << "Pos: " << thisVertex.Pos[0] << "/" << thisVertex.Pos[1] << "/" << thisVertex.Pos[2] << endl;
-			cout << "Normals: " << thisVertex.Normal[0] << "/" << thisVertex.Normal[1] << "/" << thisVertex.Normal[2] << endl;
-			cout << "Bi-Normals: " << thisVertex.BiNormal[0] << "/" << thisVertex.BiNormal[1] << "/" << thisVertex.BiNormal[2] << endl;
-			cout << "Bi-Tangents: " << thisVertex.BiTangent[0] << "/" << thisVertex.BiTangent[1] << "/" << thisVertex.BiTangent[2] << endl;
-			cout << "UV: " << thisVertex.Uv[0] << "/" << thisVertex.Uv[1] << endl;
+			//cout << "Pos: " << thisVertex.Pos[0] << "/" << thisVertex.Pos[1] << "/" << thisVertex.Pos[2] << endl;
+			//cout << "Normals: " << thisVertex.Normal[0] << "/" << thisVertex.Normal[1] << "/" << thisVertex.Normal[2] << endl;
+			//cout << "Bi-Normals: " << thisVertex.BiNormal[0] << "/" << thisVertex.BiNormal[1] << "/" << thisVertex.BiNormal[2] << endl;
+			//cout << "Bi-Tangents: " << thisVertex.BiTangent[0] << "/" << thisVertex.BiTangent[1] << "/" << thisVertex.BiTangent[2] << endl;
+			//cout << "UV: " << thisVertex.Uv[0] << "/" << thisVertex.Uv[1] << endl;
 		}
-		MGlobal::displayInfo("Befor Third Loop");
+		//MGlobal::displayInfo("Befor Third Loop");
 
 		//for (UINT i = 0; i < triangleList.length(); i++) {
 		//	UINT k = 0;

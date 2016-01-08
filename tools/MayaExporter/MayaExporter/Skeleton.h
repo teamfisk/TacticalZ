@@ -6,68 +6,81 @@
 #include <algorithm>
 #include "MayaIncludes.h"
 #include "OutputData.h"
-class Joint : public OutputData{
+
+class Animation : public OutputData {
 public:
-	//Joint() : OutputData((Joint)*this)
-	//{};
-	//int ParentIndex;
-	//std::array<float, 3> Rotation;
-	//std::array<float, 3> Translation;
-	//std::array<float, 3> Scale;
-	//std::array<std::array<float, 4>, 4> OffsetMatrix;
-	float OffsetMatrix[4][4];
-
-	virtual void WriteBinary(std::ostream& out)
+	struct Keyframe
 	{
-		out.write((char*)OffsetMatrix, 4 * 4 * sizeof(float));
-	}
-
-	virtual void WriteASCII(std::ostream& out) const
-	{
-		for (int i = 0; i < 4; i++)
+		struct JointProperty
 		{
-			for (int k = 0; k < 4; k++)
-				out << this->OffsetMatrix[i][k] << " ";
-			out << endl;
-		}
-	};
-};
+			int ID;
+			float Position[3];
+			float Rotation[4];
+			float Scale[3];
+		};
 
-class SkeletonNode : public OutputData {
-public:
+		int Index;
+		double Time;
+		std::vector<JointProperty> JointProperties;
+	};
+
 	std::string Name;
-	std::vector<Joint> Joints;
+	double Duration;
+	std::vector<Keyframe> Keyframes;
 
 	virtual void WriteBinary(std::ostream& out)
 	{
-		out.write(Name.c_str(), Name.size());
-		for (auto aJoint : Joints)
-		{
-			aJoint.WriteBinary(out);
+		out.write(Name.c_str(), Name.size() + 1);
+		out.write((char*)&Duration, sizeof(double));
+		for (auto aKeyframe : Keyframes) {
+			out.write((char*)&aKeyframe.Index, sizeof(int));
+			out.write((char*)&aKeyframe.Time, sizeof(double));
+			for (auto aJoint : aKeyframe.JointProperties) {
+				out.write((char*)&aJoint.ID, sizeof(int));
+				out.write((char*)aJoint.Position, sizeof(float) * 3);
+				out.write((char*)aJoint.Rotation, sizeof(float) * 4);
+				out.write((char*)aJoint.Scale, sizeof(float) * 3);
+			}
 		}
 	}
+
 	virtual void WriteASCII(std::ostream& out) const
 	{
-		out << "Skeleton: " << Name << endl;
-		for (auto aJoint : Joints)
-		{
-			aJoint.WriteASCII(out);
+		out << "Animation Name: " << Name << endl;
+		out << "Duration: " << Duration << endl;
+		for (auto aKeyframe : Keyframes) {
+			out << "Frame: " << aKeyframe.Index << endl;
+			out << "Time: " << aKeyframe.Time << endl;
+			for (auto aJoint : aKeyframe.JointProperties) {
+				out << "Joint ID: " << aJoint.ID << endl;
+				out << aJoint.Position[0] << " " << aJoint.Position[1] << " " << aJoint.Position[2] << endl;
+				out << aJoint.Rotation[0] << " " << aJoint.Rotation[1] << " " << aJoint.Rotation[2] << " " << aJoint.Rotation[3] << endl;
+				out << aJoint.Scale[0] << " " << aJoint.Scale[1] << " " << aJoint.Scale[2] << endl;
+			}
 		}
-	};
+		
+	}
 };
 
-class BindPoseSkeletonNode : public SkeletonNode {
+class BindPoseSkeletonNode : public OutputData {
 public:
-	std::vector<int> ParentIDs;
-	std::vector<std::string> JointNames;
+	struct BindPoseJoint
+	{
+		int ParentID;
+		std::string Name;
+		float OffsetMatrix[4][4];
+	};
+
+	std::string Name;
+	std::vector<BindPoseJoint> Joints;
 	virtual void WriteBinary(std::ostream& out)
 	{
-		out.write(Name.c_str(), Name.size());
-		for (int i = 0; i < Joints.size(); i++)
-		{
-			out.write((char*)&ParentIDs[i],sizeof(int));
-			Joints[i].WriteBinary(out);
-			out.write(JointNames[i].c_str(), JointNames[i].size());
+		out.write(Name.c_str(), Name.size() + 1);
+		for (auto Joint:Joints)
+		{	
+			out.write(Joint.Name.c_str(), Joint.Name.size() + 1);
+			out.write((char*)&Joint.OffsetMatrix, sizeof(float) * 4 * 4);
+			out.write((char*)&Joint.ParentID, sizeof(int));
 		}
 
 	}
@@ -75,18 +88,24 @@ public:
 	virtual void WriteASCII(std::ostream& out) const
 	{
 		out << "Bind Pose: " << Name << endl;
-		for (int i = 0; i < Joints.size(); i++)
+		for (auto Joint : Joints)
 		{
-			out << ParentIDs[i] << endl;
-			Joints[i].WriteASCII(out);
-			out << JointNames[i] << endl;
+			out << Joint.Name << endl;
+			for (int i = 0; i < 4; i++) {
+				for (int j = 0; j < 4; j++){
+					out << Joint.OffsetMatrix[i][j] << " ";
+				}
+				out << endl;
+			}
+			out << Joint.ParentID << endl;
 		}
 	};
 };
 
 class Skeleton {
 public:
-	std::vector<SkeletonNode> DoIt();
+	//std::vector<SkeletonNode> DoIt();
+	Animation GetAnimData(std::string animationName, int startFrame, int endFrame);
 	std::vector<BindPoseSkeletonNode> GetBindPoses();
 private:
 };

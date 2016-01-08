@@ -72,7 +72,7 @@ Menu::Menu(QDialog* dialog)
 	endLabel->setText("End:");
 
 	//exportLabel->setText("Export Path:");
-	
+
 	midLayout->addWidget(optionsBox);
 
 	topLayout->addWidget(exportLabel);
@@ -119,7 +119,7 @@ void Menu::ExportSelected(bool checked)
 	MGlobal::getActiveSelectionList(selected);
 
 	// Loop through or list of selection(s)
-	for (unsigned int i = 0; i < selected.length();i++) {
+	for (unsigned int i = 0; i < selected.length(); i++) {
 		MObject object;
 		selected.getDependNode(i, object);
 		MFnDependencyNode thisNode(object);
@@ -177,7 +177,7 @@ void Menu::RemoveClipClicked(bool)
 		QLayoutItem* tempWidget;// = m_ClipLayout->itemAt(0);
 
 		for (unsigned int i = 0; i < layouts.size(); i++) {
-			while ((tempWidget = layouts[layouts.size()-1]->takeAt(0)) != 0) {
+			while ((tempWidget = layouts[layouts.size() - 1]->takeAt(0)) != 0) {
 				delete tempWidget->widget();
 				delete tempWidget;
 			}
@@ -185,7 +185,7 @@ void Menu::RemoveClipClicked(bool)
 
 		m_ClipLayout->removeItem(tempWidget);
 		m_ClipLayout->update();
-		
+
 		layouts.pop_back();
 		m_StartFrameLines.pop_back();
 		m_EndFrameLines.pop_back();
@@ -195,10 +195,10 @@ void Menu::RemoveClipClicked(bool)
 void Menu::ExportAll(bool)
 {
 	MDagPath path;
-	
+
 	// Loop through all nodes in the scene
 	MItDependencyNodes it(MFn::kInvalid);
-	for (;!it.isDone();it.next()) {
+	for (; !it.isDone(); it.next()) {
 		MObject node = it.thisNode();
 		if (node.hasFn(MFn::kMesh)) {
 			MFnDependencyNode thisNode(node);
@@ -218,7 +218,7 @@ void Menu::ExportAll(bool)
 	m_File.ASCIIFilePath("C:/Users/Nickelodion/Desktop/coolASCII.txt");
 	m_File.binaryFilePath("C:/Users/Nickelodion/Desktop/coolSoptunz.bin");
 
-	if(m_ExportAnimationsButton->isChecked())
+	if (m_ExportAnimationsButton->isChecked())
 		GetSkeletonData();
 
 }
@@ -267,7 +267,7 @@ void Menu::GetMaterialData()
 
 	// Access the colorR component of one material (example)
 	cout << AllMaterials->at(0).Color[0] << endl;
-	MGlobal::displayInfo(MString() +  AllMaterials->at(0).Color[0]);
+	MGlobal::displayInfo(MString() + AllMaterials->at(0).Color[0]);
 }
 
 void Menu::GetSkeletonData()
@@ -277,10 +277,10 @@ void Menu::GetSkeletonData()
 		MGlobal::displayError(MString() + "Please change to 60 FPS under Preferences/Settings!");
 		return;
 	}
-	
-	std::vector<std::vector<SkeletonNode>> allSkeletons;
 
 	std::vector<BindPoseSkeletonNode> allBindPoses;
+	std::vector<Animation> allAnimations;
+
 	allBindPoses = m_SkeletonHandler->GetBindPoses();
 
 	for (unsigned int j = 0; j < m_StartFrameLines.size(); j++) {
@@ -291,24 +291,19 @@ void Menu::GetSkeletonData()
 
 		int startFrame = m_StartFrameLines[j]->text().toInt();
 		int  endFrame = m_EndFrameLines[j]->text().toInt();
+		std::string animationName = m_AnimationClipName[j]->text().toAscii().constData();
 
-		for (int i = startFrame; i < endFrame;++i)
-		{
-			MAnimControl::setCurrentTime(MTime(i, MTime::kNTSCField));
-			MTime time = MAnimControl::currentTime();
+		allAnimations.push_back(m_SkeletonHandler->GetAnimData(animationName, startFrame, endFrame));
+	}
 
-			// Traverse scene and return vector with all materials
-		allSkeletons.push_back(m_SkeletonHandler->DoIt());
-		}
-	
+	m_File.OpenFiles();
+
 	//print out all bind poses
-		m_File.OpenFiles();
-	for (auto aBindPose : allBindPoses)
-	{
+	for (auto aBindPose : allBindPoses){
 		m_File.writeToFiles(&aBindPose);
 		MGlobal::displayInfo(MString() + "BindPose Skeleton name: " + aBindPose.Name.c_str());
-		for (int i = 0; i < aBindPose.Joints.size(); i++)
-		{
+
+		for (int i = 0; i < aBindPose.Joints.size(); i++){
 			//MGlobal::displayInfo(MString() + aBindPose.JointNames[i].c_str());
 			//MGlobal::displayInfo(MString() + aBindPose.ParentIDs[i]);
 			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Translation[0] + " " + aBindPose.Joints[i].Translation[1] + " " + aBindPose.Joints[i].Translation[2]);
@@ -316,25 +311,9 @@ void Menu::GetSkeletonData()
 			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Scale[0] + " " + aBindPose.Joints[i].Scale[1] + " " + aBindPose.Joints[i].Scale[2]);
 		}
 	}
-
-	//Print out all skeletons for all frames
-	
-	MGlobal::displayInfo(MString() + allSkeletons.size());
-	for (auto frameSkeletons : allSkeletons)
-		{
-		for (auto aSkeleton : frameSkeletons)
-			{
-			MGlobal::displayInfo(MString() + aSkeleton.Name.c_str());
-			//m_File.writeToFiles(&aSkeleton);
-			for (auto joint : aSkeleton.Joints)
-				{
-					//m_File.writeToFiles(&joint);
-				//MGlobal::displayInfo(MString() + joint.Translation[0] + " " + joint.Translation[1] + " " + joint.Translation[2]);
-				//MGlobal::displayInfo(MString() + joint.Rotation[0] + " " + joint.Rotation[1] + " " + joint.Rotation[2]);
-				//MGlobal::displayInfo(MString() + joint.Scale[0] + " " + joint.Scale[1] + " " + joint.Scale[2]);
-				}
-			}
-		}
+	//print out all animations
+	for (auto aAnimation : allAnimations) {
+		m_File.writeToFiles(&aAnimation);
 	}
 	m_File.CloseFiles();
 }
