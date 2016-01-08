@@ -4,8 +4,6 @@
 
 void CollisionSystem::UpdateComponent(World * world, ComponentWrapper & cAABB, double dt)
 {
-    //TODO: Update CollisionSystem system after PlayerSystem.
-
     //Right now, cAABB is a component attached to any entity that should be collideable.
     AABB thisBox;
     if (!Collision::GetEntityBox(world, cAABB, thisBox)) {

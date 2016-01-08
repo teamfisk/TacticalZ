@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
+#include "Game/HealthSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -27,7 +28,7 @@ Game::Game(int argc, char* argv[])
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-    ));
+        ));
     m_Renderer->Initialize();
     m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
@@ -52,11 +53,18 @@ Game::Game(int argc, char* argv[])
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    m_SystemPipeline->AddSystem<RaptorCopterSystem>();
-    m_SystemPipeline->AddSystem<PlayerSystem>();
-    m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
-    m_SystemPipeline->AddSystem<CollisionSystem>();
-    m_SystemPipeline->AddSystem<TriggerSystem>();
+
+    //All systems with orderlevel 0 will be updated first.
+    unsigned int updateOrderLevel = 0;
+    m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
+
+    //Collision and TriggerSystem should update after player.
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
