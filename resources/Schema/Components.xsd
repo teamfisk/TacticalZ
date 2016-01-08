@@ -9,4 +9,7 @@
 	<xs:include schemaLocation="Components/AABB.xsd"/>
 	<xs:include schemaLocation="Components/Trigger.xsd"/>
 	<xs:include schemaLocation="Components/Health.xsd"/>
+	<xs:include schemaLocation="Components/PrimaryItem.xsd"/>
+	<xs:include schemaLocation="Components/SecondaryItem.xsd"/>
+
 </xs:schema>
