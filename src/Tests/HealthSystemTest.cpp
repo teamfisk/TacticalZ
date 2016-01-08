@@ -47,8 +47,8 @@ GameHealthSystemTest::GameHealthSystemTest()
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    m_SystemPipeline->AddSystem<PlayerSystem>();
-    m_SystemPipeline->AddSystem<HealthSystem>();
+    m_SystemPipeline->AddSystem<PlayerSystem>(0);
+    m_SystemPipeline->AddSystem<HealthSystem>(0);
 
     //The Test
     //create entity which has transorm,player,model,health in it. i.e. is a player
