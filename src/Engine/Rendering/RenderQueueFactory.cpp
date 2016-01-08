@@ -132,7 +132,7 @@ void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)
         float falloff = (double)pointlightC["Falloff"];
 
         PointLightJob job;
-        job.Position = transformC["Position"];
+        job.Position = glm::vec4(AbsolutePosition(world, transformC.EntityID), 1.f);
         job.Color = color;
         job.Radius = radius;
         job.Intensity = intensity;
