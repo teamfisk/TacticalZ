@@ -64,54 +64,53 @@ void EntityFileWriter::appentEntityComponents(xercesc::DOMElement* parentElement
         DOMElement* componentElement = doc->createElement(X(qualifiedComponentName));
         parentElement->appendChild(componentElement);
         ComponentWrapper c = kv.second->GetByEntity(entity);
-        for (auto& kv : c.Info.FieldTypes) {
+        for (auto& kv : c.Info.Fields) {
             std::string fieldName = kv.first;
-            std::string fieldType = kv.second;
-            std::size_t fieldOffset = c.Info.FieldOffsets.at(fieldName);
+            auto& field = kv.second;
 
             // Ignore fields that are equal to the default
             // HACK: This is probably sloooooow, but it's okay.
-            if (memcmp(c.Data + fieldOffset, c.Info.Defaults.get() + fieldOffset, EntityFile::GetTypeStride(fieldType)) == 0) {
+            if (memcmp(c.Data + field.Offset, c.Info.Defaults.get() + field.Offset, field.Stride) == 0) {
                 continue;
             }
 
             DOMElement* fieldElement = doc->createElement(X(fieldName));
             componentElement->appendChild(fieldElement);
 
-            if (fieldType == "Vector") {
+            if (field.Type == "Vector") {
                 const glm::vec3& vec = c[fieldName];
                 fieldElement->setAttribute(X("X"), X(boost::lexical_cast<std::string>(vec.x)));
                 fieldElement->setAttribute(X("Y"), X(boost::lexical_cast<std::string>(vec.y)));
                 fieldElement->setAttribute(X("Z"), X(boost::lexical_cast<std::string>(vec.z)));
-            } else if (fieldType == "Color") {
+            } else if (field.Type == "Color") {
                 const glm::vec4& vec = c[fieldName];
                 fieldElement->setAttribute(X("R"), X(boost::lexical_cast<std::string>(vec.r)));
                 fieldElement->setAttribute(X("G"), X(boost::lexical_cast<std::string>(vec.g)));
                 fieldElement->setAttribute(X("B"), X(boost::lexical_cast<std::string>(vec.b)));
                 fieldElement->setAttribute(X("A"), X(boost::lexical_cast<std::string>(vec.a)));
-            } else if (fieldType == "Quaternion") {
+            } else if (field.Type == "Quaternion") {
                 const glm::quat& q = c[fieldName];
                 fieldElement->setAttribute(X("X"), X(boost::lexical_cast<std::string>(q.x)));
                 fieldElement->setAttribute(X("Y"), X(boost::lexical_cast<std::string>(q.y)));
                 fieldElement->setAttribute(X("Z"), X(boost::lexical_cast<std::string>(q.z)));
                 fieldElement->setAttribute(X("W"), X(boost::lexical_cast<std::string>(q.w)));
-            } else if (fieldType == "int") {
+            } else if (field.Type == "int") {
                 const int& value = c[fieldName];
                 fieldElement->appendChild(doc->createTextNode(X(boost::lexical_cast<std::string>(value))));
-            } else if (fieldType == "float") {
+            } else if (field.Type == "float") {
                 const float& value = c[fieldName];
                 fieldElement->appendChild(doc->createTextNode(X(boost::lexical_cast<std::string>(value))));
-            } else if (fieldType == "double") {
+            } else if (field.Type == "double") {
                 const double& value = c[fieldName];
                 fieldElement->appendChild(doc->createTextNode(X(boost::lexical_cast<std::string>(value))));
-            } else if (fieldType == "bool") {
+            } else if (field.Type == "bool") {
                 const bool& value = c[fieldName];
                 if (value) {
                     fieldElement->appendChild(doc->createTextNode(X("true")));
                 } else {
                     fieldElement->appendChild(doc->createTextNode(X("false")));
                 }
-            } else if (fieldType == "string") {
+            } else if (field.Type == "string") {
                 const std::string& value = c[fieldName];
                 fieldElement->appendChild(doc->createTextNode(X(value)));
             }

@@ -19,8 +19,9 @@ EntityFilePreprocessor::EntityFilePreprocessor(const EntityFile* entityFile)
         LOG_DEBUG("Component: %s (%s)", info.Name.c_str(), info.Meta.Annotation.c_str());
         LOG_DEBUG("Stride: %i", info.Meta.Stride);
         LOG_DEBUG("Allocation: %i", info.Meta.Allocation);
-        for (auto& kv : info.FieldTypes) {
-            LOG_DEBUG("\t%i\t%s %s", info.FieldOffsets[kv.first], kv.second.c_str(), kv.first.c_str());
+        for (auto& kv : info.Fields) {
+            auto& field = kv.second;
+            LOG_DEBUG("\t%i\t%s %s", field.Offset, field.Type, kv.first.c_str());
         }
     }
 
@@ -142,8 +143,10 @@ void EntityFilePreprocessor::parseComponentInfo()
                 continue;
             }
 
-            compInfo.FieldTypes[name] = type;
-            compInfo.FieldOffsets[name] = fieldOffset;
+            compInfo.Fields[name].Type = type;
+            compInfo.Fields[name].Offset = fieldOffset;
+            compInfo.Fields[name].Stride = stride;
+
             fieldOffset += stride;
         }
 
@@ -187,8 +190,9 @@ void EntityFilePreprocessor::parseDefaults()
         auto componentElement = dynamic_cast<DOMElement*>(rootNodes->item(0));
 
         // Fill the default value buffer with values
-        for (auto& field : ci.second.FieldOffsets) {
-            std::string fieldName = field.first;
+        for (auto& kv : ci.second.Fields) {
+            std::string fieldName = kv.first;
+            auto& field = kv.second;
             auto fieldNodes = componentElement->getElementsByTagName(XS::ToXMLCh(fieldName));
             auto fieldNode = fieldNodes->item(0);
             if (fieldNode == nullptr) {
@@ -197,9 +201,7 @@ void EntityFilePreprocessor::parseDefaults()
             }
             auto fieldElement = dynamic_cast<DOMElement*>(fieldNode);
 
-            std::string fieldType = ci.second.FieldTypes.at(fieldName);
-            unsigned int fieldOffset = ci.second.FieldOffsets.at(fieldName);
-            char* data = ci.second.Defaults.get() + fieldOffset;
+            char* data = ci.second.Defaults.get() + field.Offset;
 
             // Handle potential field attributes
             if (fieldElement->hasAttributes()) {
@@ -209,14 +211,14 @@ void EntityFilePreprocessor::parseDefaults()
                     auto attribItem = attributeMap->item(i);
                     attributes[XS::ToString(attribItem->getNodeName())] = XS::ToString(attribItem->getNodeValue());
                 }
-                EntityFile::WriteAttributeData(data, fieldType, attributes);
+                EntityFile::WriteAttributeData(data, field, attributes);
             }
 
             // Handle potential field values
             auto childNode = fieldElement->getFirstChild();
             if (childNode != nullptr && childNode->getNodeType() == DOMNode::TEXT_NODE) {
                 char* cstrValue = XMLString::transcode(childNode->getNodeValue());
-                EntityFile::WriteValueData(data, fieldType, cstrValue);
+                EntityFile::WriteValueData(data, field, cstrValue);
                 XMLString::release(&cstrValue);
             }
         }

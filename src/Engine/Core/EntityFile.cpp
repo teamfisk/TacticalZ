@@ -46,50 +46,50 @@ std::size_t EntityFile::GetTypeStride(std::string typeName)
     return (it != typeStrides.end()) ? it->second : 0;
 }
 
-void EntityFile::WriteAttributeData(char* outData, const std::string fieldType, const std::map<std::string, std::string>& attributes)
+void EntityFile::WriteAttributeData(char* outData, const ComponentInfo::Field_t& field, const std::map<std::string, std::string>& attributes)
 {
-    if (fieldType == "Vector") {
+    if (field.Type == "Vector") {
         glm::vec3 vec;
         vec.x = boost::lexical_cast<float>(attributes.at("X"));
         vec.y = boost::lexical_cast<float>(attributes.at("Y"));
         vec.z = boost::lexical_cast<float>(attributes.at("Z"));
-        memcpy(outData, reinterpret_cast<char*>(&vec), EntityFile::GetTypeStride(fieldType));
-    } else if (fieldType == "Color") {
+        memcpy(outData, reinterpret_cast<char*>(&vec), field.Stride);
+    } else if (field.Type == "Color") {
         glm::vec4 vec;
         vec.r = boost::lexical_cast<float>(attributes.at("R"));
         vec.g = boost::lexical_cast<float>(attributes.at("G"));
         vec.b = boost::lexical_cast<float>(attributes.at("B"));
         vec.a = boost::lexical_cast<float>(attributes.at("A"));
-        memcpy(outData, reinterpret_cast<char*>(&vec), EntityFile::GetTypeStride(fieldType));
-    } else if (fieldType == "Quaternion") {
+        memcpy(outData, reinterpret_cast<char*>(&vec), field.Stride);
+    } else if (field.Type == "Quaternion") {
         glm::quat q;
         q.x = boost::lexical_cast<float>(attributes.at("X"));
         q.y = boost::lexical_cast<float>(attributes.at("Y"));
         q.z = boost::lexical_cast<float>(attributes.at("Z"));
         q.w = boost::lexical_cast<float>(attributes.at("W"));
-        memcpy(outData, reinterpret_cast<char*>(&q), EntityFile::GetTypeStride(fieldType));
+        memcpy(outData, reinterpret_cast<char*>(&q), field.Stride);
     } else if (!attributes.empty()) {
         LOG_WARNING("%i attributes not handled by any type conversion!", attributes.size());
     }
 }
 
-void EntityFile::WriteValueData(char* outData, const std::string fieldType, const char* valueData)
+void EntityFile::WriteValueData(char* outData, const ComponentInfo::Field_t& field, const char* valueData)
 {
-    if (fieldType == "int") {
+    if (field.Type == "int") {
         int value = boost::lexical_cast<int>(valueData);
-        memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-    } else if (fieldType == "float") {
+        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+    } else if (field.Type == "float") {
         float value = boost::lexical_cast<float>(valueData);
-        memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-    } else if (fieldType == "double") {
+        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+    } else if (field.Type == "double") {
         double value = boost::lexical_cast<double>(valueData);
-        memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-    } else if (fieldType == "bool") {
+        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+    } else if (field.Type == "bool") {
         bool value = (valueData[0] == 't'); // Lazy bool evaluation
-        memcpy(outData, reinterpret_cast<char*>(&value), EntityFile::GetTypeStride(fieldType));
-    } else if (fieldType == "string") {
+        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+    } else if (field.Type == "string") {
         new (outData) std::string(valueData);
     } else {
-        LOG_WARNING("Unknown value data type: %s", fieldType.c_str());
+        LOG_WARNING("Unknown value data type: %s", field.Type.c_str());
     }
 }

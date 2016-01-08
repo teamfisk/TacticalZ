@@ -35,24 +35,24 @@ void EntityFileParser::onStartComponentField(EntityID entity, std::string compon
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
-    std::string fieldType = component.Info.FieldTypes.at(fieldName);
+    auto& field = component.Info.Fields.at(fieldName);
 
-    LOG_DEBUG("Field \"%s\" type \"%s\"", fieldName.c_str(), fieldType.c_str());
+    LOG_DEBUG("Field \"%s\" type \"%s\"", fieldName.c_str(), field.Type.c_str());
     LOG_DEBUG("Attributes:");
     for (auto& kv : attributes) {
         LOG_DEBUG("\t%s = %s", kv.first.c_str(), kv.second.c_str());
     }
 
-    char* data = component.Data + component.Info.FieldOffsets.at(fieldName);
-    EntityFile::WriteAttributeData(data, fieldType, attributes);
+    char* data = component.Data + field.Offset;
+    EntityFile::WriteAttributeData(data, field, attributes);
 }
 
 void EntityFileParser::onFieldData(EntityID entity, std::string componentType, std::string fieldName, const char* fieldData)
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
-    std::string fieldType = component.Info.FieldTypes.at(fieldName);
+    auto& field = component.Info.Fields.at(fieldName);
 
-    char* data = component.Data + component.Info.FieldOffsets.at(fieldName);
-    EntityFile::WriteValueData(data, fieldType, fieldData);
+    char* data = component.Data + field.Offset;
+    EntityFile::WriteValueData(data, field, fieldData);
 }

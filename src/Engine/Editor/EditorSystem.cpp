@@ -432,16 +432,16 @@ void EditorSystem::drawUI(World* world, double dt)
                     }
 
                     auto& component = world->GetComponent(m_Selection, componentType);
-                    for (auto& pair : ci.FieldTypes) {
-                        const std::string& field = pair.first;
-                        const std::string& type = pair.second;
+                    for (auto& kv : ci.Fields) {
+                        const std::string& fieldName = kv.first;
+                        auto& field = kv.second;
                         
-                        ImGui::PushID(field.c_str());
-                        if (type == "Vector") {
-                            auto& val = component.Property<glm::vec3>(field);
-                            if (field == "Scale") {
+                        ImGui::PushID(fieldName.c_str());
+                        if (field.Type == "Vector") {
+                            auto& val = component.Property<glm::vec3>(fieldName);
+                            if (fieldName == "Scale") {
                                 ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
-                            } else if (field == "Orientation") {
+                            } else if (fieldName == "Orientation") {
                                 glm::vec3 tempVal = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
                                 if (ImGui::SliderFloat3("", glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
                                     val = tempVal;
@@ -449,16 +449,16 @@ void EditorSystem::drawUI(World* world, double dt)
                             } else {
                                 ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
                             }
-                        } else if (type == "Color") {
-                            auto& val = component.Property<glm::vec4>(field);
+                        } else if (field.Type == "Color") {
+                            auto& val = component.Property<glm::vec4>(fieldName);
                             ImGui::ColorEdit4("", glm::value_ptr(val), true);
-                        } else if (type == "string") {
-                            std::string& val = component.Property<std::string>(field);
+                        } else if (field.Type == "string") {
+                            std::string& val = component.Property<std::string>(fieldName);
                             char tempString[1024];
                             memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString)));
                             if (ImGui::InputText("", tempString, sizeof(tempString))) {
                                 val = std::string(tempString);
-                                LOG_DEBUG("%s::%s changed!", componentType.c_str(), field.c_str());
+                                LOG_DEBUG("%s::%s changed!", componentType.c_str(), fieldName.c_str());
                             }
                             // DROP STUFF
                             if (ImGui::IsItemHovered() && !m_LastDroppedFile.empty()) {
@@ -466,21 +466,21 @@ void EditorSystem::drawUI(World* world, double dt)
                                 m_LastDroppedFile = "";
                             }
 
-                        } else if (type == "double") {
-                            float tempVal = static_cast<float>(component.Property<double>(field));
+                        } else if (field.Type == "double") {
+                            float tempVal = static_cast<float>(component.Property<double>(fieldName));
                             if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
-                                component.SetProperty(field, static_cast<double>(tempVal));
+                                component.SetProperty(fieldName, static_cast<double>(tempVal));
                             }
-                        } else if (type == "bool") {
-                            auto& val = component.Property<bool>(field);
+                        } else if (field.Type == "bool") {
+                            auto& val = component.Property<bool>(fieldName);
                             ImGui::Checkbox("", &val);
                         } else {
-                            ImGui::TextDisabled(type.c_str());
+                            ImGui::TextDisabled(field.Type.c_str());
                         }
                         ImGui::PopID();
 
                         ImGui::SameLine();
-                        ImGui::Text(field.c_str());
+                        ImGui::Text(fieldName.c_str());
                         if (ImGui::IsItemHovered()) {
                             ImGui::SetTooltip("field annotation goes here");
                         }

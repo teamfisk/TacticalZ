@@ -275,8 +275,8 @@ private:
 
 public:
     static std::size_t GetTypeStride(std::string typeName);
-    static void WriteAttributeData(char* outData, const std::string fieldType, const std::map<std::string, std::string>& attributes);
-    static void WriteValueData(char* outData, const std::string fieldType, const char* valueData);
+    static void WriteAttributeData(char* outData, const ComponentInfo::Field_t& field, const std::map<std::string, std::string>& attributes);
+    static void WriteValueData(char* outData, const ComponentInfo::Field_t& field, const char* valueData);
 
     xercesc::XMLGrammarPool* GrammarPool() const { return m_GrammarPool; }
 
