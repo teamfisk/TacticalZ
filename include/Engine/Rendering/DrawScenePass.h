@@ -31,6 +31,12 @@ private:
 
     ShaderProgram* m_BasicForwardProgram;
 
+    ShaderProgram* m_CoolDeathAnimProgram;
+
+    glm::vec3 Origin;
+    GLfloat TimeDeath = 0.f;
+    GLfloat EndDeath = 0.f;
+
 };
 
 #endif 

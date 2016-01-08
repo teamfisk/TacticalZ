@@ -90,21 +90,47 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
         }
 
         for (auto texGroup : model->TextureGroups) {
-            ModelJob job;
-            job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-            job.DiffuseTexture = texGroup.Texture.get();
-            job.NormalTexture = texGroup.NormalMap.get();
-            job.SpecularTexture = texGroup.SpecularMap.get();
-            job.Model = model;
-            job.StartIndex = texGroup.StartIndex;
-            job.EndIndex = texGroup.EndIndex;
-            job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
-            job.Color = color;
+            auto deathComp = world->HasComponent(modelC.EntityID, "CoolDeathAnim");
+            if (!deathComp) {
+                ModelJob job;
 
-            //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
-            job.Entity = modelC.EntityID;
+                job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
+                job.DiffuseTexture = texGroup.Texture.get();
+                job.NormalTexture = texGroup.NormalMap.get();
+                job.SpecularTexture = texGroup.SpecularMap.get();
+                job.Model = model;
+                job.StartIndex = texGroup.StartIndex;
+                job.EndIndex = texGroup.EndIndex;
+                job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+                job.Color = color;
 
-            renderQueue->Add(job);
+                //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+                job.Entity = modelC.EntityID;
+
+                renderQueue->Add(job);
+            }
+            else {
+                CoolDeathAnimationJob job;
+
+                job.TimeSinceDeath = 1.f;
+                job.EndOfDeath = 15.f;
+                job.OriginPos = glm::vec3(1000.f, 2.f, 0.f);
+
+                job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
+                job.DiffuseTexture = texGroup.Texture.get();
+                job.NormalTexture = texGroup.NormalMap.get();
+                job.SpecularTexture = texGroup.SpecularMap.get();
+                job.Model = model;
+                job.StartIndex = texGroup.StartIndex;
+                job.EndIndex = texGroup.EndIndex;
+                job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+                job.Color = color;
+
+                //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
+                job.Entity = modelC.EntityID;
+
+                renderQueue->Add(job);
+            }
         }
     }
 }

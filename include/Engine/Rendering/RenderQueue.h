@@ -63,6 +63,17 @@ struct ModelJob : RenderJob
 	}
 };
 
+// Cool Death Animation
+struct CoolDeathAnimationJob : ModelJob
+{
+    glm::vec3 OriginPos;
+    float TimeSinceDeath = 0.f;
+    float EndOfDeath = 15.0f;
+
+};
+
+
+
 struct SpriteJob : RenderJob
 {
 	unsigned int ShaderID = 0;

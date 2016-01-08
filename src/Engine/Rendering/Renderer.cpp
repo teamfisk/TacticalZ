@@ -76,6 +76,15 @@ void Renderer::InitializeShaders()
     m_DrawScreenQuadProgram->Compile();
     m_DrawScreenQuadProgram->Link();
 
+    m_CoolDeathAnimProgram = ResourceManager::Load<ShaderProgram>("#CoolDeathAnimProgram");
+    //m_CoolDeathAnimProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/CoolDeathAnim.vert.glsl")));
+    //m_CoolDeathAnimProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/CoolDeathAnim.geom.glsl")));
+    //m_CoolDeathAnimProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/CoolDeathAnim.frag.glsl")));
+    //m_CoolDeathAnimProgram->Compile();
+    //m_CoolDeathAnimProgram->Link();
+
+
+
     //m_CalculateFrustumProgram = ResourceManager::Load<ShaderProgram>("#CalculateFrustumProgram");
     //m_CalculateFrustumProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
     //m_CalculateFrustumProgram.Compile();
