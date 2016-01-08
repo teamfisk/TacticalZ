@@ -1,4 +1,5 @@
 <c:SoundEmitter>
+	<FilePath>Audio/crosscounter.wav</FilePath>
 	<Gain>1.0</Gain>
 	<Pitch>1.0</Pitch>
 	<MaxDistance>20.0</MaxDistance>
