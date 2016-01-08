@@ -2,6 +2,7 @@
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
 #include "Game/HealthSystem.h"
+#include "Core/EntityFileWriter.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -53,6 +54,9 @@ Game::Game(int argc, char* argv[])
         fpp.RegisterComponents(m_World);
         EntityFileParser fp(file);
         fp.MergeEntities(m_World);
+
+        EntityFileWriter writer("Testasdasdasd.xml");
+        writer.WriteWorld(m_World);
     }
 
     // Create system pipeline

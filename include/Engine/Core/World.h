@@ -22,7 +22,7 @@ public:
     // Attach a component to an entity and fill it with default values
     ComponentWrapper AttachComponent(EntityID entity, std::string componentType);
     // Check if an entity has a component
-    bool HasComponent(EntityID entity, std::string componentType);
+    bool HasComponent(EntityID entity, std::string componentType) const;
     // Get a component of an entity
     ComponentWrapper GetComponent(EntityID entity, std::string componentType);
     // Delete a component off an entity

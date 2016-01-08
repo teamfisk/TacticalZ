@@ -1,3 +1,6 @@
+#ifndef EntityFileParser_h__
+#define EntityFileParser_h__
+
 #include "EntityFile.h"
 #include "World.h"
 
@@ -21,3 +24,5 @@ private:
     void onStartComponentField(EntityID entity, std::string componentType, std::string fieldName, std::map<std::string, std::string> attributes);
     void onFieldData(EntityID entity, std::string componentType, std::string fieldName, const char* fieldData);
 };
+
+#endif

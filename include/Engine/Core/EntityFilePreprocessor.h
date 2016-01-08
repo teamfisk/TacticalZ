@@ -1,3 +1,6 @@
+#ifndef EntityFilePreprocessor_h__
+#define EntityFilePreprocessor_h__
+
 #include <xercesc/framework/psvi/XSElementDeclaration.hpp>
 #include <xercesc/framework/psvi/XSComplexTypeDefinition.hpp>
 #include <xercesc/framework/psvi/XSParticle.hpp>
@@ -29,3 +32,5 @@ private:
     void parseComponentInfo();
     void parseDefaults();
 };
+
+#endif
