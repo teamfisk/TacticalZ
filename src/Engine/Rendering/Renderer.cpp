@@ -92,6 +92,7 @@ void Renderer::Draw(RenderQueueCollection& rq)
 {
     m_PickingPass->Draw(rq);
     //DrawScreenQuad(m_PickingPass->PickingTexture());
+    m_LightCullingPass->FillLightList(rq);
     m_LightCullingPass->CullLights();
     
     //m_DrawScenePass->Draw(rq);

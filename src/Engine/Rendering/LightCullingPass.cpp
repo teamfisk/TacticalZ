@@ -3,7 +3,6 @@
 LightCullingPass::LightCullingPass(IRenderer* renderer)
 {
     m_Renderer = renderer;
-    TEMPCreateLights();
     InitializeSSBOs();
     InitializeShaderPrograms();
     GenerateNewFrustum();
@@ -35,6 +34,14 @@ void LightCullingPass::CullLights()
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
+    if (m_PointLights.size() > 0) {
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(PointLight) * m_PointLights.size(), &(m_PointLights[0]), GL_DYNAMIC_COPY);
+    } else {
+        GLfloat zero = 0.f;
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(GLfloat), &zero , GL_DYNAMIC_COPY);
+
+    }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     m_LightCullProgram->Bind();
@@ -49,6 +56,25 @@ void LightCullingPass::CullLights()
     GLERROR("CullLights Error: End");
 }
 
+void LightCullingPass::FillLightList(RenderQueueCollection& rq)
+{
+    m_PointLights.clear();
+    for(auto &job : rq.Lights) {
+        auto pointLightjob = std::dynamic_pointer_cast<PointLightJob>(job);
+        if (pointLightjob) {
+            PointLight p;
+            p.Color = pointLightjob->Color;
+            p.Falloff = pointLightjob->Falloff;
+            p.Intensity = pointLightjob->Intensity;
+            p.Position = glm::vec4(glm::vec3(pointLightjob->Position), 1.f);
+            p.Radius = pointLightjob->Radius;
+            p.Padding = 123.f;
+            m_PointLights.push_back(p);
+            continue;
+        }
+    }
+}
+
 void LightCullingPass::InitializeSSBOs()
 {
     glGenBuffers(1, &m_FrustumSSBO);
@@ -59,7 +85,9 @@ void LightCullingPass::InitializeSSBOs()
 
     glGenBuffers(1, &m_LightSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_PointLights), &m_PointLights, GL_DYNAMIC_COPY);
+    if(m_PointLights.size() > 0) {
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(PointLight) * m_PointLights.size(), &(m_PointLights[0]), GL_DYNAMIC_COPY);
+    }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightSSBO");
 
@@ -96,12 +124,3 @@ void LightCullingPass::InitializeShaderPrograms()
     m_LightCullProgram->Link();
 }
 
-void LightCullingPass::TEMPCreateLights()
-{
-    for (int i = 0; i < NUM_LIGHTS; i++) {
-        glm::vec3 pos = glm::vec3(cos(i) * i/10.f, 0.5f, sin(i) * i/10.f);
-        m_PointLights[i].Position = glm::vec4(pos, 1.f);
-        m_PointLights[i].Color = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand()%255 / 255.f, 1.f);
-        m_PointLights[i].Radius = glm::length(pos) / 5.f;
-    }
-}

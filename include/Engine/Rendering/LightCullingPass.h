@@ -17,6 +17,7 @@ public:
 
     void GenerateNewFrustum();
     void CullLights();
+    void FillLightList(RenderQueueCollection& rq);
 
     GLuint FrustumSSBO() const { return m_FrustumSSBO; }
     GLuint LightSSBO() const { return m_LightSSBO; }
@@ -49,8 +50,6 @@ private:
     };
     Frustum m_Frustums[80*45]; //TODO: Renderer: Make this change with resolution
 
-    void TEMPCreateLights();
-
     //This should be a component
     struct PointLight {
         glm::vec4 Position = glm::vec4(0.f);
@@ -60,7 +59,7 @@ private:
         float Falloff = 0.3f;
         float Padding = 1337;
     };
-    PointLight m_PointLights[NUM_LIGHTS];
+    std::vector<PointLight> m_PointLights;
 
     struct LightGrid {
         float Start;
