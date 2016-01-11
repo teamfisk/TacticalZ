@@ -29,36 +29,28 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
         double currentHealth = (double)world->GetComponent(player.EntityID, "Health")["Health"];
         int currentAmmo = 0;
         double currentCoolDownTimer = 0.0;
+        std::string HeldItemString = "";
+        if ((int)player["EquippedItem"] == (int)HeldItem::PrimaryItem)
+            HeldItemString = "PrimaryItem";
+        if ((int)player["EquippedItem"] == (int)HeldItem::SecondaryItem)
+            HeldItemString = "SecondaryItem";
 
-        if ((int)player["EquippedItem"] == (int)HeldItem::PrimaryItem) {
-            ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
+        if (HeldItemString != "") {
+            ComponentWrapper& currentItem = world->GetComponent(player.EntityID, HeldItemString);
             currentAmmo = (int)currentItem["Ammo"];
             currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
-        }
-        if ((int)player["EquippedItem"] == (int)HeldItem::SecondaryItem) {
-            ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
-            currentAmmo = (int)currentItem["Ammo"];
-            currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
-        }
 
-        if (currentHealth > 0.0 && currentAmmo > 0 && currentCoolDownTimer < 0.001) {
-            //decrease ammo count
-            //TODO: temp, set the cooldowntimer - probably done in some other system (itemSystem?) later
-            if ((int)player["EquippedItem"] == (int)HeldItem::PrimaryItem) {
-                ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
+            if (currentHealth > 0.0 && currentAmmo > 0 && currentCoolDownTimer < 0.001) {
+                //decrease ammo count
+                //TODO: temp, set the cooldowntimer - probably done in some other system (itemSystem?) later
                 currentItem["Ammo"] = (int)currentItem["Ammo"] - 1;
                 currentItem["CoolDownTimer"] = 2.0;//change later!
+                //create and publish the shoot event
+                Events::Shoot eShoot;
+                eShoot.currentAimingPoint = aimingCoordinates;
+                eShoot.currentlyEquippedItem = (int)(player["EquippedItem"]);
+                m_EventBroker->Publish(eShoot);
             }
-            if ((int)player["EquippedItem"] == (int)HeldItem::SecondaryItem) {
-                ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
-                currentItem["Ammo"] = (int)currentItem["Ammo"] - 1;
-                currentItem["CoolDownTimer"] = 2.0;//change later!
-            }
-            //create and publish the shoot event
-            Events::Shoot eShoot;
-            eShoot.currentAimingPoint = aimingCoordinates;
-            eShoot.currentlyEquippedItem = (int) ((double)player["EquippedItem"]);
-            m_EventBroker->Publish(eShoot);
         }
     }
 }
