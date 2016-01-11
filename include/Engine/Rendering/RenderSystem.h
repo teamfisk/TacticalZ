@@ -11,6 +11,7 @@
 #include "../Core/EKeyDown.h"
 #include "../Input/EInputCommand.h"
 #include "Camera.h"
+#include "ModelJob.h"
 
 
 class RenderSystem : public ImpureSystem
@@ -48,7 +49,7 @@ private:
     glm::mat4 m_ProjectionMatrix;
     
     glm::mat4 ModelMatrix(EntityID entity);
-    void FillModels(RenderQueue* renderQueue);
+    void FillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
 
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);

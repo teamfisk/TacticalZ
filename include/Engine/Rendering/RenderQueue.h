@@ -9,58 +9,16 @@
 #include "../Core/Util/Rectangle.h"
 #include "../Core/Entity.h"
 #include "Camera.h"
+#include "RenderJob.h"
+#include "ModelJob.h"
 
 class Model;
 class Skeleton;
 class Texture;
-class RenderQueue;
 
 //TODO: Render: Remove obsolete RenderJobs and fix standard values on variables.
+/*
 
-struct RenderJob
-{
-	friend class RenderQueue;
-
-	float Depth;
-
-protected:
-	uint64_t Hash;
-
-	virtual void CalculateHash() = 0;
-
-	bool operator<(const RenderJob& rhs)
-	{
-		return this->Hash < rhs.Hash;
-	}
-};
-
-struct ModelJob : RenderJob
-{
-	unsigned int ShaderID = 0;
-	unsigned int TextureID = 0;
-
-    EntityID Entity;
-	glm::mat4 Matrix;
-	const Texture* DiffuseTexture;
-	const Texture* NormalTexture;
-	const Texture* SpecularTexture;
-	float Shininess = 0.f;
-	glm::vec4 Color;
-	const Model* Model = nullptr;
-	unsigned int StartIndex = 0;
-	unsigned int EndIndex = 0;
-
-	// Animation
-	Skeleton* Skeleton = nullptr;
-	bool NoRootMotion = true;
-	std::string AnimationName;
-	double AnimationTime = 0;
-
-	void CalculateHash() override
-	{
-		Hash = TextureID;
-	}
-};
 
 struct TransparentModelJob : RenderJob
 {
@@ -123,66 +81,23 @@ struct PointLightJob : RenderJob
 		Hash = 0;
 	}
 };
-
-class RenderQueue
-{
-public:
-	template <typename T>
-	void Add(T &job)
-	{
-		job.CalculateHash();
-		Jobs.push_back(std::shared_ptr<T>(new T(job)));
-		m_Size++;
-	}
-
-	void Sort()
-	{
-		Jobs.sort();
-	}
-
-	void Clear()
-	{
-		Jobs.clear();
-		m_Size = 0;
-	}
-
-	int Size() const { return m_Size; }
-	std::list<std::shared_ptr<RenderJob>>::const_iterator begin()
-	{
-		return Jobs.begin();
-	}
-
-	std::list<std::shared_ptr<RenderJob>>::const_iterator end()
-	{
-		return Jobs.end();
-	}
-
-	std::list<std::shared_ptr<RenderJob>> Jobs;
-
-private:
-	int m_Size = 0;
-};
+*/
 
 struct RenderScene
 {
-	RenderQueue Forward;
-	RenderQueue Lights;
-    Camera* Camera;
+    ::Camera* Camera;
+    std::list<std::shared_ptr<RenderJob>> ForwardJobs;
+    std::list<std::shared_ptr<RenderJob>> LightJobs;
+
 
 	void Clear()
 	{
-		Forward.Clear();
-		Lights.Clear();
-	}
-
-	void Sort()
-	{
-		Forward.Sort();
-		Lights.Sort();
+        ForwardJobs.clear();
+        LightJobs.clear();
 	}
 };
 
-class RenderFrame
+struct RenderFrame
 {
 public:
 

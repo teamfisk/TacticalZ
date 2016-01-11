@@ -32,9 +32,8 @@ void DrawScenePass::Draw(RenderFrame& rf)
 
     DrawScenePassState state;
     for (auto scene : rf.RenderScenes) {
-        scene->Forward.Jobs.sort(DrawScenePass::DepthSort);
 
-        for (auto &job : scene->Forward) {
+        for (auto &job : scene->ForwardJobs) {
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
             if (modelJob) {
                 GLuint ShaderHandle = m_BasicForwardProgram->GetHandle();

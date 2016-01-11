@@ -61,7 +61,7 @@ void PickingPass::Draw(RenderFrame& rf)
     {
         m_Camera = scene->Camera; 
 
-        for (auto &job : scene->Forward) {
+        for (auto &job : scene->ForwardJobs) {
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
             if (modelJob) {

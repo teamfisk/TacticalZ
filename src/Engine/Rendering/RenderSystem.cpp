@@ -129,63 +129,39 @@ glm::mat4 RenderSystem::ModelMatrix(EntityID entity)
     return modelMatrix;
 }
 
-void RenderSystem::FillModels(RenderQueue* renderQueue)
+void RenderSystem::FillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 {
     auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
         return;
     }
 
-    for (auto& modelC : *models) {
-        bool visible = modelC["Visible"];
+    for (auto& modelComponent : *models) {
+        bool visible = modelComponent["Visible"];
         if (!visible) {
             continue;
         }
-        std::string resource = modelC["Resource"];
+        std::string resource = modelComponent["Resource"];
         if (resource.empty()) {
             continue;
         }
-        glm::vec4 color = modelC["Color"];
-        Model* model = ResourceManager::Load<Model>(resource);
+
+
+        Model* model = ResourceManager::Load<::Model>(resource);
         if (model == nullptr) {
-            model = ResourceManager::Load<Model>("Models/Core/Error.obj");
+            model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
         }
 
+
+        glm::mat4 modelMatrix = ModelMatrix(modelComponent.EntityID);
+        glm::mat4 matrix = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * (model->m_Matrix * modelMatrix);
         for (auto texGroup : model->TextureGroups) {
-
-            if (color.a < 1.0f || texGroup.Transparency < 1.0f) {
-                //transparent stuffs
-                TransparentModelJob job;
-                job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-                job.DiffuseTexture = texGroup.Texture.get();
-                job.NormalTexture = texGroup.NormalMap.get();
-                job.SpecularTexture = texGroup.SpecularMap.get();
-                job.Model = model;
-                job.StartIndex = texGroup.StartIndex;
-                job.EndIndex = texGroup.EndIndex;
-                job.Matrix = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * (model->m_Matrix * ModelMatrix(modelC.EntityID));
-                job.Color = color;
-                job.Entity = modelC.EntityID;
-
-                job.Depth = 10.f; //insert real viewspace depth here
-
-                renderQueue->Add(job);
-            } else {
-                ModelJob job;
-                job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
-                job.DiffuseTexture = texGroup.Texture.get();
-                job.NormalTexture = texGroup.NormalMap.get();
-                job.SpecularTexture = texGroup.SpecularMap.get();
-                job.Model = model;
-                job.StartIndex = texGroup.StartIndex;
-                job.EndIndex = texGroup.EndIndex;
-                job.Matrix = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * (model->m_Matrix * ModelMatrix(modelC.EntityID));
-                job.Color = color;
-                job.Entity = modelC.EntityID;
-
-                renderQueue->Add(job);
-            }
+            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, matrix, texGroup, modelComponent));
+            jobs.push_back(modelJob);
         }
+
+
+        
     }
 }
 
@@ -261,7 +237,7 @@ void RenderSystem::Update(World* world, double dt)
     m_RenderFrame->Clear();
     RenderScene* rs = new RenderScene();
     rs->Camera = m_Camera;
-    FillModels(&rs->Forward);
+    FillModels(rs->ForwardJobs);
     m_RenderFrame->Add(*rs);
     delete rs;
 }
