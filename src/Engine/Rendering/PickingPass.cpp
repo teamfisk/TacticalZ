@@ -68,7 +68,7 @@ void PickingPass::Draw(RenderQueueCollection& rq)
                 pickColor[1] = color->second[1];
             } else {
                 entityColors[modelJob->Entity] = glm::vec2(pickColor[0], pickColor[1]);
-                if (r + 10 > 255) {
+                if (r + 1 > 255) {
                     r = 0;
                     g += 1;
                 } else {

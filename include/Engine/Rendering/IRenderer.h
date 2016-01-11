@@ -9,7 +9,9 @@
 #include "Camera.h"
 #include "RenderQueue.h"
 #include "Model.h"
-#include "../Core/World.h"
+#include "../Core/World.h" //So temp
+#include "RenderQueueFactory.h" //So temp
+
 
 class IRenderer
 {

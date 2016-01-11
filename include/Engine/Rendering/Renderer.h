@@ -35,6 +35,8 @@ private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
 
+    int m_bi = 0;
+
     std::shared_ptr<DebugCameraInputController<Renderer>> m_DebugCameraInputController;
 
     Texture* m_ErrorTexture;

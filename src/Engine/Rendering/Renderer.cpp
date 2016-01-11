@@ -91,7 +91,14 @@ void Renderer::Update(double dt)
 void Renderer::Draw(RenderQueueCollection& rq)
 {
     FillDepth(rq);
-
+    if (m_bi == 1) {
+        for (auto i : rq.Forward) {
+            printf("D: %f| \n", i->Depth);
+        }
+        m_bi = 0;
+        printf("------THE END------");
+    }
+    m_bi++;
     m_PickingPass->Draw(rq);
     //DrawScreenQuad(m_PickingPass->PickingTexture());
     m_LightCullingPass->FillLightList(rq);
@@ -128,8 +135,8 @@ void Renderer::DrawScreenQuad(GLuint textureToDraw)
 
 void Renderer::InitializeTextures()
 {
-    m_ErrorTexture=ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
-    m_WhiteTexture=ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+    m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
+    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
@@ -140,7 +147,7 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, NULL);//TODO: Renderer: Fix the precision and Resolution
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("Texture initialization failed");
 }
 
@@ -152,14 +159,14 @@ void Renderer::InitializeRenderPasses()
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
 }
 
+//Temp func
 void Renderer::FillDepth(RenderQueueCollection& rq)
 {
-    for(auto job : rq.Forward)
-    {
+    for(auto job : rq.Forward) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-        glm::vec3 pos = m_World->GetComponent(modelJob->Entity, "Transform")["Position"];
-        glm::vec3 worldpos = glm::vec3((m_Camera->ViewMatrix() * modelJob->ModelMatrix) * glm::vec4(pos, 1));
-        job->Depth = worldpos.z;
+        glm::vec3 abspos = RenderQueueFactory::AbsolutePosition(m_World, modelJob->Entity);
+        glm::vec3 worldpos = glm::vec3(m_Camera->ViewMatrix() * glm::vec4(abspos, 1));
+        modelJob->Depth = worldpos.z;
     }
-    rq.Forward.Sort();
+    rq.Forward.Jobs.sort(Renderer::DepthSort);
 }
