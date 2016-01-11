@@ -59,6 +59,8 @@ void PickingPass::Draw(RenderFrame& rf)
 
     for(auto scene : rf.RenderScenes)
     {
+        m_Camera = scene->Camera; 
+
         for (auto &job : scene->Forward) {
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
@@ -99,8 +101,8 @@ void PickingPass::Draw(RenderFrame& rf)
     Events::Picking pickEvent = Events::Picking(
         &m_PickingBuffer,
         &m_DepthBuffer,
-        m_Renderer->Camera()->ProjectionMatrix(),
-        m_Renderer->Camera()->ViewMatrix(),
+        m_Camera->ProjectionMatrix(),
+        m_Camera->ViewMatrix(),
         Rectangle(fbWidth, fbHeight),
         &m_PickingColorsToEntity);
 
@@ -108,6 +110,8 @@ void PickingPass::Draw(RenderFrame& rf)
 
     delete state;
 }
+
+
 
 void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
 {

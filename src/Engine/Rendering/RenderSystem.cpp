@@ -263,4 +263,5 @@ void RenderSystem::Update(World* world, double dt)
     rs->Camera = m_Camera;
     FillModels(&rs->Forward);
     m_RenderFrame->Add(*rs);
+    delete rs;
 }

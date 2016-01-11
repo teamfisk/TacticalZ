@@ -37,6 +37,7 @@ private:
     const IRenderer* m_Renderer;
 
     ShaderProgram* m_PickingProgram;
+    Camera* m_Camera;
 
     std::unordered_map<glm::vec2, EntityID> m_PickingColorsToEntity;
 

@@ -92,7 +92,7 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& rf)
 {
-    m_Camera = (*rf.begin())->Camera;
+    m_Camera = (*rf.begin())->Camera; // Fix this with some better solution
     m_PickingPass->Draw(rf);
     
     glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
