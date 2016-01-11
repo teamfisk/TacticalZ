@@ -9,9 +9,13 @@
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
-#include "Core/EntityXMLFile.h"
+#include "Core/EntityFile.h"
 #include "Core/SystemPipeline.h"
 #include "PlayerSystem.h"
+
+#include "Core/EntityFilePreprocessor.h"
+#include "Core/EntityFileParser.h"
+#include "Core/EntityFileWriter.h"
 
 #include "Core\EMouseRelease.h"
 #include "Core\EShoot.h"

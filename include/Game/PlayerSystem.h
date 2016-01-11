@@ -37,8 +37,8 @@ private:
     bool PlayerSystem::OnMouseRelease(const Events::MouseRelease& e);
     enum class HeldItem {
         None = 0,
-        PrimaryWeapon = 1,
-        SecondaryWeapon = 2
+        PrimaryItem = 1,
+        SecondaryItem = 2
     };
 };
 

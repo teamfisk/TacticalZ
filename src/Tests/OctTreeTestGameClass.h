@@ -13,7 +13,7 @@
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
-#include "Core/EntityXMLFile.h"
+#include "Core/EntityFile.h"
 #include "Core/SystemPipeline.h"
 #include "RaptorCopterSystem.h"
 #include "PlayerSystem.h"

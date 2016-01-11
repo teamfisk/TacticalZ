@@ -5,7 +5,7 @@ Game::Game(int argc, char* argv[]) : someOctTree(AABB(-0.5f*worldSize, 0.5f*worl
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<Texture>("Texture");
-    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<EntityFile>("EntityFile");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
