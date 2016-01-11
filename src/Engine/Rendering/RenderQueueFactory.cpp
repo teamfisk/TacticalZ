@@ -111,34 +111,6 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 
 void RenderQueueFactory::FillLights(World* world, RenderQueue* renderQueue)
 {
-    auto pointLights = world->GetComponents("PointLight");
-    if(pointLights == nullptr) {
-        return;
-    }
 
-    for(auto& pointlightC : *pointLights) {
-        bool visible = pointlightC["Visible"];
-        if(!visible) {
-            continue;
-        }
-        auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
-        if(&transformC == nullptr) {
-            return;
-        }
-
-        glm::vec4 color = pointlightC["Color"];
-        float radius = (double)pointlightC["Radius"];
-        float intensity = (double)pointlightC["Intensity"];
-        float falloff = (double)pointlightC["Falloff"];
-
-        PointLightJob job;
-        job.Position = glm::vec4(AbsolutePosition(world, transformC.EntityID), 1.f);
-        job.Color = color;
-        job.Radius = radius;
-        job.Intensity = intensity;
-        job.Falloff = falloff;
-
-        renderQueue->Add(job);
-    }
 }
 
