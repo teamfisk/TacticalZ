@@ -11,6 +11,7 @@ in vec3 Normal;
 in vec3 Position;
 in vec2 TextureCoordinate;
 in vec4 DiffuseColor;
+in vec4 ExplosionColor;
 
 out vec4 fragmentColor;
 
@@ -18,5 +19,5 @@ out vec4 fragmentColor;
 void main()
 {
 	vec4 texel = texture2D(texture0, TextureCoordinate);
-	fragmentColor = texel * DiffuseColor * Color;
+	fragmentColor = texel * DiffuseColor * Color + ExplosionColor;
 }

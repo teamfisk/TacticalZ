@@ -33,14 +33,6 @@ void DrawScenePass::InitializeShaderPrograms()
 void DrawScenePass::Draw(RenderQueueCollection& rq)
 {
 
-    if (TimeDeath > 2.f) {
-        TimeDeath = 0.f;
-    }
-
-    Origin = glm::vec3(0.f, 0.0f, 0.f);
-    TimeDeath = TimeDeath + 0.01f;
-    EndDeath = EndDeath + 0.05f;
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLERROR("Renderer::Draw PickingPass");
 
@@ -52,16 +44,24 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
         auto coolDeathAnimationJob = std::dynamic_pointer_cast<CoolDeathAnimationJob>(job);
         if (coolDeathAnimationJob) {
             GLuint ShaderHandle = m_CoolDeathAnimProgram->GetHandle(); //---
-                                                                       //---
+
             m_CoolDeathAnimProgram->Bind();
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(coolDeathAnimationJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ProjectionMatrix()));
             glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(coolDeathAnimationJob->Color));
-            glUniform3fv(glGetUniformLocation(ShaderHandle, "OriginPos"), 1, glm::value_ptr(Origin));
-            glUniform1f(glGetUniformLocation(ShaderHandle, "TimeSinceDeath"), TimeDeath);
-            glUniform1f(glGetUniformLocation(ShaderHandle, "EndOfDeath"), EndDeath);
+            glUniform3fv(glGetUniformLocation(ShaderHandle, "OriginPos"), 1, glm::value_ptr(coolDeathAnimationJob->OriginPos));
+            glUniform1f(glGetUniformLocation(ShaderHandle, "TimeSinceDeath"), coolDeathAnimationJob->TimeSinceDeath);
+            glUniform1f(glGetUniformLocation(ShaderHandle, "EndOfDeath"), coolDeathAnimationJob->EndOfDeath);
+            glUniform1i(glGetUniformLocation(ShaderHandle, "Gravity"), coolDeathAnimationJob->Gravity);
+            glUniform1f(glGetUniformLocation(ShaderHandle, "GravityForce"), coolDeathAnimationJob->GravityForce);
+            glUniform1f(glGetUniformLocation(ShaderHandle, "ObjectRadius"), coolDeathAnimationJob->ObjectRadius);
+            glUniform4fv(glGetUniformLocation(ShaderHandle, "EndColor"), 1, glm::value_ptr(coolDeathAnimationJob->EndColor));
+            glUniform1i(glGetUniformLocation(ShaderHandle, "UseRandomness"), coolDeathAnimationJob->UseRandomness);
+            glUniform1fv(glGetUniformLocation(ShaderHandle, "RandomNumbers"), 10, coolDeathAnimationJob->RandomNumbers.data());
+            glUniform1f(glGetUniformLocation(ShaderHandle, "RandomnessScalar"), coolDeathAnimationJob->RandomnessScalar);
+
 
             //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
             if (coolDeathAnimationJob->DiffuseTexture != nullptr) {

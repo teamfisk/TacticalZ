@@ -1,5 +1,11 @@
 <c:CoolDeathAnim>
 	<OriginPos X="0" Y="0" Z="0"/>
 	<TimeSinceDeath>0</TimeSinceDeath>
-	<EndOfDeath>15</EndOfDeath>
+	<EndOfDeath>2</EndOfDeath>
+	<Gravity>1</Gravity>
+	<GravityForce>1</GravityForce>
+	<ObjectRadius>2</ObjectRadius>
+	<EndColor R="0" G="0" B="0" A="0"/>
+	<UseRandomness>0</UseRandomness>
+	<RandomnessScalar>1</RandomnessScalar>
 </c:CoolDeathAnim>

@@ -6,6 +6,13 @@ uniform mat4 P;
 uniform vec3 OriginPos;
 uniform float TimeSinceDeath; 
 uniform float EndOfDeath; 
+uniform bool Gravity;
+uniform float GravityForce;
+uniform float ObjectRadius;
+uniform vec4 EndColor;
+uniform bool UseRandomness;
+uniform float RandomNumbers[10];
+uniform float RandomnessScalar;
 
 in VertexData{
 	vec3 Position;
@@ -18,6 +25,7 @@ out vec3 Normal;
 out vec3 Position;
 out vec2 TextureCoordinate;
 out vec4 DiffuseColor;
+out vec4 ExplosionColor;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
@@ -71,24 +79,59 @@ void main()
 	// center position of triangle to origin
 	vec3 oriToCenterTri = normalize(centerPosS - OriginPos);
 	
+	float dist = distance(OriginPos, centerPosS);
+	
+	// The distance a polygon will travel under one second.
+	float travelUnitS = EndOfDeath / ObjectRadius;
+	
+	// The distance a polygon will travel under the current frame.
+	float travelUnitF = TimeSinceDeath * travelUnitS;
+	
+	float randomness = 0.0f;
+	int randomIndex = int(mod(gl_PrimitiveIDIn, 10));
+	
+	// Explosion from origin
 	for(int i = 0; i < gl_in.length(); i++)
 	{	
+		//gl_in.gl_PrimitiveIDIn;
+
+		if (UseRandomness == true)
+		{
+			switch (randomIndex)
+			{
+				case 0: randomness = RandomNumbers[0]; break;
+				case 1: randomness = RandomNumbers[1]; break;
+				case 2: randomness = RandomNumbers[2]; break;
+				case 3: randomness = RandomNumbers[3]; break;
+				case 4: randomness = RandomNumbers[4]; break;
+				case 5: randomness = RandomNumbers[5]; break;
+				case 6: randomness = RandomNumbers[6]; break;
+				case 7: randomness = RandomNumbers[7]; break;
+				case 8: randomness = RandomNumbers[8]; break;
+				case 9: randomness = RandomNumbers[9]; break;
+			}
+		}
+		
+		float fullRandomness = dist + (randomness * RandomnessScalar);
+		
 		vec4 screenPos = gl_in[i].gl_Position;
 		
-		if (distance(OriginPos, Input[0].Position) <= TimeSinceDeath)
+		//if (dist + fullRandomness <= travelUnitF)
+		if (fullRandomness <= travelUnitF)
 		{
-			vec4 changedPos = M * vec4(Input[i].Position  + (oriToCenterTri * TimeSinceDeath), 1.0); //objectspace
-			changedPos = vec4(changedPos.x, changedPos.y - pow(TimeSinceDeath, 2), changedPos.z, changedPos.w); //objectspace
+			vec4 changedPos = M * vec4(Input[i].Position + (oriToCenterTri * travelUnitF) - (oriToCenterTri * fullRandomness), 1.0); //objectspace
+			if (Gravity == true)
+			{
+				changedPos.y = changedPos.y - pow((travelUnitF - fullRandomness) * GravityForce, 2);
+			}
 			screenPos = P*V * changedPos; //sceenspace
 		}
-		// Explosion from origin
-		
-		
 
 		Normal = Input[i].Normal;
 		Position = Input[i].Position;
 		TextureCoordinate = Input[i].TextureCoordinate;
-		DiffuseColor = vec4(Input[i].DiffuseColor.rg, Input[i].DiffuseColor.b + TimeSinceDeath, Input[i].DiffuseColor.a);
+		DiffuseColor = Input[i].DiffuseColor;
+		ExplosionColor = EndColor * travelUnitF;
 		
 		gl_Position = screenPos;
 		//gl_Position = gl_in[i].gl_Position;

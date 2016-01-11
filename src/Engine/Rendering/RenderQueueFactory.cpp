@@ -90,8 +90,8 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
         }
 
         for (auto texGroup : model->TextureGroups) {
-            auto deathComp = world->HasComponent(modelC.EntityID, "CoolDeathAnim");
-            if (!deathComp) {
+            bool hasDeathComp = world->HasComponent(modelC.EntityID, "CoolDeathAnim");
+            if (!hasDeathComp) {
                 ModelJob job;
 
                 job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
@@ -112,9 +112,28 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
             else {
                 CoolDeathAnimationJob job;
 
-                job.TimeSinceDeath = 1.f;
-                job.EndOfDeath = 15.f;
-                job.OriginPos = glm::vec3(1000.f, 2.f, 0.f);
+                auto deathComp = world->GetComponent(modelC.EntityID, "CoolDeathAnim");
+
+                job.OriginPos = (glm::vec3)deathComp["OriginPos"];
+                job.TimeSinceDeath = (double)deathComp["TimeSinceDeath"];
+                job.EndOfDeath = (double)deathComp["EndOfDeath"];
+                job.Gravity = (bool)deathComp["Gravity"];
+                job.GravityForce = (double)deathComp["GravityForce"];
+                job.ObjectRadius = (double)deathComp["ObjectRadius"];
+                job.EndColor = (glm::vec4)deathComp["EndColor"];
+                job.UseRandomness = (bool)deathComp["UseRandomness"];
+                job.RandomnessScalar = (double)deathComp["RandomnessScalar"];
+                job.RandomNumbers = {
+                    0.3257552917701f,
+                    0.07601508315467f,
+                    0.57408909014151f,
+                    0.0f,
+                    0.8618231368539f,
+                    0.074957156588769f,
+                    0.39413607511396f,
+                    0.54579346698979f,
+                    0.83222648353885f,
+                    0.83635707285086f };
 
                 job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
                 job.DiffuseTexture = texGroup.Texture.get();
