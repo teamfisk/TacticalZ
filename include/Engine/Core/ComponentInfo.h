@@ -21,6 +21,7 @@ struct ComponentInfo
 
 	std::string Name;
     std::unordered_map<std::string, Field_t> Fields;
+    std::vector<const Field_t*> FieldsInOrder;
 	Meta_t Meta;
     std::shared_ptr<char> Defaults = nullptr;
 };

@@ -143,9 +143,11 @@ void EntityFilePreprocessor::parseComponentInfo()
                 continue;
             }
 
-            compInfo.Fields[name].Type = type;
-            compInfo.Fields[name].Offset = fieldOffset;
-            compInfo.Fields[name].Stride = stride;
+            auto& field = compInfo.Fields[name];
+            field.Type = type;
+            field.Offset = fieldOffset;
+            field.Stride = stride;
+            compInfo.FieldsInOrder.push_back(&field);
 
             fieldOffset += stride;
         }
