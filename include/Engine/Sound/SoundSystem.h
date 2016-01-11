@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "glm/common.hpp"
-#include "glm/gtx/rotate_vector.hpp"
+#include "glm/gtx/rotate_vector.hpp" // Calculate Up vector
 #include "OpenAL/al.h"
 #include "OpenAL/alc.h"
 
@@ -13,9 +13,16 @@
 #include "Rendering/RenderQueueFactory.h" // Absolute transform
 #include "Sound/Sound.h"
 #include "Sound/EPlaySound.h"
+#include "Sound/EPlaySoundOnEntity.h"
+#include "Sound/EPlaySoundOnPosition.h"
+#include "Sound/EPauseSound.h"
+#include "Sound/EStopSound.h"
+#include "Sound/EContinueSound.h"
+
 
 struct Source
 {
+    Source() { }
     Sound* SoundResource;
     ALuint ALsource;
 };
@@ -38,32 +45,42 @@ private:
     void setSourcePos(ALuint source, glm::vec3 pos) { ALfloat spos[3] = { pos.x, pos.y, pos.z };  alSourcefv(source, AL_POSITION, spos); };
     void setSourceVel(ALuint source, glm::vec3 vel) { ALfloat svel[3] = { vel.x, vel.y, vel.z };  alSourcefv(source, AL_VELOCITY, svel); };
 
-    bool isPlaying(ALuint source);
-
     // Logic
-    World* m_World;
-    EventBroker* m_EventBroker;
-
     void initOpenAL();
     void updateEmitters();
     void updateListener();
     void deleteInactiveEmitters();
     void addNewEmitters();
-    ALuint createSource();
-    void playSound(Source source);
-    void stopSound(Source source);
+    Source* createSource(std::string filePath);
+    void playSound(Source* source);
+    void stopSound(Source* source);
     void stopEmitter(EntityID emitter);
+    void stopEmitters();
+    bool isPlaying(ALuint source);
+    void setSoundProperties(ALuint source, float gain, float pitch, bool loop, float maxDistance, float rollOffFactor, float referenceDistance);
 
     // OpenAL system variables
     ALCdevice* m_ALCdevice = nullptr;
     ALCcontext* m_ALCcontext = nullptr;
 
     // Logic
-    std::unordered_map<EntityID, Source> m_Sources;
+    World* m_World;
+    EventBroker* m_EventBroker;
+    std::unordered_map<EntityID, Source*> m_Sources;
 
     // Events
     EventRelay<SoundSystem, Events::PlaySound> m_EPlaySound;
     bool OnPlaySound(const Events::PlaySound &e);
+    EventRelay<SoundSystem, Events::PlaySoundOnEntity> m_EPlaySoundOnEntity;
+    bool OnPlaySoundOnEntity(const Events::PlaySoundOnEntity &e);
+    EventRelay<SoundSystem, Events::PlaySoundOnPosition> m_EPlaySoundOnPosition;
+    bool OnPlaySoundOnPosition(const Events::PlaySoundOnPosition &e);
+    EventRelay<SoundSystem, Events::PauseSound> m_EPauseSound;
+    bool OnPauseSound(const Events::PauseSound &e);
+    EventRelay<SoundSystem, Events::StopSound> m_EStopSound;
+    bool OnStopSound(const Events::StopSound &e);
+    EventRelay<SoundSystem, Events::ContinueSound> m_EContinueSound;
+    bool OnContinueSound(const Events::ContinueSound &e);
 };
 
 #endif

@@ -2,6 +2,7 @@
 	<FilePath>Audio/crosscounter.wav</FilePath>
 	<Gain>1.0</Gain>
 	<Pitch>1.0</Pitch>
+	<Loop>false</Loop>
 	<MaxDistance>20.0</MaxDistance>
 	<RollOffFactor>1.0</RollOffFactor>
 	<ReferenceDistance>1.0</ReferenceDistance>

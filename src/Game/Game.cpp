@@ -130,8 +130,20 @@ void Game::Tick()
 bool Game::debugOnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "PlaySound" && e.Value > 0) {
-        Events::PlaySound e;
+        Events::PlaySoundOnEntity e;
+        e.emitterID = 18;
         e.FilePath = "Audio/crosscounter.wav";
+        //e.emitterID = 18; // rofl
+        m_EventBroker->Publish(e);
+    }
+    if (e.Command == "Reload" && e.Value > 0) {
+        Events::PauseSound e;
+        e.EmitterID = 18;
+        m_EventBroker->Publish(e);
+    }
+    if (e.Command == "Crouch" && e.Value > 0) {
+        Events::ContinueSound e;
+        e.EmitterID = 18;
         m_EventBroker->Publish(e);
     }
     return true;

@@ -1,5 +1,5 @@
-#ifndef Events_PlaySound_h__
-#define Events_PlaySound_h__
+#ifndef Events_PauseSound_h__
+#define Events_PauseSound_h__
 
 #include "Core/EventBroker.h"
 #include "Core/Entity.h"
@@ -7,9 +7,8 @@
 namespace Events
 {
 
-    struct PlaySound : Event
+struct PauseSound : Event
 {
-    std::string FilePath;
     EntityID EmitterID;
 };
 
