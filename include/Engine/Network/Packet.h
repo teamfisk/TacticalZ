@@ -14,8 +14,9 @@ public:
     Packet(MessageType type, unsigned int& packetID);
     // Used to create packet from already existing data buffer.
     Packet(char* data, const int sizeOfPacket);
-    
     ~Packet();
+    void Init(MessageType type, unsigned int& packetID);
+
     // Add primitive types like int, float, char...
     template<typename T>
     void WritePrimitive(T val)
@@ -23,6 +24,7 @@ public:
         // Check if we are trying to add more than the package can fit.
         if (m_MaxPacketSize < m_Offset + sizeof(T)) {
             LOG_WARNING("Packet AddPrimitive(): You are trying to add more than we have allocated for!");
+            return;
         }
         memcpy(m_Data + m_Offset, &val, sizeof(T));
         m_Offset += sizeof(T);
@@ -50,6 +52,8 @@ public:
 
     int Size() { return m_Offset; };
     char* Data() { return m_Data; };
+    unsigned int DataReadSize() { return m_ReturnDataOffset; }
+    unsigned int MaxSize() { return m_MaxPacketSize; }
 
 private:
     char* m_Data;

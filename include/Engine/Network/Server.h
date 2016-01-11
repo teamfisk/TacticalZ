@@ -67,6 +67,7 @@ private:
     void moveMessageHead(char*& data, size_t& length, size_t stepSize);
     void broadcast(std::string message);
     void broadcast(Packet& packet);
+    //void parseShitTest(Packet& packet); // Remove this when network is working
     void sendSnapshot();
     void sendPing();
     void checkForTimeOuts();

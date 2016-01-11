@@ -50,7 +50,7 @@ void Client::Close()
 
 void Client::readFromServer()
 {
-    if (m_Socket.available()) {
+    while (m_Socket.available()) {
         bytesRead = receive(readBuf, INPUTSIZE);
         if (bytesRead > 0) {
             Packet packet(readBuf, bytesRead);
@@ -60,7 +60,7 @@ void Client::readFromServer()
     std::clock_t currentTime = std::clock();
     if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
         if (isConnected()) {
-            sendSnapshotToServer();
+            //sendSnapshotToServer();
         }
         previousSnapshotMessage = currentTime;
     }
@@ -120,6 +120,8 @@ void Client::parseMessageType(Packet& packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+    if (m_PacketID <= m_PreviousPacketID)
+        return;
     //IdentifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
@@ -181,33 +183,45 @@ void Client::parseEventMessage(Packet& packet)
 
 void Client::parseSnapshot(Packet& packet)
 {
-    std::string tempName;
-    for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-        // We're checking for empty name for now. This might not be the best way,
-        // but it is to avoid sending redundant data.
-        tempName = packet.ReadString();
-
-
-        // Apply the position data read to the player entity
-        // New player connected on the server side 
-        if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
-            m_PlayerDefinitions[i].Name = tempName;
-            m_PlayerDefinitions[i].EntityID = createPlayer();
-        } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
-            // Someone disconnected
-            // TODO: Insert code here
-            break;
-        } else if (m_PlayerDefinitions[i].Name == "" && tempName == "") {
-            // Not a connected player
-            break;
+    std::string componentType = packet.ReadString();
+    //LOG_INFO("A snapshot was parsed. first component type is: %s", componentType.c_str());
+    int stride = packet.ReadPrimitive<int>();
+    int nrOfComponents = (packet.Size() - packet.DataReadSize()) / (stride + sizeof(EntityID));
+    if (componentType == "Model")
+        return;
+    for (size_t i = 0; i < nrOfComponents; i++) {
+        EntityID entityID = packet.ReadPrimitive<EntityID>();
+        //ComponentWrapper model = m_World->GetComponent(entityID, "Model");
+        //std::string checkPath = model["Resource"];
+        // Check if entity exists
+        if (m_World->HasEntity(entityID)) {
+            // check if component exists
+            if (m_World->HasComponent(entityID, componentType)) {
+                //Copy data to component
+                memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
+            } else {
+                // If component doesen't exist
+                // Create component
+                m_World->AttachComponent(entityID, componentType);
+                // Copy data to newly created component
+                memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
+            }
+        } else {
+            // If entity dosen't exist
+            EntityID newEntityID = m_World->CreateEntity();
+            // Check if EntityIDs are out of sync
+            if (newEntityID != entityID) {
+                LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the same as the one sent by server \
+                                  EntityIDs are out of sync");
+            }
+            m_World->AttachComponent(newEntityID, componentType);
+            // Copy data to newly created component
+            memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
         }
-        if (m_PlayerDefinitions[i].EntityID != -1) {
-
-            // Move player to server position
-            int dataSize = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Info.Meta.Stride;
-            memcpy(m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Data, packet.ReadData(dataSize), dataSize);
-        }
+        //ComponentWrapper model2 = m_World->GetComponent(entityID, "Model");
+        //std::string checkPath2 = model2["Resource"];
     }
+
 }
 
 int Client::receive(char* data, size_t length)

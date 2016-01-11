@@ -22,6 +22,8 @@ public:
     void RegisterComponent(ComponentInfo& ci);
     // Attach a component to an entity and fill it with default values
     ComponentWrapper AttachComponent(EntityID entity, std::string componentType);
+    // Check if world has an entity
+    bool HasEntity(EntityID entity);
     // Check if an entity has a component
     bool HasComponent(EntityID entity, std::string componentType) const;
     // Get a component of an entity

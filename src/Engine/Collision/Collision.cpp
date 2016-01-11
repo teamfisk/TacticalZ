@@ -245,23 +245,29 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
 
 bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
 {
-    ComponentWrapper& cTrans = world->GetComponent(AABBComponent.EntityID, "Transform");
-    ComponentWrapper model = world->GetComponent(AABBComponent.EntityID, "Model");
-    Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
-    outBox.CreateFromCenter(AABBComponent["BoxCenter"], AABBComponent["BoxSize"]);
-    glm::vec3 mini = outBox.MinCorner();
-    glm::vec3 maxi = outBox.MaxCorner();
+    if (world->HasComponent(AABBComponent.EntityID, "Transform") && world->HasComponent(AABBComponent.EntityID, "Model"))
+    {
+        ComponentWrapper& cTrans = world->GetComponent(AABBComponent.EntityID, "Transform");
+        ComponentWrapper model = world->GetComponent(AABBComponent.EntityID, "Model");
+        if(AABBComponent.EntityID == 3);
+            std::string checkPath = model["Resource"];
+        Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
+        outBox.CreateFromCenter(AABBComponent["BoxCenter"], AABBComponent["BoxSize"]);
+        glm::vec3 mini = outBox.MinCorner();
+        glm::vec3 maxi = outBox.MaxCorner();
 
-    if (modelRes == nullptr) {
-        return false;
+        if (modelRes == nullptr) {
+            return false;
+        }
+        glm::mat4 modelMatrix = modelRes->m_Matrix *
+            glm::translate(glm::mat4(), (glm::vec3)cTrans["Position"]) *
+            glm::scale((glm::vec3)cTrans["Scale"]);
+
+        outBox = AABB(modelMatrix * glm::vec4(mini.x, mini.y, mini.z, 1),
+            modelMatrix * glm::vec4(maxi.x, maxi.y, maxi.z, 1));
+        return true;
     }
-    glm::mat4 modelMatrix = modelRes->m_Matrix *
-        glm::translate(glm::mat4(), (glm::vec3)cTrans["Position"]) *
-        glm::scale((glm::vec3)cTrans["Scale"]);
-
-    outBox = AABB(modelMatrix * glm::vec4(mini.x, mini.y, mini.z, 1),
-        modelMatrix * glm::vec4(maxi.x, maxi.y, maxi.z, 1));
-    return true;
+    return false;
 }
 
 bool GetEntityBox(World* world, EntityID entity, AABB& outBox, bool forceBoxFromModel)

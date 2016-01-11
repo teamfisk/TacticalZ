@@ -80,7 +80,13 @@ ComponentWrapper World::AttachComponent(EntityID entity, std::string componentTy
     return c;
 }
 
-bool World::HasComponent(EntityID entity, std::string componentType) const
+bool World::HasEntity(EntityID entity)
+{
+    return m_EntityParents.find(entity) != m_EntityParents.end();
+}
+
+
+bool World::HasComponent(EntityID entity, std::string componentType)
 {
     ComponentPool* pool = m_ComponentPools.at(componentType);
     return pool->KnowsEntity(entity);
