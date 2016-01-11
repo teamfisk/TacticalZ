@@ -27,39 +27,39 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
         leftMouseWasReleased = false;
         //get the health component linked to the playerId
         double currentHealth = (double)world->GetComponent(player.EntityID, "Health")["Health"];
-        double currentAmmo = (double)0;
-        double currentCoolDownTimer = (double)0;
+        double currentAmmo = 0.0;
+        double currentCoolDownTimer = 0.0;
 
-        if (fabs((double)player["EquippedItem"] - (double)1) < (double) 0.0001f) {
+        if (fabs((double)player["EquippedItem"] - (double)HeldItem::PrimaryWeapon) < 0.0001) {
             ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
             currentAmmo = (double)currentItem["Ammo"];
             currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
         }
-        if (fabs((double)player["EquippedItem"] - (double)2) < (double) 0.0001f) {
+        if (fabs((double)player["EquippedItem"] - (double)HeldItem::SecondaryWeapon) < 0.0001) {
             ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
             currentAmmo = (double)currentItem["Ammo"];
             currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
         }
 
-        if (currentHealth > (double)0.0f && currentAmmo > (double)0.0f && currentCoolDownTimer < (double)0.001f) {
+        if (currentHealth > 0.0 && currentAmmo > 0.0 && currentCoolDownTimer < 0.001) {
             //decrease ammo count
             //TODO: temp, set the cooldowntimer - probably done in some other system (itemSystem?) later
-            if (fabs((double)player["EquippedItem"] - (double)1) < (double) 0.0001f) {
+            if (fabs((double)player["EquippedItem"] - (double)HeldItem::PrimaryWeapon) < 0.0001) {
                 ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
                 int currentAmmoInt = (int)((double)currentItem["Ammo"]);
                 currentItem["Ammo"] = (double)(currentAmmoInt - 1);
-                currentItem["CoolDownTimer"] = (double)2;
+                currentItem["CoolDownTimer"] = 2.0;//change later!
             }
-            if (fabs((double)player["EquippedItem"] - (double)2) < (double) 0.0001f) {
+            if (fabs((double)player["EquippedItem"] - (double)HeldItem::SecondaryWeapon) < 0.0001) {
                 ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
                 int currentAmmoInt = (int)((double)currentItem["Ammo"]);
                 currentItem["Ammo"] = (double)(currentAmmoInt - 1);
-                currentItem["CoolDownTimer"] = (double)2;
+                currentItem["CoolDownTimer"] = 2.0;//change later!
             }
             //create and publish the shoot event
             Events::Shoot eShoot;
             eShoot.currentAimingPoint = aimingCoordinates;
-            eShoot.weaponType = (int)player["EquippedItem"];
+            eShoot.currentlyEquippedItem = (int) ((double)player["EquippedItem"]);
             m_EventBroker->Publish(eShoot);
         }
     }
