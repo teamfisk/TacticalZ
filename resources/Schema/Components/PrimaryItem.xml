@@ -1,4 +1,4 @@
 <c:PrimaryItem>
 	<Ammo>0</Ammo>
 	<CoolDownTimer>0</CoolDownTimer>
-</c:Player>
+</c:PrimaryItem>
