@@ -35,6 +35,11 @@ private:
     bool PlayerSystem::OnLeave(const Events::TriggerLeave &event);
     EventRelay<PlayerSystem, Events::MouseRelease> m_MouseRelease;
     bool PlayerSystem::OnMouseRelease(const Events::MouseRelease& e);
+    enum class HeldItem {
+        None = 0,
+        PrimaryWeapon = 1,
+        SecondaryWeapon = 2
+    };
 };
 
 #endif

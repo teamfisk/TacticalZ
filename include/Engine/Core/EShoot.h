@@ -12,7 +12,7 @@ struct Shoot : Event
 {
     //shotgun etc has different amounts of damage probably (a sniper shot might one-shot)
     //also different weapons will have different spread
-    std::string weaponType;
+    int currentlyEquippedItem;
     //currentAimingPoint must be sent, in case the camera is moved while the event is being processed
     glm::vec2 currentAimingPoint;
 };
