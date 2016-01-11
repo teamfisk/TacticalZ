@@ -13,8 +13,12 @@ public:
     RenderQueueFactory();
     void Update(World* world);
 
-    
     RenderQueueCollection RenderQueues() const { return m_RenderQueues; }
+
+    static glm::vec3 AbsolutePosition(World* world, EntityID entity);
+    static glm::quat AbsoluteOrientation(World* world, EntityID entity);
+    static glm::vec3 AbsoluteScale(World* world, EntityID entity);
+
 private:
     RenderQueueCollection m_RenderQueues;
 
@@ -22,7 +26,6 @@ private:
     void FillLights(World* world, RenderQueue* renderQueue);
 
     glm::mat4 ModelMatrix(World* world, EntityID entity);
-    glm::vec3 GetAbsolutePosition(World* world, ComponentWrapper transformComponent);
 };
 
 #endif

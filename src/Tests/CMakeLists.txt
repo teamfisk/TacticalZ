@@ -12,6 +12,7 @@ include_directories(
 )
 
 file(GLOB SOURCE_FILES
+	"*.h"
     "*.cpp"
 )
 

@@ -86,8 +86,7 @@ T* ClassType::PublicMemberFunction(bool value)
 
 	if (m_PrivateMember2->PublicMember == 1) {
 		return new T();
-	}
-	else {
+	} else {
 		return nullptr;
 	}
 }

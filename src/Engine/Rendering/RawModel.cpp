@@ -8,7 +8,7 @@ RawModel::RawModel(std::string fileName)
 	if (scene == nullptr) {
 		LOG_ERROR("Failed to load model \"%s\"", fileName.c_str());
 		LOG_ERROR("Assimp error: %s", importer.GetErrorString());
-		return;
+        throw std::runtime_error("Failed to open model file.");
 	}
 
 	auto m = scene->mRootNode->mTransformation;
@@ -34,10 +34,10 @@ RawModel::RawModel(std::string fileName)
 			numIndices += face.mNumIndices;
 		}
 	}
-	LOG_DEBUG("Vertex count %i", numVertices);
-	LOG_DEBUG("Index count %i", numIndices);
+	//LOG_DEBUG("Vertex count %i", numVertices);
+	//LOG_DEBUG("Index count %i", numIndices);
 
-	LOG_DEBUG("Model has %i embedded textures", scene->mNumTextures);
+	//LOG_DEBUG("Model has %i embedded textures", scene->mNumTextures);
 
 	std::vector<std::tuple<std::string, glm::mat4>> boneInfo;
 	std::map<std::string, int> boneNameMapping;
@@ -76,13 +76,15 @@ RawModel::RawModel(std::string fileName)
 			}
 
 			// Material diffuse color
-			aiColor4D diffuse;
+			aiColor3D diffuse;
 			material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+            float opacity;
+            material->Get(AI_MATKEY_OPACITY, opacity);
+			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
 			// Material specular color
-			aiColor4D specular;
+			aiColor3D specular;
 			material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-			desc.SpecularVertexColor = glm::vec4(specular.r, specular.g, specular.b, specular.a);
+			desc.SpecularVertexColor = glm::vec4(specular.r, specular.g, specular.b, 1.f);
 
 			m_Vertices.push_back(desc);
 		}
@@ -132,35 +134,35 @@ RawModel::RawModel(std::string fileName)
 		matGroup.EndIndex = m_Indices.size() - 1;
 		// Material shininess
 		material->Get(AI_MATKEY_SHININESS, matGroup.Shininess);
-		LOG_DEBUG("Shininess: %f", matGroup.Shininess);
+		//LOG_DEBUG("Shininess: %f", matGroup.Shininess);
 		// Diffuse texture
-		LOG_DEBUG("%i diffuse textures found", material->GetTextureCount(aiTextureType_DIFFUSE));
+		//LOG_DEBUG("%i diffuse textures found", material->GetTextureCount(aiTextureType_DIFFUSE));
 		if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
 			aiString path;
 			aiTextureMapping mapping;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &path, &mapping);
 			std::string absolutePath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
-			LOG_DEBUG("Diffuse texture: %s", absolutePath.c_str());
+			//LOG_DEBUG("Diffuse texture: %s", absolutePath.c_str());
 			matGroup.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(absolutePath));
 		}
 		// Normal map
-		LOG_DEBUG("%i normal maps found", material->GetTextureCount(aiTextureType_HEIGHT));
+		//LOG_DEBUG("%i normal maps found", material->GetTextureCount(aiTextureType_HEIGHT));
 		if (material->GetTextureCount(aiTextureType_HEIGHT)) {
 			aiString path;
 			aiTextureMapping mapping;
 			material->GetTexture(aiTextureType_HEIGHT, 0, &path, &mapping);
 			std::string absolutePath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
-			LOG_DEBUG("Normal map: %s", absolutePath.c_str());
+			//LOG_DEBUG("Normal map: %s", absolutePath.c_str());
 			matGroup.NormalMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(absolutePath));
 		}
 		// Specular map
-		LOG_DEBUG("%i specular maps found", material->GetTextureCount(aiTextureType_SPECULAR));
+		//LOG_DEBUG("%i specular maps found", material->GetTextureCount(aiTextureType_SPECULAR));
 		if (material->GetTextureCount(aiTextureType_SPECULAR)) {
 			aiString path;
 			aiTextureMapping mapping;
 			material->GetTexture(aiTextureType_SPECULAR, 0, &path, &mapping);
 			std::string absolutePath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
-			LOG_DEBUG("Specular map: %s", absolutePath.c_str());
+			//LOG_DEBUG("Specular map: %s", absolutePath.c_str());
 			matGroup.SpecularMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(absolutePath));
 		}
 		TextureGroups.push_back(matGroup);
@@ -216,20 +218,20 @@ RawModel::RawModel(std::string fileName)
 		m_Skeleton = new Skeleton();
 		CreateSkeleton(boneInfo, boneNameMapping, scene->mRootNode, -1);
 		int numBones = m_Skeleton->Bones.size();
-		LOG_DEBUG("Bone count: %i", numBones);
+		//LOG_DEBUG("Bone count: %i", numBones);
 		if (numBones > 0) {
 			m_Skeleton->PrintSkeleton();
 		}
 	}
 
 	// Animations
-	LOG_DEBUG("Animation count: %i", scene->mNumAnimations);
+	//LOG_DEBUG("Animation count: %i", scene->mNumAnimations);
 	for (int i = 0; i < scene->mNumAnimations; ++i) {
 		auto animation = scene->mAnimations[i];
 		std::string animationName = animation->mName.C_Str();
-		LOG_DEBUG("Animation: %s", animationName.c_str());
-		LOG_DEBUG("Duration: %f", animation->mDuration);
-		LOG_DEBUG("Ticks per second: %f", animation->mTicksPerSecond);
+		//LOG_DEBUG("Animation: %s", animationName.c_str());
+		//LOG_DEBUG("Duration: %f", animation->mDuration);
+		//LOG_DEBUG("Ticks per second: %f", animation->mTicksPerSecond);
 
 		Skeleton::Animation skelAnim;
 		skelAnim.Name = animationName;
@@ -303,7 +305,7 @@ void RawModel::CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &b
 
 	// Find the bone by name in the bone info list
 	if (boneNameMapping.find(nodeName) == boneNameMapping.end()) {
-		LOG_DEBUG("Node \"%s\" was not a bone", nodeName.c_str());
+		//LOG_DEBUG("Node \"%s\" was not a bone", nodeName.c_str());
 	} else {
 		glm::mat4 offsetMatrix;
 		int ID = boneNameMapping[nodeName];

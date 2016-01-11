@@ -1,6 +1,9 @@
+#ifndef ShaderProgram_h__
+#define ShaderProgram_h__
 
 #include "../Common.h"
 #include "../OpenGL.h"
+#include "../Core/ResourceManager.h"
 #include <fstream>
 
 class Shader
@@ -60,11 +63,13 @@ public:
 		: ShaderType(fileName) { }
 };
 
-class ShaderProgram
+class ShaderProgram : public Resource
 {
-public:
-	ShaderProgram()
+    friend class ResourceManager;
+private:
+	ShaderProgram(std::string)
 		: m_ShaderProgramHandle(0) { }
+public:
 	~ShaderProgram();
 
 	void AddShader(std::shared_ptr<Shader> shader);
@@ -79,3 +84,5 @@ private:
 	GLuint m_ShaderProgramHandle;
 	std::vector<std::shared_ptr<Shader>> m_Shaders;
 };
+
+#endif

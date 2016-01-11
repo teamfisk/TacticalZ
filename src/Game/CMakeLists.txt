@@ -19,6 +19,8 @@ file(GLOB SOURCE_FILES
 set(SOURCE_FILES
     ${SOURCE_FILES}
     "Game.cpp"
+    "HealthSystem.cpp"
+	"PlayerSystem.cpp"
 )
 
 set(LIBRARIES

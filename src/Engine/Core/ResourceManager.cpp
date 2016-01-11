@@ -35,6 +35,20 @@ void ResourceManager::Reload(std::string resourceName)
 	}
 }
 
+
+void ResourceManager::Release(std::string resourceType, std::string resourceName)
+{
+    auto key = std::make_pair(resourceType, resourceName);
+    if (m_ResourceCache.find(key) == m_ResourceCache.end()) {
+        return;
+    }
+    auto resource = m_ResourceCache.at(key);
+    m_ResourceCache.erase(key);
+    m_ResourceFromName.erase(resourceName);
+    m_ResourceParents.erase(resource);
+    delete resource;
+}
+
 unsigned int ResourceManager::GetNewResourceID(unsigned int typeID)
 {
 	return m_ResourceCount[typeID]++;
@@ -86,7 +100,7 @@ Resource* ResourceManager::Load(std::string resourceType, std::string resourceNa
 		LOG_WARNING("Hot-loading resource \"%s\"", resourceName.c_str());
 	}
 
-	return CreateResource(resourceType, resourceName, parent);
+    return CreateResource(resourceType, resourceName, parent);
 }
 
 Resource* ResourceManager::CreateResource(std::string resourceType, std::string resourceName, Resource* parent)
@@ -98,10 +112,16 @@ Resource* ResourceManager::CreateResource(std::string resourceType, std::string 
 	}
 
 	// Call the factory function
-	Resource* resource = facIt->second(resourceName);
-	// Store IDs
-	resource->TypeID = GetTypeID(resourceType);
-	resource->ResourceID = GetNewResourceID(resource->TypeID);
+    Resource* resource;
+    try {
+        resource = facIt->second(resourceName);
+        // Store IDs
+        resource->TypeID = GetTypeID(resourceType);
+        resource->ResourceID = GetNewResourceID(resource->TypeID);
+    } catch (const std::exception& e) {
+        resource = nullptr;
+		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": %s", resourceName.c_str(), resourceType.c_str(), e.what());
+    }
 	// Cache
 	m_ResourceCache[std::make_pair(resourceType, resourceName)] = resource;
 	m_ResourceFromName[resourceName] = resource;
