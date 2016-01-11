@@ -662,8 +662,8 @@ void EditorSystem::fileImport(World* world)
 {
     m_CurrentFile = openDialog(m_DefaultEntityDir);
     auto file = ResourceManager::Load<EntityFile>(m_CurrentFile.string());
-    //EntityFilePreprocessor fpp(file);
-    //fpp.RegisterComponents(world);
+    EntityFilePreprocessor fpp(file);
+    fpp.RegisterComponents(world);
     EntityFileParser fp(file);
     fp.MergeEntities(world);
     createWidget();

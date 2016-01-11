@@ -53,7 +53,9 @@ void World::DeleteEntity(EntityID entity)
 
 void World::RegisterComponent(ComponentInfo& ci)
 {
-    m_ComponentPools[ci.Name] = new ComponentPool(ci);
+    if (m_ComponentPools.find(ci.Name) == m_ComponentPools.end()) {
+        m_ComponentPools[ci.Name] = new ComponentPool(ci);
+    }
 }
 
 ComponentWrapper World::AttachComponent(EntityID entity, std::string componentType)
