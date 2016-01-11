@@ -16,7 +16,8 @@ public:
     EntityID CreateEntity(EntityID parent = 0);
     // Delete entity and all components within
     void DeleteEntity(EntityID entity);
-
+    // Check if an entity exists
+    bool ValidEntity(EntityID entity) const;
     // Register a component type and allocate space for it
     void RegisterComponent(ComponentInfo& ci);
     // Attach a component to an entity and fill it with default values

@@ -622,7 +622,7 @@ bool EditorSystem::createEntityNode(World* world, EntityID entity)
             if (ImGui::Button("Delete")) {
                 world->DeleteEntity(entity);
                 ImGui::CloseCurrentPopup();
-                if (m_Selection == entity) {
+                if (!world->ValidEntity(m_Selection)) {
                     m_Selection = EntityID_Invalid;
                 }
             }

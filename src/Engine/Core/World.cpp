@@ -54,6 +54,11 @@ void World::DeleteEntity(EntityID entity)
     m_EntityNames.erase(entity);
 }
 
+bool World::ValidEntity(EntityID entity) const
+{
+    return m_EntityParents.find(entity) != m_EntityParents.end();
+}
+
 void World::RegisterComponent(ComponentInfo& ci)
 {
     if (m_ComponentPools.find(ci.Name) == m_ComponentPools.end()) {
@@ -75,7 +80,6 @@ ComponentWrapper World::AttachComponent(EntityID entity, std::string componentTy
     return c;
 }
 
-
 bool World::HasComponent(EntityID entity, std::string componentType) const
 {
     ComponentPool* pool = m_ComponentPools.at(componentType);
@@ -87,7 +91,6 @@ ComponentWrapper World::GetComponent(EntityID entity, std::string componentType)
     ComponentPool* pool = m_ComponentPools.at(componentType);
     return pool->GetByEntity(entity);
 }
-
 
 void World::DeleteComponent(EntityID entity, std::string componentType)
 {
@@ -102,12 +105,10 @@ const ComponentPool* World::GetComponents(std::string componentType)
     return (it != m_ComponentPools.end()) ? it->second : nullptr;
 }
 
-
 EntityID World::GetParent(EntityID entity)
 {
     return m_EntityParents.at(entity);
 }
-
 
 void World::SetParent(EntityID entity, EntityID parent)
 {
