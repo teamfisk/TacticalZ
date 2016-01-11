@@ -24,10 +24,15 @@ void EntityFileWriter::WriteEntity(World* world, EntityID entity)
     root->appendChild(childrenElement);
     appendEntityChildren(childrenElement, world, entity);
 
-    XMLFormatTarget* target = new StdOutFormatTarget();
-    DOMLSOutput* output = static_cast<DOMImplementationLS*>(m_DOMImplementation)->createLSOutput();
-    output->setByteStream(target);
-    m_DOMLSSerializer->write(doc, output);
+    try {
+        LocalFileFormatTarget* target = new LocalFileFormatTarget(X(m_FilePath.string()));
+        DOMLSOutput* output = static_cast<DOMImplementationLS*>(m_DOMImplementation)->createLSOutput();
+        output->setByteStream(target);
+        m_DOMLSSerializer->write(doc, output);
+        delete target;
+    } catch (const std::runtime_error& e) {
+        LOG_ERROR("Failed to save \"%s\": %s", m_FilePath.c_str(), e.what());
+    }
 
     doc->release();
 }
