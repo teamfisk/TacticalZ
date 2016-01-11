@@ -56,7 +56,7 @@ struct LightResult {
 	vec4 Specular;
 };
 
-float CalcAttenuation(float radius, float dist) {
+float CalcAttenuation(float radius, float dist, float falloff) {
 	return 1.0 - smoothstep(radius * 0.3, radius, dist);
 }
 
@@ -71,13 +71,13 @@ vec4 CalcDiffuse(vec4 lightColor, vec4 lightVec, vec4 normal) {
 	return lightColor * power;
 }
 
-LightResult CalcPointLight(vec4 lightPos, float lightRadius, vec4 lightColor, float intensity, vec4 viewVec, vec4 position, vec4 normal)
+LightResult CalcPointLight(vec4 lightPos, float lightRadius, vec4 lightColor, float intensity, vec4 viewVec, vec4 position, vec4 normal, float falloff)
 {
 	vec4 L = lightPos - position;
 	float dist = length(L);
 	L = normalize(L);
 
-	float attenuation = CalcAttenuation(lightRadius, dist);
+	float attenuation = CalcAttenuation(lightRadius, dist, falloff);
 
 	LightResult result;
 	result.Diffuse = CalcDiffuse(lightColor, L, normal) * attenuation * intensity;
@@ -108,7 +108,7 @@ void main()
 	{
 		int l = int(LightIndex[i]);
 
-		LightResult result = CalcPointLight(V * PointLights.List[l].Position, PointLights.List[l].Radius, PointLights.List[l].Color, PointLights.List[l].Intensity, viewVec, position, normal);
+		LightResult result = CalcPointLight(V * PointLights.List[l].Position, PointLights.List[l].Radius, PointLights.List[l].Color, PointLights.List[l].Intensity, viewVec, position, normal, PointLights.List[i].Falloff);
 
 		totalLighting.Diffuse += result.Diffuse;
 		totalLighting.Specular += result.Specular;

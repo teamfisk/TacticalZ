@@ -91,14 +91,6 @@ void Renderer::Update(double dt)
 void Renderer::Draw(RenderQueueCollection& rq)
 {
     FillDepth(rq);
-    if (m_bi == 1) {
-        for (auto i : rq.Forward) {
-            printf("D: %f| \n", i->Depth);
-        }
-        m_bi = 0;
-        printf("------THE END------");
-    }
-    m_bi++;
     m_PickingPass->Draw(rq);
     //DrawScreenQuad(m_PickingPass->PickingTexture());
     m_LightCullingPass->FillLightList(rq);
