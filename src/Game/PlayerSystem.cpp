@@ -30,27 +30,27 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
         double currentAmmo = (double)0;
         double currentCoolDownTimer = (double)0;
 
-        if ((double)player["EquippedItem"] == (double)1) {
+        if (fabs((double)player["EquippedItem"] - (double)1) < (double) 0.0001f) {
             ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
-            currentAmmo = currentItem["Ammo"];
+            currentAmmo = (double)currentItem["Ammo"];
             currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
         }
-        if ((double)player["EquippedItem"] == (double)2) {
+        if (fabs((double)player["EquippedItem"] - (double)2) < (double) 0.0001f) {
             ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
-            currentAmmo = currentItem["Ammo"];
+            currentAmmo = (double)currentItem["Ammo"];
             currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
         }
 
         if (currentHealth > (double)0.0f && currentAmmo > (double)0.0f && currentCoolDownTimer < (double)0.001f) {
             //decrease ammo count
             //TODO: temp, set the cooldowntimer - probably done in some other system (itemSystem?) later
-            if ((double)player["EquippedItem"] == (double)1) {
+            if (fabs((double)player["EquippedItem"] - (double)1) < (double) 0.0001f) {
                 ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
                 int currentAmmoInt = (int)((double)currentItem["Ammo"]);
                 currentItem["Ammo"] = (double)(currentAmmoInt - 1);
                 currentItem["CoolDownTimer"] = (double)2;
             }
-            if ((double)player["EquippedItem"] == (double)2) {
+            if (fabs((double)player["EquippedItem"] - (double)2) < (double) 0.0001f) {
                 ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
                 int currentAmmoInt = (int)((double)currentItem["Ammo"]);
                 currentItem["Ammo"] = (double)(currentAmmoInt - 1);
