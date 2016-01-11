@@ -3,17 +3,15 @@ using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 
 #include "ShootEventTest.h"
-#include "Core\EPlayerDamage.h";
-#include "Core\EPlayerHealthPickup.h";
-#include "Core\EPlayerDeath.h";
 #include "Game/HealthSystem.h"
 
 BOOST_AUTO_TEST_SUITE(ShootEventTestSuite)
 
-//AShootEventTest != ShootEventTest -> else it confuses names!
-BOOST_AUTO_TEST_CASE(AShootEventTest)
+//dont use the same name as the classname in test cases...
+BOOST_AUTO_TEST_CASE(ShootEventTest_PrimaryWeaponFiring)
 {
-    ShootEventTest game;
+    //Test firing primary weapon
+    ShootEventTest game(1);
     //100 loops will be more than enough to do the test
     int loops = 100;
     bool success = false;
@@ -28,9 +26,59 @@ BOOST_AUTO_TEST_CASE(AShootEventTest)
     //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
+BOOST_AUTO_TEST_CASE(ShootEventTest_SecondaryWeaponFiring)
+{
+    //Test firing secondary weapon
+    ShootEventTest game(2);
+    //100 loops will be more than enough to do the test
+    int loops = 100;
+    bool success = false;
+    while (loops > 0) {
+        game.Tick();
+        if (game.TestSucceeded) {
+            success = true;
+            break;
+        }
+        loops--;
+    }
+    //The system will process the events, hence it will take a while before we can read anything
+    BOOST_TEST(success);
+}
+BOOST_AUTO_TEST_CASE(ShootEventTest_NoWeaponFiring)
+{
+    //Test firing with no weapon equipped
+    ShootEventTest game(3);
+    //100 loops will be more than enough to do the test
+    int loops = 100;
+    bool success = false;
+    while (loops > 0) {
+        game.Tick();
+        loops--;
+    }
+    //The system will process the events, hence it will take a while before we can read anything
+    if (game.TestSucceeded)
+        success = true;
+    BOOST_TEST(success);
+}
+BOOST_AUTO_TEST_CASE(ShootEventTest_WeaponOnCooldown)
+{
+    //Test firing with weapon on cooldown
+    ShootEventTest game(4);
+    //100 loops will be more than enough to do the test
+    int loops = 100;
+    bool success = false;
+    while (loops > 0) {
+        game.Tick();
+        loops--;
+    }
+    //The system will process the events, hence it will take a while before we can read anything
+    if (game.TestSucceeded)
+        success = true;
+    BOOST_TEST(success);
+}
 BOOST_AUTO_TEST_SUITE_END()
 
-ShootEventTest::ShootEventTest()
+ShootEventTest::ShootEventTest(int runTestNumber)
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
@@ -41,7 +89,7 @@ ShootEventTest::ShootEventTest()
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-     // Create a world
+    // Create a world
     m_World = new World();
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
@@ -54,30 +102,40 @@ ShootEventTest::ShootEventTest()
     m_SystemPipeline->AddSystem<HealthSystem>(0);
 
     //The Test
-    //create entity which has transorm,player,model,health in it. i.e. is a player
+    //create entity which has transform,player,model,health in it. i.e. is a player
     EntityID playerID = m_World->CreateEntity();
-    ComponentWrapper transform = m_World->AttachComponent(playerID, "Transform");
-    ComponentWrapper model = m_World->AttachComponent(playerID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.obj";
-    ComponentWrapper& player = m_World->AttachComponent(playerID, "Player");
+    m_PlayerID = playerID;
     ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
-    playersID = playerID;
+    ComponentWrapper& player = m_World->AttachComponent(playerID, "Player");
     //attach 2x weaps
     ComponentWrapper& pItem = m_World->AttachComponent(playerID, "PrimaryItem");
-    ComponentWrapper& sItem= m_World->AttachComponent(playerID, "SecondaryItem");
-    //set currentweap
-    player["EquippedItem"] = 1;
-    //set ammo set cooldown
-    pItem["Ammo"] = 100;
-    pItem["CoolDownTimer"] = 0.0f;
+    ComponentWrapper& sItem = m_World->AttachComponent(playerID, "SecondaryItem");
 
-    //trigger event leftmousedown
+    m_RunTestNumber = runTestNumber;
+    switch (runTestNumber)
+    {
+    case 1:
+        TestSetup1(player, pItem, sItem);
+        break;
+    case 2:
+        TestSetup2(player, pItem, sItem);
+        break;
+    case 3:
+        TestSetup3(player, pItem, sItem);
+        break;
+    case 4:
+        TestSetup4(player, pItem, sItem);
+        break;
+    default:
+        break;
+    }
+
+    //fire once = trigger event leftmousedown
     Events::MouseRelease eMouseRelease;
     eMouseRelease.Button = GLFW_MOUSE_BUTTON_LEFT;
     eMouseRelease.X = 1.0f;
     eMouseRelease.Y = 1.0f;
     m_EventBroker->Publish(eMouseRelease);
-
 }
 
 ShootEventTest::~ShootEventTest()
@@ -87,6 +145,77 @@ ShootEventTest::~ShootEventTest()
     delete m_EventBroker;
 }
 
+void ShootEventTest::TestSetup1(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+{
+    //set currentweap
+    player["EquippedItem"] = (double)1.0f;
+    //set ammo set cooldown
+    pItem["Ammo"] = (double)100.0f;
+    pItem["CoolDownTimer"] = (double)0.0f;
+}
+void ShootEventTest::TestSetup2(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+{
+    //set currentweap
+    player["EquippedItem"] = (double)2.0f;
+    //set ammo set cooldown
+    sItem["Ammo"] = (double)10.0f;
+    sItem["CoolDownTimer"] = (double)0.0f;
+}
+void ShootEventTest::TestSetup3(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+{
+    player["EquippedItem"] = (double)0.0f;
+    pItem["Ammo"] = (double)100.0f;
+    sItem["Ammo"] = (double)100.0f;
+    //TestSucceeded will be set to false if ammo changes during the 100 loops
+    TestSucceeded = true;
+}
+void ShootEventTest::TestSetup4(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+{
+    //set currentweap
+    player["EquippedItem"] = (double)1.0f;
+    //set ammo set cooldown
+    pItem["Ammo"] = (double)100.0f;
+    pItem["CoolDownTimer"] = (double)5.0f;
+    //TestSucceeded will be set to false if ammo changes during the 100 loops
+    TestSucceeded = true;
+}
+void ShootEventTest::TestSuccess1() {
+    //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
+    double currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
+    if (currentAmmo == (double)99)
+        TestSucceeded = true;
+}
+void ShootEventTest::TestSuccess2() {
+    //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
+    double currentAmmo = m_World->GetComponent(m_PlayerID, "SecondaryItem")["Ammo"];
+    if (currentAmmo == (double)9)
+        TestSucceeded = true;
+}
+void ShootEventTest::TestSuccess3() {
+    //try firing again
+    Events::MouseRelease eMouseRelease;
+    eMouseRelease.Button = GLFW_MOUSE_BUTTON_LEFT;
+    eMouseRelease.X = 1.0f;
+    eMouseRelease.Y = 1.0f;
+    m_EventBroker->Publish(eMouseRelease);
+    //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
+    double currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
+    double currentAmmoSecondary = m_World->GetComponent(m_PlayerID, "SecondaryItem")["Ammo"];
+    if (currentAmmo != (double)100 || currentAmmoSecondary != (double)100)
+        TestSucceeded = false;
+}
+void ShootEventTest::TestSuccess4() {
+    //try firing again
+    Events::MouseRelease eMouseRelease;
+    eMouseRelease.Button = GLFW_MOUSE_BUTTON_LEFT;
+    eMouseRelease.X = 1.0f;
+    eMouseRelease.Y = 1.0f;
+    m_EventBroker->Publish(eMouseRelease);    
+    //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
+    double currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
+    if (currentAmmo != (double)100)
+        TestSucceeded = false;
+}
 void ShootEventTest::Tick()
 {
     glfwPollEvents();
@@ -101,8 +230,22 @@ void ShootEventTest::Tick()
     m_EventBroker->Swap();
     m_EventBroker->Clear();
 
-    //if ammocount reaches 99 we know the test has succeeded, i.e. a shot has been fired
-    int currentAmmo = (int)m_World->GetComponent(playersID, "PrimaryItem")["Ammo"];
-    if (currentAmmo ==99)
-        TestSucceeded = true;
+    switch (m_RunTestNumber)
+    {
+    case 1:
+        TestSuccess1();
+        break;
+    case 2:
+        TestSuccess2();
+        break;
+    case 3:
+        TestSuccess3();
+        break;
+    case 4:
+        TestSuccess4();
+        break;
+    default:
+        break;
+    }
+
 }

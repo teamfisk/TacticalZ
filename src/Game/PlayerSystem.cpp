@@ -27,25 +27,35 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
         leftMouseWasReleased = false;
         //get the health component linked to the playerId
         double currentHealth = (double)world->GetComponent(player.EntityID, "Health")["Health"];
-        int currentAmmo = 0;
-        double currentCoolDownTimer = 0.0f;
+        double currentAmmo = (double)0;
+        double currentCoolDownTimer = (double)0;
 
-        if ((int)player["EquippedItem"] == 1) {
+        if ((double)player["EquippedItem"] == (double)1) {
             ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
             currentAmmo = currentItem["Ammo"];
-            //subtract 1 ammo - the ItemSystem will probably listen to eShoot and handle the CoolDownTimer
-            currentItem["Ammo"] = (int)currentItem["Ammo"] -1;
-            int test = (int)currentItem["Ammo"];
-            currentCoolDownTimer = (double)world->GetComponent(player.EntityID, "PrimaryItem")["CoolDownTimer"];
+            currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
         }
-        if ((int)player["EquippedItem"] == 2) {
+        if ((double)player["EquippedItem"] == (double)2) {
             ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
             currentAmmo = currentItem["Ammo"];
-            //subtract 1 ammo - the ItemSystem will probably listen to eShoot and handle the CoolDownTimer
-            currentItem["Ammo"] = (int)currentItem["Ammo"] - 1;
-            currentCoolDownTimer = (double)world->GetComponent(player.EntityID, "SecondaryItem")["CoolDownTimer"];
+            currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
         }
-        if (currentHealth > 0.0f && currentAmmo > 0 && currentCoolDownTimer < 0.001f) {
+
+        if (currentHealth > (double)0.0f && currentAmmo > (double)0.0f && currentCoolDownTimer < (double)0.001f) {
+            //decrease ammo count
+            //TODO: temp, set the cooldowntimer - probably done in some other system (itemSystem?) later
+            if ((double)player["EquippedItem"] == (double)1) {
+                ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
+                int currentAmmoInt = (int)((double)currentItem["Ammo"]);
+                currentItem["Ammo"] = (double)(currentAmmoInt - 1);
+                currentItem["CoolDownTimer"] = (double)2;
+            }
+            if ((double)player["EquippedItem"] == (double)2) {
+                ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "SecondaryItem");
+                int currentAmmoInt = (int)((double)currentItem["Ammo"]);
+                currentItem["Ammo"] = (double)(currentAmmoInt - 1);
+                currentItem["CoolDownTimer"] = (double)2;
+            }
             //create and publish the shoot event
             Events::Shoot eShoot;
             eShoot.currentAimingPoint = aimingCoordinates;

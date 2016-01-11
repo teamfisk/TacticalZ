@@ -4,6 +4,9 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
 	<xs:element name="Player">
+		<xs:annotation>
+			<xs:documentation>The player charachter</xs:documentation>
+		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="Velocity" type="t:Vector" minOccurs="0"/>
@@ -11,7 +14,7 @@
 				<xs:element name="Left" type="t:bool" minOccurs="0"/>
 				<xs:element name="Back" type="t:bool" minOccurs="0"/>
 				<xs:element name="Right" type="t:bool" minOccurs="0"/>
-				<xs:element name="EquippedItem" type="t:int" minOccurs="0"/>
+				<xs:element name="EquippedItem" type="t:double" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
