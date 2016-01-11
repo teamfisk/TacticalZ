@@ -23,7 +23,7 @@
 class Renderer : public IRenderer
 {
 public:
-    Renderer(EventBroker* eventBroker) 
+    Renderer(EventBroker* eventBroker)
         : m_EventBroker(eventBroker)
     { }
 
@@ -60,6 +60,9 @@ private:
     void InputUpdate(double dt);
     //void PickingPass(RenderQueueCollection& rq);
     void DrawScreenQuad(GLuint textureToDraw);
+
+    static bool DepthSort(const std::shared_ptr<RenderJob> &i, const std::shared_ptr<RenderJob> &j) { return (i->Depth < j->Depth); }
+    void FillDepth(RenderQueueCollection& rq);
 
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//

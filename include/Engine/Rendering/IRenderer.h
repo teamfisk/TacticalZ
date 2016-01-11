@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "RenderQueue.h"
 #include "Model.h"
+#include "../Core/World.h"
 
 class IRenderer
 {
@@ -33,6 +34,8 @@ public:
 	virtual void Initialize() = 0;
 	virtual void Update(double dt) = 0;
 	virtual void Draw(RenderQueueCollection& rq) = 0;
+
+    World* m_World; //Temp world, untill viktor merge.
 
 protected:
 	Rectangle m_Resolution = Rectangle::Rectangle(1280, 720);

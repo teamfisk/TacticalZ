@@ -90,6 +90,8 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderQueueCollection& rq)
 {
+    FillDepth(rq);
+
     m_PickingPass->Draw(rq);
     //DrawScreenQuad(m_PickingPass->PickingTexture());
     m_LightCullingPass->FillLightList(rq);
@@ -148,4 +150,16 @@ void Renderer::InitializeRenderPasses()
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
+}
+
+void Renderer::FillDepth(RenderQueueCollection& rq)
+{
+    for(auto job : rq.Forward)
+    {
+        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+        glm::vec3 pos = m_World->GetComponent(modelJob->Entity, "Transform")["Position"];
+        glm::vec3 worldpos = glm::vec3((m_Camera->ViewMatrix() * modelJob->ModelMatrix) * glm::vec4(pos, 1));
+        job->Depth = worldpos.z;
+    }
+    rq.Forward.Sort();
 }

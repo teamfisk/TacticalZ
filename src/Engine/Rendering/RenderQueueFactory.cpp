@@ -89,6 +89,12 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
             model = ResourceManager::Load<Model>("Models/Core/Error.obj");
         }
 
+        auto transformC = world->GetComponent(modelC.EntityID, "Transform");
+        if(&transformC == nullptr)
+        {
+            return;
+        }
+
         for (auto texGroup : model->TextureGroups) {
             ModelJob job;
             job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
