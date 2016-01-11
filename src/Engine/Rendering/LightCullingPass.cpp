@@ -119,7 +119,7 @@ void LightCullingPass::InitializeShaderPrograms()
     m_CalculateFrustumProgram->Link();
 
     m_LightCullProgram = ResourceManager::Load<ShaderProgram>("#LightCullProgram");
-    m_LightCullProgram->AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
+    m_LightCullProgram->AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/CullLights.comp.glsl")));
     m_LightCullProgram->Compile();
     m_LightCullProgram->Link();
 }
