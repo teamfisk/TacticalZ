@@ -566,6 +566,11 @@ void EditorSystem::drawUI(World* world, double dt)
 
 bool EditorSystem::createEntityNode(World* world, EntityID entity)
 {
+    // HACK: Don't show the widget entities in the entity tree
+    if (entity == m_Widget) {
+        return false;
+    }
+
     ImVec2 pos = ImGui::GetCursorScreenPos();
     float width = ImGui::GetContentRegionAvailWidth();
     ImRect bb(pos + ImVec2(20, 0), pos + ImVec2(width, 13));
@@ -673,8 +678,14 @@ void EditorSystem::fileImport(World* world)
 void EditorSystem::fileSave(World* world)
 {
     if (boost::filesystem::exists(m_CurrentFile)) {
+        // HACK: Delete the widgets so they don't appear in the saved file
+        world->DeleteEntity(m_Widget);
+        m_Widget = EntityID_Invalid;
+
         EntityFileWriter writer(m_CurrentFile.string());
         writer.WriteWorld(world);
+
+        createWidget();
     } else {
         fileSaveAs(world);
     }
@@ -683,6 +694,16 @@ void EditorSystem::fileSave(World* world)
 void EditorSystem::fileSaveAs(World* world)
 {
     auto filePath = saveDialog(m_DefaultEntityDir);
+    if (filePath.empty()) {
+        return;
+    }
+
+    // HACK: Delete the widgets so they don't appear in the saved file
+    world->DeleteEntity(m_Widget);
+    m_Widget = EntityID_Invalid;
+
     EntityFileWriter writer(filePath.string());
     writer.WriteWorld(world);
+
+    createWidget();
 }
