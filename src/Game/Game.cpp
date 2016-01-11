@@ -52,11 +52,8 @@ Game::Game(int argc, char* argv[])
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
         EntityFilePreprocessor fpp(file);
         fpp.RegisterComponents(m_World);
-        EntityFileParser fp(file);
-        fp.MergeEntities(m_World);
-
-        EntityFileWriter writer("Testasdasdasd.xml");
-        writer.WriteWorld(m_World);
+        //EntityFileParser fp(file);
+        //fp.MergeEntities(m_World);
     }
 
     // Create system pipeline
