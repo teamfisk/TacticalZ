@@ -1,6 +1,8 @@
 #ifndef PickingPass_h__
 #define PickingPass_h__
 
+
+
 #include "IRenderer.h"
 #include "PickingPassState.h"
 #include "FrameBuffer.h"
@@ -8,6 +10,8 @@
 #include "Util/UnorderedMapVec2.h"
 #include "../Core/EventBroker.h"
 #include "EPicking.h"
+
+
 
 class PickingPass
 {
@@ -20,14 +24,12 @@ public:
 
     void Draw(RenderQueueCollection& rq);
 
-
     //Getters
     const ShaderProgram& PickingProgram() const { return *m_PickingProgram; }
     const std::unordered_map<glm::vec2, EntityID>& PickingColorsToEntity() const { return m_PickingColorsToEntity; }
     GLuint PickingTexture() const { return m_PickingTexture; }
     GLuint DepthBuffer() const { return m_DepthBuffer; }
     const FrameBuffer& PickingBuffer() const { return m_PickingBuffer; }
-
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;

@@ -10,7 +10,7 @@
 		</c:Model>
 	</Components>
 	<Children>
-		<Entity>
+		<!--<Entity>
 			<Components>
 				<c:Transform>
 					<Position X="-1.5"/>
@@ -20,8 +20,8 @@
 					<Resource>Models/ScaleWidget.obj</Resource>
 				</c:Model>
 			</Components>
-		</Entity>
-		<Entity>
+		</Entity>-->
+		<!--<Entity>
 			<Components>
 				<c:Transform>
 					<Position X="1.5"/>
@@ -33,7 +33,7 @@
 				<c:Trigger>
 				</c:Trigger>
 			</Components>
-		</Entity>
+		</Entity>-->
 		<!--<Entity>
 			<Components>
 				<c:Player>
