@@ -279,7 +279,6 @@ bool EditorSystem::OnFileDropped(const Events::FileDropped& e)
     return true;
 }
 
-
 void EditorSystem::createWidget()
 {
     if (m_Widget == EntityID_Invalid) {
@@ -600,7 +599,14 @@ bool EditorSystem::createEntityNode(World* world, EntityID entity)
     }
 
     ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
-    if (ImGui::TreeNode((std::string("#") + std::to_string(entity)).c_str())) {
+    std::string nodeTitle;
+    const std::string& entityName = world->GetName(entity);
+    if (!entityName.empty()) {
+        nodeTitle = entityName;
+    } else {
+        nodeTitle = std::string("#") + std::to_string(entity);
+    }
+    if (ImGui::TreeNode(nodeTitle.c_str())) {
         if (m_UIDraggingEntity != EntityID_Invalid && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0)) {
             LOG_DEBUG("Changed parent of %i to %i", m_UIDraggingEntity, entity);
             changeParent(m_UIDraggingEntity, entity);

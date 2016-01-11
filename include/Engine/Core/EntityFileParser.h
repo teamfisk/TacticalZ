@@ -19,10 +19,10 @@ private:
     // created in order to resolve parent-child relationships.
     std::map<EntityID, EntityID> m_EntityIDMapper;
 
-    void onStartEntity(EntityID entity, EntityID parent);
-    void onStartComponent(EntityID entity, std::string component);
-    void onStartComponentField(EntityID entity, std::string componentType, std::string fieldName, std::map<std::string, std::string> attributes);
-    void onFieldData(EntityID entity, std::string componentType, std::string fieldName, const char* fieldData);
+    void onStartEntity(EntityID entity, EntityID parent, const std::string& name);
+    void onStartComponent(EntityID entity, const std::string& component);
+    void onStartComponentField(EntityID entity, const std::string& componentType, const std::string& fieldName, const std::map<std::string, std::string>& attributes);
+    void onFieldData(EntityID entity, const std::string& componentType, const std::string& fieldName, const char* fieldData);
 };
 
 #endif

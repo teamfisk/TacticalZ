@@ -36,23 +36,23 @@ class EntityFileHandler
 public:
     // @param EntityID The entity found
     // @param EntityID The parent of the entity
-    typedef std::function<void(EntityID, EntityID)> OnStartEntityCallback;
+    typedef std::function<void(EntityID, EntityID, const std::string&)> OnStartEntityCallback;
     void SetStartEntityCallback(OnStartEntityCallback c) { m_OnStartEntityCallback = c; }
     // @param EntityID The entity the component corresponds to
     // @param std::string Type name of the component
-    typedef std::function<void(EntityID, std::string)> OnStartComponentCallback;
+    typedef std::function<void(EntityID, const std::string&)> OnStartComponentCallback;
     void SetStartComponentCallback(OnStartComponentCallback c) { m_OnStartComponentCallback = c; }
     // @param EntityID Entity 
     // @param std::string Component name 
     // @param std::string Field name
     // @param std::map<std::string, std::string> Field attribute names and values
-    typedef std::function<void(EntityID, std::string, std::string, std::map<std::string, std::string>)> OnStartFieldCallback;
+    typedef std::function<void(EntityID, const std::string&, const std::string&, const std::map<std::string, std::string>&)> OnStartFieldCallback;
     void SetStartFieldCallback(OnStartFieldCallback c) { m_OnStartFieldCallback = c; }
     // @param EntityID Entity 
     // @param std::string Component name 
     // @param std::string Field name
     // @param char* Field data
-    typedef std::function<void(EntityID, std::string, std::string, const char*)> OnStartFieldDataCallback;
+    typedef std::function<void(EntityID, const std::string&, const std::string&, const char*)> OnStartFieldDataCallback;
     void SetStartFieldDataCallback(OnStartFieldDataCallback c) { m_OnStartFieldDataCallback = c; }
 
 private:
@@ -172,13 +172,13 @@ private:
     {
         EntityID parent = m_EntityStack.top();
 
-        // TODO: Create entity here
-        auto xName = attrs.getValue(XS::ToXMLCh("name"));
-        std::string name = XS::ToString(xName);
-        //LOG_DEBUG("Entity %i (%i): %s", m_NextEntityID, parent, name.c_str());
-
         if (m_Handler->m_OnStartEntityCallback) {
-            m_Handler->m_OnStartEntityCallback(m_NextEntityID, parent);
+            std::string name;
+            auto xName = attrs.getValue(XS::ToXMLCh("name"));
+            if (xName != nullptr) {
+                name = XS::ToString(xName);
+            }
+            m_Handler->m_OnStartEntityCallback(m_NextEntityID, parent, name);
         }
 
         m_EntityStack.push(m_NextEntityID);
@@ -198,7 +198,7 @@ private:
         parser->parse(path.c_str());
         delete parser;
     }
-    void onStartComponent(std::string name)
+    void onStartComponent(const std::string& name)
     {
         //LOG_DEBUG("    Component: %s", name.c_str());
         m_CurrentComponent = name;
@@ -206,8 +206,8 @@ private:
             m_Handler->m_OnStartComponentCallback(m_EntityStack.top(), name);
         }
     }
-    void onEndComponent(std::string name) { }
-    void onStartComponentField(std::string field, const xercesc::Attributes& attrs) 
+    void onEndComponent(const std::string& name) { }
+    void onStartComponentField(const std::string& field, const xercesc::Attributes& attrs) 
     {
         //LOG_DEBUG("        Field: %s", field.c_str());
         m_CurrentField = field;
@@ -223,7 +223,7 @@ private:
             m_Handler->m_OnStartFieldCallback(m_EntityStack.top(), m_CurrentComponent, field, m_CurrentAttributes);
         }
     }
-    void onEndComponentField(std::string field) { }
+    void onEndComponentField(const std::string& field) { }
 
     void onFieldData(char* data)
     {

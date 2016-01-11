@@ -49,6 +49,9 @@ void World::DeleteEntity(EntityID entity)
             break;
         }
     }
+
+    // Erase potential name
+    m_EntityNames.erase(entity);
 }
 
 void World::RegisterComponent(ComponentInfo& ci)
@@ -119,6 +122,25 @@ void World::SetParent(EntityID entity, EntityID parent)
 
     m_EntityParents[entity] = parent;
     m_EntityChildren.insert(std::make_pair(parent, entity));
+}
+
+void World::SetName(EntityID entity, const std::string& name)
+{
+    m_EntityNames[entity] = name;
+}
+
+std::string World::GetName(EntityID entity) const
+{
+    if (entity == EntityID_Invalid) {
+        return "EntityID_Invalid";
+    }
+
+    auto it = m_EntityNames.find(entity);
+    if (it != m_EntityNames.end()) {
+        return it->second;
+    } else {
+        return std::string();
+    }
 }
 
 EntityID World::generateEntityID()

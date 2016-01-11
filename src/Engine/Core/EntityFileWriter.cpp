@@ -15,6 +15,10 @@ void EntityFileWriter::WriteEntity(World* world, EntityID entity)
     root->setAttribute(X("xmlns:xsi"), X("http://www.w3.org/2001/XMLSchema-instance"));
     root->setAttribute(X("xsi:noNamespaceSchemaLocation"), X("../Types/Entity.xsd"));
     root->setAttribute(X("xmlns:c"), X("components"));
+    const std::string& name = world->GetName(entity);
+    if (!name.empty()) {
+        root->setAttribute(X("name"), X(name));
+    }
     
     DOMElement* componentsElement = doc->createElement(X("Components"));
     root->appendChild(componentsElement);
@@ -47,6 +51,10 @@ void EntityFileWriter::appendEntityChildren(xercesc::DOMElement* parentElement, 
         EntityID childEntity = it->second;
 
         DOMElement* entityElement = doc->createElement(X("Entity"));
+        const std::string& name = world->GetName(childEntity);
+        if (!name.empty()) {
+            entityElement->setAttribute(X("name"), X(name));
+        }
         parentElement->appendChild(entityElement);
 
         DOMElement* componentsElement = doc->createElement(X("Components"));
