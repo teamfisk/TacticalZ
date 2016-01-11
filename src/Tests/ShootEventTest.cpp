@@ -81,9 +81,10 @@ BOOST_AUTO_TEST_SUITE_END()
 ShootEventTest::ShootEventTest(int runTestNumber)
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
-    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+    std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
 
     // Create the core event broker
@@ -91,22 +92,26 @@ ShootEventTest::ShootEventTest(int runTestNumber)
 
     // Create a world
     m_World = new World();
-    std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
-    if (!mapToLoad.empty()) {
-        ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
-    }
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     m_SystemPipeline->AddSystem<PlayerSystem>(0);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
 
+    if (!mapToLoad.empty()) {
+        auto file = ResourceManager::Load<EntityFile>(mapToLoad);
+        EntityFilePreprocessor fpp(file);
+        fpp.RegisterComponents(m_World);
+        EntityFileParser fp(file);
+        fp.MergeEntities(m_World);
+    }
+
     //The Test
     //create entity which has transform,player,model,health in it. i.e. is a player
     EntityID playerID = m_World->CreateEntity();
     m_PlayerID = playerID;
-    ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
     ComponentWrapper& player = m_World->AttachComponent(playerID, "Player");
+    ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
     //attach 2x weaps
     ComponentWrapper& pItem = m_World->AttachComponent(playerID, "PrimaryItem");
     ComponentWrapper& sItem = m_World->AttachComponent(playerID, "SecondaryItem");
@@ -148,47 +153,47 @@ ShootEventTest::~ShootEventTest()
 void ShootEventTest::TestSetup1(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
 {
     //set currentweap
-    player["EquippedItem"] = 1.0;
+    player["EquippedItem"] = 1;
     //set ammo set cooldown
-    pItem["Ammo"] = 100.0;
+    pItem["Ammo"] = 100;
     pItem["CoolDownTimer"] = 0.0;
 }
 void ShootEventTest::TestSetup2(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
 {
     //set currentweap
-    player["EquippedItem"] = 2.0;
+    player["EquippedItem"] = 2;
     //set ammo set cooldown
-    sItem["Ammo"] = 10.0;
+    sItem["Ammo"] = 10;
     sItem["CoolDownTimer"] = 0.0;
 }
 void ShootEventTest::TestSetup3(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
 {
-    player["EquippedItem"] = 0.0;
-    pItem["Ammo"] = 100.0;
-    sItem["Ammo"] = 100.0;
+    player["EquippedItem"] = 0;
+    pItem["Ammo"] = 100;
+    sItem["Ammo"] = 100;
     //TestSucceeded will be set to false if ammo changes during the 100 loops
     TestSucceeded = true;
 }
 void ShootEventTest::TestSetup4(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
 {
     //set currentweap
-    player["EquippedItem"] = 1.0;
+    player["EquippedItem"] = 1;
     //set ammo set cooldown
-    pItem["Ammo"] = 100.0;
+    pItem["Ammo"] = 100;
     pItem["CoolDownTimer"] = 5.0;
     //TestSucceeded will be set to false if ammo changes during the 100 loops
     TestSucceeded = true;
 }
 void ShootEventTest::TestSuccess1() {
     //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
-    double currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
-    if (currentAmmo == 99.0)
+    int currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
+    if (currentAmmo == 99)
         TestSucceeded = true;
 }
 void ShootEventTest::TestSuccess2() {
     //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
-    double currentAmmo = m_World->GetComponent(m_PlayerID, "SecondaryItem")["Ammo"];
-    if (currentAmmo == 9.0)
+    int currentAmmo = m_World->GetComponent(m_PlayerID, "SecondaryItem")["Ammo"];
+    if (currentAmmo == 9)
         TestSucceeded = true;
 }
 void ShootEventTest::TestSuccess3() {
@@ -199,9 +204,9 @@ void ShootEventTest::TestSuccess3() {
     eMouseRelease.Y = 1.0f;
     m_EventBroker->Publish(eMouseRelease);
     //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
-    double currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
-    double currentAmmoSecondary = m_World->GetComponent(m_PlayerID, "SecondaryItem")["Ammo"];
-    if (currentAmmo != 100.0 || currentAmmoSecondary != 100.0)
+    int currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
+    int currentAmmoSecondary = m_World->GetComponent(m_PlayerID, "SecondaryItem")["Ammo"];
+    if (currentAmmo != 100 || currentAmmoSecondary != 100)
         TestSucceeded = false;
 }
 void ShootEventTest::TestSuccess4() {
@@ -212,8 +217,8 @@ void ShootEventTest::TestSuccess4() {
     eMouseRelease.Y = 1.0f;
     m_EventBroker->Publish(eMouseRelease);    
     //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
-    double currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
-    if (currentAmmo != 100.0)
+    int currentAmmo = m_World->GetComponent(m_PlayerID, "PrimaryItem")["Ammo"];
+    if (currentAmmo != 100)
         TestSucceeded = false;
 }
 void ShootEventTest::Tick()

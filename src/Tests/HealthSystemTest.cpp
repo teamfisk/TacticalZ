@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE_END()
 GameHealthSystemTest::GameHealthSystemTest()
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
-    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -41,8 +41,13 @@ GameHealthSystemTest::GameHealthSystemTest()
      // Create a world
     m_World = new World();
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
+
     if (!mapToLoad.empty()) {
-        ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
+        auto file = ResourceManager::Load<EntityFile>(mapToLoad);
+        EntityFilePreprocessor fpp(file);
+        fpp.RegisterComponents(m_World);
+        EntityFileParser fp(file);
+        fp.MergeEntities(m_World);
     }
 
     // Create system pipeline
