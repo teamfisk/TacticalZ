@@ -27,16 +27,16 @@ glm::vec3 RenderQueueFactory::AbsolutePosition(World* world, EntityID entity)
 {
     glm::vec3 position;
 
-    do {
+    while (entity != EntityID_Invalid) {
         ComponentWrapper transform = world->GetComponent(entity, "Transform");
         EntityID parent = world->GetParent(entity);
-        if (parent != 0) {
+        //if (parent != EntityID_Invalid) {
             position += AbsoluteOrientation(world, parent) * (glm::vec3)transform["Position"];
-        } else {
-            position += (glm::vec3)transform["Position"];
-        }
+        //} else {
+        //    position += (glm::vec3)transform["Position"];
+        //}
         entity = parent;
-    } while (entity != 0);
+    }
    
     return position;
 }
@@ -45,11 +45,11 @@ glm::quat RenderQueueFactory::AbsoluteOrientation(World* world, EntityID entity)
 {
     glm::quat orientation;
 
-    do {
+    while (entity != EntityID_Invalid) {
         ComponentWrapper transform = world->GetComponent(entity, "Transform");
         orientation = glm::quat((glm::vec3)transform["Orientation"]) * orientation;
         entity = world->GetParent(entity);
-    } while (entity != 0);
+    }
     
     return orientation;
 }
@@ -58,11 +58,11 @@ glm::vec3 RenderQueueFactory::AbsoluteScale(World* world, EntityID entity)
 {
     glm::vec3 scale(1.f);
 
-    do {
+    while (entity != EntityID_Invalid) {
         ComponentWrapper transform = world->GetComponent(entity, "Transform");
         scale *= (glm::vec3)transform["Scale"];
         entity = world->GetParent(entity);
-    } while (entity != 0);
+    }
 
     return scale;
 }
