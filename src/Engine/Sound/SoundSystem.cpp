@@ -65,28 +65,30 @@ void SoundSystem::stopEmitters()
 
 void SoundSystem::Update()
 {
-    deleteInactiveEmitters();
     addNewEmitters();
+    deleteInactiveEmitters();
     updateEmitters();
     updateListener();
 }
 
 void SoundSystem::deleteInactiveEmitters()
 {
-    //auto emitterComponents = m_World->GetComponents("SoundEmitter");
-    //for (auto it = emitterComponents->begin(); it != emitterComponents->end();) {
-    //    EntityID emitter = (*it).EntityID;
-    //    if (isPlaying(m_Sources[emitter]->ALsource)) { // The sound is still playing, do not remove
-    //        it++;
-    //        continue;
-    //    } else {
-    //        alDeleteBuffers(1, &m_Sources[emitter]->ALsource);
-    //        alDeleteSources(1, &m_Sources[emitter]->ALsource);
-    //        //delete m_Sources[emitter]->SoundResource;
-    //        m_Sources.erase(emitter);
-    //        m_World->DeleteEntity(emitter);
-    //    }
-    //}
+    auto emitterComponents = m_World->GetComponents("SoundEmitter");
+    for (auto it = emitterComponents->begin(); it != emitterComponents->end();) {
+        EntityID emitter = (*it).EntityID;
+        Source* source = m_Sources[emitter];
+        if (isPlaying(source->ALsource) || !source->HasBeenPlayed) { // The sound is still playing, do not remove
+            it++;
+            continue;
+        } 
+        else {
+            alDeleteBuffers(1, &source->ALsource);
+            alDeleteSources(1, &source->ALsource);
+            //delete m_Sources[emitter]->SoundResource;
+            m_Sources.erase(emitter);
+            m_World->DeleteEntity(emitter);
+        } 
+    }
 
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end();) {
@@ -140,15 +142,15 @@ void SoundSystem::updateEmitters()
             if (i != m_Sources.end()) {
                 // Get previous pos
                 glm::vec3 previousPos;
-                alGetSource3f(m_Sources[emitter]->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
+                alGetSource3f(i->second->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
                 // Get next pos
                 glm::vec3 nextPos = RenderQueueFactory::AbsolutePosition(m_World, emitter);
                 // Calculate velocity
                 glm::vec3 velocity = nextPos - previousPos;
-                setSourcePos(m_Sources[emitter]->ALsource, nextPos);
-                setSourceVel(m_Sources[emitter]->ALsource, velocity);
+                setSourcePos(i->second->ALsource, nextPos);
+                setSourceVel(i->second->ALsource, velocity);
                 setSoundProperties(
-                    m_Sources[emitter]->ALsource,
+                    i->second->ALsource,
                     (float)(double)(*it)["Gain"],
                     (float)(double)(*it)["Pitch"],
                     (bool)(*it)["Loop"],
@@ -160,9 +162,11 @@ void SoundSystem::updateEmitters()
                 // To make an emitter play when spawned in editor mode
                 if (m_EditorEnabled) {
                     // Path changed
-                    if (m_Sources[emitter]->SoundResource->Path() != (std::string)(*it)["FilePath"]) {
-                        m_Sources[emitter]->SoundResource = ResourceManager::Load<Sound>((std::string)(*it)["FilePath"]);
-                        playSound(m_Sources[emitter]);
+                    if (i->second->SoundResource->Path() != (std::string)(*it)["FilePath"]) {
+                        i->second->SoundResource = ResourceManager::Load<Sound>((std::string)(*it)["FilePath"]);
+                        if (i->second->SoundResource->Buffer() != 0) {
+                            playSound(i->second);
+                        }
                     }
                 }
                 it++;
@@ -203,6 +207,7 @@ void SoundSystem::playSound(Source* source)
 {
     alSourcei(source->ALsource, AL_BUFFER, source->SoundResource->Buffer());
     alSourcePlay(source->ALsource);
+    source->HasBeenPlayed = true;
 }
 
 void SoundSystem::stopSound(Source* source)

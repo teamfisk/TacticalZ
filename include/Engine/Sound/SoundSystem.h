@@ -26,8 +26,9 @@
 struct Source
 {
     Source() { }
-    Sound* SoundResource;
+    Sound* SoundResource = nullptr;
     ALuint ALsource;
+    bool HasBeenPlayed = false;
 };
 
 class SoundSystem
