@@ -23,7 +23,6 @@ public:
     ~Client();
     void Start(World* world, EventBroker* eventBroker) override;
     void Update() override;
-    void Close();
 private:
     // Assio UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
@@ -49,7 +48,6 @@ private:
     // Network logic
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
     SnapshotDefinitions m_NextSnapshot;
-    bool m_ThreadIsRunning = true;
     double m_DurationOfPingTime;
     std::clock_t m_StartPingTime;
     // Use to check if we should send disconnect message

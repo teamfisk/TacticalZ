@@ -20,8 +20,6 @@ public:
     ~Server();
     void Start(World* m_world, EventBroker *eventBroker) override;
     void Update() override;
-    void Close();
-
 private:
     // UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
@@ -55,9 +53,6 @@ private:
     unsigned int m_PacketID;
     unsigned int m_PreviousPacketID;
     unsigned int m_SendPacketID;
-    
-    // Close logic
-    bool m_ThreadIsRunning = true;
 
     // Private member functions
     int  receive(char* data, size_t length);

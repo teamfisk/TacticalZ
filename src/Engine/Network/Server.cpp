@@ -24,12 +24,6 @@ void Server::Update()
     readFromClients();
 }
 
-void Server::Close()
-{
-    m_ThreadIsRunning = false;
-    m_Socket.close();
-}
-
 void Server::readFromClients()
 {
     while (m_Socket.available()) {

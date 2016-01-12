@@ -17,7 +17,6 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 
 Client::~Client()
 {
-    m_EventBroker->Unsubscribe(m_EInputCommand);
 }
 
 void Client::Start(World* world, EventBroker* eventBroker)
@@ -36,14 +35,6 @@ void Client::Start(World* world, EventBroker* eventBroker)
 void Client::Update()
 {
     readFromServer();
-}
-
-void Client::Close()
-{
-    disconnect();
-    m_ThreadIsRunning = false;
-    m_Socket.close();
-    m_EventBroker->Unsubscribe(m_EInputCommand);
 }
 
 void Client::readFromServer()
