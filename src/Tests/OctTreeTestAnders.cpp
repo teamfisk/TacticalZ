@@ -15,7 +15,7 @@ using boost::unit_test_framework::test_case;
 #include "OctTreeTestGameClass.h"
 
 #define private public//HACK! Needed for white box testing
-#include <Engine\Core\OctTree.h>
+#include "Engine/Core/OctTree.h"
 //else we would have to "open up" the octTree class more with get/sets, public methods, etc. which is not good encapsulation-wise
 
 BOOST_AUTO_TEST_SUITE(octTreeTestsA)

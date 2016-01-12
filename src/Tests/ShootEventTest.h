@@ -17,8 +17,8 @@
 #include "Core/EntityFileParser.h"
 #include "Core/EntityFileWriter.h"
 
-#include "Core\EMouseRelease.h"
-#include "Core\EShoot.h"
+#include "Core/EMouseRelease.h"
+#include "Core/EShoot.h"
 
 class ShootEventTest
 {
