@@ -51,7 +51,7 @@ public:
         if (it != PickingColorsToEntity->end()) {
             pickData.Entity = it->second;
         } else {
-            pickData.Entity = 0;
+            pickData.Entity = EntityID_Invalid;
         }
         pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, Resolution, ProjectionMatrix, ViewMatrix);
 

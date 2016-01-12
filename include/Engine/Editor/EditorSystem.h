@@ -1,6 +1,7 @@
 #include <imgui/imgui.h>
 #include <glm/gtx/common.hpp>
 #include <boost/filesystem/path.hpp>
+#include <nativefiledialog/nfd.h>
 #include "../Core/System.h"
 #include "../Core/EMousePress.h"
 #include "../Core/EMouseRelease.h"
@@ -11,6 +12,9 @@
 #include "../Rendering/EPicking.h"
 #include "../Core/EFileDropped.h"
 #include "../Rendering/RenderQueueFactory.h"
+#include "../Core/EntityFilePreprocessor.h"
+#include "../Core/EntityFileParser.h"
+#include "../Core/EntityFileWriter.h"
 
 class EditorSystem : public ImpureSystem
 {
@@ -25,6 +29,8 @@ private:
 
     bool m_Enabled;
     bool m_Visible;
+    boost::filesystem::path m_DefaultEntityDir;
+    boost::filesystem::path m_CurrentFile;
     std::vector<glm::vec2> m_PickingQueue;
 
     enum class WidgetMode
@@ -41,21 +47,25 @@ private:
         Global
     } m_WidgetSpace = WidgetSpace::Global;
 
-    EntityID m_Widget = 0;
-    EntityID m_WidgetX = 0;
-    EntityID m_WidgetPlaneX = 0;
-    EntityID m_WidgetY = 0;
-    EntityID m_WidgetPlaneY = 0;
-    EntityID m_WidgetZ = 0;
-    EntityID m_WidgetPlaneZ = 0;
-    EntityID m_WidgetOrigin = 0;
+    EntityID m_Widget = EntityID_Invalid;
+    EntityID m_WidgetX = EntityID_Invalid;
+    EntityID m_WidgetPlaneX = EntityID_Invalid;
+    EntityID m_WidgetY = EntityID_Invalid;
+    EntityID m_WidgetPlaneY = EntityID_Invalid;
+    EntityID m_WidgetZ = EntityID_Invalid;
+    EntityID m_WidgetPlaneZ = EntityID_Invalid;
+    EntityID m_WidgetOrigin = EntityID_Invalid;
     glm::vec3 m_WidgetCurrentAxis;
     float m_WidgetPickingDepth = 0.f;
 
-    EntityID m_Selection = 0;
-    EntityID m_LastSelection = 0;
+    EntityID m_Selection = EntityID_Invalid;
+    EntityID m_LastSelection = EntityID_Invalid;
+    EntityID m_UIDraggingEntity = EntityID_Invalid;
     glm::vec3 m_Position;
     std::string m_LastDroppedFile;
+
+    static boost::filesystem::path openDialog(boost::filesystem::path defaultPath);
+    static boost::filesystem::path saveDialog(boost::filesystem::path defaultPath);
 
     EventRelay<EditorSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
@@ -70,10 +80,15 @@ private:
     EventRelay<EditorSystem, Events::FileDropped> m_EFileDropped;
     bool OnFileDropped(const Events::FileDropped& e);
 
+    void createWidget();
     void updateWidget();
     void setWidgetMode(WidgetMode newMode);
     void setWidgetSpace(WidgetSpace space);
     void drawUI(World* world, double dt);
     bool createDeleteButton(std::string componentType);
+    bool createEntityNode(World* world, EntityID entity);
     void changeParent(EntityID entity, EntityID newParent);
+    void fileImport(World* world);
+    void fileSave(World* world);
+    void fileSaveAs(World* world);
 };

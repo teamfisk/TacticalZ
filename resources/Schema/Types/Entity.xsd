@@ -15,6 +15,7 @@
 							<xs:element ref="c:Test" minOccurs="0"/>
 							<xs:element ref="c:RaptorCopter" minOccurs="0"/>
 							<xs:element ref="c:Player" minOccurs="0"/>
+							<xs:element ref="c:Health" minOccurs="0"/>
 							<xs:element ref="c:Listener" minOccurs="0"/>
 							<xs:element ref="c:SoundEmitter" minOccurs="0"/>
 						</xs:all>
@@ -25,11 +26,19 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
+							<xs:element name="EntityRef" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:all>
+										<xs:attribute name="file" type="xs:string" minOccurs="0"/>
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
 			</xs:all>
 			<xs:attribute ref="xml:base"/>
+			<xs:attribute name="name" type="xs:string" minOccurs="0" default=""/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>
