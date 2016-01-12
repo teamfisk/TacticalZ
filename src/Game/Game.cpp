@@ -77,8 +77,6 @@ Game::Game(int argc, char* argv[])
         networkFunction();
     }
     m_LastTime = glfwGetTime();
-    // For testing
-    debugInitialize();
 }
 
 Game::~Game()
@@ -115,8 +113,6 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
-    // For testing
-    debugTick(dt);
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     m_Renderer->Update(dt);
@@ -134,33 +130,6 @@ void Game::debugTick(double dt)
 {
     m_EventBroker->Process<Game>();
 }
-
-// For testing
-bool Game::debugOnInputCommand(const Events::InputCommand& e)
-{
-    if (e.Command == "SwitchToServer" && e.Value > 0) {
-        m_ClientOrServer->Close(); // memory leak for now, use delete when it works
-                                   //delete m_ClientOrServer;
-        m_ClientOrServer = new Server();
-        LOG_INFO("Switching to server");
-        m_ClientOrServer->Start(m_World, m_EventBroker);
-    } else if (e.Command == "SwitchToClient" && e.Value > 0) {
-        m_ClientOrServer->Close(); // memory leak for now, use delete when it works
-                                   //delete m_ClientOrServer;
-        m_ClientOrServer = new Client(m_Config);
-        m_ClientOrServer->Start(m_World, m_EventBroker);
-        LOG_INFO("Switching to client");
-    }
-
-    return false;
-}
-
-// For testing
-void Game::debugInitialize()
-{
-    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
-}
-
 
 void Game::networkFunction()
 {
