@@ -113,7 +113,6 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
-
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     m_Renderer->Update(dt);
@@ -144,10 +143,5 @@ void Game::networkFunction()
         m_ClientOrServer = new Server();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
-    // I don't think we are reaching this part of the code right now.
-    // ~Game() is not called if the game is exited by closing console windows
-    // When server or client is done set it to false.
-    //m_IsClientOrServer = false;
-    // Destroy it
-    //delete m_ClientOrServer;
+
 }
