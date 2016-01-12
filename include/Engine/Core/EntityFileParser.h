@@ -9,7 +9,7 @@ class EntityFileParser
 public:
     EntityFileParser(const EntityFile* entityFile);
 
-    void MergeEntities(World* world);
+    void MergeEntities(World* world, EntityID parent = EntityID_Invalid);
 
 private:
     const EntityFile* m_EntityFile;

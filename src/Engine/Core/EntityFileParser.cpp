@@ -9,10 +9,10 @@ EntityFileParser::EntityFileParser(const EntityFile* entityFile)
     m_Handler.SetStartFieldDataCallback(std::bind(&EntityFileParser::onFieldData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 }
 
-void EntityFileParser::MergeEntities(World* world)
+void EntityFileParser::MergeEntities(World* world, EntityID parent /*= EntityID_Invalid*/)
 {
     m_World = world;
-    m_EntityIDMapper[EntityID_Invalid] = EntityID_Invalid;
+    m_EntityIDMapper[EntityID_Invalid] = parent;
     m_EntityFile->Parse(&m_Handler);
 }
 

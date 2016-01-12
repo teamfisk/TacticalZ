@@ -31,6 +31,7 @@ private:
     bool m_Visible;
     boost::filesystem::path m_DefaultEntityDir;
     boost::filesystem::path m_CurrentFile;
+    std::map<boost::filesystem::path, EntityID> m_CurrentFiles;
     std::vector<glm::vec2> m_PickingQueue;
 
     enum class WidgetMode
