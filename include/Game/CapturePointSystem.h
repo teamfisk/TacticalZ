@@ -7,6 +7,8 @@
 #include "Common.h"
 #include "Core/System.h"
 #include "Engine/Collision/ETrigger.h"
+#include "Core/ECaptured.h"
+#include "Core/EWin.h"
 
 #include <tuple>
 #include <vector>
@@ -26,6 +28,8 @@ private:
     bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e);
     EventRelay<CapturePointSystem, Events::TriggerLeave> m_ETriggerLeave;
     bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e);
+
+    bool WinnerWasFound = false;
 
     //vectors which will keep track of enter/leave changes
     std::vector<std::tuple<EntityID, EntityID>> m_ETriggerTouchVector;

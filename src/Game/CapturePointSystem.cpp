@@ -42,30 +42,57 @@ void CapturePointSystem::UpdateComponent(World *world, ComponentWrapper &capture
     int ownedBy = capturePoint["OwnedBy"];
     double captureTimer = capturePoint["CaptureTimer"];
 
+    //+-5 
+
     //A.nobodys standing inside
     if (firstTeamPlayersStandingInside == 0 && secondTeamPlayersStandingInside == 0) {
         //do nothing (?)
     }
     //B.first team has players but second none
     if (firstTeamPlayersStandingInside > 0 && secondTeamPlayersStandingInside == 0) {
+        //ownedBy 1 -> timer should stay at 5
         if (ownedBy == 2 || ownedBy == 0)
             capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + dt;
-        //check if captureTimer > 5 and if so change owner
-        if ((double)capturePoint["CaptureTimer"] > 5.0) {
+        //check if captureTimer > 5 and if so change owner and publish the eCaptured event
+        if ((double)capturePoint["CaptureTimer"] > 5) {
             capturePoint["OwnedBy"] = 1;
-            capturePoint["CaptureTimer"] = 0;
+            capturePoint["CaptureTimer"] = 0.0;
+            Events::Captured e;
+            e.CapturePointID = capturePoint.EntityID;
+            e.TeamNumberThatCapturedCapturePoint = 1;
+            m_EventBroker->Publish(e);
         }
     }
     //C.second team has players but second none
     if (firstTeamPlayersStandingInside == 0 && secondTeamPlayersStandingInside > 0) {
+        //ownedBy 2 -> timer should stay at -5
+        if (ownedBy == 1 || ownedBy == 0)
+            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] - dt;
+        //check if captureTimer > 5 and if so change owner and publish the eCaptured event
+        if ((double)capturePoint["CaptureTimer"] < -5.0) {
+            capturePoint["OwnedBy"] = 2;
+            capturePoint["CaptureTimer"] = 0.0;
+            Events::Captured e;
+            e.CapturePointID = capturePoint.EntityID;
+            e.TeamNumberThatCapturedCapturePoint = 2;
+            m_EventBroker->Publish(e);
+        }
 
     }
     //D.both teams have players inside
     if (firstTeamPlayersStandingInside > 0 && secondTeamPlayersStandingInside > 0) {
-
+        //do nothing (?)
     }
 
-
+    //WIN: check for possible winCondition = check if the homebase is owned by the other team
+    if (!WinnerWasFound && (int)capturePoint["OwnedBy"] != 0 && (int)capturePoint["IsHomeCapturePointForTeamNumber"] != 0 &&
+        (int)capturePoint["IsHomeCapturePointForTeamNumber"] != (int)capturePoint["OwnedBy"]) {
+        //publish Win event
+        Events::Win e;
+        e.TeamThatWon = capturePoint["OwnedBy"];
+        m_EventBroker->Publish(e);
+        WinnerWasFound = true;
+    }
 
 }
 

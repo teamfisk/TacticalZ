@@ -1,4 +1,5 @@
 <c:CapturePoint>
 	<CaptureTimer>0</CaptureTimer>
 	<OwnedBy>0</OwnedBy>
+	<IsHomeCapturePointForTeamNumber>0</IsHomeCapturePointForTeamNumber>
 </c:CapturePoint>
