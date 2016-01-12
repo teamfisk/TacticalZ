@@ -117,7 +117,7 @@ PickData PickingPass::Pick(glm::vec2 screenCoord)
     if (it != m_PickingColorsToEntity.end()) {
         pickData.Entity = it->second;
     } else {
-        pickData.Entity = 0;
+        pickData.Entity = EntityID_Invalid;
     }
     pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, resolution, m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
 

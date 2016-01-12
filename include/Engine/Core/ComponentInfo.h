@@ -12,9 +12,16 @@ struct ComponentInfo
         unsigned int Stride = 0;
 	};
 
+    struct Field_t
+    {
+        std::string Type;
+        unsigned int Offset;
+        unsigned int Stride;
+    };
+
 	std::string Name;
-	std::unordered_map<std::string, std::string> FieldTypes;
-	std::unordered_map<std::string, unsigned int> FieldOffsets;
+    std::unordered_map<std::string, Field_t> Fields;
+    std::vector<const Field_t*> FieldsInOrder;
 	Meta_t Meta;
     std::shared_ptr<char> Defaults = nullptr;
 };

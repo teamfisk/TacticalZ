@@ -253,7 +253,7 @@ public:
 	}
 
 	//Postfix increment i.e. iter++. Prefer pre-increment (++iter) for efficiency.
-	MemoryPoolForwardIterator& operator++(int)
+	MemoryPoolForwardIterator operator++(int)
 	{
 		MemoryPoolForwardIterator<T> copyIter(*this);
 		operator++();

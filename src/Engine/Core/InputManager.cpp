@@ -2,6 +2,7 @@
 
 std::vector<unsigned int> InputManager::GLFWCharCallbackQueue;
 std::vector<std::pair<double, double>> InputManager::GLFWScrollCallbackQueue;
+std::vector<std::string> InputManager::GLFWDropCallbackQueue;
 
 void InputManager::Initialize()
 {
@@ -10,6 +11,7 @@ void InputManager::Initialize()
 	//m_LastGamepadButtonState = std::array<GamepadButtonState, XUSER_MAX_COUNT>();
     glfwSetCharCallback(m_GLFWWindow, &InputManager::GLFWCharCallback);
     glfwSetScrollCallback(m_GLFWWindow, &InputManager::GLFWScrollCallback);
+    glfwSetDropCallback(m_GLFWWindow, &InputManager::GLFWDropCallback);
 
 	EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &InputManager::OnLockMouse);
 	EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &InputManager::OnUnlockMouse);
@@ -94,6 +96,14 @@ void InputManager::Update(double dt)
         m_EventBroker->Publish(e);
     }
     GLFWScrollCallbackQueue.clear();
+
+    // File drop
+    for (auto& path : GLFWDropCallbackQueue) {
+        Events::FileDropped e;
+        e.Path = path;
+        m_EventBroker->Publish(e);
+    }
+    GLFWDropCallbackQueue.clear();
 
 	// // Lock mouse while holding LMB
 	// if (m_CurrentMouseState[GLFW_MOUSE_BUTTON_LEFT])
@@ -227,6 +237,14 @@ void InputManager::GLFWCharCallback(GLFWwindow* window, unsigned int c)
 void InputManager::GLFWScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     GLFWScrollCallbackQueue.push_back(std::make_pair(xoffset, yoffset));
+}
+
+
+void InputManager::GLFWDropCallback(GLFWwindow* window, int count, const char* paths[])
+{
+    for (int i = 0; i < count; i++) {
+        GLFWDropCallbackQueue.push_back(std::string(paths[i]));
+    }
 }
 
 bool InputManager::OnLockMouse(const Events::LockMouse &event)

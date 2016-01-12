@@ -2,56 +2,41 @@
 
 void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, double dt)
 {
-    if (input.Forward) {
-        m_Direction.z = -1;
-    } else if (input.Back) {
-        m_Direction.z = 1;
-    } else {
-        m_Direction.z = 0;
+    player["Velocity"] = glm::vec3(0.f, 0.f, 0.f);
+    if ((bool&)player["Forward"] == true) {
+        ((glm::vec3&)player["Velocity"]).z = m_Speed * float(dt) * -1;
+
     }
-    if (input.Left) {
-        m_Direction.x = -1;
-    } else if (input.Right) {
-        m_Direction.x = 1;
-    } else {
-        m_Direction.x = 0;
+    if ((bool&)player["Left"] == true) {
+        ((glm::vec3&)player["Velocity"]).x = m_Speed * float(dt) * -1;
     }
-    m_EventBroker->Process<PlayerSystem>();
-    ComponentWrapper& transform = world->GetComponent(player.EntityID, "Transform");
-    (glm::vec3&)player["Velocity"] = m_Speed * float(dt) * m_Direction;
-    (glm::vec3&)transform["Position"] += (glm::vec3)player["Velocity"];
+    if ((bool&)player["Back"] == true) {
+        ((glm::vec3&)player["Velocity"]).z = m_Speed * float(dt);
+    }
+    if ((bool&)player["Right"] == true) {
+        ((glm::vec3&)player["Velocity"]).x = m_Speed * float(dt);
+    }
+
+    if ((glm::vec3)player["Velocity"] != glm::vec3(0.f)) {
+        ComponentWrapper& transform = world->GetComponent(player.EntityID, "Transform");
+        (glm::vec3&)transform["Position"] += (glm::vec3)player["Velocity"];
+    }
 }
 
-bool PlayerSystem::OnKeyDown(const Events::KeyDown & event)
+bool PlayerSystem::OnTouch(const Events::TriggerTouch &event)
 {
-    if (event.KeyCode == GLFW_KEY_W) {
-        input.Forward = true;
-    }
-    if (event.KeyCode == GLFW_KEY_A) {
-        input.Left = true;
-    }
-    if (event.KeyCode == GLFW_KEY_S) {
-        input.Back = true;
-    }
-    if (event.KeyCode == GLFW_KEY_D) {
-        input.Right = true;
-    }
-    return true;
+    LOG_INFO("Player entity %i touched widget (entity %i).", event.Entity, event.Trigger);
+    return false;
 }
 
-bool PlayerSystem::OnKeyUp(const Events::KeyUp & event)
+bool PlayerSystem::OnEnter(const Events::TriggerEnter &event)
 {
-    if (event.KeyCode == GLFW_KEY_W) {
-        input.Forward = false;
-    }
-    if (event.KeyCode == GLFW_KEY_A) {
-        input.Left = false;
-    }
-    if (event.KeyCode == GLFW_KEY_S) {
-        input.Back = false;
-    }
-    if (event.KeyCode == GLFW_KEY_D) {
-        input.Right = false;
-    }
+    LOG_INFO("Player entity %i entered widget (entity %i).", event.Entity, event.Trigger);
+    return false;
+}
+
+bool PlayerSystem::OnLeave(const Events::TriggerLeave &event)
+{
+    LOG_INFO("Player entity %i left widget (entity %i).", event.Entity, event.Trigger);
     return false;
 }

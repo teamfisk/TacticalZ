@@ -9,6 +9,7 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer)
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Enabled = config->Get<bool>("Debug.EditorEnabled", false);
     m_Visible = m_Enabled;
+    m_DefaultEntityDir = boost::filesystem::path("Schema") / boost::filesystem::path("Entities");
 
     if (!m_Enabled) {
         return;
@@ -18,6 +19,7 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorSystem::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &EditorSystem::OnMouseRelease);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseMove, &EditorSystem::OnMouseMove);
+    EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorSystem::OnFileDropped);
 }
 
 void EditorSystem::Update(World* world, double dt)
@@ -35,6 +37,40 @@ void EditorSystem::Update(World* world, double dt)
     updateWidget();
 
     drawUI(world, dt);
+
+    // Clear drop queue if it wasn't handled by any UI element
+    if (!m_LastDroppedFile.empty()) {
+        m_LastDroppedFile = "";
+    }
+}
+
+
+boost::filesystem::path EditorSystem::openDialog(boost::filesystem::path defaultPath)
+{
+    namespace bfs = boost::filesystem;
+    auto absolutePath = bfs::absolute(defaultPath);
+    nfdchar_t* outPath = nullptr;
+    nfdresult_t result = NFD_OpenDialog(NULL, absolutePath.string().c_str(), &outPath);
+    if (result == NFD_ERROR) {
+        LOG_ERROR("NFD Error: %s", NFD_GetError());
+        return bfs::path();
+    }
+
+    return bfs::absolute(outPath);
+}
+
+boost::filesystem::path EditorSystem::saveDialog(boost::filesystem::path defaultPath)
+{
+    namespace bfs = boost::filesystem;
+    auto absolutePath = bfs::absolute(defaultPath);
+    nfdchar_t* outPath = nullptr;
+    nfdresult_t result = NFD_SaveDialog(NULL, absolutePath.string().c_str(), &outPath);
+    if (result == NFD_ERROR) {
+        LOG_ERROR("NFD Error: %s", NFD_GetError());
+        return bfs::path();
+    }
+
+    return bfs::absolute(outPath);
 }
 
 bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
@@ -74,14 +110,24 @@ bool EditorSystem::OnMousePress(const Events::MousePress& e)
 
 bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
 {
-    if (m_Widget == 0) {
+    if (m_Widget == EntityID_Invalid) {
+        return false;
+    }
+    if (m_Selection == EntityID_Invalid) {
+        return false;
+    }
+    if (m_Selection == m_Widget) {
+        return false;
+    }
+    // TODO: No widgets for root entity until widgets reside in thier own world,
+    // or the widgets will move relative to the root entity being moved, which is WEEEIRD.
+    if (m_Selection == 0) {
         return false;
     }
 
     auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
     glm::vec3 widgetOrientation = widgetTransform["Orientation"];
-
-    glm::quat  totalOrientation = m_Renderer->Camera()->Orientation() * glm::inverse(glm::quat(widgetOrientation));
+    glm::quat totalOrientation = m_Renderer->Camera()->Orientation() * glm::inverse(glm::quat(widgetOrientation));
 
     int width;
     int height;
@@ -112,9 +158,9 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
             if (m_WidgetSpace == WidgetSpace::Global) {
                 EntityID parent = m_World->GetParent(m_Selection);
                 glm::quat inverseParentOrientation;
-                if (parent != 0) {
+                //if (parent != 0) {
                     inverseParentOrientation = glm::inverse(RenderSystem::AbsoluteOrientation(m_World, parent));
-                }
+                //}
                 (glm::vec3&)m_World->GetComponent(m_Selection, "Transform")["Position"] += inverseParentOrientation * movement;
             } else if (m_WidgetSpace == WidgetSpace::Local) {
                 auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
@@ -128,12 +174,12 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
             if (m_WidgetSpace == WidgetSpace::Global) {
                 EntityID parent = m_World->GetParent(m_Selection);
                 glm::quat parentOrientation;
-                if (parent != 0) {
-                    parentOrientation = RenderSystem::AbsoluteOrientation(m_World, parent);
-                }
+                //if (parent != 0) {
+                //    parentOrientation = RenderSystem::AbsoluteOrientation(m_World, parent);
+                //}
                 glm::vec3& selectionOrientation = m_World->GetComponent(m_Selection, "Transform")["Orientation"];
-                //glm::quat currentOrientation = RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection);
-                glm::quat currentOrientation = parentOrientation * glm::quat(selectionOrientation);
+                glm::quat currentOrientation = RenderSystem::AbsoluteOrientation(m_World, m_Selection);
+                //glm::quat currentOrientation = parentOrientation * glm::quat(selectionOrientation);
                 glm::quat deltaOrientation(finalMovement);
                 selectionOrientation = glm::eulerAngles(glm::inverse(parentOrientation) * (deltaOrientation * currentOrientation));
             } else if (m_WidgetSpace == WidgetSpace::Local) {
@@ -146,6 +192,13 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
             glm::vec3& scaleX = m_World->GetComponent(m_WidgetX, "Transform")["Scale"];
             glm::vec3& scaleY = m_World->GetComponent(m_WidgetY, "Transform")["Scale"];
             glm::vec3& scaleZ = m_World->GetComponent(m_WidgetZ, "Transform")["Scale"];
+
+            if (m_WidgetCurrentAxis.x > 0 && m_WidgetCurrentAxis.y > 0 && m_WidgetCurrentAxis.z > 0) {
+                float movementLength = glm::length(movement);
+                float dot = glm::dot((glm::vec3)widgetOrientation, movement);
+                movement = glm::vec3(movementLength) * glm::sign(dot);
+                (glm::vec3&)m_World->GetComponent(m_WidgetOrigin, "Transform")["Scale"] += movement;
+            }
             if (m_WidgetCurrentAxis.x > 0) {
                 scaleX.x += movement.x;
             }
@@ -155,13 +208,18 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
             if (m_WidgetCurrentAxis.z > 0) {
                 scaleZ.z += movement.z;
             }
-            if (m_WidgetCurrentAxis.x > 0 && m_WidgetCurrentAxis.y > 0 && m_WidgetCurrentAxis.z > 0) {
-                float max = glm::max(scaleX.x, glm::max(scaleY.y, scaleZ.z));
-                (glm::vec3&)m_World->GetComponent(m_WidgetOrigin, "Transform")["Scale"] = glm::vec3(max);
-            }
             (glm::vec3&)m_World->GetComponent(m_Selection, "Transform")["Scale"] += movement;
         }
     }
+
+
+    /*LOG_DEBUG("DELTA %f", e.DeltaX);
+    if (e.X < 0) {
+        glfwSetCursorPos(m_Renderer->Window(), width - 1, e.Y);
+    }
+    if (e.X >= width) {
+        glfwSetCursorPos(m_Renderer->Window(), 0, e.Y);
+    }*/
 
     return true;
 }
@@ -182,15 +240,16 @@ void EditorSystem::Picking()
         auto result = m_Renderer->Pick(pos);
         EntityID entity = result.Entity;
         if (glm::length2(m_WidgetCurrentAxis) > 0.f) {
+            // ???
         } else {
             LOG_INFO("Selected %i", entity);
-            if (entity != 0) {
+            if (entity != EntityID_Invalid) {
                 EntityID parent = m_World->GetParent(entity);
                 if (parent == m_Widget) {
                     m_WidgetCurrentAxis = glm::vec3(
-                        (entity == m_WidgetX) || (entity == m_WidgetOrigin),
-                        (entity == m_WidgetY) || (entity == m_WidgetOrigin),
-                        (entity == m_WidgetZ) || (entity == m_WidgetOrigin)
+                        (entity == m_WidgetX) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneY || entity == m_WidgetPlaneZ),
+                        (entity == m_WidgetY) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneX || entity == m_WidgetPlaneZ),
+                        (entity == m_WidgetZ) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneX || entity == m_WidgetPlaneY)
                     );
                     m_WidgetPickingDepth = result.Depth;
 
@@ -199,39 +258,68 @@ void EditorSystem::Picking()
                     //widgetTransform["Position"] = (glm::vec3)selectionTransform["Position"];
                 } else {
                     ImGui::SetActiveID(0, nullptr);
-                    m_Selection = entity;
+                    if (m_WidgetMode == WidgetMode::None) {
+                        m_WidgetMode = WidgetMode::Translate;
+                    }
                     setWidgetMode(m_WidgetMode);
+                    m_Selection = entity;
                 }
-            } else {
-                m_Selection = 0;
             }
         }
     }
     m_PickingQueue.clear();
 };
 
-
-void EditorSystem::updateWidget()
+bool EditorSystem::OnFileDropped(const Events::FileDropped& e)
 {
-    if (m_Widget == 0) {
+    m_LastDroppedFile = boost::filesystem::path(e.Path).lexically_relative(boost::filesystem::current_path()).string();
+    std::replace(m_LastDroppedFile.begin(), m_LastDroppedFile.end(), '\\', '/');
+    return true;
+}
+
+void EditorSystem::createWidget()
+{
+    if (m_Widget == EntityID_Invalid) {
         m_Widget = m_World->CreateEntity();
         m_World->AttachComponent(m_Widget, "Transform");
         m_WidgetX = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetX, "Transform");
         m_World->AttachComponent(m_WidgetX, "Model");
+        m_WidgetPlaneX = m_World->CreateEntity(m_Widget);
+        m_World->AttachComponent(m_WidgetPlaneX, "Transform");
+        m_World->AttachComponent(m_WidgetPlaneX, "Model");
+        m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/WidgetPlaneX.obj";
         m_WidgetY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetY, "Transform");
         m_World->AttachComponent(m_WidgetY, "Model");
+        m_WidgetPlaneY = m_World->CreateEntity(m_Widget);
+        m_World->AttachComponent(m_WidgetPlaneY, "Transform");
+        m_World->AttachComponent(m_WidgetPlaneY, "Model");
+        m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/WidgetPlaneY.obj";
         m_WidgetZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetZ, "Transform");
         m_World->AttachComponent(m_WidgetZ, "Model");
+        m_WidgetPlaneZ = m_World->CreateEntity(m_Widget);
+        m_World->AttachComponent(m_WidgetPlaneZ, "Transform");
+        m_World->AttachComponent(m_WidgetPlaneZ, "Model");
+        m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/WidgetPlaneZ.obj";
         m_WidgetOrigin = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetOrigin, "Transform");
         m_World->AttachComponent(m_WidgetOrigin, "Model");
-        setWidgetMode(WidgetMode::Translate);
+        setWidgetMode(WidgetMode::None);
+    }
+}
+
+void EditorSystem::updateWidget()
+{
+    if (m_Widget == EntityID_Invalid) {
+        return;
+    }
+    if (m_Selection == m_Widget) {
+        return;
     }
 
-    if (m_Selection != 0) {
+    if (m_Selection != EntityID_Invalid) {
         auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
         glm::vec3 selectionPosition = RenderSystem::AbsolutePosition(m_World, m_Selection);
         widgetTransform["Position"] = selectionPosition;
@@ -243,23 +331,32 @@ void EditorSystem::updateWidget()
 
 void EditorSystem::setWidgetMode(WidgetMode newMode)
 {
-    if (m_Widget == 0) {
+    if (m_Widget == EntityID_Invalid) {
         return;
     }
 
     auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
     widgetTransform["Orientation"] = glm::vec3(0.f);
     m_World->GetComponent(m_WidgetX, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetPlaneX, "Model")["Visible"] = false;
     m_World->GetComponent(m_WidgetY, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetPlaneY, "Model")["Visible"] = false;
     m_World->GetComponent(m_WidgetZ, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetPlaneZ, "Model")["Visible"] = false;
     m_World->GetComponent(m_WidgetOrigin, "Transform")["Scale"] = glm::vec3(1.f);
+    m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = false;
 
     if (newMode == WidgetMode::Translate) {
         m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/TranslationWidgetX.obj";
         m_World->GetComponent(m_WidgetY, "Model")["Resource"] = "Models/TranslationWidgetY.obj";
         m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/TranslationWidgetZ.obj";
-        m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = false;
-        if (m_Selection != 0) {
+        // Temporarily disabled for local space until I can figure out what's wrong with the math 
+        if (m_WidgetSpace != WidgetSpace::Local) {
+            m_World->GetComponent(m_WidgetPlaneX, "Model")["Visible"] = true;
+            m_World->GetComponent(m_WidgetPlaneY, "Model")["Visible"] = true;
+            m_World->GetComponent(m_WidgetPlaneZ, "Model")["Visible"] = true;
+        }
+        if (m_Selection != EntityID_Invalid) {
             if (m_WidgetSpace == WidgetSpace::Local) {
                 auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
                 widgetTransform["Orientation"] = glm::eulerAngles(RenderSystem::AbsoluteOrientation(m_World, m_Selection));
@@ -271,16 +368,15 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/ScaleWidgetZ.obj";
         m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = true;
         m_World->GetComponent(m_WidgetOrigin, "Model")["Resource"] = "Models/ScaleWidgetOrigin.obj";
-        if (m_Selection != 0) {
+        if (m_Selection != EntityID_Invalid) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
-            widgetTransform["Orientation"] = (glm::vec3)selectionTransform["Orientation"];
+            widgetTransform["Orientation"] = glm::eulerAngles(RenderSystem::AbsoluteOrientation(m_World, m_Selection));
         }
     } else if (newMode == WidgetMode::Rotate) {
         m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/RotationWidgetX.obj";
         m_World->GetComponent(m_WidgetY, "Model")["Resource"] = "Models/RotationWidgetY.obj";
         m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/RotationWidgetZ.obj";
-        m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = false;
-        if (m_Selection != 0) {
+        if (m_Selection != EntityID_Invalid) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
             if (m_WidgetSpace == WidgetSpace::Local) {
                 widgetTransform["Orientation"] = glm::eulerAngles(RenderSystem::AbsoluteOrientation(m_World, m_Selection));
@@ -290,7 +386,6 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
     m_WidgetMode = newMode;
 }
 
-
 void EditorSystem::setWidgetSpace(WidgetSpace space)
 {
     m_WidgetSpace = space;
@@ -299,16 +394,23 @@ void EditorSystem::setWidgetSpace(WidgetSpace space)
 
 void EditorSystem::drawUI(World* world, double dt)
 {
+    namespace bfs = boost::filesystem;
+
     ImGui::ShowTestWindow();
     //ImGui::ShowStyleEditor();
 
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-
-            if (ImGui::MenuItem("New")) { }
-            if (ImGui::MenuItem("Open", "Ctrl+O")) { }
-            if (ImGui::MenuItem("Save", "Ctrl+S")) { }
-            if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) { }
+            //if (ImGui::MenuItem("New")) { }
+            if (ImGui::MenuItem("Import", "Ctrl+O")) {
+                fileImport(world);
+            }
+            if (ImGui::MenuItem("Save", "Ctrl+S")) {
+                fileSave(world);
+            }
+            if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) {
+                fileSaveAs(world);
+            }
             ImGui::Separator();
             if (ImGui::MenuItem("Close Editor", "F1")) { }
 
@@ -343,7 +445,7 @@ void EditorSystem::drawUI(World* world, double dt)
 
     std::string title = std::string("Components #") + std::to_string(m_Selection) + std::string("###Components");
     if (ImGui::Begin(title.c_str())) {
-        if (m_Selection != 0) {
+        if (m_Selection != EntityID_Invalid) {
             auto& pools = world->GetComponentPools();
 
             std::vector<const char*> componentTypes;
@@ -383,41 +485,57 @@ void EditorSystem::drawUI(World* world, double dt)
                     }
 
                     auto& component = world->GetComponent(m_Selection, componentType);
-                    for (auto& pair : ci.FieldTypes) {
-                        const std::string& field = pair.first;
-                        const std::string& type = pair.second;
+                    for (auto& kv : ci.Fields) {
+                        const std::string& fieldName = kv.first;
+                        auto& field = kv.second;
                         
-                        if (type == "Vector") {
-                            auto& val = component.Property<glm::vec3>(field);
-                            if (field == "Scale") {
-                                ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
-                            } else if (field == "Orientation") {
+                        ImGui::PushID(fieldName.c_str());
+                        if (field.Type == "Vector") {
+                            auto& val = component.Property<glm::vec3>(fieldName);
+                            if (fieldName == "Scale") {
+                                ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
+                            } else if (fieldName == "Orientation") {
                                 glm::vec3 tempVal = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
-                                if (ImGui::SliderFloat3(field.c_str(), glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
+                                if (ImGui::SliderFloat3("", glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
                                     val = tempVal;
                                 }
                             } else {
-                                ImGui::DragFloat3(field.c_str(), glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
+                                ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
                             }
-                        } else if (type == "Color") {
-                            auto& val = component.Property<glm::vec4>(field);
-                            ImGui::ColorEdit4(field.c_str(), glm::value_ptr(val), true);
-                        } else if (type == "string") {
-                            std::string& val = component.Property<std::string>(field);
+                        } else if (field.Type == "Color") {
+                            auto& val = component.Property<glm::vec4>(fieldName);
+                            ImGui::ColorEdit4("", glm::value_ptr(val), true);
+                        } else if (field.Type == "string") {
+                            std::string& val = component.Property<std::string>(fieldName);
                             char tempString[1024];
                             memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString)));
-                            if (ImGui::InputText(field.c_str(), tempString, sizeof(tempString))) {
+                            if (ImGui::InputText("", tempString, sizeof(tempString))) {
                                 val = std::string(tempString);
-                                LOG_DEBUG("%s::%s changed!", componentType.c_str(), field.c_str());
+                                LOG_DEBUG("%s::%s changed!", componentType.c_str(), fieldName.c_str());
                             }
-                        } else if (type == "double") {
-                            float tempVal = static_cast<float>(component.Property<double>(field));
-                            if (ImGui::InputFloat(field.c_str(), &tempVal, 0.01f, 1.f)) {
-                                component.SetProperty(field, static_cast<double>(tempVal));
+                            // DROP STUFF
+                            if (ImGui::IsItemHovered() && !m_LastDroppedFile.empty()) {
+                                val = m_LastDroppedFile;
+                                m_LastDroppedFile = "";
                             }
-                        } else if (type == "bool") {
-                            auto& val = component.Property<bool>(field);
-                            ImGui::Checkbox(field.c_str(), &val);
+
+                        } else if (field.Type == "double") {
+                            float tempVal = static_cast<float>(component.Property<double>(fieldName));
+                            if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
+                                component.SetProperty(fieldName, static_cast<double>(tempVal));
+                            }
+                        } else if (field.Type == "bool") {
+                            auto& val = component.Property<bool>(fieldName);
+                            ImGui::Checkbox("", &val);
+                        } else {
+                            ImGui::TextDisabled(field.Type.c_str());
+                        }
+                        ImGui::PopID();
+
+                        ImGui::SameLine();
+                        ImGui::Text(fieldName.c_str());
+                        if (ImGui::IsItemHovered()) {
+                            ImGui::SetTooltip("field annotation goes here");
                         }
                     }
                 }
@@ -427,72 +545,91 @@ void EditorSystem::drawUI(World* world, double dt)
     }
     ImGui::End();
 
-    if (ImGui::Begin("Entitites")) {
-        static EntityID draggingEntity = 0;
+    if (ImGui::Begin("Entities")) {
         auto entityChildren = world->GetEntityChildren();
         std::function<void(EntityID)> recurse = [&](EntityID parent) {
             auto range = entityChildren.equal_range(parent);
             for (auto it = range.first; it != range.second; it++) {
-
-                ImVec2 pos = ImGui::GetCursorScreenPos();
-                float width = ImGui::GetContentRegionAvailWidth();
-                ImRect bb(pos + ImVec2(20, 0), pos + ImVec2(width, 13));
-                auto window = ImGui::GetCurrentWindow();
-                if (m_Selection == it->second) {
-                    const ImU32 col = window->Color(ImGuiCol_HeaderActive);
-                    window->DrawList->AddRectFilled(bb.Min, bb.Max, col);
-                }
-                ImGuiID id = window->GetID((std::string("#SelectButton") + std::to_string(it->second)).c_str());
-                bool hovered = false;
-                bool held = false;
-                if (ImGui::ButtonBehavior(bb, id, &hovered, &held)) {
-                    m_Selection = it->second;
-                }
-                if (held) {
-                    ImVec2 entityDragDelta = ImGui::GetMouseDragDelta(0);
-                    if (std::abs(entityDragDelta.x) > 0 && std::abs(entityDragDelta.y) > 0) {
-                        if (draggingEntity == 0) {
-                            draggingEntity = it->second;
-                            LOG_DEBUG("Started drag of entity %i", draggingEntity);
-                        }
-                        ImGui::SetNextWindowPos(ImGui::GetIO().MousePos + ImVec2(20, 0));
-                        ImGui::Begin("Change parent", nullptr, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings);
-                        ImGui::Text("#%i", draggingEntity);
-                        ImGui::End();
-                    }
-                }
-
-                ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
-                if (ImGui::TreeNode((std::string("#") + std::to_string(it->second)).c_str())) {
-                    if (draggingEntity != 0 && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0)) {
-                        LOG_DEBUG("Changed parent of %i to %i", draggingEntity, it->second);
-                        changeParent(draggingEntity, it->second);
-                        draggingEntity = 0;
-                    }
-
-                    if (ImGui::BeginPopupContextItem("item context menu")) {
-                        if (ImGui::Button("Add")) {
-                            EntityID entity = world->CreateEntity(it->second);
-                            world->AttachComponent(entity, "Transform");
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Delete")) {
-                            world->DeleteEntity(it->second);
-                            ImGui::CloseCurrentPopup();
-                            if (m_Selection == it->second) {
-                                m_Selection = 0;
-                            }
-                        }
-                        ImGui::EndPopup();
-                    }
+                if (createEntityNode(world, it->second)) {
                     recurse(it->second);
                     ImGui::TreePop();
                 }
             }
         };
-        recurse(0);
+        recurse(EntityID_Invalid);
     }
     ImGui::End();
+}
+
+bool EditorSystem::createEntityNode(World* world, EntityID entity)
+{
+    // HACK: Don't show the widget entities in the entity tree
+    if (entity == m_Widget) {
+        return false;
+    }
+
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    float width = ImGui::GetContentRegionAvailWidth();
+    ImRect bb(pos + ImVec2(20, 0), pos + ImVec2(width, 13));
+    auto window = ImGui::GetCurrentWindow();
+    if (m_Selection == entity) {
+        const ImU32 col = window->Color(ImGuiCol_HeaderActive);
+        window->DrawList->AddRectFilled(bb.Min, bb.Max, col);
+    }
+    ImGuiID id = window->GetID((std::string("#SelectButton") + std::to_string(entity)).c_str());
+    bool hovered = false;
+    bool held = false;
+    if (ImGui::ButtonBehavior(bb, id, &hovered, &held)) {
+        m_Selection = entity;
+    }
+    if (held) {
+        ImVec2 entityDragDelta = ImGui::GetMouseDragDelta(0);
+        if (std::abs(entityDragDelta.x) > 0 && std::abs(entityDragDelta.y) > 0) {
+            if (m_UIDraggingEntity == EntityID_Invalid) {
+                m_UIDraggingEntity = entity;
+                LOG_DEBUG("Started drag of entity %i", m_UIDraggingEntity);
+            }
+            ImGui::SetNextWindowPos(ImGui::GetIO().MousePos + ImVec2(20, 0));
+            ImGui::Begin("Change parent", nullptr, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings);
+            ImGui::Text("#%i", m_UIDraggingEntity);
+            ImGui::End();
+        }
+    }
+
+    ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
+    std::string nodeTitle;
+    const std::string& entityName = world->GetName(entity);
+    if (!entityName.empty()) {
+        nodeTitle = entityName;
+    } else {
+        nodeTitle = std::string("#") + std::to_string(entity);
+    }
+    if (ImGui::TreeNode(nodeTitle.c_str())) {
+        if (m_UIDraggingEntity != EntityID_Invalid && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0)) {
+            LOG_DEBUG("Changed parent of %i to %i", m_UIDraggingEntity, entity);
+            changeParent(m_UIDraggingEntity, entity);
+            m_UIDraggingEntity = EntityID_Invalid;
+        }
+
+        if (ImGui::BeginPopupContextItem("item context menu")) {
+            if (ImGui::Button("Add")) {
+                EntityID newEntity = world->CreateEntity(entity);
+                world->AttachComponent(newEntity, "Transform");
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Delete")) {
+                world->DeleteEntity(entity);
+                ImGui::CloseCurrentPopup();
+                if (!world->ValidEntity(m_Selection)) {
+                    m_Selection = EntityID_Invalid;
+                }
+            }
+            ImGui::EndPopup();
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool EditorSystem::createDeleteButton(std::string componentType)
@@ -528,4 +665,49 @@ void EditorSystem::changeParent(EntityID entity, EntityID newParent)
     }
 
     m_World->SetParent(entity, newParent);
+}
+
+void EditorSystem::fileImport(World* world)
+{
+    m_CurrentFile = openDialog(m_DefaultEntityDir);
+    auto file = ResourceManager::Load<EntityFile>(m_CurrentFile.string());
+    EntityFilePreprocessor fpp(file);
+    fpp.RegisterComponents(world);
+    EntityFileParser fp(file);
+    fp.MergeEntities(world);
+    createWidget();
+    updateWidget();
+}
+
+void EditorSystem::fileSave(World* world)
+{
+    if (boost::filesystem::exists(m_CurrentFile)) {
+        // HACK: Delete the widgets so they don't appear in the saved file
+        world->DeleteEntity(m_Widget);
+        m_Widget = EntityID_Invalid;
+
+        EntityFileWriter writer(m_CurrentFile.string());
+        writer.WriteWorld(world);
+
+        createWidget();
+    } else {
+        fileSaveAs(world);
+    }
+}
+
+void EditorSystem::fileSaveAs(World* world)
+{
+    auto filePath = saveDialog(m_DefaultEntityDir);
+    if (filePath.empty()) {
+        return;
+    }
+
+    // HACK: Delete the widgets so they don't appear in the saved file
+    world->DeleteEntity(m_Widget);
+    m_Widget = EntityID_Invalid;
+
+    EntityFileWriter writer(filePath.string());
+    writer.WriteWorld(world);
+
+    createWidget();
 }

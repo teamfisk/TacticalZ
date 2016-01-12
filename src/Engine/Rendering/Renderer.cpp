@@ -1,5 +1,4 @@
 #include "Rendering/Renderer.h"
-#include "Rendering/DebugCameraInputController.h"
 
 void Renderer::Initialize()
 {

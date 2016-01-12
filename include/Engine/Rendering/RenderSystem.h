@@ -18,7 +18,7 @@ class RenderSystem : public ImpureSystem
 {
 public:
     RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
-    
+
     virtual void Update(World* world, double dt) override;
 
     static glm::vec3 AbsolutePosition(World* world, EntityID entity);
@@ -40,7 +40,7 @@ private:
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(const Events::SetCamera &event);
-    EntityID m_CurrentCamera = -1;
+    EntityID m_CurrentCamera = EntityID_Invalid;
 
     void switchCamera(EntityID entity);
 
@@ -50,8 +50,8 @@ private:
     glm::mat4 m_ViewMatrix;
     glm::mat4 m_ProjectionMatrix;
     
-    glm::mat4 ModelMatrix(EntityID entity);
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
+    glm::mat4 ModelMatrix(EntityID entity, World* world);
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
 
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);

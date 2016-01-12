@@ -16,6 +16,7 @@
 #include "ELockMouse.h"
 #include "EGamepadAxis.h"
 #include "EGamepadButton.h"
+#include "EFileDropped.h"
 
 class InputManager
 {
@@ -71,6 +72,8 @@ private:
     static void GLFWCharCallback(GLFWwindow* window, unsigned int c);
     static std::vector<std::pair<double, double>> GLFWScrollCallbackQueue;
     static void GLFWScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+    static std::vector<std::string> GLFWDropCallbackQueue;
+    static void GLFWDropCallback(GLFWwindow* window, int count, const char* paths[]);
 };
 
 #endif

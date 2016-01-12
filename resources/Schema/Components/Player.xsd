@@ -7,6 +7,10 @@
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="Velocity" type="t:Vector" minOccurs="0"/>
+				<xs:element name="Forward" type="t:bool" minOccurs="0"/>
+				<xs:element name="Left" type="t:bool" minOccurs="0"/>
+				<xs:element name="Back" type="t:bool" minOccurs="0"/>
+				<xs:element name="Right" type="t:bool" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

@@ -7,4 +7,7 @@
 	<xs:include schemaLocation="Components/RaptorCopter.xsd"/>
 	<xs:include schemaLocation="Components/Player.xsd"/>
 	<xs:include schemaLocation="Components/Camera.xsd"/>
+	<xs:include schemaLocation="Components/AABB.xsd"/>
+	<xs:include schemaLocation="Components/Trigger.xsd"/>
+	<xs:include schemaLocation="Components/Health.xsd"/>
 </xs:schema>

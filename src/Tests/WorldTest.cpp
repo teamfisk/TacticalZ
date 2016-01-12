@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(WorldTestMultipleAllocations, * utf::tolerance(0.00001))
 
     // Loop through them and check data
     int i = 0;
-    for (auto& c : w.GetComponents("Test")) {
+    for (auto& c : *w.GetComponents("Test")) {
         BOOST_TEST((int)c["TestInteger"] == i);
         i++;
     }

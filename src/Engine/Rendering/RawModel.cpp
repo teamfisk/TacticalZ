@@ -76,18 +76,18 @@ RawModel::RawModel(std::string fileName)
 			}
 
 			// Material diffuse color
-			aiColor4D diffuse;
+			aiColor3D diffuse;
 			material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-
             float opacity;
             material->Get(AI_MATKEY_OPACITY, opacity);
+			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
 
 			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
             
 			// Material specular color
-			aiColor4D specular;
+			aiColor3D specular;
 			material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-			desc.SpecularVertexColor = glm::vec4(specular.r, specular.g, specular.b, specular.a);
+			desc.SpecularVertexColor = glm::vec4(specular.r, specular.g, specular.b, 1.f);
 
 			m_Vertices.push_back(desc);
 		}

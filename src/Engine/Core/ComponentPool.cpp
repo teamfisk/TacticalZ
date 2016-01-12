@@ -19,7 +19,7 @@ bool ComponentPoolForwardIterator::operator!=(const ComponentPoolForwardIterator
     return m_MemoryPoolIterator != other.m_MemoryPoolIterator;
 }
 
-ComponentPoolForwardIterator& ComponentPoolForwardIterator::operator++(int)
+ComponentPoolForwardIterator ComponentPoolForwardIterator::operator++(int)
 {
     ComponentPoolForwardIterator copyIter(*this);
     operator++();
