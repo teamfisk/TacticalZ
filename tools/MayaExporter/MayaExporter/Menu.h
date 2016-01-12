@@ -46,6 +46,7 @@ public:
 	Menu(QDialog* dialog);
 	~Menu();
 
+    void GetMeshData(MObject object);
 	void GetMaterialData();
 	void GetSkeletonData();
 

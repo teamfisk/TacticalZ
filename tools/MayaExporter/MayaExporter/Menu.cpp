@@ -125,8 +125,7 @@ void Menu::ExportSelected(bool checked)
 		MFnDependencyNode thisNode(object);
 
 		cout << thisNode.name().asChar() << endl;
-		Mesh mesh;
-		mesh.GetMeshData(object);
+		GetMeshData(object);
 	}
 	if (m_ExportPath->text().isEmpty()) {
 		cout << "Please select a folder." << endl;
@@ -195,17 +194,32 @@ void Menu::RemoveClipClicked(bool)
 void Menu::ExportAll(bool)
 {
 	MDagPath path;
+    m_File.ASCIIFilePath("C:/Users/Nickelodion/Desktop/coolASCII.txt");
+    m_File.binaryFilePath("C:/Users/Nickelodion/Desktop/coolSoptunz.bin");
+    m_File.OpenFiles();
 
 	// Loop through all nodes in the scene
-	MItDependencyNodes it(MFn::kInvalid);
+	MItDependencyNodes it(MFn::kMesh);
 	for (; !it.isDone(); it.next()) {
 		MObject node = it.thisNode();
 		if (node.hasFn(MFn::kMesh)) {
 			MFnDependencyNode thisNode(node);
+            MPlugArray connections;
 
-			cout << thisNode.name().asChar() << endl;
-			Mesh mesh;
-			mesh.GetMeshData(node);
+            thisNode.findPlug("inMesh").connectedTo(connections, true, true);
+            bool next = false;
+            for (unsigned int i = 0; i < connections.length(); i++) {
+                if(connections[i].node().apiType() == MFn::kSkinClusterFilter){ 
+                    next = true;
+                    break;
+                }
+            }
+            if (next)
+                continue;
+
+            cout << thisNode.name().asChar() << endl;
+            MGlobal::displayInfo("EXPORT ALL FUNCTION: " + thisNode.name() + " " + thisNode.findPlug("inMesh").asMObject().apiTypeStr());
+            GetMeshData(node);
 		}
 	}
 	if (m_ExportPath->text().isEmpty()) {
@@ -215,12 +229,9 @@ void Menu::ExportAll(bool)
 		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
 	}
 
-	m_File.ASCIIFilePath("C:/Users/Nickelodion/Desktop/coolASCII.txt");
-	m_File.binaryFilePath("C:/Users/Nickelodion/Desktop/coolSoptunz.bin");
-
 	if (m_ExportAnimationsButton->isChecked())
 		GetSkeletonData();
-
+    m_File.CloseFiles();
 }
 
 void Menu::CancelClicked(bool)
@@ -257,7 +268,19 @@ void Menu::Button3Clicked(bool)
 		cout << "3 unchecked!" << endl;
 	}
 }
+void Menu::GetMeshData(MObject object)
+{
+    std::vector<VertexLayout> vertexList;
+    std::vector<unsigned int> indexList;
 
+    Mesh mesh;
+    mesh.GetMeshData(object, vertexList, indexList);
+
+    for (auto aVertex : vertexList) {
+        m_File.writeToFiles(&aVertex);
+    }
+    m_File.writeToFiles(indexList.data(), indexList.size());
+}
 void Menu::GetMaterialData()
 {
 	this->m_MaterialHandler = new Material();
@@ -296,8 +319,6 @@ void Menu::GetSkeletonData()
 		allAnimations.push_back(m_SkeletonHandler->GetAnimData(animationName, startFrame, endFrame));
 	}
 
-	m_File.OpenFiles();
-
 	//print out all bind poses
 	for (auto aBindPose : allBindPoses){
 		m_File.writeToFiles(&aBindPose);
@@ -315,7 +336,6 @@ void Menu::GetSkeletonData()
 	for (auto aAnimation : allAnimations) {
 		m_File.writeToFiles(&aAnimation);
 	}
-	m_File.CloseFiles();
 }
 
 Menu::~Menu()

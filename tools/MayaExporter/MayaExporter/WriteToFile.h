@@ -20,19 +20,31 @@ public:
 		MGlobal::displayInfo("WriteToFile::writeToFiles()");
 		if (ASCIIFile.is_open())
 		{
-			MGlobal::displayInfo("Writing to ASCIIfile");
 			for (unsigned int i = startIndex; i < numOfElementToWrite + startIndex; i++)
 				ASCIIFile << toWrite[i] << endl;
 		}
 
 		if (binFile.is_open())
 		{
-			MGlobal::displayInfo("Writing to binaryfile");
 			for (unsigned int i = startIndex; i < numOfElementToWrite + startIndex; i++)
 				toWrite[i].WriteBinary(binFile);
 		}
 
 	}
+
+    void writeToFiles(unsigned int* toWrite, unsigned int numOfElementToWrite = 1, unsigned int startIndex = 0)
+    {
+        MGlobal::displayInfo("WriteToFile::writeToFiles()");
+        if (ASCIIFile.is_open()) {
+            for (unsigned int i = startIndex; i < numOfElementToWrite + startIndex; i++)
+                ASCIIFile << toWrite[i] << endl;
+        }
+
+        if (binFile.is_open()) {
+                binFile.write((char*)toWrite, numOfElementToWrite * sizeof(int));
+        }
+
+    }
 
 	void OpenFiles();
 	void CloseFiles();

@@ -37,6 +37,11 @@
 #include <maya/MTransformationMatrix.h>
 #include <maya/MFnMatrixData.h>
 #include <maya/MItMeshFaceVertex.h>
+#include <maya/MFnSkinCluster.h>
+#include <maya/MDagPathArray.h>
+#include <maya/MItGeometry.h>
+#include <maya/MItMeshVertex.h>
+#include <maya/MFnWeightGeometryFilter.h>
 
 
 // Wrappers
