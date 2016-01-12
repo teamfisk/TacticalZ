@@ -32,10 +32,6 @@ void Server::Close()
 
 void Server::readFromClients()
 {
-    // m_ThreadIsRunning might be unnecessary but the 
-    // program crashed if it executed m_Socket.available()
-    // when closing the program. 
-
     while (m_Socket.available()) {
         try {
             bytesRead = receive(readBuffer, INPUTSIZE);
@@ -44,7 +40,6 @@ void Server::readFromClients()
         } catch (const std::exception& err) {
             //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
         }
-
     }
     std::clock_t currentTime = std::clock();
     // Send snapshot
@@ -111,7 +106,7 @@ int Server::receive(char * data, size_t length)
 
 void Server::send(Packet& packet, int playerID)
 {
-    m_Socket.send_to(
+    int bytesSent = m_Socket.send_to(
         boost::asio::buffer(packet.Data(), packet.Size()),
         m_PlayerDefinitions[playerID].Endpoint,
         0);
@@ -152,119 +147,34 @@ void Server::broadcast(Packet& packet)
         }
     }
 }
-//
-//void Server::parseShitTest(Packet& packet)
-//{ 
-//    packet.ReadPrimitive<int>(); // MessageType
-//    packet.ReadPrimitive<int>(); // Packet ID
-//    
-//    std::string componentType = packet.ReadString();
-//    //LOG_INFO("A snapshot was parsed. first component type is: %s", componentType.c_str());
-//    int stride = packet.ReadPrimitive<int>();
-//    int nrOfComponents = (packet.Size() - packet.DataReadSize()) / (stride + sizeof(EntityID));
-//    //if (componentType == "Model")
-//    //    return;
-//    for (size_t i = 0; i < nrOfComponents; i++) {
-//        EntityID entityID = packet.ReadPrimitive<EntityID>();
-//        ComponentWrapper model = m_World->GetComponent(entityID, "Model");
-//        std::string checkPath = model["Resource"];
-//        // Check if entity exists
-//        if (m_World->HasEntity(entityID)) {
-//            // check if component exists
-//            if (m_World->HasComponent(entityID, componentType)) {
-//                //Copy data to component
-//                memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
-//            } else {
-//                // If component doesen't exist
-//                // Create component
-//                m_World->AttachComponent(entityID, componentType);
-//                // Copy data to newly created component
-//                memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
-//            }
-//        } else {
-//            // If entity dosen't exist
-//            EntityID newEntityID = m_World->CreateEntity();
-//            // Check if EntityIDs are out of sync
-//            if (newEntityID != entityID) {
-//                LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the same as the one sent by server \
-//                                  EntityIDs are out of sync");
-//            }
-//            m_World->AttachComponent(newEntityID, componentType);
-//            // Copy data to newly created component
-//            memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
-//        }
-//        ComponentWrapper model2 = m_World->GetComponent(entityID, "Model");
-//        std::string checkPath2 = model2["Resource"];
-//    }
-//}
 
+// Send snapshot fields
 void Server::sendSnapshot()
 {
     // Should time this
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
-    for (auto it : worldComponentPools) {
+    for (auto& it : worldComponentPools) {
         Packet packet(MessageType::Snapshot, m_SendPacketID);
         std::string componentType = it.first;
-        //if (componentType != "Model")
-        //    continue;
         ComponentPool* componentPool = it.second;
         ComponentInfo componentInfo = componentPool->ComponentInfo();
         packet.WriteString(componentInfo.Name);
-        packet.WritePrimitive(componentInfo.Meta.Stride);
-        for (auto componentWrapper : *componentPool) {
-            if (packet.Size() + componentInfo.Meta.Stride >= packet.MaxSize()) {
-                broadcast(packet);
-                //parseShitTest(packet);
-                // Packet destructor is called (which is what we want).
-                packet.Init(MessageType::Snapshot, m_SendPacketID);
-                // Add Component header
-                packet.WriteString(componentInfo.Name);
-                packet.WritePrimitive(componentInfo.Meta.Stride);
-            }
-            // Component data
+
+        for (auto& componentWrapper : *componentPool) {
             packet.WritePrimitive(componentWrapper.EntityID);
-            packet.WriteData(componentWrapper.Data, componentWrapper.Info.Meta.Stride);
+            for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
+                ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(componentField);
+                if (fieldInfo.Type == "string") {
+                    std::string& value = componentWrapper[componentField];
+                    packet.WriteString(value);
+                } else {
+                    packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
+                }
+            }
         }
         broadcast(packet);
     }
 }
-
-//void Server::sendSnapshot()
-//{
-//    // Should time this
-//    std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
-//    for (auto it : worldComponentPools) {
-//        Packet packet(MessageType::Snapshot, m_SendPacketID);
-//        std::string componentType = it.first;
-//        ComponentPool* componentPool = it.second;
-//        ComponentInfo componentInfo = componentPool->ComponentInfo();
-//        if (componentInfo.Name != "Transform")
-//            continue;
-//        packet.WriteString(componentInfo.Name);
-//        packet.WritePrimitive(componentInfo.Meta.Stride);
-//        auto componentWrapper = *componentPool->begin();
-//        packet.WritePrimitive(componentWrapper.EntityID);
-//        packet.WriteData(componentWrapper.Data, componentWrapper.Info.Meta.Stride);
-//
-//        for (auto componentWrapper : *componentPool) {
-//            //// When packet is full send it
-//            //if (packet.Size() + componentInfo.Meta.Stride >= packet.MaxSize()) {
-//            //    broadcast(packet);
-//            //    // Packet destructor is called (which is what we want).
-//            //    packet.Init(MessageType::Snapshot, m_SendPacketID);
-//            //    // Add Component header
-//            //    packet.WriteString(componentInfo.Name);
-//            //    packet.WritePrimitive(componentInfo.Meta.Stride);
-//
-//            //}
-//            //// Component data
-//            //packet.WritePrimitive(componentWrapper.EntityID);
-//            //packet.WriteData(componentWrapper.Data, componentWrapper.Info.Meta.Stride);
-//            broadcast(packet);
-//        }
-//        broadcast(packet);
-//    }
-//}
 
 void Server::sendPing()
 {
@@ -275,7 +185,6 @@ void Server::sendPing()
             LOG_INFO("Last packetID received %i: Player %i's ping: %i", m_PacketID, i, ping);
         }
     }
-
     // Create ping message
     Packet packet(MessageType::ServerPing, m_SendPacketID);
     packet.WriteString("Ping from server");

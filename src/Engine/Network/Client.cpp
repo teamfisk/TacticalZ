@@ -27,8 +27,6 @@ void Client::Start(World* world, EventBroker* eventBroker)
     m_World = world;
 
     // Subscribe to events
-    //m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
-    //m_EventBroker->Subscribe(m_EInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
 
     m_Socket.connect(m_ReceiverEndpoint);
@@ -73,7 +71,6 @@ void Client::sendSnapshotToServer()
     m_NextSnapshot.InputRight = "";
 
     auto player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
-
 
     // See if any movement keys are down
     // We dont care if it's overwritten by later
@@ -181,47 +178,53 @@ void Client::parseEventMessage(Packet& packet)
     }
 }
 
+void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
+{
+    for (auto field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        if (fieldInfo.Type == "string") {
+            std::string& value = packet.ReadString();
+            m_World->GetComponent(entityID, componentType)[fieldInfo.Name] = value;
+        } else {
+            memcpy(m_World->GetComponent(entityID, componentType).Data + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+        }
+    }
+}
+
+// Field parse
 void Client::parseSnapshot(Packet& packet)
 {
     std::string componentType = packet.ReadString();
-    //LOG_INFO("A snapshot was parsed. first component type is: %s", componentType.c_str());
-    int stride = packet.ReadPrimitive<int>();
-    int nrOfComponents = (packet.Size() - packet.DataReadSize()) / (stride + sizeof(EntityID));
-    if (componentType == "Model")
-        return;
-    for (size_t i = 0; i < nrOfComponents; i++) {
+    while (packet.DataReadSize() < packet.Size()) {
         EntityID entityID = packet.ReadPrimitive<EntityID>();
-        //ComponentWrapper model = m_World->GetComponent(entityID, "Model");
-        //std::string checkPath = model["Resource"];
-        // Check if entity exists
-        if (m_World->HasEntity(entityID)) {
-            // check if component exists
+        ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
+        if (m_World->ValidEntity(entityID)) {
             if (m_World->HasComponent(entityID, componentType)) {
-                //Copy data to component
-                memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
+                // If the entity and the component exists update it
+                updateFields(packet, componentInfo, entityID, componentType);
+                // if entity exists but not the component
             } else {
-                // If component doesen't exist
                 // Create component
                 m_World->AttachComponent(entityID, componentType);
                 // Copy data to newly created component
-                memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
+                updateFields(packet, componentInfo, entityID, componentType);
             }
+            // If the entity dosent exist nor the component
         } else {
+            //Create Entity
             // If entity dosen't exist
             EntityID newEntityID = m_World->CreateEntity();
             // Check if EntityIDs are out of sync
             if (newEntityID != entityID) {
-                LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the same as the one sent by server \
-                                  EntityIDs are out of sync");
+                LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the \
+                            same as the one sent by server (EntityIDs are out of sync)");
             }
+            // Create component
             m_World->AttachComponent(newEntityID, componentType);
             // Copy data to newly created component
-            memcpy(m_World->GetComponent(entityID, componentType).Data, packet.ReadData(stride), stride);
+            updateFields(packet, componentInfo, newEntityID, componentType);
         }
-        //ComponentWrapper model2 = m_World->GetComponent(entityID, "Model");
-        //std::string checkPath2 = model2["Resource"];
     }
-
 }
 
 int Client::receive(char* data, size_t length)
@@ -234,7 +237,7 @@ int Client::receive(char* data, size_t length)
         0, error);
 
     if (error) {
-        //LOG_ERROR("receive: %s", error.message().c_str());
+        LOG_ERROR("receive: %s", error.message().c_str());
     }
 
     return bytesReceived;

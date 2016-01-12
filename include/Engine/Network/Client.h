@@ -32,7 +32,7 @@ private:
 
     // Sending message to server logic
     int bytesRead = -1;
-    char readBuf[1024] = { 0 };
+    char readBuf[INPUTSIZE] = { 0 };
     int snapshotInterval = 33;
     std::clock_t previousSnapshotMessage = std::clock();
 
@@ -59,7 +59,7 @@ private:
     // Private member functions
     void readFromServer();
     void sendSnapshotToServer();
-    int receive(char* data, size_t length);
+    int  receive(char* data, size_t length);
     void send(Packet& packet);
     void connect();
     void disconnect();
@@ -67,6 +67,7 @@ private:
     void moveMessageHead(char*& data, size_t& length, size_t stepSize);
     void parseMessageType(Packet& packet);
     void parseEventMessage(Packet& packet);
+    void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
     void parseConnect(Packet& packet);
     void parsePing();
     void parseServerPing();

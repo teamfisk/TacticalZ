@@ -6,7 +6,7 @@
 #include "Network/Packet.h"
 
 #define MAXCONNECTIONS 8
-#define INPUTSIZE 128
+#define INPUTSIZE 4097
 
 class Network
 {

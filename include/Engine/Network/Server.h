@@ -30,7 +30,7 @@ private:
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
 
     // Sending messages to client logic
-    char readBuffer[1024] = { 0 };
+    char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
     // time for previouse message
     std::clock_t previousePingMessage = std::clock();
@@ -67,7 +67,6 @@ private:
     void moveMessageHead(char*& data, size_t& length, size_t stepSize);
     void broadcast(std::string message);
     void broadcast(Packet& packet);
-    //void parseShitTest(Packet& packet); // Remove this when network is working
     void sendSnapshot();
     void sendPing();
     void checkForTimeOuts();
