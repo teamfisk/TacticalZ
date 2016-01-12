@@ -13,9 +13,9 @@ using boost::unit_test_framework::test_case;
 #include <string>
 
 //ray vs model
-#include "Engine\Core\ResourceManager.h"
-#include "Engine\Rendering\Model.h"
-#include "Engine\Core\Ray.h"
+#include "Engine/Core/ResourceManager.h"
+#include "Engine/Rendering/Model.h"
+#include "Engine/Core/Ray.h"
 
 //vs memleaks
 //#define _CRTDBG_MAP_ALLOC

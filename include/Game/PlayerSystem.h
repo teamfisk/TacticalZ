@@ -7,8 +7,8 @@
 #include "Common.h"
 #include "Core/System.h"
 #include "Collision/ETrigger.h"
-#include "Core\EMouseRelease.h"
-#include "Core\EShoot.h"
+#include "Core/EMouseRelease.h"
+#include "Core/EShoot.h"
 
 class PlayerSystem : public PureSystem
 {
