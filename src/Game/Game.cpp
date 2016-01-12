@@ -3,6 +3,7 @@
 #include "Collision/CollisionSystem.h"
 #include "Game/HealthSystem.h"
 #include "Core/EntityFileWriter.h"
+#include "Game/CapturePointSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -70,6 +71,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {

@@ -1,4 +1,5 @@
 <c:Player>
+	<TeamNumber>0</TeamNumber>
 	<EquippedItem>0</EquippedItem>
 	<Velocity X="0" Y="0" Z="0"/>
 	<Forward>false</Forward>

@@ -11,5 +11,5 @@
 	<xs:include schemaLocation="Components/Health.xsd"/>
 	<xs:include schemaLocation="Components/PrimaryItem.xsd"/>
 	<xs:include schemaLocation="Components/SecondaryItem.xsd"/>
-
+	<xs:include schemaLocation="Components/CapturePoint.xsd"/>
 </xs:schema>

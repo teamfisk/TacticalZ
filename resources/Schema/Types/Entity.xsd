@@ -18,6 +18,7 @@
 							<xs:element ref="c:Health" minOccurs="0"/>
 							<xs:element ref="c:PrimaryItem" minOccurs="0"/>
 							<xs:element ref="c:SecondaryItem" minOccurs="0"/>
+							<xs:element ref="c:CapturePoint" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>
