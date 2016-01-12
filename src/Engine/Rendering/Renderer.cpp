@@ -103,6 +103,11 @@ void Renderer::Draw(RenderFrame& rf)
 	glfwSwapBuffers(m_Window);
 }
 
+PickData Renderer::Pick(glm::vec2 screenCoord)
+{
+    return m_PickingPass->Pick(screenCoord);
+}
+
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

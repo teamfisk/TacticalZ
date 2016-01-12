@@ -12,12 +12,12 @@
 #include "../Input/EInputCommand.h"
 #include "Camera.h"
 #include "ModelJob.h"
-
+#include "Renderer.h"
 
 class RenderSystem : public ImpureSystem
 {
 public:
-    RenderSystem(EventBroker* eventBrokerer, RenderFrame* renderFrame);
+    RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
     
     virtual void Update(World* world, double dt) override;
 
@@ -29,6 +29,7 @@ public:
 
 private:
     World* m_World = nullptr;
+    const IRenderer* m_Renderer = nullptr;
 
     RenderFrame* m_RenderFrame;
     bool m_SwitchCamera = false;
@@ -44,6 +45,7 @@ private:
     void SwitchCamera(EntityID entity);
 
     void Initialize();
+    void UpdateCamera(World* world, double dt);
     void UpdateProjectionMatrix(ComponentWrapper& cameraComponent);
     glm::mat4 m_ViewMatrix;
     glm::mat4 m_ProjectionMatrix;

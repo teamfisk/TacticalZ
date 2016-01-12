@@ -7,7 +7,8 @@
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
 #include "../Core/EventBroker.h"
-#include "EPicking.h"
+
+
 
 class PickingPass
 {
@@ -28,6 +29,8 @@ public:
     GLuint DepthBuffer() const { return m_DepthBuffer; }
     const FrameBuffer& PickingBuffer() const { return m_PickingBuffer; }
 
+    
+    PickData Pick(glm::vec2 screenCoord);
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;

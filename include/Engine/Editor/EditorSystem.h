@@ -7,7 +7,6 @@
 #include "../Core/ConfigFile.h"
 #include "../Input/EInputCommand.h"
 #include "../Rendering/IRenderer.h"
-#include "../Rendering/EPicking.h"
 #include "../Rendering/RenderSystem.h"
 
 class EditorSystem : public ImpureSystem
@@ -59,8 +58,8 @@ private:
     bool OnMousePress(const Events::MousePress& e);
     EventRelay<EditorSystem, Events::MouseMove> m_EMouseMove;
     bool OnMouseMove(const Events::MouseMove& e);
-    EventRelay<EditorSystem, Events::Picking> m_EPicking;
-    bool OnPicking(const Events::Picking& e);
+
+    void Picking();
 
     void updateWidget();
     void setWidgetMode(WidgetMode newMode);

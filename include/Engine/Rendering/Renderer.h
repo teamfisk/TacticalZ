@@ -13,7 +13,6 @@
 #include "PickingPass.h"
 #include "DrawScenePass.h"
 #include "../Core/EventBroker.h"
-#include "EPicking.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
 
@@ -28,6 +27,8 @@ public:
     virtual void Initialize() override;
     virtual void Update(double dt) override;
     virtual void Draw(RenderFrame& rf) override;
+
+    virtual PickData Pick(glm::vec2 screenCoord) override;
 
 private:
     //----------------------Variables----------------------//

@@ -12,11 +12,8 @@
 #include "RenderJob.h"
 #include "ModelJob.h"
 
-class Model;
-class Skeleton;
-class Texture;
 
-//TODO: Render: Remove obsolete RenderJobs and fix standard values on variables.
+
 /*
 
 
@@ -88,7 +85,7 @@ struct RenderScene
     ::Camera* Camera;
     std::list<std::shared_ptr<RenderJob>> ForwardJobs;
     std::list<std::shared_ptr<RenderJob>> LightJobs;
-
+    Rectangle ViewPort;
 
 	void Clear()
 	{
@@ -125,8 +122,7 @@ public:
     }
 
     std::list<std::shared_ptr<RenderScene>> RenderScenes;
-
-
+    
 private:
     int m_Size = 0;
 };

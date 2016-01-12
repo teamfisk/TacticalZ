@@ -10,6 +10,13 @@
 #include "RenderQueue.h"
 #include "Model.h"
 
+struct PickData
+{
+    EntityID Entity;
+    glm::vec3 Position; //World position
+    float Depth;
+};
+
 class IRenderer
 {
 public:
@@ -32,6 +39,7 @@ public:
 	virtual void Initialize() = 0;
 	virtual void Update(double dt) = 0;
 	virtual void Draw(RenderFrame& rq) = 0;
+    virtual PickData Pick(glm::vec2 screenCord) = 0;
 
 protected:
 	Rectangle m_Resolution = Rectangle(1280, 720);

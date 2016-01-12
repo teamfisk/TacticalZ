@@ -21,8 +21,6 @@ void DrawScenePass::InitializeShaderPrograms()
     m_BasicForwardProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/BasicForward.frag.glsl")));
     m_BasicForwardProgram->Compile();
     m_BasicForwardProgram->Link();
-
-
 }
 
 void DrawScenePass::Draw(RenderFrame& rf)

@@ -59,7 +59,7 @@ void PickingPass::Draw(RenderFrame& rf)
 
     for(auto scene : rf.RenderScenes)
     {
-        m_Camera = scene->Camera; 
+        m_Camera = scene->Camera;
 
         for (auto &job : scene->ForwardJobs) {
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
@@ -94,24 +94,35 @@ void PickingPass::Draw(RenderFrame& rf)
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
 
-    //Publish pick event every frame with the pick data that can be picked by the event
-    int fbWidth;
-    int fbHeight;
-    glfwGetFramebufferSize(m_Renderer->Window(), &fbWidth, &fbHeight);
-    Events::Picking pickEvent = Events::Picking(
-        &m_PickingBuffer,
-        &m_DepthBuffer,
-        m_Camera->ProjectionMatrix(),
-        m_Camera->ViewMatrix(),
-        Rectangle(fbWidth, fbHeight),
-        &m_PickingColorsToEntity);
-
-    m_EventBroker->Publish(pickEvent);
 
     delete state;
 }
 
 
+
+PickData PickingPass::Pick(glm::vec2 screenCoord)
+{
+    int fbWidth;
+    int fbHeight;
+    glfwGetFramebufferSize(m_Renderer->Window(), &fbWidth, &fbHeight);
+
+    Rectangle resolution = Rectangle(fbWidth, fbHeight);
+    PickData pickData;
+    // Invert screen y coordinate
+    screenCoord.y = resolution.Height - screenCoord.y;
+    ScreenCoords::PixelData data = ScreenCoords::ToPixelData(screenCoord, &m_PickingBuffer, m_DepthBuffer);
+    pickData.Depth = data.Depth;
+
+    auto it = m_PickingColorsToEntity.find(glm::vec2(data.Color[0], data.Color[1]));
+    if (it != m_PickingColorsToEntity.end()) {
+        pickData.Entity = it->second;
+    } else {
+        pickData.Entity = 0;
+    }
+    pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, resolution, m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
+
+    return pickData;
+}
 
 void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
 {

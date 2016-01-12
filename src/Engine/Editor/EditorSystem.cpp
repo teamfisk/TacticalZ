@@ -18,7 +18,6 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorSystem::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &EditorSystem::OnMouseRelease);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseMove, &EditorSystem::OnMouseMove);
-    EVENT_SUBSCRIBE_MEMBER(m_EPicking, &EditorSystem::OnPicking);
 }
 
 void EditorSystem::Update(World* world, double dt)
@@ -32,7 +31,7 @@ void EditorSystem::Update(World* world, double dt)
     if (!m_Visible) {
         return;
     }
-
+    Picking();
     updateWidget();
 
     drawUI(world, dt);
@@ -177,10 +176,10 @@ bool EditorSystem::OnMouseRelease(const Events::MouseRelease& e)
     return true;
 }
 
-bool EditorSystem::OnPicking(const Events::Picking& e)
+void EditorSystem::Picking()
 {
     for (auto& pos : m_PickingQueue) {
-        auto result = e.Pick(pos);
+        auto result = m_Renderer->Pick(pos);
         EntityID entity = result.Entity;
         if (glm::length2(m_WidgetCurrentAxis) > 0.f) {
         } else {
@@ -209,7 +208,6 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
         }
     }
     m_PickingQueue.clear();
-    return true;
 };
 
 
