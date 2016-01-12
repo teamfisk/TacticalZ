@@ -65,7 +65,7 @@ Game::Game(int argc, char* argv[])
         networkFunction();
     }
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
-    m_SoundSystem = new SoundSystem(m_World, m_EventBroker);
+    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
 
     auto soundListenerCube = m_World->CreateEntity();
     m_World->AttachComponent(soundListenerCube, "Listener");
@@ -130,20 +130,9 @@ void Game::Tick()
 bool Game::debugOnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "PlaySound" && e.Value > 0) {
-        Events::PlaySoundOnEntity e;
-        e.emitterID = 18;
+        Events::PlayBackgroundMusic e;
         e.FilePath = "Audio/crosscounter.wav";
         //e.emitterID = 18; // rofl
-        m_EventBroker->Publish(e);
-    }
-    if (e.Command == "Reload" && e.Value > 0) {
-        Events::PauseSound e;
-        e.EmitterID = 18;
-        m_EventBroker->Publish(e);
-    }
-    if (e.Command == "Crouch" && e.Value > 0) {
-        Events::ContinueSound e;
-        e.EmitterID = 18;
         m_EventBroker->Publish(e);
     }
     return true;

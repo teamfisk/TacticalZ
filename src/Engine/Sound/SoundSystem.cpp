@@ -1,9 +1,10 @@
 #include "Sound/SoundSystem.h"
 
-SoundSystem::SoundSystem(World* world, EventBroker* eventBroker)
+SoundSystem::SoundSystem(World* world, EventBroker* eventBroker, bool editorMode)
 {
     m_EventBroker = eventBroker;
     m_World = world;
+    m_EditorEnabled = editorMode;
     
     initOpenAL();
 
@@ -17,6 +18,9 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EStopSound, &SoundSystem::OnStopSound);
     EVENT_SUBSCRIBE_MEMBER(m_EPauseSound, &SoundSystem::OnPauseSound);
     EVENT_SUBSCRIBE_MEMBER(m_EContinueSound, &SoundSystem::OnContinueSound);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayBackgroundMusic, &SoundSystem::OnPlayBackgroundMusic);
+    //EVENT_SUBSCRIBE_MEMBER(m_ESetBGMGain, &SoundSystem::SetBGMGain);
+    //EVENT_SUBSCRIBE_MEMBER(m_ESetSFXGain, &SoundSystem::OnSetSFXGain);
 }
 
 void SoundSystem::initOpenAL()
@@ -36,6 +40,7 @@ SoundSystem::~SoundSystem()
     stopEmitters(); // Stopps emitters
     deleteInactiveEmitters(); // Deletes stopped emitters
 
+    // Delete entities
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end(); it++) {
         m_World->DeleteEntity((*it).first);
@@ -116,12 +121,15 @@ void SoundSystem::updateEmitters()
         std::unordered_map<EntityID, Source*>::iterator i;
         i = m_Sources.find(emitter);
         if (i != m_Sources.end()) {
+            // Get previous pos
             glm::vec3 previousPos;
-            alGetSource3f(m_Sources[emitter]->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
-            glm::vec3 nextPos = RenderQueueFactory::AbsolutePosition(m_World, emitter); // Get next pos
-            glm::vec3 velocity = nextPos - previousPos; // Calculate velocity
-            setSourcePos(m_Sources[emitter]->ALsource, nextPos); // Set next pos
-            setSourceVel(m_Sources[emitter]->ALsource, velocity); // Set velocity
+            alGetSource3f(m_Sources[emitter]->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); 
+            // Get next pos
+            glm::vec3 nextPos = RenderQueueFactory::AbsolutePosition(m_World, emitter); 
+            // Calculate velocity
+            glm::vec3 velocity = nextPos - previousPos; 
+            setSourcePos(m_Sources[emitter]->ALsource, nextPos); 
+            setSourceVel(m_Sources[emitter]->ALsource, velocity); 
             setSoundProperties(
                 m_Sources[emitter]->ALsource,
                 (float)(double)(*it)["Gain"],
@@ -131,8 +139,16 @@ void SoundSystem::updateEmitters()
                 (float)(double)(*it)["RollOffFactor"],
                 (float)(double)(*it)["ReferenceDistance"]
             );
+
+            // To make an emitter play when spawned in editor mode
+            if (m_EditorEnabled) {
+                // Path changed
+                if (m_Sources[emitter]->SoundResource->Path() != (std::string)(*it)["FilePath"]) { 
+                    m_Sources[emitter]->SoundResource = ResourceManager::Load<Sound>((std::string)(*it)["FilePath"]);
+                    playSound(m_Sources[emitter]);
+                }
+            }
         }
-        // No orientation, emitts in all directions
     }
 }
 
@@ -156,8 +172,8 @@ Source* SoundSystem::createSource(std::string filePath)
 {
     ALuint alSource;
     alGenSources((ALuint)1, &alSource);
-    alSourcei(alSource, AL_REFERENCE_DISTANCE, 1.0);
-    alSourcei(alSource, AL_MAX_DISTANCE, FLT_MAX);
+    alSourcef(alSource, AL_REFERENCE_DISTANCE, 1.0);
+    alSourcef(alSource, AL_MAX_DISTANCE, FLT_MAX);
     Source* source = new Source();
     source->ALsource = alSource;
     source->SoundResource = ResourceManager::Load<Sound>(filePath);
@@ -175,11 +191,6 @@ void SoundSystem::stopSound(Source* source)
     alSourceStop(source->ALsource);
 }
 
-void SoundSystem::stopEmitter(EntityID emitter)
-{ 
-    
-}
-
 bool SoundSystem::OnPlaySound(const Events::PlaySound & e)
 {
     Source* sauce = createSource(e.FilePath);
@@ -190,7 +201,7 @@ bool SoundSystem::OnPlaySound(const Events::PlaySound & e)
 bool SoundSystem::OnPlaySoundOnEntity(const Events::PlaySoundOnEntity & e)
 {
     Source* source = createSource(e.FilePath);
-    m_Sources[e.emitterID] = source;
+    m_Sources[e.EmitterID] = source;
     playSound(source);
     return false;
 }
@@ -233,6 +244,34 @@ bool SoundSystem::OnContinueSound(const Events::ContinueSound & e)
     return true;
 }
 
+bool SoundSystem::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
+{
+    auto listenerComponents = m_World->GetComponents("Listener");
+    for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
+        auto emitterChild = m_World->CreateEntity((*it).EntityID);
+        auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
+        (bool&)emitter["Loop"] = true;
+        (std::string&)emitter["FilePath"] = e.FilePath;
+        m_World->AttachComponent(emitterChild, "Transform");
+        Source* source = createSource(e.FilePath);
+        m_Sources[emitterChild] = source;
+        playSound(source);
+    }
+    return false;
+}
+
+bool SoundSystem::OnSetBGMGain(const Events::SetBGMGain & e)
+{
+    m_BGMVolumeChannel = e.Gain;
+    return true;
+}
+
+bool SoundSystem::OnSetSFXGain(const Events::SetSFXGain & e)
+{
+    m_SFXVolumeChannel = e.Gain;
+    return true;
+}
+
 void SoundSystem::setListenerOri(glm::vec3 ori)
 {
     glm::vec3 forward = glm::vec3(0.0, 0.0, -1.0);
@@ -256,9 +295,14 @@ bool SoundSystem::isPlaying(ALuint source)
     return (state == AL_PLAYING);
 }
 
+void SoundSystem::setGain(Source * source, float gain)
+{ 
+    alSourcef(source->ALsource, AL_GAIN, gain);
+}
+
 void SoundSystem::setSoundProperties(ALuint source, float gain, float pitch, bool loop, float maxDistance, float rollOffFactor, float referenceDistance)
 {
-    alSourcef(source, AL_GAIN, gain);
+    alSourcef(source, AL_GAIN, gain * m_SFXVolumeChannel);
     alSourcef(source, AL_PITCH, pitch);
     alSourcei(source, AL_LOOPING, (int)loop); // YOLO
     alSourcef(source, AL_MAX_DISTANCE, maxDistance);

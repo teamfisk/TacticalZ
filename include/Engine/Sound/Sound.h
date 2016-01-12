@@ -7,7 +7,7 @@ class Sound : public Resource
 {
     friend class ResourceManager;
 public:
-    Sound(std::string path) { m_Buffer = LoadFile(path); }
+    Sound(std::string path) { m_Buffer = LoadFile(path); m_Path = path; }
     ~Sound() { ClearBuffer(); }
     ALuint Buffer() { return m_Buffer; }
     std::string Path() { return m_Path; }
@@ -35,14 +35,14 @@ private:
             return m_BufferCache[path];
         }
 
-        //// Open file
+        // Open file
         FILE *fp = fopen(path.c_str(), "rb");
         if (!fp) {
-            printf("Failed to open file %s, no such file exists", path.c_str());
+            printf("Sound: Failed to open file %s, no such file exists", path.c_str());
             return 0;
         }
 
-        //// CHECK FOR VALID WAVE-FILE
+        //CHECK FOR VALID WAVE-FILE
         fread(m_Type, sizeof(char), 4, fp);
         if (m_Type[0] != 'R' || m_Type[1] != 'I' || m_Type[2] != 'F' || m_Type[3] != 'F') {
             printf("ERROR: No RIFF in WAVE-file");
@@ -62,7 +62,7 @@ private:
             return 0;
         }
 
-        //// READ THE DATA FROM WAVE-FILE
+        // READ THE DATA FROM WAVE-FILE
         fread(&m_ChunkSize, 4 * sizeof(char), 1, fp);
         fread(&m_FormatType, 2 * sizeof(char), 1, fp);
         fread(&m_Channels, 2 * sizeof(char), 1, fp);
@@ -83,7 +83,7 @@ private:
         fread(buf, sizeof(char), m_DataSize, fp);
         fclose(fp);
 
-        //// Create buffer
+        // Create buffer
         ALuint format = 0;
         if (m_BitsPerSample == 8) {
             if (m_Channels == 1) {

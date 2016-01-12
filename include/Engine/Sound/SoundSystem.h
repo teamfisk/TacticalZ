@@ -15,9 +15,12 @@
 #include "Sound/EPlaySound.h"
 #include "Sound/EPlaySoundOnEntity.h"
 #include "Sound/EPlaySoundOnPosition.h"
+#include "Sound/EPlayBackgroundMusic.h"
 #include "Sound/EPauseSound.h"
-#include "Sound/EStopSound.h"
 #include "Sound/EContinueSound.h"
+#include "Sound/EStopSound.h"
+#include "Sound/ESetBGMGain.h"
+#include "Sound/ESetSFXGain.h"
 
 
 struct Source
@@ -31,9 +34,10 @@ class SoundSystem
 {
 public:
     SoundSystem() { }
-    SoundSystem(World* world, EventBroker* eventBroker);
+    SoundSystem(World* world, EventBroker* eventBroker, bool editorMode);
     ~SoundSystem();
-    void Update(); // Update emitters
+    // Update emitters / listener
+    void Update(); 
 private:
     // Help functions for working with OpenaAL
     void setListenerPos(glm::vec3 pos) { alListener3f(AL_POSITION, pos.x, pos.y, pos.z); };
@@ -54,9 +58,9 @@ private:
     Source* createSource(std::string filePath);
     void playSound(Source* source);
     void stopSound(Source* source);
-    void stopEmitter(EntityID emitter);
     void stopEmitters();
     bool isPlaying(ALuint source);
+    void setGain(Source* source, float gain);
     void setSoundProperties(ALuint source, float gain, float pitch, bool loop, float maxDistance, float rollOffFactor, float referenceDistance);
 
     // OpenAL system variables
@@ -64,9 +68,12 @@ private:
     ALCcontext* m_ALCcontext = nullptr;
 
     // Logic
-    World* m_World;
-    EventBroker* m_EventBroker;
+    World* m_World = nullptr;
+    EventBroker* m_EventBroker = nullptr;
     std::unordered_map<EntityID, Source*> m_Sources;
+    float m_BGMVolumeChannel = 1.f;
+    float m_SFXVolumeChannel = 1.f;
+    bool m_EditorEnabled = false;
 
     // Events
     EventRelay<SoundSystem, Events::PlaySound> m_EPlaySound;
@@ -81,6 +88,12 @@ private:
     bool OnStopSound(const Events::StopSound &e);
     EventRelay<SoundSystem, Events::ContinueSound> m_EContinueSound;
     bool OnContinueSound(const Events::ContinueSound &e);
+    EventRelay<SoundSystem, Events::PlayBackgroundMusic> m_EPlayBackgroundMusic;
+    bool OnPlayBackgroundMusic(const Events::PlayBackgroundMusic &e);
+    EventRelay<SoundSystem, Events::SetBGMGain> m_ESetBGMGain; 
+    bool OnSetBGMGain(const Events::SetBGMGain &e); // Not tested
+    EventRelay<SoundSystem, Events::SetSFXGain> m_ESetSFXGain; 
+    bool OnSetSFXGain(const Events::SetSFXGain &e); // Not tested
 };
 
 #endif

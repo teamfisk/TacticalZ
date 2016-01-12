@@ -2,7 +2,7 @@
 #define Events_PlaySoundOnPosition_h__
 
 #include <string>
-#include <glm\common.hpp>
+#include <glm/common.hpp>
 #include "Core/Event.h"
 
 namespace Events
