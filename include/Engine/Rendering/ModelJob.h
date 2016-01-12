@@ -8,7 +8,6 @@
 #include "../Core/ComponentWrapper.h"
 #include "Texture.h"
 #include "Model.h"
-
 #include "RenderJob.h"
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
@@ -30,7 +29,6 @@ struct ModelJob : RenderJob
         Entity = modelComponent.EntityID;
     };
 
-
     unsigned int TextureID;
     unsigned int ShaderID;
 
@@ -45,13 +43,10 @@ struct ModelJob : RenderJob
     unsigned int StartIndex = 0;
     unsigned int EndIndex = 0;
 
-
     void CalculateHash() override
     {
         Hash = TextureID;
     }
-
-
 };
 
 #endif

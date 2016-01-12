@@ -5,7 +5,7 @@ RenderSystem::RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer
 {
     m_Renderer = renderer;
     m_RenderFrame = renderFrame;
-    Initialize();
+    initialize();
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
 
@@ -16,7 +16,6 @@ RenderSystem::RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer
     }
 }
 
-
 bool RenderSystem::OnSetCamera(const Events::SetCamera &event)
 {
     auto cameras = m_World->GetComponents("Camera");
@@ -24,14 +23,14 @@ bool RenderSystem::OnSetCamera(const Events::SetCamera &event)
     if (cameras != nullptr) {
         for (auto it = cameras->begin(); it != cameras->end(); it++) {
             if ((std::string)(*it)["Name"] == event.Name) {
-                SwitchCamera((*it).EntityID);
+                switchCamera((*it).EntityID);
             }
         }
     }
     return true;
 }
 
-void RenderSystem::SwitchCamera(EntityID entity)
+void RenderSystem::switchCamera(EntityID entity)
 {
     if(m_World->HasComponent(entity, "Camera")) {
         if (m_World->HasComponent(m_CurrentCamera, "Model")) {
@@ -50,12 +49,12 @@ void RenderSystem::SwitchCamera(EntityID entity)
     }
 }
 
-void RenderSystem::Initialize()
+void RenderSystem::initialize()
 {
     
 }
 
-void RenderSystem::UpdateProjectionMatrix(ComponentWrapper& cameraComponent)
+void RenderSystem::updateProjectionMatrix(ComponentWrapper& cameraComponent)
 {
     double fov = cameraComponent["FOV"];
     double aspectRatio = m_Renderer->Resolution().Width / m_Renderer->Resolution().Height;
@@ -126,7 +125,7 @@ glm::mat4 RenderSystem::ModelMatrix(EntityID entity)
     return modelMatrix;
 }
 
-void RenderSystem::FillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
+void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 {
     auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
@@ -173,18 +172,19 @@ void RenderSystem::Update(World* world, double dt)
     m_World = world;
     m_EventBroker->Process<RenderSystem>();
 
-    UpdateCamera(world, dt);
+    updateCamera(world, dt);
 
+    //Only supports opaque geometry atm
     m_RenderFrame->Clear();
     RenderScene* rs = new RenderScene();
     rs->Camera = m_Camera;
     rs->ViewPort = Rectangle(1280, 720);
-    FillModels(rs->ForwardJobs);
+    fillModels(rs->ForwardJobs);
     m_RenderFrame->Add(*rs);
     delete rs;
 }
 
-void RenderSystem::UpdateCamera(World* world, double dt)
+void RenderSystem::updateCamera(World* world, double dt)
 {
     static DebugCameraInputController<RenderSystem> firstPersonInputController(m_EventBroker, -1);
 
@@ -196,9 +196,9 @@ void RenderSystem::UpdateCamera(World* world, double dt)
                 if ((*it).EntityID == m_CurrentCamera) {
                     it++;
                     if (it != cameras->end()) {
-                        SwitchCamera((*it).EntityID);
+                        switchCamera((*it).EntityID);
                     } else {
-                        SwitchCamera((*cameras->begin()).EntityID);
+                        switchCamera((*cameras->begin()).EntityID);
                     }
                     break;
                 }
@@ -227,7 +227,7 @@ void RenderSystem::UpdateCamera(World* world, double dt)
         m_Camera->SetPosition(position);
         m_Camera->SetOrientation(orientation);
 
-        UpdateProjectionMatrix(cameraComponent);
+        updateProjectionMatrix(cameraComponent);
         m_Camera->UpdateViewMatrix();
     } else {
         m_Camera = m_DefaultCamera;
@@ -235,7 +235,7 @@ void RenderSystem::UpdateCamera(World* world, double dt)
         auto cameras = world->GetComponents("Camera");
         if (cameras != nullptr) {
             ComponentWrapper& cameraC = *cameras->begin();
-            SwitchCamera(cameraC.EntityID);
+            switchCamera(cameraC.EntityID);
             world->GetComponent(m_CurrentCamera, "Model")["Visible"] = false;
         }
     }

@@ -42,16 +42,16 @@ private:
     bool OnSetCamera(const Events::SetCamera &event);
     EntityID m_CurrentCamera = -1;
 
-    void SwitchCamera(EntityID entity);
+    void switchCamera(EntityID entity);
 
-    void Initialize();
-    void UpdateCamera(World* world, double dt);
-    void UpdateProjectionMatrix(ComponentWrapper& cameraComponent);
+    void initialize();
+    void updateCamera(World* world, double dt);
+    void updateProjectionMatrix(ComponentWrapper& cameraComponent);
     glm::mat4 m_ViewMatrix;
     glm::mat4 m_ProjectionMatrix;
     
     glm::mat4 ModelMatrix(EntityID entity);
-    void FillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
 
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
