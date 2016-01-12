@@ -69,6 +69,7 @@ public:
     {
         Unknown,
         Entity,
+        EntityRef,
         Component,
         ComponentField
     };
@@ -77,29 +78,32 @@ public:
         : m_Handler(handler)
         , m_Reader(reader)
     {
-        // 0 is imaginary world entity
-        m_EntityStack.push(0);
+        // Push first parent
+        m_EntityStack.push(EntityID_Invalid);
         m_StateStack.push(State::Unknown);
     }
 
     void startElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname, const xercesc::Attributes& attrs) override
     {
         std::string name = XS::ToString(_localName);
-
-        if (m_StateStack.top() == State::Unknown || m_StateStack.top() == State::Entity) {
+        if (m_StateStack.top() == State::Unknown || m_StateStack.top() == State::Entity || m_StateStack.top() == State::EntityRef) {
             if (name == "Entity") {
-                m_StateStack.push(State::Entity);
-                onStartEntity(attrs);
-                return;
-            }
-            if (name == "EntityRef") {
-                onStartEntityRef(attrs);
+                // Handle entity references
+                const XMLCh* refAttr = attrs.getValue(XS::ToXMLCh("ref"));
+                std::string ref = XS::ToString(refAttr);
+                if (ref.empty()) {
+                    m_StateStack.push(State::Entity);
+                    onStartEntity(attrs);
+                } else {
+                    m_StateStack.push(State::EntityRef);
+                    onStartEntityRef(ref, attrs);
+                }
                 return;
             }
         }
 
         std::string uri = XS::ToString(_uri);
-        if (m_StateStack.top() == State::Entity) {
+        if (m_StateStack.top() == State::Entity || m_StateStack.top() == State::EntityRef) {
             if (uri == "components") {
                 m_StateStack.push(State::Component);
                 onStartComponent(name);
@@ -125,10 +129,16 @@ public:
     void endElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname) override
     {
         std::string name = XS::ToString(_localName);
-        if (m_StateStack.top() == State::Entity) {
+        if (m_StateStack.top() == State::Entity || m_StateStack.top() == State::EntityRef) {
             if (name == "Entity") {
-                m_StateStack.pop();
-                onEndEntity();
+                if (m_StateStack.top() == State::Entity) {
+                    m_StateStack.pop();
+                    if (m_StateStack.top() == State::EntityRef) {
+                        onEndEntityRef();
+                    } else {
+                        onEndEntity();
+                    }
+                }
                 return;
             }
         }
@@ -188,16 +198,16 @@ private:
     {
         m_EntityStack.pop();
     }
-    void onStartEntityRef(const xercesc::Attributes& attrs)
+    void onStartEntityRef(const std::string& ref, const xercesc::Attributes& attrs)
     {
-        std::string path = XS::ToString(attrs.getValue(XS::ToXMLCh("file")));
-        
         xercesc::SAX2XMLReader* parser = xercesc::XMLReaderFactory::createXMLReader();
         parser->setContentHandler(this);
         parser->setErrorHandler(this);
-        parser->parse(path.c_str());
+        parser->parse(ref.c_str());
         delete parser;
+        //m_StateStack.push(State::Entity);
     }
+    void onEndEntityRef() { }
     void onStartComponent(const std::string& name)
     {
         //LOG_DEBUG("    Component: %s", name.c_str());

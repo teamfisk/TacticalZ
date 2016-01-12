@@ -20,7 +20,7 @@ void EntityFile::Parse(const EntityFileHandler* handler) const
 {
     using namespace xercesc;
 
-    EntityFileSAXHandler saxHandler(handler, nullptr);
+    EntityFileSAXHandler saxHandler(handler, m_SAX2XMLReader);
     m_SAX2XMLReader->setFeature(XMLUni::fgXercesCacheGrammarFromParse, true);
     m_SAX2XMLReader->setFeature(XMLUni::fgXercesUseCachedGrammarInParse, true);
     m_SAX2XMLReader->setContentHandler(&saxHandler);

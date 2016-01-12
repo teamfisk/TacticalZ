@@ -12,7 +12,7 @@ EntityFileParser::EntityFileParser(const EntityFile* entityFile)
 void EntityFileParser::MergeEntities(World* world)
 {
     m_World = world;
-    m_EntityIDMapper[0] = 0;
+    m_EntityIDMapper[EntityID_Invalid] = EntityID_Invalid;
     m_EntityFile->Parse(&m_Handler);
 }
 
