@@ -615,8 +615,8 @@ bool EditorSystem::createEntityNode(World* world, EntityID entity)
 
         if (ImGui::BeginPopupContextItem("item context menu")) {
             if (ImGui::Button("Add")) {
-                EntityID entity = world->CreateEntity(entity);
-                world->AttachComponent(entity, "Transform");
+                EntityID newEntity = world->CreateEntity(entity);
+                world->AttachComponent(newEntity, "Transform");
             }
             ImGui::SameLine();
             if (ImGui::Button("Delete")) {
