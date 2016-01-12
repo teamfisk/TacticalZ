@@ -114,15 +114,19 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
 
                 auto deathComp = world->GetComponent(modelC.EntityID, "CoolDeathAnim");
 
-                job.OriginPos = (glm::vec3)deathComp["OriginPos"];
+                job.ExplosionOrigin = (glm::vec3)deathComp["ExplosionOrigin"];
                 job.TimeSinceDeath = (double)deathComp["TimeSinceDeath"];
-                job.EndOfDeath = (double)deathComp["EndOfDeath"];
+                job.ExplosionDuration = (double)deathComp["ExplosionDuration"];
                 job.Gravity = (bool)deathComp["Gravity"];
                 job.GravityForce = (double)deathComp["GravityForce"];
                 job.ObjectRadius = (double)deathComp["ObjectRadius"];
                 job.EndColor = (glm::vec4)deathComp["EndColor"];
-                job.UseRandomness = (bool)deathComp["UseRandomness"];
+                job.Randomness = (bool)deathComp["Randomness"];
                 job.RandomnessScalar = (double)deathComp["RandomnessScalar"];
+                job.Acceleration = (glm::vec2)deathComp["Acceleration"];
+                job.ColorPerPolygon = (bool)deathComp["ColorPerPolygon"];
+                job.ReverseAnimation = (bool)deathComp["ReverseAnimation"];
+                job.Wireframe = (bool)deathComp["Wireframe"];
                 job.RandomNumbers = {
                     0.3257552917701f,
                     0.07601508315467f,
@@ -133,7 +137,17 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
                     0.39413607511396f,
                     0.54579346698979f,
                     0.83222648353885f,
-                    0.83635707285086f };
+                    0.83635707285086f,
+                    0.34473986148124f,
+                    0.98092448710507f,
+                    0.46346380070944f,
+                    0.7308761201477f,
+                    0.70832470371776f,
+                    0.28268750909841f,
+                    0.26291620883295f,
+                    0.07685032816457f,
+                    0.30760929515008f,
+                    0.2781575388639f };
 
                 job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
                 job.DiffuseTexture = texGroup.Texture.get();

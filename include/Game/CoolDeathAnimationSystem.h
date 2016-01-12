@@ -12,7 +12,7 @@ public:
     {
         ComponentWrapper& Component = world->GetComponent(object.EntityID, "CoolDeathAnim");
 
-        if ((double)Component["TimeSinceDeath"] > (double)Component["EndOfDeath"]) {
+        if ((double)Component["TimeSinceDeath"] > (double)Component["ExplosionDuration"]) {
             (double)Component["TimeSinceDeath"] = 0.f;
         }
         (double&)Component["TimeSinceDeath"] += dt;

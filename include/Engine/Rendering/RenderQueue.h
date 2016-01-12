@@ -66,17 +66,20 @@ struct ModelJob : RenderJob
 // Cool Death Animation
 struct CoolDeathAnimationJob : ModelJob
 {
-    glm::vec3 OriginPos;
-    double TimeSinceDeath = 0.f;
-    double EndOfDeath = 2.f;
+    glm::vec3 ExplosionOrigin;
+    double TimeSinceDeath = 0.f; //Seconds
+    double ExplosionDuration = 2.f;
     bool Gravity = true;
     double GravityForce = 1.f; // Speed
     double ObjectRadius = 2.f; // TODO: Change this for object radius when it's available
     glm::vec4 EndColor;
-    bool UseRandomness = false;
-    std::array<float, 10> RandomNumbers;
+    bool Randomness = false;
+    std::array<float, 20> RandomNumbers;
     float RandomnessScalar = 1.f;
-    float Acceleration = 0.f;
+    glm::vec2 Acceleration;
+    bool ColorPerPolygon = false;
+    bool ReverseAnimation = false;
+    bool Wireframe = false;
 };
 
 struct SpriteJob : RenderJob
