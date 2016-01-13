@@ -76,7 +76,6 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::Message:
         break;
     case MessageType::Snapshot:
-        parseSnapshot(packet);
         break;
     case MessageType::Disconnect:
         parseDisconnect();
@@ -149,13 +148,15 @@ void Server::sendSnapshot()
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     for (auto& it : worldComponentPools) {
         Packet packet(MessageType::Snapshot, m_SendPacketID);
-        std::string componentType = it.first;
         ComponentPool* componentPool = it.second;
         ComponentInfo componentInfo = componentPool->ComponentInfo();
+        // Component Type
         packet.WriteString(componentInfo.Name);
-
         for (auto& componentWrapper : *componentPool) {
+            // Components EntityID
             packet.WritePrimitive(componentWrapper.EntityID);
+            // Parents EntityID
+            packet.WritePrimitive(m_World->GetParent(componentWrapper.EntityID));
             for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
                 ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(componentField);
                 if (fieldInfo.Type == "string") {
@@ -228,29 +229,12 @@ void Server::parseEvent(Packet& packet)
     // If no player matches the address return.
     if (i >= 8)
         return;
-
-    unsigned int entityId = m_PlayerDefinitions[i].EntityID;
-    std::string eventString = packet.ReadString();
-    if ("+Forward" == eventString) {
-        m_World->GetComponent(entityId, "Player")["Forward"] = true;
-        m_World->GetComponent(entityId, "Player")["Back"] = false;
-    } else if ("-Forward" == eventString) {
-        m_World->GetComponent(entityId, "Player")["Forward"] = false;
-        m_World->GetComponent(entityId, "Player")["Back"] = true;
-    } else if ("0Forward" == eventString) {
-        m_World->GetComponent(entityId, "Player")["Forward"] = false;
-        m_World->GetComponent(entityId, "Player")["Back"] = false;
-    }
-    if ("+Right" == eventString) {
-        m_World->GetComponent(entityId, "Player")["Left"] = false;
-        m_World->GetComponent(entityId, "Player")["Right"] = true;
-    } else if ("-Right" == eventString) {
-        m_World->GetComponent(entityId, "Player")["Right"] = false;
-        m_World->GetComponent(entityId, "Player")["Left"] = true;
-    } else if ("0Right" == eventString) {
-        m_World->GetComponent(entityId, "Player")["Right"] = false;
-        m_World->GetComponent(entityId, "Player")["Left"] = false;
-    }
+    Events::InputCommand e;
+    e.Command = packet.ReadString();
+    e.PlayerID = packet.ReadPrimitive<int>();
+    e.Value = packet.ReadPrimitive<float>();
+    m_EventBroker->Publish(e);
+    LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
 }
 
 void Server::parseConnect(Packet& packet)
@@ -315,21 +299,6 @@ void Server::parseServerPing()
         if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
             m_StopTimes[i] = std::clock();
             break;
-        }
-    }
-}
-
-// NOT USED
-void Server::parseSnapshot(Packet& packet)
-{
-    // Does no logic. Returns snapshot if client request one
-    // The snapshot is not a real snapshot tho...
-    for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
-            m_Socket.send_to(
-                boost::asio::buffer("I'm sending a snapshot to you guys!"),
-                m_PlayerDefinitions[i].Endpoint,
-                0);
         }
     }
 }

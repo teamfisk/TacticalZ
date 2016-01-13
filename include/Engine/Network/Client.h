@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ctime>
+#include <limits>
 
 #include <glm/common.hpp>
 #include <boost/asio.hpp>
@@ -45,6 +46,10 @@ private:
     std::string m_PlayerName;
     int m_PlayerID = -1;
 
+    // Server Client Lookup map
+    // Assumes that root node for client and server is EntityID 0.
+    std::unordered_map<EntityID, EntityID> m_ServerToClientMap;
+
     // Network logic
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
     SnapshotDefinitions m_NextSnapshot;
@@ -56,7 +61,7 @@ private:
 
     // Private member functions
     void readFromServer();
-    void sendSnapshotToServer();
+    void sendInputEvents();
     int  receive(char* data, size_t length);
     void send(Packet& packet);
     void connect();
@@ -73,7 +78,7 @@ private:
     void identifyPacketLoss();
     bool isConnected();
     EntityID createPlayer();
-
+    bool hasMappedEntity(EntityID entityID);
     // Events
     EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;

@@ -5,6 +5,8 @@ using namespace boost::asio::ip;
 
 Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 {
+    // Asumes root node is EntityID 0
+    m_ServerToClientMap.insert(std::make_pair(0, 0));
     // Default is local host
     std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
     int port = config->Get<int>("Networking.Port", 13);
@@ -16,8 +18,7 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 }
 
 Client::~Client()
-{
-}
+{ }
 
 void Client::Start(World* world, EventBroker* eventBroker)
 {
@@ -55,7 +56,7 @@ void Client::readFromServer()
     }
 }
 
-void Client::sendSnapshotToServer()
+void Client::sendInputEvents()
 {
     // Reset previous key state in snapshot.
     m_NextSnapshot.InputForward = "";
@@ -187,9 +188,16 @@ void Client::parseSnapshot(Packet& packet)
 {
     std::string componentType = packet.ReadString();
     while (packet.DataReadSize() < packet.Size()) {
-        EntityID entityID = packet.ReadPrimitive<EntityID>();
+        // Components EntityID
+        EntityID receivedEntityID = packet.ReadPrimitive<EntityID>();
+        // Parents EntityID 
+        EntityID receivedParentEntityID = packet.ReadPrimitive<EntityID>();
         ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
-        if (m_World->ValidEntity(entityID)) {
+        // Check if the received EntityID is mapped to one of our local EntityIDs
+        if (hasMappedEntity(receivedEntityID)) {
+            // Get the local EntityID
+            EntityID entityID = m_ServerToClientMap.at(receivedEntityID);
+            // Check if the component exists
             if (m_World->HasComponent(entityID, componentType)) {
                 // If the entity and the component exists update it
                 updateFields(packet, componentInfo, entityID, componentType);
@@ -202,11 +210,12 @@ void Client::parseSnapshot(Packet& packet)
             }
             // If the entity dosent exist nor the component
         } else {
-            //Create Entity
+            // Create Entity
             // If entity dosen't exist
             EntityID newEntityID = m_World->CreateEntity();
+            m_ServerToClientMap.insert(std::make_pair(receivedEntityID, newEntityID));
             // Check if EntityIDs are out of sync
-            if (newEntityID != entityID) {
+            if (newEntityID != receivedEntityID) {
                 LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the \
                             same as the one sent by server (EntityIDs are out of sync)");
             }
@@ -214,6 +223,21 @@ void Client::parseSnapshot(Packet& packet)
             m_World->AttachComponent(newEntityID, componentType);
             // Copy data to newly created component
             updateFields(packet, componentInfo, newEntityID, componentType);
+        }
+
+        // Parent Logic
+        // Don't need to check if receivedEntityID is mapped. (It should have been set) 
+        if (receivedParentEntityID != std::numeric_limits<EntityID>::max()) {
+            if (hasMappedEntity(receivedParentEntityID)) {
+                m_World->SetParent(m_ServerToClientMap.at(receivedEntityID), m_ServerToClientMap.at(receivedParentEntityID));
+                // If Parent dosen't exist create one and map receivedParentEntityID to it.
+            } else {
+                // Create the new parent and add it to map
+                EntityID newParentEntityID = m_World->CreateEntity();
+                m_ServerToClientMap.insert(std::make_pair(receivedParentEntityID, newParentEntityID));
+                // Set the newly created Entity as parent.
+                m_World->SetParent(m_ServerToClientMap.at(receivedEntityID), newParentEntityID);
+            }
         }
     }
 }
@@ -273,39 +297,21 @@ void Client::moveMessageHead(char*& data, size_t& length, size_t stepSize)
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    if (isConnected()) {
-        ComponentWrapper& player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
-        if (e.Command == "Forward") {
-            if (e.Value > 0) {
-                (bool&)player["Forward"] = true;
-                (bool&)player["Back"] = false;
-            } else if (e.Value < 0) {
-                (bool&)player["Back"] = true;
-                (bool&)player["Forward"] = false;
-            } else {
-                (bool&)player["Forward"] = false;
-                (bool&)player["Back"] = false;
-            }
-        }
-        if (e.Command == "Right") {
-            if (e.Value > 0) {
-                (bool&)player["Right"] = true;
-                (bool&)player["Left"] = false;
-            } else if (e.Value < 0) {
-                (bool&)player["Left"] = true;
-                (bool&)player["Right"] = false;
-            } else {
-                (bool&)player["Left"] = false;
-                (bool&)player["Right"] = false;
-            }
-        }
-    }
-    if (e.Command == "ConnectToServer") { // Connect for now
+    if (e.Command == "Forward" || e.Command == "Right") {
+        Packet packet(MessageType::Event, m_SendPacketID);
+        packet.WriteString(e.Command);
+        packet.WritePrimitive(e.PlayerID);
+        packet.WritePrimitive(e.Value);
+        send(packet);
+        LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        return true;
+    } else if (e.Command == "ConnectToServer") { // Connect for now
         connect();
+        LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        return true;
     }
     return false;
 }
-
 
 void Client::identifyPacketLoss()
 {
@@ -334,4 +340,9 @@ EntityID Client::createPlayer()
     model["Resource"] = "Models/Core/UnitSphere.obj";
     ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
     return entityID;
+}
+
+bool Client::hasMappedEntity(EntityID entityID)
+{
+    return m_ServerToClientMap.find(entityID) != m_ServerToClientMap.end();
 }

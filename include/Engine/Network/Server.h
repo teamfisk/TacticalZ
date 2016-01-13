@@ -12,6 +12,7 @@
 #include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Network/Network.h"
+#include "Input/EInputCommand.h"
 
 class Server : public Network
 {
@@ -72,7 +73,6 @@ private:
     void parseDisconnect();
     void parseClientPing();
     void parseServerPing();
-    void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     EntityID createPlayer();
 };
