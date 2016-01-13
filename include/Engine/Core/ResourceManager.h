@@ -40,6 +40,30 @@ private:
 	ResourceManager();
 
 public:
+    //TODO: Check if this is ever used, and remove it if it isn't.
+    //Why would a resource load another resource async. in the ctor?
+    //Should be thrown in a Resource's constructor if it cannot complete because another resource is still loading.
+    //Eg. If a Model loads a Texture asyncronously in the constructor, and it is not done yet.
+    struct StillLoadingException : public std::exception
+    {
+        virtual const char* what() const throw()
+        {
+            return "Resource is still loading.";
+        }
+    };
+    //Should be thrown in a Resource's constructor if certain work needs to be handled by 
+    //the main thread, and not a parallel worker thread. Eg. opengl commands.
+    struct WorkerCannotExecute : public std::exception
+    {
+        virtual const char* what() const throw()
+        {
+            return "Worker thread is unable to execute, main thread need to handle the code.";
+        }
+    };
+
+    static void AssertIsMainThread();
+    static bool IsMainThread();
+
 	/*static ResourceManager& Instance()
 	{
 	static ResourceManager s;
@@ -49,15 +73,6 @@ public:
 	template <typename T>
 	static void RegisterType(std::string typeName);
 
-	/** Preloads a resource and caches it for future use
-
-		@tparam T Resource type.
-		@param resourceName Fully qualified name of the resource to preload.
-	*/
-	template <typename T>
-	static void Preload(std::string resourceName);
-	static void Preload(std::string resourceType, std::string resourceName);
-
 	/** Checks if a resource is in cache
 
 		@param resourceType Resource type as string.
@@ -66,14 +81,25 @@ public:
 	// TODO: Templateify
 	static bool IsResourceLoaded(std::string resourceType, std::string resourceName);
 
-	/** Hot-loads a resource and caches it for future use
+    /** If the resource is not in cache, starts loading the resource and returns nullptr immediately.
+        If the resource has been loaded already, return a pointer to it.
+
+        @tparam T Resource type.
+        @param resourceName Fully qualified name of the resource to load.
+    */
+    template <typename T>
+    static T* LoadAsync(std::string resourceName, Resource* parent = nullptr);
+	static Resource* LoadAsync(std::string resourceType, std::string resourceName, Resource* parent = nullptr);
+
+	/** Hot-loads a resource and caches it for future use. 
+        Fairly safe to assume that return value is a valid pointer, will only return nullptr on error.
 
 		@tparam T Resource type.
 		@param resourceName Fully qualified name of the resource to load.
 	*/
 	template <typename T>
 	static T* Load(std::string resourceName, Resource* parent = nullptr);
-	static Resource* Load(std::string resourceType, std::string resourceName, Resource* parent = nullptr);
+    static Resource* Load(std::string resourceType, std::string resourceName, Resource* parent = nullptr);
 
 	/** Reloads an already loaded resource, keeping its resource ID intact.
 
@@ -87,19 +113,40 @@ public:
 	static void Update();
 
 private:
+    //Represents pointer values to signify that a resource haven't failed, but is not fully loaded.
+    class SpecialResourcePointer
+    {
+    public:
+        SpecialResourcePointer()
+            : m_Val(new Resource())
+        {}
+        ~SpecialResourcePointer()
+        {
+            delete m_Val;
+        }
+        //Make this class implicitly convertible to the Resource*.
+        operator Resource* const() const { return m_Val; }
+    private:
+        Resource* const m_Val;
+    };
+    //TODO: Check if this is ever used, and remove it if it isn't.
+    static SpecialResourcePointer m_StillLoading;
+    static SpecialResourcePointer m_LoadWithMainThread;
+
 	static std::unordered_map<std::string, std::string> m_CompilerTypenameToResourceType;
     static std::unordered_map<std::string, std::function<Resource*(std::string)>> m_FactoryFunctions; // type -> factory function
 	static std::unordered_map<std::pair<std::string, std::string>, Resource*> m_ResourceCache; // (type, name) -> resource
 	static std::unordered_map<std::string, Resource*> m_ResourceFromName; // name -> resource
 	static std::unordered_map<Resource*, Resource*> m_ResourceParents; // resource -> parent resource
 
+	static std::unordered_map<std::pair<std::string, std::string>, boost::thread> m_LoadingThreads; // (type, name) -> loading thread
+    static boost::recursive_mutex m_Mutex;
+
 	// TODO: Getters for IDs
 	static unsigned int m_CurrentResourceTypeID;
 	static std::unordered_map<std::string, unsigned int> m_ResourceTypeIDs;
 	// Number of resources of a type. Doubles as local ID.
 	static std::unordered_map<unsigned int, unsigned int> m_ResourceCount;
-	// Flag to suppress hot-load warnings when a preloading resource chain loads another resource
-	static bool m_Preloading;
 
 	static FileWatcher m_FileWatcher;
 	static void fileWatcherCallback(std::string path, FileWatcher::FileEventFlags flags);
@@ -108,20 +155,20 @@ private:
 	static unsigned int GetNewResourceID(unsigned int typeID);
 
 	// Internal: Create a resource and cache it
-	static Resource* CreateResource(std::string resourceType, std::string resourceName, Resource* parent);
+	static Resource* createResource(std::string resourceType, std::string resourceName, Resource* parent);
 };
 
 template <typename T>
 T* ResourceManager::Load(std::string resourceName, Resource* parent /* = nullptr */)
 {
-	auto resourceTypename = typeid(T).name();
-	auto it = m_CompilerTypenameToResourceType.find(resourceTypename);
-	if (it == m_CompilerTypenameToResourceType.end()) {
-		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": type not registered", resourceName.c_str(), resourceTypename);
-		return nullptr;
-	}
+    auto resourceTypename = typeid(T).name();
+    auto it = m_CompilerTypenameToResourceType.find(resourceTypename);
+    if (it == m_CompilerTypenameToResourceType.end()) {
+        LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": type not registered", resourceName.c_str(), resourceTypename);
+        return nullptr;
+    }
 
-	return static_cast<T*>(Load(it->second, resourceName, parent));
+    return static_cast<T*>(Load(it->second, resourceName, parent));
 }
 
 template <typename T>
@@ -132,16 +179,16 @@ void ResourceManager::RegisterType(std::string typeName)
 }
 
 template <typename T>
-void ResourceManager::Preload(std::string resourceName)
+T* ResourceManager::LoadAsync(std::string resourceName, Resource* parent /* = nullptr */)
 {
 	auto resourceTypename = typeid(T).name();
 	auto it = m_CompilerTypenameToResourceType.find(resourceTypename);
 	if (it == m_CompilerTypenameToResourceType.end()) {
 		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": type not registered", resourceName.c_str(), resourceTypename);
-		return;
+		return nullptr;
 	}
 
-	Preload(it->second, resourceName);
+	return static_cast<T*>(LoadAsync(it->second, resourceName, parent));
 }
 
 #endif
