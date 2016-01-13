@@ -83,7 +83,16 @@ CapturePointTest::CapturePointTest(int runTestNumber)
     ComponentWrapper& capturePoint = m_World->AttachComponent(capturePointID, "CapturePoint");
     //this capturePoint is homeBase for team 2
     capturePoint["IsHomeCapturePointForTeamNumber"] = 2;
+    capturePoint["CapturePointNumber"] = 0;
     m_CapturePointID = capturePointID;
+
+    EntityID capturePointID2 = m_World->CreateEntity();
+    ComponentWrapper& capturePoint2 = m_World->AttachComponent(capturePointID2, "CapturePoint");
+    //this capturePoint is homeBase for team 1
+    capturePoint2["IsHomeCapturePointForTeamNumber"] = 1;
+    capturePoint2["CapturePointNumber"] = 1;
+    m_CapturePointID2 = capturePointID2;
+
     m_RunTestNumber = runTestNumber;
 
     //add some touch/leave events
@@ -104,7 +113,7 @@ CapturePointTest::CapturePointTest(int runTestNumber)
 
     Events::TriggerTouch eTriggerTouched3;
     eTriggerTouched3.Entity = m_PlayerID;
-    eTriggerTouched3.Trigger = m_CapturePointID;
+    eTriggerTouched3.Trigger = m_CapturePointID2;
     m_EventBroker->Publish(eTriggerTouched3);
 
     //init glfw so dt works

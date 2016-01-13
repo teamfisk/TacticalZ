@@ -12,6 +12,7 @@
 				<xs:element name="CaptureTimer" type="t:double" minOccurs="0"/>
 				<xs:element name="OwnedBy" type="t:int" minOccurs="0"/>
 				<xs:element name="IsHomeCapturePointForTeamNumber" type="t:int" minOccurs="0"/>
+				<xs:element name="CapturePointNumber" type="t:int" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

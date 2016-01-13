@@ -34,7 +34,7 @@ private:
     EventBroker* m_EventBroker;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    int m_PlayerID, m_PlayerID2, m_CapturePointID;
+    int m_PlayerID, m_PlayerID2, m_CapturePointID, m_CapturePointID2;
     int m_RunTestNumber;
 
 };

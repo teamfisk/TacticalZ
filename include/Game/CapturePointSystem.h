@@ -16,7 +16,7 @@
 class CapturePointSystem : public PureSystem
 {
 public:
-    //TODO: on new map, destroy all info in the vectors
+    //WARNING: on new map, destroy all info in the vectors, as well as reset all variables (just make new?)
     CapturePointSystem(EventBroker* eventBroker);
 
     //updatecomponent
@@ -30,6 +30,12 @@ private:
     bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e);
 
     bool WinnerWasFound = false;
+    //need to track these variables for the captureSystem to work as per design!
+    const int m_NotACapturePoint = 999;
+    int m_Team1NextPossibleCapturePoint = m_NotACapturePoint;
+    int m_Team2NextPossibleCapturePoint = m_NotACapturePoint;
+    int m_Team1HomeCapturePoint = m_NotACapturePoint;
+    int m_Team2HomeCapturePoint = m_NotACapturePoint;
 
     //vectors which will keep track of enter/leave changes
     std::vector<std::tuple<EntityID, EntityID>> m_ETriggerTouchVector;
