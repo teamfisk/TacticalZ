@@ -180,7 +180,7 @@ void ShootEventTest::TestSetup4(ComponentWrapper &player, ComponentWrapper &pIte
     player["EquippedItem"] = 1;
     //set ammo set cooldown
     pItem["Ammo"] = 100;
-    pItem["CoolDownTimer"] = 5.0;
+    pItem["CoolDownTimer"] = 99999999.0;//very long coolDownTimer
     //TestSucceeded will be set to false if ammo changes during the 100 loops
     TestSucceeded = true;
 }
@@ -225,10 +225,12 @@ void ShootEventTest::Tick()
 {
     glfwPollEvents();
 
-    double currentTime = glfwGetTime();
-    double dt = currentTime - m_LastTime;
-    m_LastTime = currentTime;
+    //double currentTime = glfwGetTime();
+    //double dt = currentTime - m_LastTime;
+    //m_LastTime = currentTime;
 
+    //just set dt to 1.0
+    double dt = 0.34567;
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
 

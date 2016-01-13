@@ -1,4 +1,5 @@
 #include "PlayerSystem.h"
+#include <algorithm>
 
 void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, double dt)
 {
@@ -22,6 +23,12 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
         (glm::vec3&)transform["Position"] += (glm::vec3)player["Velocity"];
     }
 
+    //decrease CoolDownTimers for both HeldItems
+    ComponentWrapper& currentItem = world->GetComponent(player.EntityID, "PrimaryItem");
+    ComponentWrapper& currentItem2 = world->GetComponent(player.EntityID, "SecondaryItem");
+    currentItem["CoolDownTimer"] = std::max(0.0, (double)currentItem["CoolDownTimer"] - dt);
+    currentItem2["CoolDownTimer"] = std::max(0.0, (double)currentItem2["CoolDownTimer"] - dt);
+
     //do shootEvent: if left mouse was released, and ammo/weaponcooldown/playeralive/shootingcooldown are ok
     if (leftMouseWasReleased) {
         leftMouseWasReleased = false;
@@ -44,7 +51,7 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
                 //decrease ammo count
                 //TODO: temp, set the cooldowntimer - probably done in some other system (itemSystem?) later
                 currentItem["Ammo"] = (int)currentItem["Ammo"] - 1;
-                currentItem["CoolDownTimer"] = 2.0;//change later!
+                currentItem["CoolDownTimer"] = 2.0;//change later! probably to maxCoolDownTimer
                 //create and publish the shoot event
                 Events::Shoot eShoot;
                 eShoot.currentAimingPoint = aimingCoordinates;
