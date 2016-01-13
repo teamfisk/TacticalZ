@@ -13,8 +13,6 @@ CapturePointSystem::CapturePointSystem(EventBroker* eventBroker)
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
 void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capturePoint, double dt)
 {
-    //for testing only:
-    //dt = 20.0;
     int firstTeamPlayersStandingInside = 0;
     int secondTeamPlayersStandingInside = 0;
 
@@ -42,10 +40,8 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
     }
 
     int ownedBy = capturePoint["OwnedBy"];
-    double captureTimer = capturePoint["CaptureTimer"];
 
     //check what capturePoint can be taken over next
-    //TODO: modify this when a point has been taken over
     //A. no capturepoint taken yet for at least one of the teams
     //A1. at the start of the match the system is unaware of what capturePoint is the first one for each team
     if (m_Team1NextPossibleCapturePoint == m_NotACapturePoint && (int)capturePoint["IsHomeCapturePointForTeamNumber"] == 1) {
@@ -70,13 +66,19 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
         && m_Team1NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"]) {
         //ownedBy 1 -> timer should stay at 15
         //increased by numberOfPlayersInside*dt
-        if (ownedBy == 2 || ownedBy == 0)
+        //if capturePoint is not owned by the team, just increase the CaptureTimer
+        if (ownedBy != 1)
+            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + firstTeamPlayersStandingInside*dt;
+        //if capturePoint is owned by the team, and the other team has been trying to take it, then increase the timer towards 0
+        if (ownedBy == 1 && (double)capturePoint["CaptureTimer"] < 0.0)
             capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + firstTeamPlayersStandingInside*dt;
         //check if captureTimer > 15 and if so change owner and publish the eCaptured event
-        //TODO: graphics 25,50,75% captured events? for graphical issues
+        //TODO: graphics 25,50,75% captured events? for graphical displaying
         if ((double)capturePoint["CaptureTimer"] > 15.0) {
-            //publish Captured event
+            //capturePoint is now owned by this team, hence also reset the captureTimer so it still takes 15secs to take it back
             capturePoint["OwnedBy"] = 1;
+            capturePoint["CaptureTimer"] = 0.0;
+            //publish Captured event
             Events::Captured e;
             e.CapturePointID = capturePoint.EntityID;
             e.TeamNumberThatCapturedCapturePoint = 1;
@@ -104,12 +106,18 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
         && m_Team2NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"]) {
         //ownedBy 2 -> timer should stay at -15
         //decreased by numberOfPlayersInside*dt
-        if (ownedBy == 1 || ownedBy == 0)
+        //if capturePoint is not owned by the team, just increase the CaptureTimer
+        if (ownedBy != 2)
+            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] - secondTeamPlayersStandingInside*dt;
+        //if capturePoint is owned by the team, and the other team has been trying to take it, then increase the timer towards 0
+        if (ownedBy == 2 && (double)capturePoint["CaptureTimer"] > 0.0)
             capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] - secondTeamPlayersStandingInside*dt;
         //check if captureTimer < -15 and if so change owner and publish the eCaptured event
-        //TODO: graphics 25,50,75% captured events? for graphical issues
+        //TODO: graphics 25,50,75% captured events? for graphical displaying
         if ((double)capturePoint["CaptureTimer"] < -15.0) {
+            //capturePoint is now owned by this team, hence also reset the captureTimer so it still takes 15secs to take it back
             capturePoint["OwnedBy"] = 2;
+            capturePoint["CaptureTimer"] = 0.0;
             Events::Captured e;
             e.CapturePointID = capturePoint.EntityID;
             e.TeamNumberThatCapturedCapturePoint = 2;
