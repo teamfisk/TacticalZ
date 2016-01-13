@@ -4,8 +4,8 @@
 #include <glm/common.hpp>
 #include <unordered_set>
 
-#include "Core/System.h"
-#include "Core/EventBroker.h"
+#include "../Core/System.h"
+#include "../Core/EventBroker.h"
 #include "ETrigger.h"
 
 class AABB;
