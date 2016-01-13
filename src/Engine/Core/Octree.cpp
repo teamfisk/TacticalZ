@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <bitset>
 
-#include "Core/OctTree.h"
+#include "Core/Octree.h"
 #include "Collision/Collision.h"
 
 namespace

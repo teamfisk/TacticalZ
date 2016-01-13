@@ -3,7 +3,7 @@ using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 #include <stdlib.h>//srand
 
-#include "Engine/Core/OctTree.h"
+#include "Engine/Core/Octree.h"
 #include "Engine/Core/Ray.h"
 #include "OldOctTree.h"
 
