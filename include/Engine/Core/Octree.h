@@ -1,6 +1,7 @@
 #ifndef Octree_h__
 #define Octree_h__
 
+#include "../Common.h"
 #include "Core/AABB.h"
 
 class Ray;
