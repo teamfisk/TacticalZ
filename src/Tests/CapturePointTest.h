@@ -27,6 +27,20 @@ public:
 
     void Tick();
     bool TestSucceeded = false;
+    int NumLoops = 0;
+
+    void TestSetup1_OnePlayerOnCapturePoint();
+    void TestSetup2_TwoPlayersOnCapturePoint();
+    void TestSetup3_NoPlayersOnCapturePoint();
+    void TestSetup4_TwoCapturePointsBeingCaptured();
+    void TestSetup5_SameCapturePointContestedAndTakenOver();
+    void TestSetup6_Team1CapturedTheLastPointAndWon();
+    void TestSuccess1();
+    void TestSuccess2();
+    void TestSuccess3();
+    void TestSuccess4();
+    void TestSuccess5();
+    void TestSuccess6();
 
 private:
     double m_LastTime;
@@ -34,7 +48,7 @@ private:
     EventBroker* m_EventBroker;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    int m_PlayerID, m_PlayerID2, m_CapturePointID, m_CapturePointID2;
+    int m_PlayerID, m_PlayerID2, m_CapturePointID, m_CapturePointID2, m_CapturePointID3;
     int m_RunTestNumber;
 
 };
