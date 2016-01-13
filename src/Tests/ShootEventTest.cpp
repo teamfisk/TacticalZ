@@ -150,7 +150,7 @@ ShootEventTest::~ShootEventTest()
     delete m_EventBroker;
 }
 
-void ShootEventTest::TestSetup1(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+void ShootEventTest::TestSetup1(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem)
 {
     //set currentweap
     player["EquippedItem"] = 1;
@@ -158,7 +158,7 @@ void ShootEventTest::TestSetup1(ComponentWrapper &player, ComponentWrapper &pIte
     pItem["Ammo"] = 100;
     pItem["CoolDownTimer"] = 0.0;
 }
-void ShootEventTest::TestSetup2(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+void ShootEventTest::TestSetup2(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem)
 {
     //set currentweap
     player["EquippedItem"] = 2;
@@ -166,7 +166,7 @@ void ShootEventTest::TestSetup2(ComponentWrapper &player, ComponentWrapper &pIte
     sItem["Ammo"] = 10;
     sItem["CoolDownTimer"] = 0.0;
 }
-void ShootEventTest::TestSetup3(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+void ShootEventTest::TestSetup3(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem)
 {
     player["EquippedItem"] = 0;
     pItem["Ammo"] = 100;
@@ -174,7 +174,7 @@ void ShootEventTest::TestSetup3(ComponentWrapper &player, ComponentWrapper &pIte
     //TestSucceeded will be set to false if ammo changes during the 100 loops
     TestSucceeded = true;
 }
-void ShootEventTest::TestSetup4(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem)
+void ShootEventTest::TestSetup4(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem)
 {
     //set currentweap
     player["EquippedItem"] = 1;

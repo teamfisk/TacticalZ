@@ -30,10 +30,10 @@ public:
     bool TestSucceeded = false;
 
 private:
-    void TestSetup1(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem);
-    void TestSetup2(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem);
-    void TestSetup3(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem);
-    void TestSetup4(ComponentWrapper &player, ComponentWrapper &pItem, ComponentWrapper &sItem);
+    void TestSetup1(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem);
+    void TestSetup2(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem);
+    void TestSetup3(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem);
+    void TestSetup4(ComponentWrapper& player, ComponentWrapper& pItem, ComponentWrapper& sItem);
     void TestSuccess1();
     void TestSuccess2();
     void TestSuccess3();

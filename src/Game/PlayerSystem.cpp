@@ -1,7 +1,6 @@
 #include "PlayerSystem.h"
-#include <algorithm>
 
-void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, double dt)
+void PlayerSystem::UpdateComponent(World* world, ComponentWrapper& player, double dt)
 {
     player["Velocity"] = glm::vec3(0.f, 0.f, 0.f);
     if ((bool&)player["Forward"] == true) {
@@ -30,20 +29,20 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
     currentItem2["CoolDownTimer"] = std::max(0.0, (double)currentItem2["CoolDownTimer"] - dt);
 
     //do shootEvent: if left mouse was released, and ammo/weaponcooldown/playeralive/shootingcooldown are ok
-    if (leftMouseWasReleased) {
-        leftMouseWasReleased = false;
+    if (m_LeftMouseWasReleased) {
+        m_LeftMouseWasReleased = false;
         //get the health component linked to the playerId
         double currentHealth = (double)world->GetComponent(player.EntityID, "Health")["Health"];
         int currentAmmo = 0;
         double currentCoolDownTimer = 0.0;
-        std::string HeldItemString = "";
+        std::string heldItemString = "";
         if ((int)player["EquippedItem"] == (int)HeldItem::PrimaryItem)
-            HeldItemString = "PrimaryItem";
+            heldItemString = "PrimaryItem";
         if ((int)player["EquippedItem"] == (int)HeldItem::SecondaryItem)
-            HeldItemString = "SecondaryItem";
+            heldItemString = "SecondaryItem";
 
-        if (HeldItemString != "") {
-            ComponentWrapper& currentItem = world->GetComponent(player.EntityID, HeldItemString);
+        if (heldItemString != "") {
+            ComponentWrapper& currentItem = world->GetComponent(player.EntityID, heldItemString);
             currentAmmo = (int)currentItem["Ammo"];
             currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
 
@@ -54,8 +53,8 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
                 currentItem["CoolDownTimer"] = 2.0;//change later! probably to maxCoolDownTimer
                 //create and publish the shoot event
                 Events::Shoot eShoot;
-                eShoot.currentAimingPoint = aimingCoordinates;
-                eShoot.currentlyEquippedItem = (int)(player["EquippedItem"]);
+                eShoot.CurrentAimingPoint = m_AimingCoordinates;
+                eShoot.CurrentlyEquippedItem = (int)(player["EquippedItem"]);
                 m_EventBroker->Publish(eShoot);
             }
         }
@@ -86,7 +85,7 @@ bool PlayerSystem::OnMouseRelease(const Events::MouseRelease& e)
     //kolla om left mouse varit nere
     if (e.Button != GLFW_MOUSE_BUTTON_LEFT)
         return false;
-    aimingCoordinates = glm::vec2(e.X, e.Y);
-    leftMouseWasReleased = true;
+    m_AimingCoordinates = glm::vec2(e.X, e.Y);
+    m_LeftMouseWasReleased = true;
     return true;
 }

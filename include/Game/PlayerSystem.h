@@ -9,6 +9,7 @@
 #include "Collision/ETrigger.h"
 #include "Core/EMouseRelease.h"
 #include "Core/EShoot.h"
+#include <algorithm>
 
 class PlayerSystem : public PureSystem
 {
@@ -25,8 +26,8 @@ public:
     virtual void UpdateComponent(World* world, ComponentWrapper& player, double dt) override;
 private:
     float m_Speed = 5;
-    bool leftMouseWasReleased = false;
-    glm::vec2 aimingCoordinates;
+    bool m_LeftMouseWasReleased = false;
+    glm::vec2 m_AimingCoordinates;
     EventRelay<PlayerSystem, Events::TriggerEnter> m_EEnter;
     bool OnEnter(const Events::TriggerEnter &event);
     EventRelay<PlayerSystem, Events::TriggerTouch> m_ETouch;
