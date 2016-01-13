@@ -11,7 +11,7 @@ CapturePointSystem::CapturePointSystem(EventBroker* eventBroker)
 
 //here all capturepoints will update their component
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
-void CapturePointSystem::UpdateComponent(World *world, ComponentWrapper &capturePoint, double dt)
+void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capturePoint, double dt)
 {
     //for testing only:
     //dt = 20.0;
@@ -140,13 +140,13 @@ void CapturePointSystem::UpdateComponent(World *world, ComponentWrapper &capture
     }
 
     //WIN: check for possible winCondition = check if the homebase is owned by the other team
-    if (!WinnerWasFound && (int)capturePoint["OwnedBy"] != 0 && (int)capturePoint["IsHomeCapturePointForTeamNumber"] != 0 &&
+    if (!m_WinnerWasFound && (int)capturePoint["OwnedBy"] != 0 && (int)capturePoint["IsHomeCapturePointForTeamNumber"] != 0 &&
         (int)capturePoint["IsHomeCapturePointForTeamNumber"] != (int)capturePoint["OwnedBy"]) {
         //publish Win event
         Events::Win e;
         e.TeamThatWon = capturePoint["OwnedBy"];
         m_EventBroker->Publish(e);
-        WinnerWasFound = true;
+        m_WinnerWasFound = true;
     }
 
 }

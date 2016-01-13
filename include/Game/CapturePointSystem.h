@@ -29,7 +29,7 @@ private:
     EventRelay<CapturePointSystem, Events::TriggerLeave> m_ETriggerLeave;
     bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e);
 
-    bool WinnerWasFound = false;
+    bool m_WinnerWasFound = false;
     //need to track these variables for the captureSystem to work as per design!
     const int m_NotACapturePoint = 999;
     int m_Team1NextPossibleCapturePoint = m_NotACapturePoint;

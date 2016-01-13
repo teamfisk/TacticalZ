@@ -21,6 +21,7 @@ set(SOURCE_FILES
     "Game.cpp"
     "HealthSystem.cpp"
 	"PlayerSystem.cpp"
+    "CapturePointSystem.cpp"
 )
 
 set(LIBRARIES
