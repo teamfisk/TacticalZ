@@ -3,11 +3,12 @@
 
 using namespace std;
 
-Mesh::Mesh()
+MeshClass::MeshClass()
 {
 
 }
-std::map<int, Mesh::WeightInfo> Mesh::GetWeightData()
+
+std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
 {
     map<int, WeightInfo> weightMap;
 
@@ -72,10 +73,14 @@ std::map<int, Mesh::WeightInfo> Mesh::GetWeightData()
     return weightMap;
 }
 
-void Mesh::GetMeshData(MObject object, std::vector<VertexLayout>& vertexList, std::vector<unsigned int>& indexList)
+Mesh MeshClass::GetMeshData(MObject object)
 {
+    Mesh newMesh;
+    std::vector<VertexLayout>& vertexList = newMesh.Vertices;
+    std::vector<int>& indexList = newMesh.Indices;
 	// In here, we retrieve triangulated polygons from the mesh
 	MFnMesh mesh(object);
+
 	map<unsigned int, vector<unsigned int>> vertexToIndex;;
 
 	MIntArray intdexOffsetVertexCount, vertices, triangleList;
@@ -106,7 +111,7 @@ void Mesh::GetMeshData(MObject object, std::vector<VertexLayout>& vertexList, st
 
         meshPolyIter.getVertices(vertices);
         meshPolyIter.getTriangles(dummy, triangleList);
-        MGlobal::displayInfo(MString() + "vertices.length(): " + vertices.length());
+
         //MGlobal::displayInfo("Befor Second Loop");
         for (unsigned int i = 0; i < vertices.length(); i++) {
             vertexIndex = meshPolyIter.vertexIndex(i);
@@ -160,25 +165,26 @@ void Mesh::GetMeshData(MObject object, std::vector<VertexLayout>& vertexList, st
             //cout << "Bi-Tangents: " << thisVertex.BiTangent[0] << "/" << thisVertex.BiTangent[1] << "/" << thisVertex.BiTangent[2] << endl;
             //cout << "UV: " << thisVertex.Uv[0] << "/" << thisVertex.Uv[1] << endl;
         }
-        //MGlobal::displayInfo("Befor Third Loop");
-        MGlobal::displayInfo(MString() + "localVertexToGlobalIndex.size(): " + localVertexToGlobalIndex.size());
-        MGlobal::displayInfo(MString() + "vertexList.size(): " + vertexList.size());
+
 
         for (unsigned int i = 0; i < triangleList.length(); i++) {
             unsigned int  k = 0;
-            MGlobal::displayInfo(MString() + "triangleList[i]: " + triangleList[i]);
             if (localVertexToGlobalIndex.size() > 0) {
                 while (localVertexToGlobalIndex[k] != triangleList[i] && k < localVertexToGlobalIndex.size()) {
-                    MGlobal::displayInfo(MString() + "localVertexToGlobalIndex[k]: " + localVertexToGlobalIndex[k]);
                     k++;
                 }
                 indexList.push_back(indexOffset + k);
             } 
         }
     }
+
+    newMesh.NumIndices = newMesh.Indices.size();
+    newMesh.NumVertices = newMesh.Vertices.size();
+
+    return newMesh;
 }
 
-Mesh::~Mesh()
+MeshClass::~MeshClass()
 {
 
 }

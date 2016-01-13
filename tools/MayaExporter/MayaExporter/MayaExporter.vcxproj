@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Export.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_Menu.cpp">
@@ -199,6 +200,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Export.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="OutputData.h" />
     <ClInclude Include="Skeleton.h" />

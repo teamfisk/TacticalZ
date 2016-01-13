@@ -17,7 +17,7 @@ public:
 
 	void writeToFiles(OutputData* toWrite, unsigned int numOfElementToWrite = 1, unsigned int startIndex = 0)
 	{
-		MGlobal::displayInfo("WriteToFile::writeToFiles()");
+		MGlobal::displayInfo("WriteToFile::writeToFiles(OutputData*)");
 		if (ASCIIFile.is_open())
 		{
 			for (unsigned int i = startIndex; i < numOfElementToWrite + startIndex; i++)
@@ -32,16 +32,18 @@ public:
 
 	}
 
-    void writeToFiles(unsigned int* toWrite, unsigned int numOfElementToWrite = 1, unsigned int startIndex = 0)
+    template <typename T>
+    void writeToFiles(T* toWrite, unsigned int numOfElementToWrite = 1, unsigned int startIndex = 0)
     {
-        MGlobal::displayInfo("WriteToFile::writeToFiles()");
+        MGlobal::displayInfo("WriteToFile::writeToFiles(T*) - Template T");
         if (ASCIIFile.is_open()) {
             for (unsigned int i = startIndex; i < numOfElementToWrite + startIndex; i++)
                 ASCIIFile << toWrite[i] << endl;
         }
 
         if (binFile.is_open()) {
-                binFile.write((char*)toWrite, numOfElementToWrite * sizeof(int));
+            for (unsigned int i = startIndex; i < numOfElementToWrite + startIndex; i++)
+                binFile.write((char*)toWrite, sizeof(T));
         }
 
     }

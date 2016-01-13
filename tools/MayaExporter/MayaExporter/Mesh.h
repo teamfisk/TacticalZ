@@ -10,7 +10,6 @@
 class VertexLayout : public OutputData
 {
 public:
-
 	float Pos[3];
 	float Normal[3];
 	float BiNormal[3];
@@ -32,7 +31,6 @@ public:
 
     virtual void WriteASCII(std::ostream& out) const
     {
-        out << "New Vertex: " << endl;
         out <<  Pos[0] << " " << Pos[1]  << " " << Pos[2] << endl;
         out <<  Normal[0] << " " << Normal[1]  << " " << Normal[2] << endl;
         out <<  BiNormal[0] << " " << BiNormal[1]  << " " << BiNormal[2] << endl;
@@ -56,15 +54,50 @@ public:
     }
 };
 
+class Mesh : public OutputData {
+public:
+    int NumVertices;
+    int NumIndices;
+    std::vector<VertexLayout> Vertices;
+    std::vector<int> Indices;
+
+    virtual void WriteBinary(std::ostream& out)
+    {
+        out.write((char*)&NumVertices, sizeof(int));
+        out.write((char*)&NumIndices, sizeof(int));
+        for (auto aVertex : Vertices) {
+            aVertex.WriteBinary(out);
+        }
+        for (auto aIndex : Indices) {
+            out.write((char*)&aIndex, sizeof(int));
+        }
+    }
+
+    virtual void WriteASCII(std::ostream& out) const
+    {
+        out << "New Mesh _ not in binary" << endl;
+        out << "Number of vertices: " << NumVertices << endl;
+        out << "number of indices: " << NumIndices << endl;
+        int vertexNumber = 0;
+        for (auto aVertex : Vertices) {
+            out << "New vertex number: " << vertexNumber <<  "_ not in binary" << endl;
+            aVertex.WriteASCII(out);
+            vertexNumber++;
+        }
+        for (int i = 0; i < NumIndices; i += 3) {
+            out << Indices[i] << " " << Indices[i+1] << " " << Indices[i + 2] << endl;
+        }
+    }
+};
 
 
 
-class Mesh
+class MeshClass
 {
 public:
-	Mesh();
-	void GetMeshData(MObject Object, std::vector<VertexLayout>& vertexList, std::vector<unsigned int>& indexList);
-    ~Mesh();
+    MeshClass();
+    Mesh GetMeshData(MObject Object);
+    ~MeshClass();
 private:
     struct WeightInfo {
         float BoneIndices[4] = { 0 };
