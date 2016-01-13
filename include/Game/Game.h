@@ -20,6 +20,7 @@
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
 #include "Core/EntityFileParser.h"
+#include "Core/Octree.h"
 
 // Network
 #include <boost/thread.hpp>
@@ -46,6 +47,8 @@ private:
     InputProxy* m_InputProxy;
 	GUI::Frame* m_FrameStack;
     World* m_World;
+    Octree* m_OctreeCollision;
+    Octree* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
     RenderQueueFactory* m_RenderQueueFactory;
     // Network variables

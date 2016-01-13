@@ -2,7 +2,7 @@
 #define Octree_h__
 
 #include "../Common.h"
-#include "Core/AABB.h"
+#include "AABB.h"
 
 class Ray;
 
@@ -14,7 +14,7 @@ public:
         float CollideDistance;
     };
 
-    Octree();
+    Octree() = delete;
     ~Octree();
     //For the root Octree, [octreeBounds] should be a box containing the entire level.
     Octree(const AABB& octreeBounds, int subDivisions);

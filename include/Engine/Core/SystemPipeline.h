@@ -32,8 +32,8 @@ public:
         System* system = new T(m_EventBroker, args...);
         group.Systems[typeid(T).name()] = system;
 
-        if (std::is_base_of<PureSystem, T>::value) {
-            PureSystem* pureSystem = static_cast<PureSystem*>(system);
+        PureSystem* pureSystem = dynamic_cast<PureSystem*>(system);
+        if (pureSystem != nullptr) {
             if (!pureSystem->m_ComponentType.empty()) {
                 group.PureSystems[pureSystem->m_ComponentType].push_back(pureSystem);
             } else {
@@ -41,8 +41,8 @@ public:
             }
         }
 
-        if (std::is_base_of<ImpureSystem, T>::value) {
-            ImpureSystem* impureSystem = static_cast<ImpureSystem*>(system);
+        ImpureSystem* impureSystem = dynamic_cast<ImpureSystem*>(system);
+        if (impureSystem != nullptr) {
             group.ImpureSystems.push_back(impureSystem);
         }
     }
@@ -56,6 +56,9 @@ public:
             }
 
             // Update
+            for (auto& system : group.ImpureSystems) {
+                system->Update(world, dt);
+            }
             for (auto& pair : group.PureSystems) {
                 const std::string& componentName = pair.first;
                 auto& systems = pair.second;
@@ -68,9 +71,6 @@ public:
                         system->UpdateComponent(world, component, dt);
                     }
                 }
-            }
-            for (auto& system : group.ImpureSystems) {
-                system->Update(world, dt);
             }
         }
     }

@@ -12,7 +12,8 @@ class PlayerSystem : public PureSystem
 {
 public:
     PlayerSystem(EventBroker* eventBroker)
-        : PureSystem(eventBroker, "Player")
+        : System(eventBroker)
+        , PureSystem("Player")
     {
         EVENT_SUBSCRIBE_MEMBER(m_ETouch, &PlayerSystem::OnTouch);
         EVENT_SUBSCRIBE_MEMBER(m_EEnter, &PlayerSystem::OnEnter);

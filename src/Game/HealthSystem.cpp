@@ -2,7 +2,8 @@
 #include <algorithm>
 
 HealthSystem::HealthSystem(EventBroker* eventBroker)
-    : PureSystem(eventBroker, "Health")
+    : System(eventBroker)
+    , PureSystem("Health")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &HealthSystem::OnPlayerDamaged);

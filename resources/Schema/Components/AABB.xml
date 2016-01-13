@@ -1,4 +1,4 @@
 <c:AABB>
-	<BoxCenter X="0" Y="0" Z="0"/>
-	<BoxSize X="1" Y="1" Z="1"/>
+	<Origin X="0" Y="0" Z="0"/>
+	<Size X="1" Y="1" Z="1"/>
 </c:AABB>

@@ -6,11 +6,13 @@
 //or you will get "fatal error C1189: #error:  gl.h included before glew.h"
 
 #include <vector>
+#include <boost/optional.hpp>
 
-#include "Core/Ray.h"
-#include "Core/AABB.h"
-#include "Engine/Rendering/RawModel.h"
-#include "Core/Entity.h"
+#include "../Core/Ray.h"
+#include "../Core/AABB.h"
+#include "../Rendering/RawModel.h"
+#include "../Rendering/RenderQueueFactory.h"
+#include "../Core/Entity.h"
 
 class World;
 struct ComponentWrapper;
@@ -50,9 +52,8 @@ bool AABBVsAABB(const AABB& a, const AABB& b);
 bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation);
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon = 0.0001f);
 
-//Returns true if the entity has a boundingbox. Outputs the aabb in [outBox].
-bool GetEntityBox(World* world, EntityID entity, AABB& outBox, bool forceBoxFromModel = false);
-bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox);
+// Calculates an absolute AABB from an entity AABB component
+boost::optional<AABB> EntityAbsoluteAABB(World* world, EntityID entity);
 
 }
 

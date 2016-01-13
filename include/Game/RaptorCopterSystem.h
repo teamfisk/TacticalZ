@@ -5,7 +5,8 @@ class RaptorCopterSystem : public PureSystem
 {
 public:
     RaptorCopterSystem(EventBroker* eventBroker)
-        : PureSystem(eventBroker, "RaptorCopter")
+        : System(eventBroker)
+        , PureSystem("RaptorCopter")
     { }
 
     virtual void UpdateComponent(World* world, ComponentWrapper& raptorCopter, double dt) override

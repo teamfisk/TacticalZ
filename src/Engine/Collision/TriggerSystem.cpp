@@ -3,27 +3,27 @@
 #include "Core/AABB.h"
 #include "Rendering/Model.h"
 
-void TriggerSystem::UpdateComponent(World* world, ComponentWrapper& trigger, double dt)
+void TriggerSystem::UpdateComponent(World* world, ComponentWrapper& cTrigger, double dt)
 {
     //Currently only players can trigger things.
     auto players = world->GetComponents("Player");
     if (players == nullptr) {
         return;
     }
-    EntityID tId = trigger.EntityID;
-    AABB triggerBox;
+    EntityID tId = cTrigger.EntityID;
+    boost::optional<AABB> triggerBox = Collision::EntityAbsoluteAABB(world, tId);
     //The trigger *should* have a bounding box, or something, to test against so it can be triggered.
-    if (!Collision::GetEntityBox(world, tId, triggerBox, true)) {
+    if (!triggerBox) {
         return;
     }
     for (auto& pc : *players) {
         EntityID pId = pc.EntityID;
-        AABB playerBox;
+        boost::optional<AABB> playerBox = Collision::EntityAbsoluteAABB(world, pId);
         //The player can't trigger anything without an AABB.
-        if (!Collision::GetEntityBox(world, pId, playerBox, true)) {
+        if (!playerBox) {
             continue;
         }
-        if (!Collision::AABBVsAABB(triggerBox, playerBox)) {
+        if (!Collision::AABBVsAABB(*triggerBox, *playerBox)) {
             //Entity is not touching the trigger,
             //Throw event if it was previously.
             if (throwLeaveIfWasInTrigger(m_EntitiesTouchingTrigger[tId], pId, tId)) {
@@ -34,10 +34,9 @@ void TriggerSystem::UpdateComponent(World* world, ComponentWrapper& trigger, dou
             throwLeaveIfWasInTrigger(m_EntitiesCompletelyInTrigger[tId], pId, tId);
         } else {
             //Entity is at least touching the trigger.
-            AABB completelyInsideBox;
-            completelyInsideBox.CreateFromCenter(triggerBox.Center(), triggerBox.Size() - 2.0f * playerBox.Size());
-            if (Collision::AABBVsAABB(completelyInsideBox, playerBox) &&
-                glm::all(glm::greaterThan(triggerBox.Size(), playerBox.Size()))) {
+            AABB completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * (*playerBox).Size());
+            if (Collision::AABBVsAABB(completelyInsideBox, *playerBox) &&
+                glm::all(glm::greaterThan((*triggerBox).Size(), (*playerBox).Size()))) {
                 //Entity is completely inside the trigger.
                 //If it was only touching before, it is erased.
                 m_EntitiesTouchingTrigger[tId].erase(pId);

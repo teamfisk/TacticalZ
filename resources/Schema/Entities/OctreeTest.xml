@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Color A="1" B="1" G="0" R="0"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="-0.104774237" Y="2.44278431" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Color A="1" B="0" G="0" R="1"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="0.548663795" Y="3.91025019" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Color A="1" B="0" G="1" R="0"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="-1.35118687" Y="3.90650201" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Scale X="48.5000038" Y="0.200000003" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -2,31 +2,30 @@
 #include "Collision/CollisionSystem.h"
 #include "Core/AABB.h"
 
-void CollisionSystem::UpdateComponent(World * world, ComponentWrapper & cAABB, double dt)
+void CollisionSystem::UpdateComponent(World* world, ComponentWrapper& cAABB, double dt)
 {
-    //Right now, cAABB is a component attached to any entity that should be collideable.
-    AABB thisBox;
-    if (!Collision::GetEntityBox(world, cAABB, thisBox)) {
+    EntityID entity = cAABB.EntityID;
+    boost::optional<AABB> boundingBox = Collision::EntityAbsoluteAABB(world, entity);
+    if (!boundingBox) {
         return;
     }
+    ComponentWrapper& cTransform = world->GetComponent(entity, "Transform");
+    AABB& boxA = *boundingBox;
+
     //Press 'Z' to enable/disable collision.
     if (zPress) {
         return;
     }
-    //Here, mover should be an object that moves, currently only players.
-    for (auto& mover : *world->GetComponents("Player")) {
-        if (cAABB.EntityID == mover.EntityID) {
+
+    std::vector<AABB> octreeResult;
+    m_Octree->BoxesInSameRegion(*boundingBox, octreeResult);
+    for (auto& boxB : octreeResult) {
+        glm::vec3 resolutionVector;
+        if (Collision::IsSameBoxProbably(boxA, boxB)) {
             continue;
         }
-        AABB otherBox;
-        if (!Collision::GetEntityBox(world, mover.EntityID, otherBox)) {
-            continue;
-        }
-        glm::vec3 resolveTranslation;
-        if (Collision::AABBVsAABB(otherBox, thisBox, resolveTranslation)) {
-            ComponentWrapper& trans = world->GetComponent(mover.EntityID, "Transform");
-            //TODO: Special treatment if both are movers.
-            trans["Position"] = (glm::vec3)trans["Position"] + resolveTranslation;
+        if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
+            (glm::vec3&)cTransform["Position"] += resolutionVector;
         }
     }
 }

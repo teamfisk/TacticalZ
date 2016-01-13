@@ -4,8 +4,9 @@
 #include <glm/common.hpp>
 #include <unordered_set>
 
-#include "Core/System.h"
-#include "Core/EventBroker.h"
+#include "../Core/System.h"
+#include "../Core/EventBroker.h"
+#include "../Core/Octree.h"
 #include "ETrigger.h"
 
 class AABB;
@@ -13,13 +14,16 @@ class AABB;
 class TriggerSystem : public PureSystem
 {
 public:
-    TriggerSystem(EventBroker* eventBroker)
-        : PureSystem(eventBroker, "Trigger")
-    {}
+    TriggerSystem(EventBroker* eventBroker, Octree* octree)
+        : System(eventBroker)
+        , PureSystem("Trigger")
+        , m_Octree(octree)
+    { }
 
     virtual void UpdateComponent(World* world, ComponentWrapper& collision, double dt) override;
 
 private:
+    Octree* m_Octree;
     std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesTouchingTrigger;
     std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesCompletelyInTrigger;
 

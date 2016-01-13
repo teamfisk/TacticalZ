@@ -21,9 +21,9 @@ BOOST_AUTO_TEST_CASE(octSameRegionTest)
     tree.BoxesInSameRegion(testBox, region);
     BOOST_REQUIRE(region.size() == 1);
     AABB& box = region[0];
-    BOOST_CHECK_CLOSE_FRACTION(box.Center().x, firstQuadrant.Center().x, 0.00001f);
-    BOOST_CHECK_CLOSE_FRACTION(box.Center().y, firstQuadrant.Center().y, 0.00001f);
-    BOOST_CHECK_CLOSE_FRACTION(box.Center().z, firstQuadrant.Center().z, 0.00001f);
+    BOOST_CHECK_CLOSE_FRACTION(box.Origin().x, firstQuadrant.Origin().x, 0.00001f);
+    BOOST_CHECK_CLOSE_FRACTION(box.Origin().y, firstQuadrant.Origin().y, 0.00001f);
+    BOOST_CHECK_CLOSE_FRACTION(box.Origin().z, firstQuadrant.Origin().z, 0.00001f);
     BOOST_CHECK_CLOSE_FRACTION(box.HalfSize().x, firstQuadrant.HalfSize().x, 0.00001f);
     BOOST_CHECK_CLOSE_FRACTION(box.HalfSize().y, firstQuadrant.HalfSize().y, 0.00001f);
     BOOST_CHECK_CLOSE_FRACTION(box.HalfSize().z, firstQuadrant.HalfSize().z, 0.00001f);

@@ -3,7 +3,8 @@
 #include <imgui/imgui_internal.h>
 
 EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer) 
-    : ImpureSystem(eventBroker)
+    : System(eventBroker)
+    , ImpureSystem()
     , m_Renderer(renderer)
 {
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
