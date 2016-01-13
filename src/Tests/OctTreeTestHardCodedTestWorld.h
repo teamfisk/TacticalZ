@@ -16,9 +16,9 @@ class HardcodedTestWorld : public World
 public:
     struct LinkOctTreeAndModel {
         EntityID entId;
-        OctTree::OctChild* child;
+        Octree::Child* child;
         glm::vec3 posxyz;
-        LinkOctTreeAndModel(EntityID eId, OctTree::OctChild* ch, glm::vec3 pos)
+        LinkOctTreeAndModel(EntityID eId, Octree::Child* ch, glm::vec3 pos)
         {
             entId = eId;
             child = ch;
@@ -27,7 +27,7 @@ public:
     };
     EntityID anotherBoxTransformId;
     std::vector<LinkOctTreeAndModel> linkOM;
-    OctTree someOctTree;
+    Octree someOctTree;
 
     //constructor
     HardcodedTestWorld()
@@ -115,7 +115,7 @@ private:
         model["Resource"] = "Models/Core/UnitBox.obj";
     }
 
-    void AddBoxModel(const glm::vec3 &center, const float &halfSize, OctTree::OctChild* child, EntityID &outEntityId) {
+    void AddBoxModel(const glm::vec3 &center, const float &halfSize, Octree::Child* child, EntityID &outEntityId) {
         World& world = *this;
 
         EntityID entityDummyScene = world.CreateEntity();

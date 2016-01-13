@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(octSameRegionTest)
 {
     glm::vec3 mini = glm::vec3(-1, -1, -1);
     glm::vec3 maxi = glm::vec3(1, 1, 1);
-    OctTree tree(AABB(mini, maxi), 2);
+    Octree tree(AABB(mini, maxi), 2);
     AABB firstQuadrant(mini, 0.8f*mini);
     tree.AddStaticObject(firstQuadrant);
     AABB testBox(0.9f*mini, 0.8f*mini);
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(octRegionPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octRegionPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(RegionTest<OctTree>);
+    TestLoop<Octree>(RegionTest<Octree>);
     BOOST_CHECK(true);
 }
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(octBoxPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octBoxPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(BoxTest<OctTree>);
+    TestLoop<Octree>(BoxTest<Octree>);
     BOOST_CHECK(true);
 }
 
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(octRayPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octRayPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(RayTest<OctTree>);
+    TestLoop<Octree>(RayTest<Octree>);
     BOOST_CHECK(true);
 }
 
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(octNopPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octNopPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(NopTest<OctTree>);
+    TestLoop<Octree>(NopTest<Octree>);
     BOOST_CHECK(true);
 }
 

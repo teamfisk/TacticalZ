@@ -21,65 +21,65 @@ bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
 
 }
 
-OctTree::OctTree()
-    : OctTree(AABB(), 0)
+Octree::Octree()
+    : Octree(AABB(), 0)
 {}
 
-OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
-    : m_Root(new OctChild(octTreeBounds, subDivisions, m_StaticObjects, m_DynamicObjects))
+Octree::Octree(const AABB& octTreeBounds, int subDivisions)
+    : m_Root(new Child(octTreeBounds, subDivisions, m_StaticObjects, m_DynamicObjects))
     , m_UpdatedOnce(false)
 {}
 
-OctTree::~OctTree()
+Octree::~Octree()
 {
     delete m_Root;
 }
 
-void OctTree::AddDynamicObject(const AABB& box)
+void Octree::AddDynamicObject(const AABB& box)
 {
     m_Root->AddDynamicObject(box);
     m_DynamicObjects.push_back(box);
 }
 
-void OctTree::AddStaticObject(const AABB& box)
+void Octree::AddStaticObject(const AABB& box)
 {
     m_Root->AddStaticObject(box);
     m_StaticObjects.push_back(box);
 }
 
-void OctTree::BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes)
+void Octree::BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes)
 {
     falsifyObjectChecks();
     m_Root->BoxesInSameRegion(box, outBoxes);
 }
 
-void OctTree::ClearObjects()
+void Octree::ClearObjects()
 {
     m_StaticObjects.clear();
     m_DynamicObjects.clear();
     m_Root->ClearObjects();
 }
 
-void OctTree::ClearDynamicObjects()
+void Octree::ClearDynamicObjects()
 {
     m_DynamicObjects.clear();
     m_Root->ClearDynamicObjects();
 }
 
-bool OctTree::RayCollides(const Ray& ray, Output& data)
+bool Octree::RayCollides(const Ray& ray, Output& data)
 {
     falsifyObjectChecks();
     data.CollideDistance = -1;
     return m_Root->RayCollides(ray, data);
 }
 
-bool OctTree::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected)
+bool Octree::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected)
 {
     falsifyObjectChecks();
     return m_Root->BoxCollides(boxToTest, outBoxIntersected);
 }
 
-void OctTree::falsifyObjectChecks()
+void Octree::falsifyObjectChecks()
 {
     for (auto& obj : m_StaticObjects) {
         obj.Checked = false;
@@ -89,7 +89,7 @@ void OctTree::falsifyObjectChecks()
     }
 }
 
-OctTree::OctChild::OctChild(const AABB& octTreeBounds,
+Octree::Child::Child(const AABB& octTreeBounds,
     int subDivisions, 
     std::vector<ContainedObject>& staticObjects,
     std::vector<ContainedObject>& dynamicObjects)
@@ -98,7 +98,7 @@ OctTree::OctChild::OctChild(const AABB& octTreeBounds,
     , m_DynamicObjectsRef(dynamicObjects)
 {
     if (subDivisions == 0) {
-        for (OctChild*& c : m_Children) {
+        for (Child*& c : m_Children) {
             c = nullptr;
         }
     } else {
@@ -134,14 +134,14 @@ OctTree::OctChild::OctChild(const AABB& octTreeBounds,
                 minPos.z = parentMin.z;
                 maxPos.z = parentCenter.z;
             }
-            m_Children[i] = new OctChild(AABB(minPos, maxPos), subDivisions, m_StaticObjectsRef, m_DynamicObjectsRef);
+            m_Children[i] = new Child(AABB(minPos, maxPos), subDivisions, m_StaticObjectsRef, m_DynamicObjectsRef);
         }
     }
 }
 
-OctTree::OctChild::~OctChild()
+Octree::Child::~Child()
 {
-    for (OctChild*& c : m_Children) {
+    for (Child*& c : m_Children) {
         if (c != nullptr) {
             delete c;
             c = nullptr;
@@ -149,7 +149,7 @@ OctTree::OctChild::~OctChild()
     }
 }
 
-bool OctTree::OctChild::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
+bool Octree::Child::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
 {
     if (hasChildren()) {
         for (int i : childIndicesContainingBox(boxToTest)) {
@@ -182,7 +182,7 @@ bool OctTree::OctChild::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersect
     return false;
 }
 
-bool OctTree::OctChild::RayCollides(const Ray& ray, Output& data) const
+bool Octree::Child::RayCollides(const Ray& ray, Output& data) const
 {
     //If the node AABB is missed, everything it contains is missed.
     if (Collision::RayAABBIntr(ray, m_Box)) {
@@ -234,7 +234,7 @@ bool OctTree::OctChild::RayCollides(const Ray& ray, Output& data) const
 }
 
 
-void OctTree::OctChild::AddDynamicObject(const AABB& box)
+void Octree::Child::AddDynamicObject(const AABB& box)
 {
     if (hasChildren()) {
         for (auto i : childIndicesContainingBox(box)) {
@@ -246,7 +246,7 @@ void OctTree::OctChild::AddDynamicObject(const AABB& box)
     }
 }
 
-void OctTree::OctChild::AddStaticObject(const AABB& box)
+void Octree::Child::AddStaticObject(const AABB& box)
 {
     if (hasChildren()) {
         for (auto i : childIndicesContainingBox(box)) {
@@ -258,7 +258,7 @@ void OctTree::OctChild::AddStaticObject(const AABB& box)
     }
 }
 
-void OctTree::OctChild::BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const
+void Octree::Child::BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const
 {
     if (hasChildren()) {
         for (auto i : childIndicesContainingBox(box)) {
@@ -292,10 +292,10 @@ void OctTree::OctChild::BoxesInSameRegion(const AABB& box, std::vector<AABB>& ou
     }
 }
 
-void OctTree::OctChild::ClearObjects()
+void Octree::Child::ClearObjects()
 {
     if (hasChildren()) {
-        for (OctChild*& c : m_Children) {
+        for (Child*& c : m_Children) {
             c->ClearObjects();
         }
     } else {
@@ -304,10 +304,10 @@ void OctTree::OctChild::ClearObjects()
     }
 }
 
-void OctTree::OctChild::ClearDynamicObjects()
+void Octree::Child::ClearDynamicObjects()
 {
     if (hasChildren()) {
-        for (OctChild*& c : m_Children) {
+        for (Child*& c : m_Children) {
             c->ClearObjects();
         }
     } else {
@@ -327,13 +327,13 @@ void OctTree::OctChild::ClearDynamicObjects()
 //    x : - - - - + + + +
 //    y : - - + + - - + +
 //    z : - + - + - + - +
-int OctTree::OctChild::childIndexContainingPoint(const glm::vec3& point) const
+int Octree::Child::childIndexContainingPoint(const glm::vec3& point) const
 {
     const glm::vec3& c = m_Box.Center();
     return (1 << 2) * (point.x >= c.x) | (1 << 1) * (point.y >= c.y) | (point.z >= c.z);
 }
 
-std::vector<int> OctTree::OctChild::childIndicesContainingBox(const AABB& box) const
+std::vector<int> Octree::Child::childIndicesContainingBox(const AABB& box) const
 {
     int minInd = childIndexContainingPoint(box.MinCorner());
     int maxInd = childIndexContainingPoint(box.MaxCorner());
@@ -371,7 +371,7 @@ std::vector<int> OctTree::OctChild::childIndicesContainingBox(const AABB& box) c
     }
 }
 
-inline bool OctTree::OctChild::hasChildren() const
+inline bool Octree::Child::hasChildren() const
 {
     return m_Children[0] != nullptr;
 }
