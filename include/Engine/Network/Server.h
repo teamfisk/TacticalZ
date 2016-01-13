@@ -68,7 +68,7 @@ private:
     void checkForTimeOuts();
     void disconnect(int i);
     void parseMessageType(Packet& packet);
-    void parseEvent(Packet& packet);
+    void parseOnInputCommand(Packet& packet);
     void parseConnect(Packet& packet);
     void parseDisconnect();
     void parseClientPing();

@@ -254,7 +254,6 @@ int Client::receive(char* data, size_t length)
     if (error) {
         LOG_ERROR("receive: %s", error.message().c_str());
     }
-
     return bytesReceived;
 }
 
@@ -297,16 +296,16 @@ void Client::moveMessageHead(char*& data, size_t& length, size_t stepSize)
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    if (e.Command == "Forward" || e.Command == "Right") {
-        Packet packet(MessageType::Event, m_SendPacketID);
+    if (e.Command == "ConnectToServer") { // Connect for now
+        connect();
+        LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        return true;
+    } else {
+        Packet packet(MessageType::OnInputCommand, m_SendPacketID);
         packet.WriteString(e.Command);
         packet.WritePrimitive(e.PlayerID);
         packet.WritePrimitive(e.Value);
         send(packet);
-        LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
-        return true;
-    } else if (e.Command == "ConnectToServer") { // Connect for now
-        connect();
         LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     }

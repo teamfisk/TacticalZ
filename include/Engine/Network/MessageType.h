@@ -12,6 +12,7 @@ enum class MessageType
 	Message,
 	Snapshot,
 	Event,
+    OnInputCommand
 };
 
 #endif

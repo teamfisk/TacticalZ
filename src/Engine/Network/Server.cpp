@@ -81,8 +81,10 @@ void Server::parseMessageType(Packet& packet)
         parseDisconnect();
         break;
     case MessageType::Event:
-        parseEvent(packet);
         break;
+    case MessageType::OnInputCommand:
+        parseOnInputCommand(packet);
+        break;;
     default:
         break;
     }
@@ -218,7 +220,7 @@ void Server::disconnect(int i)
     m_PlayerDefinitions[i].Name = "";
 }
 
-void Server::parseEvent(Packet& packet)
+void Server::parseOnInputCommand(Packet& packet)
 {
     size_t i;
     for (i = 0; i < MAXCONNECTIONS; i++) {

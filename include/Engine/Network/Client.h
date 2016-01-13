@@ -81,8 +81,9 @@ private:
     bool hasMappedEntity(EntityID entityID);
     // Events
     EventBroker* m_EventBroker;
+   
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
-    bool OnInputCommand(const Events::InputCommand &e);
+    bool OnInputCommand(const Events::InputCommand& e);
 };
 
 #endif
