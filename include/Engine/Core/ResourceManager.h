@@ -12,14 +12,33 @@
 /** Base Resource class.
 
 	Implement this class for every resource to be handled by the resource manager.
-	Implement Create() to return a new object of that type.
+	
+    If it should be possible to load the resource asyncronously (on a separate thread in the background), 
+    using LoadAsync() then any necessary OpenGL calls (Eg. glGenBuffers(), glBindBuffer(), etc.) must be 
+    made in GlCommands() method, and not inside the constructor (see Texture.cpp for an example).
 */
 class Resource
 {
 	friend class ResourceManager;
 
+private:
+    bool m_FullyConstructed;
+
 protected:
-	Resource() { }
+	Resource() : m_FullyConstructed(false) { }
+    //This method only needs to be overridden if: 
+    //      1:  a) It should be possible to load the resource with LoadAsync(), or
+    //          b) This resource will be loaded inside the constructor of another resource that can be loaded with LoadAsync().
+    //          c) Same as above but recursively.
+    //      2:  a) The resource needs to make OpenGL calls, or
+    //          b) The resource contains a resource that makes OGL calls, or
+    //          c) The resource contains a resource that contains ... ... a resource that makes OGL calls, or
+    //
+    //If 2.a: any calls should be made in the GlCommands.
+    //If 2.b or 2.c: PostCtorGLCommands() should be called on the contained resource(s).
+    //If GlCommands needs to be overridden and GlCommands is also overridden by a baseclass then the baseclass 
+    //implementation should be called in from the derived class implementation (see Model.cpp for an example).
+    virtual void GlCommands() { }
 
 public:
 	// Pretend that this is a pure virtual function that you have to implement
@@ -28,6 +47,16 @@ public:
 
 	virtual void Reload() {	}
 	virtual void OnChildReloaded(Resource* child) { }
+    //If this resource implements GlCommands and it is loaded in another resource, 
+    //then the containing resource must also implement GlCommands and 
+    //call this method in it (see RawModel.cpp for an example).
+    void PostCtorGLCommands() 
+    {
+        if (!m_FullyConstructed) {
+            GlCommands();
+        }
+        m_FullyConstructed = true;
+    }
 
 	unsigned int TypeID;
 	unsigned int ResourceID;
@@ -40,30 +69,6 @@ private:
 	ResourceManager();
 
 public:
-    //TODO: Check if this is ever used, and remove it if it isn't.
-    //Why would a resource load another resource async. in the ctor?
-    //Should be thrown in a Resource's constructor if it cannot complete because another resource is still loading.
-    //Eg. If a Model loads a Texture asyncronously in the constructor, and it is not done yet.
-    struct StillLoadingException : public std::exception
-    {
-        virtual const char* what() const throw()
-        {
-            return "Resource is still loading.";
-        }
-    };
-    //Should be thrown in a Resource's constructor if certain work needs to be handled by 
-    //the main thread, and not a parallel worker thread. Eg. opengl commands.
-    struct WorkerCannotExecute : public std::exception
-    {
-        virtual const char* what() const throw()
-        {
-            return "Worker thread is unable to execute, main thread need to handle the code.";
-        }
-    };
-
-    static void AssertIsMainThread();
-    static bool IsMainThread();
-
 	/*static ResourceManager& Instance()
 	{
 	static ResourceManager s;
@@ -89,7 +94,6 @@ public:
     */
     template <typename T>
     static T* LoadAsync(std::string resourceName, Resource* parent = nullptr);
-	static Resource* LoadAsync(std::string resourceType, std::string resourceName, Resource* parent = nullptr);
 
 	/** Hot-loads a resource and caches it for future use. 
         Fairly safe to assume that return value is a valid pointer, will only return nullptr on error.
@@ -99,7 +103,6 @@ public:
 	*/
 	template <typename T>
 	static T* Load(std::string resourceName, Resource* parent = nullptr);
-    static Resource* Load(std::string resourceType, std::string resourceName, Resource* parent = nullptr);
 
 	/** Reloads an already loaded resource, keeping its resource ID intact.
 
@@ -113,25 +116,15 @@ public:
 	static void Update();
 
 private:
-    //Represents pointer values to signify that a resource haven't failed, but is not fully loaded.
-    class SpecialResourcePointer
+    //This is a haxy way to make sure that IsMainThread is run when the program starts, so the master thread id is set.
+    struct MasterThreadChecker
     {
-    public:
-        SpecialResourcePointer()
-            : m_Val(new Resource())
-        {}
-        ~SpecialResourcePointer()
+        MasterThreadChecker()
         {
-            delete m_Val;
+            ResourceManager::IsMainThread();
         }
-        //Make this class implicitly convertible to the Resource*.
-        operator Resource* const() const { return m_Val; }
-    private:
-        Resource* const m_Val;
     };
-    //TODO: Check if this is ever used, and remove it if it isn't.
-    static SpecialResourcePointer m_StillLoading;
-    static SpecialResourcePointer m_LoadWithMainThread;
+    static MasterThreadChecker m_Checker;
 
 	static std::unordered_map<std::string, std::string> m_CompilerTypenameToResourceType;
     static std::unordered_map<std::string, std::function<Resource*(std::string)>> m_FactoryFunctions; // type -> factory function
@@ -156,6 +149,10 @@ private:
 
 	// Internal: Create a resource and cache it
 	static Resource* createResource(std::string resourceType, std::string resourceName, Resource* parent);
+
+    static bool IsMainThread();
+    template <bool Async>
+    static Resource* Load(std::string resourceType, std::string resourceName, Resource* parent = nullptr);
 };
 
 template <typename T>
@@ -168,7 +165,7 @@ T* ResourceManager::Load(std::string resourceName, Resource* parent /* = nullptr
         return nullptr;
     }
 
-    return static_cast<T*>(Load(it->second, resourceName, parent));
+    return static_cast<T*>(Load<false>(it->second, resourceName, parent));
 }
 
 template <typename T>
@@ -188,7 +185,65 @@ T* ResourceManager::LoadAsync(std::string resourceName, Resource* parent /* = nu
 		return nullptr;
 	}
 
-	return static_cast<T*>(LoadAsync(it->second, resourceName, parent));
+	return static_cast<T*>(Load<true>(it->second, resourceName, parent));
+}
+
+template <bool Async>
+static Resource* ResourceManager::Load(std::string resourceType, std::string resourceName, Resource* parent /* = nullptr */)
+{
+    auto cacheKey = std::make_pair(resourceType, resourceName);
+    decltype(m_ResourceCache)::iterator it;
+    //If a thread has already been launched to load this resource.
+    auto tIt = m_LoadingThreads.find(cacheKey);
+    if (tIt != m_LoadingThreads.end()) {
+        if (Async) {
+            //Return null if the thread is still working.
+            if (!tIt->second.try_join_for(boost::chrono::nanoseconds(1))) {
+                return nullptr;
+            }
+            //Else we know the thread has completed.
+        } else {
+            //Wait for the thread to finish loading.
+            tIt->second.join();
+        }
+        //When the thread is done, delete the thread.
+        m_LoadingThreads.erase(tIt);
+        //Find the resource that the thread loaded.
+        it = m_ResourceCache.find(cacheKey);
+        if (it != m_ResourceCache.end()) {
+            //At this point the resource may not be completely 
+            //done since the worker threads cannot do opengl commands.
+            if (IsMainThread()) {
+                //Do the gl commands to complete the resource if we are not a worker thread.
+                it->second->PostCtorGLCommands();
+            }
+            return it->second;
+        } else {
+            //If resource is still null at cacheKey after thread finishes, it failed.
+            return nullptr;
+        }
+    }
+
+    //If resource has already been loaded and cached.
+    it = m_ResourceCache.find(cacheKey);
+    if (it != m_ResourceCache.end()) {
+        return it->second;
+    }
+
+    //If resource is not cached..
+    if (Async) {
+        //Create a thread that loads the resource into cache.
+        m_LoadingThreads[cacheKey] = boost::thread(createResource, resourceType, resourceName, parent);
+        return nullptr;
+    } else {
+        //load and return the resource.
+        Resource* res = createResource(resourceType, resourceName, parent);
+        if (IsMainThread() && res != nullptr) {
+            //Do the gl commands to complete the resource if we are not a worker thread.
+            res->PostCtorGLCommands();
+        }
+        return res;
+    }
 }
 
 #endif

@@ -292,6 +292,22 @@ RawModel::RawModel(std::string fileName)
 	}
 }
 
+void RawModel::GlCommands()
+{
+    //Since RawModel contains Textures that was loaded in the constructor, their GlCommands must be run.
+    for (auto& texGroup : TextureGroups) {
+        if (texGroup.Texture) {
+            texGroup.Texture->PostCtorGLCommands();
+        }
+        if (texGroup.NormalMap) {
+            texGroup.NormalMap->PostCtorGLCommands();
+        }
+        if (texGroup.SpecularMap) {
+            texGroup.SpecularMap->PostCtorGLCommands();
+        }
+    }
+}
+
 RawModel::~RawModel()
 {
 	if (m_Skeleton) {

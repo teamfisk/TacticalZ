@@ -220,7 +220,7 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
     }
     ComponentWrapper model = world->GetComponent(id, "Model");
     ComponentWrapper collision = world->AttachComponent(id, "AABB");
-    Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
+    Model* modelRes = ResourceManager::LoadAsync<Model>(model["Resource"]);
     if (modelRes == nullptr) {
         return false;
     }
@@ -247,7 +247,7 @@ bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
 {
     ComponentWrapper& cTrans = world->GetComponent(AABBComponent.EntityID, "Transform");
     ComponentWrapper model = world->GetComponent(AABBComponent.EntityID, "Model");
-    Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
+    Model* modelRes = ResourceManager::LoadAsync<Model>(model["Resource"]);
     outBox.CreateFromCenter(AABBComponent["BoxCenter"], AABBComponent["BoxSize"]);
     glm::vec3 mini = outBox.MinCorner();
     glm::vec3 maxi = outBox.MaxCorner();

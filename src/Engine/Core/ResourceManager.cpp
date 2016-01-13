@@ -14,8 +14,6 @@ std::unordered_map<unsigned int, unsigned int> ResourceManager::m_ResourceCount;
 FileWatcher ResourceManager::m_FileWatcher;
 std::unordered_map<std::pair<std::string, std::string>, boost::thread> ResourceManager::m_LoadingThreads;
 boost::recursive_mutex ResourceManager::m_Mutex;
-ResourceManager::SpecialResourcePointer ResourceManager::m_StillLoading;
-ResourceManager::SpecialResourcePointer ResourceManager::m_LoadWithMainThread;
 
 unsigned int ResourceManager::GetTypeID(std::string resourceType)
 {
@@ -80,86 +78,6 @@ void ResourceManager::Update()
 	m_FileWatcher.Check();
 }
 
-Resource* ResourceManager::LoadAsync(std::string resourceType, std::string resourceName, Resource* parent /*= nullptr*/)
-{
-    auto cacheKey = std::make_pair(resourceType, resourceName);
-    decltype(m_ResourceCache)::iterator it;
-    //If a thread has already been launched to load this resource.
-    auto tIt = m_LoadingThreads.find(cacheKey);
-    if (tIt != m_LoadingThreads.end()) {
-        //If the thread is still working.
-        if (tIt->second.joinable()) {
-            return nullptr;
-        }
-        //Else, the thread is done.
-        m_LoadingThreads.erase(tIt);
-        it = m_ResourceCache.find(cacheKey);
-        if (it != m_ResourceCache.end()) {
-            //If the thread is done, but it cannot complete the rest, main thread must complete construction.
-            if (it->second == m_LoadWithMainThread) {
-                AssertIsMainThread();
-                return createResource(resourceType, resourceName, parent);
-            }
-            return it->second;
-        } else {
-            //If cache is still empty at cacheKey after thread finishes, it failed.
-            return nullptr;
-        }
-    }
-
-    //If resource has already been loaded and cached.
-    it = m_ResourceCache.find(cacheKey);
-    if (it != m_ResourceCache.end()) {
-        //if ConstructByMainThread, createResource from Main.
-        return it->second;
-    }
-
-    //Create a thread that loads the resource into cache.
-    m_LoadingThreads[cacheKey] = boost::thread(createResource, resourceType, resourceName, parent);
-    return nullptr;
-}
-
-Resource* ResourceManager::Load(std::string resourceType, std::string resourceName, Resource* parent /*= nullptr*/)
-{
-    Resource* resource;
-    auto cacheKey = std::make_pair(resourceType, resourceName);
-    decltype(m_ResourceCache)::iterator it;
-    //If a thread has already been launched to load this resource.
-    auto tIt = m_LoadingThreads.find(cacheKey);
-    if (tIt != m_LoadingThreads.end()) {
-        //Wait for the thread to finish loading.
-        tIt->second.join();
-        //Then delete the thread.
-        m_LoadingThreads.erase(tIt);
-        it = m_ResourceCache.find(cacheKey);
-        if (it != m_ResourceCache.end()) {
-            //If the thread is done, but it cannot complete the rest, main thread must complete construction.
-            if (it->second == m_LoadWithMainThread) {
-                AssertIsMainThread();
-                return createResource(resourceType, resourceName, parent);
-            }
-            return it->second;
-        } else {
-            //If cache is still empty at cacheKey after thread finishes, it failed.
-            return nullptr;
-        }
-    }
-    //If resource has already been loaded and cached.
-    it = m_ResourceCache.find(cacheKey);
-    if (it != m_ResourceCache.end()) {
-        return it->second;
-    }
-
-    //If resource is not cached, load and return it.
-    resource = createResource(resourceType, resourceName, parent);
-    if (resource == m_LoadWithMainThread) {
-        //If we entered here then we know the caller is a worker thread.
-        //And we know the resource must be loaded from master thread.
-        throw(WorkerCannotExecute());
-    }
-    return resource;
-}
-
 Resource* ResourceManager::createResource(std::string resourceType, std::string resourceName, Resource* parent)
 {
     //Lock the mutex immediately, and unlock it when leaving the function.
@@ -174,12 +92,10 @@ Resource* ResourceManager::createResource(std::string resourceType, std::string 
     Resource* resource = nullptr;
     try {
         resource = facIt->second(resourceName);
-    } catch (const WorkerCannotExecute& e) {
-        resource = m_LoadWithMainThread;
     } catch (const std::exception& e) {
 		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": %s", resourceName.c_str(), resourceType.c_str(), e.what());
     }
-    if (resource != nullptr && resource != m_LoadWithMainThread) {
+    if (resource != nullptr) {
         // Store IDs
         resource->TypeID = GetTypeID(resourceType);
         resource->ResourceID = GetNewResourceID(resource->TypeID);
@@ -203,11 +119,4 @@ bool ResourceManager::IsMainThread()
 {
     static boost::thread::id MainThreadId = boost::this_thread::get_id();
     return boost::this_thread::get_id() == MainThreadId;
-}
-
-void ResourceManager::AssertIsMainThread()
-{
-    if (!IsMainThread()) {
-        throw WorkerCannotExecute();
-    }
 }

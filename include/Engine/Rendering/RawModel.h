@@ -24,6 +24,7 @@ class RawModel : public Resource
 
 protected:
 	RawModel(std::string fileName);
+    virtual void GlCommands() override;
 
 public:
 	~RawModel();

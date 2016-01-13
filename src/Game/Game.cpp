@@ -4,7 +4,6 @@
 
 Game::Game(int argc, char* argv[])
 {
-    ResourceManager::AssertIsMainThread();
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<Texture>("Texture");

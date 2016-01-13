@@ -10,6 +10,7 @@ class Model : public RawModel
 
 private:
 	Model(std::string fileName);
+    virtual void GlCommands() override;
 
 public:
 	~Model();

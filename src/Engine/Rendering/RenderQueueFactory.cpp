@@ -84,7 +84,6 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
             continue;
         }
         glm::vec4 color = modelC["Color"];
-        //Model* model = ResourceManager::Load<Model>(resource);
         Model* model = ResourceManager::LoadAsync<Model>(resource);
         if (model == nullptr) {
             model = ResourceManager::Load<Model>("Models/Core/Error.obj");
