@@ -1,3 +1,6 @@
+#ifndef CollidableOctreeSystem_h__
+#define CollidableOctreeSystem_h__
+
 #include "../Core/System.h"
 #include "../Core/Octree.h"
 #include "Collision.h"
@@ -17,3 +20,5 @@ public:
 private:
     Octree* m_Octree;
 };
+
+#endif

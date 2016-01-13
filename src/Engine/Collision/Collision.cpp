@@ -199,6 +199,46 @@ bool RayVsModel(const Ray& ray,
     return hit;
 }
 
+bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
+{
+    bool hit = false;
+    
+    const glm::vec3& origin = box.Origin();
+    const glm::vec3& min = box.MinCorner();
+    const glm::vec3& max = box.MaxCorner();
+
+    outResolutionVector.x = INFINITY;
+
+    for (int i = 0; i < modelIndices.size(); ++i) {
+        glm::vec3 p = modelVertices[i].Position;
+        p = glm::vec3(modelMatrix * glm::vec4(p.x, p.y, p.z, 1));
+
+        float distFromOrigin = glm::abs(origin.x - p.x);
+        float penetration = box.HalfSize().x - distFromOrigin;
+        if (penetration > 0 && penetration < glm::abs(outResolutionVector.x)) {
+            if (p.x > origin.x) {
+                outResolutionVector.x = -penetration;
+            } else {
+                outResolutionVector.x = penetration;
+            }
+            hit = true;
+        }
+        //glm::vec3 pLocal = origin - p;
+        //for (int axis = 0; axis < 3; ++axis) {
+        //    if (p[axis] < min[axis] || p[axis] > max[axis]) {
+        //        continue;
+        //    }
+
+        //    if (glm::abs(pLocal[axis]) < box.HalfSize()[axis]) {
+        //        outResolutionVector[axis] = (glm::sign(pLocal[axis]) * box.HalfSize()[axis]) - pLocal[axis];
+        //        hit = true;
+        //    }
+        //}
+    }
+
+    return hit;
+}
+
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)
 {
     const glm::vec3& ma1 = first.MaxCorner();

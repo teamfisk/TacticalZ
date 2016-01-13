@@ -45,6 +45,12 @@ bool RayVsModel(const Ray& ray,
     float& outUCoord,
     float& outVCoord);
 
+bool AABBvsTriangles(const AABB& box,
+    const std::vector<RawModel::Vertex>& modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix,
+    glm::vec3& outResolutionVector);
+
 //Return true if the boxes are intersecting.
 bool AABBVsAABB(const AABB& a, const AABB& b);
 //Return true if the boxes are intersecting.
