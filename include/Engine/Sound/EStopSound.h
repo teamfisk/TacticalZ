@@ -6,7 +6,7 @@
 
 namespace Events
 {
-
+// Stops a sound emitter, and will also delete it.
 struct StopSound : Event
 {
     EntityID EmitterID;

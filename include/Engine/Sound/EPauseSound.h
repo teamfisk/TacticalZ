@@ -6,7 +6,7 @@
 
 namespace Events
 {
-
+// Pauses a playing sound
 struct PauseSound : Event
 {
     EntityID EmitterID;

@@ -7,7 +7,7 @@
 
 namespace Events
 {
-
+// Play a sound that will be heared the same anywhere
 struct PlayBackgroundMusic : public Event
 {
     std::string FilePath = "";

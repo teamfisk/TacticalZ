@@ -5,7 +5,7 @@
 
 namespace Events
 {
-
+// Set the "volume" for all background sounds
 struct SetBGMGain : public Event
 {
     float Gain;

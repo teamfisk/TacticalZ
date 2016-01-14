@@ -8,38 +8,24 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventBroker, bool editorMode
 
     initOpenAL();
 
-    alSpeedOfSound(340.29f); // Speed of sound
+    alSpeedOfSound(340.29f);
     alDistanceModel(AL_LINEAR_DISTANCE);
     alDopplerFactor(1);
 
-    EVENT_SUBSCRIBE_MEMBER(m_EPlaySound, &SoundSystem::OnPlaySound);
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnEntity, &SoundSystem::OnPlaySoundOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnPosition, &SoundSystem::OnPlaySoundOnPosition);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayBackgroundMusic, &SoundSystem::OnPlayBackgroundMusic);
     EVENT_SUBSCRIBE_MEMBER(m_EStopSound, &SoundSystem::OnStopSound);
     EVENT_SUBSCRIBE_MEMBER(m_EPauseSound, &SoundSystem::OnPauseSound);
     EVENT_SUBSCRIBE_MEMBER(m_EContinueSound, &SoundSystem::OnContinueSound);
-    EVENT_SUBSCRIBE_MEMBER(m_EPlayBackgroundMusic, &SoundSystem::OnPlayBackgroundMusic);
-    //EVENT_SUBSCRIBE_MEMBER(m_ESetBGMGain, &SoundSystem::SetBGMGain);
-    //EVENT_SUBSCRIBE_MEMBER(m_ESetSFXGain, &SoundSystem::OnSetSFXGain);
-}
-
-void SoundSystem::initOpenAL()
-{
-    // Initialize OpenAL
-    m_ALCdevice = alcOpenDevice(nullptr);
-    if (m_ALCdevice != nullptr) {
-        m_ALCcontext = alcCreateContext(m_ALCdevice, nullptr);
-        alcMakeContextCurrent(m_ALCcontext);
-    } else {
-        LOG_ERROR("OpenAL failed to initialize.");
-    }
+    EVENT_SUBSCRIBE_MEMBER(m_ESetBGMGain, &SoundSystem::OnSetBGMGain);
+    EVENT_SUBSCRIBE_MEMBER(m_ESetSFXGain, &SoundSystem::OnSetSFXGain);
 }
 
 SoundSystem::~SoundSystem()
 {
     stopEmitters(); // Stopps emitters
     deleteInactiveEmitters(); // Deletes stopped emitters
-
     // Delete entities
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end(); it++) {
@@ -49,58 +35,49 @@ SoundSystem::~SoundSystem()
 
     alcDestroyContext(m_ALCcontext);
     alcCloseDevice(m_ALCdevice);
-    delete m_ALCcontext;
-    delete m_ALCdevice;
 }
 
 void SoundSystem::stopEmitters()
 {
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end(); it++) {
-        if (isPlaying((*it).second->ALsource)) {
+        if (getSourceState((*it).second->ALsource) == AL_PLAYING) {
             stopSound((*it).second);
         }
     }
 }
 
 void SoundSystem::Update()
-{
-    addNewEmitters();
-    deleteInactiveEmitters();
+{ 
+    addNewEmitters(); // can be optimized with "EEntityCreated"
+    deleteInactiveEmitters(); // can be optimized with "EEntityDeleted"
     updateEmitters();
     updateListener();
 }
 
 void SoundSystem::deleteInactiveEmitters()
 {
-    auto emitterComponents = m_World->GetComponents("SoundEmitter");
-    for (auto it = emitterComponents->begin(); it != emitterComponents->end();) {
-        EntityID emitter = (*it).EntityID;
-        Source* source = m_Sources[emitter];
-        if (isPlaying(source->ALsource) || !source->HasBeenPlayed) { // The sound is still playing, do not remove
-            it++;
-            continue;
-        } 
-        else {
-            alDeleteBuffers(1, &source->ALsource);
-            alDeleteSources(1, &source->ALsource);
-            //delete m_Sources[emitter]->SoundResource;
-            m_Sources.erase(emitter);
-            m_World->DeleteEntity(emitter);
-        } 
-    }
-
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end();) {
         if (m_World->ValidEntity((*it).first)) {
-            // Entity is valid, move on.
-            it++;
-            continue;
+            if (getSourceState(it->second->ALsource) != AL_STOPPED) {
+                // Nothing to see here, move along
+                it++;
+                continue;
+            } else {
+                // Sound has been stopped / finished playing
+                alDeleteBuffers(1, &it->second->ALsource);
+                alDeleteSources(1, &it->second->ALsource);
+                delete it->second->SoundResource;
+                m_World->DeleteEntity(it->first);
+                it = m_Sources.erase(it);
+            }
         } else {
+            // Entity has been removed
             stopSound((*it).second);
-            alDeleteBuffers(1, &m_Sources[(*it).first]->ALsource);
-            alDeleteSources(1, &m_Sources[(*it).first]->ALsource);
-            //delete m_Sources[emitter]->SoundResource;
+            alDeleteBuffers(1, &it->second->ALsource);
+            alDeleteSources(1, &it->second->ALsource);
+            delete it->second->SoundResource;
             it = m_Sources.erase(it);
         }
     }
@@ -111,19 +88,10 @@ void SoundSystem::addNewEmitters()
     auto emitterComponents = m_World->GetComponents("SoundEmitter");
     for (auto it = emitterComponents->begin(); it != emitterComponents->end(); it++) {
         EntityID emitter = (*it).EntityID;
-        std::unordered_map<EntityID, Source*>::iterator i;
-        i = m_Sources.find(emitter);
-        if (i == m_Sources.end()) { // Did not exist, add it
+        std::unordered_map<EntityID, Source*>::iterator source;
+        source = m_Sources.find(emitter);
+        if (source == m_Sources.end()) { // Did not exist, add it
             Source* source = createSource((std::string)(*it)["FilePath"]);
-            setSoundProperties(
-                source->ALsource,
-                (float)(double)(*it)["Gain"],
-                (float)(double)(*it)["Pitch"],
-                (bool)(*it)["Loop"],
-                (float)(double)(*it)["MaxDistance"],
-                (float)(double)(*it)["RollOffFactor"],
-                (float)(double)(*it)["ReferenceDistance"]
-                );
             m_Sources[emitter] = source;
         }
     }
@@ -131,45 +99,30 @@ void SoundSystem::addNewEmitters()
 
 void SoundSystem::updateEmitters()
 {
-    auto emitterComponents = m_World->GetComponents("SoundEmitter");
-    for (auto it = emitterComponents->begin(); it != emitterComponents->end();) {
-        EntityID emitter = (*it).EntityID;
-        if (!m_World->ValidEntity(emitter)) { // Entity has been deleted
-            // Delete
-        } else {
-            std::unordered_map<EntityID, Source*>::iterator i;
-            i = m_Sources.find(emitter);
-            if (i != m_Sources.end()) {
-                // Get previous pos
-                glm::vec3 previousPos;
-                alGetSource3f(i->second->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
-                // Get next pos
-                glm::vec3 nextPos = RenderQueueFactory::AbsolutePosition(m_World, emitter);
-                // Calculate velocity
-                glm::vec3 velocity = nextPos - previousPos;
-                setSourcePos(i->second->ALsource, nextPos);
-                setSourceVel(i->second->ALsource, velocity);
-                setSoundProperties(
-                    i->second->ALsource,
-                    (float)(double)(*it)["Gain"],
-                    (float)(double)(*it)["Pitch"],
-                    (bool)(*it)["Loop"],
-                    (float)(double)(*it)["MaxDistance"],
-                    (float)(double)(*it)["RollOffFactor"],
-                    (float)(double)(*it)["ReferenceDistance"]
-                    );
+    std::unordered_map<EntityID, Source*>::iterator it;
+    for (it = m_Sources.begin(); it != m_Sources.end(); it++) {
+        // Get previous pos
+        glm::vec3 previousPos;
+        alGetSource3f(it->second->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
+        // Get next pos
+        glm::vec3 nextPos = RenderQueueFactory::AbsolutePosition(m_World, it->first);
+        // Calculate velocity
+        glm::vec3 velocity = nextPos - previousPos;
+        setSourcePos(it->second->ALsource, nextPos);
+        setSourceVel(it->second->ALsource, velocity);
+        float gain;
+        (bool)(it->second->Type) ? gain = m_SFXVolumeChannel : gain = m_BGMVolumeChannel;
+        auto emitter = m_World->GetComponent(it->first, "SoundEmitter");
+        setSoundProperties(it->second->ALsource, &emitter);
 
-                // To make an emitter play when spawned in editor mode
-                if (m_EditorEnabled) {
-                    // Path changed
-                    if (i->second->SoundResource->Path() != (std::string)(*it)["FilePath"]) {
-                        i->second->SoundResource = ResourceManager::Load<Sound>((std::string)(*it)["FilePath"]);
-                        if (i->second->SoundResource->Buffer() != 0) {
-                            playSound(i->second);
-                        }
-                    }
+        // To make an emitter play when spawned in editor mode
+        if (m_EditorEnabled) {
+            // Path changed
+            if (it->second->SoundResource->Path() != (std::string)emitter["FilePath"]) {
+                it->second->SoundResource = ResourceManager::Load<Sound>((std::string)emitter["FilePath"]);
+                if (it->second->SoundResource->Buffer() != 0) {
+                    playSound(it->second);
                 }
-                it++;
             }
         }
     }
@@ -207,7 +160,6 @@ void SoundSystem::playSound(Source* source)
 {
     alSourcei(source->ALsource, AL_BUFFER, source->SoundResource->Buffer());
     alSourcePlay(source->ALsource);
-    source->HasBeenPlayed = true;
 }
 
 void SoundSystem::stopSound(Source* source)
@@ -215,16 +167,10 @@ void SoundSystem::stopSound(Source* source)
     alSourceStop(source->ALsource);
 }
 
-bool SoundSystem::OnPlaySound(const Events::PlaySound & e)
-{
-    Source* sauce = createSource(e.FilePath);
-    playSound(sauce);
-    return false;
-}
-
 bool SoundSystem::OnPlaySoundOnEntity(const Events::PlaySoundOnEntity & e)
 {
     Source* source = createSource(e.FilePath);
+    source->Type = SoundType::SFX;
     m_Sources[e.EmitterID] = source;
     playSound(source);
     return false;
@@ -245,6 +191,7 @@ bool SoundSystem::OnPlaySoundOnPosition(const Events::PlaySoundOnPosition & e)
     (float&)(double)emitter["ReferenceDistance"] = e.ReferenceDistance;
     auto model = m_World->AttachComponent(emitterID, "Model");
     (std::string&)model["Resource"] = "Models/Core/UnitCube.obj";
+    source->Type = SoundType::SFX;
     m_Sources[emitterID] = source;
     playSound(source);
     return false;
@@ -278,6 +225,7 @@ bool SoundSystem::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
         (std::string&)emitter["FilePath"] = e.FilePath;
         m_World->AttachComponent(emitterChild, "Transform");
         Source* source = createSource(e.FilePath);
+        source->Type = SoundType::BGM;
         m_Sources[emitterChild] = source;
         playSound(source);
     }
@@ -312,11 +260,11 @@ void SoundSystem::setListenerOri(glm::vec3 ori)
     alListenerfv(AL_ORIENTATION, lOri);
 }
 
-bool SoundSystem::isPlaying(ALuint source)
+ALenum SoundSystem::getSourceState(ALuint source)
 {
     ALenum state;
     alGetSourcei(source, AL_SOURCE_STATE, &state);
-    return (state == AL_PLAYING);
+    return state;
 }
 
 void SoundSystem::setGain(Source * source, float gain)
@@ -324,12 +272,24 @@ void SoundSystem::setGain(Source * source, float gain)
     alSourcef(source->ALsource, AL_GAIN, gain);
 }
 
-void SoundSystem::setSoundProperties(ALuint source, float gain, float pitch, bool loop, float maxDistance, float rollOffFactor, float referenceDistance)
+void SoundSystem::setSoundProperties(ALuint source, ComponentWrapper* soundComponent)
 {
-    alSourcef(source, AL_GAIN, gain * m_SFXVolumeChannel);
-    alSourcef(source, AL_PITCH, pitch);
-    alSourcei(source, AL_LOOPING, (int)loop); // YOLO
-    alSourcef(source, AL_MAX_DISTANCE, maxDistance);
-    alSourcef(source, AL_ROLLOFF_FACTOR, rollOffFactor);
-    alSourcef(source, AL_REFERENCE_DISTANCE, referenceDistance);
+    alSourcef(source, AL_GAIN, (float)(double)(*soundComponent)["Gain"]);
+    alSourcef(source, AL_PITCH, (float)(double)(*soundComponent)["Pitch"]);
+    alSourcei(source, AL_LOOPING, (int)(bool)(*soundComponent)["Loop"]); // YOLO
+    alSourcef(source, AL_MAX_DISTANCE, (float)(double)(*soundComponent)["MaxDistance"]);
+    alSourcef(source, AL_ROLLOFF_FACTOR, (float)(double)(*soundComponent)["RollOffFactor"]);
+    alSourcef(source, AL_REFERENCE_DISTANCE, (float)(double)(*soundComponent)["ReferenceDistance"]);
+}
+
+void SoundSystem::initOpenAL()
+{
+    // Initialize OpenAL
+    m_ALCdevice = alcOpenDevice(nullptr);
+    if (m_ALCdevice != nullptr) {
+        m_ALCcontext = alcCreateContext(m_ALCdevice, nullptr);
+        alcMakeContextCurrent(m_ALCcontext);
+    } else {
+        LOG_ERROR("OpenAL failed to initialize.");
+    }
 }

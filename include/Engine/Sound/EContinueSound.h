@@ -6,7 +6,7 @@
 
 namespace Events
 {
-
+// Continues to play a sound from where it was paused.
 struct ContinueSound : Event
 {
     EntityID EmitterID;

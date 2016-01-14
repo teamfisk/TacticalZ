@@ -5,7 +5,7 @@
 
 namespace Events
 {
-
+// Set the "volume" for all effect sounds
 struct SetSFXGain : public Event
 {
     float Gain;

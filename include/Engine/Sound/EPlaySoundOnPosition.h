@@ -8,7 +8,7 @@
 namespace Events
 {
 
-// Plays a sound on a given position
+// Plays a sound on a given position. Idk if this would be useful.
 struct PlaySoundOnPosition : public Event
 {
     glm::vec3 Position = glm::vec3(0);

@@ -144,7 +144,7 @@ bool Game::debugOnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "PlaySound" && e.Value > 0) {
         Events::PlayBackgroundMusic e;
-        e.FilePath = "Audio/crosscounter.wav";
+        e.FilePath = "Audio/5dollar.wav";
         //e.emitterID = 18; // rofl
         m_EventBroker->Publish(e);
     }
