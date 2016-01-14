@@ -91,11 +91,15 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
+    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    m_PickingPass->ClearPicking();
     for (auto scene : frame.RenderScenes){
         m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
         m_PickingPass->Draw(*scene);
 
-        glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
+       
 
         m_DrawScenePass->Draw(*scene);
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");

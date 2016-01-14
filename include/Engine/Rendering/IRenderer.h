@@ -15,6 +15,7 @@ struct PickData
     EntityID Entity;
     glm::vec3 Position; //World position
     float Depth;
+    ::Camera* Camera;
 };
 
 class IRenderer

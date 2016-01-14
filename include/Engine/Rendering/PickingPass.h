@@ -5,10 +5,9 @@
 #include "PickingPassState.h"
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
-#include "Util/UnorderedMapVec2.h"
+#include "Util/UnorderedMapiVec2.h"
 #include "../Core/EventBroker.h"
-
-
+#include "../Core/World.h"
 
 class PickingPass
 {
@@ -20,11 +19,12 @@ public:
     void InitializeShaderPrograms();
 
     void Draw(RenderScene& scene);
+    void ClearPicking();
 
 
     //Getters
     const ShaderProgram& PickingProgram() const { return *m_PickingProgram; }
-    const std::unordered_map<glm::vec2, EntityID>& PickingColorsToEntity() const { return m_PickingColorsToEntity; }
+    //const std::unordered_map<glm::ivec2, EntityID>& PickingColorsToEntity() const { return m_PickingColorsToEntity; }
     GLuint PickingTexture() const { return m_PickingTexture; }
     GLuint DepthBuffer() const { return m_DepthBuffer; }
     const FrameBuffer& PickingBuffer() const { return m_PickingBuffer; }
@@ -42,12 +42,22 @@ private:
     ShaderProgram* m_PickingProgram;
     Camera* m_Camera;
 
-    std::unordered_map<glm::vec2, EntityID> m_PickingColorsToEntity;
+    struct PickingInfo
+    {
+        EntityID Entity;
+        const ::World* World;
+        ::Camera* Camera;
+    };
+
+    std::unordered_map<glm::ivec2, PickingInfo> m_PickingColorsToEntity;
 
     GLuint m_PickingTexture;
     GLuint m_DepthBuffer;
 
     FrameBuffer m_PickingBuffer;
+
+    int m_ColorCounter[2];
+    std::map<std::tuple<EntityID, const World*, Camera*>, glm::ivec2> m_EntityColors;
 };
 
 #endif 

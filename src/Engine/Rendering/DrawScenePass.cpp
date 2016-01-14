@@ -28,7 +28,7 @@ void DrawScenePass::Draw(RenderScene& scene)
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLERROR("Renderer::Draw PickingPass");
 
-    DrawScenePassState state;
+    DrawScenePassState state = DrawScenePassState();
 
     for (auto &job : scene.ForwardJobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);

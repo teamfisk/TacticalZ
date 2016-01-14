@@ -127,7 +127,7 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
 
     auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
     glm::vec3 widgetOrientation = widgetTransform["Orientation"];
-    glm::quat totalOrientation = m_Renderer->Camera()->Orientation() * glm::inverse(glm::quat(widgetOrientation));
+    glm::quat totalOrientation = m_Camera->Orientation() * glm::inverse(glm::quat(widgetOrientation));
 
     int width;
     int height;
@@ -139,14 +139,14 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
         delta2,
         m_WidgetPickingDepth,
         res,
-        m_Renderer->Camera()->ProjectionMatrix(),
+        m_Camera->ProjectionMatrix(),
         glm::toMat4(glm::inverse(totalOrientation))
     );
     glm::vec3 origin = ScreenCoords::ToWorldPos(
         glm::vec2(res.Width / 2.f, res.Height / 2.f),
         m_WidgetPickingDepth,
         res,
-        m_Renderer->Camera()->ProjectionMatrix(),
+        m_Camera->ProjectionMatrix(),
         glm::toMat4(glm::inverse(totalOrientation))
     );
     deltaWorld = deltaWorld - origin;
@@ -252,7 +252,7 @@ void EditorSystem::Picking()
                         (entity == m_WidgetZ) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneX || entity == m_WidgetPlaneY)
                     );
                     m_WidgetPickingDepth = result.Depth;
-
+                    m_Camera = result.Camera;
                     //auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
                     //auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
                     //widgetTransform["Position"] = (glm::vec3)selectionTransform["Position"];
@@ -263,6 +263,7 @@ void EditorSystem::Picking()
                     }
                     setWidgetMode(m_WidgetMode);
                     m_Selection = entity;
+                    m_Camera = result.Camera;
                 }
             }
         }

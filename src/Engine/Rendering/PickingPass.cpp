@@ -45,17 +45,15 @@ void PickingPass::InitializeShaderPrograms()
 
 void PickingPass::Draw(RenderScene& scene)
 {
-    m_PickingColorsToEntity.clear();
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
-    int r = 0;
-    int g = 0;
+    
     //TODO: Render: Add code for more jobs than modeljobs.
 
     GLuint ShaderHandle = m_PickingProgram->GetHandle();
     m_PickingProgram->Bind();
 
-    std::map<EntityID, glm::vec2> entityColors;
+    
 
         m_Camera = scene.Camera;
 
@@ -63,22 +61,28 @@ void PickingPass::Draw(RenderScene& scene)
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
             if (modelJob) {
-                int pickColor[2] = { r, g };
-                auto color = entityColors.find(modelJob->Entity);
-                if (color != entityColors.end()) {
+                int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
+
+                PickingInfo pickInfo;
+                pickInfo.Entity = modelJob->Entity;
+                pickInfo.World = modelJob->World;
+                pickInfo.Camera = scene.Camera;
+
+                auto color = m_EntityColors.find(std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera));
+                if (color != m_EntityColors.end()) {
                     pickColor[0] = color->second[0];
                     pickColor[1] = color->second[1];
                 } else {
-                    entityColors[modelJob->Entity] = glm::vec2(pickColor[0], pickColor[1]);
-                    if (r + 10 > 255) {
-                        r = 0;
-                        g += 1;
+                    m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
+                    if (m_ColorCounter[0] > 255) {
+                        m_ColorCounter[0] = 0;
+                        m_ColorCounter[1]++;;
                     } else {
-                        r += 1;
+                        m_ColorCounter[0]++;;
                     }
                 }
-                m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
 
+                m_PickingColorsToEntity[glm::ivec2(pickColor[0], pickColor[1])] = pickInfo;
 
                 glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
                 glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
@@ -101,6 +105,19 @@ void PickingPass::Draw(RenderScene& scene)
 
 
 
+void PickingPass::ClearPicking()
+{
+    m_PickingColorsToEntity.clear();
+    m_EntityColors.clear();
+    m_ColorCounter[0] = 0;
+    m_ColorCounter[1] = 0;
+
+    m_PickingBuffer.Bind();
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_PickingBuffer.Unbind();
+}
+
 PickData PickingPass::Pick(glm::vec2 screenCoord)
 {
     int fbWidth;
@@ -114,14 +131,19 @@ PickData PickingPass::Pick(glm::vec2 screenCoord)
     ScreenCoords::PixelData data = ScreenCoords::ToPixelData(screenCoord, &m_PickingBuffer, m_DepthBuffer);
     pickData.Depth = data.Depth;
 
-    auto it = m_PickingColorsToEntity.find(glm::vec2(data.Color[0], data.Color[1]));
+    PickingInfo pickInfo;
+
+    auto it = m_PickingColorsToEntity.find(glm::ivec2(data.Color[0], data.Color[1]));
     if (it != m_PickingColorsToEntity.end()) {
-        pickData.Entity = it->second;
+        pickInfo = it->second;
     } else {
         pickData.Entity = EntityID_Invalid;
     }
-    pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, resolution, m_Camera->ProjectionMatrix(), m_Camera->ViewMatrix());
+    pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, resolution, pickInfo.Camera->ProjectionMatrix(), pickInfo.Camera->ViewMatrix());
+   
 
+    pickData.Entity = pickInfo.Entity;
+    pickData.Camera = pickInfo.Camera;
     return pickData;
 }
 

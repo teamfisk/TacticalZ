@@ -11,10 +11,11 @@
 #include "RenderJob.h"
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
+#include "../Core/World.h"
 
 struct ModelJob : RenderJob
 {
-    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::Model::MaterialGroup texGroup, ComponentWrapper modelComponent)
+    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::Model::MaterialGroup texGroup, ComponentWrapper modelComponent, World* world)
         : RenderJob()
     {
         Model = model;
@@ -27,6 +28,7 @@ struct ModelJob : RenderJob
         Matrix = matrix;
         Color = modelComponent["Color"];
         Entity = modelComponent.EntityID;
+        World = world;
     };
 
     unsigned int TextureID;
@@ -42,6 +44,7 @@ struct ModelJob : RenderJob
     const ::Model* Model = nullptr;
     unsigned int StartIndex = 0;
     unsigned int EndIndex = 0;
+    const World* World;
 
     void CalculateHash() override
     {

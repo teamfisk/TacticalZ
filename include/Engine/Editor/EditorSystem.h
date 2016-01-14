@@ -25,6 +25,7 @@ public:
 private:
     IRenderer* m_Renderer;
     World* m_World = nullptr;
+    Camera* m_Camera = nullptr;
 
     bool m_Enabled;
     bool m_Visible;
@@ -56,6 +57,7 @@ private:
     EntityID m_WidgetOrigin = EntityID_Invalid;
     glm::vec3 m_WidgetCurrentAxis;
     float m_WidgetPickingDepth = 0.f;
+    glm::vec3 m_WidgetPickingPosition = glm::vec3(0);
 
     EntityID m_Selection = EntityID_Invalid;
     EntityID m_LastSelection = EntityID_Invalid;

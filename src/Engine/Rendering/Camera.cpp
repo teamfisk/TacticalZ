@@ -50,6 +50,18 @@ void Camera::SetOrientation(glm::quat val)
 	UpdateViewMatrix();
 }
 
+
+void Camera::SetProjectionMatrix(glm::mat4 val)
+{
+    m_ProjectionMatrix = val;
+}
+
+
+void Camera::SetViewMatrix(glm::mat4 val)
+{
+    m_ViewMatrix = val;
+}
+
 //void Camera::Pitch(float val)
 //{
 //	m_Pitch = val;
