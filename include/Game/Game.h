@@ -29,10 +29,6 @@
 
 // Sound
 #include "Sound/SoundSystem.h"
-//#include "Sound/EPlaySound.h"
-//#include "Sound/EPlaySoundOnEntity.h"
-//#include "Sound/EPlaySoundOnPosition.h"
-
 
 class Game
 {
@@ -65,8 +61,8 @@ private:
     // Sound
     SoundSystem* m_SoundSystem;
 
-    EventRelay<Game, Events::InputCommand> m_EInputCommand;
-    bool debugOnInputCommand(const Events::InputCommand& e);
+    //EventRelay<Game, Events::InputCommand> m_EInputCommand;
+    //bool debugOnInputCommand(const Events::InputCommand& e);
 
     void debugInitialize();
     void debugTick(double dt);

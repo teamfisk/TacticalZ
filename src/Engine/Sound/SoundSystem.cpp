@@ -49,6 +49,7 @@ void SoundSystem::stopEmitters()
 
 void SoundSystem::Update()
 { 
+    m_EventBroker->Process<SoundSystem>();
     addNewEmitters(); // can be optimized with "EEntityCreated"
     deleteInactiveEmitters(); // can be optimized with "EEntityDeleted"
     updateEmitters();
@@ -66,14 +67,14 @@ void SoundSystem::deleteInactiveEmitters()
                 it++;
                 continue;
             } else {
-                // Sound has been stopped / finished playing. And has correct component.
+                // Sound has been stopped / finished playing. 
                 alDeleteBuffers(1, &it->second->ALsource);
                 alDeleteSources(1, &it->second->ALsource);
                 m_World->DeleteEntity(it->first);
                 it = m_Sources.erase(it);
             }
         } else {
-            // Entity has been removed
+            // Entity / Component has been removed
             stopSound((*it).second);
             alDeleteBuffers(1, &it->second->ALsource);
             alDeleteSources(1, &it->second->ALsource);
@@ -251,6 +252,7 @@ bool SoundSystem::OnSetSFXGain(const Events::SetSFXGain & e)
 
 void SoundSystem::setListenerOri(glm::vec3 ori)
 {
+    // Calculate forward and up vector.
     glm::vec3 forward = glm::vec3(0.0, 0.0, -1.0);
     forward = glm::rotateX(forward, ori.x);
     forward = glm::rotateY(forward, ori.y);

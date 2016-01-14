@@ -77,7 +77,8 @@ Game::Game(int argc, char* argv[])
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();
     }
-    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
+
+    // Invoke sound system
     m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
 
     m_LastTime = glfwGetTime();
@@ -86,6 +87,7 @@ Game::Game(int argc, char* argv[])
 Game::~Game()
 {
     delete m_SystemPipeline;
+    delete m_SoundSystem;
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;
@@ -122,7 +124,6 @@ void Game::Tick()
     debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-    m_EventBroker->Process<SoundSystem>();
     m_SoundSystem->Update();
     m_RenderQueueFactory->Update(m_World);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
@@ -130,11 +131,6 @@ void Game::Tick()
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-}
-
-bool Game::debugOnInputCommand(const Events::InputCommand & e)
-{
-    return true;
 }
 
 void Game::debugTick(double dt)
