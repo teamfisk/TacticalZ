@@ -16,6 +16,7 @@ struct PickData
     glm::vec3 Position; //World position
     float Depth;
     ::Camera* Camera;
+    const ::World* World;
 };
 
 class IRenderer

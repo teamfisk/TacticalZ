@@ -245,6 +245,7 @@ void EditorSystem::Picking()
             LOG_INFO("Selected %i", entity);
             if (entity != EntityID_Invalid) {
                 EntityID parent = m_World->GetParent(entity);
+                m_Camera = result.Camera;
                 if (parent == m_Widget) {
                     m_WidgetCurrentAxis = glm::vec3(
                         (entity == m_WidgetX) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneY || entity == m_WidgetPlaneZ),
@@ -252,7 +253,6 @@ void EditorSystem::Picking()
                         (entity == m_WidgetZ) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneX || entity == m_WidgetPlaneY)
                     );
                     m_WidgetPickingDepth = result.Depth;
-                    m_Camera = result.Camera;
                     //auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
                     //auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
                     //widgetTransform["Position"] = (glm::vec3)selectionTransform["Position"];
@@ -263,7 +263,6 @@ void EditorSystem::Picking()
                     }
                     setWidgetMode(m_WidgetMode);
                     m_Selection = entity;
-                    m_Camera = result.Camera;
                 }
             }
         }

@@ -144,6 +144,7 @@ PickData PickingPass::Pick(glm::vec2 screenCoord)
 
     pickData.Entity = pickInfo.Entity;
     pickData.Camera = pickInfo.Camera;
+    pickData.World = pickInfo.World;
     return pickData;
 }
 
