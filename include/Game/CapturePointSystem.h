@@ -37,6 +37,8 @@ private:
     int m_Team1HomeCapturePoint = m_NotACapturePoint;
     int m_Team2HomeCapturePoint = m_NotACapturePoint;
 
+    const double m_CaptureTimeToTakeOver = 15.0;
+
     //vectors which will keep track of enter/leave changes
     std::vector<std::tuple<EntityID, EntityID>> m_ETriggerTouchVector;
     std::vector<std::tuple<EntityID, EntityID>> m_ETriggerLeaveVector;

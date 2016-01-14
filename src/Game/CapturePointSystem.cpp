@@ -16,6 +16,7 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
     int firstTeamPlayersStandingInside = 0;
     int secondTeamPlayersStandingInside = 0;
 
+    //check how many players are standing inside and are healthy
     for (size_t i = 0; i < m_ETriggerTouchVector.size(); i++)
     {
         auto triggerTouched = m_ETriggerTouchVector[i];
@@ -30,10 +31,10 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
             if ((int)currentHealth == 0)
                 continue;
             //check team - 0 = no team
-            int teamNumber = (int)world->GetComponent(playerID, "Player")["TeamNumber"];
+            int teamNumber = world->GetComponent(playerID, "Player")["TeamNumber"];
             if (teamNumber == 1)
                 firstTeamPlayersStandingInside++;
-            if (teamNumber == 2)
+            else if (teamNumber == 2)
                 secondTeamPlayersStandingInside++;
             continue;
         }
@@ -41,113 +42,90 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
 
     int ownedBy = capturePoint["OwnedBy"];
 
-    //check what capturePoint can be taken over next
-    //A. no capturepoint taken yet for at least one of the teams
-    //A1. at the start of the match the system is unaware of what capturePoint is the first one for each team
+    /*check what capturePoint can be taken over next:
+    no capturepoint taken yet for at least one of the teams <->
+    at the start of the match the system is unaware of what capturePoint is the first one for each team*/
     if (m_Team1NextPossibleCapturePoint == m_NotACapturePoint && (int)capturePoint["IsHomeCapturePointForTeamNumber"] == 1) {
         m_Team1NextPossibleCapturePoint = capturePoint["CapturePointNumber"];
         m_Team1HomeCapturePoint = capturePoint["CapturePointNumber"];//needed to calculate next m_Team1NextPossibleCapturePoint
     }
-    if (m_Team2NextPossibleCapturePoint == m_NotACapturePoint && (int)capturePoint["IsHomeCapturePointForTeamNumber"] == 2) {
+    else if (m_Team2NextPossibleCapturePoint == m_NotACapturePoint && (int)capturePoint["IsHomeCapturePointForTeamNumber"] == 2) {
         m_Team2NextPossibleCapturePoint = capturePoint["CapturePointNumber"];
         m_Team2HomeCapturePoint = capturePoint["CapturePointNumber"];//needed to calculate next m_Team2NextPossibleCapturePoint
     }
-    //B. at least one capturepoint has been taken over
+    //at least one capturepoint has been taken over
     //do nothing, its being handled inside the next code:
 
-    //TODO: refactor code a bit
+    //create data to be used in option B
+    //check so this is the next possible capture point for the take-over team and see if only one team is standing inside it
+    double timerDeltaChange = 0.0;
+    int currentTeam = 0;
+    if (firstTeamPlayersStandingInside > 0 && secondTeamPlayersStandingInside == 0
+        && m_Team1NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"])
+    {
+        timerDeltaChange = firstTeamPlayersStandingInside*dt;
+        currentTeam = 1;
+    }
+    else if (firstTeamPlayersStandingInside == 0 && secondTeamPlayersStandingInside > 0
+        && m_Team2NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"])
+    {
+        timerDeltaChange = -secondTeamPlayersStandingInside*dt;
+        currentTeam = 2;
+    }
 
     //A.nobodys standing inside
     if (firstTeamPlayersStandingInside == 0 && secondTeamPlayersStandingInside == 0) {
         //do nothing (?)
     }
-    //B.first team has players but second none, and this capturePoint is the next in line to be able to be captured
-    if (firstTeamPlayersStandingInside > 0 && secondTeamPlayersStandingInside == 0
-        && m_Team1NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"]) {
-        //ownedBy 1 -> timer should stay at 15
-        //increased by numberOfPlayersInside*dt
-        //if capturePoint is not owned by the team, just increase the CaptureTimer
-        if (ownedBy != 1)
-            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + firstTeamPlayersStandingInside*dt;
-        //if capturePoint is owned by the team, and the other team has been trying to take it, then increase the timer towards 0
-        if (ownedBy == 1 && (double)capturePoint["CaptureTimer"] < 0.0)
-            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + firstTeamPlayersStandingInside*dt;
-        //check if captureTimer > 15 and if so change owner and publish the eCaptured event
-        //TODO: graphics 25,50,75% captured events? for graphical displaying
-        if ((double)capturePoint["CaptureTimer"] > 15.0) {
-            //capturePoint is now owned by this team, hence also reset the captureTimer so it still takes 15secs to take it back
-            capturePoint["OwnedBy"] = 1;
+
+    //B. at most one of the teams have players inside (this means datavariable currentTeam is not 0)
+    else if (currentTeam != 0) {
+        //if capturePoint is not owned by the take-over team, just modify the CaptureTimer accordingly
+        if (ownedBy != currentTeam)
+            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + timerDeltaChange;
+        //if capturePoint is owned by the team, and the other team has been trying to take it, then increase/decrease the timer towards 0.0
+        if (ownedBy == currentTeam && currentTeam == 1 && (double)capturePoint["CaptureTimer"] < 0.0)
+            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + timerDeltaChange;
+        if (ownedBy == currentTeam && currentTeam == 2 && (double)capturePoint["CaptureTimer"] > 0.0)
+            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + timerDeltaChange;
+        //check if captureTimer > m_CaptureTimeToTakeOver and if so change owner and publish the eCaptured event
+        if (abs((double)capturePoint["CaptureTimer"]) > abs(m_CaptureTimeToTakeOver)) {
+            capturePoint["OwnedBy"] = currentTeam;
             capturePoint["CaptureTimer"] = 0.0;
             //publish Captured event
             Events::Captured e;
             e.CapturePointID = capturePoint.EntityID;
-            e.TeamNumberThatCapturedCapturePoint = 1;
+            e.TeamNumberThatCapturedCapturePoint = currentTeam;
             m_EventBroker->Publish(e);
-            //modify next m_Team1NextPossibleCapturePoint
-            //example team1:s homepoint is at 0 and team2:s at 7. team 1 capture 3, next will be 4
-            //example team1:s homepoint is at 7 and team2:s at 0. team 1 capture 3, next will be 2
+            //modify nextPossibleCapturePoint, depending on, example: if team 1 has "0" as homebase or team 1 has "7" as homebase
             if (m_Team1HomeCapturePoint < m_Team2HomeCapturePoint) {
-                m_Team1NextPossibleCapturePoint++;
+                if (currentTeam == 1) 
+                    m_Team1NextPossibleCapturePoint++;
+                if (currentTeam == 2)
+                    m_Team2NextPossibleCapturePoint--;
                 //if this was a contested capturePoint (i.e. both teams try to take point 3), then modify other teams next point as well
                 if (m_Team1NextPossibleCapturePoint > m_Team2NextPossibleCapturePoint)
                     m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint;
             }
             else
             {
-                m_Team1NextPossibleCapturePoint--;
+                if (currentTeam == 1)
+                    m_Team1NextPossibleCapturePoint--;
+                if (currentTeam == 2)
+                    m_Team2NextPossibleCapturePoint++;
                 //if this was a contested capturePoint (i.e. both teams try to take point 3), then modify other teams next point as well
                 if (m_Team1NextPossibleCapturePoint < m_Team2NextPossibleCapturePoint)
                     m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint;
             }
         }
     }
-    //C.second team has players but second none, and this capturePoint is the next in line to be able to be captured
-    if (firstTeamPlayersStandingInside == 0 && secondTeamPlayersStandingInside > 0
-        && m_Team2NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"]) {
-        //ownedBy 2 -> timer should stay at -15
-        //decreased by numberOfPlayersInside*dt
-        //if capturePoint is not owned by the team, just increase the CaptureTimer
-        if (ownedBy != 2)
-            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] - secondTeamPlayersStandingInside*dt;
-        //if capturePoint is owned by the team, and the other team has been trying to take it, then increase the timer towards 0
-        if (ownedBy == 2 && (double)capturePoint["CaptureTimer"] > 0.0)
-            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] - secondTeamPlayersStandingInside*dt;
-        //check if captureTimer < -15 and if so change owner and publish the eCaptured event
-        //TODO: graphics 25,50,75% captured events? for graphical displaying
-        if ((double)capturePoint["CaptureTimer"] < -15.0) {
-            //capturePoint is now owned by this team, hence also reset the captureTimer so it still takes 15secs to take it back
-            capturePoint["OwnedBy"] = 2;
-            capturePoint["CaptureTimer"] = 0.0;
-            Events::Captured e;
-            e.CapturePointID = capturePoint.EntityID;
-            e.TeamNumberThatCapturedCapturePoint = 2;
-            m_EventBroker->Publish(e);
-            //modify next m_Team2NextPossibleCapturePoint
-            //example team2:s homepoint is at 0 and team1:s at 7. team 2 capture 3, next will be 4
-            //example team2:s homepoint is at 7 and team1:s at 0. team 2 capture 3, next will be 2
-            if (m_Team2HomeCapturePoint < m_Team1HomeCapturePoint)
-            {
-                m_Team2NextPossibleCapturePoint++;
-                //if this was a contested capturePoint (i.e. both teams try to take point 3), then modify other teams next point as well
-                if (m_Team2NextPossibleCapturePoint > m_Team1NextPossibleCapturePoint)
-                    m_Team1NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint;
-            }
-            else
-            {
-                m_Team2NextPossibleCapturePoint--;
-                //if this was a contested capturePoint (i.e. both teams try to take point 3), then modify other teams next point as well
-                if (m_Team2NextPossibleCapturePoint < m_Team1NextPossibleCapturePoint)
-                    m_Team1NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint;
-            }
-        }
 
-    }
-    //D.both teams have players inside
-    if (firstTeamPlayersStandingInside > 0 && secondTeamPlayersStandingInside > 0) {
+    //C.both teams have players inside
+    else if (firstTeamPlayersStandingInside > 0 && secondTeamPlayersStandingInside > 0) {
         //do nothing (?)
     }
 
-    //WIN: check for possible winCondition = check if the homebase is owned by the other team
+    //check for possible winCondition = check if the homebase is owned by the other team
     if (!m_WinnerWasFound && (int)capturePoint["OwnedBy"] != 0 && (int)capturePoint["IsHomeCapturePointForTeamNumber"] != 0 &&
         (int)capturePoint["IsHomeCapturePointForTeamNumber"] != (int)capturePoint["OwnedBy"]) {
         //publish Win event
