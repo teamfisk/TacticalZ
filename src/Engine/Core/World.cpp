@@ -66,7 +66,7 @@ void World::RegisterComponent(ComponentInfo& ci)
     }
 }
 
-ComponentWrapper World::AttachComponent(EntityID entity, std::string componentType)
+ComponentWrapper World::AttachComponent(EntityID entity, const std::string& componentType)
 {
     // TODO: Allocate dynamic pool if component isn't registered
     ComponentPool* pool = m_ComponentPools.at(componentType);
@@ -80,26 +80,26 @@ ComponentWrapper World::AttachComponent(EntityID entity, std::string componentTy
     return c;
 }
 
-bool World::HasComponent(EntityID entity, std::string componentType) const
+bool World::HasComponent(EntityID entity, const std::string& componentType) const
 {
     ComponentPool* pool = m_ComponentPools.at(componentType);
     return pool->KnowsEntity(entity);
 }
 
-ComponentWrapper World::GetComponent(EntityID entity, std::string componentType)
+ComponentWrapper World::GetComponent(EntityID entity, const std::string& componentType)
 {
     ComponentPool* pool = m_ComponentPools.at(componentType);
     return pool->GetByEntity(entity);
 }
 
-void World::DeleteComponent(EntityID entity, std::string componentType)
+void World::DeleteComponent(EntityID entity, const std::string& componentType)
 {
     ComponentPool* pool = m_ComponentPools.at(componentType);
     ComponentWrapper c = pool->GetByEntity(entity);
     return pool->Delete(c);
 }
 
-const ComponentPool* World::GetComponents(std::string componentType)
+const ComponentPool* World::GetComponents(const std::string& componentType)
 {
     auto it = m_ComponentPools.find(componentType);
     return (it != m_ComponentPools.end()) ? it->second : nullptr;

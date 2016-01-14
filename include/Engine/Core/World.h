@@ -21,15 +21,15 @@ public:
     // Register a component type and allocate space for it
     void RegisterComponent(ComponentInfo& ci);
     // Attach a component to an entity and fill it with default values
-    ComponentWrapper AttachComponent(EntityID entity, std::string componentType);
+    ComponentWrapper AttachComponent(EntityID entity, const std::string& componentType);
     // Check if an entity has a component
-    bool HasComponent(EntityID entity, std::string componentType) const;
+    bool HasComponent(EntityID entity, const std::string& componentType) const;
     // Get a component of an entity
-    ComponentWrapper GetComponent(EntityID entity, std::string componentType);
+    ComponentWrapper GetComponent(EntityID entity, const std::string& componentType);
     // Delete a component off an entity
-    void DeleteComponent(EntityID entity, std::string componentType);
+    void DeleteComponent(EntityID entity, const std::string& componentType);
     // Get all components of the specified type
-    const ComponentPool* GetComponents(std::string componentType);
+    const ComponentPool* GetComponents(const std::string& componentType);
     // Get entity parent
     EntityID GetParent(EntityID entity);
     // Change the parent of an entity
