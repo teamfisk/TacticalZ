@@ -9,7 +9,7 @@ class DummyRenderer : public IRenderer
 {
 public:
 	virtual void Initialize() override;
-	virtual void Draw(RenderQueueCollection& rq) override;
+	virtual void Draw(RenderFrame& rq) override;
 };
 
 #endif

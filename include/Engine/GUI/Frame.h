@@ -212,7 +212,7 @@ public:
 
 	virtual void Update(double dt) { }
 
-	void DrawLayered(RenderQueueCollection& rq)
+	void DrawLayered(RenderScene& rq)
 	{
 		if (this->Hidden())
 			return;
@@ -232,7 +232,7 @@ public:
 		}
 	}
 
-	virtual void Draw(RenderQueueCollection& rq) { }
+	virtual void Draw(RenderScene& rq) { }
 
 protected:
 	::EventBroker* m_EventBroker;
