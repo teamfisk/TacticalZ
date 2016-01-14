@@ -23,7 +23,7 @@ public:
         EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &CollisionSystem::OnKeyUp);
     }
 
-    virtual void UpdateComponent(World* world, ComponentWrapper& cAABB, double dt) override;
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     Octree* m_Octree;

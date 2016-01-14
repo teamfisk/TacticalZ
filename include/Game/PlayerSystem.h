@@ -20,7 +20,7 @@ public:
         EVENT_SUBSCRIBE_MEMBER(m_ELeave, &PlayerSystem::OnLeave);
     }
 
-    virtual void UpdateComponent(World* world, ComponentWrapper& player, double dt) override;
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 private:
     float m_Speed = 5;
     EventRelay<PlayerSystem, Events::TriggerEnter> m_EEnter;

@@ -19,7 +19,7 @@ public:
     HealthSystem(EventBroker* eventBroker);
 
     //updatecomponent
-    virtual void UpdateComponent(World* world, ComponentWrapper& health, double dt) override;
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     //methods which will take care of specific events

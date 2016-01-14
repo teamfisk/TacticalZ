@@ -68,7 +68,7 @@ public:
                 }
                 for (auto& component : *pool) {
                     for (auto& system : systems) {
-                        system->UpdateComponent(world, component, dt);
+                        system->UpdateComponent(world, EntityWrapper(world, component.EntityID), component, dt);
                     }
                 }
             }

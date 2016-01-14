@@ -9,9 +9,9 @@ public:
         , PureSystem("RaptorCopter")
     { }
 
-    virtual void UpdateComponent(World* world, ComponentWrapper& raptorCopter, double dt) override
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override
     {
-        ComponentWrapper& transform = world->GetComponent(raptorCopter.EntityID, "Transform");
-        (glm::vec3&)transform["Orientation"] += (float)(double)raptorCopter["Speed"] * (float)dt * (glm::vec3)raptorCopter["Axis"];
+        ComponentWrapper& transform = world->GetComponent(component.EntityID, "Transform");
+        (glm::vec3&)transform["Orientation"] += (float)(double)component["Speed"] * (float)dt * (glm::vec3)component["Axis"];
     }
 };

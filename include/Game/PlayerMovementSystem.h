@@ -8,5 +8,5 @@ public:
         : PureSystem(eventBroker, "Player")
     { }
 
-    virtual void UpdateComponent(World* world, ComponentWrapper& player, double dt);
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt);
 };

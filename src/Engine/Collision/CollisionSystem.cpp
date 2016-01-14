@@ -2,14 +2,13 @@
 #include "Collision/CollisionSystem.h"
 #include "Core/AABB.h"
 
-void CollisionSystem::UpdateComponent(World* world, ComponentWrapper& cAABB, double dt)
+void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
-    EntityID entity = cAABB.EntityID;
-    boost::optional<AABB> boundingBox = Collision::EntityAbsoluteAABB(world, entity);
+    boost::optional<AABB> boundingBox = Collision::EntityAbsoluteAABB(entity);
     if (!boundingBox) {
         return;
     }
-    ComponentWrapper& cTransform = world->GetComponent(entity, "Transform");
+    ComponentWrapper& cTransform = entity["Transform"];
     AABB& boxA = *boundingBox;
 
     //Press 'Z' to enable/disable collision.

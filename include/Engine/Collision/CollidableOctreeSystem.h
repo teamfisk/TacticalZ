@@ -15,7 +15,7 @@ public:
     { }
 
     virtual void Update(World* world, double dt) override;
-    virtual void UpdateComponent(World* world, ComponentWrapper& component, double dt) override;
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     Octree* m_Octree;

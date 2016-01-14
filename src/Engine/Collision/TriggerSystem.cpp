@@ -3,22 +3,22 @@
 #include "Core/AABB.h"
 #include "Rendering/Model.h"
 
-void TriggerSystem::UpdateComponent(World* world, ComponentWrapper& cTrigger, double dt)
+void TriggerSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     //Currently only players can trigger things.
     auto players = world->GetComponents("Player");
     if (players == nullptr) {
         return;
     }
-    EntityID tId = cTrigger.EntityID;
-    boost::optional<AABB> triggerBox = Collision::EntityAbsoluteAABB(world, tId);
+    EntityID tId = component.EntityID;
+    boost::optional<AABB> triggerBox = Collision::EntityAbsoluteAABB(entity);
     //The trigger *should* have a bounding box, or something, to test against so it can be triggered.
     if (!triggerBox) {
         return;
     }
     for (auto& pc : *players) {
         EntityID pId = pc.EntityID;
-        boost::optional<AABB> playerBox = Collision::EntityAbsoluteAABB(world, pId);
+        boost::optional<AABB> playerBox = Collision::EntityAbsoluteAABB(EntityWrapper(world, pId));
         //The player can't trigger anything without an AABB.
         if (!playerBox) {
             continue;

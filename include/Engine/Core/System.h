@@ -3,6 +3,7 @@
 
 #include "EventBroker.h"
 #include "World.h"
+#include "EntityWrapper.h"
 #include "ComponentWrapper.h"
 
 class System
@@ -33,7 +34,7 @@ protected:
 
     const std::string m_ComponentType;
 
-    virtual void UpdateComponent(World* world, ComponentWrapper& component, double dt) = 0;
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) = 0;
 };
 
 class ImpureSystem : public virtual System

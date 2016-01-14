@@ -283,15 +283,15 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
     return true;
 }
 
-boost::optional<AABB> EntityAbsoluteAABB(World* world, EntityID entity)
+boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity)
 {
-    if (!world->HasComponent(entity, "AABB")) {
+    if (!entity.HasComponent("AABB")) {
         return boost::none;
     }
 
-    ComponentWrapper& cAABB = world->GetComponent(entity, "AABB");
-    glm::vec3 absPosition = RenderQueueFactory::AbsolutePosition(world, entity);
-    glm::vec3 absScale = RenderQueueFactory::AbsoluteScale(world, entity);
+    ComponentWrapper& cAABB = entity["AABB"];
+    glm::vec3 absPosition = RenderQueueFactory::AbsolutePosition(entity.World, entity.ID);
+    glm::vec3 absScale = RenderQueueFactory::AbsoluteScale(entity.World, entity.ID);
     glm::vec3 origin = absPosition + (glm::vec3)cAABB["Origin"];
     glm::vec3 size = (glm::vec3)cAABB["Size"] * absScale;
     return AABB::FromOriginSize(origin, size);

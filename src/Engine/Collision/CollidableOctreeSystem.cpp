@@ -5,16 +5,14 @@ void CollidableOctreeSystem::Update(World* world, double dt)
     m_Octree->ClearDynamicObjects();
 }
 
-void CollidableOctreeSystem::UpdateComponent(World* world, ComponentWrapper& cCollidable, double dt)
+void CollidableOctreeSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
-    EntityID entity = cCollidable.EntityID;
-
-    if (world->HasComponent(entity, "AABB")) {
-        boost::optional<AABB> absoluteAABB = Collision::EntityAbsoluteAABB(world, entity);
+    if (entity.HasComponent("AABB")) {
+        boost::optional<AABB> absoluteAABB = Collision::EntityAbsoluteAABB(entity);
         if (absoluteAABB) {
             m_Octree->AddDynamicObject(*absoluteAABB);
         }
-    } else if (world->HasComponent(entity, "Model")) {
+    } else if (entity.HasComponent("Model")) {
         // TODO: Derive AABB from model
     }
 }

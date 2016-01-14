@@ -13,6 +13,7 @@
 #include "../Rendering/RawModel.h"
 #include "../Rendering/RenderQueueFactory.h"
 #include "../Core/Entity.h"
+#include "../Core/EntityWrapper.h"
 
 class World;
 struct ComponentWrapper;
@@ -59,7 +60,7 @@ bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation);
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon = 0.0001f);
 
 // Calculates an absolute AABB from an entity AABB component
-boost::optional<AABB> EntityAbsoluteAABB(World* world, EntityID entity);
+boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity);
 
 }
 
