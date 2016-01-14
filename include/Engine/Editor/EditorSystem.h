@@ -9,9 +9,8 @@
 #include "../Core/ConfigFile.h"
 #include "../Input/EInputCommand.h"
 #include "../Rendering/IRenderer.h"
-#include "../Rendering/EPicking.h"
+#include "../Core/Transform.h"
 #include "../Core/EFileDropped.h"
-#include "../Rendering/RenderQueueFactory.h"
 #include "../Core/EntityFilePreprocessor.h"
 #include "../Core/EntityFileParser.h"
 #include "../Core/EntityFileWriter.h"
@@ -26,6 +25,7 @@ public:
 private:
     IRenderer* m_Renderer;
     World* m_World = nullptr;
+    Camera* m_Camera = nullptr;
 
     bool m_Enabled;
     bool m_Visible;
@@ -57,6 +57,7 @@ private:
     EntityID m_WidgetOrigin = EntityID_Invalid;
     glm::vec3 m_WidgetCurrentAxis;
     float m_WidgetPickingDepth = 0.f;
+    glm::vec3 m_WidgetPickingPosition = glm::vec3(0);
 
     EntityID m_Selection = EntityID_Invalid;
     EntityID m_LastSelection = EntityID_Invalid;
@@ -75,11 +76,10 @@ private:
     bool OnMousePress(const Events::MousePress& e);
     EventRelay<EditorSystem, Events::MouseMove> m_EMouseMove;
     bool OnMouseMove(const Events::MouseMove& e);
-    EventRelay<EditorSystem, Events::Picking> m_EPicking;
-    bool OnPicking(const Events::Picking& e);
     EventRelay<EditorSystem, Events::FileDropped> m_EFileDropped;
     bool OnFileDropped(const Events::FileDropped& e);
-
+    
+    void Picking();
     void createWidget();
     void updateWidget();
     void setWidgetMode(WidgetMode newMode);

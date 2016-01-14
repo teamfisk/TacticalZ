@@ -8,7 +8,6 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
-#include "Rendering/RenderQueueFactory.h"
 #include "Input/InputProxy.h"
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
@@ -17,6 +16,7 @@
 #include "Core/SystemPipeline.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
+#include "Rendering/RenderSystem.h"
 #include "Core/EntityFileParser.h"
 #include "Core/Octree.h"
 
@@ -48,7 +48,7 @@ private:
     Octree* m_OctreeCollision;
     Octree* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
-    RenderQueueFactory* m_RenderQueueFactory;
+    RenderFrame* m_RenderFrame;
     // Network variables
     boost::thread m_NetworkThread;
 

@@ -20,7 +20,6 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorSystem::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &EditorSystem::OnMouseRelease);
     EVENT_SUBSCRIBE_MEMBER(m_EMouseMove, &EditorSystem::OnMouseMove);
-    EVENT_SUBSCRIBE_MEMBER(m_EPicking, &EditorSystem::OnPicking);
     EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorSystem::OnFileDropped);
 }
 
@@ -35,7 +34,7 @@ void EditorSystem::Update(World* world, double dt)
     if (!m_Visible) {
         return;
     }
-
+    Picking();
     updateWidget();
 
     drawUI(world, dt);
@@ -129,7 +128,7 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
 
     auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
     glm::vec3 widgetOrientation = widgetTransform["Orientation"];
-    glm::quat totalOrientation = m_Renderer->Camera()->Orientation() * glm::inverse(glm::quat(widgetOrientation));
+    glm::quat totalOrientation = m_Camera->Orientation() * glm::inverse(glm::quat(widgetOrientation));
 
     int width;
     int height;
@@ -141,14 +140,14 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
         delta2,
         m_WidgetPickingDepth,
         res,
-        m_Renderer->Camera()->ProjectionMatrix(),
+        m_Camera->ProjectionMatrix(),
         glm::toMat4(glm::inverse(totalOrientation))
     );
     glm::vec3 origin = ScreenCoords::ToWorldPos(
         glm::vec2(res.Width / 2.f, res.Height / 2.f),
         m_WidgetPickingDepth,
         res,
-        m_Renderer->Camera()->ProjectionMatrix(),
+        m_Camera->ProjectionMatrix(),
         glm::toMat4(glm::inverse(totalOrientation))
     );
     deltaWorld = deltaWorld - origin;
@@ -161,7 +160,7 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
                 EntityID parent = m_World->GetParent(m_Selection);
                 glm::quat inverseParentOrientation;
                 //if (parent != 0) {
-                    inverseParentOrientation = glm::inverse(RenderQueueFactory::AbsoluteOrientation(m_World, parent));
+                    inverseParentOrientation = glm::inverse(Transform::AbsoluteOrientation(m_World, parent));
                 //}
                 (glm::vec3&)m_World->GetComponent(m_Selection, "Transform")["Position"] += inverseParentOrientation * movement;
             } else if (m_WidgetSpace == WidgetSpace::Local) {
@@ -177,10 +176,10 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
                 EntityID parent = m_World->GetParent(m_Selection);
                 glm::quat parentOrientation;
                 //if (parent != 0) {
-                //    parentOrientation = RenderQueueFactory::AbsoluteOrientation(m_World, parent);
+                //    parentOrientation = RenderSystem::AbsoluteOrientation(m_World, parent);
                 //}
                 glm::vec3& selectionOrientation = m_World->GetComponent(m_Selection, "Transform")["Orientation"];
-                glm::quat currentOrientation = RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection);
+                glm::quat currentOrientation = Transform::AbsoluteOrientation(m_World, m_Selection);
                 //glm::quat currentOrientation = parentOrientation * glm::quat(selectionOrientation);
                 glm::quat deltaOrientation(finalMovement);
                 selectionOrientation = glm::eulerAngles(glm::inverse(parentOrientation) * (deltaOrientation * currentOrientation));
@@ -236,10 +235,10 @@ bool EditorSystem::OnMouseRelease(const Events::MouseRelease& e)
     return true;
 }
 
-bool EditorSystem::OnPicking(const Events::Picking& e)
+void EditorSystem::Picking()
 {
     for (auto& pos : m_PickingQueue) {
-        auto result = e.Pick(pos);
+        auto result = m_Renderer->Pick(pos);
         EntityID entity = result.Entity;
         if (glm::length2(m_WidgetCurrentAxis) > 0.f) {
             // ???
@@ -247,6 +246,7 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
             LOG_INFO("Selected %i", entity);
             if (entity != EntityID_Invalid) {
                 EntityID parent = m_World->GetParent(entity);
+                m_Camera = result.Camera;
                 if (parent == m_Widget) {
                     m_WidgetCurrentAxis = glm::vec3(
                         (entity == m_WidgetX) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneY || entity == m_WidgetPlaneZ),
@@ -254,7 +254,6 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
                         (entity == m_WidgetZ) || (entity == m_WidgetOrigin) || (entity == m_WidgetPlaneX || entity == m_WidgetPlaneY)
                     );
                     m_WidgetPickingDepth = result.Depth;
-
                     //auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
                     //auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
                     //widgetTransform["Position"] = (glm::vec3)selectionTransform["Position"];
@@ -270,7 +269,6 @@ bool EditorSystem::OnPicking(const Events::Picking& e)
         }
     }
     m_PickingQueue.clear();
-    return true;
 };
 
 bool EditorSystem::OnFileDropped(const Events::FileDropped& e)
@@ -324,10 +322,10 @@ void EditorSystem::updateWidget()
 
     if (m_Selection != EntityID_Invalid) {
         auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
-        glm::vec3 selectionPosition = RenderQueueFactory::AbsolutePosition(m_World, m_Selection);
+        glm::vec3 selectionPosition = Transform::AbsolutePosition(m_World, m_Selection);
         widgetTransform["Position"] = selectionPosition;
         if (m_WidgetSpace == WidgetSpace::Local) {
-            widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
+            widgetTransform["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(m_World, m_Selection));
         }
     }
 }
@@ -362,7 +360,7 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         if (m_Selection != EntityID_Invalid) {
             if (m_WidgetSpace == WidgetSpace::Local) {
                 auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
-                widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
+                widgetTransform["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(m_World, m_Selection));
             }
         }
     } else if (newMode == WidgetMode::Scale) {
@@ -373,7 +371,7 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         m_World->GetComponent(m_WidgetOrigin, "Model")["Resource"] = "Models/ScaleWidgetOrigin.obj";
         if (m_Selection != EntityID_Invalid) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
-            widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
+            widgetTransform["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(m_World, m_Selection));
         }
     } else if (newMode == WidgetMode::Rotate) {
         m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/RotationWidgetX.obj";
@@ -382,7 +380,7 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
         if (m_Selection != EntityID_Invalid) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
             if (m_WidgetSpace == WidgetSpace::Local) {
-                widgetTransform["Orientation"] = glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, m_Selection));
+                widgetTransform["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(m_World, m_Selection));
             }
         }
     }
