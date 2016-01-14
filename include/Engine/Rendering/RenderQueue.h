@@ -52,7 +52,7 @@ struct RenderScene
     ::Camera* Camera;
     std::list<std::shared_ptr<RenderJob>> ForwardJobs;
     std::list<std::shared_ptr<RenderJob>> LightJobs;
-    Rectangle ViewPort;
+    Rectangle Viewport;
 
 	void Clear()
 	{

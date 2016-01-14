@@ -19,7 +19,7 @@ public:
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
 
-    void Draw(RenderFrame& rf);
+    void Draw(RenderScene& scene);
 
 
     //Getters

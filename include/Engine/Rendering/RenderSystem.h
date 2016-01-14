@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "ModelJob.h"
 #include "Renderer.h"
+#include "../Core/Transform.h"
 
 class RenderSystem : public ImpureSystem
 {
@@ -20,12 +21,6 @@ public:
     RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
 
     virtual void Update(World* world, double dt) override;
-
-    static glm::vec3 AbsolutePosition(World* world, EntityID entity);
-    static glm::quat AbsoluteOrientation(World* world, EntityID entity);
-    static glm::vec3 AbsoluteScale(World* world, EntityID entity);
-
-    
 
 private:
     World* m_World = nullptr;
@@ -44,13 +39,11 @@ private:
 
     void switchCamera(EntityID entity);
 
-    void initialize();
     void updateCamera(World* world, double dt);
     void updateProjectionMatrix(ComponentWrapper& cameraComponent);
     glm::mat4 m_ViewMatrix;
     glm::mat4 m_ProjectionMatrix;
     
-    glm::mat4 ModelMatrix(EntityID entity, World* world);
     void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
 
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;

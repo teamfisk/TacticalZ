@@ -1,6 +1,5 @@
 #version 430
 
-uniform mat4 Matrix;
 uniform vec4 Color;
 
 uniform sampler2D texture0;

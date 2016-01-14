@@ -89,15 +89,18 @@ void Renderer::Update(double dt)
     m_ImGuiRenderPass->Update(dt);
 }
 
-void Renderer::Draw(RenderFrame& rf)
+void Renderer::Draw(RenderFrame& frame)
 {
-    m_Camera = (*rf.begin())->Camera; // Fix this with some better solution
-    m_PickingPass->Draw(rf);
-    
-    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
+    for (auto scene : frame.RenderScenes){
+        m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
+        m_PickingPass->Draw(*scene);
 
-    m_DrawScenePass->Draw(rf);
-    GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+        glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
+
+        m_DrawScenePass->Draw(*scene);
+        GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    }
+
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
 }

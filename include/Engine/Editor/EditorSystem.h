@@ -9,7 +9,7 @@
 #include "../Core/ConfigFile.h"
 #include "../Input/EInputCommand.h"
 #include "../Rendering/IRenderer.h"
-#include "../Rendering/RenderSystem.h"
+#include "../Core/Transform.h"
 #include "../Core/EFileDropped.h"
 #include "../Core/EntityFilePreprocessor.h"
 #include "../Core/EntityFileParser.h"

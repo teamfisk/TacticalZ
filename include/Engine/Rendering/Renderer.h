@@ -26,7 +26,7 @@ public:
 
     virtual void Initialize() override;
     virtual void Update(double dt) override;
-    virtual void Draw(RenderFrame& rf) override;
+    virtual void Draw(RenderFrame& frame) override;
 
     virtual PickData Pick(glm::vec2 screenCoord) override;
 
