@@ -119,23 +119,11 @@ void RenderSystem::Update(World* world, double dt)
     //Only supports opaque geometry atm
     m_RenderFrame->Clear();
 
-    
-
     RenderScene rs;
     rs.Camera = m_Camera;
     rs.Viewport = Rectangle(1280, 720);
     fillModels(rs.ForwardJobs, world);
     m_RenderFrame->Add(rs);
-
-    RenderScene rs2;
-    rs2.Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);;
-    rs2.Camera->SetProjectionMatrix(glm::mat4(1));
-    rs2.Camera->SetViewMatrix(glm::mat4(1));
-
-    rs2.Viewport = Rectangle(1280, 720);
-    fillModels(rs2.ForwardJobs, world);
-    m_RenderFrame->Add(rs2);
-
    
 }
 
