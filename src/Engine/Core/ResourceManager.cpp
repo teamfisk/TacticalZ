@@ -14,6 +14,7 @@ std::unordered_map<unsigned int, unsigned int> ResourceManager::m_ResourceCount;
 FileWatcher ResourceManager::m_FileWatcher;
 std::unordered_map<std::pair<std::string, std::string>, boost::thread> ResourceManager::m_LoadingThreads;
 boost::recursive_mutex ResourceManager::m_Mutex;
+const ResourceManager::SpecialResourcePointer ResourceManager::m_StillLoading;
 
 unsigned int ResourceManager::GetTypeID(std::string resourceType)
 {
@@ -92,6 +93,8 @@ Resource* ResourceManager::createResource(std::string resourceType, std::string 
     Resource* resource = nullptr;
     try {
         resource = facIt->second(resourceName);
+    } catch (const ThreadUnsafeResource::StillLoadingException&) {
+        resource = m_StillLoading;
     } catch (const std::exception& e) {
 		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": %s", resourceName.c_str(), resourceType.c_str(), e.what());
     }

@@ -24,7 +24,6 @@ class RawModel : public Resource
 
 protected:
 	RawModel(std::string fileName);
-    virtual void GlCommands() override;
 
 public:
 	~RawModel();
@@ -47,8 +46,11 @@ public:
 	struct MaterialGroup
 	{
 		float Shininess;
+        std::string TexturePath;
 		std::shared_ptr<::Texture> Texture;
+        std::string NormalMapPath;
 		std::shared_ptr<::Texture> NormalMap;
+        std::string SpecularMapPath;
 		std::shared_ptr<::Texture> SpecularMap;
 		unsigned int StartIndex;
 		unsigned int EndIndex;

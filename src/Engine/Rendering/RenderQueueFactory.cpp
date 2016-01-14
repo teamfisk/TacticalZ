@@ -84,12 +84,12 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
             continue;
         }
         glm::vec4 color = modelC["Color"];
-        Model* model = ResourceManager::LoadAsync<Model>(resource);
+        Model* model = ResourceManager::Load<Model, true>(resource);
         if (model == nullptr) {
             model = ResourceManager::Load<Model>("Models/Core/Error.obj");
         }
 
-        for (auto texGroup : model->TextureGroups) {
+        for (auto texGroup : model->TextureGroups()) {
             ModelJob job;
             job.TextureID = (texGroup.Texture) ? texGroup.Texture->ResourceID : 0;
             job.DiffuseTexture = texGroup.Texture.get();
@@ -98,7 +98,7 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
             job.Model = model;
             job.StartIndex = texGroup.StartIndex;
             job.EndIndex = texGroup.EndIndex;
-            job.ModelMatrix = model->m_Matrix * ModelMatrix(world, modelC.EntityID);
+            job.ModelMatrix = model->Matrix() * ModelMatrix(world, modelC.EntityID);
             job.Color = color;
 
             //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this

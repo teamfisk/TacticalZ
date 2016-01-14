@@ -220,16 +220,16 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
     }
     ComponentWrapper model = world->GetComponent(id, "Model");
     ComponentWrapper collision = world->AttachComponent(id, "AABB");
-    Model* modelRes = ResourceManager::LoadAsync<Model>(model["Resource"]);
+    Model* modelRes = ResourceManager::Load<Model, true>(model["Resource"]);
     if (modelRes == nullptr) {
         return false;
     }
 
-    glm::mat4 modelMatrix = modelRes->m_Matrix;
+    glm::mat4 modelMatrix = modelRes->Matrix();
 
     glm::vec3 mini = glm::vec3(INFINITY, INFINITY, INFINITY);
     glm::vec3 maxi = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
-    for (const auto& v : modelRes->m_Vertices) {
+    for (const auto& v : modelRes->Vertices()) {
         const auto& wPos = modelMatrix * glm::vec4(v.Position.x, v.Position.y, v.Position.z, 1);
         maxi.x = std::max(wPos.x, maxi.x);
         maxi.y = std::max(wPos.y, maxi.y);
@@ -247,7 +247,7 @@ bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
 {
     ComponentWrapper& cTrans = world->GetComponent(AABBComponent.EntityID, "Transform");
     ComponentWrapper model = world->GetComponent(AABBComponent.EntityID, "Model");
-    Model* modelRes = ResourceManager::LoadAsync<Model>(model["Resource"]);
+    Model* modelRes = ResourceManager::Load<Model, true>(model["Resource"]);
     outBox.CreateFromCenter(AABBComponent["BoxCenter"], AABBComponent["BoxSize"]);
     glm::vec3 mini = outBox.MinCorner();
     glm::vec3 maxi = outBox.MaxCorner();
@@ -255,7 +255,7 @@ bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
     if (modelRes == nullptr) {
         return false;
     }
-    glm::mat4 modelMatrix = modelRes->m_Matrix *
+    glm::mat4 modelMatrix = modelRes->Matrix() *
         glm::translate(glm::mat4(), (glm::vec3)cTrans["Position"]) *
         glm::scale((glm::vec3)cTrans["Scale"]);
 

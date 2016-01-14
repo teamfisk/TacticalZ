@@ -11,10 +11,7 @@ class Texture : public BaseTexture
 
 private:
 	Texture(std::string path);
-    virtual void GlCommands() override;
 
-    GLint m_Format;
-    Image* m_Image;
 public:
 	~Texture();
 
