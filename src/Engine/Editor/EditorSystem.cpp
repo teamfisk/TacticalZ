@@ -492,7 +492,8 @@ void EditorSystem::drawUI(World* world, double dt)
                         const std::string& fieldName = kv.first;
                         auto& field = kv.second;
                         
-                        ImGui::PushID(fieldName.c_str());
+                        std::string uniqueID = componentType + fieldName;
+                        ImGui::PushID(uniqueID.c_str());
                         if (field.Type == "Vector") {
                             auto& val = component.Property<glm::vec3>(fieldName);
                             if (fieldName == "Scale") {
