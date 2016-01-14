@@ -12,7 +12,8 @@ enum class MessageType
 	Message,
 	Snapshot,
 	Event,
-    OnInputCommand
+    OnInputCommand,
+    OnPlayerDamage
 };
 
 #endif

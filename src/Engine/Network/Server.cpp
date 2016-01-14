@@ -84,7 +84,10 @@ void Server::parseMessageType(Packet& packet)
         break;
     case MessageType::OnInputCommand:
         parseOnInputCommand(packet);
-        break;;
+        break;
+    case MessageType::OnPlayerDamage:
+        parseOnPlayerDamage(packet);
+        break;
     default:
         break;
     }
@@ -222,21 +225,22 @@ void Server::disconnect(int i)
 
 void Server::parseOnInputCommand(Packet& packet)
 {
-    size_t i;
-    for (i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
-            break;
-        }
-    }
-    // If no player matches the address return.
-    if (i >= 8)
-        return;
     Events::InputCommand e;
     e.Command = packet.ReadString();
     e.PlayerID = packet.ReadPrimitive<int>();
     e.Value = packet.ReadPrimitive<float>();
     m_EventBroker->Publish(e);
-    LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    LOG_DEBUG("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+}
+
+void Server::parseOnPlayerDamage(Packet & packet)
+{ 
+    Events::PlayerDamage e;
+    e.DamageAmount = packet.ReadPrimitive<double>();
+    e.PlayerDamagedID = packet.ReadPrimitive<EntityID>();
+    e.TypeOfDamage = packet.ReadString();
+    m_EventBroker->Publish(e);
+    LOG_DEBUG("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
 }
 
 void Server::parseConnect(Packet& packet)

@@ -13,6 +13,7 @@
 #include "Core/EventBroker.h"
 #include "Network/Network.h"
 #include "Input/EInputCommand.h"
+#include "Core/EPlayerDamage.h"
 
 class Server : public Network
 {
@@ -69,6 +70,7 @@ private:
     void disconnect(int i);
     void parseMessageType(Packet& packet);
     void parseOnInputCommand(Packet& packet);
+    void parseOnPlayerDamage(Packet& packet);
     void parseConnect(Packet& packet);
     void parseDisconnect();
     void parseClientPing();

@@ -16,6 +16,7 @@
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
 #include "Input/EInputCommand.h"
+#include "Core/EPlayerDamage.h"
 
 class Client : public Network
 {
@@ -79,11 +80,13 @@ private:
     bool isConnected();
     EntityID createPlayer();
     bool hasMappedEntity(EntityID entityID);
+
     // Events
     EventBroker* m_EventBroker;
-   
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
+    EventRelay<Client, Events::PlayerDamage> m_EPlayeDamage;
+    bool OnPlayerDamage(const Events::PlayerDamage& e);
 };
 
 #endif

@@ -298,7 +298,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "ConnectToServer") { // Connect for now
         connect();
-        LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     } else {
         Packet packet(MessageType::OnInputCommand, m_SendPacketID);
@@ -306,9 +306,19 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
         packet.WritePrimitive(e.PlayerID);
         packet.WritePrimitive(e.Value);
         send(packet);
-        LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     }
+    return false;
+}
+
+bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
+{
+    Packet packet(MessageType::OnInputCommand, m_SendPacketID);
+    packet.WritePrimitive(e.DamageAmount);
+    packet.WritePrimitive(e.PlayerDamagedID);
+    packet.WriteString(e.TypeOfDamage);
+    send(packet);
     return false;
 }
 
