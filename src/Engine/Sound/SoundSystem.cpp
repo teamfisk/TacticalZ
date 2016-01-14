@@ -86,6 +86,9 @@ void SoundSystem::deleteInactiveEmitters()
 void SoundSystem::addNewEmitters()
 {
     auto emitterComponents = m_World->GetComponents("SoundEmitter");
+    if (emitterComponents == nullptr) {
+        return;
+    }
     for (auto it = emitterComponents->begin(); it != emitterComponents->end(); it++) {
         EntityID emitter = (*it).EntityID;
         std::unordered_map<EntityID, Source*>::iterator source;
@@ -132,6 +135,9 @@ void SoundSystem::updateListener()
 {
     // Should only be one listener.
     auto listenerComponents = m_World->GetComponents("Listener");
+    if (listenerComponents == nullptr) {
+        return;
+    }
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
         EntityID listener = (*it).EntityID;
         glm::vec3 previousPos;

@@ -80,13 +80,6 @@ Game::Game(int argc, char* argv[])
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
     m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
 
-    auto soundListenerCube = m_World->CreateEntity();
-    m_World->AttachComponent(soundListenerCube, "Listener");
-    m_World->AttachComponent(soundListenerCube, "Transform");
-    auto model = m_World->AttachComponent(soundListenerCube, "Model");
-    model["Resource"] = "Models/Core/UnitCube.obj";
-    model["Color"] = glm::vec4(1, 0, 0, 1);
-
     m_LastTime = glfwGetTime();
 }
 
@@ -124,7 +117,6 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
-
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     debugTick(dt);
@@ -142,12 +134,6 @@ void Game::Tick()
 
 bool Game::debugOnInputCommand(const Events::InputCommand & e)
 {
-    if (e.Command == "PlaySound" && e.Value > 0) {
-        Events::PlayBackgroundMusic e;
-        e.FilePath = "Audio/5dollar.wav";
-        //e.emitterID = 18; // rofl
-        m_EventBroker->Publish(e);
-    }
     return true;
 }
 
@@ -168,10 +154,5 @@ void Game::networkFunction()
         m_ClientOrServer = new Server();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
-    // I don't think we are reaching this part of the code right now.
-    // ~Game() is not called if the game is exited by closing console windows
-    // When server or client is done set it to false.
-    //m_IsClientOrServer = false;
-    // Destroy it
-    //delete m_ClientOrServer;
+
 }

@@ -4,7 +4,9 @@ Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::a
 { }
 
 Server::~Server()
-{ }
+{
+
+}
 
 
 void Server::Start(World* world, EventBroker* eventBroker)
@@ -22,18 +24,9 @@ void Server::Update()
     readFromClients();
 }
 
-void Server::Close()
-{
-    m_ThreadIsRunning = false;
-}
-
 void Server::readFromClients()
 {
-    // m_ThreadIsRunning might be unnecessary but the 
-    // program crashed if it executed m_Socket.available()
-    // when closing the program. 
-
-    if (m_Socket.available()) {
+    while (m_Socket.available()) {
         try {
             bytesRead = receive(readBuffer, INPUTSIZE);
             Packet packet(readBuffer, bytesRead);
@@ -41,7 +34,6 @@ void Server::readFromClients()
         } catch (const std::exception& err) {
             //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
         }
-
     }
     std::clock_t currentTime = std::clock();
     // Send snapshot
@@ -58,7 +50,7 @@ void Server::readFromClients()
 
     // Time out logic
     if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
-        checkForTimeOuts();
+        //checkForTimeOuts();
         timOutTimer = currentTime;
     }
 }
@@ -108,7 +100,7 @@ int Server::receive(char * data, size_t length)
 
 void Server::send(Packet& packet, int playerID)
 {
-    m_Socket.send_to(
+    int bytesSent = m_Socket.send_to(
         boost::asio::buffer(packet.Data(), packet.Size()),
         m_PlayerDefinitions[playerID].Endpoint,
         0);
@@ -150,22 +142,32 @@ void Server::broadcast(Packet& packet)
     }
 }
 
+// Send snapshot fields
 void Server::sendSnapshot()
 {
-    Packet packet(MessageType::Snapshot, m_SendPacketID);
-    for (size_t i = 0; i < MAXCONNECTIONS; i++) {
+    // Should time this
+    std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
+    for (auto& it : worldComponentPools) {
+        Packet packet(MessageType::Snapshot, m_SendPacketID);
+        std::string componentType = it.first;
+        ComponentPool* componentPool = it.second;
+        ComponentInfo componentInfo = componentPool->ComponentInfo();
+        packet.WriteString(componentInfo.Name);
 
-        // Send an empty name if there is no player connected on this position.
-        packet.WriteString(m_PlayerDefinitions[i].Name);
-
-        if (m_PlayerDefinitions[i].EntityID == -1) {
-            continue;
+        for (auto& componentWrapper : *componentPool) {
+            packet.WritePrimitive(componentWrapper.EntityID);
+            for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
+                ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(componentField);
+                if (fieldInfo.Type == "string") {
+                    std::string& value = componentWrapper[componentField];
+                    packet.WriteString(value);
+                } else {
+                    packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
+                }
+            }
         }
-        // Pack transfrom component into data packet
-        auto transform = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform");
-        packet.WriteData(transform.Data, transform.Info.Meta.Stride);
+        broadcast(packet);
     }
-    broadcast(packet);
 }
 
 void Server::sendPing()
@@ -174,10 +176,9 @@ void Server::sendPing()
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
             int ping = 1000 * (m_StopTimes[i] - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
-            LOG_INFO("%i: Player %i's ping: %i", m_PacketID, i, ping);
+            LOG_INFO("Last packetID received %i: Player %i's ping: %i", m_PacketID, i, ping);
         }
     }
-
     // Create ping message
     Packet packet(MessageType::ServerPing, m_SendPacketID);
     packet.WriteString("Ping from server");
@@ -271,7 +272,7 @@ void Server::parseConnect(Packet& packet)
 
             m_StopTimes[i] = std::clock();
 
-            LOG_INFO("Player \"%s\" connected on IP: %s", m_PlayerDefinitions[i].Name, m_PlayerDefinitions[i].Endpoint.address().to_string());
+            LOG_INFO("Player \"%s\" connected on IP: %s", m_PlayerDefinitions[i].Name.c_str(), m_PlayerDefinitions[i].Endpoint.address().to_string().c_str());
 
             Packet packet(MessageType::Connect, m_SendPacketID);
             packet.WritePrimitive<int>(i); // Player ID
