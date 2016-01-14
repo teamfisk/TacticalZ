@@ -2,7 +2,10 @@
 #include "Collision/CollidableOctreeSystem.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
-#include "Game/HealthSystem.h"
+#include "Systems/RaptorCopterSystem.h"
+#include "Systems/PlayerSystem.h"
+#include "Systems/HealthSystem.h"
+#include "Systems/PlayerMovementSystem.h"
 #include "Core/EntityFileWriter.h"
 
 Game::Game(int argc, char* argv[])
@@ -69,6 +72,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);

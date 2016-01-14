@@ -1,5 +1,4 @@
-#include "HealthSystem.h"
-#include <algorithm>
+#include "Systems/HealthSystem.h"
 
 HealthSystem::HealthSystem(EventBroker* eventBroker)
     : System(eventBroker)

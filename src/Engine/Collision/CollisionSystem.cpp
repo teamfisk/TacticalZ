@@ -4,6 +4,11 @@
 
 void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
+    if (!entity.HasComponent("Physics")) {
+        return;
+    }
+    ComponentWrapper& cPhysics = entity["Physics"];
+
     boost::optional<AABB> boundingBox = Collision::EntityAbsoluteAABB(entity);
     if (!boundingBox) {
         return;
@@ -25,7 +30,10 @@ void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, Compo
             continue;
         }
         if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
-            (glm::vec3&)cTransform["Position"] += resolutionVector;
+            if (entity.HasComponent("Physics")) {
+                (glm::vec3&)cTransform["Position"] += resolutionVector;
+                cPhysics["Velocity"] = glm::vec3(0, 0, 0);
+            }
         }
     }
 

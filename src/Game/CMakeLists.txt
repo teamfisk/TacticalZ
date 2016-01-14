@@ -11,16 +11,15 @@ include_directories(
 )
 
 file(GLOB SOURCE_FILES
-    "${INCLUDE_PATH}/*.h"
-    #"*.cpp"
+    "${INCLUDE_PATH}/Systems/*.h"
+    "Systems/*.cpp"
 )
-#source_group(Core FILES ${SOURCE_FILES})
+source_group(Systems FILES ${SOURCE_FILES_Systems})
 
 set(SOURCE_FILES
     ${SOURCE_FILES}
     "Game.cpp"
-    "HealthSystem.cpp"
-	"PlayerSystem.cpp"
+    ${SOURCE_FILES_Systems}
 )
 
 set(LIBRARIES

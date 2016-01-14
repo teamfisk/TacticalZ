@@ -4,10 +4,5 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
 	<xs:element name="Collidable">
-		<xs:complexType>
-			<xs:all>
-				<xs:element name="Static" type="t:bool" minOccurs="0"/>
-			</xs:all>
-		</xs:complexType>
 	</xs:element>
 </xs:schema>
