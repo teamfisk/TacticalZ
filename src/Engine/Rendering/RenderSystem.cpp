@@ -187,4 +187,3 @@ void RenderSystem::updateCamera(World* world, double dt)
 
     m_Camera->UpdateViewMatrix();
 }
-
