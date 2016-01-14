@@ -103,21 +103,25 @@ void EntityFilePreprocessor::parseComponentInfo()
                 }
             }
         } else {
-            LOG_WARNING("Component is missing an annotation!");
+            LOG_WARNING("Component \"%s\" is missing an annotation!", compInfo.Name.c_str());
         }
 
         // <xs:complexType>
         auto typeDefinition = element->getTypeDefinition();
+        // Allow empty components
+        if (typeDefinition == nullptr) {
+            continue;
+        }
         if (typeDefinition->getTypeCategory() != XSTypeDefinition::COMPLEX_TYPE) {
-            LOG_ERROR("Type definition wasn't COMPLEX_TYPE! Skipping.");
+            LOG_ERROR("Failed to parse component definition for \"%s\": Type definition wasn't COMPLEX_TYPE!", compInfo.Name.c_str());
             continue;
         }
         auto complexTypeDefinition = dynamic_cast<XSComplexTypeDefinition*>(typeDefinition);
 
         // <xs:all>
         auto modelGroupParticle = complexTypeDefinition->getParticle();
-        if (modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
-            LOG_ERROR("Model group particle wasn't TERM_MODELGROUP! Skipping.");
+        if (modelGroupParticle == nullptr || modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
+            LOG_ERROR("Failed to parse component definition for \"%s\": Model group particle was null or wasn't TERM_MODELGROUP!", compInfo.Name.c_str());
             continue;
         }
         auto modelGroup = modelGroupParticle->getModelGroupTerm();
@@ -129,7 +133,7 @@ void EntityFilePreprocessor::parseComponentInfo()
         for (unsigned int i = 0; i < particles->size(); ++i) {
             auto particle = particles->elementAt(i);
             if (particle->getTermType() != XSParticle::TERM_ELEMENT) {
-                LOG_ERROR("Particle wasn't TERM_ELEMENT! Skipping.");
+                LOG_ERROR("Failed to parse a field definition in component \"%s\": Particle wasn't TERM_ELEMENT! Skipping.", compInfo.Name.c_str());
                 continue;
             }
             auto elementDeclaration = particle->getElementTerm();
@@ -139,7 +143,7 @@ void EntityFilePreprocessor::parseComponentInfo()
 
             size_t stride = EntityFile::GetTypeStride(type);
             if (stride == 0) {
-                std::cout << "Warning: Field \"" << name << "\" in component \"" << compInfo.Name << "\" uses unexpected field type \"" << type << "\". Skipping." << std::endl;
+                LOG_WARNING("Field \"%s\" in component \"%s\" uses unexpected field type \"%s\". Skipping.", name.c_str(), compInfo.Name.c_str(), type.c_str());
                 continue;
             }
 
