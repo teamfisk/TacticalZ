@@ -59,16 +59,16 @@ void SoundSystem::deleteInactiveEmitters()
 {
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end();) {
-        if (m_World->ValidEntity((*it).first)) {
+        if (m_World->ValidEntity(it->first) 
+            && m_World->HasComponent(it->first, "SoundEmitter")) {
             if (getSourceState(it->second->ALsource) != AL_STOPPED) {
                 // Nothing to see here, move along
                 it++;
                 continue;
             } else {
-                // Sound has been stopped / finished playing
+                // Sound has been stopped / finished playing. And has correct component.
                 alDeleteBuffers(1, &it->second->ALsource);
                 alDeleteSources(1, &it->second->ALsource);
-                delete it->second->SoundResource;
                 m_World->DeleteEntity(it->first);
                 it = m_Sources.erase(it);
             }
@@ -77,7 +77,6 @@ void SoundSystem::deleteInactiveEmitters()
             stopSound((*it).second);
             alDeleteBuffers(1, &it->second->ALsource);
             alDeleteSources(1, &it->second->ALsource);
-            delete it->second->SoundResource;
             it = m_Sources.erase(it);
         }
     }
