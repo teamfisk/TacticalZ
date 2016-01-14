@@ -290,8 +290,8 @@ boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity)
     }
 
     ComponentWrapper& cAABB = entity["AABB"];
-    glm::vec3 absPosition = RenderQueueFactory::AbsolutePosition(entity.World, entity.ID);
-    glm::vec3 absScale = RenderQueueFactory::AbsoluteScale(entity.World, entity.ID);
+    glm::vec3 absPosition = Transform::AbsolutePosition(entity.World, entity.ID);
+    glm::vec3 absScale = Transform::AbsoluteScale(entity.World, entity.ID);
     glm::vec3 origin = absPosition + (glm::vec3)cAABB["Origin"];
     glm::vec3 size = (glm::vec3)cAABB["Size"] * absScale;
     return AABB::FromOriginSize(origin, size);

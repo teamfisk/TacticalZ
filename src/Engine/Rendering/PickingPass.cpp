@@ -109,7 +109,7 @@ void PickingPass::ClearPicking()
 {
     m_PickingColorsToEntity.clear();
     m_EntityColors.clear();
-    m_ColorCounter[0] = 0;
+    m_ColorCounter[0] = 1;
     m_ColorCounter[1] = 0;
 
     m_PickingBuffer.Bind();
@@ -138,10 +138,10 @@ PickData PickingPass::Pick(glm::vec2 screenCoord)
         pickInfo = it->second;
     } else {
         pickData.Entity = EntityID_Invalid;
+        return pickData;
     }
-    pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, resolution, pickInfo.Camera->ProjectionMatrix(), pickInfo.Camera->ViewMatrix());
-   
 
+    pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, resolution, pickInfo.Camera->ProjectionMatrix(), pickInfo.Camera->ViewMatrix());
     pickData.Entity = pickInfo.Entity;
     pickData.Camera = pickInfo.Camera;
     pickData.World = pickInfo.World;

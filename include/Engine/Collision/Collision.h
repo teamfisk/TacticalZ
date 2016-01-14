@@ -11,7 +11,7 @@
 #include "../Core/Ray.h"
 #include "../Core/AABB.h"
 #include "../Rendering/RawModel.h"
-#include "../Rendering/RenderQueueFactory.h"
+#include "../Core/Transform.h"
 #include "../Core/Entity.h"
 #include "../Core/EntityWrapper.h"
 

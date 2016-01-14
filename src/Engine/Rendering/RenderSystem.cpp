@@ -1,18 +1,21 @@
 #include "Rendering/RenderSystem.h"
-#include "Rendering/DebugCameraInputController.h"
 
-RenderSystem::RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame) :ImpureSystem(eventBrokerer)
+RenderSystem::RenderSystem(EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame)
+    : System(eventBroker)
+    , m_Renderer(renderer)
+    , m_RenderFrame(renderFrame)
 {
-    m_Renderer = renderer;
-    m_RenderFrame = renderFrame;
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
 
-    m_DefaultCamera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
-    m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
-    if (m_Camera == nullptr) {
-        m_Camera = m_DefaultCamera;
-    }
+    m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_DebugCameraInputController = new DebugCameraInputController<RenderSystem>(eventBroker, -1);
+}
+
+RenderSystem::~RenderSystem()
+{
+    delete m_Camera;
+    delete m_DebugCameraInputController;
 }
 
 bool RenderSystem::OnSetCamera(const Events::SetCamera &event)
@@ -54,14 +57,11 @@ void RenderSystem::switchCamera(EntityID entity)
 void RenderSystem::updateProjectionMatrix(ComponentWrapper& cameraComponent)
 {
     double fov = cameraComponent["FOV"];
-    double aspectRatio = m_Renderer->Resolution().Width / m_Renderer->Resolution().Height;
+    double aspectRatio = (float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height;
     double nearClip = cameraComponent["NearClip"];
     double farClip = cameraComponent["FarClip"];
 
-    double fovY = atan(tan(glm::radians(fov)/2.0) * aspectRatio) * 2.0;
-    m_ProjectionMatrix = glm::perspective(fovY, aspectRatio, nearClip, farClip);
-
-    m_Camera->SetFOV(fovY);
+    m_Camera->SetFOV(glm::radians(fov));
     m_Camera->SetAspectRatio(aspectRatio);
     m_Camera->SetNearClip(nearClip);
     m_Camera->SetFarClip(farClip);
@@ -129,66 +129,62 @@ void RenderSystem::Update(World* world, double dt)
 
 void RenderSystem::updateCamera(World* world, double dt)
 {
-    
-        static DebugCameraInputController<RenderSystem> firstPersonInputController(m_EventBroker, -1);
-
-        if (m_SwitchCamera) {
-            auto cameras = world->GetComponents("Camera");
-            for (auto it = cameras->begin(); it != cameras->end(); it++) {
-                if ((*it).EntityID == m_CurrentCamera) {
-                    it++;
-                    if (it != cameras->end()) {
-                        switchCamera((*it).EntityID);
-                    } else {
-                        switchCamera((*cameras->begin()).EntityID);
-                    }
-                    break;
+    if (m_SwitchCamera) {
+        auto cameras = world->GetComponents("Camera");
+        for (auto it = cameras->begin(); it != cameras->end(); it++) {
+            if ((*it).EntityID == m_CurrentCamera) {
+                it++;
+                if (it != cameras->end()) {
+                    switchCamera((*it).EntityID);
+                } else {
+                    switchCamera((*cameras->begin()).EntityID);
                 }
+                break;
             }
+        }
+        ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
+        ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
+
+        m_DebugCameraInputController->SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
+        m_DebugCameraInputController->SetPosition(cameraTransform["Position"]);
+    }
+
+    if (m_World->ValidEntity(m_CurrentCamera)) {
+        if (world->HasComponent(m_CurrentCamera, "Camera") && world->HasComponent(m_CurrentCamera, "Transform")) {
             ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
             ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
 
-            firstPersonInputController.SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
-            firstPersonInputController.SetPosition(cameraTransform["Position"]);
-            
-        }
+            m_DebugCameraInputController->Update(dt);
+            (glm::vec3&)cameraTransform["Orientation"] = glm::eulerAngles(m_DebugCameraInputController->Orientation());
+            (glm::vec3&)cameraTransform["Position"] = m_DebugCameraInputController->Position();
 
-        if (m_World->ValidEntity(m_CurrentCamera)) {
-            if (world->HasComponent(m_CurrentCamera, "Camera") && world->HasComponent(m_CurrentCamera, "Transform")) {
+            glm::vec3 position = Transform::AbsolutePosition(world, m_CurrentCamera);
+            glm::quat orientation = Transform::AbsoluteOrientation(world, m_CurrentCamera);
+
+            m_Camera->SetPosition(position);
+            m_Camera->SetOrientation(orientation);
+
+            updateProjectionMatrix(cameraComponent);
+
+        }
+    } else {
+        m_Camera = m_Camera;
+
+        auto cameras = world->GetComponents("Camera");
+        if (cameras != nullptr) {
+            if (cameras->begin() != cameras->end()) {
+                ComponentWrapper& cameraC = *cameras->begin();
+                switchCamera(cameraC.EntityID);
+
                 ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
                 ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
 
-                firstPersonInputController.Update(dt);
-                (glm::vec3&)cameraTransform["Orientation"] = glm::eulerAngles(firstPersonInputController.Orientation());
-                (glm::vec3&)cameraTransform["Position"] = firstPersonInputController.Position();
-
-                glm::vec3 position = Transform::AbsolutePosition(world, m_CurrentCamera);
-                glm::quat orientation = Transform::AbsoluteOrientation(world, m_CurrentCamera);
-
-                m_Camera->SetPosition(position);
-                m_Camera->SetOrientation(orientation);
-
-                updateProjectionMatrix(cameraComponent);
-                
-            }
-        } else {
-            m_Camera = m_DefaultCamera;
-
-            auto cameras = world->GetComponents("Camera");
-            if (cameras != nullptr) {
-                if (cameras->begin() != cameras->end()) {
-                    ComponentWrapper& cameraC = *cameras->begin();
-                    switchCamera(cameraC.EntityID);
-
-                    ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
-                    ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
-
-                    firstPersonInputController.SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
-                    firstPersonInputController.SetPosition(cameraTransform["Position"]);
-                }
+                m_DebugCameraInputController->SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
+                m_DebugCameraInputController->SetPosition(cameraTransform["Position"]);
             }
         }
+    }
 
-        m_Camera->UpdateViewMatrix();
+    m_Camera->UpdateViewMatrix();
 }
 

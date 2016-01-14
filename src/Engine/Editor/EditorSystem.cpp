@@ -125,6 +125,9 @@ bool EditorSystem::OnMouseMove(const Events::MouseMove& e)
     if (m_Selection == 0) {
         return false;
     }
+    if (m_Camera == nullptr) {
+        return false;
+    }
 
     auto widgetTransform = m_World->GetComponent(m_Widget, "Transform");
     glm::vec3 widgetOrientation = widgetTransform["Orientation"];

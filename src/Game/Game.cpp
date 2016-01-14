@@ -35,6 +35,7 @@ Game::Game(int argc, char* argv[])
         ));
     m_Renderer->Initialize();
     //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    m_RenderFrame = new RenderFrame();
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
@@ -59,8 +60,6 @@ Game::Game(int argc, char* argv[])
         fp.MergeEntities(m_World);
     }
 
-    m_RenderFrame = new RenderFrame();
-
     // Create Octrees
     m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     m_OctreeFrustrumCulling = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
@@ -82,7 +81,6 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
-
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
