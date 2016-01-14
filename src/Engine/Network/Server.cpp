@@ -50,7 +50,7 @@ void Server::readFromClients()
 
     // Time out logic
     if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
-        //checkForTimeOuts();
+        checkForTimeOuts();
         timOutTimer = currentTime;
     }
 }
@@ -79,8 +79,6 @@ void Server::parseMessageType(Packet& packet)
         break;
     case MessageType::Disconnect:
         parseDisconnect();
-        break;
-    case MessageType::Event:
         break;
     case MessageType::OnInputCommand:
         parseOnInputCommand(packet);
@@ -118,23 +116,6 @@ void Server::send(Packet & packet)
             packet.Size()),
         m_ReceiverEndpoint,
         0);
-}
-
-void Server::moveMessageHead(char *& data, size_t & length, size_t stepSize)
-{
-    data += stepSize;
-    length -= stepSize;
-}
-
-void Server::broadcast(std::string message)
-{
-    Packet packet(MessageType::Event, m_SendPacketID);
-    packet.WriteString(message);
-    for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
-            send(packet, i);
-        }
-    }
 }
 
 void Server::broadcast(Packet& packet)
@@ -214,7 +195,7 @@ void Server::checkForTimeOuts()
 
 void Server::disconnect(int i)
 {
-    broadcast("A player disconnected");
+    //broadcast("A player disconnected");
     LOG_INFO("Player %i disconnected/timed out", i);
 
     // Remove enteties and stuff
@@ -234,7 +215,7 @@ void Server::parseOnInputCommand(Packet& packet)
 }
 
 void Server::parseOnPlayerDamage(Packet & packet)
-{ 
+{
     Events::PlayerDamage e;
     e.DamageAmount = packet.ReadPrimitive<double>();
     e.PlayerDamagedID = packet.ReadPrimitive<EntityID>();
@@ -264,15 +245,16 @@ void Server::parseConnect(Packet& packet)
 
             LOG_INFO("Player \"%s\" connected on IP: %s", m_PlayerDefinitions[i].Name.c_str(), m_PlayerDefinitions[i].Endpoint.address().to_string().c_str());
 
+            // Send a message to the player that connected
             Packet packet(MessageType::Connect, m_SendPacketID);
             packet.WritePrimitive<int>(i); // Player ID
-
+            packet.WritePrimitive<EntityID>(m_PlayerDefinitions[i].EntityID); // Entity ID
             send(packet, i);
 
             // Send notification that a player has connected
-            std::string str = m_PacketID + "Player " + m_PlayerDefinitions[i].Name + " connected on: "
-                + m_PlayerDefinitions[i].Endpoint.address().to_string();
-            broadcast(str);
+            Packet notificationPacket(MessageType::PlayerConnected, m_PacketID);
+            broadcast(notificationPacket);
+
             break;
         }
     }

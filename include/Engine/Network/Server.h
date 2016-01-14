@@ -48,8 +48,6 @@ private:
     // Game logic
     World* m_World;
     EventBroker* m_EventBroker;
-    // vec.size() = ammount of players to create, stores playerID's
-    std::vector<unsigned int> m_PlayersToCreate;
     
     // Packet loss logic
     unsigned int m_PacketID;
@@ -61,8 +59,6 @@ private:
     void readFromClients();
     void send(Packet& packet, int playerID);
     void send(Packet& packet);
-    void moveMessageHead(char*& data, size_t& length, size_t stepSize);
-    void broadcast(std::string message);
     void broadcast(Packet& packet);
     void sendSnapshot();
     void sendPing();

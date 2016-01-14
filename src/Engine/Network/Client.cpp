@@ -6,15 +6,13 @@ using namespace boost::asio::ip;
 Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 {
     // Asumes root node is EntityID 0
-    m_ServerToClientMap.insert(std::make_pair(0, 0));
+    insertIntoServerClientMaps(0, 0);
     // Default is local host
     std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
     int port = config->Get<int>("Networking.Port", 13);
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
     // Set up network stream
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
-    m_NextSnapshot.InputForward = "";
-    m_NextSnapshot.InputRight = "";
 }
 
 Client::~Client()
@@ -22,7 +20,6 @@ Client::~Client()
 
 void Client::Start(World* world, EventBroker* eventBroker)
 {
-    m_WasStarted = true;
     m_EventBroker = eventBroker;
     m_World = world;
 
@@ -46,58 +43,6 @@ void Client::readFromServer()
             Packet packet(readBuf, bytesRead);
             parseMessageType(packet);
         }
-    }
-    std::clock_t currentTime = std::clock();
-    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-        if (isConnected()) {
-            //sendSnapshotToServer();
-        }
-        previousSnapshotMessage = currentTime;
-    }
-}
-
-void Client::sendInputEvents()
-{
-    // Reset previous key state in snapshot.
-    m_NextSnapshot.InputForward = "";
-    m_NextSnapshot.InputRight = "";
-
-    auto player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
-
-    // See if any movement keys are down
-    // We dont care if it's overwritten by later
-    // if statement. Watcha gonna do, right!
-    if (player["Forward"]) {
-        m_NextSnapshot.InputForward = "+Forward";
-    }
-    if (player["Left"]) {
-        m_NextSnapshot.InputRight = "-Right";
-    }
-    if (player["Back"]) {
-        m_NextSnapshot.InputForward = "-Forward";
-    }
-    if (player["Right"]) {
-        m_NextSnapshot.InputRight = "+Right";
-    }
-
-    if (m_NextSnapshot.InputForward != "") {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString(m_NextSnapshot.InputForward);
-        send(packet);
-    } else {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString("0Forward");
-        send(packet);
-    }
-
-    if (m_NextSnapshot.InputRight != "") {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString(m_NextSnapshot.InputRight);
-        send(packet);
-    } else {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString("0Right");
-        send(packet);
     }
 }
 
@@ -130,9 +75,8 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::Disconnect:
         break;
-    case MessageType::Event:
-        parseEventMessage(packet);
-        break;
+    case MessageType::PlayerConnected:
+        parsePlayerConnected(packet);
     default:
         break;
     }
@@ -140,8 +84,17 @@ void Client::parseMessageType(Packet& packet)
 
 void Client::parseConnect(Packet& packet)
 {
+    // Set your own player id
     m_PlayerID = packet.ReadPrimitive<int>();
+    m_ServerEntityID = packet.ReadPrimitive<EntityID>();
+    // Map ServerEntityID and your PlayerID
     LOG_INFO("%i: I am player: %i", m_PacketID, m_PlayerID);
+}
+
+void Client::parsePlayerConnected(Packet & packet)
+{ 
+    // Map ServerEntityID and other player's PlayerID
+    LOG_INFO("A Player connected");
 }
 
 void Client::parsePing()
@@ -155,19 +108,6 @@ void Client::parseServerPing()
     Packet packet(MessageType::ServerPing, m_SendPacketID);
     packet.WriteString("Ping recieved");
     send(packet);
-}
-
-void Client::parseEventMessage(Packet& packet)
-{
-    int Id = -1;
-    std::string command = packet.ReadString();
-    if (command.find("+Player") != std::string::npos) {
-        Id = packet.ReadPrimitive<int>();
-        // Sett Player name
-        m_PlayerDefinitions[Id].Name = command.erase(0, 7);
-    } else {
-        LOG_INFO("%i: Event message: %s", m_PacketID, command.c_str());
-    }
 }
 
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
@@ -194,9 +134,9 @@ void Client::parseSnapshot(Packet& packet)
         EntityID receivedParentEntityID = packet.ReadPrimitive<EntityID>();
         ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
         // Check if the received EntityID is mapped to one of our local EntityIDs
-        if (hasMappedEntity(receivedEntityID)) {
+        if (clientServerMapsHasEntity(receivedEntityID)) {
             // Get the local EntityID
-            EntityID entityID = m_ServerToClientMap.at(receivedEntityID);
+            EntityID entityID = m_ServerIDToClientID.at(receivedEntityID);
             // Check if the component exists
             if (m_World->HasComponent(entityID, componentType)) {
                 // If the entity and the component exists update it
@@ -213,7 +153,7 @@ void Client::parseSnapshot(Packet& packet)
             // Create Entity
             // If entity dosen't exist
             EntityID newEntityID = m_World->CreateEntity();
-            m_ServerToClientMap.insert(std::make_pair(receivedEntityID, newEntityID));
+            insertIntoServerClientMaps(receivedEntityID, newEntityID);
             // Check if EntityIDs are out of sync
             if (newEntityID != receivedEntityID) {
                 LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the \
@@ -228,15 +168,15 @@ void Client::parseSnapshot(Packet& packet)
         // Parent Logic
         // Don't need to check if receivedEntityID is mapped. (It should have been set) 
         if (receivedParentEntityID != std::numeric_limits<EntityID>::max()) {
-            if (hasMappedEntity(receivedParentEntityID)) {
-                m_World->SetParent(m_ServerToClientMap.at(receivedEntityID), m_ServerToClientMap.at(receivedParentEntityID));
+            if (clientServerMapsHasEntity(receivedParentEntityID)) {
+                m_World->SetParent(m_ServerIDToClientID.at(receivedEntityID), m_ServerIDToClientID.at(receivedParentEntityID));
                 // If Parent dosen't exist create one and map receivedParentEntityID to it.
             } else {
                 // Create the new parent and add it to map
                 EntityID newParentEntityID = m_World->CreateEntity();
-                m_ServerToClientMap.insert(std::make_pair(receivedParentEntityID, newParentEntityID));
+                insertIntoServerClientMaps(receivedParentEntityID, newParentEntityID);
                 // Set the newly created Entity as parent.
-                m_World->SetParent(m_ServerToClientMap.at(receivedEntityID), newParentEntityID);
+                m_World->SetParent(m_ServerIDToClientID.at(receivedEntityID), newParentEntityID);
             }
         }
     }
@@ -252,7 +192,7 @@ int Client::receive(char* data, size_t length)
         0, error);
 
     if (error) {
-        LOG_ERROR("receive: %s", error.message().c_str());
+        //LOG_ERROR("receive: %s", error.message().c_str());
     }
     return bytesReceived;
 }
@@ -286,12 +226,6 @@ void Client::ping()
     packet.WriteString("Ping");
     m_StartPingTime = std::clock();
     send(packet);
-}
-
-void Client::moveMessageHead(char*& data, size_t& length, size_t stepSize)
-{
-    data += stepSize;
-    length -= stepSize;
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
@@ -351,7 +285,19 @@ EntityID Client::createPlayer()
     return entityID;
 }
 
-bool Client::hasMappedEntity(EntityID entityID)
+bool Client::clientServerMapsHasEntity(EntityID clientEntityID)
 {
-    return m_ServerToClientMap.find(entityID) != m_ServerToClientMap.end();
+    return m_ClientIDToServerID.find(clientEntityID) != m_ClientIDToServerID.end();
+}
+
+bool Client::serverClientMapsHasEntity(EntityID serverEntityID)
+{
+    return m_ServerIDToClientID.find(serverEntityID) != m_ServerIDToClientID.end();
+}
+
+void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)
+{ 
+    m_ServerIDToClientID.insert(std::make_pair(serverEntityID, clientEntityID));
+    m_ClientIDToServerID.insert(std::make_pair(clientEntityID, serverEntityID));
+
 }
