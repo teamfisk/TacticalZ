@@ -13,7 +13,7 @@ struct InputCommand : Event
 	/** The command that was sent. */
 	std::string Command;
 	/** The value of the command. */
-	float Value;
+	float Value = 0;
 };
 
 }

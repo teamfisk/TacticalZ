@@ -10,58 +10,61 @@
 #include "Util/UnorderedMapVec2.h"
 #include "FrameBuffer.h"
 #include "../Core/World.h"
-
+#include "PickingPass.h"
+#include "DrawScenePass.h"
 #include "../Core/EventBroker.h"
-#include "EPicking.h"
+#include "ImGuiRenderPass.h"
+#include "Camera.h"
 
 #include "TextRenderer.h"
 
 class Renderer : public IRenderer
 {
 public:
-    Renderer(EventBroker* eventBroker) 
+    Renderer(EventBroker* eventBroker, World* world) 
         : m_EventBroker(eventBroker)
+        , m_World(world)
     { }
 
-	virtual void Initialize() override;
-	virtual void Update(double dt) override;
-	virtual void Draw(RenderQueueCollection& rq) override;
+    virtual void Initialize() override;
+    virtual void Update(double dt) override;
+    virtual void Draw(RenderFrame& frame) override;
+
+    virtual PickData Pick(glm::vec2 screenCoord) override;
 
 private:
-	//----------------------Variables----------------------//
+    //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
+    World* m_World;
     TextRenderer* m_TextRenderer;
 
-	Texture* m_ErrorTexture;
-	Texture* m_WhiteTexture;
-	float m_CameraMoveSpeed;
-    FrameBuffer m_PickingBuffer;
-    GLuint m_PickingTexture;
-    GLuint m_DepthBuffer;
+    Texture* m_ErrorTexture;
+    Texture* m_WhiteTexture;
 
     Model* m_ScreenQuad;
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-    std::unordered_map<glm::vec2, EntityID> m_PickingColorsToEntity;
+    DrawScenePass* m_DrawScenePass;
+    PickingPass* m_PickingPass;
+    ImGuiRenderPass* m_ImGuiRenderPass;
 
-	//----------------------Functions----------------------//
-	void InitializeWindow();
-	void InitializeShaders();
+    //----------------------Functions----------------------//
+    void InitializeWindow();
+    void InitializeShaders();
     void InitializeTextures();
-    void InitializeFrameBuffers();
+    void InitializeSSBOs();
+    void InitializeRenderPasses();
     //TODO: Renderer: Get InputUpdate out of renderer
-	void InputUpdate(double dt);
-    void PickingPass(RenderQueueCollection& rq);
+    void InputUpdate(double dt);
+    //void PickingPass(RenderQueueCollection& rq);
     void DrawScreenQuad(GLuint textureToDraw);
-    void DrawScene(RenderQueueCollection& rq);
-
 
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
-	ShaderProgram m_BasicForwardProgram;
-    ShaderProgram m_PickingProgram;
-    ShaderProgram m_DrawScreenQuadProgram;
+	ShaderProgram* m_BasicForwardProgram;
+    ShaderProgram* m_DrawScreenQuadProgram;
+
 };
 
 #endif

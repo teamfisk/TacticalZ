@@ -20,7 +20,7 @@ public:
 	~ComponentPoolForwardIterator() = default;
 	ComponentPoolForwardIterator& operator=(const ComponentPoolForwardIterator& other) = default;
 	ComponentPoolForwardIterator& operator++();
-	ComponentPoolForwardIterator& operator++(int);
+	ComponentPoolForwardIterator operator++(int);
 	bool operator!=(const ComponentPoolForwardIterator& other) const;
 	bool operator==(const ComponentPoolForwardIterator& other) const;
 	ComponentWrapper operator*() const;
@@ -54,6 +54,8 @@ public:
     ComponentWrapper Allocate(EntityID entity);
     // Get the component belonging to a specific entity
     ComponentWrapper GetByEntity(EntityID ent);
+    // Returns true if the pool contains a component for the specified entity
+    bool KnowsEntity(EntityID ent);
     // Delete a component and free its memory
     void Delete(ComponentWrapper& wrapper);
 

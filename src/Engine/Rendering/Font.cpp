@@ -8,16 +8,19 @@ Font::Font(std::string path)
 
     if (FT_Init_FreeType(&library)) {
         LOG_ERROR("FreeType error: init failed");
+        return;
     }
 
     if (FT_New_Face(library, path.c_str(), 0, &face)) {
         LOG_ERROR("FreeType error: loading font");
+        return;
     }
 
     FT_Set_Pixel_Sizes(face, 0, 48);
 
     if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
         LOG_ERROR("FreeType error: loading char");
+        return;
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

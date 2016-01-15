@@ -8,12 +8,26 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
-#include "Rendering/RenderQueueFactory.h"
+#include "Input/InputProxy.h"
+#include "Input/KeyboardInputHandler.h"
+#include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
-#include "Core/EntityXMLFile.h"
+#include "Core/EntityFilePreprocessor.h"
 #include "Core/SystemPipeline.h"
 #include "RaptorCopterSystem.h"
+#include "PlayerSystem.h"
+#include "Editor/EditorSystem.h"
+#include "Core/EntityFile.h"
+#include "Rendering/RenderSystem.h"
+#include "Core/EntityFileParser.h"
 #include "Rendering/Font.h"
+
+// Network
+#include <boost/thread.hpp>
+#include "Network/Network.h"
+#include "Network/Server.h"
+#include "Network/Client.h"
+
 
 class Game
 {
@@ -30,16 +44,26 @@ private:
 	EventBroker* m_EventBroker;
 	IRenderer* m_Renderer;
 	InputManager* m_InputManager;
+    InputProxy* m_InputProxy;
 	GUI::Frame* m_FrameStack;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    RenderQueueFactory* m_RenderQueueFactory;
+    RenderFrame* m_RenderFrame;
+    // Network variables
+    boost::thread m_NetworkThread;
 
-    EventRelay<Game, Events::KeyUp> m_EKeyUp;
-    bool testOnKeyUp(const Events::KeyUp& e);
+    // Network methods
+    void networkFunction();
+    Network* m_ClientOrServer;
+    bool m_IsClientOrServer = false;
 
-    void testIntialize();
-    void testTick(double dt);
+    EventRelay<Game, Events::InputCommand> m_EInputCommand;
+    bool debugOnInputCommand(const Events::InputCommand& e);
+
+    void debugInitialize();
+    void debugTick(double dt);
+	EventRelay<Client, Events::KeyDown> m_EKeyDown;
+
 };
 
 #endif

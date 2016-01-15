@@ -17,7 +17,7 @@ public:
     TextRenderer();
     void Initialize();
     void Update();
-    void Draw(RenderQueue &rq, glm::mat4 projection, glm::mat4 view);
+    void Draw(RenderScene& scene);
 
 private:
     Font* font;
@@ -26,7 +26,7 @@ private:
 
     void RenderText(std::string text, Font* font, GLfloat scale, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 
-    ShaderProgram m_TextProgram;
+    ShaderProgram* m_TextProgram;
 
     std::string text = "";
 

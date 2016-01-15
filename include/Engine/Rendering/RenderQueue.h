@@ -8,164 +8,57 @@
 #include "../GLM.h"
 #include "../Core/Util/Rectangle.h"
 #include "../Core/Entity.h"
-#include "Font.h"
+#include "Camera.h"
+#include "RenderJob.h"
+#include "ModelJob.h"
+#include "TextJob.h"
 
-class Model;
-class Skeleton;
-class Texture;
-class RenderQueue;
-
-//TODO: Render: Remove obsolete RenderJobs and fix standard values on variables.
-
-struct RenderJob
+struct RenderScene
 {
-	friend class RenderQueue;
+    ::Camera* Camera;
+    std::list<std::shared_ptr<RenderJob>> ForwardJobs;
+    std::list<std::shared_ptr<RenderJob>> LightJobs;
+    std::list<std::shared_ptr<RenderJob>> TextJobs;
+    Rectangle Viewport;
 
-	float Depth;
-
-protected:
-	uint64_t Hash;
-
-	virtual void CalculateHash() = 0;
-
-	bool operator<(const RenderJob& rhs)
+	void Clear()
 	{
-		return this->Hash < rhs.Hash;
+        ForwardJobs.clear();
+        LightJobs.clear();
+        TextJobs.clear();
 	}
 };
 
-struct ModelJob : RenderJob
-{
-	unsigned int ShaderID = 0;
-	unsigned int TextureID = 0;
-
-    //TODO: RENDERER: Not sure if the best solution for pickingColor to entity link is this
-    EntityID Entity;
-
-	glm::mat4 ModelMatrix;
-	const Texture* DiffuseTexture;
-	const Texture* NormalTexture;
-	const Texture* SpecularTexture;
-	float Shininess = 0.f;
-	glm::vec4 Color;
-	const Model* Model = nullptr;
-	unsigned int StartIndex = 0;
-	unsigned int EndIndex = 0;
-
-	// Animation
-	Skeleton* Skeleton = nullptr;
-	bool NoRootMotion = true;
-	std::string AnimationName;
-	double AnimationTime = 0;
-
-	void CalculateHash() override
-	{
-		Hash = TextureID;
-	}
-};
-
-struct SpriteJob : RenderJob
-{
-	unsigned int ShaderID = 0;
-	unsigned int TextureID = 0;
-
-	glm::mat4 ModelMatrix;
-	const Texture* DiffuseTexture = nullptr;
-	const Texture* NormalTexture = nullptr;
-	const Texture* SpecularTexture = nullptr;
-	glm::vec4 Color;
-
-	void CalculateHash() override
-	{
-		Hash = TextureID;
-	}
-};
-
-struct TextJob : RenderJob
-{
-    glm::mat4 ModelMatrix;
-    glm::vec4 Color;
-    std::string Content;
-    Font* Resource;
-
-    void CalculateHash() override
-    {
-        Hash = 0;
-    }
-};
-
-struct PointLightJob : RenderJob
-{
-	glm::vec3 Position;
-	glm::vec3 SpecularColor = glm::vec3(1, 1, 1);
-	glm::vec3 DiffuseColor = glm::vec3(1, 1, 1);
-	float Radius = 1.f;
-    float Intensity = 0.8f;
-
-	void CalculateHash() override
-	{
-		Hash = 0;
-	}
-};
-
-class RenderQueue
+struct RenderFrame
 {
 public:
-	template <typename T>
-	void Add(T &job)
-	{
-		job.CalculateHash();
-		Jobs.push_back(std::shared_ptr<T>(new T(job)));
-		m_Size++;
-	}
 
-	void Sort()
-	{
-		Jobs.sort();
-	}
+    void Add(RenderScene &scene)
+    {
+        RenderScenes.push_back(std::shared_ptr<RenderScene>(new RenderScene(scene)));
+        m_Size++;
+    }
 
-	void Clear()
-	{
-		Jobs.clear();
-		m_Size = 0;
-	}
+    void Clear()
+    {
+        RenderScenes.clear();
+        m_Size = 0;
+    }
 
-	int Size() const { return m_Size; }
-	std::list<std::shared_ptr<RenderJob>>::const_iterator begin()
-	{
-		return Jobs.begin();
-	}
+    int Size() const { return m_Size; }
+    std::list<std::shared_ptr<RenderScene>>::const_iterator begin()
+    {
+        return RenderScenes.begin();
+    }
 
-	std::list<std::shared_ptr<RenderJob>>::const_iterator end()
-	{
-		return Jobs.end();
-	}
+    std::list<std::shared_ptr<RenderScene>>::const_iterator end()
+    {
+        return RenderScenes.end();
+    }
 
-	std::list<std::shared_ptr<RenderJob>> Jobs;
-
+    std::list<std::shared_ptr<RenderScene>> RenderScenes;
+    
 private:
-	int m_Size = 0;
+    int m_Size = 0;
 };
-
-struct RenderQueueCollection
-{
-	RenderQueue Forward;
-	RenderQueue Lights;
-    RenderQueue Text;
-
-	void Clear()
-	{
-		Forward.Clear();
-		Lights.Clear();
-        Text.Clear();
-	}
-
-	void Sort()
-	{
-		Forward.Sort();
-		Lights.Sort();
-        Text.Sort();
-	}
-};
-
 #endif

@@ -9,50 +9,81 @@
 class SystemPipeline
 {
 public:
-    SystemPipeline(const EventBroker* eventBroker)
+    SystemPipeline(EventBroker* eventBroker)
         : m_EventBroker(eventBroker)
     { }
     ~SystemPipeline()
     {
-        for (auto& pair : m_Systems) {
-            for (auto& system : pair.second) {
-                delete system;
+        for (UnorderedSystems& group : m_OrderedSystemGroups) {
+            for (auto& pair : group.Systems) {
+                delete pair.second;
             }
         }
     }
 
     template <typename T, typename... Arguments>
-    void AddSystem(Arguments... args)
+    //All systems with orderlevel 0 will be updated first, then 1, 2, etc.
+    void AddSystem(int updateOrderLevel, Arguments... args)
     {
+        if (updateOrderLevel + 1 > m_OrderedSystemGroups.size()) {
+            m_OrderedSystemGroups.resize(updateOrderLevel + 1);
+        }
+        UnorderedSystems& group = m_OrderedSystemGroups[updateOrderLevel];
         System* system = new T(m_EventBroker, args...);
-        if (!system->m_ComponentType.empty()) {
-            m_Systems[system->m_ComponentType].push_back(system);
-        } else {
-            LOG_ERROR("Failed to add system \"%s\": Missing component type!", typeid(T).name());
-            delete system;
+        group.Systems[typeid(T).name()] = system;
+
+        if (std::is_base_of<PureSystem, T>::value) {
+            PureSystem* pureSystem = static_cast<PureSystem*>(system);
+            if (!pureSystem->m_ComponentType.empty()) {
+                group.PureSystems[pureSystem->m_ComponentType].push_back(pureSystem);
+            } else {
+                LOG_ERROR("Failed to add pure system \"%s\": Missing component type!", typeid(T).name());
+            }
+        }
+
+        if (std::is_base_of<ImpureSystem, T>::value) {
+            ImpureSystem* impureSystem = static_cast<ImpureSystem*>(system);
+            group.ImpureSystems.push_back(impureSystem);
         }
     }
 
     void Update(World* world, double dt)
     {
-        for (auto& pair : m_Systems) {
-            const std::string& componentName = pair.first;
-            auto& systems = pair.second;
-            const ComponentPool* pool = world->GetComponents(componentName);
-            if (pool == nullptr) {
-                continue;
+        for (UnorderedSystems& group : m_OrderedSystemGroups) {
+            // Process events
+            for (auto& pair : group.Systems) {
+                m_EventBroker->Process(pair.first);
             }
-            for (auto& component : *pool) {
-                for (auto& system : systems) {
-                    system->Update(world, component, dt);
+
+            // Update
+            for (auto& pair : group.PureSystems) {
+                const std::string& componentName = pair.first;
+                auto& systems = pair.second;
+                const ComponentPool* pool = world->GetComponents(componentName);
+                if (pool == nullptr) {
+                    continue;
                 }
+                for (auto& component : *pool) {
+                    for (auto& system : systems) {
+                        system->UpdateComponent(world, component, dt);
+                    }
+                }
+            }
+            for (auto& system : group.ImpureSystems) {
+                system->Update(world, dt);
             }
         }
     }
 
 private:
-    const EventBroker* m_EventBroker;
-    std::unordered_map<std::string, std::vector<System*>> m_Systems;
+    EventBroker* m_EventBroker;
+    struct UnorderedSystems
+    {
+        std::map<std::string, System*> Systems;
+        std::map<std::string, std::vector<PureSystem*>> PureSystems;
+        std::vector<ImpureSystem*> ImpureSystems;
+    };
+    std::vector<UnorderedSystems> m_OrderedSystemGroups;
 };
 
 #endif

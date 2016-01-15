@@ -17,10 +17,11 @@ void TextRenderer::Initialize()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    m_TextProgram.AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Text.vert.glsl")));
-    m_TextProgram.AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Text.frag.glsl")));
-    m_TextProgram.Compile();
-    m_TextProgram.Link();
+    m_TextProgram = ResourceManager::Load<ShaderProgram>("#TextProgram");
+    m_TextProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Text.vert.glsl")));
+    m_TextProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Text.frag.glsl")));
+    m_TextProgram->Compile();
+    m_TextProgram->Link();
 }
 
 void TextRenderer::Update()
@@ -28,12 +29,12 @@ void TextRenderer::Update()
 
 }
 
-void TextRenderer::Draw(RenderQueue &rq, glm::mat4 projection, glm::mat4 view)
+void TextRenderer::Draw(RenderScene& scene)
 {
-    for (auto &job : rq) {
+    for (auto &job : scene.TextJobs) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
-            RenderText(textJob->Content, textJob->Resource, 0.01f, textJob->Color, textJob->ModelMatrix, projection, view);
+            RenderText(textJob->Content, textJob->Resource, 0.01f, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
         }
     }
 }
@@ -50,11 +51,11 @@ void TextRenderer::RenderText(std::string text, Font* font, GLfloat scale, glm::
     glDisable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    m_TextProgram.Bind();
-    glUniform3f(glGetUniformLocation(m_TextProgram.GetHandle(), "textColor"), color.x, color.y, color.z);
-    glUniformMatrix4fv(glGetUniformLocation(m_TextProgram.GetHandle(), "M"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(m_TextProgram.GetHandle(), "V"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(glGetUniformLocation(m_TextProgram.GetHandle(), "P"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    m_TextProgram->Bind();
+    glUniform3f(glGetUniformLocation(m_TextProgram->GetHandle(), "textColor"), color.x, color.y, color.z);
+    glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "M"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "V"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "P"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 

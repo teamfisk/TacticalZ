@@ -8,7 +8,7 @@ RawModel::RawModel(std::string fileName)
 	if (scene == nullptr) {
 		LOG_ERROR("Failed to load model \"%s\"", fileName.c_str());
 		LOG_ERROR("Assimp error: %s", importer.GetErrorString());
-		return;
+        throw std::runtime_error("Failed to open model file.");
 	}
 
 	auto m = scene->mRootNode->mTransformation;
@@ -76,13 +76,18 @@ RawModel::RawModel(std::string fileName)
 			}
 
 			// Material diffuse color
-			aiColor4D diffuse;
+			aiColor3D diffuse;
 			material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+            float opacity;
+            material->Get(AI_MATKEY_OPACITY, opacity);
+			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
+
+			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
+            
 			// Material specular color
-			aiColor4D specular;
+			aiColor3D specular;
 			material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-			desc.SpecularVertexColor = glm::vec4(specular.r, specular.g, specular.b, specular.a);
+			desc.SpecularVertexColor = glm::vec4(specular.r, specular.g, specular.b, 1.f);
 
 			m_Vertices.push_back(desc);
 		}
@@ -132,6 +137,7 @@ RawModel::RawModel(std::string fileName)
 		matGroup.EndIndex = m_Indices.size() - 1;
 		// Material shininess
 		material->Get(AI_MATKEY_SHININESS, matGroup.Shininess);
+        material->Get(AI_MATKEY_OPACITY, matGroup.Transparency);
 		//LOG_DEBUG("Shininess: %f", matGroup.Shininess);
 		// Diffuse texture
 		//LOG_DEBUG("%i diffuse textures found", material->GetTextureCount(aiTextureType_DIFFUSE));
