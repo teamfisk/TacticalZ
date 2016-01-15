@@ -65,6 +65,7 @@ private:
 	ResourceManager();
 
 public:
+    static bool UseThreading;
 	/*static ResourceManager& Instance()
 	{
 	static ResourceManager s;
@@ -94,7 +95,7 @@ public:
 		@param resourceName Fully qualified name of the resource to load.
 	*/
     template <typename T, bool async = false>
-    static T* Load(std::string resourceName, Resource* parent = nullptr);
+    static T* Load(const std::string& resourceName, Resource* parent = nullptr);
 
 	/** Reloads an already loaded resource, keeping its resource ID intact.
 
@@ -141,9 +142,9 @@ private:
 	static unsigned int GetNewResourceID(unsigned int typeID);
 
 	// Internal: Create a resource and cache it
-    static Resource* createResourceThrowing(std::string resourceType, std::string resourceName, Resource* parent);
-	static Resource* createResource(std::string resourceType, std::string resourceName, Resource* parent, std::exception_ptr& exception);
-    static Resource* cacheResource(Resource* resource, std::string resourceType, std::string resourceName, Resource* parent);
+    static Resource* createResourceThrowing(const std::string& resourceType, const std::string& resourceName, Resource* parent);
+	static Resource* createResource(const std::string& resourceType, const std::string& resourceName, Resource* parent, std::exception_ptr& exception);
+    static Resource* cacheResource(Resource* resource, const std::string& resourceType, const std::string& resourceName, Resource* parent);
 
     static bool IsMainThread();
 };
@@ -156,7 +157,7 @@ void ResourceManager::RegisterType(std::string typeName)
 }
 
 template <typename T, bool async>
-static T* ResourceManager::Load(std::string resourceName, Resource* parent /* = nullptr */)
+static T* ResourceManager::Load(const std::string& resourceName, Resource* parent /* = nullptr */)
 {
     auto resourceTypename = typeid(T).name();
     auto iter = m_CompilerTypenameToResourceType.find(resourceTypename);
@@ -176,7 +177,7 @@ static T* ResourceManager::Load(std::string resourceName, Resource* parent /* = 
     decltype(m_ResourceCache)::iterator it;
     //If a thread has already been launched to load this resource.
     auto tIt = m_LoadingThreads.find(cacheKey);
-    if (tIt != m_LoadingThreads.end()) {
+    if (UseThreading && tIt != m_LoadingThreads.end()) {
         if (async) {
             //Throw StillLoadingException if the thread is still working.
             if (!tIt->second.try_join_for(boost::chrono::nanoseconds(1))) {
@@ -209,9 +210,8 @@ static T* ResourceManager::Load(std::string resourceName, Resource* parent /* = 
         }
     }
 
-    Resource* res = nullptr;
     //If resource is not cached..
-    if (async) {
+    if (UseThreading && async) {
         if (mustNotLoadInThread) {
             try {
                 return static_cast<T*>(createResourceThrowing(resourceType, resourceName, parent));

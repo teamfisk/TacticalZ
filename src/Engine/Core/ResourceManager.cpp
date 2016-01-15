@@ -9,6 +9,7 @@ std::unordered_map<std::pair<std::string, std::string>, Resource*> ResourceManag
 std::unordered_map<std::string, Resource*> ResourceManager::m_ResourceFromName;
 std::unordered_map<Resource*, Resource*> ResourceManager::m_ResourceParents;
 unsigned int ResourceManager::m_CurrentResourceTypeID = 0;
+bool ResourceManager::UseThreading = false;
 std::unordered_map<std::string, unsigned int> ResourceManager::m_ResourceTypeIDs;
 std::unordered_map<unsigned int, unsigned int> ResourceManager::m_ResourceCount;
 FileWatcher ResourceManager::m_FileWatcher;
@@ -79,7 +80,7 @@ void ResourceManager::Update()
 	m_FileWatcher.Check();
 }
 
-Resource* ResourceManager::createResource(std::string resourceType, std::string resourceName, Resource* parent, std::exception_ptr& exception)
+Resource* ResourceManager::createResource(const std::string& resourceType, const std::string& resourceName, Resource* parent, std::exception_ptr& exception)
 {
 	auto facIt = m_FactoryFunctions.find(resourceType);
 	if (facIt == m_FactoryFunctions.end()) {
@@ -102,7 +103,7 @@ Resource* ResourceManager::createResource(std::string resourceType, std::string 
 }
 
 
-Resource* ResourceManager::createResourceThrowing(std::string resourceType, std::string resourceName, Resource* parent)
+Resource* ResourceManager::createResourceThrowing(const std::string& resourceType, const std::string& resourceName, Resource* parent)
 {
     std::exception_ptr exception;
     Resource* res = createResource(resourceType, resourceName, parent, exception);
@@ -112,7 +113,7 @@ Resource* ResourceManager::createResourceThrowing(std::string resourceType, std:
     return res;
 }
 
-Resource* ResourceManager::cacheResource(Resource* resource, std::string resourceType, std::string resourceName, Resource* parent)
+Resource* ResourceManager::cacheResource(Resource* resource, const std::string& resourceType, const std::string& resourceName, Resource* parent)
 {
     //Lock the mutex immediately, and unlock it when leaving the code block.
     boost::lock_guard<decltype(m_Mutex)> guard(m_Mutex);
