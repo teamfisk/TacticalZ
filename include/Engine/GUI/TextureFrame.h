@@ -16,7 +16,7 @@ public:
 	void EnableScissor() { m_ScissorEnabled = true; }
 	void DisableScissor() { m_ScissorEnabled = false; }
 
-	void Draw(RenderQueueCollection& rq) override
+	void Draw(RenderScene& rq) override
 	{
 		if (m_Texture == nullptr)
 			return;

@@ -3,27 +3,27 @@
 void Renderer::Initialize()
 {
 	InitializeWindow();
-	// Create default camera
-	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
-	m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
-	if (m_Camera == nullptr) {
-		m_Camera = m_DefaultCamera;
-	}
-    m_DebugCameraInputController = std::make_shared<DebugCameraInputController<Renderer>>(m_EventBroker, -1);
-    TEMPCreateLights();
+    
     InitializeRenderPasses();
 
 	glfwSwapInterval(m_VSYNC);
 	InitializeShaders();
     InitializeTextures();
-    InitializeSSBOs();
-    //CalculateFrustum();
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
+
+
+    // Create default camera
+    m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
+    if (m_Camera == nullptr) {
+        m_Camera = m_DefaultCamera;
+    }
+
 }
 
 void Renderer::InitializeWindow()
@@ -75,52 +75,11 @@ void Renderer::InitializeShaders()
     m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
     m_DrawScreenQuadProgram->Compile();
     m_DrawScreenQuadProgram->Link();
-
-    //m_CalculateFrustumProgram = ResourceManager::Load<ShaderProgram>("#CalculateFrustumProgram");
-    //m_CalculateFrustumProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/GridFrustum.comp.glsl")));
-    //m_CalculateFrustumProgram.Compile();
-    //m_CalculateFrustumProgram.Link();
-
-    //m_LightCullProgram = ResourceManager::Load<ShaderProgram>("#LightCullProgram");
-    //m_LightCullProgram.AddShader(std::shared_ptr<Shader>(new ComputeShader("Shaders/cullLights.comp.glsl")));
-    //m_LightCullProgram.Compile();
-    //m_LightCullProgram.Link();
 }
 
 void Renderer::InputUpdate(double dt)
 {
-	glm::vec3 m_Position = m_Camera->Position();
-	if (glfwGetKey(m_Window, GLFW_KEY_O) == GLFW_PRESS)
-	{
-		m_Position = glm::vec3(0.f, 0.f, 5.f);
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		m_Position += m_Camera->Forward() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		m_Position -= m_Camera->Forward() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		m_Position += m_Camera->Right() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		m_Position -= m_Camera->Right() * m_CameraMoveSpeed * (float)dt;
-	}
-	if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-	{
-		m_CameraMoveSpeed = 5.f;
-	}
-	else {
-		m_CameraMoveSpeed = 0.5f;
-	}
-
-    m_DebugCameraInputController->Update(dt);
-    m_Camera->SetOrientation(m_DebugCameraInputController->Orientation());
-	m_Camera->SetPosition(m_DebugCameraInputController->Position());
+   
 }
 
 void Renderer::Update(double dt)
@@ -130,18 +89,29 @@ void Renderer::Update(double dt)
     m_ImGuiRenderPass->Update(dt);
 }
 
-void Renderer::Draw(RenderQueueCollection& rq)
+void Renderer::Draw(RenderFrame& frame)
 {
-    m_PickingPass->Draw(rq);
-    //DrawScreenQuad(m_PickingPass->PickingTexture());
-    //CullLights();
-    
-    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
+    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    m_DrawScenePass->Draw(rq);
-    GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    m_PickingPass->ClearPicking();
+    for (auto scene : frame.RenderScenes){
+        m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
+        m_PickingPass->Draw(*scene);
+
+       
+
+        m_DrawScenePass->Draw(*scene);
+        GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    }
+
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
+}
+
+PickData Renderer::Pick(glm::vec2 screenCoord)
+{
+    return m_PickingPass->Pick(screenCoord);
 }
 
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
@@ -183,95 +153,8 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     GLERROR("Texture initialization failed");
 }
 
-void Renderer::InitializeSSBOs()
-{
-    printf("Size: %i\n", sizeof(m_Frustums));
-    glGenBuffers(1, &m_FrustumSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_FrustumSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Frustums), &m_Frustums, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    GLERROR("m_FrustumSSBO");
-
-    glGenBuffers(1, &m_LightSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_PointLights), &m_PointLights, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    GLERROR("m_LightSSBO");
-
-
-    glGenBuffers(1, &m_LightGridSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    GLERROR("m_LightGridSSBO");
-
-
-    glGenBuffers(1, &m_LightOffsetSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    GLERROR("m_LightOffsetSSBO");
-
-
-    glGenBuffers(1, &m_LightIndexSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
-    GLERROR("m_LightIndexSSBO");
-
-}
-
 void Renderer::InitializeRenderPasses()
 {
     m_DrawScenePass = new DrawScenePass(this);
     m_PickingPass = new PickingPass(this, m_EventBroker);
 }
-
-void Renderer::CalculateFrustum()
-{
-    GLERROR("CalculateFrustum Error-1");
-    m_CalculateFrustumProgram->Bind();
-    
-    GLERROR("CalculateFrustum Error1");
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    GLERROR("CalculateFrustum Error2");
-    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Camera->ProjectionMatrix()));
-    GLERROR("CalculateFrustum Error3");
-    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Resolution.Width, m_Resolution.Height);
-    GLERROR("CalculateFrustum Error4");
-    glDispatchCompute(5, 3, 1);
-    GLERROR("CalculateFrustum Error5");
-
-}
-
-void Renderer::TEMPCreateLights()
-{
-    for (int i = 0; i < NUM_LIGHTS; i++) {
-        m_PointLights[i].Position = glm::vec4(i, 0.f, 0.f, 0.f);
-        m_PointLights[i].Color = glm::vec4(1.f, 0.5f, 0.f + i*0.1f, 1.f);
-    }
-}
-
-void Renderer::CullLights()
-{
-    m_LightCullProgram->Bind();
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
-    glDispatchCompute(m_Resolution.Width / TILE_SIZE, m_Resolution.Height / TILE_SIZE, 1);
-    GLERROR("CullLights Error");
-
-}
-

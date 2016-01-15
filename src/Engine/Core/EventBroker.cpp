@@ -3,7 +3,7 @@
 BaseEventRelay::~BaseEventRelay()
 {
     if (m_Broker != nullptr) {
-        m_Broker->Unsubscribe(*this);
+		m_Broker->Unsubscribe(*this);
     }
 }
 

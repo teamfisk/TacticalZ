@@ -21,7 +21,7 @@ struct ComponentWrapper
     template <typename T>
     T& Property(std::string name)
     {
-        unsigned int offset = Info.FieldOffsets.at(name);
+        unsigned int offset = Info.Fields.at(name).Offset;
         return *reinterpret_cast<T*>(&Data[offset]);
     }
 
@@ -78,8 +78,9 @@ public:
     void AddProperty(std::string fieldName, T defaultValue)
     {
         m_DefaultValues.push_back(defaultValue);
-        m_ComponentInfo.FieldTypes[fieldName] = typeid(T).name();
-        m_ComponentInfo.FieldOffsets[fieldName] = m_ComponentInfo.Meta.Stride;
+        m_ComponentInfo.Fields[fieldName].Name = typeid(T).name();
+        m_ComponentInfo.Fields[fieldName].Offset = m_ComponentInfo.Meta.Stride;
+        m_ComponentInfo.Fields[fieldName].Stride = sizeof(T);
         m_ComponentInfo.Meta.Stride += sizeof(T);
     }
     
