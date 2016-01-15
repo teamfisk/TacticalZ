@@ -112,7 +112,7 @@ void SoundSystem::updateEmitters(double dt)
         // Get next pos
         glm::vec3 nextPos = Transform::AbsolutePosition(m_World, it->first);
         // Calculate velocity
-        glm::vec3 velocity = nextPos - previousPos;
+        glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt;
         setSourcePos(it->second->ALsource, nextPos);
         setSourceVel(it->second->ALsource, velocity);
         float gain;
