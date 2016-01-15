@@ -42,7 +42,12 @@ void EntityFileParser::onStartComponentField(EntityID entity, const std::string&
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
-    auto& field = component.Info.Fields.at(fieldName);
+    auto fieldIt = component.Info.Fields.find(fieldName);
+    if (fieldIt == component.Info.Fields.end()) {
+        LOG_ERROR("Tried to set unknown field \"%s\" of component type \"%s\"! Ignoring.", fieldName.c_str(), componentType.c_str());
+        return;
+    }
+    auto& field = fieldIt->second;
 
     LOG_DEBUG("Field \"%s\" type \"%s\"", fieldName.c_str(), field.Type.c_str());
     LOG_DEBUG("Attributes:");
@@ -58,7 +63,11 @@ void EntityFileParser::onFieldData(EntityID entity, const std::string& component
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
-    auto& field = component.Info.Fields.at(fieldName);
+    auto fieldIt = component.Info.Fields.find(fieldName);
+    if (fieldIt == component.Info.Fields.end()) {
+        return;
+    }
+    auto& field = fieldIt->second;
 
     char* data = component.Data + field.Offset;
     EntityFile::WriteValueData(data, field, fieldData);
