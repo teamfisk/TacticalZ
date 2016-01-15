@@ -24,18 +24,22 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
             //some player has touched this - lets figure out: what team, health
             EntityID playerID = std::get<0>(triggerTouched);
             bool hasHealthComponent = world->HasComponent(playerID, "Health");
-            if (!hasHealthComponent)
+            if (!hasHealthComponent) {
                 continue;
+            }
             double currentHealth = world->GetComponent(playerID, "Health")["Health"];
             //check if player is dead
-            if ((int)currentHealth == 0)
+            if ((int)currentHealth == 0) {
                 continue;
+            }
             //check team - 0 = no team
             int teamNumber = world->GetComponent(playerID, "Player")["TeamNumber"];
-            if (teamNumber == 1)
+            if (teamNumber == 1) {
                 firstTeamPlayersStandingInside++;
-            else if (teamNumber == 2)
+            }
+            else if (teamNumber == 2) {
                 secondTeamPlayersStandingInside++;
+            }
             continue;
         }
     }
@@ -81,13 +85,14 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
     //B. at most one of the teams have players inside (this means datavariable currentTeam is not 0)
     else if (currentTeam != 0) {
         //if capturePoint is not owned by the take-over team, just modify the CaptureTimer accordingly
-        if (ownedBy != currentTeam)
+        if (ownedBy != currentTeam) {
             capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + timerDeltaChange;
+        }
         //if capturePoint is owned by the team, and the other team has been trying to take it, then increase/decrease the timer towards 0.0
-        if (ownedBy == currentTeam && currentTeam == 1 && (double)capturePoint["CaptureTimer"] < 0.0)
+        if ((ownedBy == currentTeam && currentTeam == 1 && (double)capturePoint["CaptureTimer"] < 0.0) ||
+            (ownedBy == currentTeam && currentTeam == 2 && (double)capturePoint["CaptureTimer"] > 0.0)) {
             capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + timerDeltaChange;
-        if (ownedBy == currentTeam && currentTeam == 2 && (double)capturePoint["CaptureTimer"] > 0.0)
-            capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + timerDeltaChange;
+        }
         //check if captureTimer > m_CaptureTimeToTakeOver and if so change owner and publish the eCaptured event
         if (abs((double)capturePoint["CaptureTimer"]) > abs(m_CaptureTimeToTakeOver)) {
             capturePoint["OwnedBy"] = currentTeam;
@@ -98,24 +103,38 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
             e.TeamNumberThatCapturedCapturePoint = currentTeam;
             m_EventBroker->Publish(e);
             //modify nextPossibleCapturePoint, depending on, example: if team 1 has "0" as homebase or team 1 has "7" as homebase
-            if (m_Team1HomeCapturePoint < m_Team2HomeCapturePoint) {
-                if (currentTeam == 1) 
+
+            //0 = false 1 = true
+            bool team1HasTheZeroCapturePoint = m_Team1HomeCapturePoint < m_Team2HomeCapturePoint;
+
+            if (team1HasTheZeroCapturePoint) {
+                if (currentTeam == 1) {
                     m_Team1NextPossibleCapturePoint++;
-                if (currentTeam == 2)
+                }
+                else {
                     m_Team2NextPossibleCapturePoint--;
-                //if this was a contested capturePoint (i.e. both teams try to take point 3), then modify other teams next point as well
-                if (m_Team1NextPossibleCapturePoint > m_Team2NextPossibleCapturePoint)
-                    m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint;
+                }
+                //adjust flag for other team if their previous point has just been taken
+                if (m_Team2NextPossibleCapturePoint == m_Team1NextPossibleCapturePoint - 2) {
+                    m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint + 1;
+                }
+                if (m_Team1NextPossibleCapturePoint == m_Team2NextPossibleCapturePoint + 2) {
+                    m_Team1NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint - 1;
+                }
             }
-            else
-            {
-                if (currentTeam == 1)
+            else {
+                if (currentTeam == 1) {
                     m_Team1NextPossibleCapturePoint--;
-                if (currentTeam == 2)
+                }
+                else {
                     m_Team2NextPossibleCapturePoint++;
-                //if this was a contested capturePoint (i.e. both teams try to take point 3), then modify other teams next point as well
-                if (m_Team1NextPossibleCapturePoint < m_Team2NextPossibleCapturePoint)
-                    m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint;
+                }
+                if (m_Team2NextPossibleCapturePoint == m_Team1NextPossibleCapturePoint + 2) {
+                    m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint - 1;
+                }
+                if (m_Team1NextPossibleCapturePoint == m_Team2NextPossibleCapturePoint - 2) {
+                    m_Team1NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint + 1;
+                }
             }
         }
     }
@@ -139,8 +158,7 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
 
 bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e)
 {
-    //auto personEntered = e.Entity;
-    //auto thingEntered = e.Trigger;
+    //personEntered = e.Entity, thingEntered = e.Trigger
     m_ETriggerTouchVector.push_back(std::make_tuple(e.Entity, e.Trigger));
     return true;
 }
