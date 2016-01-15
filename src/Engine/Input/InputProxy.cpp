@@ -20,15 +20,16 @@ void InputProxy::LoadBindings(std::string file)
     for (auto& origin : config->GetAll<std::string>("Bindings")) {
         Events::BindOrigin e;
         e.Origin = origin.first;
-        e.Command = origin.second;
-        e.Value = 1.f;
-        if (!e.Command.empty()) {
-            char prefix = e.Command.at(0);
-            if (prefix == '+' || prefix == '-') {
-                e.Command = e.Command.substr(1);
-                if (prefix == '-') {
-                    e.Value *= -1.f;
-                }
+        const std::string& command = origin.second;
+        if (!command.empty()) {
+            boost::char_separator<char> separator(", ");
+            boost::tokenizer<decltype(separator)> tokenizer(command, separator);
+            auto token = tokenizer.begin();
+            e.Command = *token;
+            if (++token != tokenizer.end()) {
+                e.Value = boost::lexical_cast<float>(*token);
+            } else {
+                e.Value = 1.f;
             }
             OnBindOrigin(e);
         }
@@ -62,7 +63,7 @@ void InputProxy::Process()
             e.Command = command;
             e.Value = currentValue;
             m_EventBroker->Publish(e);
-            //LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+            LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
             m_LastCommandValues[command] = currentValue;
         }
     }
@@ -78,7 +79,7 @@ void InputProxy::Process()
         }
         //e.Value = std::max(-1.f, std::min(e.Value, 1.f));
         m_EventBroker->Publish(e);
-        //LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+        LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
     }
     m_CommandQueue.clear();
 }
