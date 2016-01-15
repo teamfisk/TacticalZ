@@ -1,0 +1,6 @@
+<c:Camera>
+	<Name>cam</Name>
+	<FOV>60.0</FOV>
+	<NearClip>0.01</NearClip>
+	<FarClip>5000</FarClip>
+</c:Camera>

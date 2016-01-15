@@ -19,10 +19,9 @@ Game::Game(int argc, char* argv[])
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-    m_RenderQueueFactory = new RenderQueueFactory();
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_World);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -32,7 +31,7 @@ Game::Game(int argc, char* argv[])
         m_Config->Get<int>("Video.Height", 720)
         ));
     m_Renderer->Initialize();
-    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
@@ -57,8 +56,11 @@ Game::Game(int argc, char* argv[])
         fp.MergeEntities(m_World);
     }
 
+    m_RenderFrame = new RenderFrame();
+
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    
 
     //All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
@@ -71,6 +73,9 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
+
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
@@ -92,8 +97,8 @@ Game::~Game()
     delete m_FrameStack;
     delete m_InputProxy;
     delete m_InputManager;
+    delete m_RenderFrame;
     delete m_Renderer;
-    delete m_RenderQueueFactory;
     delete m_EventBroker;
 }
 
@@ -125,9 +130,8 @@ void Game::Tick()
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
     m_SoundSystem->Update();
-    m_RenderQueueFactory->Update(m_World);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
-    m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
+    m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();

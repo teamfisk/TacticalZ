@@ -10,7 +10,7 @@
 
 #include "Core/World.h"
 #include "Core/EventBroker.h"
-#include "Rendering/RenderQueueFactory.h" // Absolute transform
+#include "Core/Transform.h" // Absolute transform
 #include "Sound/Sound.h"
 #include "Sound/EPlaySoundOnEntity.h"
 #include "Sound/EPlaySoundOnPosition.h"

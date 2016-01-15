@@ -108,7 +108,7 @@ void SoundSystem::updateEmitters()
         glm::vec3 previousPos;
         alGetSource3f(it->second->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
         // Get next pos
-        glm::vec3 nextPos = RenderQueueFactory::AbsolutePosition(m_World, it->first);
+        glm::vec3 nextPos = Transform::AbsolutePosition(m_World, it->first);
         // Calculate velocity
         glm::vec3 velocity = nextPos - previousPos;
         setSourcePos(it->second->ALsource, nextPos);
@@ -142,11 +142,11 @@ void SoundSystem::updateListener()
         EntityID listener = (*it).EntityID;
         glm::vec3 previousPos;
         alGetListener3f(AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
-        glm::vec3 nextPos = RenderQueueFactory::AbsolutePosition(m_World, listener); // Get next (current) pos
+        glm::vec3 nextPos = Transform::AbsolutePosition(m_World, listener); // Get next (current) pos
         glm::vec3 velocity = nextPos - previousPos; // Calculate velocity
         setListenerPos(nextPos);
         setListenerVel(velocity);
-        setListenerOri(glm::eulerAngles(RenderQueueFactory::AbsoluteOrientation(m_World, listener)));
+        setListenerOri(glm::eulerAngles(Transform::AbsoluteOrientation(m_World, listener)));
     }
 }
 
