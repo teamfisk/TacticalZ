@@ -39,10 +39,16 @@ void RenderSystem::switchCamera(EntityID entity)
             if (m_World->HasComponent(m_CurrentCamera, "Model")) {
                 m_World->GetComponent(m_CurrentCamera, "Model")["Visible"] = true;
             }
+            if (m_World->HasComponent(m_CurrentCamera, "Listener")) {
+                m_World->DeleteComponent(m_CurrentCamera, "Listener");
+            }
         }
 
         if (m_World->HasComponent(entity, "Model")) {
             m_World->GetComponent(entity, "Model")["Visible"] = false;
+        }
+        if (!m_World->HasComponent(entity, "Listener")) {
+            m_World->AttachComponent(entity, "Listener");
         }
         m_CurrentCamera = entity;
         m_SwitchCamera = false;
@@ -162,6 +168,9 @@ void RenderSystem::updateCamera(World* world, double dt)
 {
     if (m_SwitchCamera) {
         auto cameras = world->GetComponents("Camera");
+        if (cameras == nullptr) {
+            return;
+        }
         for (auto it = cameras->begin(); it != cameras->end(); it++) {
             if ((*it).EntityID == m_CurrentCamera) {
                 it++;
@@ -173,11 +182,13 @@ void RenderSystem::updateCamera(World* world, double dt)
                 break;
             }
         }
-        ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
-        ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
+        if (m_World->HasComponent(m_CurrentCamera, "Camera")) {
+            ComponentWrapper& cameraComponent = world->GetComponent(m_CurrentCamera, "Camera");
+            ComponentWrapper& cameraTransform = world->GetComponent(m_CurrentCamera, "Transform");
 
-        m_DebugCameraInputController->SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
-        m_DebugCameraInputController->SetPosition(cameraTransform["Position"]);
+            m_DebugCameraInputController->SetOrientation(glm::quat((glm::vec3)cameraTransform["Orientation"]));
+            m_DebugCameraInputController->SetPosition(cameraTransform["Position"]);
+        }
     }
 
     if (m_World->ValidEntity(m_CurrentCamera)) {

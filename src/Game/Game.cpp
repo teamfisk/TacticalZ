@@ -7,6 +7,7 @@
 Game::Game(int argc, char* argv[])
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+    ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
@@ -83,12 +84,17 @@ Game::Game(int argc, char* argv[])
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();
     }
+
+    // Invoke sound system
+    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
+
     m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
     delete m_SystemPipeline;
+    delete m_SoundSystem;
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;
@@ -122,9 +128,10 @@ void Game::Tick()
     }
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
+    debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-
+    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");
