@@ -44,7 +44,7 @@ struct ModelJob : RenderJob
     const ::Model* Model = nullptr;
     unsigned int StartIndex = 0;
     unsigned int EndIndex = 0;
-    const World* World;
+    World* World;
 
     void CalculateHash() override
     {

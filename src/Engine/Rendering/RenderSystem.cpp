@@ -106,6 +106,29 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
     }
 }
 
+
+void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+{
+    auto pointLights = world->GetComponents("PointLight");
+    if (pointLights == nullptr) {
+        return;
+    }
+
+    for (auto& pointlightC : *pointLights) {
+        bool visible = pointlightC["Visible"];
+        if (!visible) {
+            continue;
+        }
+        auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
+        if (&transformC == nullptr) {
+            return;
+        }
+
+        std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
+        jobs.push_back(pointLightJob);
+    }
+}
+
 bool RenderSystem::OnInputCommand(const Events::InputCommand& e)
 {
     if (e.Command == "SwitchCamera" && e.Value > 0) {
@@ -126,11 +149,12 @@ void RenderSystem::Update(World* world, double dt)
     //Only supports opaque geometry atm
     m_RenderFrame->Clear();
 
-    RenderScene rs;
-    rs.Camera = m_Camera;
-    rs.Viewport = Rectangle(1280, 720);
-    fillModels(rs.ForwardJobs, world);
-    m_RenderFrame->Add(rs);
+    RenderScene scene;
+    scene.Camera = m_Camera;
+    scene.Viewport = Rectangle(1280, 720);
+    fillModels(scene.ForwardJobs, world);
+    fillLight(scene.PointLightJobs, world);
+    m_RenderFrame->Add(scene);
    
 }
 
