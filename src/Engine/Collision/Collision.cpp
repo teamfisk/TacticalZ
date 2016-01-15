@@ -265,11 +265,11 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
         return false;
     }
 
-    glm::mat4 modelMatrix = modelRes->m_Matrix;
+    glm::mat4 modelMatrix = modelRes->Matrix();
 
     glm::vec3 mini = glm::vec3(INFINITY, INFINITY, INFINITY);
     glm::vec3 maxi = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
-    for (const auto& v : modelRes->m_Vertices) {
+    for (const auto& v : modelRes->Vertices()) {
         const auto& wPos = modelMatrix * glm::vec4(v.Position.x, v.Position.y, v.Position.z, 1);
         maxi.x = std::max(wPos.x, maxi.x);
         maxi.y = std::max(wPos.y, maxi.y);

@@ -14,7 +14,6 @@ void DrawScenePass::InitializeTextures()
 
 void DrawScenePass::InitializeShaderPrograms()
 {
-    //Gör så att shaders är en resource, tex som texture classen. Konstruktorn måste vara privat.
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#BasicForwardProgram");
 
     m_BasicForwardProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/BasicForward.vert.glsl")));
@@ -26,16 +25,16 @@ void DrawScenePass::InitializeShaderPrograms()
 void DrawScenePass::Draw(RenderScene& scene)
 {
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    GLERROR("Renderer::Draw PickingPass");
+    GLERROR("DrawScenePass::Draw: Pre");
 
     DrawScenePassState state = DrawScenePassState();
+    m_BasicForwardProgram->Bind();
 
     for (auto &job : scene.ForwardJobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
         if (modelJob) {
             GLuint ShaderHandle = m_BasicForwardProgram->GetHandle();
 
-            m_BasicForwardProgram->Bind();
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
@@ -57,7 +56,7 @@ void DrawScenePass::Draw(RenderScene& scene)
 
             //continue;
         }
-    }
     
-    GLERROR("DrawScene Error");
+    }
+    GLERROR("DrawScenePass::Draw: End");
 }

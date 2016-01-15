@@ -13,12 +13,15 @@
 Game::Game(int argc, char* argv[])
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+    ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
+    ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+    ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
 
     // Create the core event broker
@@ -61,6 +64,8 @@ Game::Game(int argc, char* argv[])
         EntityFileParser fp(file);
         fp.MergeEntities(m_World);
     }
+    //SO MUCH TEMP PLEASE REMOVE ME OMFG VIKTOR HELP
+    m_Renderer->m_World = m_World;
 
     // Create Octrees
     m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
@@ -92,12 +97,17 @@ Game::Game(int argc, char* argv[])
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();
     }
+
+    // Invoke sound system
+    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
+
     m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
     delete m_SystemPipeline;
+    delete m_SoundSystem;
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
     delete m_World;
@@ -133,9 +143,10 @@ void Game::Tick()
     }
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
+    debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-
+    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");
