@@ -81,8 +81,6 @@ void ResourceManager::Update()
 
 Resource* ResourceManager::createResource(std::string resourceType, std::string resourceName, Resource* parent)
 {
-    //Lock the mutex immediately, and unlock it when leaving the function.
-    boost::lock_guard<decltype(m_Mutex)> guard(m_Mutex);
 	auto facIt = m_FactoryFunctions.find(resourceType);
 	if (facIt == m_FactoryFunctions.end()) {
 		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": type not registered", resourceName.c_str(), resourceType.c_str());
@@ -98,23 +96,29 @@ Resource* ResourceManager::createResource(std::string resourceType, std::string 
     } catch (const std::exception& e) {
 		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": %s", resourceName.c_str(), resourceType.c_str(), e.what());
     }
-    if (resource != nullptr) {
-        // Store IDs
-        resource->TypeID = GetTypeID(resourceType);
-        resource->ResourceID = GetNewResourceID(resource->TypeID);
+
+    {
+        //Lock the mutex immediately, and unlock it when leaving the code block.
+        boost::lock_guard<decltype(m_Mutex)> guard(m_Mutex);
+        if (resource != nullptr) {
+            // Store IDs
+            resource->TypeID = GetTypeID(resourceType);
+            resource->ResourceID = GetNewResourceID(resource->TypeID);
+        }
+
+        // Cache
+        m_ResourceCache[std::make_pair(resourceType, resourceName)] = resource;
+        m_ResourceFromName[resourceName] = resource;
+        if (parent != nullptr) {
+            m_ResourceParents[resource] = parent;
+        }
+
+        if (!boost::filesystem::is_directory(resourceName)) {
+            LOG_DEBUG("Adding watch for %s", resourceName.c_str());
+            m_FileWatcher.AddWatch(resourceName, fileWatcherCallback);
+        }
     }
 
-	// Cache
-	m_ResourceCache[std::make_pair(resourceType, resourceName)] = resource;
-	m_ResourceFromName[resourceName] = resource;
-	if (parent != nullptr) {
-		m_ResourceParents[resource] = parent;
-	}
-
-	if (!boost::filesystem::is_directory(resourceName)) {
-		LOG_DEBUG("Adding watch for %s", resourceName.c_str());
-		m_FileWatcher.AddWatch(resourceName, fileWatcherCallback);
-	}
 	return resource;
 }
 

@@ -131,8 +131,8 @@ void Renderer::DrawScreenQuad(GLuint textureToDraw)
 
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
-    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->TextureGroups()[0].EndIndex - m_ScreenQuad->TextureGroups()[0].StartIndex +1
-        , GL_UNSIGNED_INT, 0, m_ScreenQuad->TextureGroups()[0].StartIndex);
+    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].EndIndex - m_ScreenQuad->MaterialGroups()[0].StartIndex +1
+        , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].StartIndex);
 }
 
 void Renderer::InitializeTextures()

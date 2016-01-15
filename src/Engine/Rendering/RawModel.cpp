@@ -163,7 +163,7 @@ RawModel::RawModel(std::string fileName)
 			material->GetTexture(aiTextureType_SPECULAR, 0, &path, &mapping);
             matGroup.SpecularMapPath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
 		}
-		TextureGroups.push_back(matGroup);
+		MaterialGroups.push_back(matGroup);
 
 		// Bones
 		std::map<int, std::vector<std::tuple<int, float>>> vertexWeights;

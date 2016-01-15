@@ -84,15 +84,15 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
             continue;
         }
 
-        Model* model = ResourceManager::Load<::Model>(resource);
+        Model* model = ResourceManager::Load<::Model, true>(resource);
         if (model == nullptr) {
             model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, world);
         
-        for (auto texGroup : model->TextureGroups) {
-            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, texGroup, modelComponent, world));
+        for (auto matGroup : model->MaterialGroups()) {
+            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, world));
             jobs.push_back(modelJob);
         }
     }

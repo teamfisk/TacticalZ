@@ -57,7 +57,7 @@ public:
 		unsigned int EndIndex;
 	};
 
-	std::vector<MaterialGroup> TextureGroups;
+	std::vector<MaterialGroup> MaterialGroups;
 
 	std::vector<Vertex> m_Vertices;
 	std::vector<unsigned int> m_Indices;

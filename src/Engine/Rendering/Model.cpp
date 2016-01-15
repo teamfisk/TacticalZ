@@ -9,7 +9,7 @@ Model::Model(std::string fileName)
         throw StillLoadingException();
     }
 
-    for (auto& group : m_RawModel->TextureGroups) {
+    for (auto& group : m_RawModel->MaterialGroups) {
         if (!group.TexturePath.empty()) {
             group.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.TexturePath));
         }
