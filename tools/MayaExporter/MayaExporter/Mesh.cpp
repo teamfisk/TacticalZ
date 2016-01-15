@@ -92,12 +92,12 @@ Mesh MeshClass::GetMeshData(MObject object)
 	double biTangent[3];
 	double biNormal[3];
 	VertexLayout thisVertex;
-	MFloatVectorArray biTangents;
+	MFloatVectorArray Tangents;
 	MFloatVectorArray biNormals;
 
     std::map<int, WeightInfo> vertexWeights = GetWeightData();
 
-	mesh.getTangents(biTangents, MSpace::kObject, NULL);
+	mesh.getTangents(Tangents, MSpace::kObject, NULL);
 	mesh.getBinormals(biNormals, MSpace::kObject, NULL);
 
 	MItMeshFaceVertex faceVert(object);
@@ -123,12 +123,12 @@ Mesh MeshClass::GetMeshData(MObject object)
             thisVertex.Normal[1] = normal[1];
             thisVertex.Normal[2] = normal[2];
 
-            MFloatVector biTangent = biTangents[faceVert.tangentId()];
+            MFloatVector Tangent = Tangents[faceVert.tangentId()];
             //MVector tmp = faceVert.getTangent(MSpace::kObject, NULL);
             //tmp.get(biTangent);
-            thisVertex.BiTangent[0] = biTangent[0];
-            thisVertex.BiTangent[1] = biTangent[1];
-            thisVertex.BiTangent[2] = biTangent[2];
+            thisVertex.Tangent[0] = Tangent[0];
+            thisVertex.Tangent[1] = Tangent[1];
+            thisVertex.Tangent[2] = Tangent[2];
 
             MFloatVector biNormal = biNormals[faceVert.tangentId()];
             //faceVert.getBinormal().get(biNormal);

@@ -1,4 +1,4 @@
-#include "Rendering/RawModel.h"
+#include "Rendering/RawModelAssimp.h"
 
 RawModel::RawModel(std::string fileName)
 {
@@ -38,7 +38,7 @@ RawModel::RawModel(std::string fileName)
 	//LOG_DEBUG("Index count %i", numIndices);
 
 	//LOG_DEBUG("Model has %i embedded textures", scene->mNumTextures);
-
+    
 	std::vector<std::tuple<std::string, glm::mat4>> boneInfo;
 	std::map<std::string, int> boneNameMapping;
 
@@ -74,17 +74,6 @@ RawModel::RawModel(std::string fileName)
 				auto uv = mesh->mTextureCoords[0][vertexIndex];
 				desc.TextureCoords = glm::vec2(uv.x, uv.y);
 			}
-
-			// Material diffuse color
-			aiColor3D diffuse;
-			material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-            float opacity;
-            material->Get(AI_MATKEY_OPACITY, opacity);
-			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
-			// Material specular color
-			aiColor3D specular;
-			material->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-			desc.SpecularVertexColor = glm::vec4(specular.r, specular.g, specular.b, 1.f);
 
 			m_Vertices.push_back(desc);
 		}
@@ -125,7 +114,7 @@ RawModel::RawModel(std::string fileName)
 		}
 		for (auto& vertex : m_Vertices) {
 			vertex.Tangent = glm::normalize(vertex.Tangent);
-			vertex.BiTangent = glm::normalize(glm::cross(vertex.Tangent, glm::normalize(vertex.Normal)));
+			vertex.BiNormal = glm::normalize(glm::cross(vertex.Tangent, glm::normalize(vertex.Normal)));
 		}
 
 		// Material info
@@ -203,10 +192,7 @@ RawModel::RawModel(std::string fileName)
 				LOG_WARNING("Vertex weights (%i) greater than max weights per vertex (%i)", weights.size(), maxWeights);
 			}
 			for (int weightIndex = 0; weightIndex < weights.size() && weightIndex < maxWeights && weightIndex < 4; ++weightIndex) {
-				std::tie(desc.BoneIndices1[weightIndex], desc.BoneWeights1[weightIndex]) = weights[weightIndex];
-			}
-			for (int weightIndex = 4; weightIndex < weights.size() && weightIndex < maxWeights && weightIndex < 8; ++weightIndex) {
-				std::tie(desc.BoneIndices2[weightIndex - 4], desc.BoneWeights2[weightIndex - 4]) = weights[weightIndex];
+				std::tie(desc.BoneIndices[weightIndex], desc.BoneWeights[weightIndex]) = weights[weightIndex];
 			}
 		}
 

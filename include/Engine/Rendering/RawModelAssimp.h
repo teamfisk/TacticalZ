@@ -1,5 +1,5 @@
-#ifndef RawModel_h__
-#define RawModel_h__
+#ifndef RawModelAssimp_h__
+#define RawModelAssimp_h__
 
 #include <fstream>
 #include <iostream>
@@ -23,7 +23,7 @@ class RawModel : public Resource
 	friend class ResourceManager;
 
 protected:
-	RawModel(std::string fileName);
+    RawModel(std::string fileName);
 
 public:
 	~RawModel();
@@ -33,14 +33,10 @@ public:
 		glm::vec3 Position;
 		glm::vec3 Normal;
 		glm::vec3 Tangent;
-		glm::vec3 BiTangent;
+		glm::vec3 BiNormal;
 		glm::vec2 TextureCoords;
-		glm::vec4 DiffuseVertexColor;
-		glm::vec4 SpecularVertexColor;
-		glm::vec4 BoneIndices1;
-		glm::vec4 BoneIndices2;
-		glm::vec4 BoneWeights1;
-		glm::vec4 BoneWeights2;
+		glm::vec4 BoneIndices;
+		glm::vec4 BoneWeights;
 	};
 
 	struct MaterialGroup
@@ -64,8 +60,6 @@ private:
 	std::vector<glm::ivec2> BoneIndices;
 	std::vector<glm::vec2> BoneWeights;
 	std::vector<glm::vec3> Normals;
-	std::vector<glm::vec4> DiffuseVertexColor;
-	std::vector<glm::vec4> SpecularVertexColor;
 	std::vector<glm::vec3> TangentNormals;
 	std::vector<glm::vec3> BiTangentNormals;
 	std::vector<glm::vec2> TextureCoords;
