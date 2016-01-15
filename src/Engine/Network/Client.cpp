@@ -134,7 +134,7 @@ void Client::parseSnapshot(Packet& packet)
         EntityID receivedParentEntityID = packet.ReadPrimitive<EntityID>();
         ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
         // Check if the received EntityID is mapped to one of our local EntityIDs
-        if (clientServerMapsHasEntity(receivedEntityID)) {
+        if (serverClientMapsHasEntity(receivedEntityID)) {
             // Get the local EntityID
             EntityID entityID = m_ServerIDToClientID.at(receivedEntityID);
             // Check if the component exists
@@ -168,7 +168,7 @@ void Client::parseSnapshot(Packet& packet)
         // Parent Logic
         // Don't need to check if receivedEntityID is mapped. (It should have been set) 
         if (receivedParentEntityID != std::numeric_limits<EntityID>::max()) {
-            if (clientServerMapsHasEntity(receivedParentEntityID)) {
+            if (serverClientMapsHasEntity(receivedParentEntityID)) {
                 m_World->SetParent(m_ServerIDToClientID.at(receivedEntityID), m_ServerIDToClientID.at(receivedParentEntityID));
                 // If Parent dosen't exist create one and map receivedParentEntityID to it.
             } else {
