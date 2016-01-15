@@ -11,8 +11,8 @@ Libraries bundled along with binaries for Windows (MSVC14), available as a submo
 | **[libpng](http://www.libpng.org/pub/png/libpng.html)**          | 1.6.19       | [libpng License](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)                                                                                                             |
 | **[Xerces-C++](https://xerces.apache.org/xerces-c)**             | 3.1.2        | [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)                                                                                                          |
 | **[ImGui](https://github.com/ocornut/imgui)**                    | 2015-12-12   | [MIT License](https://github.com/ocornut/imgui/blob/de3a154f3801de22c8e0bd2aeabf663a70c05972/LICENSE)                                                                              |
-| **[nativefiledialog](https://github.com/mlabbe/nativefiledialog) | 2016-01-08   | https://github.com/mlabbe/nativefiledialog/blob/master/LICENSE                                                                                                                     |
-| **[OpenAL](https://www.openal.org/)**                            | 1.1          | [OpenAL License]()                                                                            |
+| **[nativefiledialog](https://github.com/mlabbe/nativefiledialog)** | 2016-01-08   | [nativefiledialog Licence](https://github.com/mlabbe/nativefiledialog/blob/master/LICENSE)                                                                                                              |
+| **[OpenAL](https://www.openal.org/)**                            | 1.1          | [OpenAL License](resources/Licenses/OpenAL.txt)
 
 #### External libraries
 Libraries that are too big to be bundled with the project.
