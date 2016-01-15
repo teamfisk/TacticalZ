@@ -84,13 +84,21 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
             continue;
         }
 
-        Model* model = ResourceManager::Load<::Model, true>(resource);
-        if (model == nullptr) {
-            model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+        Model* model;
+        try {
+            model = ResourceManager::Load<::Model, true>(resource);
+        } catch (const Resource::StillLoadingException&) {
+            //continue;
+            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.obj");
+        } catch (const std::exception&) {
+            try {
+                model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+            } catch (const std::exception&) {
+                continue;
+            }
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, world);
-        
         for (auto matGroup : model->MaterialGroups()) {
             std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, world));
             jobs.push_back(modelJob);

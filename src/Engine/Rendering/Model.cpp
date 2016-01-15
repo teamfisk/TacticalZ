@@ -2,12 +2,8 @@
 
 Model::Model(std::string fileName)
 {
-    //Load the RawModel asyncronously, this will be done on a separate thread in the background.
+    //Try loading the model asyncronously, if it throws any exceptions then let it propagate back to caller.
     m_RawModel = ResourceManager::Load<RawModel, true>(fileName);
-    //If it is null, the model is not done yet, so tell resourceManager to try constructing me again later.
-    if (m_RawModel == nullptr) {
-        throw StillLoadingException();
-    }
 
     for (auto& group : m_RawModel->MaterialGroups) {
         if (!group.TexturePath.empty()) {
