@@ -15,22 +15,24 @@
 #include "Renderer.h"
 #include "PointLightJob.h"
 #include "../Core/Transform.h"
+#include "DebugCameraInputController.h"
 
 class RenderSystem : public ImpureSystem
 {
 public:
     RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
+    ~RenderSystem();
 
     virtual void Update(World* world, double dt) override;
 
 private:
     World* m_World = nullptr;
-    const IRenderer* m_Renderer = nullptr;
+    const IRenderer* m_Renderer;
 
     RenderFrame* m_RenderFrame;
     bool m_SwitchCamera = false;
-    Camera* m_Camera = nullptr;
-    Camera* m_DefaultCamera = nullptr;
+    Camera* m_Camera;
+    DebugCameraInputController<RenderSystem>* m_DebugCameraInputController;
     
     std::list<ComponentWrapper> m_CameraComponents;
 
@@ -42,8 +44,6 @@ private:
 
     void updateCamera(World* world, double dt);
     void updateProjectionMatrix(ComponentWrapper& cameraComponent);
-    glm::mat4 m_ViewMatrix;
-    glm::mat4 m_ProjectionMatrix;
     
     void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
