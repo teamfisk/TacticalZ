@@ -9,17 +9,21 @@ EntityFileParser::EntityFileParser(const EntityFile* entityFile)
     m_Handler.SetStartFieldDataCallback(std::bind(&EntityFileParser::onFieldData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 }
 
-void EntityFileParser::MergeEntities(World* world)
+EntityID EntityFileParser::MergeEntities(World* world, EntityID baseParent /*= EntityID_Invalid */)
 {
     m_World = world;
-    m_EntityIDMapper[0] = 0;
+    m_EntityIDMapper[0] = baseParent;
     m_EntityFile->Parse(&m_Handler);
+    return m_FirstEntity;
 }
 
 void EntityFileParser::onStartEntity(EntityID entity, EntityID parent, const std::string& name)
 {
     EntityID realParent = m_EntityIDMapper.at(parent);
     EntityID realEntity = m_World->CreateEntity(realParent);
+    if (m_FirstEntity == EntityID_Invalid) {
+        m_FirstEntity = realEntity;
+    }
     if (!name.empty()) {
         m_World->SetName(realEntity, name);
     }

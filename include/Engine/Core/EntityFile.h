@@ -77,7 +77,7 @@ public:
         : m_Handler(handler)
         , m_Reader(reader)
     {
-        // 0 is imaginary world entity
+        // 0 is imaginary base parent
         m_EntityStack.push(0);
         m_StateStack.push(State::Unknown);
     }
