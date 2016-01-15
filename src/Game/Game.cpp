@@ -32,6 +32,7 @@ Game::Game(int argc, char* argv[])
         ));
     m_Renderer->Initialize();
     //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    m_RenderFrame = new RenderFrame();
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
@@ -56,8 +57,6 @@ Game::Game(int argc, char* argv[])
         fp.MergeEntities(m_World);
     }
 
-    m_RenderFrame = new RenderFrame();
-
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     
@@ -73,7 +72,6 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
-
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
