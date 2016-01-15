@@ -46,6 +46,7 @@ public:
 	struct MaterialGroup
 	{
 		float Shininess;
+        float Transparency;
 		std::shared_ptr<::Texture> Texture;
 		std::shared_ptr<::Texture> NormalMap;
 		std::shared_ptr<::Texture> SpecularMap;
