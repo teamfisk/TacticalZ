@@ -41,8 +41,8 @@ void SoundSystem::stopEmitters()
 {
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end(); it++) {
-        if (getSourceState((*it).second->ALsource) == AL_PLAYING) {
-            stopSound((*it).second);
+        if (getSourceState(it->second->ALsource) == AL_PLAYING) {
+            stopSound(it->second);
         }
     }
 }
@@ -71,6 +71,7 @@ void SoundSystem::deleteInactiveEmitters()
                 alDeleteBuffers(1, &it->second->ALsource);
                 alDeleteSources(1, &it->second->ALsource);
                 m_World->DeleteEntity(it->first);
+                delete it->second;
                 it = m_Sources.erase(it);
             }
         } else {
@@ -78,6 +79,7 @@ void SoundSystem::deleteInactiveEmitters()
             stopSound((*it).second);
             alDeleteBuffers(1, &it->second->ALsource);
             alDeleteSources(1, &it->second->ALsource);
+            delete it->second;
             it = m_Sources.erase(it);
         }
     }
@@ -200,19 +202,19 @@ bool SoundSystem::OnPlaySoundOnPosition(const Events::PlaySoundOnPosition & e)
     source->Type = SoundType::SFX;
     m_Sources[emitterID] = source;
     playSound(source);
-    return false;
+    return true;
 }
 
 bool SoundSystem::OnPauseSound(const Events::PauseSound & e)
 {
     alSourcePause(m_Sources[e.EmitterID]->ALsource);
-    return false;
+    return true;
 }
 
 bool SoundSystem::OnStopSound(const Events::StopSound & e)
 {
     alSourceStop(m_Sources[e.EmitterID]->ALsource);
-    return false;
+    return true;
 }
 
 bool SoundSystem::OnContinueSound(const Events::ContinueSound & e)
@@ -235,7 +237,7 @@ bool SoundSystem::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
         m_Sources[emitterChild] = source;
         playSound(source);
     }
-    return false;
+    return true;
 }
 
 bool SoundSystem::OnSetBGMGain(const Events::SetBGMGain & e)
