@@ -135,6 +135,7 @@ void SoundSystem::updateEmitters()
 
 void SoundSystem::updateListener()
 {
+    int testremove = 0;
     // Should only be one listener.
     auto listenerComponents = m_World->GetComponents("Listener");
     if (listenerComponents == nullptr) {
@@ -147,8 +148,12 @@ void SoundSystem::updateListener()
         glm::vec3 nextPos = Transform::AbsolutePosition(m_World, listener); // Get next (current) pos
         glm::vec3 velocity = nextPos - previousPos; // Calculate velocity
         setListenerPos(nextPos);
-        setListenerVel(velocity);
+        //setListenerVel(velocity);
         setListenerOri(glm::eulerAngles(Transform::AbsoluteOrientation(m_World, listener)));
+        testremove++;
+    }
+    if (testremove > 1) {
+        testremove = 0;
     }
 }
 
