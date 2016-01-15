@@ -32,12 +32,8 @@
 #include <QtGui/qlayoutitem.h>
 #include <QtGui/qtabwidget.h>
 
-
 #include "MayaIncludes.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Skeleton.h"
-#include "WriteToFile.h"
+#include "Export.h"
 
 class Menu : public QWidget
 {
@@ -46,22 +42,12 @@ public:
 	Menu(QDialog* dialog);
 	~Menu();
 
-    void GetMeshData(MObject object);
-	void GetMaterialData();
-	void GetSkeletonData();
-
 private slots:
-	void ExportSelected(bool checked);
 	void ExportPathClicked(bool);
 	void AddClipClicked(bool);
 	void RemoveClipClicked(bool);
 	void ExportAll(bool);
 	void CancelClicked(bool);
-
-	void Button1Clicked(bool);
-	void Button2Clicked(bool);
-	void Button3Clicked(bool);
-
 
 private:
 	Menu();
@@ -71,13 +57,13 @@ private:
 	std::vector<QHBoxLayout*> layouts;
 	QVBoxLayout* m_ClipLayout;
 
-	QPushButton* m_ExportSelectedButton = nullptr;
 	QPushButton* m_BrowseButton = nullptr;
 	QPushButton* m_ExportAllButton = nullptr;
 	QPushButton* m_CancelButton = nullptr;
 	QPushButton* m_AddClipsButton = nullptr;
 	QPushButton* m_RemoveClipsButton = nullptr;
 
+    QCheckBox* m_ExportSelectedButton = nullptr;
 	QCheckBox* m_ExportAnimationsButton = nullptr;
 	QCheckBox* m_CopyTexturesButton = nullptr;
 	QCheckBox* m_Button3 = nullptr;
@@ -86,10 +72,7 @@ private:
 	QFileDialog* m_FileDialog = nullptr;
 	QDialog* m_DialogPointer = nullptr;
 
-	Material* m_MaterialHandler = nullptr;
-	Skeleton* m_SkeletonHandler = nullptr;
-
-	WriteToFile m_File;
+    Export m_Export;
 };
 
 #endif

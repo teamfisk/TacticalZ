@@ -26,12 +26,16 @@ public:
 
 	std::string Name;
 	double Duration;
+    int NumKeyFrames;
+    int NumberOfJoints;
 	std::vector<Keyframe> Keyframes;
 
 	virtual void WriteBinary(std::ostream& out)
 	{
 		out.write(Name.c_str(), Name.size() + 1);
 		out.write((char*)&Duration, sizeof(double));
+        out.write((char*)&NumKeyFrames, sizeof(int));
+        out.write((char*)&NumberOfJoints, sizeof(int));
 		for (auto aKeyframe : Keyframes) {
 			out.write((char*)&aKeyframe.Index, sizeof(int));
 			out.write((char*)&aKeyframe.Time, sizeof(double));
@@ -48,6 +52,8 @@ public:
 	{
 		out << "Animation Name: " << Name << endl;
 		out << "Duration: " << Duration << endl;
+        out << "Number of KeyFrames: " << NumKeyFrames << endl;
+        out << "Number of Joints: " << NumberOfJoints << endl;
 		for (auto aKeyframe : Keyframes) {
 			out << "Frame: " << aKeyframe.Index << endl;
 			out << "Time: " << aKeyframe.Time << endl;

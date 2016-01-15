@@ -13,9 +13,8 @@ Menu::Menu(QDialog* dialog)
 	m_DialogPointer = dialog;
 
 	// Create QpushButtons & give them names
-	m_ExportSelectedButton = new QPushButton("&Export Selected", this);
 	m_BrowseButton = new QPushButton("&...", this);
-	m_ExportAllButton = new QPushButton("&Export All", this);
+	m_ExportAllButton = new QPushButton("&Export", this);
 	m_CancelButton = new QPushButton("&Cancel", this);
 	m_AddClipsButton = new QPushButton("&Add Clips", this);
 	m_RemoveClipsButton = new QPushButton("&Remove Latest Clip", this);
@@ -23,6 +22,7 @@ Menu::Menu(QDialog* dialog)
 	// Option box and checkboxes
 	QGroupBox *optionsBox = new QGroupBox(tr("Options"));
 
+    m_ExportSelectedButton = new QCheckBox(tr("&Export Selected"));
 	m_ExportAnimationsButton = new QCheckBox(tr("&Export Animations"));
 	m_CopyTexturesButton = new QCheckBox(tr("&Copy Textures"));
 	m_Button3 = new QCheckBox(tr("Test Materials"));
@@ -30,6 +30,7 @@ Menu::Menu(QDialog* dialog)
 	m_ExportAnimationsButton->setChecked(true);
 	m_CopyTexturesButton->setChecked(true);
 	QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(m_ExportSelectedButton);
 	vbox->addWidget(m_ExportAnimationsButton);
 	vbox->addWidget(m_CopyTexturesButton);
 	vbox->addWidget(m_Button3);
@@ -37,16 +38,16 @@ Menu::Menu(QDialog* dialog)
 	optionsBox->setLayout(vbox);
 
 	// Connect the buttons with signals & functions
-	connect(m_ExportSelectedButton, SIGNAL(clicked(bool)), this, SLOT(ExportSelected(bool)));
 	connect(m_BrowseButton, SIGNAL(clicked(bool)), this, SLOT(ExportPathClicked(bool)));
 	connect(m_ExportAllButton, SIGNAL(clicked(bool)), this, SLOT(ExportAll(bool)));
 	connect(m_CancelButton, SIGNAL(clicked(bool)), this, SLOT(CancelClicked(bool)));
 	connect(m_AddClipsButton, SIGNAL(clicked(bool)), this, SLOT(AddClipClicked(bool)));
 	connect(m_RemoveClipsButton, SIGNAL(clicked(bool)), this, SLOT(RemoveClipClicked(bool)));
 
-	connect(m_ExportAnimationsButton, SIGNAL(clicked(bool)), this, SLOT(Button1Clicked(bool)));
-	connect(m_CopyTexturesButton, SIGNAL(clicked(bool)), this, SLOT(Button2Clicked(bool)));
-	connect(m_Button3, SIGNAL(clicked(bool)), this, SLOT(Button3Clicked(bool)));
+    connect(m_ExportSelectedButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
+	connect(m_ExportAnimationsButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
+	connect(m_CopyTexturesButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
+	connect(m_Button3, SIGNAL(clicked(bool)), this, SLOT(NULL));
 
 	// Creating several layouts, adding widgets & adding them to one layout in the end
 	QHBoxLayout* topLayout = new QHBoxLayout;
@@ -61,7 +62,8 @@ Menu::Menu(QDialog* dialog)
 
 	m_ExportPath = new QLineEdit;
 	m_FileDialog = new QFileDialog;
-
+    QString tmpPath("C:/Users/Nickelodion/Desktop/Baljj");
+    m_ExportPath->setText(tmpPath);
 	QLabel* exportLabel = new QLabel;
 	exportLabel->setText("Export Path:");
 	QLabel* nameLabel = new QLabel;
@@ -79,7 +81,6 @@ Menu::Menu(QDialog* dialog)
 	topLayout->addWidget(m_ExportPath);
 	topLayout->addWidget(m_BrowseButton);
 
-	botLayout->addWidget(m_ExportSelectedButton);
 	botLayout->addWidget(m_ExportAllButton);
 	botLayout->addWidget(m_CancelButton);
 
@@ -107,35 +108,6 @@ Menu::Menu(QDialog* dialog)
 
 	for (unsigned int i = 0; i < 3; i++) {
 		this->AddClipClicked(true);
-	}
-
-}
-
-
-void Menu::ExportSelected(bool checked)
-{
-	// Retrieving the objects we currently have selected
-	MSelectionList selected;
-	MGlobal::getActiveSelectionList(selected);
-
-	// Loop through or list of selection(s)
-	for (unsigned int i = 0; i < selected.length(); i++) {
-		MObject object;
-		selected.getDependNode(i, object);
-		MFnDependencyNode thisNode(object);
-
-		cout << thisNode.name().asChar() << endl;
-		GetMeshData(object);
-	}
-	if (m_ExportPath->text().isEmpty()) {
-		cout << "Please select a folder." << endl;
-	}
-	else {
-		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
-	}
-
-	if (m_ExportAnimationsButton->isChecked()) {
-		GetSkeletonData();
 	}
 
 }
@@ -188,154 +160,50 @@ void Menu::RemoveClipClicked(bool)
 		layouts.pop_back();
 		m_StartFrameLines.pop_back();
 		m_EndFrameLines.pop_back();
+        m_AnimationClipName.pop_back();
 	}
 }
 
 void Menu::ExportAll(bool)
 {
-	MDagPath path;
-    m_File.ASCIIFilePath("C:/Users/Nickelodion/Desktop/coolASCII.txt");
-    m_File.binaryFilePath("C:/Users/Nickelodion/Desktop/coolSoptunz.bin");
-    m_File.OpenFiles();
+    if (m_ExportPath->text().isEmpty()) {
+        MGlobal::displayError(MString() + "Please select a folder.");
+        return;
+    }
 
-	// Loop through all nodes in the scene
-	MItDependencyNodes it(MFn::kMesh);
-	for (; !it.isDone(); it.next()) {
-		MObject node = it.thisNode();
-		if (node.hasFn(MFn::kMesh)) {
-			MFnDependencyNode thisNode(node);
-            MPlugArray connections;
+    //Export meshes
+    if (!m_Export.Meshes(m_ExportPath->text().toLocal8Bit().constData(), m_ExportSelectedButton->isChecked())) {
+        MGlobal::displayError(MString() + "Could not export mesh");
+        return;
+    }
 
-            thisNode.findPlug("inMesh").connectedTo(connections, true, true);
-            bool next = false;
-            for (unsigned int i = 0; i < connections.length(); i++) {
-                if(connections[i].node().apiType() == MFn::kSkinClusterFilter){ 
-                    next = true;
-                    break;
-                }
-            }
-            if (next)
-                continue;
+    std::vector<Export::AnimationInfo> animations;
+    MGlobal::displayInfo(MString() + "yeeehaa");
+    for (unsigned int i = 0; i < m_AnimationClipName.size(); i++) {
+        Export::AnimationInfo thisClip;
+        MGlobal::displayInfo(MString() + "qwqw");
+        thisClip.Name = std::string(m_AnimationClipName[i]->text().toLocal8Bit().constData());
+        MGlobal::displayInfo(MString() + "shizzzz");
+        thisClip.Start = m_StartFrameLines[i]->text().toInt();
+        MGlobal::displayInfo(MString() + "dsdsfg");
+        thisClip.End = m_EndFrameLines[i]->text().toInt();
+        MGlobal::displayInfo(MString() + "aaaaaaaaaaaaaaaaaaaa");
 
-            cout << thisNode.name().asChar() << endl;
-            MGlobal::displayInfo("EXPORT ALL FUNCTION: " + thisNode.name() + " " + thisNode.findPlug("inMesh").asMObject().apiTypeStr());
-            GetMeshData(node);
-		}
-	}
-	if (m_ExportPath->text().isEmpty()) {
-		cout << "Please select a folder." << endl;
-	}
-	else {
-		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
-	}
-
-	if (m_ExportAnimationsButton->isChecked())
-		GetSkeletonData();
-    m_File.CloseFiles();
+        animations.push_back(thisClip);
+    }
+    MGlobal::displayInfo(MString() + "asdf");
+    if (m_ExportAnimationsButton->isChecked()) {
+        //Export Animations
+        if (!m_Export.Animations(m_ExportPath->text().toLocal8Bit().constData(), animations)) {
+            MGlobal::displayError(MString() + "Could not export animations");
+            return;
+        }
+    }
 }
 
 void Menu::CancelClicked(bool)
 {
 	m_DialogPointer->close();
-}
-
-void Menu::Button1Clicked(bool)
-{
-	if (m_ExportAnimationsButton->isChecked()) {
-		MGlobal::displayInfo("1 checked!");
-	}
-	else {
-		MGlobal::displayInfo("1 unchecked!");
-	}
-}
-
-void Menu::Button2Clicked(bool)
-{
-	if (m_CopyTexturesButton->isChecked()) {
-		cout << "2 checked!" << endl;
-	}
-	else {
-		cout << "2 unchecked!" << endl;
-	}
-}
-
-void Menu::Button3Clicked(bool)
-{
-	if (m_Button3->isChecked()) {
-		cout << "3 checked!" << endl;
-	}
-	else {
-		cout << "3 unchecked!" << endl;
-	}
-}
-void Menu::GetMeshData(MObject object)
-{
-    std::vector<VertexLayout> vertexList;
-    std::vector<unsigned int> indexList;
-
-    Mesh mesh;
-    mesh.GetMeshData(object, vertexList, indexList);
-
-    for (auto aVertex : vertexList) {
-        m_File.writeToFiles(&aVertex);
-    }
-    m_File.writeToFiles(indexList.data(), indexList.size());
-}
-void Menu::GetMaterialData()
-{
-	this->m_MaterialHandler = new Material();
-
-	// Traverse scene and return vector with all materials
-	std::vector<MaterialNode>* AllMaterials = m_MaterialHandler->DoIt();
-
-	// Access the colorR component of one material (example)
-	cout << AllMaterials->at(0).Color[0] << endl;
-	MGlobal::displayInfo(MString() + AllMaterials->at(0).Color[0]);
-}
-
-void Menu::GetSkeletonData()
-{
-	if (MAnimControl::currentTime().unit() != MTime::kNTSCField) {
-
-		MGlobal::displayError(MString() + "Please change to 60 FPS under Preferences/Settings!");
-		return;
-	}
-
-	std::vector<BindPoseSkeletonNode> allBindPoses;
-	std::vector<Animation> allAnimations;
-
-	allBindPoses = m_SkeletonHandler->GetBindPoses();
-
-	for (unsigned int j = 0; j < m_StartFrameLines.size(); j++) {
-		if (m_StartFrameLines[j]->text().isEmpty() == true || m_StartFrameLines[j]->text().isEmpty() == true) {
-			MGlobal::displayError(MString() + "Empty Animation Clip(s)");
-			return;
-		}
-
-		int startFrame = m_StartFrameLines[j]->text().toInt();
-		int  endFrame = m_EndFrameLines[j]->text().toInt();
-		std::string animationName = m_AnimationClipName[j]->text().toAscii().constData();
-
-		allAnimations.push_back(m_SkeletonHandler->GetAnimData(animationName, startFrame, endFrame));
-	}
-
-	//print out all bind poses
-	for (auto aBindPose : allBindPoses){
-		m_File.writeToFiles(&aBindPose);
-		MGlobal::displayInfo(MString() + "BindPose Skeleton name: " + aBindPose.Name.c_str());
-
-		for (int i = 0; i < aBindPose.Joints.size(); i++){
-			//MGlobal::displayInfo(MString() + aBindPose.JointNames[i].c_str());
-			//MGlobal::displayInfo(MString() + aBindPose.ParentIDs[i]);
-			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Translation[0] + " " + aBindPose.Joints[i].Translation[1] + " " + aBindPose.Joints[i].Translation[2]);
-			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Rotation[0] + " " + aBindPose.Joints[i].Rotation[1] + " " + aBindPose.Joints[i].Rotation[2]);
-			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Scale[0] + " " + aBindPose.Joints[i].Scale[1] + " " + aBindPose.Joints[i].Scale[2]);
-		}
-	}
-	//print out all animations
-	for (auto aAnimation : allAnimations) {
-		m_File.writeToFiles(&aAnimation);
-	}
 }
 
 Menu::~Menu()
@@ -346,5 +214,6 @@ Menu::~Menu()
 	//delete fileDialog;
 	m_FileDialog->~QFileDialog();
 
+    //delete m_Export;
 	//delete MaterialHandler;
 }

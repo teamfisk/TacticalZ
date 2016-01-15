@@ -64,12 +64,13 @@ std::string attr[9] = { "scaleX", "scaleY", "scaleZ", "translateX", "translateY"
 
 Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int endFrame)
 {
+    std::vector<MObject> animatedJoints;
+    std::vector<MObject> m_Hierarchy;
+
 	Animation returnData;
 	double oneDivSixty = 1 / 60.0;
 	returnData.Name = animationName;
 	returnData.Duration = (endFrame - startFrame) * oneDivSixty;
-	std::vector<MObject> animatedJoints;
-	std::vector<MObject> m_Hierarchy;
 
 	MItDag jointIt(MItDag::TraversalType::kDepthFirst, MFn::kJoint);
 	while (!jointIt.isDone())
@@ -121,7 +122,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 
 					if (BindPoseMatrix != MayaJoint.transformationMatrix())
 					{
-						MGlobal::displayError(MString() + animationName.c_str() + " is using a joint that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
+						MGlobal::displayError(MString() + animationName.c_str() + " is using " + MayaJoint.name() + " that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
 					}
 				}
 			}
@@ -173,6 +174,10 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 		returnData.Keyframes.push_back(thisKeyFrame);
 		currentFrame++;
 	}
+
+    returnData.NumKeyFrames = returnData.Keyframes.size();
+    returnData.NumberOfJoints = animatedJoints.size();
+
 	return returnData;
 }
 
