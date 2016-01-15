@@ -7,10 +7,10 @@
 
 #include <vector>
 
-#include "Core/Ray.h"
-#include "Core/AABB.h"
-#include "Engine/Rendering/RawModel.h"
-#include "Core/Entity.h"
+#include "../Core/Ray.h"
+#include "../Core/AABB.h"
+#include "../Rendering/RawModel.h"
+#include "../Core/Entity.h"
 
 class World;
 struct ComponentWrapper;

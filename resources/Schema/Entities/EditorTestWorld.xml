@@ -1,49 +1,57 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
-<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd" xmlns:c="components">
-	<Components>
-		<c:Transform>
-			<Position X="0" Y="0" Z="0"/>
-			<Orientation X="0" Y="0" Z="0"/>
-		</c:Transform>
-	</Components>
-	<Children>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="0" Y="0" Z="0"/>
-					<Scale X="100" Y="1" Z="100"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/Core/UnitPlane.obj</Resource>
-				</c:Model>
-			</Components>
-		</Entity>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="1" Y="1" Z="0"/>
-					<Orientation X="0" Y="0.78539" Z="0"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>An error</Resource>
-				</c:Model>
-			</Components>
-			<Children>
-				<Entity>
-					<Components>
-						<c:Transform>
-							<Position X="2" Y="0" Z="0"/>
-							<Orientation X="0" Y="0.78539" Z="0"/>
-						</c:Transform>
-						<c:Model>
-							<Resource>An error</Resource>
-						</c:Model>
-					</Components>
-					<Children>
-					</Children>
-				</Entity>
-			</Children>
-		</Entity>
-	</Children>
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Scale X="100" Y="1" Z="100"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>An error</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="1" Y="1" Z="0"/>
+          <Orientation X="0" Y="0.785390019" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>An error</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="2" Y="0" Z="0"/>
+              <Orientation X="0" Y="0.785390019" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Camera/>
+        <c:Transform>
+          <Position X="5.85247707" Y="3.8454349" Z="-1.14486957"/>
+          <Orientation X="2.51327395" Y="1.23916209" Z="-3.1415925"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
 </Entity>

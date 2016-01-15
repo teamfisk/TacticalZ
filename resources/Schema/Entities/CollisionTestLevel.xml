@@ -17,7 +17,7 @@
 					<Scale X="1" Y="1" Z="1"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/ScaleWidget.obj</Resource>
+					<Resource>Models/Core/UnitSphere.obj</Resource>
 				</c:Model>
 			</Components>
 		</Entity>

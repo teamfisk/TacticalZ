@@ -9,11 +9,13 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
+    ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+    ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
 
     // Create the core event broker
@@ -56,6 +58,8 @@ Game::Game(int argc, char* argv[])
         EntityFileParser fp(file);
         fp.MergeEntities(m_World);
     }
+    //SO MUCH TEMP PLEASE REMOVE ME OMFG VIKTOR HELP
+    m_Renderer->m_World = m_World;
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);

@@ -90,17 +90,48 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
             continue;
         }
 
-        Model* model = ResourceManager::Load<::Model>(resource);
-        if (model == nullptr) {
-            model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+        Model* model;
+        try {
+            model = ResourceManager::Load<::Model, true>(resource);
+        } catch (const Resource::StillLoadingException&) {
+            //continue;
+            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.obj");
+        } catch (const std::exception&) {
+            try {
+                model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+            } catch (const std::exception&) {
+                continue;
+            }
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, world);
-        
-        for (auto texGroup : model->TextureGroups) {
-            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, texGroup, modelComponent, world));
+        for (auto matGroup : model->MaterialGroups()) {
+            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, world));
             jobs.push_back(modelJob);
         }
+    }
+}
+
+
+void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+{
+    auto pointLights = world->GetComponents("PointLight");
+    if (pointLights == nullptr) {
+        return;
+    }
+
+    for (auto& pointlightC : *pointLights) {
+        bool visible = pointlightC["Visible"];
+        if (!visible) {
+            continue;
+        }
+        auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
+        if (&transformC == nullptr) {
+            return;
+        }
+
+        std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
+        jobs.push_back(pointLightJob);
     }
 }
 
@@ -124,11 +155,12 @@ void RenderSystem::Update(World* world, double dt)
     //Only supports opaque geometry atm
     m_RenderFrame->Clear();
 
-    RenderScene rs;
-    rs.Camera = m_Camera;
-    rs.Viewport = Rectangle(1280, 720);
-    fillModels(rs.ForwardJobs, world);
-    m_RenderFrame->Add(rs);
+    RenderScene scene;
+    scene.Camera = m_Camera;
+    scene.Viewport = Rectangle(1280, 720);
+    fillModels(scene.ForwardJobs, world);
+    fillLight(scene.PointLightJobs, world);
+    m_RenderFrame->Add(scene);
    
 }
 

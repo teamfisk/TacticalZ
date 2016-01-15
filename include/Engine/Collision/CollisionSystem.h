@@ -4,10 +4,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/common.hpp>
 
-#include "Common.h"
-#include "Core/System.h"
-#include "Core/EventBroker.h"
-#include "Core/EKeyUp.h"
+#include "../Common.h"
+#include "../Core/System.h"
+#include "../Core/EventBroker.h"
+#include "../Core/EKeyUp.h"
 
 class CollisionSystem : public PureSystem
 {
