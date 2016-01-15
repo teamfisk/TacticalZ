@@ -4,7 +4,7 @@ uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 uniform vec4 Color;
-
+uniform vec2 ScreenDimensions;
 uniform sampler2D texture0;
 
 #define TILE_SIZE 16
@@ -99,7 +99,7 @@ void main()
 
 	LightResult totalLighting;
 	totalLighting.Diffuse = scene_ambient;
-	int currentTile = int(floor(gl_FragCoord.x/TILE_SIZE) + (floor(gl_FragCoord.y/TILE_SIZE) * 80));
+	int currentTile = int(floor(gl_FragCoord.x/TILE_SIZE) + (floor(gl_FragCoord.y/TILE_SIZE) * int(ScreenDimensions.x/TILE_SIZE)));
 
 	int start = int(LightGrids.Data[currentTile].Start);
 	int amount = int(LightGrids.Data[currentTile].Amount);

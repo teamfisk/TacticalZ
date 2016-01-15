@@ -1,7 +1,6 @@
 #version 430
 
 #define TILE_SIZE 16
-#define NUM_TILES 3600
 
 uniform mat4 P;
 uniform vec2 ScreenDimensions;
@@ -70,7 +69,7 @@ void main ()
 
 	
 	if ( gl_GlobalInvocationID.x < ScreenDimensions.x / TILE_SIZE && gl_GlobalInvocationID.y < ScreenDimensions.y / TILE_SIZE ) { // inside the screen
-        Frustums.Data[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y*80] = f;	
+        Frustums.Data[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y*int(ScreenDimensions.x/TILE_SIZE)] = f;	
 
     }
 }

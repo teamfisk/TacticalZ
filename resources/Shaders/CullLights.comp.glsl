@@ -9,10 +9,10 @@
 
 
 #define MAX_LIGHTS_PER_TILE 200
-#define NUM_TILES 3600
 #define TILE_SIZE 16
 
 uniform mat4 V;
+uniform vec2 ScreenDimensions;
 
 struct Plane {
 	vec3 Normal;
@@ -105,7 +105,7 @@ void AppendLight(int li)
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 void main ()
 {
-	GroupIndex = int(gl_WorkGroupID.x + (gl_WorkGroupID.y * 80));
+	GroupIndex = int(gl_WorkGroupID.x + (gl_WorkGroupID.y * int(ScreenDimensions.x/TILE_SIZE)));
 	if(gl_LocalInvocationIndex == 0)
 	{
 		GroupLightCount = 0;

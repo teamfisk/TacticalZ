@@ -3,6 +3,7 @@
 LightCullingPass::LightCullingPass(IRenderer* renderer)
 {
     m_Renderer = renderer;
+    SetSSBOSizes();
     InitializeSSBOs();
     InitializeShaderPrograms();
     //GenerateNewFrustum(TODO);
@@ -25,9 +26,29 @@ void LightCullingPass::GenerateNewFrustum(RenderScene& scene)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(scene.Camera->ProjectionMatrix()));
     glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
-    glDispatchCompute(5, 3, 1); //TODO: Renderer: This needs change so resolution will be right.
+    glDispatchCompute((int)(m_Renderer->Resolution().Width/(TILE_SIZE*TILE_SIZE) + 1), (int)(m_Renderer->Resolution().Height/(TILE_SIZE*TILE_SIZE) + 1), 1);
 
     GLERROR("CalculateFrustum Error: End");
+}
+
+
+void LightCullingPass::OnResolutionChange()
+{
+    SetSSBOSizes();
+}
+
+
+void LightCullingPass::SetSSBOSizes()
+{
+    m_NumberOfTiles = (int)(m_Renderer->Resolution().Width*m_Renderer->Resolution().Height)/TILE_SIZE;
+
+    //m_Frustums = new Frustum[s];
+    //m_LightGrid = new LightGrid[s];
+    //m_LightIndex = new float[s*200];
+
+    m_Frustums = new Frustum[m_NumberOfTiles];
+    m_LightGrid = new LightGrid[m_NumberOfTiles];
+    m_LightIndex = new float[m_NumberOfTiles*MAX_LIGHTS_PER_TILE];
 }
 
 void LightCullingPass::CullLights(RenderScene& scene)
@@ -43,11 +64,11 @@ void LightCullingPass::CullLights(RenderScene& scene)
     } else {
         GLfloat zero = 0.f;
         glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(GLfloat), &zero , GL_DYNAMIC_COPY);
-
     }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     m_LightCullProgram->Bind();
+    glUniform2f(glGetUniformLocation(m_LightCullProgram->GetHandle(), "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
     glUniformMatrix4fv(glGetUniformLocation(m_LightCullProgram->GetHandle(), "V"), 1, false, glm::value_ptr(scene.Camera->ViewMatrix()));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
@@ -83,7 +104,7 @@ void LightCullingPass::InitializeSSBOs()
 {
     glGenBuffers(1, &m_FrustumSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_FrustumSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_Frustums), &m_Frustums, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Frustum)*m_NumberOfTiles, m_Frustums, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_FrustumSSBO");
 
@@ -97,7 +118,7 @@ void LightCullingPass::InitializeSSBOs()
 
     glGenBuffers(1, &m_LightGridSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightGrid), &m_LightGrid, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightGrid)*m_NumberOfTiles, m_LightGrid, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightGridSSBO");
 
@@ -110,7 +131,7 @@ void LightCullingPass::InitializeSSBOs()
 
     glGenBuffers(1, &m_LightIndexSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightIndexSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightIndex), &m_LightIndex, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*m_NumberOfTiles*MAX_LIGHTS_PER_TILE, m_LightIndex, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightIndexSSBO");
 }

@@ -2,7 +2,7 @@
 #define LightCullingPass_h__
 
 #define TILE_SIZE 16 
-#define NUM_LIGHTS 1000
+#define MAX_LIGHTS_PER_TILE 200
 
 #include "IRenderer.h"
 #include "LightCullingPassState.h"
@@ -17,6 +17,8 @@ public:
     ~LightCullingPass();
 
     void GenerateNewFrustum(RenderScene& scene);
+    void OnResolutionChange();
+    void SetSSBOSizes();
     void CullLights(RenderScene& scene);
     void FillLightList(RenderScene& scene);
 
@@ -41,6 +43,8 @@ private:
     ShaderProgram* m_CalculateFrustumProgram;
     ShaderProgram* m_LightCullProgram;
 
+    int m_NumberOfTiles = 0;
+
     struct Plane {
         glm::vec3 Normal;
         float d;
@@ -49,7 +53,7 @@ private:
     struct Frustum {
         Plane Planes[4];
     };
-    Frustum m_Frustums[80*45]; //TODO: Renderer: Make this change with resolution
+    Frustum* m_Frustums;
 
     //This should be a component
     struct PointLight {
@@ -68,11 +72,11 @@ private:
         glm::vec2 Padding;
     };
 
-    LightGrid m_LightGrid[80*45]; //TODO: Renderer: Make this change with resolution
+    LightGrid* m_LightGrid;
 
     int m_LightOffset = 0;
 
-    float m_LightIndex[80*45*200]; //TODO: Renderer: Make this change with resolution
+    float* m_LightIndex;
 };
 
 

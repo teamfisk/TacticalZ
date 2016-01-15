@@ -116,7 +116,7 @@ void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World*
             return;
         }
 
-        std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC));
+        std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
         jobs.push_back(pointLightJob);
     }
 }
