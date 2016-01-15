@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="11.2723322" Y="1.28011799" Z="3.66820574"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.obj</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0" Z="1.26689196"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.obj</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-1.14786315"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Camera/>
+        <c:Transform>
+          <Position X="-9.75645447" Y="12.7158976" Z="7.92630243"/>
+          <Orientation X="-0.757485211" Y="-1.44177103" Z="7.17310422e-06"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

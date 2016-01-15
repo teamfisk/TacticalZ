@@ -7,6 +7,11 @@
 class World;
 struct EntityWrapper
 {
+    EntityWrapper()
+        : World(nullptr)
+        , ID(EntityID_Invalid)
+    { }
+
     EntityWrapper(::World* world, EntityID id)
         : World(world)
         , ID(id)

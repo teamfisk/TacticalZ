@@ -10,16 +10,23 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
 )
 
-file(GLOB SOURCE_FILES
+file(GLOB SOURCE_FILES_Systems
     "${INCLUDE_PATH}/Systems/*.h"
     "Systems/*.cpp"
 )
 source_group(Systems FILES ${SOURCE_FILES_Systems})
 
+file(GLOB SOURCE_FILES_Events
+	"${INCLUDE_PATH}/Events/*.h"
+	"Events/*.cpp"
+)
+source_group(Events FILES ${SOURCE_FILES_Events})
+
 set(SOURCE_FILES
     ${SOURCE_FILES}
     "Game.cpp"
     ${SOURCE_FILES_Systems}
+	${SOURCE_FILES_Events}
 )
 
 set(LIBRARIES

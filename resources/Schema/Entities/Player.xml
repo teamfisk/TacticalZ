@@ -3,6 +3,7 @@
 
   <Components>
     <c:AABB/>
+    <c:Physics/>
     <c:Collidable/>
     <c:Model>
       <Resource>Models/Core/UnitSphere.obj</Resource>

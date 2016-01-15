@@ -20,6 +20,9 @@
 							<xs:element ref="c:Trigger" minOccurs="0"/>
 							<xs:element ref="c:Health" minOccurs="0"/>
 							<xs:element ref="c:Collidable" minOccurs="0"/>
+							<xs:element ref="c:Spawner" minOccurs="0"/>
+							<xs:element ref="c:SpawnPoint" minOccurs="0"/>
+							<xs:element ref="c:PlayerSpawn" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>
