@@ -3,6 +3,7 @@
 bool RenderState::Enable(GLenum cap)
 {
     if (glIsEnabled(cap)) {
+        //LOG_WARNING("Trying to enable somthing that is already enabled.");
         return false;
     }
     m_ResetFunctions.push_back(std::bind(glDisable, cap));

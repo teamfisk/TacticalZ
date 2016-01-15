@@ -7,21 +7,23 @@
 Game::Game(int argc, char* argv[])
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+    ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
+    ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+    ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-    m_RenderQueueFactory = new RenderQueueFactory();
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_World);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -31,7 +33,8 @@ Game::Game(int argc, char* argv[])
         m_Config->Get<int>("Video.Height", 720)
         ));
     m_Renderer->Initialize();
-    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    m_RenderFrame = new RenderFrame();
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
@@ -55,9 +58,12 @@ Game::Game(int argc, char* argv[])
         EntityFileParser fp(file);
         fp.MergeEntities(m_World);
     }
+    //SO MUCH TEMP PLEASE REMOVE ME OMFG VIKTOR HELP
+    m_Renderer->m_World = m_World;
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    
 
     //All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
@@ -70,24 +76,31 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();
     }
+
+    // Invoke sound system
+    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
+
     m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
     delete m_SystemPipeline;
+    delete m_SoundSystem;
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;
     delete m_InputManager;
+    delete m_RenderFrame;
     delete m_Renderer;
-    delete m_RenderQueueFactory;
     delete m_EventBroker;
 }
 
@@ -113,15 +126,14 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
-
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
+    debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-
-    m_RenderQueueFactory->Update(m_World);
+    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
-    m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
+    m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
@@ -144,10 +156,5 @@ void Game::networkFunction()
         m_ClientOrServer = new Server();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
-    // I don't think we are reaching this part of the code right now.
-    // ~Game() is not called if the game is exited by closing console windows
-    // When server or client is done set it to false.
-    //m_IsClientOrServer = false;
-    // Destroy it
-    //delete m_ClientOrServer;
+
 }

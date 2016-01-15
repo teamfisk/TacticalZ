@@ -9,114 +9,19 @@
 			<Resource>Models/DummyScene.obj</Resource>
 		</c:Model>
 	</Components>
+</Entity>
 	<Children>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="-1.5"/>
-					<Scale X="1" Y="1" Z="1"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/ScaleWidget.obj</Resource>
-				</c:Model>
-			</Components>
-		</Entity>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="1.5"/>
-					<Scale X="2" Y="2" Z="2"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/RotationWidget.obj</Resource>
-				</c:Model>
-				<c:Trigger>
-				</c:Trigger>
-			</Components>
-		</Entity>
-		<!--<Entity>
-			<Components>
-				<c:Player>
-					<Velocity X="0" Y="0" Z="0"/>
-				</c:Player>
-				<c:Transform>
-					<Position X="2.5"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/Core/UnitCube.obj</Resource>
-				</c:Model>
-				<c:AABB>
-				</c:AABB>
-			</Components>
-		</Entity>-->
 		<Entity>
 			<Components>
 				<c:Transform>
 					<Position X="0" Y="-0"/>
 					<Scale X="1" Y="1" Z="1"/>
 				</c:Transform>
-				<!--<c:Move>
-					<Speed>1</Speed>
-					<Direction X="-1"/>
-					<Rotation Y="3.14"/>
-				</c:Move>-->
+				<c:Camera>
+				</c:Camera>
+				<c:Model>
+					<Resource>Models/Camera.obj</Resource>
+				</c:Model>
 			</Components>
-			<Children>
-				<Entity>
-					<Components>
-						<c:Transform>
-							<Position X="0" Y="0"/>
-							<Orientation X="0.0" Y="0" Z="1.0"/>
-						</c:Transform>
-						<c:Model>
-							<Resource>Models/Core/UnitRaptor.obj</Resource>
-							<Color R="1" G="0.4" B="0.8"/>
-						</c:Model>
-					</Components>
-					<Children>
-						<Entity>
-							<Components>
-								<c:Transform>
-									<Position X="-0.01" Y="0.55"/>
-									<Orientation X="0" Y="0" Z="-1"/>
-								</c:Transform>
-								<c:RaptorCopter>
-									<Speed>20</Speed>
-									<Axis Y="1"/>
-								</c:RaptorCopter>
-							</Components>
-							<Children>
-								<Entity>
-									<Components>
-										<c:Transform>
-											<Position X="0" Y="0"/>
-											<Scale X="1.7" Y="0.03" Z="0.1"/>
-											<Orientation X="0" Y="0" Z="0"/>
-										</c:Transform>
-										<c:Model>
-											<Resource>Models/Core/UnitCube.obj</Resource>
-											<Color R="1" G="0.4" B="0.8"/>
-										</c:Model>
-									</Components>
-								</Entity>
-								<Entity>
-									<Components>
-										<c:Transform>
-											<Position X="0" Y="0"/>
-											<Scale X="1.7" Y="0.03" Z="0.1"/>
-											<Orientation X="0" Y="1.57" Z="0"/>
-										</c:Transform>
-										<c:Model>
-											<Resource>Models/Core/UnitCube.obj</Resource>
-											<Color R="1" G="0.4" B="0.8"/>
-										</c:Model>
-									</Components>
-								</Entity>
-							</Children>
-						</Entity>
-					</Children>
-				</Entity>
-			</Children>
 		</Entity>
 	</Children>
-</Entity>

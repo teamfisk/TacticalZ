@@ -7,7 +7,6 @@
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
 #include "Rendering/Renderer.h"
-#include "Core/EntityXMLFile.h"
 #include "Engine\Rendering\Texture.h"
 
 BOOST_AUTO_TEST_SUITE(resourceManagerTests)

@@ -75,6 +75,9 @@ RawModel::RawModel(std::string fileName)
 				desc.TextureCoords = glm::vec2(uv.x, uv.y);
 			}
 
+
+			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
+            
 			m_Vertices.push_back(desc);
 		}
 
@@ -123,6 +126,7 @@ RawModel::RawModel(std::string fileName)
 		matGroup.EndIndex = m_Indices.size() - 1;
 		// Material shininess
 		material->Get(AI_MATKEY_SHININESS, matGroup.Shininess);
+        material->Get(AI_MATKEY_OPACITY, matGroup.Transparency);
 		//LOG_DEBUG("Shininess: %f", matGroup.Shininess);
 		// Diffuse texture
 		//LOG_DEBUG("%i diffuse textures found", material->GetTextureCount(aiTextureType_DIFFUSE));
@@ -130,9 +134,7 @@ RawModel::RawModel(std::string fileName)
 			aiString path;
 			aiTextureMapping mapping;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &path, &mapping);
-			std::string absolutePath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
-			//LOG_DEBUG("Diffuse texture: %s", absolutePath.c_str());
-			matGroup.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(absolutePath));
+			matGroup.TexturePath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
 		}
 		// Normal map
 		//LOG_DEBUG("%i normal maps found", material->GetTextureCount(aiTextureType_HEIGHT));
@@ -140,9 +142,7 @@ RawModel::RawModel(std::string fileName)
 			aiString path;
 			aiTextureMapping mapping;
 			material->GetTexture(aiTextureType_HEIGHT, 0, &path, &mapping);
-			std::string absolutePath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
-			//LOG_DEBUG("Normal map: %s", absolutePath.c_str());
-			matGroup.NormalMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(absolutePath));
+            matGroup.NormalMapPath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
 		}
 		// Specular map
 		//LOG_DEBUG("%i specular maps found", material->GetTextureCount(aiTextureType_SPECULAR));
@@ -150,11 +150,9 @@ RawModel::RawModel(std::string fileName)
 			aiString path;
 			aiTextureMapping mapping;
 			material->GetTexture(aiTextureType_SPECULAR, 0, &path, &mapping);
-			std::string absolutePath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
-			//LOG_DEBUG("Specular map: %s", absolutePath.c_str());
-			matGroup.SpecularMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(absolutePath));
+            matGroup.SpecularMapPath = (boost::filesystem::path(fileName).branch_path() / path.C_Str()).string();
 		}
-		TextureGroups.push_back(matGroup);
+		MaterialGroups.push_back(matGroup);
 
 		// Bones
 		std::map<int, std::vector<std::tuple<int, float>>> vertexWeights;
