@@ -5,7 +5,7 @@ LightCullingPass::LightCullingPass(IRenderer* renderer)
     m_Renderer = renderer;
     InitializeSSBOs();
     InitializeShaderPrograms();
-    GenerateNewFrustum();
+    //GenerateNewFrustum(TODO);
 }
 
 LightCullingPass::~LightCullingPass()
@@ -13,21 +13,24 @@ LightCullingPass::~LightCullingPass()
 
 }
 
-void LightCullingPass::GenerateNewFrustum()
+void LightCullingPass::GenerateNewFrustum(RenderScene& scene)
 {
+    if (scene.PointLightJobs.size() == 0)
+        return;
+
     GLERROR("CalculateFrustum Error: Pre");
 
     m_CalculateFrustumProgram->Bind();
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
-    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(m_Renderer->Camera()->ProjectionMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(scene.Camera->ProjectionMatrix()));
     glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
     glDispatchCompute(5, 3, 1); //TODO: Renderer: This needs change so resolution will be right.
 
     GLERROR("CalculateFrustum Error: End");
 }
 
-void LightCullingPass::CullLights()
+void LightCullingPass::CullLights(RenderScene& scene)
 {
     GLERROR("CullLights Error: Pre");
     m_LightOffset = 0;
@@ -45,7 +48,7 @@ void LightCullingPass::CullLights()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     m_LightCullProgram->Bind();
-    glUniformMatrix4fv(glGetUniformLocation(m_LightCullProgram->GetHandle(), "V"), 1, false, glm::value_ptr(m_Renderer->Camera()->ViewMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(m_LightCullProgram->GetHandle(), "V"), 1, false, glm::value_ptr(scene.Camera->ViewMatrix()));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
@@ -56,10 +59,11 @@ void LightCullingPass::CullLights()
     GLERROR("CullLights Error: End");
 }
 
-void LightCullingPass::FillLightList(RenderQueueCollection& rq)
+void LightCullingPass::FillLightList(RenderScene& scene)
 {
     m_PointLights.clear();
-    for(auto &job : rq.Lights) {
+
+    for(auto &job : scene.PointLightJobs) {
         auto pointLightjob = std::dynamic_pointer_cast<PointLightJob>(job);
         if (pointLightjob) {
             PointLight p;

@@ -3,13 +3,7 @@
 void Renderer::Initialize()
 {
 	InitializeWindow();
-	// Create default camera
-	m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(90.0f), 0.01f, 5000.f);
-	m_DefaultCamera->SetPosition(glm::vec3(0, 1, 10));
-	if (m_Camera == nullptr) {
-		m_Camera = m_DefaultCamera;
-	}
-    m_DebugCameraInputController = std::make_shared<DebugCameraInputController<Renderer>>(m_EventBroker, -1);
+    
     InitializeRenderPasses();
 
 	glfwSwapInterval(m_VSYNC);
@@ -21,6 +15,15 @@ void Renderer::Initialize()
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
+
+
+    // Create default camera
+    m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
+    if (m_Camera == nullptr) {
+        m_Camera = m_DefaultCamera;
+    }
+
 }
 
 void Renderer::InitializeWindow()
@@ -76,9 +79,7 @@ void Renderer::InitializeShaders()
 
 void Renderer::InputUpdate(double dt)
 {
-    m_DebugCameraInputController->Update(dt);
-    m_Camera->SetOrientation(m_DebugCameraInputController->Orientation());
-	m_Camera->SetPosition(m_DebugCameraInputController->Position());
+   
 }
 
 void Renderer::Update(double dt)
@@ -88,20 +89,35 @@ void Renderer::Update(double dt)
     m_ImGuiRenderPass->Update(dt);
 }
 
-void Renderer::Draw(RenderQueueCollection& rq)
+void Renderer::Draw(RenderFrame& frame)
 {
-    FillDepth(rq);
-    m_PickingPass->Draw(rq);
-    //DrawScreenQuad(m_PickingPass->PickingTexture());
-    m_LightCullingPass->FillLightList(rq);
-    m_LightCullingPass->CullLights();
+    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
     
-    //m_DrawScenePass->Draw(rq);
-    m_DrawFinalPass->Draw(rq);
-    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 1.f);
-    GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+
+    m_PickingPass->ClearPicking();
+    for (auto scene : frame.RenderScenes){
+    
+        m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
+        FillDepth(*scene);
+        m_PickingPass->Draw(*scene);
+        m_LightCullingPass->GenerateNewFrustum(*scene);
+        m_LightCullingPass->FillLightList(*scene);
+        m_LightCullingPass->CullLights(*scene);
+        m_DrawFinalPass->Draw(*scene);
+        //m_DrawScenePass->Draw(rq);
+
+        GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+    }
+
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
+}
+
+PickData Renderer::Pick(glm::vec2 screenCoord)
+{
+    return m_PickingPass->Pick(screenCoord);
 }
 
 void Renderer::DrawScreenQuad(GLuint textureToDraw)
@@ -152,13 +168,18 @@ void Renderer::InitializeRenderPasses()
 }
 
 //Temp func
-void Renderer::FillDepth(RenderQueueCollection& rq)
+void Renderer::FillDepth(RenderScene& scene)
 {
-    for(auto job : rq.Forward) {
+    for (auto job : scene.ForwardJobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-        glm::vec3 abspos = RenderQueueFactory::AbsolutePosition(m_World, modelJob->Entity);
-        glm::vec3 worldpos = glm::vec3(m_Camera->ViewMatrix() * glm::vec4(abspos, 1));
+        if(! modelJob) {
+            return;
+        }
+
+
+        glm::vec3 abspos = Transform::AbsolutePosition(modelJob->World, modelJob->Entity);
+        glm::vec3 worldpos = glm::vec3(scene.Camera->ViewMatrix() * glm::vec4(abspos, 1));
         modelJob->Depth = worldpos.z;
     }
-    rq.Forward.Jobs.sort(Renderer::DepthSort);
+    scene.ForwardJobs.sort(Renderer::DepthSort);
 }

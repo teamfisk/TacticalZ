@@ -7,6 +7,7 @@
 #include "IRenderer.h"
 #include "LightCullingPassState.h"
 #include "ShaderProgram.h"
+#include "RenderQueue.h"
 
 
 class LightCullingPass
@@ -15,9 +16,9 @@ public:
     LightCullingPass(IRenderer* renderer);
     ~LightCullingPass();
 
-    void GenerateNewFrustum();
-    void CullLights();
-    void FillLightList(RenderQueueCollection& rq);
+    void GenerateNewFrustum(RenderScene& scene);
+    void CullLights(RenderScene& scene);
+    void FillLightList(RenderScene& scene);
 
     GLuint FrustumSSBO() const { return m_FrustumSSBO; }
     GLuint LightSSBO() const { return m_LightSSBO; }

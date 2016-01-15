@@ -1,8 +1,5 @@
 #version 430
 
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
 uniform vec2 PickingColor;
 
 in VertexData{

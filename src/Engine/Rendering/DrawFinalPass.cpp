@@ -22,7 +22,7 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ForwardPlusProgram->Link();
 }
 
-void DrawFinalPass::Draw(RenderQueueCollection& rq)
+void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("DrawFinalPass::Draw: Pre");
 
@@ -38,11 +38,11 @@ void DrawFinalPass::Draw(RenderQueueCollection& rq)
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ProjectionMatrix()));
 
     //TODO: Render: Add code for more jobs than modeljobs.
-    for (auto &job : rq.Forward) {
+    for (auto &job : scene.ForwardJobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
         if(modelJob) {
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
 
             if(modelJob->DiffuseTexture != nullptr) {

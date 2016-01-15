@@ -12,34 +12,34 @@
 #include "../Core/World.h"
 #include "PickingPass.h"
 #include "DrawScenePass.h"
-#include "DebugCameraInputController.h"
 #include "LightCullingPass.h"
 #include "DrawFinalPass.h"
-
 #include "../Core/EventBroker.h"
-#include "EPicking.h"
 #include "ImGuiRenderPass.h"
+#include "Camera.h"
+#include "../Core/Transform.h"
 
 class Renderer : public IRenderer
 {
 public:
-    Renderer(EventBroker* eventBroker)
+    Renderer(EventBroker* eventBroker, World* world) 
         : m_EventBroker(eventBroker)
+        , m_World(world)
     { }
 
     virtual void Initialize() override;
     virtual void Update(double dt) override;
-    virtual void Draw(RenderQueueCollection& rq) override;
+    virtual void Draw(RenderFrame& frame) override;
+
+    virtual PickData Pick(glm::vec2 screenCoord) override;
 
 private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
-
-    std::shared_ptr<DebugCameraInputController<Renderer>> m_DebugCameraInputController;
+    World* m_World;
 
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
-    float m_CameraMoveSpeed;
 
     Model* m_ScreenQuad;
     Model* m_UnitQuad;
@@ -62,8 +62,7 @@ private:
     void DrawScreenQuad(GLuint textureToDraw);
 
     static bool DepthSort(const std::shared_ptr<RenderJob> &i, const std::shared_ptr<RenderJob> &j) { return (i->Depth < j->Depth); }
-    void FillDepth(RenderQueueCollection& rq);
-
+    void FillDepth(RenderScene& scene);
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram* m_BasicForwardProgram;

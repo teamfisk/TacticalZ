@@ -18,7 +18,7 @@ public:
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
 
-    void Draw(RenderQueueCollection& rq);
+    void Draw(RenderScene& scene);
 
     //Getters
 
