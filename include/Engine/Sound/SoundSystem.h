@@ -41,7 +41,7 @@ public:
     SoundSystem(World* world, EventBroker* eventBroker, bool editorMode);
     ~SoundSystem();
     // Update emitters / listener
-    void Update(); 
+    void Update(double dt); 
 private:
     // Help functions for working with OpenaAL
     void setListenerPos(glm::vec3 pos) { alListener3f(AL_POSITION, pos.x, pos.y, pos.z); };
@@ -55,10 +55,10 @@ private:
 
     // Logic 
     void initOpenAL();
-    void updateEmitters();
-    void updateListener();
+    void updateEmitters(double dt);
+    void updateListener(double dt);
     void deleteInactiveEmitters();
-    void addNewEmitters();
+    void addNewEmitters(double dt);
     Source* createSource(std::string filePath);
     void playSound(Source* source);
     void stopSound(Source* source);

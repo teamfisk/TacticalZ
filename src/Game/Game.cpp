@@ -127,7 +127,7 @@ void Game::Tick()
     debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-    m_SoundSystem->Update();
+    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");

@@ -47,13 +47,13 @@ void SoundSystem::stopEmitters()
     }
 }
 
-void SoundSystem::Update()
+void SoundSystem::Update(double dt)
 { 
     m_EventBroker->Process<SoundSystem>();
-    addNewEmitters(); // can be optimized with "EEntityCreated"
+    addNewEmitters(dt); // can be optimized with "EEntityCreated"
     deleteInactiveEmitters(); // can be optimized with "EEntityDeleted"
-    updateEmitters();
-    updateListener();
+    updateEmitters( dt);
+    updateListener( dt);
 }
 
 void SoundSystem::deleteInactiveEmitters()
@@ -85,7 +85,7 @@ void SoundSystem::deleteInactiveEmitters()
     }
 }
 
-void SoundSystem::addNewEmitters()
+void SoundSystem::addNewEmitters(double dt)
 {
     auto emitterComponents = m_World->GetComponents("SoundEmitter");
     if (emitterComponents == nullptr) {
@@ -102,7 +102,7 @@ void SoundSystem::addNewEmitters()
     }
 }
 
-void SoundSystem::updateEmitters()
+void SoundSystem::updateEmitters(double dt)
 {
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end(); it++) {
@@ -133,9 +133,8 @@ void SoundSystem::updateEmitters()
     }
 }
 
-void SoundSystem::updateListener()
+void SoundSystem::updateListener(double dt)
 {
-    int testremove = 0;
     // Should only be one listener.
     auto listenerComponents = m_World->GetComponents("Listener");
     if (listenerComponents == nullptr) {
@@ -146,14 +145,10 @@ void SoundSystem::updateListener()
         glm::vec3 previousPos;
         alGetListener3f(AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
         glm::vec3 nextPos = Transform::AbsolutePosition(m_World, listener); // Get next (current) pos
-        glm::vec3 velocity = nextPos - previousPos; // Calculate velocity
+        glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt; // Calculate velocity
         setListenerPos(nextPos);
-        //setListenerVel(velocity);
+        setListenerVel(velocity);
         setListenerOri(glm::eulerAngles(Transform::AbsoluteOrientation(m_World, listener)));
-        testremove++;
-    }
-    if (testremove > 1) {
-        testremove = 0;
     }
 }
 
