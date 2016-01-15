@@ -1,10 +1,9 @@
-#ifndef BUTTONS_H
-#define BUTTONS_H
+#ifndef Menu_Menu_h__
+#define Menu_Menu_h__
 
 #include <map>
 #include <vector>
 
-#include "MayaIncludes.h"
 // Qt
 #pragma comment(lib, "QtCore4")
 #pragma comment(lib, "QtGui4")
@@ -30,13 +29,15 @@
 #include <QtGui/qfiledialog.h>
 #include <QtGui/qlineedit.h>
 #include <QtGui/qgroupbox.h>
+#include <QtGui/qlayoutitem.h>
+#include <QtGui/qtabwidget.h>
 
-struct VertexLayout
-{
-	float pos[3];
-	float normal[3];
-	float uv[2];
-};
+
+#include "MayaIncludes.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "Skeleton.h"
+#include "WriteToFile.h"
 
 class Menu : public QWidget
 {
@@ -45,12 +46,15 @@ public:
 	Menu(QDialog* dialog);
 	~Menu();
 
-	void GetMeshData(MObject object);
-	void exportMaterial(MObject object);
+    void GetMeshData(MObject object);
+	void GetMaterialData();
+	void GetSkeletonData();
 
 private slots:
 	void ExportSelected(bool checked);
 	void ExportPathClicked(bool);
+	void AddClipClicked(bool);
+	void RemoveClipClicked(bool);
 	void ExportAll(bool);
 	void CancelClicked(bool);
 
@@ -61,19 +65,31 @@ private slots:
 
 private:
 	Menu();
-	QPushButton* exportSelectedButton;
-	QPushButton* browseButton;
-	QPushButton* exportAllButton;
-	QPushButton* cancelButton;
+	std::vector<QLineEdit*> m_AnimationClipName;
+	std:: vector<QLineEdit*> m_StartFrameLines;
+	std::vector<QLineEdit*> m_EndFrameLines;
+	std::vector<QHBoxLayout*> layouts;
+	QVBoxLayout* m_ClipLayout;
 
-	QCheckBox* exportAnimationsButton;
-	QCheckBox* copyTexturesButton;
-	QCheckBox* button3;
+	QPushButton* m_ExportSelectedButton = nullptr;
+	QPushButton* m_BrowseButton = nullptr;
+	QPushButton* m_ExportAllButton = nullptr;
+	QPushButton* m_CancelButton = nullptr;
+	QPushButton* m_AddClipsButton = nullptr;
+	QPushButton* m_RemoveClipsButton = nullptr;
 
-	QLineEdit* exportPath;
-	QFileDialog* fileDialog;
-	QDialog* dialogPointer;
+	QCheckBox* m_ExportAnimationsButton = nullptr;
+	QCheckBox* m_CopyTexturesButton = nullptr;
+	QCheckBox* m_Button3 = nullptr;
 
+	QLineEdit* m_ExportPath = nullptr;
+	QFileDialog* m_FileDialog = nullptr;
+	QDialog* m_DialogPointer = nullptr;
+
+	Material* m_MaterialHandler = nullptr;
+	Skeleton* m_SkeletonHandler = nullptr;
+
+	WriteToFile m_File;
 };
 
 #endif

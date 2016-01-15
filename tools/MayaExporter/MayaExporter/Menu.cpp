@@ -10,74 +10,107 @@ Menu::Menu()
 Menu::Menu(QDialog* dialog)
 {
 	// Save the dialog pointer. Needed when the application gets destroyed
-	dialogPointer = dialog;
+	m_DialogPointer = dialog;
 
 	// Create QpushButtons & give them names
-	exportSelectedButton = new QPushButton("&Export Selected", this);
-	browseButton = new QPushButton("&...", this);
-	exportAllButton = new QPushButton("&Export All", this);
-	cancelButton = new QPushButton("&Cancel", this);
+	m_ExportSelectedButton = new QPushButton("&Export Selected", this);
+	m_BrowseButton = new QPushButton("&...", this);
+	m_ExportAllButton = new QPushButton("&Export All", this);
+	m_CancelButton = new QPushButton("&Cancel", this);
+	m_AddClipsButton = new QPushButton("&Add Clips", this);
+	m_RemoveClipsButton = new QPushButton("&Remove Latest Clip", this);
 
 	// Option box and checkboxes
 	QGroupBox *optionsBox = new QGroupBox(tr("Options"));
 
-	exportAnimationsButton = new QCheckBox(tr("&Export Animations"));
-	copyTexturesButton = new QCheckBox(tr("&Copy Textures"));
-	button3 = new QCheckBox(tr("option3"));
+	m_ExportAnimationsButton = new QCheckBox(tr("&Export Animations"));
+	m_CopyTexturesButton = new QCheckBox(tr("&Copy Textures"));
+	m_Button3 = new QCheckBox(tr("Test Materials"));
 
-	exportAnimationsButton->setChecked(true);
-	copyTexturesButton->setChecked(true);
+	m_ExportAnimationsButton->setChecked(true);
+	m_CopyTexturesButton->setChecked(true);
 	QVBoxLayout *vbox = new QVBoxLayout;
-	vbox->addWidget(exportAnimationsButton);
-	vbox->addWidget(copyTexturesButton);
-	vbox->addWidget(button3);
+	vbox->addWidget(m_ExportAnimationsButton);
+	vbox->addWidget(m_CopyTexturesButton);
+	vbox->addWidget(m_Button3);
 	vbox->addStretch(1);
 	optionsBox->setLayout(vbox);
 
 	// Connect the buttons with signals & functions
-	connect(exportSelectedButton, SIGNAL(clicked(bool)), this, SLOT(ExportSelected(bool)));
-	connect(browseButton, SIGNAL(clicked(bool)), this, SLOT(ExportPathClicked(bool)));
-	connect(exportAllButton, SIGNAL(clicked(bool)), this, SLOT(ExportAll(bool)));
-	connect(cancelButton, SIGNAL(clicked(bool)), this, SLOT(CancelClicked(bool)));
+	connect(m_ExportSelectedButton, SIGNAL(clicked(bool)), this, SLOT(ExportSelected(bool)));
+	connect(m_BrowseButton, SIGNAL(clicked(bool)), this, SLOT(ExportPathClicked(bool)));
+	connect(m_ExportAllButton, SIGNAL(clicked(bool)), this, SLOT(ExportAll(bool)));
+	connect(m_CancelButton, SIGNAL(clicked(bool)), this, SLOT(CancelClicked(bool)));
+	connect(m_AddClipsButton, SIGNAL(clicked(bool)), this, SLOT(AddClipClicked(bool)));
+	connect(m_RemoveClipsButton, SIGNAL(clicked(bool)), this, SLOT(RemoveClipClicked(bool)));
 
-	connect(exportAnimationsButton, SIGNAL(clicked(bool)), this, SLOT(Button1Clicked(bool)));
-	connect(copyTexturesButton, SIGNAL(clicked(bool)), this, SLOT(Button2Clicked(bool)));
-	connect(button3, SIGNAL(clicked(bool)), this, SLOT(Button3Clicked(bool)));
+	connect(m_ExportAnimationsButton, SIGNAL(clicked(bool)), this, SLOT(Button1Clicked(bool)));
+	connect(m_CopyTexturesButton, SIGNAL(clicked(bool)), this, SLOT(Button2Clicked(bool)));
+	connect(m_Button3, SIGNAL(clicked(bool)), this, SLOT(Button3Clicked(bool)));
 
 	// Creating several layouts, adding widgets & adding them to one layout in the end
 	QHBoxLayout* topLayout = new QHBoxLayout;
 	QVBoxLayout* midLayout = new QVBoxLayout;
 	QHBoxLayout* botLayout = new QHBoxLayout;
 	QVBoxLayout* baseLayout = new QVBoxLayout;
+	QHBoxLayout* clipButtonLayout = new QHBoxLayout;
+	QHBoxLayout* startEndLabelLayout = new QHBoxLayout;
+	m_ClipLayout = new QVBoxLayout;
 
-	exportPath = new QLineEdit;
-	fileDialog = new QFileDialog;
+
+
+	m_ExportPath = new QLineEdit;
+	m_FileDialog = new QFileDialog;
 
 	QLabel* exportLabel = new QLabel;
 	exportLabel->setText("Export Path:");
-	
+	QLabel* nameLabel = new QLabel;
+	nameLabel->setText("Name:");
+	QLabel* startLabel = new QLabel;
+	startLabel->setText("Start:");
+	QLabel* endLabel = new QLabel;
+	endLabel->setText("End:");
+
+	//exportLabel->setText("Export Path:");
+
 	midLayout->addWidget(optionsBox);
 
 	topLayout->addWidget(exportLabel);
-	topLayout->addWidget(exportPath);
-	topLayout->addWidget(browseButton);
+	topLayout->addWidget(m_ExportPath);
+	topLayout->addWidget(m_BrowseButton);
 
-	botLayout->addWidget(exportSelectedButton);
-	botLayout->addWidget(exportAllButton);
-	botLayout->addWidget(cancelButton);
+	botLayout->addWidget(m_ExportSelectedButton);
+	botLayout->addWidget(m_ExportAllButton);
+	botLayout->addWidget(m_CancelButton);
+
+	startEndLabelLayout->addWidget(nameLabel);
+	startEndLabelLayout->addWidget(startLabel);
+	startEndLabelLayout->addWidget(endLabel);
+
+	clipButtonLayout->addWidget(m_AddClipsButton);
+	clipButtonLayout->addWidget(m_RemoveClipsButton);
 
 	baseLayout->addLayout(topLayout);
 	baseLayout->addLayout(midLayout);
 
 	baseLayout->addSpacing(10);
-	
 	baseLayout->addLayout(botLayout);
+
+	baseLayout->addSpacing(10);
+	baseLayout->addLayout(clipButtonLayout);
+	baseLayout->addLayout(startEndLabelLayout);
+	baseLayout->addLayout(m_ClipLayout);
 	baseLayout->addStretch();
 
 	// Set the layout for our window
 	dialog->setLayout(baseLayout);
 
+	for (unsigned int i = 0; i < 3; i++) {
+		this->AddClipClicked(true);
+	}
+
 }
+
 
 void Menu::ExportSelected(bool checked)
 {
@@ -86,8 +119,7 @@ void Menu::ExportSelected(bool checked)
 	MGlobal::getActiveSelectionList(selected);
 
 	// Loop through or list of selection(s)
-	for (unsigned int i = 0; i < selected.length();i++)
-	{
+	for (unsigned int i = 0; i < selected.length(); i++) {
 		MObject object;
 		selected.getDependNode(i, object);
 		MFnDependencyNode thisNode(object);
@@ -95,138 +127,215 @@ void Menu::ExportSelected(bool checked)
 		cout << thisNode.name().asChar() << endl;
 		GetMeshData(object);
 	}
-	if (exportPath->text().isEmpty())
+	if (m_ExportPath->text().isEmpty()) {
 		cout << "Please select a folder." << endl;
-	else
-		cout << exportPath->text().toLocal8Bit().constData() << endl;
+	}
+	else {
+		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
+	}
+
+	if (m_ExportAnimationsButton->isChecked()) {
+		GetSkeletonData();
+	}
+
 }
 
 void Menu::ExportPathClicked(bool)
 {
 	// Opens up a file dialog. Save/Changes the name in the exportPath
-	fileDialog->setFileMode(QFileDialog::Directory);
-	fileDialog->setOption(QFileDialog::ShowDirsOnly);
-	QString fileName = fileDialog->getExistingDirectory(this, "Select", "/home", QFileDialog::ShowDirsOnly);
-	exportPath->setText(fileName);
+	m_FileDialog->setFileMode(QFileDialog::Directory);
+	m_FileDialog->setOption(QFileDialog::ShowDirsOnly);
+	QString fileName = m_FileDialog->getExistingDirectory(this, "Select", "/home", QFileDialog::ShowDirsOnly);
+	m_ExportPath->setText(fileName);
+}
+
+void Menu::AddClipClicked(bool)
+{
+	QHBoxLayout* tempLayout = new QHBoxLayout;
+
+	QLineEdit* nameLineEdit = new QLineEdit;
+	QLineEdit* startLineEdit = new QLineEdit;
+	QLineEdit* endLineEdit = new QLineEdit;
+
+	m_AnimationClipName.push_back(nameLineEdit);
+	m_StartFrameLines.push_back(startLineEdit);
+	m_EndFrameLines.push_back(endLineEdit);
+
+	tempLayout->addWidget(nameLineEdit);
+	tempLayout->addWidget(startLineEdit);
+	tempLayout->addWidget(endLineEdit);
+
+	m_ClipLayout->addLayout(tempLayout);
+	//m_ClipLayout->update();
+	layouts.push_back(tempLayout);
+}
+
+void Menu::RemoveClipClicked(bool)
+{
+	if (m_StartFrameLines.size() > 0) {
+		QLayoutItem* tempWidget;// = m_ClipLayout->itemAt(0);
+
+		for (unsigned int i = 0; i < layouts.size(); i++) {
+			while ((tempWidget = layouts[layouts.size() - 1]->takeAt(0)) != 0) {
+				delete tempWidget->widget();
+				delete tempWidget;
+			}
+		}
+
+		m_ClipLayout->removeItem(tempWidget);
+		m_ClipLayout->update();
+
+		layouts.pop_back();
+		m_StartFrameLines.pop_back();
+		m_EndFrameLines.pop_back();
+	}
 }
 
 void Menu::ExportAll(bool)
 {
 	MDagPath path;
-	
-	// Loop through all nodes in the scene
-	MItDependencyNodes it(MFn::kInvalid);
-	for (;!it.isDone();it.next())
-	{
-		MObject node = it.thisNode();
-		if (node.hasFn(MFn::kMesh))
-		{
-			MFnDependencyNode thisNode(node);
+    m_File.ASCIIFilePath("C:/Users/Nickelodion/Desktop/coolASCII.txt");
+    m_File.binaryFilePath("C:/Users/Nickelodion/Desktop/coolSoptunz.bin");
+    m_File.OpenFiles();
 
-			cout << thisNode.name().asChar() << endl;
-			GetMeshData(node);
+	// Loop through all nodes in the scene
+	MItDependencyNodes it(MFn::kMesh);
+	for (; !it.isDone(); it.next()) {
+		MObject node = it.thisNode();
+		if (node.hasFn(MFn::kMesh)) {
+			MFnDependencyNode thisNode(node);
+            MPlugArray connections;
+
+            thisNode.findPlug("inMesh").connectedTo(connections, true, true);
+            bool next = false;
+            for (unsigned int i = 0; i < connections.length(); i++) {
+                if(connections[i].node().apiType() == MFn::kSkinClusterFilter){ 
+                    next = true;
+                    break;
+                }
+            }
+            if (next)
+                continue;
+
+            cout << thisNode.name().asChar() << endl;
+            MGlobal::displayInfo("EXPORT ALL FUNCTION: " + thisNode.name() + " " + thisNode.findPlug("inMesh").asMObject().apiTypeStr());
+            GetMeshData(node);
 		}
 	}
-	if (exportPath->text().isEmpty())
+	if (m_ExportPath->text().isEmpty()) {
 		cout << "Please select a folder." << endl;
-	else
-		cout << exportPath->text().toLocal8Bit().constData() << endl;
+	}
+	else {
+		cout << m_ExportPath->text().toLocal8Bit().constData() << endl;
+	}
+
+	if (m_ExportAnimationsButton->isChecked())
+		GetSkeletonData();
+    m_File.CloseFiles();
 }
 
 void Menu::CancelClicked(bool)
 {
-	dialogPointer->close();
+	m_DialogPointer->close();
 }
 
 void Menu::Button1Clicked(bool)
 {
-	if(exportAnimationsButton->isChecked())
-		cout << "1 checked!" << endl;
-	else
-		cout << "1 unchecked!" << endl;
+	if (m_ExportAnimationsButton->isChecked()) {
+		MGlobal::displayInfo("1 checked!");
+	}
+	else {
+		MGlobal::displayInfo("1 unchecked!");
+	}
 }
 
 void Menu::Button2Clicked(bool)
 {
-	if (copyTexturesButton->isChecked())
+	if (m_CopyTexturesButton->isChecked()) {
 		cout << "2 checked!" << endl;
-	else
+	}
+	else {
 		cout << "2 unchecked!" << endl;
+	}
 }
 
 void Menu::Button3Clicked(bool)
 {
-	if (button3->isChecked())
+	if (m_Button3->isChecked()) {
 		cout << "3 checked!" << endl;
-	else
+	}
+	else {
 		cout << "3 unchecked!" << endl;
+	}
 }
-
 void Menu::GetMeshData(MObject object)
 {
-	// In here, we retrieve triangulated polygons from the mesh
-	MFnMesh mesh(object);
+    std::vector<VertexLayout> vertexList;
+    std::vector<unsigned int> indexList;
 
-	map<UINT, vector<UINT>> vertexToIndex;
+    Mesh mesh;
+    mesh.GetMeshData(object, vertexList, indexList);
 
-	vector<VertexLayout> verticesData;
-	vector<UINT>indexArray;
+    for (auto aVertex : vertexList) {
+        m_File.writeToFiles(&aVertex);
+    }
+    m_File.writeToFiles(indexList.data(), indexList.size());
+}
+void Menu::GetMaterialData()
+{
+	this->m_MaterialHandler = new Material();
 
-	MIntArray intdexOffsetVertexCount, vertices, triangleList;
-	MPointArray dummy;
+	// Traverse scene and return vector with all materials
+	std::vector<MaterialNode>* AllMaterials = m_MaterialHandler->DoIt();
 
-	UINT vertexIndex;
-	MVector normal;
-	MPoint pos;
-	float2 UV;
-	VertexLayout thisVertex;
-
-	for (MItMeshPolygon meshPolyIter(object); !meshPolyIter.isDone(); meshPolyIter.next())
-	{
-		vector<UINT> localVertexToGlobalIndex;
-		meshPolyIter.getVertices(vertices);
-
-		meshPolyIter.getTriangles(dummy, triangleList);
-		UINT indexOffset = verticesData.size();
-
-		for (UINT i = 0; i < vertices.length(); i++)
-		{
-			vertexIndex = meshPolyIter.vertexIndex(i);
-			pos = meshPolyIter.point(i);
-			pos.get(thisVertex.pos);
-
-			meshPolyIter.getNormal(i, normal);
-			thisVertex.normal[0] = normal[0];
-			thisVertex.normal[1] = normal[1];
-			thisVertex.normal[2] = normal[2];
-
-			meshPolyIter.getUV(i, UV);
-			thisVertex.uv[0] = UV[0];
-			thisVertex.uv[1] = UV[1];
-
-			verticesData.push_back(thisVertex);
-			localVertexToGlobalIndex.push_back(vertexIndex);
-
-			cout << "Pos: " << thisVertex.pos[0] << "/" << thisVertex.pos[1] << "/" << thisVertex.pos[2] << endl;
-			cout << "Normals: " << thisVertex.normal[0] << "/" << thisVertex.normal[1] << "/" << thisVertex.normal[2] << endl;
-			cout << "UV: " << thisVertex.uv[0] << "/" << thisVertex.uv[1] << endl;
-		}
-		for (UINT i = 0; i < triangleList.length(); i++)
-		{
-			UINT k = 0;
-			while (localVertexToGlobalIndex[k] != triangleList[i])
-				k++;
-			indexArray.push_back(indexOffset + k);
-		}
-	}
-	
+	// Access the colorR component of one material (example)
+	cout << AllMaterials->at(0).Color[0] << endl;
+	MGlobal::displayInfo(MString() + AllMaterials->at(0).Color[0]);
 }
 
-void Menu::exportMaterial(MObject object)
+void Menu::GetSkeletonData()
 {
-	MItDependencyNodes matIt(MFn::kLambert);
+	if (MAnimControl::currentTime().unit() != MTime::kNTSCField) {
 
+		MGlobal::displayError(MString() + "Please change to 60 FPS under Preferences/Settings!");
+		return;
+	}
 
+	std::vector<BindPoseSkeletonNode> allBindPoses;
+	std::vector<Animation> allAnimations;
+
+	allBindPoses = m_SkeletonHandler->GetBindPoses();
+
+	for (unsigned int j = 0; j < m_StartFrameLines.size(); j++) {
+		if (m_StartFrameLines[j]->text().isEmpty() == true || m_StartFrameLines[j]->text().isEmpty() == true) {
+			MGlobal::displayError(MString() + "Empty Animation Clip(s)");
+			return;
+		}
+
+		int startFrame = m_StartFrameLines[j]->text().toInt();
+		int  endFrame = m_EndFrameLines[j]->text().toInt();
+		std::string animationName = m_AnimationClipName[j]->text().toAscii().constData();
+
+		allAnimations.push_back(m_SkeletonHandler->GetAnimData(animationName, startFrame, endFrame));
+	}
+
+	//print out all bind poses
+	for (auto aBindPose : allBindPoses){
+		m_File.writeToFiles(&aBindPose);
+		MGlobal::displayInfo(MString() + "BindPose Skeleton name: " + aBindPose.Name.c_str());
+
+		for (int i = 0; i < aBindPose.Joints.size(); i++){
+			//MGlobal::displayInfo(MString() + aBindPose.JointNames[i].c_str());
+			//MGlobal::displayInfo(MString() + aBindPose.ParentIDs[i]);
+			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Translation[0] + " " + aBindPose.Joints[i].Translation[1] + " " + aBindPose.Joints[i].Translation[2]);
+			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Rotation[0] + " " + aBindPose.Joints[i].Rotation[1] + " " + aBindPose.Joints[i].Rotation[2]);
+			//MGlobal::displayInfo(MString() + aBindPose.Joints[i].Scale[0] + " " + aBindPose.Joints[i].Scale[1] + " " + aBindPose.Joints[i].Scale[2]);
+		}
+	}
+	//print out all animations
+	for (auto aAnimation : allAnimations) {
+		m_File.writeToFiles(&aAnimation);
+	}
 }
 
 Menu::~Menu()
@@ -235,5 +344,7 @@ Menu::~Menu()
 	//delete browseButton;
 	//delete exportPath;
 	//delete fileDialog;
-	fileDialog->~QFileDialog();
+	m_FileDialog->~QFileDialog();
+
+	//delete MaterialHandler;
 }
