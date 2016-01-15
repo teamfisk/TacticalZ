@@ -21,38 +21,6 @@ void PlayerSystem::UpdateComponent(World * world, ComponentWrapper & player, dou
         ComponentWrapper& transform = world->GetComponent(player.EntityID, "Transform");
         (glm::vec3&)transform["Position"] += (glm::vec3)player["Velocity"];
     }
-
-    //do shootEvent: if left mouse was released, and ammo/weaponcooldown/playeralive/shootingcooldown are ok
-    if (leftMouseWasReleased) {
-        leftMouseWasReleased = false;
-        //get the health component linked to the playerId
-        double currentHealth = (double)world->GetComponent(player.EntityID, "Health")["Health"];
-        int currentAmmo = 0;
-        double currentCoolDownTimer = 0.0;
-        std::string HeldItemString = "";
-        if ((int)player["EquippedItem"] == (int)HeldItem::PrimaryItem)
-            HeldItemString = "PrimaryItem";
-        if ((int)player["EquippedItem"] == (int)HeldItem::SecondaryItem)
-            HeldItemString = "SecondaryItem";
-
-        if (HeldItemString != "") {
-            ComponentWrapper& currentItem = world->GetComponent(player.EntityID, HeldItemString);
-            currentAmmo = (int)currentItem["Ammo"];
-            currentCoolDownTimer = (double)currentItem["CoolDownTimer"];
-
-            if (currentHealth > 0.0 && currentAmmo > 0 && currentCoolDownTimer < 0.001) {
-                //decrease ammo count
-                //TODO: temp, set the cooldowntimer - probably done in some other system (itemSystem?) later
-                currentItem["Ammo"] = (int)currentItem["Ammo"] - 1;
-                currentItem["CoolDownTimer"] = 2.0;//change later!
-                //create and publish the shoot event
-                Events::Shoot eShoot;
-                eShoot.currentAimingPoint = aimingCoordinates;
-                eShoot.currentlyEquippedItem = (int)(player["EquippedItem"]);
-                m_EventBroker->Publish(eShoot);
-            }
-        }
-    }
 }
 
 bool PlayerSystem::OnTouch(const Events::TriggerTouch &event)
@@ -71,15 +39,4 @@ bool PlayerSystem::OnLeave(const Events::TriggerLeave &event)
 {
     LOG_INFO("Player entity %i left widget (entity %i).", event.Entity, event.Trigger);
     return false;
-}
-
-bool PlayerSystem::OnMouseRelease(const Events::MouseRelease& e)
-{
-    //kolla ammoleft, cooldowntimer shooting
-    //kolla om left mouse varit nere
-    if (e.Button != GLFW_MOUSE_BUTTON_LEFT)
-        return false;
-    aimingCoordinates = glm::vec2(e.X, e.Y);
-    leftMouseWasReleased = true;
-    return true;
 }
