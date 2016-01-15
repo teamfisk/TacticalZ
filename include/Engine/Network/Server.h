@@ -20,8 +20,6 @@ public:
     ~Server();
     void Start(World* m_world, EventBroker *eventBroker) override;
     void Update() override;
-    void Close();
-
 private:
     // UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
@@ -30,7 +28,7 @@ private:
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
 
     // Sending messages to client logic
-    char readBuffer[1024] = { 0 };
+    char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
     // time for previouse message
     std::clock_t previousePingMessage = std::clock();
@@ -55,9 +53,6 @@ private:
     unsigned int m_PacketID;
     unsigned int m_PreviousPacketID;
     unsigned int m_SendPacketID;
-    
-    // Close logic
-    bool m_ThreadIsRunning = true;
 
     // Private member functions
     int  receive(char* data, size_t length);

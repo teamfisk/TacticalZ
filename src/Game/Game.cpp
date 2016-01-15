@@ -32,6 +32,7 @@ Game::Game(int argc, char* argv[])
         ));
     m_Renderer->Initialize();
     //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    m_RenderFrame = new RenderFrame();
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
@@ -56,8 +57,6 @@ Game::Game(int argc, char* argv[])
         fp.MergeEntities(m_World);
     }
 
-    m_RenderFrame = new RenderFrame();
-
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
     
@@ -73,7 +72,6 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
-
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
@@ -119,7 +117,6 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
-
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     m_Renderer->Update(dt);
@@ -149,10 +146,5 @@ void Game::networkFunction()
         m_ClientOrServer = new Server();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
-    // I don't think we are reaching this part of the code right now.
-    // ~Game() is not called if the game is exited by closing console windows
-    // When server or client is done set it to false.
-    //m_IsClientOrServer = false;
-    // Destroy it
-    //delete m_ClientOrServer;
+
 }
