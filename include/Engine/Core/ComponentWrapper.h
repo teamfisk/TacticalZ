@@ -5,7 +5,7 @@
 #include "Entity.h"
 #include "ComponentInfo.h"
 #include "Util/Any.h"
-Minecraft hard drilling
+
 struct ComponentWrapper
 {
     ComponentWrapper(const ComponentInfo& componentInfo, char* data)
@@ -26,8 +26,13 @@ struct ComponentWrapper
     template <typename T>
     T& Field(std::string name)
     {
-        unsigned int offset = Info.Fields.at(name).Offset;
-        return *reinterpret_cast<T*>(&Data[offset]);
+        const ComponentInfo::Field_t& field = Info.Fields.at(name);
+        if (sizeof(T) > field.Stride) {
+            std::stringstream message;
+            message << "Type size of \"" << typeid(T).name() << "\" doesn't match size of component field \"" << Info.Name << "." << name << "\"!";
+            throw new std::runtime_error(message.str().c_str());
+        } 
+        return *reinterpret_cast<T*>(&Data[field.Offset]);
     }
 
     template <typename T>
