@@ -5,8 +5,7 @@
 #include "Entity.h"
 #include "ComponentInfo.h"
 #include "Util/Any.h"
-
-// TODO: Change all instances "Property" to "Field" to remain consistent with ComponentInfo
+Minecraft hard drilling
 struct ComponentWrapper
 {
     ComponentWrapper(const ComponentInfo& componentInfo, char* data)
@@ -25,20 +24,20 @@ struct ComponentWrapper
     }
 
     template <typename T>
-    T& Property(std::string name)
+    T& Field(std::string name)
     {
         unsigned int offset = Info.Fields.at(name).Offset;
         return *reinterpret_cast<T*>(&Data[offset]);
     }
 
     template <typename T>
-    void SetProperty(std::string name, const T value) { Property<T>(name) = value; }
+    void SetField(std::string name, const T value) { Field<T>(name) = value; }
     //template <typename T>
-    //void SetProperty(std::string name, T& value) { Property<T>(name) = value; }
+    //void SetField(std::string name, T& value) { Field<T>(name) = value; }
 
     // Specialization for string literals
     template <std::size_t N>
-    void SetProperty(std::string name, const char(&value)[N]) { Property<std::string>(name) = std::string(value); }
+    void SetField(std::string name, const char(&value)[N]) { Field<std::string>(name) = std::string(value); }
     
     struct SubscriptProxy
     {
@@ -57,17 +56,17 @@ struct ComponentWrapper
         int Enum(const char* enumKey) { return m_Component->Enum(m_PropertyName.c_str(), enumKey); }
 
         template <typename T>
-        operator T&() { return m_Component->Property<T>(m_PropertyName); }
+        operator T&() { return m_Component->Field<T>(m_PropertyName); }
 
         template <typename T>
-        void operator=(const T val) { m_Component->SetProperty<T>(m_PropertyName, val); }
+        void operator=(const T val) { m_Component->SetField<T>(m_PropertyName, val); }
         // TODO: Pass by reference and rvalue (universal reference?)
         //template <typename T>
-        //void operator=(T& val) { m_Component->SetProperty<T>(m_PropertyName, val); }
+        //void operator=(T& val) { m_Component->SetField<T>(m_PropertyName, val); }
 
         // Specialization for string literals
-        template<std::size_t N>
-        void operator=(const char(&val)[N]) { m_Component->SetProperty<N>(m_PropertyName, val); }
+        template <std::size_t N>
+        void operator=(const char(&val)[N]) { m_Component->SetField<N>(m_PropertyName, val); }
     };
     SubscriptProxy operator[](std::string propertyName) { return SubscriptProxy(this, propertyName); }
 };

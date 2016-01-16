@@ -496,7 +496,7 @@ void EditorSystem::drawUI(World* world, double dt)
                         std::string uniqueID = componentType + fieldName;
                         ImGui::PushID(uniqueID.c_str());
                         if (field.Type == "Vector") {
-                            auto& val = component.Property<glm::vec3>(fieldName);
+                            auto& val = component.Field<glm::vec3>(fieldName);
                             if (fieldName == "Scale") {
                                 ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
                             } else if (fieldName == "Orientation") {
@@ -508,10 +508,10 @@ void EditorSystem::drawUI(World* world, double dt)
                                 ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
                             }
                         } else if (field.Type == "Color") {
-                            auto& val = component.Property<glm::vec4>(fieldName);
+                            auto& val = component.Field<glm::vec4>(fieldName);
                             ImGui::ColorEdit4("", glm::value_ptr(val), true);
                         } else if (field.Type == "string") {
-                            std::string& val = component.Property<std::string>(fieldName);
+                            std::string& val = component.Field<std::string>(fieldName);
                             char tempString[1024];
                             memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString)));
                             if (ImGui::InputText("", tempString, sizeof(tempString))) {
@@ -525,15 +525,15 @@ void EditorSystem::drawUI(World* world, double dt)
                             }
 
                         } else if (field.Type == "double") {
-                            float tempVal = static_cast<float>(component.Property<double>(fieldName));
+                            float tempVal = static_cast<float>(component.Field<double>(fieldName));
                             if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
-                                component.SetProperty(fieldName, static_cast<double>(tempVal));
+                                component.SetField(fieldName, static_cast<double>(tempVal));
                             }
                         } else if (field.Type == "int") {
-                            int val = component.Property<int>(fieldName);
+                            int val = component.Field<int>(fieldName);
                             ImGui::InputInt("", &val);
                         } else if (field.Type == "enum") {
-                            int currentValue = component.Property<int>(fieldName);
+                            int currentValue = component.Field<int>(fieldName);
                             int item = -1;
                             std::stringstream enumKeys;
                             std::vector<int> enumValues;
@@ -547,10 +547,10 @@ void EditorSystem::drawUI(World* world, double dt)
                                 i++;
                             }
                             if (ImGui::Combo("", &item, enumKeys.str().c_str())) {
-                                component.SetProperty(fieldName, enumValues.at(item));
+                                component.SetField(fieldName, enumValues.at(item));
                             }
                         } else if (field.Type == "bool") {
-                            auto& val = component.Property<bool>(fieldName);
+                            auto& val = component.Field<bool>(fieldName);
                             ImGui::Checkbox("", &val);
                         } else {
                             ImGui::TextDisabled(field.Type.c_str());
