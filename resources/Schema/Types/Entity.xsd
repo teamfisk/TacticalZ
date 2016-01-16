@@ -27,6 +27,7 @@
 							<xs:element ref="c:Spawner" minOccurs="0"/>
 							<xs:element ref="c:SpawnPoint" minOccurs="0"/>
 							<xs:element ref="c:PlayerSpawn" minOccurs="0"/>
+							<xs:element ref="c:Team" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

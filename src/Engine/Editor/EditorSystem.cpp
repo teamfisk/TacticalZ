@@ -484,8 +484,8 @@ void EditorSystem::drawUI(World* world, double dt)
                 }
 
                 if (ImGui::CollapsingHeader(componentType.c_str())) {
-                    if (!ci.Meta.Annotation.empty()) {
-                        ImGui::Text(ci.Meta.Annotation.c_str());
+                    if (!ci.Meta->Annotation.empty()) {
+                        ImGui::Text(ci.Meta->Annotation.c_str());
                     }
 
                     auto& component = world->GetComponent(m_Selection, componentType);
@@ -528,6 +528,26 @@ void EditorSystem::drawUI(World* world, double dt)
                             float tempVal = static_cast<float>(component.Property<double>(fieldName));
                             if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
                                 component.SetProperty(fieldName, static_cast<double>(tempVal));
+                            }
+                        } else if (field.Type == "int") {
+                            int val = component.Property<int>(fieldName);
+                            ImGui::InputInt("", &val);
+                        } else if (field.Type == "enum") {
+                            int currentValue = component.Property<int>(fieldName);
+                            int item = -1;
+                            std::stringstream enumKeys;
+                            std::vector<int> enumValues;
+                            int i = 0;
+                            for (auto& kv : ci.Meta->FieldEnumDefinitions.at(fieldName)) {
+                                enumKeys << kv.first << " (" << kv.second << ")" << '\0';
+                                enumValues.push_back(kv.second);
+                                if (currentValue == kv.second) {
+                                    item = i;
+                                }
+                                i++;
+                            }
+                            if (ImGui::Combo("", &item, enumKeys.str().c_str())) {
+                                component.SetProperty(fieldName, enumValues.at(item));
                             }
                         } else if (field.Type == "bool") {
                             auto& val = component.Property<bool>(fieldName);

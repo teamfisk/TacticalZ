@@ -6,6 +6,7 @@
 #include "ComponentInfo.h"
 #include "Util/Any.h"
 
+// TODO: Change all instances "Property" to "Field" to remain consistent with ComponentInfo
 struct ComponentWrapper
 {
     ComponentWrapper(const ComponentInfo& componentInfo, char* data)
@@ -17,6 +18,11 @@ struct ComponentWrapper
     const ComponentInfo& Info;
     const ::EntityID EntityID;
     char* Data;
+
+    int Enum(const char* fieldName, const char* enumKey)
+    {
+        return Info.Meta->FieldEnumDefinitions.at(fieldName).at(enumKey);
+    }
 
     template <typename T>
     T& Property(std::string name)
@@ -33,7 +39,7 @@ struct ComponentWrapper
     // Specialization for string literals
     template <std::size_t N>
     void SetProperty(std::string name, const char(&value)[N]) { Property<std::string>(name) = std::string(value); }
-
+    
     struct SubscriptProxy
     {
         friend struct ComponentWrapper;
@@ -47,6 +53,9 @@ struct ComponentWrapper
         std::string m_PropertyName;
 
     public:
+        // Return the integer value of an enum type key for this field
+        int Enum(const char* enumKey) { return m_Component->Enum(m_PropertyName.c_str(), enumKey); }
+
         template <typename T>
         operator T&() { return m_Component->Property<T>(m_PropertyName); }
 
@@ -71,7 +80,7 @@ public:
     ComponentWrapperFactory(std::string componentTypeName, std::size_t allocation = 0)
     {
         m_ComponentInfo.Name = componentTypeName;
-        m_ComponentInfo.Meta.Allocation = allocation;
+        m_ComponentInfo.Meta->Allocation = allocation;
     }
 
     template <typename T>
@@ -79,14 +88,14 @@ public:
     {
         m_DefaultValues.push_back(defaultValue);
         m_ComponentInfo.Fields[fieldName].Name = typeid(T).name();
-        m_ComponentInfo.Fields[fieldName].Offset = m_ComponentInfo.Meta.Stride;
+        m_ComponentInfo.Fields[fieldName].Offset = m_ComponentInfo.Stride;
         m_ComponentInfo.Fields[fieldName].Stride = sizeof(T);
-        m_ComponentInfo.Meta.Stride += sizeof(T);
+        m_ComponentInfo.Stride += sizeof(T);
     }
     
     ComponentInfo& Finalize()
     {
-        m_ComponentInfo.Defaults = std::shared_ptr<char>(new char[m_ComponentInfo.Meta.Stride]);
+        m_ComponentInfo.Defaults = std::shared_ptr<char>(new char[m_ComponentInfo.Stride]);
         std::size_t offset = 0;
         for (auto& val : m_DefaultValues) {
             memcpy(m_ComponentInfo.Defaults.get() + offset, val.Data.get(), val.Size);

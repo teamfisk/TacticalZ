@@ -114,7 +114,7 @@ void EntityFileWriter::appentEntityComponents(xercesc::DOMElement* parentElement
                 fieldElement->setAttribute(X("Y"), X(boost::lexical_cast<std::string>(q.y)));
                 fieldElement->setAttribute(X("Z"), X(boost::lexical_cast<std::string>(q.z)));
                 fieldElement->setAttribute(X("W"), X(boost::lexical_cast<std::string>(q.w)));
-            } else if (field.Type == "int") {
+            } else if (field.Type == "int" || field.Type == "enum") {
                 const int& value = c[fieldName];
                 fieldElement->appendChild(doc->createTextNode(X(boost::lexical_cast<std::string>(value))));
             } else if (field.Type == "float") {

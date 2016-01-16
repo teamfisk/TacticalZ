@@ -75,7 +75,7 @@ ComponentWrapper World::AttachComponent(EntityID entity, const std::string& comp
     // Allocate space for the component
     ComponentWrapper c = pool->Allocate(entity);
     // Write default values
-    memcpy(c.Data, ci.Defaults.get(), ci.Meta.Stride);
+    memcpy(c.Data, ci.Defaults.get(), ci.Stride);
 
     return c;
 }
