@@ -1,6 +1,7 @@
-<c:Camera>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Camera xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Camera.xsd">
 	<Name>cam</Name>
 	<FOV>45</FOV>
 	<NearClip>0.01</NearClip>
 	<FarClip>5000</FarClip>
-</c:Camera>
+</Camera>

@@ -23,6 +23,8 @@ void EntityFile::Parse(const EntityFileHandler* handler) const
     EntityFileSAXHandler saxHandler(handler, nullptr);
     m_SAX2XMLReader->setFeature(XMLUni::fgXercesCacheGrammarFromParse, true);
     m_SAX2XMLReader->setFeature(XMLUni::fgXercesUseCachedGrammarInParse, true);
+    m_SAX2XMLReader->setFeature(XMLUni::fgXercesSchema, true);
+    m_SAX2XMLReader->setFeature(XMLUni::fgXercesSchemaFullChecking, true);
     m_SAX2XMLReader->setContentHandler(&saxHandler);
     m_SAX2XMLReader->setErrorHandler(&saxHandler);
     m_SAX2XMLReader->setDeclarationHandler(&saxHandler);

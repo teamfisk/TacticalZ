@@ -174,7 +174,11 @@ void EntityFilePreprocessor::parseDefaults()
         memset(ci.second.Defaults.get(), 0, ci.second.Meta.Stride);
 
         XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager);
+        parser.setDoSchema(true);
+        parser.setDoNamespaces(true);
         parser.setErrorHandler(&errorHandler);
+        parser.setValidationScheme(XercesDOMParser::Val_Always);
+        parser.setValidationSchemaFullChecking(true);
 
         std::string componentName = ci.first;
         LOG_DEBUG("Parsing defaults for component %s", componentName.c_str());
