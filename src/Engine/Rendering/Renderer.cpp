@@ -161,7 +161,6 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
 
 void Renderer::InitializeRenderPasses()
 {
-    m_DrawScenePass = new DrawScenePass(this);
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
