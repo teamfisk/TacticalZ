@@ -1,3 +1,6 @@
+#ifndef DebugCameraInputController_h__
+#define DebugCameraInputController_h__
+
 #include <imgui/imgui.h>
 #include "../Input/FirstPersonInputController.h"
 
@@ -64,3 +67,5 @@ protected:
     float m_BaseSpeed = 2.0f;
     float m_Speed = m_BaseSpeed;
 };
+
+#endif

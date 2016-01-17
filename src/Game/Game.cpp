@@ -77,7 +77,6 @@ Game::Game(int argc, char* argv[])
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
@@ -91,6 +90,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
@@ -149,6 +150,7 @@ void Game::Tick()
     m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
+    m_RenderFrame->Clear();
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();

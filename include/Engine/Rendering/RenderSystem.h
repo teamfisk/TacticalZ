@@ -28,28 +28,17 @@ public:
 private:
     World* m_World = nullptr;
     const IRenderer* m_Renderer;
-
     RenderFrame* m_RenderFrame;
-    bool m_SwitchCamera = false;
     Camera* m_Camera;
-    DebugCameraInputController<RenderSystem>* m_DebugCameraInputController;
-    
-    std::list<ComponentWrapper> m_CameraComponents;
+    EntityWrapper m_CurrentCamera = EntityWrapper::Invalid;
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
-    bool OnSetCamera(const Events::SetCamera &event);
-    EntityID m_CurrentCamera = EntityID_Invalid;
-
-    void switchCamera(EntityID entity);
-
-    void updateCamera(World* world, double dt);
-    void updateProjectionMatrix(ComponentWrapper& cameraComponent);
-    
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
-    void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
-
+    bool OnSetCamera(Events::SetCamera &event);
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
+
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
+    void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
 };
 
 #endif

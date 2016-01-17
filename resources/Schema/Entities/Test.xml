@@ -9,7 +9,6 @@
 			<Resource>Models/DummyScene.obj</Resource>
 		</c:Model>
 	</Components>
-</Entity>
 	<Children>
 		<Entity>
 			<Components>
@@ -25,3 +24,4 @@
 			</Components>
 		</Entity>
 	</Children>
+</Entity>

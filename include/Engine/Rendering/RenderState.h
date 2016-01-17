@@ -16,10 +16,10 @@ public:
     bool Disable(GLenum cap);
     bool CullFace(GLenum mode);
     bool ClearColor(glm::vec4 color);
-    bool Clear(GLbitfield mask);
     bool BindFramebuffer(GLint framebuffer);
     bool BlendEquation(GLenum mode);
     bool BlendFunc(GLenum sfactor, GLenum dfactor);
+    bool DepthMask(GLboolean flag);
 
 private:
     std::vector<std::function<void(void)>> m_ResetFunctions;
