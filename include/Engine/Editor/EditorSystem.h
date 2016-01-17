@@ -8,6 +8,7 @@
 #include "../Core/ResourceManager.h"
 #include "../Core/EntityFilePreprocessor.h"
 #include "../Core/EntityFileParser.h"
+#include "EditorGUI.h"
 
 class EditorSystem : public ImpureSystem
 {
@@ -23,8 +24,10 @@ private:
     World* m_EditorWorld;
     SystemPipeline* m_EditorWorldSystemPipeline;
     Camera* m_EditorCamera;
-
     EntityWrapper m_Widget = EntityWrapper::Invalid;
     EntityWrapper m_Camera = EntityWrapper::Invalid;
     DebugCameraInputController<EditorSystem>* m_DebugCameraInputController;
+    EditorGUI* m_EditorGUI;
+
+    void OnEntitySelected(EntityWrapper entity);
 };

@@ -24,6 +24,9 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, Render
     m_EditorWorld->AttachComponent(m_Camera.ID, "Camera");
     m_DebugCameraInputController = new DebugCameraInputController<EditorSystem>(m_EventBroker, -1);
 
+    m_EditorGUI = new EditorGUI(m_EventBroker);
+    m_EditorGUI->SetEntitySelectedCallback(std::bind(&EditorSystem::OnEntitySelected, this, std::placeholders::_1));
+
     Events::SetCamera e;
     e.CameraEntity = m_Camera;
     m_EventBroker->Publish(e);
@@ -31,6 +34,7 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, Render
 
 EditorSystem::~EditorSystem()
 {
+    delete m_EditorGUI;
     delete m_DebugCameraInputController;
     delete m_EditorWorldSystemPipeline;
     delete m_EditorWorld;
@@ -40,7 +44,14 @@ void EditorSystem::Update(World* world, double dt)
 {
     m_EditorWorldSystemPipeline->Update(m_EditorWorld, dt);
 
+    m_EditorGUI->Draw(world);
+
     m_DebugCameraInputController->Update(dt);
     m_Camera["Transform"]["Position"] = m_DebugCameraInputController->Position();
     m_Camera["Transform"]["Orientation"] = glm::eulerAngles(m_DebugCameraInputController->Orientation());
+}
+
+void EditorSystem::OnEntitySelected(EntityWrapper entity)
+{
+    m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(entity.World, entity.ID);
 }
