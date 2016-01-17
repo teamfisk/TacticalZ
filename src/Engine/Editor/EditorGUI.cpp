@@ -2,6 +2,7 @@
 
 void EditorGUI::Draw(World* world)
 {
+    ImGui::ShowTestWindow();
     drawMenu();
     drawEntities(world);
 }
@@ -25,6 +26,15 @@ void EditorGUI::drawEntities(World* world)
         return;
     }
 
+    float buttonWidth = (ImGui::GetContentRegionAvailWidth() - 10.f) / 3.f ;
+    ImGui::Button("Create", ImVec2(buttonWidth, 0));
+    ImGui::SameLine(0.f, 5.f);
+    ImGui::Button("Import", ImVec2(buttonWidth, 0));
+    ImGui::SameLine(0.f, 5.f);
+    ImGui::Button("Reference", ImVec2(buttonWidth, 0));
+
+    ImGui::ItemSize(ImVec2(0, 3));
+
     drawEntitiesRecursive(world, EntityID_Invalid);
 
     ImGui::End();
@@ -46,13 +56,13 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
 {
     ImVec2 pos = ImGui::GetCursorScreenPos();
     float width = ImGui::GetContentRegionAvailWidth();
-    ImRect bb(pos + ImVec2(20, 0), pos + ImVec2(width, 13));
+    ImRect bb(pos + ImVec2(20, 0), pos + ImVec2(width, 14));
     auto window = ImGui::GetCurrentWindow();
     if (m_CurrentSelection == entity) {
         const ImU32 col = window->Color(ImGuiCol_HeaderActive);
         window->DrawList->AddRectFilled(bb.Min, bb.Max, col);
     }
-    ImGuiID id = window->GetID((std::string("#SelectButton") + std::to_string(entity)).c_str());
+    ImGuiID id = window->GetID((std::string("#SelectButton") + std::to_string(entity.ID)).c_str());
     bool hovered = false;
     bool held = false;
     if (ImGui::ButtonBehavior(bb, id, &hovered, &held)) {
