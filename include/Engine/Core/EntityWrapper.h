@@ -20,6 +20,8 @@ struct EntityWrapper
     ::World* World;
     EntityID ID;
 
+    static const EntityWrapper Invalid;
+
     bool HasComponent(const std::string& componentName);
 
     ComponentWrapper operator[](const std::string& componentName);

@@ -1,6 +1,8 @@
 #include "Core/EntityWrapper.h"
 #include "Core/World.h"
 
+const EntityWrapper EntityWrapper::Invalid = EntityWrapper(nullptr, EntityID_Invalid);
+
 bool EntityWrapper::operator==(const EntityWrapper& e)
 {
     return (this->World == e.World) && (this->ID == e.ID);

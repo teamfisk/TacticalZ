@@ -1,3 +1,6 @@
+#ifndef SpawnerSystem_h__
+#define SpawnerSystem_h__
+
 #include <random>
 #include "Common.h"
 #include "GLM.h"
@@ -12,9 +15,11 @@ class SpawnerSystem : public System
 public:
     SpawnerSystem(EventBroker* eventBroker);
 
+    static EntityWrapper Spawn(EntityWrapper spawner, EntityWrapper parent = EntityWrapper::Invalid);
+
 private:
     EventRelay<SpawnerSystem, Events::SpawnerSpawn> m_OnSpawnerSpawn;
     bool OnSpawnerSpawn(Events::SpawnerSpawn& e);
-
-    void spawnEntity(EntityWrapper spawner, EntityID parent, glm::vec3 position);
 };
+
+#endif

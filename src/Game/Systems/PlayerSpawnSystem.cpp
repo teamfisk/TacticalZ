@@ -8,17 +8,29 @@ PlayerSpawnSystem::PlayerSpawnSystem(EventBroker* eventBroker)
 
 void PlayerSpawnSystem::Update(World* world, double dt)
 {
-    auto componentPools = world->GetComponentPools();
-    auto spawnerPool = componentPools.find("Spawner");
-    if (spawnerPool == componentPools.end()) {
+    auto playerSpawns = world->GetComponents("PlayerSpawn");
+    if (playerSpawns == nullptr) {
         return;
     }
-;
+
     for (auto& team : m_SpawnRequests) {
-        for (auto& spawner : *spawnerPool->second) {
-            Events::SpawnerSpawn e;
-            e.Spawner = EntityWrapper(world, spawner.EntityID);
-            m_EventBroker->Publish(e);
+        for (auto& cPlayerSpawn : *playerSpawns) {
+            EntityWrapper spawner(world, cPlayerSpawn.EntityID);
+            if (!spawner.HasComponent("Spawner")) {
+                continue;
+            }
+
+            // If the spawner has a team affiliation, check it
+            if (spawner.HasComponent("Team")) {
+                if ((int)spawner["Team"]["Team"] != team) {
+                    continue;
+                }
+            }
+
+            // Spawn the player!
+            EntityWrapper player = SpawnerSystem::Spawn(spawner);
+            // Set the player team affiliation
+            player["Team"]["Team"] = team;
         }
     }
     m_SpawnRequests.clear();

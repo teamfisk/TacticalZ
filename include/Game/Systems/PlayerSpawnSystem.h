@@ -1,5 +1,6 @@
 #include "Core/System.h"
 #include "Input/EInputCommand.h"
+#include "Systems/SpawnerSystem.h"
 #include "Events/ESpawnerSpawn.h"
 
 class PlayerSpawnSystem : public ImpureSystem

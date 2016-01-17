@@ -5,43 +5,57 @@ SpawnerSystem::SpawnerSystem(EventBroker* eventBroker) : System(eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_OnSpawnerSpawn, &SpawnerSystem::OnSpawnerSpawn);
 }
 
-bool SpawnerSystem::OnSpawnerSpawn(Events::SpawnerSpawn& e)
+EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /*= EntityWrapper::Invalid*/)
 {
-    EntityWrapper& spawner = e.Spawner;
+    // Spawn the entity in the parent's world if it exists, otherwise in the spawner's world
+    World* world = parent.World;
+    if (world == nullptr) {
+        world = spawner.World;
+    } 
 
+    // Find any SpawnPoints existing as children of spawner
     auto children = spawner.World->GetChildren(spawner.ID);
-    std::vector<EntityID> spawnPoints;
+    std::vector<EntityWrapper> spawnPoints;
     for (auto kv = children.first; kv != children.second; ++kv) {
         const EntityID& child = kv->second;
         if (spawner.World->HasComponent(child, "SpawnPoint")) {
-            spawnPoints.push_back(child);
+            spawnPoints.push_back(EntityWrapper(spawner.World, child));
         }
     }
 
-    EntityID spawnPoint = spawner.ID;
+    // Choose a random SpawnPoint
+    EntityWrapper spawnPoint = spawner;
     if (!spawnPoints.empty()) {
-        // Select a random spawn point
-        static std::random_device randomDevice;
-        static std::mt19937 randomGenerator(randomDevice());
-        std::uniform_int_distribution<> distribution(0, std::distance(spawnPoints.begin(), spawnPoints.end()) - 1);
-        auto randomSpawnPointIt = spawnPoints.begin();
-        std::advance(randomSpawnPointIt, distribution(randomGenerator));
-        spawnPoint = *randomSpawnPointIt;
+        if (spawnPoints.size() > 1) {
+            static std::random_device randomDevice;
+            static std::mt19937 randomGenerator(randomDevice());
+            std::uniform_int_distribution<> distribution(0, std::distance(spawnPoints.begin(), spawnPoints.end()) - 1);
+            auto randomSpawnPointIt = spawnPoints.begin();
+            std::advance(randomSpawnPointIt, distribution(randomGenerator));
+            spawnPoint = *randomSpawnPointIt;
+        } else {
+            spawnPoint = spawnPoints.front();
+        }
     }
-    spawnEntity(spawner, e.Parent.ID, Transform::AbsolutePosition(spawner.World, spawnPoint));
-
-    return true;
-}
-
-void SpawnerSystem::spawnEntity(EntityWrapper spawner, EntityID parent, glm::vec3 position)
-{
+    
+    // Load the entity file and parse it
     const std::string& entityFilePath = spawner["Spawner"]["EntityFile"];
     auto entityFile = ResourceManager::Load<EntityFile>(entityFilePath);
     if (entityFile == nullptr) {
-        return;
+        return EntityWrapper::Invalid;
     }
-
     EntityFileParser parser(entityFile);
-    EntityWrapper spawnedEntity(spawner.World, parser.MergeEntities(spawner.World, parent));
-    spawnedEntity["Transform"]["Position"] = position;
+    EntityWrapper spawnedEntity(world, parser.MergeEntities(world, parent.ID));
+
+    // Set its position and orientation to that of the SpawnPoint
+    spawnedEntity["Transform"]["Position"] = Transform::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
+    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint.World, spawnPoint.ID));
+
+    return spawnedEntity;
+}
+
+bool SpawnerSystem::OnSpawnerSpawn(Events::SpawnerSpawn& e)
+{
+    EntityWrapper spawnedEntity = Spawn(e.Spawner, e.Parent);
+    return true;
 }

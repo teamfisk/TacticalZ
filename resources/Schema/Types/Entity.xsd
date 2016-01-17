@@ -13,7 +13,6 @@
 							<xs:element ref="c:Transform" minOccurs="0"/>
 							<xs:element ref="c:Physics" minOccurs="0"/>
 							<xs:element ref="c:Model" minOccurs="0"/>
-							<xs:element ref="c:Test" minOccurs="0"/>
 							<xs:element ref="c:RaptorCopter" minOccurs="0"/>
 							<xs:element ref="c:Player" minOccurs="0"/>
 							<xs:element ref="c:Camera" minOccurs="0"/>
