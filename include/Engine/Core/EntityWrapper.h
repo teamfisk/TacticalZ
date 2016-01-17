@@ -23,10 +23,12 @@ struct EntityWrapper
     static const EntityWrapper Invalid;
 
     bool HasComponent(const std::string& componentName);
+    bool Valid();
 
-    ComponentWrapper operator[](const std::string& componentName);
+    ComponentWrapper operator[](const char* componentName);
     bool operator==(const EntityWrapper& e);
-    explicit operator EntityID();
+    explicit operator EntityID() const;
+    operator bool();
 };
 
 #endif
