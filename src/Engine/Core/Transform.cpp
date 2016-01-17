@@ -7,7 +7,7 @@ glm::vec3 Transform::AbsolutePosition(World* world, EntityID entity)
     while (entity != EntityID_Invalid) {
         ComponentWrapper transform = world->GetComponent(entity, "Transform");
         EntityID parent = world->GetParent(entity);
-        position += Transform::AbsoluteOrientation(world, parent) * (glm::vec3)transform["Position"];
+        position += Transform::AbsoluteScale(world, parent) * Transform::AbsoluteOrientation(world, parent) * (glm::vec3)transform["Position"];
         entity = parent;
     }
 
