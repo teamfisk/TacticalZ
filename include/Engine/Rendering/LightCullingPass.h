@@ -56,15 +56,16 @@ private:
     Frustum* m_Frustums;
 
     //This should be a component
-    struct PointLight {
+    struct LightSource {
         glm::vec4 Position = glm::vec4(0.f);
+        glm::vec4 Direction = glm::vec4(0.f);
         glm::vec4 Color = glm::vec4(1.f);
         float Radius = 5.f;
         float Intensity = 0.8f;
         float Falloff = 0.3f;
-        float Padding = 1337;
+        enum Type_t { Point, Directional, Spot } Type;
     };
-    std::vector<PointLight> m_PointLights;
+    std::vector<LightSource> m_LightSources;
 
     struct LightGrid {
         float Start;

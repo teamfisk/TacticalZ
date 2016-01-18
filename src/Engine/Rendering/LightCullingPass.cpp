@@ -59,8 +59,8 @@ void LightCullingPass::CullLights(RenderScene& scene)
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(m_LightOffset), &m_LightOffset, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
-    if (m_PointLights.size() > 0) {
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(PointLight) * m_PointLights.size(), &(m_PointLights[0]), GL_DYNAMIC_COPY);
+    if (m_LightSources.size() > 0) {
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSource) * m_LightSources.size(), &(m_LightSources[0]), GL_DYNAMIC_COPY);
     } else {
         GLfloat zero = 0.f;
         glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(GLfloat), &zero , GL_DYNAMIC_COPY);
@@ -82,19 +82,20 @@ void LightCullingPass::CullLights(RenderScene& scene)
 
 void LightCullingPass::FillLightList(RenderScene& scene)
 {
-    m_PointLights.clear();
+    m_LightSources.clear();
 
     for(auto &job : scene.PointLightJobs) {
         auto pointLightjob = std::dynamic_pointer_cast<PointLightJob>(job);
         if (pointLightjob) {
-            PointLight p;
+            LightSource p;
             p.Color = pointLightjob->Color;
             p.Falloff = pointLightjob->Falloff;
             p.Intensity = pointLightjob->Intensity;
             p.Position = glm::vec4(glm::vec3(pointLightjob->Position), 1.f);
             p.Radius = pointLightjob->Radius;
-            p.Padding = 123.f;
-            m_PointLights.push_back(p);
+            //p.Padding = 123.f;
+            p.Type = LightSource::Point;
+            m_LightSources.push_back(p);
             continue;
         }
     }
@@ -110,8 +111,8 @@ void LightCullingPass::InitializeSSBOs()
 
     glGenBuffers(1, &m_LightSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
-    if(m_PointLights.size() > 0) {
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(PointLight) * m_PointLights.size(), &(m_PointLights[0]), GL_DYNAMIC_COPY);
+    if(m_LightSources.size() > 0) {
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSource) * m_LightSources.size(), &(m_LightSources[0]), GL_DYNAMIC_COPY);
     }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightSSBO");

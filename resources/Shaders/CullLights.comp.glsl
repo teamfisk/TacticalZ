@@ -27,19 +27,20 @@ layout (std430, binding = 0) buffer FrustumBuffer
 	Frustum Data[];
 } Frustums;
 
-struct PointLight {
+struct LightSource {
 	vec4 Position;
+	vec4 Direction;
 	vec4 Color;
 	float Radius;
 	float Intensity;
 	float Falloff;
-	float Padding;
+	int Type;
 };
 
 layout (std430, binding = 1) buffer LightBuffer
 {
-	PointLight List[];
-} PointLights;
+	LightSource List[];
+} LightSources;
 
 struct LightGrid {
 	float Start;
@@ -106,8 +107,7 @@ layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 void main ()
 {
 	GroupIndex = int(gl_WorkGroupID.x + (gl_WorkGroupID.y * int(ScreenDimensions.x/TILE_SIZE)));
-	if(gl_LocalInvocationIndex == 0)
-	{
+	if(gl_LocalInvocationIndex == 0) {
 		GroupLightCount = 0;
 		GroupFrustum = Frustums.Data[GroupIndex];
 	}
@@ -115,22 +115,25 @@ void main ()
 	barrier();
 	memoryBarrierShared();
 
-	for(int i = int(gl_LocalInvocationIndex); i < PointLights.List.length(); i += TILE_SIZE*TILE_SIZE)
-	{
-		PointLight light = PointLights.List[i];
+	for(int i = int(gl_LocalInvocationIndex); i < LightSources.List.length(); i += TILE_SIZE*TILE_SIZE) {
+		LightSource light = LightSources.List[i];
 
 		//if pointlight
 		//Pos i view antagligen
-		if(SphereInsideFrustrum( vec3(V * light.Position), light.Radius, GroupFrustum))
-		{
-			//TODO: Fix transparent and opaque list, and depth test.
-			AppendLight( i );
+		if(light.Type == 0) {
+			if(SphereInsideFrustrum( vec3(V * light.Position), light.Radius, GroupFrustum)) {
+				//TODO: Fix transparent and opaque list, and depth test.
+				AppendLight( i );
+			}
 		}
 
 
 		//if conelight
 
 		//if directional
+		if(light.Type == 1) {
+			AppendLight( i );
+		}
 
 	}
 

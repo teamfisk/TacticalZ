@@ -9,19 +9,20 @@ uniform sampler2D texture0;
 
 #define TILE_SIZE 16
 
-struct PointLight {
+struct LightSource {
 	vec4 Position;
+	vec4 Direction;
 	vec4 Color;
 	float Radius;
 	float Intensity;
 	float Falloff;
-	float Padding;
+	int Type;
 };
 
 layout (std430, binding = 1) buffer LightBuffer
 {
-	PointLight List[];
-} PointLights;
+	LightSource List[];
+} LightSources;
 
 struct LightGrid {
 	float Start;
@@ -71,7 +72,7 @@ vec4 CalcDiffuse(vec4 lightColor, vec4 lightVec, vec4 normal) {
 	return lightColor * power;
 }
 
-LightResult CalcPointLight(vec4 lightPos, float lightRadius, vec4 lightColor, float intensity, vec4 viewVec, vec4 position, vec4 normal, float falloff)
+LightResult CalcLightSource(vec4 lightPos, float lightRadius, vec4 lightColor, float intensity, vec4 viewVec, vec4 position, vec4 normal, float falloff)
 {
 	vec4 L = lightPos - position;
 	float dist = length(L);
@@ -108,15 +109,15 @@ void main()
 	{
 		int l = int(LightIndex[i]);
 
-		LightResult result = CalcPointLight(V * PointLights.List[l].Position, PointLights.List[l].Radius, PointLights.List[l].Color, PointLights.List[l].Intensity, viewVec, position, normal, PointLights.List[i].Falloff);
+		LightResult result = CalcLightSource(V * LightSources.List[l].Position, LightSources.List[l].Radius, LightSources.List[l].Color, LightSources.List[l].Intensity, viewVec, position, normal, LightSources.List[i].Falloff);
 
 		totalLighting.Diffuse += result.Diffuse;
 		totalLighting.Specular += result.Specular;
 	}
 
-	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
+	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
 	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
-	//fragmentColor += vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
+	fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;
 	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 )
 	{
