@@ -5,6 +5,7 @@
 #include "EventBroker.h"
 #include "System.h"
 #include "World.h"
+#include "EPause.h"
 
 class SystemPipeline
 {
@@ -12,7 +13,10 @@ public:
     SystemPipeline(World* world, EventBroker* eventBroker)
         : m_World(world)
         , m_EventBroker(eventBroker)
-    { }
+    {
+        EVENT_SUBSCRIBE_MEMBER(m_EPause, &SystemPipeline::OnPause);
+        EVENT_SUBSCRIBE_MEMBER(m_EResume, &SystemPipeline::OnResume);
+    }
 
     ~SystemPipeline()
     {
@@ -51,6 +55,10 @@ public:
 
     void Update(double dt)
     {
+        if (m_Paused) {
+            dt = 0.0;
+        }
+
         for (UnorderedSystems& group : m_OrderedSystemGroups) {
             // Process events
             for (auto& pair : group.Systems) {
@@ -80,6 +88,7 @@ public:
 private:
     World* m_World;
     EventBroker* m_EventBroker;
+    bool m_Paused = false;
 
     struct UnorderedSystems
     {
@@ -88,6 +97,21 @@ private:
         std::vector<ImpureSystem*> ImpureSystems;
     };
     std::vector<UnorderedSystems> m_OrderedSystemGroups;
+
+    EventRelay<SystemPipeline, Events::Pause> m_EPause;
+    bool OnPause(const Events::Pause& e) { 
+        if (e.World == m_World) { 
+            m_Paused = true; 
+        }
+        return true;
+    }
+    EventRelay<SystemPipeline, Events::Resume> m_EResume;
+    bool OnResume(const Events::Resume& e) {
+        if (e.World == m_World) {
+            m_Paused = false;
+        }
+        return true;
+    }
 };
 
 #endif

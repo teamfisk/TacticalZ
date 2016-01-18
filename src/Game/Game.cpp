@@ -27,7 +27,6 @@ Game::Game(int argc, char* argv[])
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-
     // Create the renderer
     m_Renderer = new Renderer(m_EventBroker, m_World);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
@@ -143,6 +142,7 @@ void Game::Tick()
         m_ClientOrServer->Update();
     }
     // Iterate through systems and update world!
+    m_EventBroker->Process<SystemPipeline>();
     m_SystemPipeline->Update(dt);
     debugTick(dt);
     m_Renderer->Update(dt);

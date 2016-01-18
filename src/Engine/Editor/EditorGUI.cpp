@@ -1,17 +1,18 @@
 #include "Editor/EditorGUI.h"
 
-EditorGUI::EditorGUI(EventBroker* eventBroker) 
-    : m_EventBroker(eventBroker)
+EditorGUI::EditorGUI(World* world, EventBroker* eventBroker) 
+    : m_World(world)
+    , m_EventBroker(eventBroker)
 {
 
 }
 
-void EditorGUI::Draw(World* world)
+void EditorGUI::Draw()
 {
     ImGui::ShowTestWindow();
     drawMenu();
     drawTools();
-    drawEntities(world);
+    drawEntities(m_World);
     drawComponents(m_CurrentSelection);
 }
 
@@ -65,10 +66,20 @@ void EditorGUI::drawTools()
         pauseIcon = ResourceManager::Load<Texture>("Textures/Icons/Pause.png")->m_Texture;
     } catch (const std::exception&) { }
 
-
-    ImGui::ImageButton((void*)playIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), ImVec4(0, 1, 0, 1));
+    static bool paused = false;
+    if (ImGui::ImageButton((void*)playIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+        Events::Resume e;
+        e.World = m_World;
+        m_EventBroker->Publish(e);
+        paused = false;
+    }
     ImGui::SameLine();
-    ImGui::ImageButton((void*)pauseIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
+    if (ImGui::ImageButton((void*)pauseIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+        Events::Pause e;
+        e.World = m_World;
+        m_EventBroker->Publish(e);
+        paused = true;
+    }
 
     ImGui::End();
 }

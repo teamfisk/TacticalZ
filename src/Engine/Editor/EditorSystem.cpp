@@ -19,7 +19,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorWorld->AttachComponent(m_Camera.ID, "Camera");
     m_DebugCameraInputController = new DebugCameraInputController<EditorSystem>(m_EventBroker, -1);
 
-    m_EditorGUI = new EditorGUI(m_EventBroker);
+    m_EditorGUI = new EditorGUI(m_World, m_EventBroker);
     m_EditorGUI->SetEntitySelectedCallback(std::bind(&EditorSystem::OnEntitySelected, this, std::placeholders::_1));
     m_EditorGUI->SetEntityImportCallback(std::bind(&EditorSystem::importEntity, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetEntitySaveCallback(std::bind(&EditorSystem::OnEntitySave, this, std::placeholders::_1, std::placeholders::_2));
@@ -49,7 +49,7 @@ void EditorSystem::Update(double dt)
 {
     m_EditorWorldSystemPipeline->Update(dt);
 
-    m_EditorGUI->Draw(m_World);
+    m_EditorGUI->Draw();
     m_EditorStats->Draw(dt);
 
     m_DebugCameraInputController->Update(dt);

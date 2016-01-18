@@ -14,14 +14,15 @@
 #include "../Core/World.h"
 #include "../Core/EntityWrapper.h"
 #include "../Core/ResourceManager.h"
+#include "../Core/EPause.h"
 #include "../Rendering/Texture.h"
 
 class EditorGUI
 {
 public:
-    EditorGUI(EventBroker* eventBroker);
+    EditorGUI(World* world, EventBroker* eventBroker);
 
-    void Draw(World* world);
+    void Draw();
 
     void SelectEntity(EntityWrapper entity);
 
@@ -57,6 +58,7 @@ public:
     void SetComponentDeleteCallback(OnComponentDelete_t f) { m_OnComponentDelete = f; }
 
 private:
+    World* m_World;
     EventBroker* m_EventBroker;
 
     // Config variables
