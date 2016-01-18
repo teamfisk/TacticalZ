@@ -6,8 +6,12 @@
 	<xs:element name="AABB">
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="BoxCenter" type="t:Vector" minOccurs="0"/>
-				<xs:element name="BoxSize" type="t:Vector" minOccurs="0"/>
+				<xs:element name="Origin" type="t:Vector" minOccurs="0">
+					<xs:annotation><xs:documentation>Middle point of the bounding box</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Size" type="t:Vector" minOccurs="0">
+					<xs:annotation><xs:documentation>Size of the bounding box</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

@@ -4,6 +4,9 @@
 	<xs:include schemaLocation="Types/Quaternion.xsd"/>
 	<xs:include schemaLocation="Types/Vector.xsd"/>
 	<xs:include schemaLocation="Types/Color.xsd"/>
+	<xs:complexType name="enum" mixed="true">
+		<xs:choice></xs:choice>
+	</xs:complexType>
 	<xs:simpleType name="bool">
 		<xs:restriction base="xs:boolean"></xs:restriction>
 	</xs:simpleType>

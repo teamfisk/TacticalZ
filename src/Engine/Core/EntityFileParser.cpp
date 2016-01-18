@@ -9,17 +9,21 @@ EntityFileParser::EntityFileParser(const EntityFile* entityFile)
     m_Handler.SetStartFieldDataCallback(std::bind(&EntityFileParser::onFieldData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 }
 
-void EntityFileParser::MergeEntities(World* world)
+EntityID EntityFileParser::MergeEntities(World* world, EntityID baseParent /*= EntityID_Invalid */)
 {
     m_World = world;
-    m_EntityIDMapper[0] = 0;
+    m_EntityIDMapper[0] = baseParent;
     m_EntityFile->Parse(&m_Handler);
+    return m_FirstEntity;
 }
 
 void EntityFileParser::onStartEntity(EntityID entity, EntityID parent, const std::string& name)
 {
     EntityID realParent = m_EntityIDMapper.at(parent);
     EntityID realEntity = m_World->CreateEntity(realParent);
+    if (m_FirstEntity == EntityID_Invalid) {
+        m_FirstEntity = realEntity;
+    }
     if (!name.empty()) {
         m_World->SetName(realEntity, name);
     }
@@ -38,7 +42,12 @@ void EntityFileParser::onStartComponentField(EntityID entity, const std::string&
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
-    auto& field = component.Info.Fields.at(fieldName);
+    auto fieldIt = component.Info.Fields.find(fieldName);
+    if (fieldIt == component.Info.Fields.end()) {
+        LOG_ERROR("Tried to set unknown field \"%s\" of component type \"%s\"! Ignoring.", fieldName.c_str(), componentType.c_str());
+        return;
+    }
+    auto& field = fieldIt->second;
 
     LOG_DEBUG("Field \"%s\" type \"%s\"", fieldName.c_str(), field.Type.c_str());
     LOG_DEBUG("Attributes:");
@@ -54,7 +63,11 @@ void EntityFileParser::onFieldData(EntityID entity, const std::string& component
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
-    auto& field = component.Info.Fields.at(fieldName);
+    auto fieldIt = component.Info.Fields.find(fieldName);
+    if (fieldIt == component.Info.Fields.end()) {
+        return;
+    }
+    auto& field = fieldIt->second;
 
     char* data = component.Data + field.Offset;
     EntityFile::WriteValueData(data, field, fieldData);

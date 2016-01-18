@@ -96,16 +96,22 @@ void Renderer::Update(double dt)
 void Renderer::Draw(RenderFrame& frame)
 {
     glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
+    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
 
     m_PickingPass->ClearPicking();
     for (auto scene : frame.RenderScenes){
+    
         m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
+        FillDepth(*scene);
         m_PickingPass->Draw(*scene);
+        m_LightCullingPass->GenerateNewFrustum(*scene);
+        m_LightCullingPass->FillLightList(*scene);
+        m_LightCullingPass->CullLights(*scene);
+        m_DrawFinalPass->Draw(*scene);
+        //m_DrawScenePass->Draw(rq);
 
-       
-
-        m_DrawScenePass->Draw(*scene);
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
 
         m_TextRenderer->Draw(*scene);
@@ -138,14 +144,14 @@ void Renderer::DrawScreenQuad(GLuint textureToDraw)
 
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
-    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->TextureGroups[0].EndIndex - m_ScreenQuad->TextureGroups[0].StartIndex +1
-        , GL_UNSIGNED_INT, 0, m_ScreenQuad->TextureGroups[0].StartIndex);
+    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].EndIndex - m_ScreenQuad->MaterialGroups()[0].StartIndex +1
+        , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].StartIndex);
 }
 
 void Renderer::InitializeTextures()
 {
-    m_ErrorTexture=ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
-    m_WhiteTexture=ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+    m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
+    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
@@ -156,7 +162,7 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, NULL);//TODO: Renderer: Fix the precision and Resolution
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("Texture initialization failed");
 }
 
@@ -164,4 +170,23 @@ void Renderer::InitializeRenderPasses()
 {
     m_DrawScenePass = new DrawScenePass(this);
     m_PickingPass = new PickingPass(this, m_EventBroker);
+    m_LightCullingPass = new LightCullingPass(this);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
+}
+
+//Temp func
+void Renderer::FillDepth(RenderScene& scene)
+{
+    for (auto job : scene.ForwardJobs) {
+        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+        if(! modelJob) {
+            return;
+        }
+
+
+        glm::vec3 abspos = Transform::AbsolutePosition(modelJob->World, modelJob->Entity);
+        glm::vec3 worldpos = glm::vec3(scene.Camera->ViewMatrix() * glm::vec4(abspos, 1));
+        modelJob->Depth = worldpos.z;
+    }
+    scene.ForwardJobs.sort(Renderer::DepthSort);
 }

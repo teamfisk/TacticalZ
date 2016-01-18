@@ -12,19 +12,20 @@
 #include "RenderJob.h"
 #include "ModelJob.h"
 #include "TextJob.h"
+#include "PointLightJob.h"
 
 struct RenderScene
 {
     ::Camera* Camera;
     std::list<std::shared_ptr<RenderJob>> ForwardJobs;
-    std::list<std::shared_ptr<RenderJob>> LightJobs;
+    std::list<std::shared_ptr<RenderJob>> PointLightJobs;
     std::list<std::shared_ptr<RenderJob>> TextJobs;
     Rectangle Viewport;
 
 	void Clear()
 	{
         ForwardJobs.clear();
-        LightJobs.clear();
+        PointLightJobs.clear();
         TextJobs.clear();
 	}
 };

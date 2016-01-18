@@ -17,16 +17,14 @@ Font::Font(std::string path)
         it++;
         if (it != tok.end()) {
             try {
-                LOG_INFO("DFhdoölshöldsihjgf");
                 fontSize = boost::lexical_cast<int>((*it).c_str());
             } catch (boost::bad_lexical_cast const&) {
-                std::cout << "Error: input string was not valid" << std::endl;
+                LOG_ERROR("input string did not have a valid font resolution");
             }
         }
     } else {
         return;
     }
-
 
 
     FT_Library library;

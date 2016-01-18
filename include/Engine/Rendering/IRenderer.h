@@ -9,6 +9,8 @@
 #include "Camera.h"
 #include "RenderQueue.h"
 #include "Model.h"
+#include "../Core/World.h" //So temp
+
 
 struct PickData
 {
@@ -42,6 +44,8 @@ public:
 	virtual void Update(double dt) = 0;
 	virtual void Draw(RenderFrame& rq) = 0;
     virtual PickData Pick(glm::vec2 screenCord) = 0;
+
+    World* m_World; //Temp world, untill viktor merge.
 
 protected:
 	Rectangle m_Resolution = Rectangle::Rectangle(1280, 720);
