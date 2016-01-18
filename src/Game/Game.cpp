@@ -71,7 +71,7 @@ Game::Game(int argc, char* argv[])
     m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     m_OctreeFrustrumCulling = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
 
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
@@ -143,7 +143,7 @@ void Game::Tick()
         m_ClientOrServer->Update();
     }
     // Iterate through systems and update world!
-    m_SystemPipeline->Update(m_World, dt);
+    m_SystemPipeline->Update(dt);
     debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();

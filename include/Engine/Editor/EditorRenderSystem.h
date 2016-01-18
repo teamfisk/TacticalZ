@@ -10,9 +10,9 @@
 class EditorRenderSystem : public ImpureSystem
 {
 public:
-    EditorRenderSystem(EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame);
+    EditorRenderSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame);
 
-    virtual void Update(World* world, double dt) override;
+    virtual void Update(double dt) override;
 
 private:
     IRenderer* m_Renderer;

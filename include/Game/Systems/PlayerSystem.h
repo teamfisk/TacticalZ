@@ -11,8 +11,8 @@
 class PlayerSystem : public PureSystem
 {
 public:
-    PlayerSystem(EventBroker* eventBroker)
-        : System(eventBroker)
+    PlayerSystem(World* world, EventBroker* eventBroker)
+        : System(world, eventBroker)
         , PureSystem("Player")
     {
         EVENT_SUBSCRIBE_MEMBER(m_ETouch, &PlayerSystem::OnTouch);
@@ -20,7 +20,7 @@ public:
         EVENT_SUBSCRIBE_MEMBER(m_ELeave, &PlayerSystem::OnLeave);
     }
 
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 private:
     float m_Speed = 5;
     EventRelay<PlayerSystem, Events::TriggerEnter> m_EEnter;

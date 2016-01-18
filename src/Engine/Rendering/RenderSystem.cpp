@@ -1,7 +1,7 @@
 #include "Rendering/RenderSystem.h"
 
-RenderSystem::RenderSystem(EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame)
-    : System(eventBroker)
+RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame) 
+    : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {
@@ -29,9 +29,9 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
     return true;
 }
 
-void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 {
-    auto models = world->GetComponents("Model");
+    auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
         return;
     }
@@ -60,17 +60,17 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
             }
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, world);
+        glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, m_World);
         for (auto matGroup : model->MaterialGroups()) {
-            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, world));
+            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, m_World));
             jobs.push_back(modelJob);
         }
     }
 }
 
-void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs)
 {
-    auto pointLights = world->GetComponents("PointLight");
+    auto pointLights = m_World->GetComponents("PointLight");
     if (pointLights == nullptr) {
         return;
     }
@@ -80,7 +80,7 @@ void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World*
         if (!visible) {
             continue;
         }
-        auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
+        auto transformC = m_World->GetComponent(pointlightC.EntityID, "Transform");
         if (&transformC == nullptr) {
             return;
         }
@@ -95,9 +95,8 @@ bool RenderSystem::OnInputCommand(const Events::InputCommand& e)
     return false;
 }
 
-void RenderSystem::Update(World* world, double dt)
+void RenderSystem::Update(double dt)
 {
-    m_World = world;
     m_EventBroker->Process<RenderSystem>();
 
     if (m_CurrentCamera) {
@@ -110,8 +109,8 @@ void RenderSystem::Update(World* world, double dt)
     RenderScene scene;
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
-    fillModels(scene.ForwardJobs, world);
-    fillLight(scene.PointLightJobs, world);
+    fillModels(scene.ForwardJobs);
+    fillLight(scene.PointLightJobs);
     m_RenderFrame->Add(scene);
    
 }

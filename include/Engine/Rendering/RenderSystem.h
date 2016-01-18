@@ -20,13 +20,12 @@
 class RenderSystem : public ImpureSystem
 {
 public:
-    RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
+    RenderSystem(World* world, EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
     ~RenderSystem();
 
-    virtual void Update(World* world, double dt) override;
+    virtual void Update(double dt) override;
 
 private:
-    World* m_World = nullptr;
     const IRenderer* m_Renderer;
     RenderFrame* m_RenderFrame;
     Camera* m_Camera;
@@ -37,8 +36,8 @@ private:
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
 
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
-    void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
+    void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
 };
 
 #endif

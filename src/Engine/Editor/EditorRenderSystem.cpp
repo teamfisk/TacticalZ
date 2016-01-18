@@ -1,7 +1,7 @@
 #include "Editor/EditorRenderSystem.h"
 
-EditorRenderSystem::EditorRenderSystem(EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(eventBroker)
+EditorRenderSystem::EditorRenderSystem(World* m_World, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
+    : System(m_World, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {
@@ -10,7 +10,7 @@ EditorRenderSystem::EditorRenderSystem(EventBroker* eventBroker, IRenderer* rend
     m_EditorCamera = new Camera((float)resolution.Width / resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
 }
 
-void EditorRenderSystem::Update(World* world, double dt)
+void EditorRenderSystem::Update(double dt)
 {
     if (m_CurrentCamera) {
         ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
@@ -23,7 +23,7 @@ void EditorRenderSystem::Update(World* world, double dt)
     scene.Camera = m_EditorCamera;
     scene.Viewport = Rectangle(1920, 1080);
 
-    auto models = world->GetComponents("Model");
+    auto models = m_World->GetComponents("Model");
     if (models != nullptr) {
         for (auto& cModel : *models) {
             if (!(bool)cModel["Visible"]) {
@@ -45,7 +45,7 @@ void EditorRenderSystem::Update(World* world, double dt)
                 }
             }
 
-            EntityWrapper entity(world, cModel.EntityID);
+            EntityWrapper entity(m_World, cModel.EntityID);
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
                 std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, nullptr, modelMatrix, matGroup, cModel, entity.World);
@@ -54,7 +54,7 @@ void EditorRenderSystem::Update(World* world, double dt)
         }
     }
 
-    auto pointLights = world->GetComponents("PointLight");
+    auto pointLights = m_World->GetComponents("PointLight");
     if (pointLights != nullptr) {
         for (auto& cPointLight : *pointLights) {
             bool visible = cPointLight["Visible"];
@@ -62,7 +62,7 @@ void EditorRenderSystem::Update(World* world, double dt)
                 continue;
             }
 
-            EntityWrapper entity(world, cPointLight.EntityID);
+            EntityWrapper entity(m_World, cPointLight.EntityID);
             ComponentWrapper& cTransform = entity["Transform"];
             std::shared_ptr<PointLightJob> pointLightJob = std::make_shared<PointLightJob>(cTransform, cPointLight, entity.World);
             scene.PointLightJobs.push_back(pointLightJob);

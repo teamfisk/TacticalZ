@@ -11,14 +11,14 @@ class System
     friend class SystemPipeline;
 
 protected:
-    System()
-        : m_EventBroker(nullptr)
-    { }
-    System(EventBroker* eventBroker)
-        : m_EventBroker(eventBroker)
+    System(World* world, EventBroker) { }
+    System(World* world, EventBroker* eventBroker)
+        : m_World(world)
+        , m_EventBroker(eventBroker)
     { }
     virtual ~System() = default;
 
+    World* m_World;
     EventBroker* m_EventBroker;
 };
 
@@ -34,7 +34,7 @@ protected:
 
     const std::string m_ComponentType;
 
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) = 0;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cUniformScale, double dt) = 0;
 };
 
 class ImpureSystem : public virtual System
@@ -45,7 +45,7 @@ protected:
     ImpureSystem() = default;
     virtual ~ImpureSystem() = default;
 
-    virtual void Update(World* world, double dt) = 0;
+    virtual void Update(double dt) = 0;
 };
 
 #endif

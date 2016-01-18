@@ -1,13 +1,13 @@
 #include "Core/UniformScaleSystem.h"
 
-UniformScaleSystem::UniformScaleSystem(EventBroker* eventBroker) 
-    : System(eventBroker)
+UniformScaleSystem::UniformScaleSystem(World* world, EventBroker* eventBroker) 
+    : System(world, eventBroker)
     , PureSystem("UniformScale")
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &UniformScaleSystem::OnSetCamera);
 }
 
-void UniformScaleSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& cUniformScale, double dt)
+void UniformScaleSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cUniformScale, double dt)
 {
     if (!m_Camera.Valid()) {
         return;

@@ -102,7 +102,7 @@ void GameHealthSystemTest::Tick()
     m_LastTime = currentTime;
 
     // Iterate through systems and update world!
-    m_SystemPipeline->Update(m_World, dt);
+    m_SystemPipeline->Update(dt);
 
     m_EventBroker->Swap();
     m_EventBroker->Clear();

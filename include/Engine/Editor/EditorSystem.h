@@ -15,10 +15,10 @@
 class EditorSystem : public ImpureSystem
 {
 public:
-    EditorSystem(EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame);
+    EditorSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame);
     ~EditorSystem();
 
-    void Update(World* world, double dt);
+    void Update(double dt);
 
 private:
     IRenderer* m_Renderer;

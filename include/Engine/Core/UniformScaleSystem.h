@@ -8,9 +8,9 @@
 class UniformScaleSystem : public PureSystem
 {
 public:
-    UniformScaleSystem(EventBroker* eventBroker);
+    UniformScaleSystem(World* world, EventBroker* eventBroker);
 
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& cUniformScale, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cUniformScale, double dt) override;
 
 private:
     EntityWrapper m_Camera = EntityWrapper::Invalid;

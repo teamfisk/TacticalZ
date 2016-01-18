@@ -18,13 +18,12 @@
 class EditorSystemOld : public ImpureSystem
 {
 public:
-    EditorSystemOld(EventBroker* eventBroker, IRenderer* renderer);
+    EditorSystemOld(World* world, EventBroker* eventBroker, IRenderer* renderer);
 
-    virtual void Update(World* world, double dt) override;
+    virtual void Update(double dt) override;
 
 private:
     IRenderer* m_Renderer;
-    World* m_World = nullptr;
     Camera* m_Camera = nullptr;
 
     bool m_Enabled;

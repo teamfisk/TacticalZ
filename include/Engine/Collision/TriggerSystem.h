@@ -14,13 +14,13 @@ class AABB;
 class TriggerSystem : public PureSystem
 {
 public:
-    TriggerSystem(EventBroker* eventBroker, Octree* octree)
-        : System(eventBroker)
+    TriggerSystem(World* world, EventBroker* eventBroker, Octree* octree)
+        : System(world, eventBroker)
         , PureSystem("Trigger")
         , m_Octree(octree)
     { }
 
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     Octree* m_Octree;

@@ -2,13 +2,13 @@
 #include "Core/UniformScaleSystem.h"
 #include "Editor/EditorRenderSystem.h"
 
-EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(eventBroker)
+EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
+    : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {
     m_EditorWorld = new World();
-    m_EditorWorldSystemPipeline = new SystemPipeline(eventBroker);
+    m_EditorWorldSystemPipeline = new SystemPipeline(m_EditorWorld, eventBroker);
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
     
@@ -45,11 +45,11 @@ EditorSystem::~EditorSystem()
     delete m_EditorWorld;
 }
 
-void EditorSystem::Update(World* world, double dt)
+void EditorSystem::Update(double dt)
 {
-    m_EditorWorldSystemPipeline->Update(m_EditorWorld, dt);
+    m_EditorWorldSystemPipeline->Update(dt);
 
-    m_EditorGUI->Draw(world);
+    m_EditorGUI->Draw(m_World);
     m_EditorStats->Draw(dt);
 
     m_DebugCameraInputController->Update(dt);

@@ -179,7 +179,7 @@ void Game::Tick()
 #endif
 
     // Iterate through systems and update world!
-    m_SystemPipeline->Update(m_World, dt);
+    m_SystemPipeline->Update(dt);
     m_Renderer->Update(dt);
 
     m_RenderQueueFactory->Update(m_World);

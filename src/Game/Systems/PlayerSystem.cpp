@@ -1,6 +1,6 @@
 #include "Systems/PlayerSystem.h"
 
-void PlayerSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void PlayerSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     component["Velocity"] = glm::vec3(0.f, 0.f, 0.f);
     if ((bool&)component["Forward"] == true) {
@@ -18,7 +18,7 @@ void PlayerSystem::UpdateComponent(World* world, EntityWrapper& entity, Componen
     }
 
     if ((glm::vec3)component["Velocity"] != glm::vec3(0.f)) {
-        ComponentWrapper& transform = world->GetComponent(component.EntityID, "Transform");
+        ComponentWrapper& transform = m_World->GetComponent(component.EntityID, "Transform");
         (glm::vec3&)transform["Position"] += (glm::vec3)component["Velocity"];
     }
 }

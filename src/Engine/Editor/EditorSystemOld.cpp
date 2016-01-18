@@ -2,8 +2,8 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui/imgui_internal.h>
 
-EditorSystemOld::EditorSystemOld(EventBroker* eventBroker, IRenderer* renderer) 
-    : System(eventBroker)
+EditorSystemOld::EditorSystemOld(World* world, EventBroker* eventBroker, IRenderer* renderer) 
+    : System(world, eventBroker)
     , ImpureSystem()
     , m_Renderer(renderer)
 {
@@ -23,10 +23,8 @@ EditorSystemOld::EditorSystemOld(EventBroker* eventBroker, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorSystemOld::OnFileDropped);
 }
 
-void EditorSystemOld::Update(World* world, double dt)
+void EditorSystemOld::Update(double dt)
 {
-    m_World = world;
-
     if (!m_Enabled) {
         return;
     }
@@ -37,7 +35,7 @@ void EditorSystemOld::Update(World* world, double dt)
     Picking();
     updateWidget();
 
-    drawUI(world, dt);
+    drawUI(m_World, dt);
 
     // Clear drop queue if it wasn't handled by any UI element
     if (!m_LastDroppedFile.empty()) {
