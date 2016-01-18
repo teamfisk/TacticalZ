@@ -3,7 +3,7 @@
 
 const EntityWrapper EntityWrapper::Invalid = EntityWrapper(nullptr, EntityID_Invalid);
 
-bool EntityWrapper::operator==(const EntityWrapper& e)
+bool EntityWrapper::operator==(const EntityWrapper& e) const
 {
     return (this->World == e.World) && (this->ID == e.ID);
 }

@@ -2,6 +2,7 @@
 #define EntityWrapper_h__
 
 #include <boost/optional.hpp>
+#include <boost/functional/hash.hpp>
 #include "ComponentWrapper.h"
 
 class World;
@@ -26,9 +27,23 @@ struct EntityWrapper
     bool Valid();
 
     ComponentWrapper operator[](const char* componentName);
-    bool operator==(const EntityWrapper& e);
+    bool operator==(const EntityWrapper& e) const;
     explicit operator EntityID() const;
     operator bool();
 };
+
+namespace std
+{
+	template<> struct hash<EntityWrapper>
+	{
+		std::size_t operator()(const EntityWrapper& e) const
+		{
+            std::size_t seed = 0;
+            boost::hash_combine(seed, e.World);
+            boost::hash_combine(seed, e.ID);
+            return seed;
+		}
+	};
+}
 
 #endif
