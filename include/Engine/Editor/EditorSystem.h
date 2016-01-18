@@ -40,6 +40,7 @@ private:
     void OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath);
     EntityWrapper OnEntityCreate(EntityWrapper parent);
     void OnEntityDelete(EntityWrapper entity);
+    void OnEntityChangeParent(EntityWrapper entity, EntityWrapper parent);
     void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
 };

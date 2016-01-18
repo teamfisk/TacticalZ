@@ -13,13 +13,13 @@
 #include "../Core/EventBroker.h"
 #include "../Core/World.h"
 #include "../Core/EntityWrapper.h"
+#include "../Core/ResourceManager.h"
+#include "../Rendering/Texture.h"
 
 class EditorGUI
 {
 public:
-    EditorGUI(EventBroker* eventBroker)
-        : m_EventBroker(eventBroker)
-    { }
+    EditorGUI(EventBroker* eventBroker);
 
     void Draw(World* world);
 
@@ -46,6 +46,9 @@ public:
     // Called when the user means to delete an entity.
     typedef std::function<void(EntityWrapper)> OnEntityDelete_t;
     void SetEntityDeleteCallback(OnEntityDelete_t f) { m_OnEntityDelete = f; }
+    // Called when the user means to change the parent of an entity.
+    typedef std::function<void(EntityWrapper, EntityWrapper)> OnEntityChangeParent_t;
+    void SetEntityChangeParentCallback(OnEntityChangeParent_t f) { m_OnEntityChangeParent = f; }
     // Called when the user means to attach a new component to an entity.
     typedef std::function<void(EntityWrapper, const std::string&)> OnComponentAttach_t;
     void SetComponentAttachCallback(OnComponentAttach_t f) { m_OnComponentAttach = f; }
@@ -62,6 +65,7 @@ private:
     // State variables
     EntityWrapper m_CurrentSelection = EntityWrapper::Invalid;
     std::unordered_map<EntityWrapper, boost::filesystem::path> m_EntityFiles;
+    EntityWrapper m_CurrentlyDragging = EntityWrapper::Invalid;
     std::string m_LastErrorMessage;
 
     // Callbacks
@@ -70,21 +74,25 @@ private:
     OnEntitySave_t m_OnEntitySave = nullptr;
     OnEntityCreate_t m_OnEntityCreate = nullptr;
     OnEntityDelete_t m_OnEntityDelete = nullptr;
+    OnEntityChangeParent_t m_OnEntityChangeParent = nullptr;
     OnComponentAttach_t m_OnComponentAttach = nullptr;
     OnComponentDelete_t m_OnComponentDelete = nullptr;
 
     // Utility functions
     boost::filesystem::path fileOpenDialog();
     boost::filesystem::path fileSaveDialog();
+    const std::string formatEntityName(EntityWrapper entity);
 
     // Entity file handling methods
     void entityImport(World* world);
-    void entitySave(EntityWrapper entity);
+    void entitySave(EntityWrapper entity, bool saveAs = false);
     void entityCreate(World* world, EntityWrapper parent);
     void entityDelete(EntityWrapper entity);
+    void entityChangeParent(EntityWrapper entity, EntityWrapper parent);
     
     // UI drawing methods
     void drawMenu();
+    void drawTools();
     void drawEntities(World* world);
     void drawEntitiesRecursive(World* world, EntityID parent);
     bool drawEntityNode(EntityWrapper entity);

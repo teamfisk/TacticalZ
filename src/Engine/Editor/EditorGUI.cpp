@@ -1,9 +1,16 @@
 #include "Editor/EditorGUI.h"
 
+EditorGUI::EditorGUI(EventBroker* eventBroker) 
+    : m_EventBroker(eventBroker)
+{
+
+}
+
 void EditorGUI::Draw(World* world)
 {
     ImGui::ShowTestWindow();
     drawMenu();
+    drawTools();
     drawEntities(world);
     drawComponents(m_CurrentSelection);
 }
@@ -19,6 +26,34 @@ void EditorGUI::SelectEntity(EntityWrapper entity)
 void EditorGUI::drawMenu()
 {
 
+}
+
+void EditorGUI::drawTools()
+{
+    if (!ImGui::Begin("Tools", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize)) {
+        return;
+    }
+
+    GLuint translateIcon = 0;
+    try {
+        translateIcon = ResourceManager::Load<Texture>("Textures/Icons/shaft.png")->m_Texture;
+    } catch (const std::exception&) { }
+    GLuint rotateIcon = 0;
+    try {
+        rotateIcon = ResourceManager::Load<Texture>("Textures/Icons/circulararrows3.png")->m_Texture;
+    } catch (const std::exception&) { }
+    GLuint scaleIcon = 0;
+    try {
+        scaleIcon = ResourceManager::Load<Texture>("Textures/Icons/increase10.png")->m_Texture;
+    } catch (const std::exception&) { }
+
+    ImGui::ImageButton((void*)translateIcon, ImVec2(24, 24));
+    ImGui::SameLine();
+    ImGui::ImageButton((void*)rotateIcon, ImVec2(24, 24));
+    ImGui::SameLine();
+    ImGui::ImageButton((void*)scaleIcon, ImVec2(24, 24));
+
+    ImGui::End();
 }
 
 void EditorGUI::drawEntities(World* world)
@@ -61,6 +96,7 @@ void EditorGUI::drawEntitiesRecursive(World* world, EntityID parent)
 
 bool EditorGUI::drawEntityNode(EntityWrapper entity)
 {
+    // Custom button hitbox to select entities on top of tree node
     ImVec2 pos = ImGui::GetCursorScreenPos();
     float width = ImGui::GetContentRegionAvailWidth();
     ImRect bb(pos + ImVec2(20, 0), pos + ImVec2(width, 14));
@@ -75,52 +111,52 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
     if (ImGui::ButtonBehavior(bb, id, &hovered, &held)) {
         SelectEntity(entity);
     }
-    //if (held) {
-    //    ImVec2 entityDragDelta = ImGui::GetMouseDragDelta(0);
-    //    if (std::abs(entityDragDelta.x) > 0 && std::abs(entityDragDelta.y) > 0) {
-    //        if (m_UIDraggingEntity == EntityID_Invalid) {
-    //            m_UIDraggingEntity = entity;
-    //            LOG_DEBUG("Started drag of entity %i", m_UIDraggingEntity);
-    //        }
-    //        ImGui::SetNextWindowPos(ImGui::GetIO().MousePos + ImVec2(20, 0));
-    //        ImGui::Begin("Change parent", nullptr, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings);
-    //        ImGui::Text("#%i", m_UIDraggingEntity);
-    //        ImGui::End();
-    //    }
-    //}
-
-    // Compose title
-    std::stringstream nodeTitle;
-    const std::string& entityName = entity.World->GetName(entity);
-    if (!entityName.empty()) {
-        nodeTitle << entityName;
-    } else {
-        nodeTitle << "#" << entity.ID;
+    // Handle entity dragging
+    if (held) {
+        ImVec2 entityDragDelta = ImGui::GetMouseDragDelta(0);
+        if (std::abs(entityDragDelta.x) > 0 && std::abs(entityDragDelta.y) > 0) {
+            if (m_CurrentlyDragging == EntityWrapper::Invalid) {
+                m_CurrentlyDragging = entity;
+                LOG_DEBUG("Started dragging %i", entity.ID);
+            }
+            ImGui::SetNextWindowPos(ImGui::GetIO().MousePos + ImVec2(20, 0));
+            ImGui::Begin("Change parent", nullptr, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings);
+            ImGui::Text(formatEntityName(entity).c_str());
+            ImGui::End();
+        }
+    } else if (m_CurrentlyDragging == entity) {
+        LOG_DEBUG("Stopped dragging %i", entity.ID);
+        m_CurrentlyDragging = EntityWrapper::Invalid;
     }
-    if (m_EntityFiles.count(entity) == 1) {
-        nodeTitle << " (" << m_EntityFiles.at(entity).filename().string() << ")";
+    // Entity context menu
+    std::string contextMenuUniqueID = std::string("EntityContextMenu") + std::to_string(entity.ID);
+    if (hovered && ImGui::IsMouseClicked(1)) {
+        ImGui::OpenPopup(contextMenuUniqueID.c_str());
+    }
+    if (ImGui::BeginPopup(contextMenuUniqueID.c_str())) {
+        ImGui::TextDisabled(formatEntityName(entity).c_str());
+        if (ImGui::MenuItem("Save", "Ctrl+S")) { 
+            entitySave(entity);
+        } else 
+        if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S")) { 
+            entitySave(entity, true);
+        } else 
+        if (ImGui::MenuItem("Delete", "Del")) {
+            entityDelete(entity);
+        } else 
+        if (ImGui::MenuItem("Move to root")) {
+            entityChangeParent(entity, EntityWrapper::Invalid);
+        }
+        drawModals();
+        ImGui::EndPopup();
     }
 
     ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
-    if (ImGui::TreeNode(nodeTitle.str().c_str())) {
-        //if (m_UIDraggingEntity != EntityID_Invalid && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0)) {
-        //    LOG_DEBUG("Changed parent of %i to %i", m_UIDraggingEntity, entity);
-        //    changeParent(m_UIDraggingEntity, entity);
-        //    m_UIDraggingEntity = EntityID_Invalid;
-        //}
-
-        if (ImGui::BeginPopupContextItem("entity context menu")) {
-            if (ImGui::Button("Save")) {
-                entitySave(entity);
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Delete")) {
-                entityDelete(entity);
-                ImGui::CloseCurrentPopup();
-            }
-            drawModals();
-            ImGui::EndPopup();
+    if (ImGui::TreeNode(formatEntityName(entity).c_str())) {
+        // Handle drop events for reparenting
+        if (m_CurrentlyDragging != EntityWrapper::Invalid && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0)) {
+            entityChangeParent(m_CurrentlyDragging, entity);
+            m_CurrentlyDragging = EntityWrapper::Invalid;
         }
         return true;
     } else {
@@ -133,7 +169,7 @@ void EditorGUI::drawComponents(EntityWrapper entity)
     std::stringstream title;
     title << "Components";
     if (entity.Valid()) {
-        title << " #" << entity.ID << "###Components";
+        title << formatEntityName(entity) << "###Components";
     }
     if (!ImGui::Begin(title.str().c_str())) {
         ImGui::End();
@@ -380,6 +416,7 @@ bool EditorGUI::createDeleteButton(const std::string& componentType)
     return pressed;
 }
 
+
 boost::filesystem::path EditorGUI::fileOpenDialog()
 {
     namespace bfs = boost::filesystem;
@@ -412,6 +449,28 @@ boost::filesystem::path EditorGUI::fileSaveDialog()
     }
 }
 
+const std::string EditorGUI::formatEntityName(EntityWrapper entity)
+{
+    if (!entity.Valid()) {
+        return "EntityID_Invalid";
+    }
+
+    std::stringstream name;
+
+    const std::string& entityName = entity.World->GetName(entity);
+    if (!entityName.empty()) {
+        name << entityName;
+    } else {
+        name << "#" << entity.ID;
+    }
+
+    if (m_EntityFiles.count(entity) == 1) {
+        name << " (" << m_EntityFiles.at(entity).filename().string() << ")";
+    }
+
+    return name.str();
+}
+
 void EditorGUI::entityImport(World* world)
 {
     boost::filesystem::path filePath = fileOpenDialog();
@@ -428,10 +487,10 @@ void EditorGUI::entityImport(World* world)
     }
 }
 
-void EditorGUI::entitySave(EntityWrapper entity)
+void EditorGUI::entitySave(EntityWrapper entity, bool saveAs /* = false */)
 {
     boost::filesystem::path filePath;
-    if (m_EntityFiles.count(entity) == 1) {
+    if (!saveAs && m_EntityFiles.count(entity) == 1) {
         filePath = m_EntityFiles.at(entity);
     } else {
         filePath = fileSaveDialog();
@@ -470,5 +529,17 @@ void EditorGUI::entityDelete(EntityWrapper entity)
     }
     if (!m_CurrentSelection.Valid()) {
         SelectEntity(EntityWrapper::Invalid);
+    }
+}
+
+void EditorGUI::entityChangeParent(EntityWrapper entity, EntityWrapper parent)
+{
+    if (entity == parent) {
+        return;
+    }
+
+    if (m_OnEntityChangeParent != nullptr) {
+        m_OnEntityChangeParent(entity, parent);
+        LOG_DEBUG("Changed parent of %i to %i", entity.ID, parent.ID);
     }
 }
