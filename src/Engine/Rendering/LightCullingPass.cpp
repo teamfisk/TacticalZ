@@ -96,19 +96,19 @@ void LightCullingPass::FillLightList(RenderScene& scene)
             //p.Padding = 123.f;
             p.Type = LightSource::Point;
             m_LightSources.push_back(p);
-            continue;
+
         }
     }
     for(auto &job : scene.DirectionalLightJobs) {
-        auto directionalLightJob = std::dynamic_pointer_cast<directionalLightJob>(job);
+        auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
         if(directionalLightJob) {
             LightSource p;
+            p.Direction = directionalLightJob->Direction;
             p.Color = directionalLightJob->Color;
             p.Intensity = directionalLightJob->Intensity;
-            p.Position = glm::vec4(glm::vec3(directionalLightJob->Position), 1.f);
             p.Type = LightSource::Directional;
             m_LightSources.push_back(p);
-            continue;
+
         }
     }
 }

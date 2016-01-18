@@ -12,12 +12,12 @@
 
 struct DirectionalLightJob : RenderJob
 {
-    DirectionalLightJob(ComponentWrapper transformComponent, ComponentWrapper directionalLightCompoentn, World* m_World)
+    DirectionalLightJob(ComponentWrapper transformComponent, ComponentWrapper directionalLightComponent, World* m_World)
         : RenderJob()
     {
-        Direction = glm::vec4((glm::vec3)directionalLightCompoentn["Direction"], 1.f);
-        Color = (glm::vec4)directionalLightCompoentn["Color"];
-        Intensity = (double)directionalLightCompoentn["Intensity"];
+        Direction = glm::vec4((glm::vec3)directionalLightComponent["Direction"], 1.f);
+        Color = (glm::vec4)directionalLightComponent["Color"];
+        Intensity = (double)directionalLightComponent["Intensity"];
     };
 
     glm::vec4 Direction;
