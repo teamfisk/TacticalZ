@@ -9,6 +9,7 @@
 #include "../Core/EntityFilePreprocessor.h"
 #include "../Core/EntityFileParser.h"
 #include "EditorGUI.h"
+#include "EditorStats.h"
 
 class EditorSystem : public ImpureSystem
 {
@@ -28,6 +29,7 @@ private:
     EntityWrapper m_Camera = EntityWrapper::Invalid;
     DebugCameraInputController<EditorSystem>* m_DebugCameraInputController;
     EditorGUI* m_EditorGUI;
+    EditorStats* m_EditorStats;
 
     void OnEntitySelected(EntityWrapper entity);
 };

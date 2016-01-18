@@ -27,6 +27,8 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, Render
     m_EditorGUI = new EditorGUI(m_EventBroker);
     m_EditorGUI->SetEntitySelectedCallback(std::bind(&EditorSystem::OnEntitySelected, this, std::placeholders::_1));
 
+    m_EditorStats = new EditorStats();
+
     Events::SetCamera e;
     e.CameraEntity = m_Camera;
     m_EventBroker->Publish(e);
@@ -34,6 +36,7 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, Render
 
 EditorSystem::~EditorSystem()
 {
+    delete m_EditorStats;
     delete m_EditorGUI;
     delete m_DebugCameraInputController;
     delete m_EditorWorldSystemPipeline;
@@ -45,6 +48,7 @@ void EditorSystem::Update(World* world, double dt)
     m_EditorWorldSystemPipeline->Update(m_EditorWorld, dt);
 
     m_EditorGUI->Draw(world);
+    m_EditorStats->Draw(dt);
 
     m_DebugCameraInputController->Update(dt);
     m_Camera["Transform"]["Position"] = m_DebugCameraInputController->Position();
