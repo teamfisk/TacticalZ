@@ -13,7 +13,7 @@
 					<xs:annotation><xs:documentation>the content of the string printed</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Resource" type="t:string" minOccurs="0">
-					<xs:annotation><xs:documentation>font file</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>The asset file, font resolution, example: Fonts/font.ttf,16</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Color" type="t:Color" minOccurs="0">
 					<xs:annotation><xs:documentation>Color</xs:documentation></xs:annotation>
