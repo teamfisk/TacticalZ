@@ -66,6 +66,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
 
     //Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
@@ -119,7 +120,6 @@ void Game::Tick()
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     m_Renderer->Update(dt);
-    m_EventBroker->Process<Client>();
 
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);

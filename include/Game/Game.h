@@ -20,7 +20,7 @@
 #include "Core/EntityFile.h"
 #include "Rendering/RenderSystem.h"
 #include "Core/EntityFileParser.h"
-
+#include "InterpolationSystem.h"
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"
