@@ -226,7 +226,7 @@ void Server::parseOnInputCommand(Packet& packet)
             e.PlayerID = playerID; // Set correct player id
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
-            LOG_DEBUG("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+            LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         }
     }
 }
@@ -332,6 +332,6 @@ EntityID Server::createPlayer()
 
 bool Server::OnInputCommand(const Events::InputCommand & e)
 {
-    LOG_INFO("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    //LOG_INFO("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
     return true;
 }
