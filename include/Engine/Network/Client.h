@@ -19,6 +19,7 @@
 #include "Core/ConfigFile.h"
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
+#include "Network/EInterpolate.h"
 
 class Client : public Network
 {

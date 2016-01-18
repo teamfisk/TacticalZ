@@ -119,12 +119,16 @@ void Client::InterpolateFields(Packet& packet, const ComponentInfo& componentInf
     int sizeOfFields = 0;
     for (auto field : componentInfo.FieldsInOrder) {
         ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
-        sizeOfFields = fieldInfo.Stride;
+        sizeOfFields += fieldInfo.Stride;
     }
     // Is the size correct?
     boost::shared_array<char> eventData(new char[componentInfo.Meta.Stride]);
     memcpy(eventData.get(), packet.ReadData(componentInfo.Meta.Stride), componentInfo.Meta.Stride);
     //Send event to interpolat system
+    Events::Interpolate e;
+    e.Entity = entityID;
+    e.DataArray = eventData;
+    m_EventBroker->Publish(e);
 
 }
 

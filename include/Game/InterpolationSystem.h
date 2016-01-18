@@ -12,9 +12,11 @@
 
 #include "Network/EInterpolate.h"
 
+
 class InterpolationSystem : public PureSystem
 {
-    struct Transform {
+    struct Transform 
+    {
         glm::vec3 Position;
         glm::vec3 Scale;
         glm::vec3 Orientation;
