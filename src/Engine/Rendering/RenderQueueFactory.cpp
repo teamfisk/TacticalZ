@@ -117,16 +117,17 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
                 job.ExplosionOrigin = (glm::vec3)deathComp["ExplosionOrigin"];
                 job.TimeSinceDeath = (double)deathComp["TimeSinceDeath"];
                 job.ExplosionDuration = (double)deathComp["ExplosionDuration"];
-                job.Gravity = (bool)deathComp["Gravity"];
-                job.GravityForce = (double)deathComp["GravityForce"];
-                job.ObjectRadius = (double)deathComp["ObjectRadius"];
+                //job.Gravity = (bool)deathComp["Gravity"];
+                //job.GravityForce = (double)deathComp["GravityForce"];
+                //job.ObjectRadius = (double)deathComp["ObjectRadius"];
                 job.EndColor = (glm::vec4)deathComp["EndColor"];
                 job.Randomness = (bool)deathComp["Randomness"];
                 job.RandomnessScalar = (double)deathComp["RandomnessScalar"];
-                job.Acceleration = (glm::vec2)deathComp["Acceleration"];
-                job.ColorPerPolygon = (bool)deathComp["ColorPerPolygon"];
-                job.ReverseAnimation = (bool)deathComp["ReverseAnimation"];
-                job.Wireframe = (bool)deathComp["Wireframe"];
+                job.Velocity = (glm::vec2)deathComp["Velocity"];
+                job.ColorByDistance = (bool)deathComp["ColorByDistance"];
+                //job.ReverseAnimation = (bool)deathComp["ReverseAnimation"];
+                //job.Wireframe = (bool)deathComp["Wireframe"];
+                job.ExponentialAccelaration = (bool)deathComp["ExponentialAccelaration"];
                 job.RandomNumbers = {
                     0.3257552917701f,
                     0.07601508315467f,

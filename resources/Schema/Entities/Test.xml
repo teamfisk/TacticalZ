@@ -76,16 +76,17 @@
 							<ExplosionOrigin X="0" Y="0" Z="0"/>
 							<TimeSinceDeath>0</TimeSinceDeath>
 							<ExplosionDuration>2</ExplosionDuration>
-							<Gravity>1</Gravity>
-							<GravityForce>1</GravityForce>
-							<ObjectRadius>2</ObjectRadius>
+							<!--<Gravity>1</Gravity>-->
+							<!--<GravityForce>1</GravityForce>-->
+							<!--<ObjectRadius>2</ObjectRadius>-->
 							<EndColor R="0" G="0" B="0" A="0"/>
 							<Randomness>0</Randomness>
 							<RandomnessScalar>1</RandomnessScalar>
-							<Acceleration X="2" Y="2"/>
-							<ColorPerPolygon>0</ColorPerPolygon>
-							<ReverseAnimation>0</ReverseAnimation>
-							<Wireframe>0</Wireframe>
+							<Velocity X="2" Y="2"/>
+							<ColorByDistance>0</ColorByDistance>
+							<!--<ReverseAnimation>0</ReverseAnimation>-->
+							<!--<Wireframe>0</Wireframe>-->
+							<ExponentialAccelaration>0</ExponentialAccelaration>
 						</c:CoolDeathAnim>
 					</Components>
 					<Children>

@@ -54,17 +54,18 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
             glUniform3fv(glGetUniformLocation(ShaderHandle, "ExplosionOrigin"), 1, glm::value_ptr(coolDeathAnimationJob->ExplosionOrigin));
             glUniform1f(glGetUniformLocation(ShaderHandle, "TimeSinceDeath"), coolDeathAnimationJob->TimeSinceDeath);
             glUniform1f(glGetUniformLocation(ShaderHandle, "ExplosionDuration"), coolDeathAnimationJob->ExplosionDuration);
-            glUniform1i(glGetUniformLocation(ShaderHandle, "Gravity"), coolDeathAnimationJob->Gravity);
-            glUniform1f(glGetUniformLocation(ShaderHandle, "GravityForce"), coolDeathAnimationJob->GravityForce);
-            glUniform1f(glGetUniformLocation(ShaderHandle, "ObjectRadius"), coolDeathAnimationJob->ObjectRadius);
+            //glUniform1i(glGetUniformLocation(ShaderHandle, "Gravity"), coolDeathAnimationJob->Gravity);
+            //glUniform1f(glGetUniformLocation(ShaderHandle, "GravityForce"), coolDeathAnimationJob->GravityForce);
+            //glUniform1f(glGetUniformLocation(ShaderHandle, "ObjectRadius"), coolDeathAnimationJob->ObjectRadius);
             glUniform4fv(glGetUniformLocation(ShaderHandle, "EndColor"), 1, glm::value_ptr(coolDeathAnimationJob->EndColor));
             glUniform1i(glGetUniformLocation(ShaderHandle, "Randomness"), coolDeathAnimationJob->Randomness);
             glUniform1fv(glGetUniformLocation(ShaderHandle, "RandomNumbers"), 20, coolDeathAnimationJob->RandomNumbers.data());
             glUniform1f(glGetUniformLocation(ShaderHandle, "RandomnessScalar"), coolDeathAnimationJob->RandomnessScalar);
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "Acceleration"), 1, glm::value_ptr(coolDeathAnimationJob->Acceleration));
-            glUniform1i(glGetUniformLocation(ShaderHandle, "ColorPerPolygon"), coolDeathAnimationJob->ColorPerPolygon);
-            glUniform1i(glGetUniformLocation(ShaderHandle, "ReverseAnimation"), coolDeathAnimationJob->ReverseAnimation);
-            glUniform1i(glGetUniformLocation(ShaderHandle, "Wireframe"), coolDeathAnimationJob->Wireframe);
+            glUniform2fv(glGetUniformLocation(ShaderHandle, "Velocity"), 1, glm::value_ptr(coolDeathAnimationJob->Velocity));
+            glUniform1i(glGetUniformLocation(ShaderHandle, "ColorByDistance"), coolDeathAnimationJob->ColorByDistance);
+            //glUniform1i(glGetUniformLocation(ShaderHandle, "ReverseAnimation"), coolDeathAnimationJob->ReverseAnimation);
+            //glUniform1i(glGetUniformLocation(ShaderHandle, "Wireframe"), coolDeathAnimationJob->Wireframe);
+            glUniform1i(glGetUniformLocation(ShaderHandle, "ExponentialAccelaration"), coolDeathAnimationJob->ExponentialAccelaration);
 
 
 

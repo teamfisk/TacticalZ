@@ -6,17 +6,18 @@ uniform mat4 P;
 uniform vec3 ExplosionOrigin;
 uniform float TimeSinceDeath; 
 uniform float ExplosionDuration; 
-uniform bool Gravity;
-uniform float GravityForce;
-uniform float ObjectRadius;
+//uniform bool Gravity;
+//uniform float GravityForce;
+//uniform float ObjectRadius;
 uniform vec4 EndColor;
 uniform bool Randomness;
 uniform float RandomNumbers[20];
 uniform float RandomnessScalar;
-uniform vec2 Velocity;           // CHANGED THIS TO VELOCITY REMEMBER YOU FUCKER
-uniform bool ColorPerPolygon;
-uniform bool ReverseAnimation;
-uniform bool Wireframe;
+uniform vec2 Velocity;
+uniform bool ColorByDistance;
+//uniform bool ReverseAnimation;
+//uniform bool Wireframe;
+uniform bool ExponentialAccelaration;
 
 in VertexData{
 	vec3 Position;
@@ -65,6 +66,7 @@ float GetRandomNumber(int polygon_index)
 }
 
 float randomNumber = 0.0;
+float randomDistance = 0.0;
 
 void main()
 {
@@ -93,45 +95,51 @@ void main()
 	// center position of triangle
 	vec3 centerOfTriangle = Input[1].Position + (s * dir1);
 	
-	// normalized center position of triangle to origin vector
-	vec3 origin2TriangleCenterVector = normalize(centerOfTriangle - ExplosionOrigin);
+	// center position of triangle to origin vector
+	vec3 origin2TriangleCenterVector = centerOfTriangle - ExplosionOrigin;
+	vec3 normalizedOrigin2TriangleCenterVector = normalize(origin2TriangleCenterVector);
 	
 	// time percentage until end of explosion (0.0-1.0)
 	float timePercetage = TimeSinceDeath / ExplosionDuration;
 	
 	// accelaration to use on current frame. is a interpolation between start and end value
-	float currentAccelaration = mix(Velocity.x, Velocity.y, timePercetage);
+	float currentVelocity = mix(Velocity.x, Velocity.y, timePercetage);
+	
+	if (ExponentialAccelaration == true)
+	{
+		currentVelocity = pow(currentVelocity, 2) / 2.0;
+	}
 	
 	// distance between origin and the center of the current triangle
-	float origin2TriangleCenterDistance = distance(ExplosionOrigin, centerOfTriangle);
+	float origin2TriangleCenterDistance = length(origin2TriangleCenterVector);
 	
 	// get a random number if randomness is enabled, otherwise the random number will be zero and won't affect the other algorithms
 	if (Randomness == true)
 	{
-		randomNumber = GetRandomNumber(gl_PrimitiveIDIn);
+		randomDistance = GetRandomNumber(gl_PrimitiveIDIn) * RandomnessScalar;
 	}
 	
 	// the distance from origin to the triangle center with eventual randomness added
-	float fullDistanceWithRandomness = origin2TriangleCenterDistance + (randomNumber * RandomnessScalar);
-	
-	// vector from the triangle center to the explosion's shockwave
-	vec3 triangleCenter2ExplosionRadius = (origin2TriangleCenterVector * (TimeSinceDeath * currentAccelaration)) - (origin2TriangleCenterVector * fullDistanceWithRandomness);
+	float fullDistanceWithRandomness = origin2TriangleCenterDistance + randomDistance;
 
+	// vector from the triangle center to the explosion's shockwave
+	vec3 triangleCenter2ExplosionRadius = (normalizedOrigin2TriangleCenterVector * (TimeSinceDeath * currentVelocity)) - (normalizedOrigin2TriangleCenterVector * fullDistanceWithRandomness);
+	
 	// if the triangle is inside the blast radius...
-	if (fullDistanceWithRandomness <= (TimeSinceDeath * currentAccelaration))
+	if (fullDistanceWithRandomness <= (TimeSinceDeath * currentVelocity))
 	{
+		float maxRadius = max(TimeSinceDeath * currentVelocity, (ExplosionDuration * currentVelocity));
+		
+		float a = (Velocity.y - Velocity.x) / ExplosionDuration;
+		//float t = sqrt((2 * origin2TriangleCenterDistance) / a);
+		
 		// if explosion color should be affected by distance instead of time...
-		if (ColorPerPolygon == true)
+		if (ColorByDistance == true)
 		{
-			// the position of the center of the triangle after it has exploded
-			vec3 movedCenterOfTriangle = vec3(centerOfTriangle + triangleCenter2ExplosionRadius);
-			
 			// calculate the max distance (s) the triangle will move
-			float a = (Velocity.y - Velocity.x) / ExplosionDuration;
 			float s = (Velocity.x * ExplosionDuration) + (0.5 * a * pow(ExplosionDuration, 2));
 			
 			ExplosionColor = EndColor * (length(triangleCenter2ExplosionRadius) / s);
-			//ExplosionColor = EndColor * (distance(ExplosionOrigin, movedCenterOfTriangle) - distance(ExplosionOrigin, centerOfTriangle))
 		}
 		else
 		{
@@ -154,20 +162,22 @@ void main()
 			vec4 ExplodedPositionInModelSpace = M * vec4(ExplodedPosition, 1.0);
 			
 			// if there is gravity, apply it
-			if (Gravity == true)
-			{
-				ExplodedPositionInModelSpace.y = ExplodedPositionInModelSpace.y - pow((TimeSinceDeath - fullDistanceWithRandomness) * GravityForce, 2);
-			}
+			//if (Gravity == true)
+			//{				
+			//	// ---DO THIS----> //ExplodedPositionInModelSpace.y = ExplodedPositionInModelSpace.y - TimeSinceHit;
+			//	
+			//	ExplodedPositionInModelSpace.y = ExplodedPositionInModelSpace.y - pow(TimeSinceDeath, 2);
+			//}
 			
-			// convert to screen space
-			gl_Position = P*V * vec4(ExplodedPosition, 1.0);
+			// convert to screen space 
+			gl_Position = P*V * ExplodedPositionInModelSpace;
 			EmitVertex();
 		}
 	}
 	else
 	{
 		// if explosion color should be affected by distance instead of time...
-		if (ColorPerPolygon == true)
+		if (ColorByDistance == true)
 		{
 			ExplosionColor = vec4(0.0);
 		}

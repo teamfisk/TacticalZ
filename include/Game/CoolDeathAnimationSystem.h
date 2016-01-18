@@ -16,5 +16,9 @@ public:
             (double)Component["TimeSinceDeath"] = 0.f;
         }
         (double&)Component["TimeSinceDeath"] += dt;
+
+        //if ((bool)Component["Gravity"] == true) {
+        //    (bool)Component["ExponentialAccelaration"] = false;
+        //}
     }
 };

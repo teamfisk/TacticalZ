@@ -18,15 +18,15 @@
 				<xs:element name="ExplosionDuration" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>How many seconds the death animation should be</xs:documentation></xs:annotation>
 				</xs:element>
-				<xs:element name="Gravity" type="t:bool" minOccurs="0">
+				<!--<xs:element name="Gravity" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Enable/disable gravity</xs:documentation></xs:annotation>
-				</xs:element>
-				<xs:element name="GravityForce" type="t:double" minOccurs="0">
+				</xs:element>-->
+				<!--<xs:element name="GravityForce" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>The force of the gravity</xs:documentation></xs:annotation>
-				</xs:element>
-				<xs:element name="ObjectRadius" type="t:double" minOccurs="0">
+				</xs:element>-->
+				<!--<xs:element name="ObjectRadius" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Object radius (TO BE REMOVED AND AUTOMATED)</xs:documentation></xs:annotation>
-				</xs:element>
+				</xs:element>-->
 				<xs:element name="EndColor" type="t:Color" minOccurs="0">
 					<xs:annotation><xs:documentation>The tint the polys end with</xs:documentation></xs:annotation>
 				</xs:element>
@@ -36,17 +36,20 @@
 				<xs:element name="RandomnessScalar" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Alter the power of the randomness</xs:documentation></xs:annotation>
 				</xs:element>
-				<xs:element name="Acceleration" type="t:Vector" minOccurs="0">
-					<xs:annotation><xs:documentation>The accelaration factors (start/end)</xs:documentation></xs:annotation>
+				<xs:element name="Velocity" type="t:Vector" minOccurs="0">
+					<xs:annotation><xs:documentation>The velocity factors (start/end)</xs:documentation></xs:annotation>
 				</xs:element>
-				<xs:element name="ColorPerPolygon" type="t:bool" minOccurs="0">
-					<xs:annotation><xs:documentation>Change the color per polygon</xs:documentation></xs:annotation>
+				<xs:element name="ColorByDistance" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Change the color by its moved distance instead of by its time</xs:documentation></xs:annotation>
 				</xs:element>
-				<xs:element name="ReverseAnimation" type="t:bool" minOccurs="0">
+				<!--<xs:element name="ReverseAnimation" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Implosions are cooler</xs:documentation></xs:annotation>
-				</xs:element>
-				<xs:element name="Wireframe" type="t:bool" minOccurs="0">
+				</xs:element>-->
+				<!--<xs:element name="Wireframe" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Enable/disable wireframe</xs:documentation></xs:annotation>
+				</xs:element>-->
+				<xs:element name="ExponentialAccelaration" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Linear/Exponential accelaration</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>
