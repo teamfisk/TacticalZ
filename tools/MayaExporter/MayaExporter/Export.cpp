@@ -51,13 +51,15 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
             GetMeshData(node);
         }
     }
-    MGlobal::displayInfo(MString() + "nrofmeshes: " + meshes.size());
     WriteMeshData(pathName);
     return true;
 }
 
-bool Export::Materials()
+bool Export::Materials(std::string pathName)
 { 
+    if (!GetMaterialData())
+        return false;
+    WriteMaterialData(pathName);
     return true;
 }
 
@@ -73,17 +75,14 @@ bool Export::Animations(std::string pathName, std::vector<AnimationInfo> animInf
         MGlobal::displayError(MString() + "Export::Animations() got no pathName. Do not know where to write file");
         return false;
     }
-    MGlobal::displayInfo("HALLOOOO");
     allBindPoses = m_SkeletonHandler.GetBindPoses();
 
     for (auto clip : animInfo) {
-        MGlobal::displayInfo("preben");
         if (!GetAnimationData(clip)) {
             MGlobal::displayError(MString() + "Export::Animations() failed to export " + clip.Name.c_str());
             return false;
         }
     }
-    MGlobal::displayInfo("ghihgihi");
     WriteAnimData(pathName);
     return true;
 }
@@ -100,11 +99,8 @@ bool Export::GetMeshData(MObject object)
 bool Export::GetMaterialData()
 { 
     // Traverse scene and return vector with all materials
-    std::vector<MaterialNode>* AllMaterials = m_MaterialHandler.DoIt();
+    AllMaterials = m_MaterialHandler.DoIt();
 
-    // Access the colorR component of one material (example)
-    cout << AllMaterials->at(0).Color[0] << endl;
-    MGlobal::displayInfo(MString() + AllMaterials->at(0).Color[0]);
     return true;
 }
 
@@ -161,6 +157,22 @@ void Export::WriteAnimData(std::string pathName)
         m_AnimFile.CloseFiles();
     } else
         MGlobal::displayInfo("Export::WriteAnimData() got called when allBindPoses contained no data, did not write nor created them");
+}
+
+void Export::WriteMaterialData(std::string pathName)
+{ 
+    m_MtrlFile.ASCIIFilePath(pathName +"_mtrl.txt");
+    m_MtrlFile.binaryFilePath(pathName + ".mtrl");
+
+    m_MtrlFile.OpenFiles();
+
+    int size = (*AllMaterials).size();
+    m_MtrlFile.writeToFiles(&size);
+
+    for (auto aMaterial : *AllMaterials) {
+        m_MtrlFile.writeToFiles((OutputData*)&aMaterial);
+    }
+    m_MtrlFile.CloseFiles();
 }
 
 Export::~Export()

@@ -9,18 +9,13 @@ layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec3 Tangent;
 layout(location = 3) in vec3 BiTangent;
 layout(location = 4) in vec2 TextureCoords;
-layout(location = 5) in vec4 DiffuseVertexColor;
-layout(location = 6) in vec4 SpecularVertexColor;
-layout(location = 7) in vec4 BoneIndices1;
-layout(location = 8) in vec4 BoneIndices2;
-layout(location = 9) in vec4 BoneWeights1;
-layout(location = 10) in vec4 BoneWeights2;
+layout(location = 5) in vec4 BoneIndices;
+layout(location = 6) in vec4 BoneWeights;
 
 out VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
-	vec4 DiffuseColor;
 }Output;
 
 void main()
@@ -30,5 +25,4 @@ void main()
 	Output.Position = Position;
 	Output.TextureCoordinate = TextureCoords;
 	Output.Normal = Normal;
-	Output.DiffuseColor = DiffuseVertexColor;
 }

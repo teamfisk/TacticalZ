@@ -24,16 +24,15 @@ Menu::Menu(QDialog* dialog)
 
     m_ExportSelectedButton = new QCheckBox(tr("&Export Selected"));
 	m_ExportAnimationsButton = new QCheckBox(tr("&Export Animations"));
-	m_CopyTexturesButton = new QCheckBox(tr("&Copy Textures"));
-	m_Button3 = new QCheckBox(tr("Test Materials"));
+	m_ExportMaterialButton = new QCheckBox(tr("&Export Material"));;
 
 	m_ExportAnimationsButton->setChecked(true);
-	m_CopyTexturesButton->setChecked(true);
+    m_ExportMaterialButton->setChecked(true);
 	QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(m_ExportSelectedButton);
 	vbox->addWidget(m_ExportAnimationsButton);
-	vbox->addWidget(m_CopyTexturesButton);
-	vbox->addWidget(m_Button3);
+	vbox->addWidget(m_ExportMaterialButton);
+
 	vbox->addStretch(1);
 	optionsBox->setLayout(vbox);
 
@@ -46,8 +45,7 @@ Menu::Menu(QDialog* dialog)
 
     connect(m_ExportSelectedButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
 	connect(m_ExportAnimationsButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
-	connect(m_CopyTexturesButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
-	connect(m_Button3, SIGNAL(clicked(bool)), this, SLOT(NULL));
+	connect(m_ExportMaterialButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
 
 	// Creating several layouts, adding widgets & adding them to one layout in the end
 	QHBoxLayout* topLayout = new QHBoxLayout;
@@ -178,24 +176,25 @@ void Menu::ExportAll(bool)
     }
 
     std::vector<Export::AnimationInfo> animations;
-    MGlobal::displayInfo(MString() + "yeeehaa");
     for (unsigned int i = 0; i < m_AnimationClipName.size(); i++) {
         Export::AnimationInfo thisClip;
-        MGlobal::displayInfo(MString() + "qwqw");
         thisClip.Name = std::string(m_AnimationClipName[i]->text().toLocal8Bit().constData());
-        MGlobal::displayInfo(MString() + "shizzzz");
         thisClip.Start = m_StartFrameLines[i]->text().toInt();
-        MGlobal::displayInfo(MString() + "dsdsfg");
         thisClip.End = m_EndFrameLines[i]->text().toInt();
-        MGlobal::displayInfo(MString() + "aaaaaaaaaaaaaaaaaaaa");
 
         animations.push_back(thisClip);
     }
-    MGlobal::displayInfo(MString() + "asdf");
     if (m_ExportAnimationsButton->isChecked()) {
         //Export Animations
         if (!m_Export.Animations(m_ExportPath->text().toLocal8Bit().constData(), animations)) {
             MGlobal::displayError(MString() + "Could not export animations");
+            return;
+        }
+    }
+
+    if (m_ExportMaterialButton->isChecked()) {
+        if (!m_Export.Materials(m_ExportPath->text().toLocal8Bit().constData())){ 
+            MGlobal::displayError(MString() + "Could not export materials");
             return;
         }
     }

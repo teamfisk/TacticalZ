@@ -9,7 +9,8 @@
 
 #include "../Core/Ray.h"
 #include "../Core/AABB.h"
-#include "Engine/Rendering/RawModelAssimp.h"
+//#include "Engine/Rendering/RawModelAssimp.h"
+#include "Engine/Rendering/RawModelCustom.h"
 #include "../Core/Entity.h"
 
 class World;

@@ -23,7 +23,7 @@ public:
     };
 
     bool Meshes(std::string pathName, bool selectedOnly = false);
-    bool Materials();
+    bool Materials(std::string pathName);
     bool Animations(std::string pathName, std::vector<AnimationInfo> animInfo);
 
 private:
@@ -33,6 +33,7 @@ private:
 
     void WriteMeshData(std::string pathName);
     void WriteAnimData(std::string pathName);
+    void WriteMaterialData(std::string pathName);
 
     Material m_MaterialHandler;
     Skeleton m_SkeletonHandler;
@@ -42,6 +43,7 @@ private:
     //File export
     WriteToFile m_MeshFile;
     WriteToFile m_AnimFile;
+    WriteToFile m_MtrlFile;
 
     //Mesh Data
     std::vector<Mesh> meshes;
@@ -50,5 +52,7 @@ private:
     std::vector<BindPoseSkeletonNode> allBindPoses;
     std::vector<Animation> allAnimations;
 
+    //Material Data
+    std::vector<MaterialNode>* AllMaterials;
 };
 #endif

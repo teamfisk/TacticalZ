@@ -74,9 +74,6 @@ RawModel::RawModel(std::string fileName)
 				auto uv = mesh->mTextureCoords[0][vertexIndex];
 				desc.TextureCoords = glm::vec2(uv.x, uv.y);
 			}
-
-
-			desc.DiffuseVertexColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, opacity);
             
 			m_Vertices.push_back(desc);
 		}

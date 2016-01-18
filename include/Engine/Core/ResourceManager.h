@@ -32,10 +32,10 @@ public:
     };
     struct FailedLoadingException : public std::exception
     {
-        virtual const char* what() const throw()
-        {
-            return "Resource is failed to load.";
-        }
+        FailedLoadingException(char const* const _Message)
+            : std::exception(_Message)
+        { }
+        FailedLoadingException() :std::exception("Resource failed to load.") { };
     };
 
 	// Pretend that this is a pure virtual function that you have to implement

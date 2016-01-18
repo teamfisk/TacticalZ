@@ -95,10 +95,10 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
             model = ResourceManager::Load<::Model, true>(resource);
         } catch (const Resource::StillLoadingException&) {
             //continue;
-            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.obj");
+            model = ResourceManager::Load<::Model>("Models/coolCube.mesh");
         } catch (const std::exception&) {
             try {
-                model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+                model = ResourceManager::Load<::Model>("Models/coolCube.mesh");
             } catch (const std::exception&) {
                 continue;
             }

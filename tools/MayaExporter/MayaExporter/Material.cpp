@@ -4,57 +4,24 @@ void Material::grabLambertProperties(MaterialNode& material_node, MFnDependencyN
 {
 	material_node.Name = node.name().asChar();
 
-	if (findColorTexture(material_node, node)) {
-		material_node.Color.fill(1.0f);
-	}
-	else {
-		m_Plug = node.findPlug("colorR");
-		m_Plug.getValue(material_node.Color[0]);
-		m_Plug = node.findPlug("colorG");
-		m_Plug.getValue(material_node.Color[1]);
-		m_Plug = node.findPlug("colorB");
-		m_Plug.getValue(material_node.Color[2]);
+    if (!findColorTexture(material_node, node)) {
+        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no color texture. Please apply a texture insted of using a value");
+    }
 
-		float TempTransp[3];
-		m_Plug = node.findPlug("transparencyR");
-		m_Plug.getValue(TempTransp[0]);
-		m_Plug = node.findPlug("transparencyG");
-		m_Plug.getValue(TempTransp[1]);
-		m_Plug = node.findPlug("transparencyB");
-		m_Plug.getValue(TempTransp[2]);
-
-		MColor TranspNode(TempTransp[0], TempTransp[1], TempTransp[2]);
-		float DummyH, DummyS;
-		TranspNode.get(MColor::kHSV, DummyH, DummyS, material_node.Color[3]);
-	}
 
 	if (findIncandescenceTexture(material_node, node)) {
-		material_node.Incandescence.fill(1.0f);
-	}
-	else {
-		m_Plug = node.findPlug("incandescenceR");
-		m_Plug.getValue(material_node.Incandescence[0]);
-		m_Plug = node.findPlug("incandescenceG");
-		m_Plug.getValue(material_node.Incandescence[1]);
-		m_Plug = node.findPlug("incandescenceB");
-		m_Plug.getValue(material_node.Incandescence[2]);
+        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no Incandescence texture. Please apply a texture insted of using value");
 	}
 
-	findNormalTexture(material_node, node);
+    if (findNormalTexture(material_node, node)) {
+        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no normal texture. Please apply a texture to it");
+    }
 }
 
 void Material::grabBlinnProperties(MaterialNode& material_node, MFnDependencyNode& node)
 {
 	if (findSpecularTexture(material_node, node)) {
-		material_node.Specular.fill(1.0f);
-	}
-	else {
-		m_Plug = node.findPlug("specularColorR");
-		m_Plug.getValue(material_node.Specular[0]);
-		m_Plug = node.findPlug("specularColorG");
-		m_Plug.getValue(material_node.Specular[1]);
-		m_Plug = node.findPlug("specularColorB");
-		m_Plug.getValue(material_node.Specular[2]);
+        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no specular texture. Please apply a specular to it");
 	}
 
 	m_Plug = node.findPlug("reflectivity");
@@ -76,17 +43,9 @@ void Material::grabBlinnProperties(MaterialNode& material_node, MFnDependencyNod
 
 void Material::grabPhongProperties(MaterialNode& material_node, MFnDependencyNode& node)
 {
-	if (findSpecularTexture(material_node, node)) {
-		material_node.Specular.fill(1.0f);
-	}
-	else {
-		m_Plug = node.findPlug("specularColorR");
-		m_Plug.getValue(material_node.Specular[0]);
-		m_Plug = node.findPlug("specularColorG");
-		m_Plug.getValue(material_node.Specular[1]);
-		m_Plug = node.findPlug("specularColorB");
-		m_Plug.getValue(material_node.Specular[2]);
-	}
+    if (findSpecularTexture(material_node, node)) {
+        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no specular texture. Please apply a specular to it");
+    }
 
 	m_Plug = node.findPlug("reflectivity");
 	m_Plug.getValue(material_node.ReflectionFactor);
@@ -109,8 +68,10 @@ bool Material::findColorTexture(MaterialNode& material_node, MFnDependencyNode& 
 			std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 			m_TexturePaths.push_back(FullPath);
 
-			material_node.ColorMapFile = FullPath.substr(FullPath.find_last_of("/"));
+            FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+			material_node.ColorMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 
+            material_node.ColorMapFileLength = material_node.ColorMapFile.length() + 1;
 			// Test
 			MGlobal::displayInfo(MString() + "Texture file: " + FullPath.c_str());
 			return true;
@@ -140,8 +101,9 @@ bool Material::findNormalTexture(MaterialNode& material_node, MFnDependencyNode&
 					std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 					m_TexturePaths.push_back(FullPath);
 
-					material_node.NormalMapFile = FullPath.substr(FullPath.find_last_of("/"));
-
+                    FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+                    material_node.NormalMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+                    material_node.NormalMapFileLength = material_node.NormalMapFile.length() + 1;
 					return true;
 				}
 			}
@@ -165,8 +127,9 @@ bool Material::findSpecularTexture(MaterialNode& material_node, MFnDependencyNod
 			std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 			m_TexturePaths.push_back(FullPath);
 
-			material_node.SpecularMapFile = FullPath.substr(FullPath.find_last_of("/"));
-
+            FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+            material_node.SpecularMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+            material_node.SpecularMapFileLength = material_node.SpecularMapFile.length() + 1;
 			return true;
 		}
 	}
@@ -187,8 +150,9 @@ bool Material::findIncandescenceTexture(MaterialNode& material_node, MFnDependen
 			std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 			m_TexturePaths.push_back(FullPath);
 
-			material_node.SpecularMapFile = FullPath.substr(FullPath.find_last_of("/"));
-
+            FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+            material_node.IncandescenceMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+            material_node.IncandescenceMapFileLength = material_node.IncandescenceMapFile.length() + 1;
 			return true;
 		}
 	}
@@ -206,7 +170,7 @@ std::vector<MaterialNode>* Material::DoIt()
 {
 	// All materials we care about inherit from Lambert
 	MItDependencyNodes matIt(MFn::kLambert);
-
+    m_AllMaterials.clear();
 	while (!matIt.isDone()) {
 		MFnDependencyNode MaterialFnDN(matIt.thisNode());
 		MaterialNode MaterialStorage;
@@ -226,7 +190,6 @@ std::vector<MaterialNode>* Material::DoIt()
 		else if (matIt.thisNode().hasFn(MFn::kLambert)) {
 			grabLambertProperties(MaterialStorage, MaterialFnDN);
 
-			MaterialStorage.Specular.fill(0.0f);
 			MaterialStorage.ReflectionFactor = 0.0f;
 			MaterialStorage.SpecularExponent = 0.0f;
 

@@ -44,7 +44,6 @@ in VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
-	vec4 DiffuseColor;
 }Input;
 
 out vec4 fragmentColor;
@@ -114,7 +113,7 @@ void main()
 		totalLighting.Specular += result.Specular;
 	}
 
-	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
+	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
 	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
 	//fragmentColor += vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;
@@ -126,7 +125,7 @@ void main()
 
 
 	}
-
+	fragmentColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 

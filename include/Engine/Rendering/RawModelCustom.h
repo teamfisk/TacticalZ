@@ -40,15 +40,22 @@ public:
 
     struct MaterialGroup
     {
-        float Shininess;
-        std::shared_ptr<::Texture> Texture;
-        std::shared_ptr<::Texture> NormalMap;
-        std::shared_ptr<::Texture> SpecularMap;
+        float SpecularExponent;
+        float ReflectionFactor;
         unsigned int StartIndex;
         unsigned int EndIndex;
+        //float Transparency;
+        std::string TexturePath;
+        std::shared_ptr<::Texture> Texture;
+        std::string NormalMapPath;
+        std::shared_ptr<::Texture> NormalMap;
+        std::string SpecularMapPath;
+        std::shared_ptr<::Texture> SpecularMap;
+        std::string IncandescenceMapPath;
+        std::shared_ptr<::Texture> IncandescenceMap;
     };
 
-    std::vector<MaterialGroup> TextureGroups;
+    std::vector<MaterialGroup> MaterialGroups;
 
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
@@ -57,10 +64,10 @@ public:
 
 private:
 
-    bool ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
-    bool ReadMesh(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
-    bool ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
-    bool ReadIndices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
+    void ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
+    void ReadMesh(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
+    void ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
+    void ReadIndices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
 
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
