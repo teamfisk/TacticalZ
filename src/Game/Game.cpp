@@ -3,7 +3,6 @@
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
 #include "Systems/RaptorCopterSystem.h"
-#include "Systems/PlayerSystem.h"
 #include "Systems/HealthSystem.h"
 #include "Systems/PlayerMovementSystem.h"
 #include "Systems/SpawnerSystem.h"
@@ -76,7 +75,6 @@ Game::Game(int argc, char* argv[])
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);

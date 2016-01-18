@@ -78,3 +78,20 @@ bool TriggerSystem::throwLeaveIfWasInTrigger(std::unordered_set<EntityID>& trigg
     return false;
 }
 
+bool TriggerSystem::OnTouch(const Events::TriggerTouch &event)
+{
+    LOG_INFO("Player entity %i touched trigger entity %i.", event.Entity, event.Trigger);
+    return true;
+}
+
+bool TriggerSystem::OnEnter(const Events::TriggerEnter &event)
+{
+    LOG_INFO("Player entity %i entered trigger entity %i.", event.Entity, event.Trigger);
+    return true;
+}
+
+bool TriggerSystem::OnLeave(const Events::TriggerLeave &event)
+{
+    LOG_INFO("Player entity %i left trigger entity %i.", event.Entity, event.Trigger);
+    return true;
+}
