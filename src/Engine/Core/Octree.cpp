@@ -352,9 +352,13 @@ std::vector<int> Octree::Child::childIndicesContainingBox(const AABB& box) const
         //the dimensions they are responsible for (which octant).
         bits.flip();
         //At this point the bits necessarily have exactly one bit set.
+        //Check the same bit in the minInd as the one set in bits.
+        int setOrUnset = (bits.to_ulong() & minInd);
         for (int c = 0; c < 8; ++c) {
-            //If the child index have the same bit set as the bits, add box to it.
-            if (bits.to_ulong() & c) {
+            //Check the same bit in the child index as the one set in bits.
+            //Enter here if both c and minInd have the bit set, or if neither have it set.
+            //I.e, if they are on the same side (+ or -) in the dimension marked by the bit in bits.
+            if (!((bits.to_ulong() & c) ^ setOrUnset)) {
                 ret.push_back(c);
             }
         }
