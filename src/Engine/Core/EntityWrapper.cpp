@@ -3,11 +3,6 @@
 
 const EntityWrapper EntityWrapper::Invalid = EntityWrapper(nullptr, EntityID_Invalid);
 
-bool EntityWrapper::operator==(const EntityWrapper& e) const
-{
-    return (this->World == e.World) && (this->ID == e.ID);
-}
-
 bool EntityWrapper::HasComponent(const std::string& componentName)
 {
     return World->HasComponent(ID, componentName);
@@ -39,6 +34,16 @@ ComponentWrapper EntityWrapper::operator[](const char* componentName)
         LOG_WARNING("EntityWrapper implicitly attached \"%s\" component to #%i as a result of a fetch request!", componentName, ID);
         return World->AttachComponent(ID, componentName);
     }
+}
+
+bool EntityWrapper::operator==(const EntityWrapper& e) const
+{
+    return (this->World == e.World) && (this->ID == e.ID);
+}
+
+bool EntityWrapper::operator!=(const EntityWrapper& e) const
+{
+    return !this->operator==(e);
 }
 
 EntityWrapper::operator EntityID() const

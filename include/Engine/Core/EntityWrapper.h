@@ -28,6 +28,7 @@ struct EntityWrapper
 
     ComponentWrapper operator[](const char* componentName);
     bool operator==(const EntityWrapper& e) const;
+    bool operator!=(const EntityWrapper& e) const;
     explicit operator EntityID() const;
     operator bool();
 };
