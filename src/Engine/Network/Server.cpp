@@ -27,6 +27,7 @@ void Server::Update()
     m_EventBroker->Process<Server>();
 }
 
+
 void Server::readFromClients()
 {
     while (m_Socket.available()) {
