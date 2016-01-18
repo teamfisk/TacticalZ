@@ -36,22 +36,39 @@ void EditorGUI::drawTools()
 
     GLuint translateIcon = 0;
     try {
-        translateIcon = ResourceManager::Load<Texture>("Textures/Icons/shaft.png")->m_Texture;
+        translateIcon = ResourceManager::Load<Texture>("Textures/Icons/Translate.png")->m_Texture;
     } catch (const std::exception&) { }
     GLuint rotateIcon = 0;
     try {
-        rotateIcon = ResourceManager::Load<Texture>("Textures/Icons/circulararrows3.png")->m_Texture;
+        rotateIcon = ResourceManager::Load<Texture>("Textures/Icons/Rotate.png")->m_Texture;
     } catch (const std::exception&) { }
     GLuint scaleIcon = 0;
     try {
-        scaleIcon = ResourceManager::Load<Texture>("Textures/Icons/increase10.png")->m_Texture;
+        scaleIcon = ResourceManager::Load<Texture>("Textures/Icons/Scale.png")->m_Texture;
     } catch (const std::exception&) { }
 
-    ImGui::ImageButton((void*)translateIcon, ImVec2(24, 24));
+    ImGui::ImageButton((void*)translateIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
     ImGui::SameLine();
-    ImGui::ImageButton((void*)rotateIcon, ImVec2(24, 24));
+    ImGui::ImageButton((void*)rotateIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
     ImGui::SameLine();
-    ImGui::ImageButton((void*)scaleIcon, ImVec2(24, 24));
+    ImGui::ImageButton((void*)scaleIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::SameLine();
+    ImGui::ItemSize(ImVec2(5, 0));
+    ImGui::SameLine();
+
+    GLuint playIcon = 0;
+    try {
+        playIcon = ResourceManager::Load<Texture>("Textures/Icons/Play.png")->m_Texture;
+    } catch (const std::exception&) { }
+    GLuint pauseIcon = 0;
+    try {
+        pauseIcon = ResourceManager::Load<Texture>("Textures/Icons/Pause.png")->m_Texture;
+    } catch (const std::exception&) { }
+
+
+    ImGui::ImageButton((void*)playIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), ImVec4(0, 1, 0, 1));
+    ImGui::SameLine();
+    ImGui::ImageButton((void*)pauseIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
 
     ImGui::End();
 }
@@ -169,8 +186,9 @@ void EditorGUI::drawComponents(EntityWrapper entity)
     std::stringstream title;
     title << "Components";
     if (entity.Valid()) {
-        title << formatEntityName(entity) << "###Components";
+        title << " " << formatEntityName(entity);
     }
+    title << "###Components";
     if (!ImGui::Begin(title.str().c_str())) {
         ImGui::End();
         return;
