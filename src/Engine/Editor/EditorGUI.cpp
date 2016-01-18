@@ -5,6 +5,7 @@ void EditorGUI::Draw(World* world)
     ImGui::ShowTestWindow();
     drawMenu();
     drawEntities(world);
+    drawComponents(m_CurrentSelection);
 }
 
 void EditorGUI::SelectEntity(EntityWrapper entity)
@@ -122,3 +123,210 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
         return false;
     }
 }
+
+void EditorGUI::drawComponents(EntityWrapper entity)
+{
+    std::stringstream title;
+    title << "Components";
+    if (entity.Valid()) {
+        title << " #" << entity.ID << "###Components";
+    }
+    if (!ImGui::Begin(title.str().c_str())) {
+        ImGui::End();
+        return;
+    }
+
+    if (!entity.Valid()) {
+        ImGui::End();
+        return;
+    }
+
+    auto& pools = entity.World->GetComponentPools();
+    // Create list of component types available to be added
+    std::vector<const char*> componentTypes;
+    for (auto& pair : pools) {
+        // Don't list components the entity already has attached
+        if (!entity.HasComponent(pair.first)) {
+            componentTypes.push_back(pair.first.c_str());
+        }
+    }
+    // Draw combo box
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 10.f);
+    int selectedItem = -1;
+    if (ImGui::Combo("", &selectedItem, componentTypes.data(), componentTypes.size())) {
+        if (selectedItem != -1) {
+            if (m_OnComponentAttach != nullptr) {
+                std::string chosenComponentType(componentTypes.at(selectedItem));
+                m_OnComponentAttach(entity, chosenComponentType);
+            }
+        }
+    }
+    ImGui::PopItemWidth();
+
+    for (auto& pair : pools) {
+        const std::string& componentType = pair.first;
+        auto pool = pair.second;
+        // Don't show components the entity doesn't have attached
+        if (!entity.HasComponent(componentType)) {
+            continue;
+        }
+        // TODO: Add delete button here
+        drawComponent(entity, pool->ComponentInfo());
+    }
+
+    ImGui::End();
+}
+
+bool EditorGUI::drawComponent(EntityWrapper entity, const ComponentInfo& ci)
+{
+    if (!ImGui::CollapsingHeader(ci.Name.c_str(), nullptr, true, true)) {
+        return false;
+    }
+
+    // Show component annotation
+    const std::string annotation = ci.Meta->Annotation;
+    if (!annotation.empty()) {
+        ImGui::TextWrapped(annotation.c_str());
+    }
+
+    // Draw component fields
+    ComponentWrapper& component = entity.World->GetComponent(entity.ID, ci.Name);
+    for (auto& kv : ci.Fields) {
+        const std::string& fieldName = kv.first;
+        const ComponentInfo::Field_t& field = kv.second;
+
+        // Draw the field widget based on its type
+        drawComponentField(component, field);
+        ImGui::SameLine();
+        // Draw field name
+        ImGui::Text(fieldName.c_str());
+        // Draw potential field annotation
+        auto fieldAnnotationIt = ci.Meta->FieldAnnotations.find(fieldName);
+        if (fieldAnnotationIt != ci.Meta->FieldAnnotations.end()) {
+            ImGui::SameLine();
+            ImGui::TextDisabled("(?)");
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip(fieldAnnotationIt->second.c_str());
+            }
+        }
+    }
+
+    return true;
+}
+
+void EditorGUI::drawComponentField(ComponentWrapper& c, const ComponentInfo::Field_t& field)
+{
+    // Push an unique widget id so different components with fields with equal names are still counted as different
+    ImGui::PushID((c.Info.Name + field.Name).c_str());
+
+    if (field.Type == "Vector") {
+        drawComponentField_Vector(c, field);
+    } else if (field.Type == "Color") {
+        drawComponentField_Color(c, field);
+    //} else if (field.Type == "Quaternion") {
+    } else if (field.Type == "int") {
+        drawComponentField_int(c, field);
+    } else if (field.Type == "enum") {
+        drawComponentField_enum(c, field);
+    } else if (field.Type == "float") {
+        drawComponentField_float(c, field);
+    } else if (field.Type == "double") {
+        drawComponentField_double(c, field);
+    } else if (field.Type == "bool") {
+        drawComponentField_bool(c, field);
+    } else if (field.Type == "string") {
+        drawComponentField_string(c, field);
+    } else {
+        ImGui::TextDisabled(field.Type.c_str());
+    }
+
+    ImGui::PopID();
+}
+
+void EditorGUI::drawComponentField_Vector(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    auto& val = c.Field<glm::vec3>(field.Name);
+    if (field.Name == "Scale") {
+        // Limit scale values to a minimum of 0
+        ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
+    } else if (field.Name == "Orientation") {
+        // Make orentations have a period of 2*Pi
+        glm::vec3 tempVal = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
+        if (ImGui::SliderFloat3("", glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
+            val = tempVal;
+        }
+    } else {
+        ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
+    }
+}
+
+void EditorGUI::drawComponentField_Color(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    auto& val = c.Field<glm::vec4>(field.Name);
+    ImGui::ColorEdit4("", glm::value_ptr(val), true);
+}
+
+void EditorGUI::drawComponentField_int(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    auto& val = c.Field<int>(field.Name);
+    ImGui::InputInt("", &val);
+}
+
+void EditorGUI::drawComponentField_enum(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    auto fieldEnumDefIt = c.Info.Meta->FieldEnumDefinitions.find(field.Name);
+    if (fieldEnumDefIt == c.Info.Meta->FieldEnumDefinitions.end()) {
+        drawComponentField_int(c, field);
+        return;
+    }
+
+    auto& val = c.Field<int>(field.Name);
+    int selectedItem = -1;
+    std::stringstream enumKeys;
+    std::vector<int> enumValues;
+    int i = 0;
+    for (auto& kv : fieldEnumDefIt->second) {
+        enumKeys << kv.first << " (" << kv.second << ")" << '\0';
+        enumValues.push_back(kv.second);
+        if (val == kv.second) {
+            selectedItem = i;
+        }
+    }
+    if (ImGui::Combo("", &selectedItem, enumKeys.str().c_str())) {
+        val = enumValues.at(selectedItem);
+    }
+}
+
+void EditorGUI::drawComponentField_float(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    auto& val = c.Field<float>(field.Name);
+    ImGui::InputFloat("", &val, 0.01f, 1.f);
+}
+
+void EditorGUI::drawComponentField_double(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    float tempVal = static_cast<float>(c.Field<double>(field.Name));
+    if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
+        c.SetField(field.Name, static_cast<double>(tempVal));
+    }
+}
+
+void EditorGUI::drawComponentField_bool(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    auto& val = c.Field<bool>(field.Name);
+    ImGui::Checkbox("", &val);
+}
+
+void EditorGUI::drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+{
+    auto& val = c.Field<std::string>(field.Name);
+    char tempString[1024]; // Let's just hope this is an sufficiently large buffer for strings :)
+    tempString[1023] = '\0'; // Null terminator just in case the string is larger than the buffer
+    // Copy the string into the buffer, taking the null terminator into account
+    memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString) - 1));
+    if (ImGui::InputText("", tempString, sizeof(tempString))) {
+        val = std::string(tempString);
+    }
+    // TODO: Handle drag and drop of files
+}
+

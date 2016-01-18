@@ -7,6 +7,8 @@
 #include <nativefiledialog/nfd.h>
 #include <boost/filesystem.hpp>
 #include "../Common.h"
+#include "../GLM.h"
+#include <glm/gtx/common.hpp>
 
 #include "../Core/EventBroker.h"
 #include "../Core/World.h"
@@ -42,6 +44,10 @@ public:
     // Called when the user means to delete an entity.
     typedef std::function<void(EntityWrapper)> OnEntityDelete_t;
     void SetEntityCreateCallback(OnEntityDelete_t f) { m_OnEntityDelete = f; }
+    // Called when the user means to attach a new component to an entity.
+    typedef std::function<void(EntityWrapper, const std::string&)> OnComponentAttach_t;
+    void SetComponentAttachCallback(OnComponentAttach_t f) { m_OnComponentAttach = f; }
+
 
 private:
     EventBroker* m_EventBroker;
@@ -55,11 +61,23 @@ private:
     OnEntitySave_t m_OnEntitySave = nullptr;
     OnEntityCreate_t m_OnEntityCreate = nullptr;
     OnEntityDelete_t m_OnEntityDelete = nullptr;
+    OnComponentAttach_t m_OnComponentAttach = nullptr;
     
     void drawMenu();
     void drawEntities(World* world);
     void drawEntitiesRecursive(World* world, EntityID parent);
     bool drawEntityNode(EntityWrapper entity);
+    void drawComponents(EntityWrapper entity);
+    bool drawComponentNode(EntityWrapper entity, const ComponentInfo& componentType);
+    void drawComponentField(ComponentWrapper& c, const ComponentInfo::Field_t& field);
+    void drawComponentField_Vector(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawComponentField_Color(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawComponentField_int(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawComponentField_enum(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawComponentField_float(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawComponentField_double(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawComponentField_bool(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field);
 };
 
 #endif
