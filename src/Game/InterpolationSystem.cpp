@@ -16,7 +16,7 @@ void InterpolationSystem::UpdateComponent(World * world, ComponentWrapper & tran
         }
         glm::vec3 nextPosition = sTransform.Position;
         glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
-        transform["Position"] = vectorInterpolation(currentPosition, nextPosition, sTransform.interpolationTime);
+        (glm::vec3&)transform["Position"] += vectorInterpolation(currentPosition, nextPosition, sTransform.interpolationTime);
     }
 }
 
@@ -37,6 +37,7 @@ bool InterpolationSystem::OnInterpolate(const Events::Interpolate & e)
     memcpy(&transform.Orientation, e.DataArray.get() + offset, sizeof(glm::vec3));
     offset += sizeof(glm::vec3);
     memcpy(&transform.Scale, e.DataArray.get() + offset, sizeof(glm::vec3));
+    transform.interpolationTime = 0.0f;
 
     // Check if queue already exists
     if (m_InterpolationPoints.find(e.Entity) != m_InterpolationPoints.end()) { // Did exist, push to queue

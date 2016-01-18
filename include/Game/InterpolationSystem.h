@@ -12,15 +12,17 @@
 
 #include "Network/EInterpolate.h"
 
-struct Transform {
-    glm::vec3 Position;
-    glm::vec3 Scale;
-    glm::vec3 Orientation;
-    double interpolationTime;
-};
 
 class InterpolationSystem : public PureSystem
 {
+    struct Transform 
+    {
+        glm::vec3 Position;
+        glm::vec3 Scale;
+        glm::vec3 Orientation;
+        double interpolationTime;
+    };
+
 public:
     InterpolationSystem(EventBroker* eventbroker)
         : PureSystem(eventbroker, "Transform")
