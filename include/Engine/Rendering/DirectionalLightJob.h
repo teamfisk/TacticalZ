@@ -23,7 +23,6 @@ struct DirectionalLightJob : RenderJob
     glm::vec4 Direction;
     glm::vec4 Color;
     float Intensity;
-    glm::vec3 padding = glm::vec3(1.f, 2.f, 3.f);
 
     void CalculateHash() override
     {

@@ -72,7 +72,7 @@ vec4 CalcDiffuse(vec4 lightColor, vec4 lightVec, vec4 normal) {
 	return lightColor * power;
 }
 
-LightResult CalcLightSource(vec4 lightPos, float lightRadius, vec4 lightColor, float intensity, vec4 viewVec, vec4 position, vec4 normal, float falloff)
+LightResult CalcPointLightSource(vec4 lightPos, float lightRadius, vec4 lightColor, float intensity, vec4 viewVec, vec4 position, vec4 normal, float falloff)
 {
 	vec4 L = lightPos - position;
 	float dist = length(L);
@@ -83,6 +83,16 @@ LightResult CalcLightSource(vec4 lightPos, float lightRadius, vec4 lightColor, f
 	LightResult result;
 	result.Diffuse = CalcDiffuse(lightColor, L, normal) * attenuation * intensity;
 	result.Specular = CalcSpecular(lightColor, viewVec, L, normal) * attenuation *  intensity;
+	return result;
+}
+
+LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensity, vec4 viewVec, vec4 vertPosition, vec4 vertNormal)
+{
+	vec4 L = normalize( -direction );
+
+	LightResult result;
+	result.Diffuse = CalcDiffuse(color, L, vertNormal) * intensity;
+	result.Specular = CalcSpecular(color, viewVec, L, vertNormal) * intensity;
 	return result;
 }
 
@@ -105,22 +115,35 @@ void main()
 	int start = int(LightGrids.Data[currentTile].Start);
 	int amount = int(LightGrids.Data[currentTile].Amount);
 	//for(int i = 0; i < 3; i++)
-	for(int i = start; i < start + amount; i++)
-	{
+	for(int i = start; i < start + amount; i++) {
 		int l = int(LightIndex[i]);
+		LightResult result;
 
-		LightResult result = CalcLightSource(V * LightSources.List[l].Position, LightSources.List[l].Radius, LightSources.List[l].Color, LightSources.List[l].Intensity, viewVec, position, normal, LightSources.List[i].Falloff);
-
+		if(LightSources.List[i].Type == 0) { // point
+			//result = CalcPointLightSource(V * LightSources.List[l].Position, LightSources.List[l].Radius, LightSources.List[l].Color, LightSources.List[l].Intensity, viewVec, position, normal, LightSources.List[i].Falloff);
+		} else if (LightSources.List[i].Type == 1) { //Directional
+			result = CalcDirectionalLightSource(V * LightSources.List[l].Direction, LightSources.List[i].Color, LightSources.List[i].Intensity, viewVec, position, normal);
+		}
 		totalLighting.Diffuse += result.Diffuse;
 		totalLighting.Specular += result.Specular;
 	}
 
+
+	fragmentColor += Input.DiffuseColor;
 	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
 	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
-	fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
+	//fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3.0, 0, 1);
+	if(LightSources.List[0].Type == 0) {
+		fragmentColor +=  vec4(1,0,0,1);
+	}
+	if(LightSources.List[0].Type == 1) {
+		fragmentColor +=  vec4(0,1,0,1);
+	}
+	if(LightSources.List[0].Type == 2) {
+		fragmentColor +=  vec4(0,0,1,1);
+	}
 	//fragmentColor = texel * Input.DiffuseColor * Color;
-	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 )
-	{
+	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 ) {
 		//fragmentColor += vec4(0.5, 0, 0, 0);
 	} else {
 		//fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/3.0, 0, 0, 1);

@@ -58,7 +58,7 @@ private:
     //This should be a component
     struct LightSource {
         glm::vec4 Position = glm::vec4(0.f);
-        glm::vec4 Direction = glm::vec4(0.f);
+        glm::vec4 Direction = glm::vec4(10.f);
         glm::vec4 Color = glm::vec4(1.f);
         float Radius = 5.f;
         float Intensity = 0.8f;
