@@ -3,6 +3,7 @@
 
 #include <string>
 #include <ctime>
+#include <limits>
 
 #include <glm/common.hpp>
 #include <boost/asio.hpp>
@@ -15,6 +16,7 @@
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
 #include "Input/EInputCommand.h"
+#include "Core/EPlayerDamage.h"
 
 class Client : public Network
 {
@@ -23,7 +25,6 @@ public:
     ~Client();
     void Start(World* world, EventBroker* eventBroker) override;
     void Update() override;
-    void Close();
 private:
     // Assio UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
@@ -32,9 +33,7 @@ private:
 
     // Sending message to server logic
     int bytesRead = -1;
-    char readBuf[1024] = { 0 };
-    int snapshotInterval = 33;
-    std::clock_t previousSnapshotMessage = std::clock();
+    char readBuf[INPUTSIZE] = { 0 };
 
     // Packet loss logic
     unsigned int m_PacketID = 0;
@@ -45,40 +44,50 @@ private:
     World* m_World;
     std::string m_PlayerName;
     int m_PlayerID = -1;
+    EntityID m_ServerEntityID = std::numeric_limits<EntityID>::max();
+    // Server Client Lookup map
+    // Assumes that root node for client and server is EntityID 0.
+
+    // Don't Add items to these two maps with insert, use insertIntoServerClientMaps(EntityID, EntityID)!!!!
+    std::unordered_map<EntityID, EntityID> m_ServerIDToClientID;
+    std::unordered_map<EntityID, EntityID> m_ClientIDToServerID;
 
     // Network logic
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
     SnapshotDefinitions m_NextSnapshot;
-    bool m_ThreadIsRunning = true;
     double m_DurationOfPingTime;
     std::clock_t m_StartPingTime;
-    // Use to check if we should send disconnect message
-    // if game is turned of by closing window.
-    bool m_WasStarted = false;
 
     // Private member functions
     void readFromServer();
-    void sendSnapshotToServer();
-    int receive(char* data, size_t length);
+    int  receive(char* data, size_t length);
     void send(Packet& packet);
     void connect();
     void disconnect();
     void ping();
-    void moveMessageHead(char*& data, size_t& length, size_t stepSize);
     void parseMessageType(Packet& packet);
-    void parseEventMessage(Packet& packet);
+    void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
     void parseConnect(Packet& packet);
+    void parsePlayerConnected(Packet& packet);
     void parsePing();
     void parseServerPing();
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     bool isConnected();
     EntityID createPlayer();
+    // Mapping Logic
+    // Returns if local EntityID exist in map
+    bool clientServerMapsHasEntity(EntityID clientEntityID);
+    // Returns if server EntityID exist in map
+    bool serverClientMapsHasEntity(EntityID serverEntityID);
+    void insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
 
     // Events
     EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
-    bool OnInputCommand(const Events::InputCommand &e);
+    bool OnInputCommand(const Events::InputCommand& e);
+    EventRelay<Client, Events::PlayerDamage> m_EPlayeDamage;
+    bool OnPlayerDamage(const Events::PlayerDamage& e);
 };
 
 #endif

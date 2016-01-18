@@ -5,30 +5,25 @@ using namespace boost::asio::ip;
 
 Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 {
+    // Asumes root node is EntityID 0
+    insertIntoServerClientMaps(0, 0);
     // Default is local host
     std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
     int port = config->Get<int>("Networking.Port", 13);
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
     // Set up network stream
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
-    m_NextSnapshot.InputForward = "";
-    m_NextSnapshot.InputRight = "";
 }
 
 Client::~Client()
-{
-    m_EventBroker->Unsubscribe(m_EInputCommand);
-}
+{ }
 
 void Client::Start(World* world, EventBroker* eventBroker)
 {
-    m_WasStarted = true;
     m_EventBroker = eventBroker;
     m_World = world;
 
     // Subscribe to events
-    //m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
-    //m_EventBroker->Subscribe(m_EInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
 
     m_Socket.connect(m_ReceiverEndpoint);
@@ -40,76 +35,14 @@ void Client::Update()
     readFromServer();
 }
 
-void Client::Close()
-{
-    if (m_WasStarted) {
-        disconnect();
-        m_ThreadIsRunning = false;
-        m_EventBroker->Unsubscribe(m_EInputCommand);
-    }
-}
-
 void Client::readFromServer()
 {
-    if (m_Socket.available()) {
+    while (m_Socket.available()) {
         bytesRead = receive(readBuf, INPUTSIZE);
         if (bytesRead > 0) {
             Packet packet(readBuf, bytesRead);
             parseMessageType(packet);
         }
-    }
-    std::clock_t currentTime = std::clock();
-    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-        if (isConnected()) {
-            sendSnapshotToServer();
-        }
-        previousSnapshotMessage = currentTime;
-    }
-}
-
-void Client::sendSnapshotToServer()
-{
-    // Reset previous key state in snapshot.
-    m_NextSnapshot.InputForward = "";
-    m_NextSnapshot.InputRight = "";
-
-    auto player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
-
-
-    // See if any movement keys are down
-    // We dont care if it's overwritten by later
-    // if statement. Watcha gonna do, right!
-    if (player["Forward"]) {
-        m_NextSnapshot.InputForward = "+Forward";
-    }
-    if (player["Left"]) {
-        m_NextSnapshot.InputRight = "-Right";
-    }
-    if (player["Back"]) {
-        m_NextSnapshot.InputForward = "-Forward";
-    }
-    if (player["Right"]) {
-        m_NextSnapshot.InputRight = "+Right";
-    }
-
-    if (m_NextSnapshot.InputForward != "") {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString(m_NextSnapshot.InputForward);
-        send(packet);
-    } else {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString("0Forward");
-        send(packet);
-    }
-
-    if (m_NextSnapshot.InputRight != "") {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString(m_NextSnapshot.InputRight);
-        send(packet);
-    } else {
-        Packet packet(MessageType::Event, m_SendPacketID);
-        packet.WriteString("0Right");
-        send(packet);
     }
 }
 
@@ -121,6 +54,8 @@ void Client::parseMessageType(Packet& packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+    if (m_PacketID <= m_PreviousPacketID)
+        return;
     //IdentifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
@@ -140,9 +75,8 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::Disconnect:
         break;
-    case MessageType::Event:
-        parseEventMessage(packet);
-        break;
+    case MessageType::PlayerConnected:
+        parsePlayerConnected(packet);
     default:
         break;
     }
@@ -150,8 +84,17 @@ void Client::parseMessageType(Packet& packet)
 
 void Client::parseConnect(Packet& packet)
 {
+    // Set your own player id
     m_PlayerID = packet.ReadPrimitive<int>();
+    m_ServerEntityID = packet.ReadPrimitive<EntityID>();
+    // Map ServerEntityID and your PlayerID
     LOG_INFO("%i: I am player: %i", m_PacketID, m_PlayerID);
+}
+
+void Client::parsePlayerConnected(Packet & packet)
+{ 
+    // Map ServerEntityID and other player's PlayerID
+    LOG_INFO("A Player connected");
 }
 
 void Client::parsePing()
@@ -167,46 +110,74 @@ void Client::parseServerPing()
     send(packet);
 }
 
-void Client::parseEventMessage(Packet& packet)
+void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
 {
-    int Id = -1;
-    std::string command = packet.ReadString();
-    if (command.find("+Player") != std::string::npos) {
-        Id = packet.ReadPrimitive<int>();
-        // Sett Player name
-        m_PlayerDefinitions[Id].Name = command.erase(0, 7);
-    } else {
-        LOG_INFO("%i: Event message: %s", m_PacketID, command.c_str());
+    for (auto field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        if (fieldInfo.Type == "string") {
+            std::string& value = packet.ReadString();
+            m_World->GetComponent(entityID, componentType)[fieldInfo.Name] = value;
+        } else {
+            memcpy(m_World->GetComponent(entityID, componentType).Data + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+        }
     }
 }
 
+// Field parse
 void Client::parseSnapshot(Packet& packet)
 {
-    std::string tempName;
-    for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-        // We're checking for empty name for now. This might not be the best way,
-        // but it is to avoid sending redundant data.
-        tempName = packet.ReadString();
-
-
-        // Apply the position data read to the player entity
-        // New player connected on the server side 
-        if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
-            m_PlayerDefinitions[i].Name = tempName;
-            m_PlayerDefinitions[i].EntityID = createPlayer();
-        } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
-            // Someone disconnected
-            // TODO: Insert code here
-            break;
-        } else if (m_PlayerDefinitions[i].Name == "" && tempName == "") {
-            // Not a connected player
-            break;
+    std::string componentType = packet.ReadString();
+    while (packet.DataReadSize() < packet.Size()) {
+        // Components EntityID
+        EntityID receivedEntityID = packet.ReadPrimitive<EntityID>();
+        // Parents EntityID 
+        EntityID receivedParentEntityID = packet.ReadPrimitive<EntityID>();
+        ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
+        // Check if the received EntityID is mapped to one of our local EntityIDs
+        if (serverClientMapsHasEntity(receivedEntityID)) {
+            // Get the local EntityID
+            EntityID entityID = m_ServerIDToClientID.at(receivedEntityID);
+            // Check if the component exists
+            if (m_World->HasComponent(entityID, componentType)) {
+                // If the entity and the component exists update it
+                updateFields(packet, componentInfo, entityID, componentType);
+                // if entity exists but not the component
+            } else {
+                // Create component
+                m_World->AttachComponent(entityID, componentType);
+                // Copy data to newly created component
+                updateFields(packet, componentInfo, entityID, componentType);
+            }
+            // If the entity dosent exist nor the component
+        } else {
+            // Create Entity
+            // If entity dosen't exist
+            EntityID newEntityID = m_World->CreateEntity();
+            insertIntoServerClientMaps(receivedEntityID, newEntityID);
+            // Check if EntityIDs are out of sync
+            if (newEntityID != receivedEntityID) {
+                LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the \
+                            same as the one sent by server (EntityIDs are out of sync)");
+            }
+            // Create component
+            m_World->AttachComponent(newEntityID, componentType);
+            // Copy data to newly created component
+            updateFields(packet, componentInfo, newEntityID, componentType);
         }
-        if (m_PlayerDefinitions[i].EntityID != -1) {
 
-            // Move player to server position
-            int dataSize = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Info.Meta.Stride;
-            memcpy(m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Data, packet.ReadData(dataSize), dataSize);
+        // Parent Logic
+        // Don't need to check if receivedEntityID is mapped. (It should have been set) 
+        if (receivedParentEntityID != std::numeric_limits<EntityID>::max()) {
+            if (serverClientMapsHasEntity(receivedParentEntityID)) {
+                m_World->SetParent(m_ServerIDToClientID.at(receivedEntityID), m_ServerIDToClientID.at(receivedParentEntityID));
+                // If Parent dosen't exist create one and map receivedParentEntityID to it.
+            } else {
+                // Create the new parent and add it to map
+                EntityID newParentEntityID = m_World->CreateEntity();
+                insertIntoServerClientMaps(receivedParentEntityID, newParentEntityID);
+                // Set the newly created Entity as parent.
+                m_World->SetParent(m_ServerIDToClientID.at(receivedEntityID), newParentEntityID);
+            }
         }
     }
 }
@@ -223,7 +194,6 @@ int Client::receive(char* data, size_t length)
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
-
     return bytesReceived;
 }
 
@@ -258,47 +228,33 @@ void Client::ping()
     send(packet);
 }
 
-void Client::moveMessageHead(char*& data, size_t& length, size_t stepSize)
-{
-    data += stepSize;
-    length -= stepSize;
-}
-
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    if (isConnected()) {
-        ComponentWrapper& player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
-        if (e.Command == "Forward") {
-            if (e.Value > 0) {
-                (bool&)player["Forward"] = true;
-                (bool&)player["Back"] = false;
-            } else if (e.Value < 0) {
-                (bool&)player["Back"] = true;
-                (bool&)player["Forward"] = false;
-            } else {
-                (bool&)player["Forward"] = false;
-                (bool&)player["Back"] = false;
-            }
-        }
-        if (e.Command == "Right") {
-            if (e.Value > 0) {
-                (bool&)player["Right"] = true;
-                (bool&)player["Left"] = false;
-            } else if (e.Value < 0) {
-                (bool&)player["Left"] = true;
-                (bool&)player["Right"] = false;
-            } else {
-                (bool&)player["Left"] = false;
-                (bool&)player["Right"] = false;
-            }
-        }
-    }
     if (e.Command == "ConnectToServer") { // Connect for now
         connect();
+        LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        return true;
+    } else {
+        Packet packet(MessageType::OnInputCommand, m_SendPacketID);
+        packet.WriteString(e.Command);
+        packet.WritePrimitive(e.PlayerID);
+        packet.WritePrimitive(e.Value);
+        send(packet);
+        LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        return true;
     }
     return false;
 }
 
+bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
+{
+    Packet packet(MessageType::OnInputCommand, m_SendPacketID);
+    packet.WritePrimitive(e.DamageAmount);
+    packet.WritePrimitive(e.PlayerDamagedID);
+    packet.WriteString(e.TypeOfDamage);
+    send(packet);
+    return false;
+}
 
 void Client::identifyPacketLoss()
 {
@@ -327,4 +283,21 @@ EntityID Client::createPlayer()
     model["Resource"] = "Models/Core/UnitSphere.obj";
     ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
     return entityID;
+}
+
+bool Client::clientServerMapsHasEntity(EntityID clientEntityID)
+{
+    return m_ClientIDToServerID.find(clientEntityID) != m_ClientIDToServerID.end();
+}
+
+bool Client::serverClientMapsHasEntity(EntityID serverEntityID)
+{
+    return m_ServerIDToClientID.find(serverEntityID) != m_ServerIDToClientID.end();
+}
+
+void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)
+{ 
+    m_ServerIDToClientID.insert(std::make_pair(serverEntityID, clientEntityID));
+    m_ClientIDToServerID.insert(std::make_pair(clientEntityID, serverEntityID));
+
 }

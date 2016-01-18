@@ -90,11 +90,26 @@ set(SOURCE_FILES
     ${SOURCE_FILES_Rendering}
     ${SOURCE_FILES_Rendering_Util}
     ${SOURCE_FILES_Collision}
+	${SOURCE_FILES_Editor}
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui.cpp
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_draw.cpp
 	${CMAKE_SOURCE_DIR}/deps/include/imgui/imgui_demo.cpp
-	${SOURCE_FILES_Editor}
+	${CMAKE_SOURCE_DIR}/deps/include/nativefiledialog/nfd_common.c
 )
+
+# nativefiledialog
+if(WIN32)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		${CMAKE_SOURCE_DIR}/deps/include/nativefiledialog/nfd_win.cpp
+	)
+endif()
+if(UNIX)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		${CMAKE_SOURCE_DIR}/deps/include/nativefiledialog/nfd_gtk.c
+		# TODO: Link with GTK+ here!
+	)
+endif()
+
 
 set(LIBRARIES
     ${OPENGL_LIBRARIES}
