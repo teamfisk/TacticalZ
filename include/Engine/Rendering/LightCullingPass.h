@@ -63,7 +63,7 @@ private:
         float Radius = 5.f;
         float Intensity = 0.8f;
         float Falloff = 0.3f;
-        enum Type_t { Point, Directional, Spot } Type;
+        enum Type_t { Zero, Point, Directional, Spot } Type;
     };
     std::vector<LightSource> m_LightSources;
 

@@ -120,7 +120,7 @@ void main ()
 
 		//if pointlight
 		//Pos i view antagligen
-		if(light.Type == 0) {
+		if(light.Type == 1) {
 			if(SphereInsideFrustrum( vec3(V * light.Position), light.Radius, GroupFrustum)) {
 				//TODO: Fix transparent and opaque list, and depth test.
 				AppendLight( i );
@@ -131,7 +131,7 @@ void main ()
 		//if conelight
 
 		//if directional
-		if(light.Type == 1) {
+		if(light.Type == 2) {
 			AppendLight( i );
 		}
 
