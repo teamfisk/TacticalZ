@@ -29,18 +29,28 @@ public:
     bool TestSucceeded = false;
     int NumLoops = 0;
 
+    bool CapturePoint_Game_Loop_OneHundredTimes();
+
     void TestSetup1_OnePlayerOnCapturePoint();
     void TestSetup2_TwoPlayersOnCapturePoint();
     void TestSetup3_NoPlayersOnCapturePoint();
     void TestSetup4_TwoCapturePointsBeingCaptured();
     void TestSetup5_SameCapturePointContestedAndTakenOver();
     void TestSetup6_Team1CapturedTheLastPointAndWon();
+    void TestSetup7();
+    void TestSetup8();
+    void DoTouchEvent(EntityID whoDidSomething, EntityID onWhatObject);
+    void DoLeaveEvent(EntityID whoDidSomething, EntityID onWhatObject);
     void TestSuccess1();
     void TestSuccess2();
     void TestSuccess3();
     void TestSuccess4();
     void TestSuccess5();
     void TestSuccess6();
+    void TestSuccess7();
+    void TestSuccess8();
+    void UpdateTest7();
+    void UpdateTest8();
 
 private:
     double m_LastTime;
@@ -48,9 +58,9 @@ private:
     EventBroker* m_EventBroker;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    int m_PlayerID, m_PlayerID2, m_CapturePointID, m_CapturePointID2, m_CapturePointID3;
+    EntityID m_PlayerID, m_PlayerID2, m_CapturePointID, m_CapturePointID2, m_CapturePointID3;
     int m_RunTestNumber;
-
+    bool phase1Success = false, phase2Success = false, phase3Success = false, phase4Success = false;
 };
 
 #endif

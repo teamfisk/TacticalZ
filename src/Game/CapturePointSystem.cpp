@@ -17,20 +17,24 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
     int secondTeamPlayersStandingInside = 0;
 
     //check how many players are standing inside and are healthy
-    for (size_t i = 0; i < m_ETriggerTouchVector.size(); i++)
+    for (size_t i = m_ETriggerTouchVector.size(); i > 0; i--)
     {
-        auto triggerTouched = m_ETriggerTouchVector[i];
+        auto triggerTouched = m_ETriggerTouchVector[i - 1];
         if (std::get<1>(triggerTouched) == capturePoint.EntityID) {
             //some player has touched this - lets figure out: what team, health
             EntityID playerID = std::get<0>(triggerTouched);
-            bool hasHealthComponent = world->HasComponent(playerID, "Health");
-            if (!hasHealthComponent) {
+            if (!world->HasComponent(playerID, "Player")) {
+                //if a non-player has entered the capturePoint, just erase that event and continue
+                m_ETriggerTouchVector.erase(m_ETriggerTouchVector.begin() + i - 1);
                 continue;
             }
-            double currentHealth = world->GetComponent(playerID, "Health")["Health"];
-            //check if player is dead
-            if ((int)currentHealth == 0) {
-                continue;
+            bool hasHealthComponent = world->HasComponent(playerID, "Health");
+            if (hasHealthComponent) {
+                double currentHealth = world->GetComponent(playerID, "Health")["Health"];
+                //check if player is dead
+                if ((int)currentHealth == 0) {
+                    continue;
+                }
             }
             //check team - 0 = no team
             int teamNumber = world->GetComponent(playerID, "Player")["TeamNumber"];
@@ -115,11 +119,12 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
                     m_Team2NextPossibleCapturePoint--;
                 }
                 //adjust flag for other team if their previous point has just been taken
+                //this depends on what team has what homepoint ("side")
                 if (m_Team2NextPossibleCapturePoint == m_Team1NextPossibleCapturePoint - 2) {
-                    m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint + 1;
+                    m_Team2NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint + 1;
                 }
                 if (m_Team1NextPossibleCapturePoint == m_Team2NextPossibleCapturePoint + 2) {
-                    m_Team1NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint - 1;
+                    m_Team1NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint - 1;
                 }
             }
             else {
@@ -129,11 +134,13 @@ void CapturePointSystem::UpdateComponent(World* world, ComponentWrapper& capture
                 else {
                     m_Team2NextPossibleCapturePoint++;
                 }
+                //adjust flag for other team if their previous point has just been taken
+                //this depends on what team has what homepoint ("side")
                 if (m_Team2NextPossibleCapturePoint == m_Team1NextPossibleCapturePoint + 2) {
-                    m_Team2NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint - 1;
+                    m_Team2NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint - 1;
                 }
                 if (m_Team1NextPossibleCapturePoint == m_Team2NextPossibleCapturePoint - 2) {
-                    m_Team1NextPossibleCapturePoint = m_Team2NextPossibleCapturePoint + 1;
+                    m_Team1NextPossibleCapturePoint = m_Team1NextPossibleCapturePoint + 1;
                 }
             }
         }

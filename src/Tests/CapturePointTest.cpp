@@ -16,108 +16,77 @@ BOOST_AUTO_TEST_SUITE(CapturePointTestSuite)
 BOOST_AUTO_TEST_CASE(CapturePointTest1_OnePlayerOnCapturePoint)
 {
     CapturePointTest game(1);
-    //100 loops will be more than enough to do the test
-    int loops = 100;
-    bool success = false;
-    while (loops > 0) {
-        game.Tick();
-        if (game.TestSucceeded) {
-            success = true;
-            break;
-        }
-        loops--;
-    }
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
     //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest2_TwoPlayersOnCapturePoint)
 {
     CapturePointTest game(2);
-    //100 loops will be more than enough to do the test
-    int loops = 100;
-    bool success = false;
-    while (loops > 0) {
-        game.Tick();
-        if (game.TestSucceeded) {
-            success = true;
-            break;
-        }
-        loops--;
-    }
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
     //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest3_NoPlayersOnCapturePoint)
 {
     CapturePointTest game(3);
-    //100 loops will be more than enough to do the test
-    int loops = 100;
-    bool success = false;
-    while (loops > 0) {
-        game.Tick();
-        //successCheck needs to know when were close to 100 to check if anything happened then (NumLoops)
-        game.NumLoops++;
-        if (game.TestSucceeded) {
-            success = true;
-            break;
-        }
-        loops--;
-    }
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
     //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest4_TwoCapturePointsBeingCaptured)
 {
     CapturePointTest game(4);
-    //100 loops will be more than enough to do the test
-    int loops = 100;
-    bool success = false;
-    while (loops > 0) {
-        game.Tick();
-        if (game.TestSucceeded) {
-            success = true;
-            break;
-        }
-        loops--;
-    }
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
     //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest5_SameCapturePointContestedAndTakenOver)
 {
     CapturePointTest game(5);
-    //100 loops will be more than enough to do the test
-    int loops = 100;
-    bool success = false;
-    while (loops > 0) {
-        game.Tick();
-        if (game.TestSucceeded) {
-            success = true;
-            break;
-        }
-        loops--;
-    }
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
     //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest6_Team1CapturedTheLastPointAndWon)
 {
     CapturePointTest game(6);
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
+    //The system will process the events, hence it will take a while before we can read anything
+    BOOST_TEST(success);
+}
+BOOST_AUTO_TEST_CASE(CapturePointTest7_Team1ForcesTeam2sNextCapturePointToGoBackwards1Step)
+{
+    CapturePointTest game(7);
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
+    //The system will process the events, hence it will take a while before we can read anything
+    BOOST_TEST(success);
+}
+BOOST_AUTO_TEST_CASE(CapturePointTest8_Team2ForcesTeam1sNextCapturePointToGoForwards1Step)
+{
+    CapturePointTest game(8);
+    bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
+    //The system will process the events, hence it will take a while before we can read anything
+    BOOST_TEST(success);
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+bool CapturePointTest::CapturePoint_Game_Loop_OneHundredTimes() {
+    //CapturePointTest game(testNumber);
     //100 loops will be more than enough to do the test
     int loops = 100;
     bool success = false;
     while (loops > 0) {
-        game.Tick();
-        if (game.TestSucceeded) {
+        Tick();
+        NumLoops++;
+        if (TestSucceeded) {
             success = true;
             break;
         }
         loops--;
     }
-    //The system will process the events, hence it will take a while before we can read anything
-    BOOST_TEST(success);
+    return success;
 }
-BOOST_AUTO_TEST_SUITE_END()
 
 CapturePointTest::CapturePointTest(int runTestNumber)
 {
@@ -150,7 +119,14 @@ CapturePointTest::CapturePointTest(int runTestNumber)
         fp.MergeEntities(m_World);
     }
 
-    //create 2 players and 3 capturepoints for testing
+    /*
+    ---TESTSETUP---
+    default: 2 players
+    healthcomponent
+    3 capturepoints
+    capturepoint(1) = home for team number 2
+    capturepoint3 = home for team number 1
+    */
     EntityID playerID = m_World->CreateEntity();
     m_PlayerID = playerID;
     ComponentWrapper& player = m_World->AttachComponent(playerID, "Player");
@@ -185,7 +161,8 @@ CapturePointTest::CapturePointTest(int runTestNumber)
     m_CapturePointID3 = capturePointID3;
 
     m_RunTestNumber = runTestNumber;
-    //add some touch/leave events
+
+    //further testsetups:i.e. add some initial touch/leave events
     switch (runTestNumber)
     {
     case 1:
@@ -205,6 +182,16 @@ CapturePointTest::CapturePointTest(int runTestNumber)
         break;
     case 6:
         TestSetup6_Team1CapturedTheLastPointAndWon();
+        break;
+    case 7:
+        //default homecapturepoints
+        TestSetup7();
+        break;
+    case 8:
+        //switch sides
+        capturePoint["IsHomeCapturePointForTeamNumber"] = 1;
+        capturePoint3["IsHomeCapturePointForTeamNumber"] = 2;
+        TestSetup8();
         break;
     default:
         break;
@@ -227,21 +214,10 @@ void CapturePointTest::TestSetup1_OnePlayerOnCapturePoint()
     Events::TriggerLeave leaveEvent;
 
     //player touches,leaves,touches m_CapturePointID. and enters m_CapturePointID3
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
-
-    leaveEvent.Entity = m_PlayerID;
-    leaveEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(leaveEvent);
-
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
-
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID3;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID);
+    DoLeaveEvent(m_PlayerID, m_CapturePointID);
+    DoTouchEvent(m_PlayerID, m_CapturePointID);
+    DoTouchEvent(m_PlayerID, m_CapturePointID3);
 }
 void CapturePointTest::TestSetup2_TwoPlayersOnCapturePoint()
 {
@@ -249,26 +225,13 @@ void CapturePointTest::TestSetup2_TwoPlayersOnCapturePoint()
     Events::TriggerLeave leaveEvent;
 
     //player touches,leaves m_CapturePointID. and enters m_CapturePointID3
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
-
-    leaveEvent.Entity = m_PlayerID;
-    leaveEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(leaveEvent);
-
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID3;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID);
+    DoLeaveEvent(m_PlayerID, m_CapturePointID);
+    DoTouchEvent(m_PlayerID, m_CapturePointID3);
 
     //player2 touches m_CapturePointID,m_CapturePointID2
-    touchEvent.Entity = m_PlayerID2;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
-
-    touchEvent.Entity = m_PlayerID2;
-    touchEvent.Trigger = m_CapturePointID2;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID2, m_CapturePointID);
+    DoTouchEvent(m_PlayerID2, m_CapturePointID2);
 }
 void CapturePointTest::TestSetup3_NoPlayersOnCapturePoint()
 {
@@ -276,86 +239,78 @@ void CapturePointTest::TestSetup3_NoPlayersOnCapturePoint()
     Events::TriggerLeave leaveEvent;
 
     //player1 touches and leaves m_CapturePointID
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
-
-    leaveEvent.Entity = m_PlayerID;
-    leaveEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(leaveEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID);
+    DoLeaveEvent(m_PlayerID, m_CapturePointID);
 
     //player2 touches and leaves m_CapturePointID2
-    touchEvent.Entity = m_PlayerID2;
-    touchEvent.Trigger = m_CapturePointID2;
-    m_EventBroker->Publish(touchEvent);
-
-    leaveEvent.Entity = m_PlayerID2;
-    leaveEvent.Trigger = m_CapturePointID2;
-    m_EventBroker->Publish(leaveEvent);
-
+    DoTouchEvent(m_PlayerID2, m_CapturePointID2);
+    DoLeaveEvent(m_PlayerID2, m_CapturePointID2);
 }
 void CapturePointTest::TestSetup4_TwoCapturePointsBeingCaptured()
 {
     Events::TriggerTouch touchEvent;
 
     //player1 touches m_CapturePointID3
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID3;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID3);
 
     //player2 touches m_CapturePointID
-    touchEvent.Entity = m_PlayerID2;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID2, m_CapturePointID);
 }
 void CapturePointTest::TestSetup5_SameCapturePointContestedAndTakenOver()
 {
     //NOTE: setup events need to trigger first then the real event will be allowed by the system later
-    Events::TriggerTouch touchEvent;
 
     //"SETUP" homebase->same capturep
     //player1 touches m_CapturePointID3
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID3;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID3);
 
     //player2 touches m_CapturePointID
-    touchEvent.Entity = m_PlayerID2;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID2, m_CapturePointID);
 
     //contested same, player1 touches the contested
     //player1 touches m_CapturePointID2
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID2;
-    m_EventBroker->Publish(touchEvent);
-
-    //player2 does nothing
-
+    DoTouchEvent(m_PlayerID, m_CapturePointID2);
 }
 void CapturePointTest::TestSetup6_Team1CapturedTheLastPointAndWon()
 {
-    //NOTE: setup events need to trigger first then the real event will be allowed by the system later
-    Events::TriggerTouch touchEvent;
-
-    //"SETUP" team1 captures point 2,3
     //player1 touches m_CapturePointID3
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID3;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID3);
+
+    //TODO: this should be in UPDATE instead
 
     //player1 touches m_CapturePointID2
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID2;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID2);
 
-    //team1 captures point 1
     //player1 touches m_CapturePointID
-    touchEvent.Entity = m_PlayerID;
-    touchEvent.Trigger = m_CapturePointID;
-    m_EventBroker->Publish(touchEvent);
+    DoTouchEvent(m_PlayerID, m_CapturePointID);
 
     //player2 does nothing
+}
+void CapturePointTest::TestSetup7()
+{
+    //2 owns 1
+    DoTouchEvent(m_PlayerID2, m_CapturePointID);
+    //1 owns 3
+    DoTouchEvent(m_PlayerID, m_CapturePointID3);
+}
+void CapturePointTest::TestSetup8()
+{
+    //2 owns 3
+    DoTouchEvent(m_PlayerID2, m_CapturePointID3);
+    //1 owns 1
+    DoTouchEvent(m_PlayerID, m_CapturePointID);
+}
+void CapturePointTest::DoTouchEvent(EntityID whoDidSomething, EntityID onWhatObject) {
+    Events::TriggerTouch touchEvent;
+    touchEvent.Entity = whoDidSomething;
+    touchEvent.Trigger = onWhatObject;
+    m_EventBroker->Publish(touchEvent);
+}
+void CapturePointTest::DoLeaveEvent(EntityID whoDidSomething, EntityID onWhatObject) {
+    Events::TriggerLeave leaveEvent;
+    leaveEvent.Entity = whoDidSomething;
+    leaveEvent.Trigger = onWhatObject;
+    m_EventBroker->Publish(leaveEvent);
 }
 void CapturePointTest::TestSuccess1() {
     //TestSetup1_OnePlayerOnCapturePoint
@@ -410,6 +365,98 @@ void CapturePointTest::TestSuccess6() {
     if (ownedByID1 == 1 && ownedByID2 == 1 && ownedByID3 == 1)
         TestSucceeded = true;
 }
+void CapturePointTest::TestSuccess7() {
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "CapturePoint")["OwnedBy"];
+    int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "CapturePoint")["OwnedBy"];
+    int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "CapturePoint")["OwnedBy"];
+
+    if (NumLoops < 20 && ownedByID1 == 2 & ownedByID3 == 1) {
+        phase1Success = true;
+    }
+    if (NumLoops < 40 && NumLoops > 20 && ownedByID2 == 1) {
+        phase2Success = true;
+    }
+    if (NumLoops < 60 && NumLoops > 40 && ownedByID1 == 1) {
+        phase3Success = true;
+    }
+    if (NumLoops < 90 && NumLoops > 60 && ownedByID2 != 2) {
+        phase4Success = true;
+    }
+
+    if (NumLoops == 99) {
+        if (phase1Success && phase2Success && phase3Success &&phase4Success)
+            TestSucceeded = true;
+    }
+}
+void CapturePointTest::TestSuccess8() {
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "CapturePoint")["OwnedBy"];
+    int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "CapturePoint")["OwnedBy"];
+    int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "CapturePoint")["OwnedBy"];
+
+    if (NumLoops < 20 && ownedByID3 == 2 & ownedByID1 == 1) {
+        phase1Success = true;
+    }
+    if (NumLoops < 40 && NumLoops > 20 && ownedByID2 == 1) {
+        phase2Success = true;
+    }
+    if (NumLoops < 60 && NumLoops > 40 && ownedByID3 == 1) {
+        phase3Success = true;
+    }
+    if (NumLoops < 90 && NumLoops > 60 && ownedByID2 != 2) {
+        phase4Success = true;
+    }
+
+    if (NumLoops == 99) {
+        if (phase1Success && phase2Success && phase3Success &&phase4Success)
+            TestSucceeded = true;
+    }
+}
+void CapturePointTest::UpdateTest7() {
+    //loop 1 = team1 has 3, team 2 has 1
+    //loop 20 = team1 takes 2, team 1 leaves 1 -> team1 next = 1, team2 next = still 2
+    if (NumLoops == 20) {
+        //leave previous
+        DoLeaveEvent(m_PlayerID2, m_CapturePointID);
+        DoLeaveEvent(m_PlayerID, m_CapturePointID3);
+
+        DoTouchEvent(m_PlayerID, m_CapturePointID2);
+    }
+    //loop 40 = team1 takes 1, team2:s next cap point should now be 1 (instead of 2)
+    if (NumLoops == 40) {
+        //leave previous, take next
+        DoLeaveEvent(m_PlayerID, m_CapturePointID2);
+        DoTouchEvent(m_PlayerID, m_CapturePointID);
+    }
+    //loop 60 = team2 tries to take 2, this shouldnt work now
+    if (NumLoops == 60) {
+        DoLeaveEvent(m_PlayerID, m_CapturePointID);
+        DoTouchEvent(m_PlayerID2, m_CapturePointID2);
+    }
+}
+void CapturePointTest::UpdateTest8() {
+    //2 owns 3
+    //1 owns 1
+
+    //loop 20 = team1 takes 2, team 1 leaves 1 -> team1 next = 1, team2 next = still 2
+    if (NumLoops == 20) {
+        //leave previous
+        DoLeaveEvent(m_PlayerID2, m_CapturePointID3);
+        DoLeaveEvent(m_PlayerID, m_CapturePointID);
+
+        DoTouchEvent(m_PlayerID, m_CapturePointID2);
+    }
+    //loop 40 = team1 takes 3, team2:s next cap point should now be 1 (instead of 2)
+    if (NumLoops == 40) {
+        //leave previous, take next
+        DoLeaveEvent(m_PlayerID, m_CapturePointID2);
+        DoTouchEvent(m_PlayerID, m_CapturePointID3);
+    }
+    //loop 60 = team2 tries to take 2, this shouldnt work now
+    if (NumLoops == 60) {
+        DoLeaveEvent(m_PlayerID, m_CapturePointID3);
+        DoTouchEvent(m_PlayerID2, m_CapturePointID2);
+    }
+}
 void CapturePointTest::Tick()
 {
     glfwPollEvents();
@@ -446,6 +493,14 @@ void CapturePointTest::Tick()
         break;
     case 6:
         TestSuccess6();
+        break;
+    case 7:
+        TestSuccess7();
+        UpdateTest7();
+        break;
+    case 8:
+        TestSuccess8();
+        UpdateTest8();
         break;
     default:
         break;
