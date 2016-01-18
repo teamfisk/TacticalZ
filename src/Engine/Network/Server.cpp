@@ -13,6 +13,8 @@ void Server::Start(World* world, EventBroker* eventBroker)
 {
     m_World = world;
     m_EventBroker = eventBroker;
+    // Subscribe to events
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         m_StopTimes[i] = std::clock();
     }
@@ -22,6 +24,7 @@ void Server::Start(World* world, EventBroker* eventBroker)
 void Server::Update()
 {
     readFromClients();
+    m_EventBroker->Process<Server>();
 }
 
 void Server::readFromClients()
@@ -206,12 +209,26 @@ void Server::disconnect(int i)
 
 void Server::parseOnInputCommand(Packet& packet)
 {
-    Events::InputCommand e;
-    e.Command = packet.ReadString();
-    e.PlayerID = packet.ReadPrimitive<int>();
-    e.Value = packet.ReadPrimitive<float>();
-    m_EventBroker->Publish(e);
-    LOG_DEBUG("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    int playerID = -1;
+    // Check which player it was who sent the message
+    for (int i = 0; i < MAXCONNECTIONS; i++) {
+        // if the player is connected set playerID to the correct PlayerID
+        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address() 
+            && m_PlayerDefinitions[i].Endpoint.port() == m_ReceiverEndpoint.port()) {
+            playerID = i;
+            break;
+        }
+    }
+    if (playerID != -1) {
+        while (packet.DataReadSize() < packet.Size()) {
+            Events::InputCommand e;
+            e.Command = packet.ReadString();
+            e.PlayerID = playerID; // Set correct player id
+            e.Value = packet.ReadPrimitive<float>();
+            m_EventBroker->Publish(e);
+            LOG_DEBUG("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        }
+    }
 }
 
 void Server::parseOnPlayerDamage(Packet & packet)
@@ -221,7 +238,7 @@ void Server::parseOnPlayerDamage(Packet & packet)
     e.PlayerDamagedID = packet.ReadPrimitive<EntityID>();
     e.TypeOfDamage = packet.ReadString();
     m_EventBroker->Publish(e);
-    LOG_DEBUG("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
+    LOG_DEBUG("Server::parseOnPlayerDamage: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
 }
 
 void Server::parseConnect(Packet& packet)
@@ -229,7 +246,8 @@ void Server::parseConnect(Packet& packet)
     LOG_INFO("Parsing connections");
     // Check if player is already connected
     for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
+        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address() && 
+            m_PlayerDefinitions[i].Endpoint.port() == m_ReceiverEndpoint.port()) {
             return;
         }
     }
@@ -310,4 +328,10 @@ EntityID Server::createPlayer()
     model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
     ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
     return entityID;
+}
+
+bool Server::OnInputCommand(const Events::InputCommand & e)
+{
+    LOG_INFO("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    return true;
 }

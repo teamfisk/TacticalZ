@@ -57,6 +57,7 @@ private:
     SnapshotDefinitions m_NextSnapshot;
     double m_DurationOfPingTime;
     std::clock_t m_StartPingTime;
+    std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
     void readFromServer();
@@ -75,6 +76,7 @@ private:
     void identifyPacketLoss();
     bool isConnected();
     EntityID createPlayer();
+    void sendInputCommands();
     // Mapping Logic
     // Returns if local EntityID exist in map
     bool clientServerMapsHasEntity(EntityID clientEntityID);

@@ -73,6 +73,10 @@ private:
     void parseServerPing();
     void identifyPacketLoss();
     EntityID createPlayer();
+    // Debug event
+
+    EventRelay<Server, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(const Events::InputCommand& e);
 };
 
 #endif

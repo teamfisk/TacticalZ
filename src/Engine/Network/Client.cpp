@@ -25,6 +25,7 @@ void Client::Start(World* world, EventBroker* eventBroker)
 
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayeDamage, &Client::OnPlayerDamage);
 
     m_Socket.connect(m_ReceiverEndpoint);
     LOG_INFO("I am client. BIP BOP");
@@ -44,6 +45,7 @@ void Client::readFromServer()
             parseMessageType(packet);
         }
     }
+    sendInputCommands();
 }
 
 void Client::parseMessageType(Packet& packet)
@@ -92,7 +94,7 @@ void Client::parseConnect(Packet& packet)
 }
 
 void Client::parsePlayerConnected(Packet & packet)
-{ 
+{
     // Map ServerEntityID and other player's PlayerID
     LOG_INFO("A Player connected");
 }
@@ -235,12 +237,8 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
         LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     } else {
-        Packet packet(MessageType::OnInputCommand, m_SendPacketID);
-        packet.WriteString(e.Command);
-        packet.WritePrimitive(e.PlayerID);
-        packet.WritePrimitive(e.Value);
-        send(packet);
-        LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        m_InputCommandBuffer.push_back(e);
+        LOG_INFO("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     }
     return false;
@@ -285,6 +283,19 @@ EntityID Client::createPlayer()
     return entityID;
 }
 
+void Client::sendInputCommands()
+{
+    if (m_InputCommandBuffer.size() > 0) {
+        Packet packet(MessageType::OnInputCommand, m_SendPacketID);
+        for (int i = 0; i < m_InputCommandBuffer.size(); i++) {
+            packet.WriteString(m_InputCommandBuffer[i].Command);
+            packet.WritePrimitive(m_InputCommandBuffer[i].Value);
+        }
+        send(packet);
+        m_InputCommandBuffer.clear();
+    }
+}
+
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)
 {
     return m_ClientIDToServerID.find(clientEntityID) != m_ClientIDToServerID.end();
@@ -296,7 +307,7 @@ bool Client::serverClientMapsHasEntity(EntityID serverEntityID)
 }
 
 void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)
-{ 
+{
     m_ServerIDToClientID.insert(std::make_pair(serverEntityID, clientEntityID));
     m_ClientIDToServerID.insert(std::make_pair(clientEntityID, serverEntityID));
 
