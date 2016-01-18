@@ -33,6 +33,7 @@ void Client::Start(World* world, EventBroker* eventBroker)
 
 void Client::Update()
 {
+    m_EventBroker->Process<Client>();
     readFromServer();
 }
 
