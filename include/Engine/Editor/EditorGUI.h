@@ -29,12 +29,14 @@ public:
     typedef std::function<void(EntityWrapper)> OnEntitySelectedCallback_t;
     void SetEntitySelectedCallback(OnEntitySelectedCallback_t f) { m_OnEntitySelected = f; }
     // Called when the user means to import an entity file. 
-    // Expects an EntityWrapper of the newly created entity in return.
-    typedef std::function<EntityWrapper(boost::filesystem::path)> OnEntityImport_t;
+    // @param EntityWrapper The entity to parent the imported entity to. The entity will be imported into the world of this entity.
+    // @param boost::filesystem::path The path to the entity to import
+    // @return EntityWrapper The newly created entity
+    typedef std::function<EntityWrapper(EntityWrapper, boost::filesystem::path)> OnEntityImport_t;
     void SetEntityImportCallback(OnEntityImport_t f) { m_OnEntityImport = f; }
     // Called when the user means to save an entity to file.
-    // Expects a bool indicating whether the save was successful or not in return.
-    typedef std::function<bool(EntityWrapper, boost::filesystem::path)> OnEntitySave_t;
+    // Permitted to throw exceptions on save failure.
+    typedef std::function<void(EntityWrapper, boost::filesystem::path)> OnEntitySave_t;
     void SetEntitySaveCallback(OnEntitySave_t f) { m_OnEntitySave = f; }
     // Called when the user means to create a new entity.
     // @param EntityWrapper The parent of the entity to be created
@@ -47,13 +49,20 @@ public:
     // Called when the user means to attach a new component to an entity.
     typedef std::function<void(EntityWrapper, const std::string&)> OnComponentAttach_t;
     void SetComponentAttachCallback(OnComponentAttach_t f) { m_OnComponentAttach = f; }
-
+    // Called when the user means to delete a component off an entity.
+    typedef std::function<void(EntityWrapper, const std::string&)> OnComponentDelete_t;
+    void SetComponentDeleteCallback(OnComponentDelete_t f) { m_OnComponentDelete = f; }
 
 private:
     EventBroker* m_EventBroker;
 
+    // Config variables
+    const boost::filesystem::path m_DefaultEntityPath = boost::filesystem::path("Schema") / boost::filesystem::path("Entities");
+
     // State variables
     EntityWrapper m_CurrentSelection = EntityWrapper::Invalid;
+    std::unordered_map<EntityWrapper, boost::filesystem::path> m_EntityFiles;
+    std::string m_LastErrorMessage;
 
     // Callbacks
     OnEntitySelectedCallback_t m_OnEntitySelected = nullptr;
@@ -62,7 +71,17 @@ private:
     OnEntityCreate_t m_OnEntityCreate = nullptr;
     OnEntityDelete_t m_OnEntityDelete = nullptr;
     OnComponentAttach_t m_OnComponentAttach = nullptr;
+    OnComponentDelete_t m_OnComponentDelete = nullptr;
+
+    // Utility functions
+    boost::filesystem::path fileOpenDialog();
+    boost::filesystem::path fileSaveDialog();
+
+    // Entity file handling methods
+    void entityImport(World* world);
+    void entitySave(EntityWrapper entity);
     
+    // UI drawing methods
     void drawMenu();
     void drawEntities(World* world);
     void drawEntitiesRecursive(World* world, EntityID parent);
@@ -78,6 +97,10 @@ private:
     void drawComponentField_double(ComponentWrapper &c, const ComponentInfo::Field_t &field);
     void drawComponentField_bool(ComponentWrapper &c, const ComponentInfo::Field_t &field);
     void drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    void drawModals();
+
+    // Custom UI elements
+    bool createDeleteButton(const std::string& componentType);
 };
 
 #endif

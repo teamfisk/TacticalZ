@@ -12,12 +12,7 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, Render
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
     
-    auto widgetEntityFile = ResourceManager::Load<EntityFile>("Schema/Entities/EditorWidget.xml");
-    EntityFilePreprocessor fpp(widgetEntityFile);
-    fpp.RegisterComponents(m_EditorWorld);
-    EntityFileParser fp(widgetEntityFile);
-    EntityID widgetID = fp.MergeEntities(m_EditorWorld);
-    m_Widget = EntityWrapper(m_EditorWorld, widgetID);
+    m_Widget = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/EditorWidget.xml");
 
     m_Camera = EntityWrapper(m_EditorWorld, m_EditorWorld->CreateEntity());
     m_EditorWorld->AttachComponent(m_Camera.ID, "Transform");
@@ -26,6 +21,10 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, Render
 
     m_EditorGUI = new EditorGUI(m_EventBroker);
     m_EditorGUI->SetEntitySelectedCallback(std::bind(&EditorSystem::OnEntitySelected, this, std::placeholders::_1));
+    m_EditorGUI->SetEntityImportCallback(std::bind(&EditorSystem::importEntity, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetEntitySaveCallback(std::bind(&EditorSystem::OnEntitySave, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
 
     m_EditorStats = new EditorStats();
 
@@ -58,4 +57,39 @@ void EditorSystem::Update(World* world, double dt)
 void EditorSystem::OnEntitySelected(EntityWrapper entity)
 {
     m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(entity.World, entity.ID);
+}
+
+void EditorSystem::OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath)
+{
+    EntityFileWriter writer(filePath);
+    writer.WriteEntity(entity.World, entity.ID);
+}
+
+void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& componentType)
+{
+    entity.World->AttachComponent(entity.ID, componentType);
+}
+
+void EditorSystem::OnComponentDelete(EntityWrapper entity, const std::string& componentType)
+{
+    entity.World->DeleteComponent(entity.ID, componentType);
+}
+
+EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem::path filePath)
+{
+    if (parent.World == nullptr) {
+        LOG_ERROR("Tried to import entity \"%s\" into null world!", filePath.string().c_str());
+        return EntityWrapper::Invalid;
+    }
+
+    try {
+        auto entityFile = ResourceManager::Load<EntityFile>(filePath.string());
+        EntityFilePreprocessor fpp(entityFile);
+        fpp.RegisterComponents(parent.World);
+        EntityFileParser fp(entityFile);
+        EntityID newEntity = fp.MergeEntities(parent.World, parent.ID);
+        return EntityWrapper(parent.World, newEntity);
+    } catch (const std::exception&) {
+        return EntityWrapper::Invalid;
+    }
 }

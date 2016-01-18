@@ -8,6 +8,7 @@
 #include "../Core/ResourceManager.h"
 #include "../Core/EntityFilePreprocessor.h"
 #include "../Core/EntityFileParser.h"
+#include "../Core/EntityFileWriter.h"
 #include "EditorGUI.h"
 #include "EditorStats.h"
 
@@ -31,5 +32,12 @@ private:
     EditorGUI* m_EditorGUI;
     EditorStats* m_EditorStats;
 
+    // Utility functions
+    EntityWrapper importEntity(EntityWrapper parent, boost::filesystem::path filePath);
+
+    // GUI callbacks
     void OnEntitySelected(EntityWrapper entity);
+    void OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath);
+    void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
+    void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
 };

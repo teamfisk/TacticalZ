@@ -28,9 +28,16 @@ void EditorGUI::drawEntities(World* world)
     }
 
     float buttonWidth = (ImGui::GetContentRegionAvailWidth() - 10.f) / 3.f ;
-    ImGui::Button("Create", ImVec2(buttonWidth, 0));
+    if (ImGui::Button("Create", ImVec2(buttonWidth, 0))) {
+        if (m_OnEntityCreate != nullptr) {
+            EntityWrapper newEntity = m_OnEntityCreate(EntityWrapper(world, EntityID_Invalid));
+            SelectEntity(newEntity);
+        }
+    }
     ImGui::SameLine(0.f, 5.f);
-    ImGui::Button("Import", ImVec2(buttonWidth, 0));
+    if (ImGui::Button("Import", ImVec2(buttonWidth, 0))) {
+        entityImport(world);
+    }
     ImGui::SameLine(0.f, 5.f);
     ImGui::Button("Reference", ImVec2(buttonWidth, 0));
 
@@ -38,6 +45,8 @@ void EditorGUI::drawEntities(World* world)
 
     drawEntitiesRecursive(world, EntityID_Invalid);
 
+    // Draw any potential modals before ending this scope
+    drawModals();
     ImGui::End();
 }
 
@@ -83,28 +92,29 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
     //    }
     //}
 
-    ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
-    std::string nodeTitle;
+    // Compose title
+    std::stringstream nodeTitle;
     const std::string& entityName = entity.World->GetName(entity);
     if (!entityName.empty()) {
-        nodeTitle = entityName;
+        nodeTitle << entityName;
     } else {
-        nodeTitle = std::string("#") + std::to_string(entity.ID);
+        nodeTitle << "#" << entity.ID;
     }
-    if (ImGui::TreeNode(nodeTitle.c_str())) {
+    if (m_EntityFiles.count(entity) == 1) {
+        nodeTitle << " (" << m_EntityFiles.at(entity).filename().string() << ")";
+    }
+
+    ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
+    if (ImGui::TreeNode(nodeTitle.str().c_str())) {
         //if (m_UIDraggingEntity != EntityID_Invalid && ImGui::IsItemHoveredRect() && ImGui::IsMouseReleased(0)) {
         //    LOG_DEBUG("Changed parent of %i to %i", m_UIDraggingEntity, entity);
         //    changeParent(m_UIDraggingEntity, entity);
         //    m_UIDraggingEntity = EntityID_Invalid;
         //}
 
-        if (ImGui::BeginPopupContextItem("item context menu")) {
-            if (ImGui::Button("Add")) {
-                if (m_OnEntityCreate != nullptr) {
-                    EntityWrapper newEntity = m_OnEntityCreate(EntityWrapper(entity.World, EntityID_Invalid));
-                    ImGui::CloseCurrentPopup();
-                    SelectEntity(newEntity);
-                }
+        if (ImGui::BeginPopupContextItem("entity context menu")) {
+            if (ImGui::Button("Save")) {
+                entitySave(entity);
             }
             ImGui::SameLine();
             if (ImGui::Button("Delete")) {
@@ -116,6 +126,7 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
                     SelectEntity(EntityWrapper::Invalid);
                 }
             }
+            drawModals();
             ImGui::EndPopup();
         }
         return true;
@@ -170,14 +181,21 @@ void EditorGUI::drawComponents(EntityWrapper entity)
         if (!entity.HasComponent(componentType)) {
             continue;
         }
-        // TODO: Add delete button here
-        drawComponent(entity, pool->ComponentInfo());
+        // Handle deletion with early out
+        if (createDeleteButton(componentType)) {
+            if (m_OnComponentDelete != nullptr) {
+                m_OnComponentDelete(entity, componentType);
+                continue;
+            }
+        }
+        // Draw the actual component node
+        drawComponentNode(entity, pool->ComponentInfo());
     }
 
     ImGui::End();
 }
 
-bool EditorGUI::drawComponent(EntityWrapper entity, const ComponentInfo& ci)
+bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
 {
     if (!ImGui::CollapsingHeader(ci.Name.c_str(), nullptr, true, true)) {
         return false;
@@ -330,3 +348,111 @@ void EditorGUI::drawComponentField_string(ComponentWrapper &c, const ComponentIn
     // TODO: Handle drag and drop of files
 }
 
+void EditorGUI::drawModals()
+{
+    if (ImGui::BeginPopupModal("Import failed", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Entity import failed. Check console for more information.\n\n");
+        ImGui::SetCursorPosX(ImGui::GetContentRegionAvailWidth() - 120);
+        if (ImGui::Button("OK", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopupModal("Save failed", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Entity save failed on an exception.\nMessage: %s\n\n", m_LastErrorMessage.c_str());
+        ImGui::SetCursorPosX(ImGui::GetContentRegionAvailWidth() - 120);
+        if (ImGui::Button("OK", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::EndPopup();
+    }
+}
+
+bool EditorGUI::createDeleteButton(const std::string& componentType)
+{
+    float width = ImGui::GetContentRegionAvailWidth();
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    auto pos = ImGui::GetCursorScreenPos() + ImVec2(width - 14.f, 1);
+    ImRect bb = ImRect(pos, pos + ImVec2(14.f, 14.f));
+    std::string idString = "#DELETE";
+    idString += componentType;
+    ImGuiID id = window->GetID(idString.c_str());
+    bool hovered;
+    bool held;
+    bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
+    //ImU32 col = window->Color((held && hovered) ? ImGuiCol_CloseButtonActive : hovered ? ImGuiCol_CloseButtonHovered : ImGuiCol_CloseButton);
+    ImU32 col = window->Color((held && hovered) ? ImGuiCol_CloseButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
+    window->DrawList->AddCircleFilled(bb.GetCenter(), 7.f, col, 16);
+    return pressed;
+}
+
+boost::filesystem::path EditorGUI::fileOpenDialog()
+{
+    namespace bfs = boost::filesystem;
+    nfdchar_t* outPath = nullptr;
+    nfdresult_t result = NFD_OpenDialog("xml", bfs::absolute(m_DefaultEntityPath).string().c_str(), &outPath);
+
+    if (result == NFD_ERROR) {
+        LOG_ERROR("NFD Error: %s", NFD_GetError());
+        return bfs::path();
+    } else if (result == NFD_CANCEL) {
+        return bfs::path();
+    } else {
+        return bfs::absolute(outPath);
+    }
+}
+
+boost::filesystem::path EditorGUI::fileSaveDialog()
+{
+    namespace bfs = boost::filesystem;
+    nfdchar_t* outPath = nullptr;
+    nfdresult_t result = NFD_SaveDialog("xml", bfs::absolute(m_DefaultEntityPath).string().c_str(), &outPath);
+
+    if (result == NFD_ERROR) {
+        LOG_ERROR("NFD Error: %s", NFD_GetError());
+        return bfs::path();
+    } else if (result == NFD_CANCEL) {
+        return bfs::path();
+    } else {
+        return bfs::absolute(outPath);
+    }
+}
+
+void EditorGUI::entityImport(World* world)
+{
+    boost::filesystem::path filePath = fileOpenDialog();
+    if (filePath.empty()) {
+        return;
+    }
+
+    EntityWrapper entity = m_OnEntityImport(EntityWrapper(world, EntityID_Invalid), filePath);
+    if (entity.Valid()) {
+        m_EntityFiles[entity] = filePath;
+        SelectEntity(entity);
+    } else {
+        ImGui::OpenPopup("Import failed");
+    }
+}
+
+void EditorGUI::entitySave(EntityWrapper entity)
+{
+    boost::filesystem::path filePath;
+    if (m_EntityFiles.count(entity) == 1) {
+        filePath = m_EntityFiles.at(entity);
+    } else {
+        filePath = fileSaveDialog();
+    }
+
+    if (filePath.empty()) {
+        return;
+    }
+
+    try {
+        m_OnEntitySave(entity, filePath);
+        m_EntityFiles[entity] = filePath;
+    } catch (const std::exception& e) {
+        m_LastErrorMessage = e.what();
+        ImGui::OpenPopup("Save failed");
+    }
+}
