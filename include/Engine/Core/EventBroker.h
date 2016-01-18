@@ -13,6 +13,8 @@
 	relay = decltype(relay)(std::bind(handler, this, std::placeholders::_1)); \
 	m_EventBroker->Subscribe(relay);
 
+typedef unsigned int EventID;
+
 class EventBroker;
 
 class BaseEventRelay
@@ -31,6 +33,7 @@ public:
     virtual bool Receive(const std::shared_ptr<Event> event) = 0;
 
 protected:
+    EventID m_EventID;
     std::string m_ContextTypeName;
     std::string m_EventTypeName;
     EventBroker* m_Broker;
@@ -40,7 +43,7 @@ template <typename ContextType, typename EventType>
 class EventRelay : public BaseEventRelay
 {
 public:
-    typedef std::function<bool(const EventType&)> CallbackType;
+    typedef std::function<bool(EventType&)> CallbackType;
 
     EventRelay()
         : m_Callback(nullptr)
@@ -62,7 +65,7 @@ template <typename ContextType, typename EventType>
 bool EventRelay<ContextType, EventType>::Receive(const std::shared_ptr<Event> event)
 {
     if (m_Callback != nullptr) {
-        return m_Callback(*static_cast<const EventType*>(event.get()));
+        return m_Callback(*static_cast<EventType*>(event.get()));
     } else {
         return false;
     }
@@ -95,6 +98,7 @@ public:
 
 private:
     bool m_IsProcessing = false;
+    EventID m_NextEventID = 0;
 
     typedef std::string ContextTypeName_t; // typeid(ContextType).name()
     typedef std::string EventTypeName_t; // typeid(EventType).name()
@@ -103,14 +107,14 @@ private:
     typedef std::unordered_map<ContextTypeName_t, EventRelays_t> ContextRelays_t;
     ContextRelays_t m_ContextRelays;
     std::vector<BaseEventRelay*> m_RelaysToSubscribe;
-    std::vector<BaseEventRelay*> m_RelaysToUnsubscribe;
+    std::vector<std::tuple<EventID, ContextTypeName_t, EventTypeName_t>> m_RelaysToUnsubscribe;
 
     typedef std::list<std::pair<EventTypeName_t, std::shared_ptr<Event>>> EventQueue_t;
     std::shared_ptr<EventQueue_t> m_EventQueueRead;
     std::shared_ptr<EventQueue_t> m_EventQueueWrite;
 
     void subscribeImmediate(BaseEventRelay& relay);
-    void unsubscribeImmediate(BaseEventRelay& relay);
+    void unsubscribeImmediate(std::tuple<EventID, ContextTypeName_t, EventTypeName_t> identifier);
 };
 
 template <typename EventType>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Health xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Health.xsd">
+	<Health>100</Health>
+	<MaxHealth>100</MaxHealth>
+</Health>

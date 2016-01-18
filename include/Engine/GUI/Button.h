@@ -40,7 +40,7 @@ public:
 		m_TexturePressed = resourceName;
 	}
 
-	void Draw(RenderQueueCollection& rq) override
+	void Draw(RenderScene& rq) override
 	{
 		if (m_Texture == nullptr && !m_TextureReleased.empty()) {
 			SetTexture(m_TextureReleased);

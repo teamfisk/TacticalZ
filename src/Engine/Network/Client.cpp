@@ -17,7 +17,6 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 
 Client::~Client()
 {
-
 }
 
 void Client::Start(World* world, EventBroker* eventBroker)
@@ -27,14 +26,8 @@ void Client::Start(World* world, EventBroker* eventBroker)
     m_World = world;
 
     // Subscribe to events
-    m_EInputCommand = decltype(m_EInputCommand)(std::bind(&Client::OnInputCommand, this, std::placeholders::_1));
-    m_EventBroker->Subscribe(m_EInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
 
-
-    //while (m_PlayerName.size() > 7) {
-    //    LOG_INFO("Please enter your name (No longer than 7 characters):");
-    //    std::cin >> m_PlayerName;
-    //}
     m_Socket.connect(m_ReceiverEndpoint);
     LOG_INFO("I am client. BIP BOP");
 }
@@ -44,18 +37,9 @@ void Client::Update()
     readFromServer();
 }
 
-void Client::Close()
-{
-    if (m_WasStarted) {
-        disconnect();
-        m_ThreadIsRunning = false;
-        m_EventBroker->Unsubscribe(m_EInputCommand);
-    }
-}
-
 void Client::readFromServer()
 {
-    if (m_Socket.available()) {
+    while (m_Socket.available()) {
         bytesRead = receive(readBuf, INPUTSIZE);
         if (bytesRead > 0) {
             Packet packet(readBuf, bytesRead);
@@ -65,7 +49,7 @@ void Client::readFromServer()
     std::clock_t currentTime = std::clock();
     if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
         if (isConnected()) {
-            sendSnapshotToServer();
+            //sendSnapshotToServer();
         }
         previousSnapshotMessage = currentTime;
     }
@@ -73,12 +57,11 @@ void Client::readFromServer()
 
 void Client::sendSnapshotToServer()
 {
-    // Reset previouse key state in snapshot.
+    // Reset previous key state in snapshot.
     m_NextSnapshot.InputForward = "";
     m_NextSnapshot.InputRight = "";
 
     auto player = m_World->GetComponent(m_PlayerDefinitions[m_PlayerID].EntityID, "Player");
-
 
     // See if any movement keys are down
     // We dont care if it's overwritten by later
@@ -125,6 +108,8 @@ void Client::parseMessageType(Packet& packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+    if (m_PacketID <= m_PreviousPacketID)
+        return;
     //IdentifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
@@ -184,33 +169,51 @@ void Client::parseEventMessage(Packet& packet)
     }
 }
 
+void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
+{
+    for (auto field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        if (fieldInfo.Type == "string") {
+            std::string& value = packet.ReadString();
+            m_World->GetComponent(entityID, componentType)[fieldInfo.Name] = value;
+        } else {
+            memcpy(m_World->GetComponent(entityID, componentType).Data + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+        }
+    }
+}
+
+// Field parse
 void Client::parseSnapshot(Packet& packet)
 {
-    std::string tempName;
-    for (size_t i = 0; i < MAXCONNECTIONS; i++) {
-        // We're checking for empty name for now. This might not be the best way,
-        // but it is to avoid sending redundant data.
-        tempName = packet.ReadString();
-
-
-        // Apply the position data read to the player entity
-        // New player connected on the server side 
-        if (m_PlayerDefinitions[i].Name == "" && tempName != "") {
-            m_PlayerDefinitions[i].Name = tempName;
-            m_PlayerDefinitions[i].EntityID = createPlayer();
-        } else if (m_PlayerDefinitions[i].Name != "" && tempName == "") {
-            // Someone disconnected
-            // TODO: Insert code here
-            break;
-        } else if (m_PlayerDefinitions[i].Name == "" && tempName == "") {
-            // Not a connected player
-            break;
-        }
-        if (m_PlayerDefinitions[i].EntityID != -1) {
-
-            // Move player to server position
-            int dataSize = m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Info.Meta.Stride;
-            memcpy(m_World->GetComponent(m_PlayerDefinitions[i].EntityID, "Transform").Data, packet.ReadData(dataSize), dataSize);
+    std::string componentType = packet.ReadString();
+    while (packet.DataReadSize() < packet.Size()) {
+        EntityID entityID = packet.ReadPrimitive<EntityID>();
+        ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
+        if (m_World->ValidEntity(entityID)) {
+            if (m_World->HasComponent(entityID, componentType)) {
+                // If the entity and the component exists update it
+                updateFields(packet, componentInfo, entityID, componentType);
+                // if entity exists but not the component
+            } else {
+                // Create component
+                m_World->AttachComponent(entityID, componentType);
+                // Copy data to newly created component
+                updateFields(packet, componentInfo, entityID, componentType);
+            }
+            // If the entity dosent exist nor the component
+        } else {
+            //Create Entity
+            // If entity dosen't exist
+            EntityID newEntityID = m_World->CreateEntity();
+            // Check if EntityIDs are out of sync
+            if (newEntityID != entityID) {
+                LOG_INFO("Client::parseSnapshot(Packet& packet): Newly created EntityID is not the \
+                            same as the one sent by server (EntityIDs are out of sync)");
+            }
+            // Create component
+            m_World->AttachComponent(newEntityID, componentType);
+            // Copy data to newly created component
+            updateFields(packet, componentInfo, newEntityID, componentType);
         }
     }
 }
@@ -225,7 +228,7 @@ int Client::receive(char* data, size_t length)
         0, error);
 
     if (error) {
-        //LOG_ERROR("receive: %s", error.message().c_str());
+        LOG_ERROR("receive: %s", error.message().c_str());
     }
 
     return bytesReceived;

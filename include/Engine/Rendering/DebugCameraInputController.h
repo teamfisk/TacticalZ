@@ -9,6 +9,9 @@ public:
         : FirstPersonInputController(eventBroker, playerID)
     { }
 
+    void SetPosition(const glm::vec3 position) { m_Position = position; }
+    void SetOrientation(const glm::quat orientation) { m_Orientation = orientation; }
+
     const glm::vec3 Position() const { return m_Position; }
     void SetBaseSpeed(float speed) { m_BaseSpeed = speed; }
 

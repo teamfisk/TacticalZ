@@ -5,17 +5,16 @@ class ExplosionEffectSystem : public PureSystem
 {
 public:
     ExplosionEffectSystem(EventBroker* eventBroker)
-        : PureSystem(eventBroker, "ExplosionEffect")
+        : PureSystem("ExplosionEffect")
     { }
 
-    virtual void UpdateComponent(World* world, ComponentWrapper& object, double dt) override
+    virtual void  UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override
     {
-        ComponentWrapper& Component = world->GetComponent(object.EntityID, "ExplosionEffect");
 
-        if ((double)Component["TimeSinceDeath"] > (double)Component["ExplosionDuration"]) {
-            (double)Component["TimeSinceDeath"] = 0.f;
+        if ((double)component["TimeSinceDeath"] > (double)component["ExplosionDuration"]) {
+            (double)component["TimeSinceDeath"] = 0.f;
         }
-        (double&)Component["TimeSinceDeath"] += dt;
+        (double&)component["TimeSinceDeath"] += dt;
 
         //if ((bool)Component["Gravity"] == true) {
         //    (bool)Component["ExponentialAccelaration"] = false;

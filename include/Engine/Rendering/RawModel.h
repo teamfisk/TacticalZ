@@ -46,14 +46,18 @@ public:
 	struct MaterialGroup
 	{
 		float Shininess;
+        float Transparency;
+        std::string TexturePath;
 		std::shared_ptr<::Texture> Texture;
+        std::string NormalMapPath;
 		std::shared_ptr<::Texture> NormalMap;
+        std::string SpecularMapPath;
 		std::shared_ptr<::Texture> SpecularMap;
 		unsigned int StartIndex;
 		unsigned int EndIndex;
 	};
 
-	std::vector<MaterialGroup> TextureGroups;
+	std::vector<MaterialGroup> MaterialGroups;
 
 	std::vector<Vertex> m_Vertices;
 	std::vector<unsigned int> m_Indices;

@@ -1,25 +1,35 @@
 #include "Game.h"
+#include "Collision/CollidableOctreeSystem.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
+#include "Systems/RaptorCopterSystem.h"
+#include "Systems/HealthSystem.h"
+#include "Systems/PlayerMovementSystem.h"
+#include "Systems/SpawnerSystem.h"
+#include "Systems/PlayerSpawnSystem.h"
+#include "Core/EntityFileWriter.h"
 
 Game::Game(int argc, char* argv[])
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+    ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
+    ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
-    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
+    ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+    ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
+    DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-    m_RenderQueueFactory = new RenderQueueFactory();
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_World);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -29,7 +39,8 @@ Game::Game(int argc, char* argv[])
         m_Config->Get<int>("Video.Height", 720)
         ));
     m_Renderer->Initialize();
-    m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
+    m_RenderFrame = new RenderFrame();
 
     // Create input manager
     m_InputManager = new InputManager(m_Renderer->Window(), m_EventBroker);
@@ -47,35 +58,64 @@ Game::Game(int argc, char* argv[])
     m_World = new World();
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
-        ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
+        auto file = ResourceManager::Load<EntityFile>(mapToLoad);
+        EntityFilePreprocessor fpp(file);
+        fpp.RegisterComponents(m_World);
+        EntityFileParser fp(file);
+        fp.MergeEntities(m_World);
     }
+    //SO MUCH TEMP PLEASE REMOVE ME OMFG VIKTOR HELP
+    m_Renderer->m_World = m_World;
 
+    // Create Octrees
+    m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeFrustrumCulling = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    m_SystemPipeline->AddSystem<RaptorCopterSystem>();
-    m_SystemPipeline->AddSystem<PlayerSystem>();
-    m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
-    m_SystemPipeline->AddSystem<CollisionSystem>();
-    m_SystemPipeline->AddSystem<TriggerSystem>();
-    m_SystemPipeline->AddSystem<ExplosionEffectSystem>();
+
+    // All systems with orderlevel 0 will be updated first.
+    unsigned int updateOrderLevel = 0;
+    m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
+    // Populate Octree with collidables
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);
+    // Collision and TriggerSystem should update after player.
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();
     }
-    m_LastTime = glfwGetTime();
 
-    debugInitialize();
+    // Invoke sound system
+    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
+
+    m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
-    // Call before to ensure that thread closes correctly.
-    //if (m_IsClientOrServer)
-    //  m_ClientOrServer.Close();
-
+    delete m_SystemPipeline;
+    delete m_SoundSystem;
+    delete m_OctreeFrustrumCulling;
+    delete m_OctreeCollision;
+    delete m_World;
     delete m_FrameStack;
+    delete m_InputProxy;
+    delete m_InputManager;
+    delete m_RenderFrame;
+    delete m_Renderer;
     delete m_EventBroker;
 }
 
@@ -101,50 +141,17 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
-
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
     debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-
-    m_RenderQueueFactory->Update(m_World);
+    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
-    m_Renderer->Draw(m_RenderQueueFactory->RenderQueues());
+    m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-}
-
-
-bool Game::debugOnInputCommand(const Events::InputCommand& e)
-{
-    if (e.Command == "DebugReload" && e.Value == 1) {
-        std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
-        if (!mapToLoad.empty()) {
-            delete m_World;
-            m_World = new World();
-            ResourceManager::Release("EntityXMLFile", mapToLoad);
-            ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
-        }
-    }
-    if (e.Command == "SwitchToServer" && e.Value > 0) {
-        m_ClientOrServer = new Server();
-        LOG_INFO("Switching to server");
-        m_ClientOrServer->Start(m_World, m_EventBroker);
-    }
-    if (e.Command == "SwitchToClient" && e.Value > 0) {
-        m_ClientOrServer = new Client(m_Config);
-        m_ClientOrServer->Start(m_World, m_EventBroker);
-        LOG_INFO("Switching to client");
-    }
-
-    return false;
-}
-
-void Game::debugInitialize()
-{
-    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Game::debugOnInputCommand);
 }
 
 void Game::debugTick(double dt)
@@ -164,10 +171,5 @@ void Game::networkFunction()
         m_ClientOrServer = new Server();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
-    // I don't think we are reaching this part of the code right now.
-    // ~Game() is not called if the game is exited by closing console windows
-    // When server or client is done set it to false.
-    //m_IsClientOrServer = false;
-    // Destroy it
-    //delete m_ClientOrServer;
+
 }

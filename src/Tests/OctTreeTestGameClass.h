@@ -9,10 +9,18 @@
 #include "GUI/Frame.h"
 #include "Core/World.h"
 #include "Rendering/RenderQueueFactory.h"
+#include "Input/InputProxy.h"
+#include "Input/KeyboardInputHandler.h"
+#include "Input/MouseInputHandler.h"
+#include "Core/EKeyDown.h"
+#include "Core/EntityXMLFile.h"
+#include "Core/SystemPipeline.h"
+#include "RaptorCopterSystem.h"
+#include "PlayerSystem.h"
+#include "Editor/EditorSystem.h"
 
 #include "OctTreeTestHardCodedTestWorld.h"
 #include "Collision/Collision.h"
-
 
 class Game
 {
@@ -32,6 +40,8 @@ private:
     GUI::Frame* m_FrameStack;
     HardcodedTestWorld* m_World;
     RenderQueueFactory* m_RenderQueueFactory;
+    InputProxy* m_InputProxy;
+    SystemPipeline* m_SystemPipeline;
 
     //Test1
     int frameCounter = 0;
@@ -45,7 +55,7 @@ private:
     glm::quat m_PrevOri;
 
     glm::vec3 worldSize = glm::vec3(50, 50, 50);
-    OctTree someOctTree;
+    Octree someOctTree;
 
 };
 

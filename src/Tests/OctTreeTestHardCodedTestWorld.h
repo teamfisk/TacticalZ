@@ -16,9 +16,9 @@ class HardcodedTestWorld : public World
 public:
     struct LinkOctTreeAndModel {
         EntityID entId;
-        OctTree::OctChild* child;
+        Octree::Child* child;
         glm::vec3 posxyz;
-        LinkOctTreeAndModel(EntityID eId, OctTree::OctChild* ch, glm::vec3 pos)
+        LinkOctTreeAndModel(EntityID eId, Octree::Child* ch, glm::vec3 pos)
         {
             entId = eId;
             child = ch;
@@ -27,7 +27,7 @@ public:
     };
     EntityID anotherBoxTransformId;
     std::vector<LinkOctTreeAndModel> linkOM;
-    OctTree someOctTree;
+    Octree someOctTree;
 
     //constructor
     HardcodedTestWorld()
@@ -77,7 +77,7 @@ private:
             auto someAABB = AABB(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
             //draw main box first
-            AddBoxModel(someAABB.Center(), someAABB.HalfSize().x, someOctTree.m_Root, tempId);
+            AddBoxModel(someAABB.Origin(), someAABB.HalfSize().x, someOctTree.m_Root, tempId);
 
             //add anotherbox in octTree
             auto anotherBox = AABB(glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.2f, 0.2f, 0.2f));
@@ -85,19 +85,19 @@ private:
             someOctTree.AddDynamicObject(anotherBox);
 
             //draw anotherbox and save it in anotherBoxTransformId
-            AddBoxModel(anotherBox.Center(), anotherBox.HalfSize().x, someOctTree.m_Root, anotherBoxTransformId);
+            AddBoxModel(anotherBox.Origin(), anotherBox.HalfSize().x, someOctTree.m_Root, anotherBoxTransformId);
 
             //draw the octTree
             for (size_t j = 0; j < 8; j++)
             {
-                AddBoxModel(someOctTree.m_Root->m_Children[j]->m_Box.Center(),
+                AddBoxModel(someOctTree.m_Root->m_Children[j]->m_Box.Origin(),
                     someOctTree.m_Root->m_Children[j]->m_Box.HalfSize().x, someOctTree.m_Root->m_Children[j], tempId);
 
                 auto someChild = someOctTree.m_Root->m_Children[j];
 
                 for (size_t i = 0; i < 8; i++)
                 {
-                    AddBoxModel(someChild->m_Children[i]->m_Box.Center(),
+                    AddBoxModel(someChild->m_Children[i]->m_Box.Origin(),
                         someChild->m_Children[i]->m_Box.HalfSize().x, someChild->m_Children[i], tempId);
                 }
             }
@@ -115,7 +115,7 @@ private:
         model["Resource"] = "Models/Core/UnitBox.obj";
     }
 
-    void AddBoxModel(const glm::vec3 &center, const float &halfSize, OctTree::OctChild* child, EntityID &outEntityId) {
+    void AddBoxModel(const glm::vec3 &center, const float &halfSize, Octree::Child* child, EntityID &outEntityId) {
         World& world = *this;
 
         EntityID entityDummyScene = world.CreateEntity();

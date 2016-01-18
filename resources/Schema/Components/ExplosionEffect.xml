@@ -1,4 +1,5 @@
-<c:ExplosionEffect>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<ExplosionEffect xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ExplosionEffect.xsd">
 	<ExplosionOrigin X="0" Y="0" Z="0"/>
 	<TimeSinceDeath>0</TimeSinceDeath>
 	<ExplosionDuration>2</ExplosionDuration>
@@ -13,4 +14,4 @@
 	<!--<ReverseAnimation>0</ReverseAnimation>-->
 	<!--<Wireframe>0</Wireframe>-->
 	<ExponentialAccelaration>0</ExponentialAccelaration>
-</c:ExplosionEffect>
+</ExplosionEffect>

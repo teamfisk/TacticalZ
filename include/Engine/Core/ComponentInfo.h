@@ -9,14 +9,24 @@ struct ComponentInfo
 	{
 		std::string Annotation;
 		unsigned int Allocation = 0;
-        unsigned int Stride = 0;
+        std::map<std::string, std::string> FieldAnnotations;
+        std::map<std::string, std::map<std::string, int>> FieldEnumDefinitions;
 	};
 
+    struct Field_t
+    {
+        std::string Name;
+        std::string Type;
+        unsigned int Offset;
+        unsigned int Stride;
+    };
+
 	std::string Name;
-	std::unordered_map<std::string, std::string> FieldTypes;
-	std::unordered_map<std::string, unsigned int> FieldOffsets;
-	Meta_t Meta;
+    std::unordered_map<std::string, Field_t> Fields;
+    std::vector<std::string> FieldsInOrder;
+    unsigned int Stride = 0;
     std::shared_ptr<char> Defaults = nullptr;
+	std::shared_ptr<Meta_t> Meta = nullptr;
 };
 
 template<>

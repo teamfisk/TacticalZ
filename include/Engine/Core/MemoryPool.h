@@ -5,6 +5,14 @@
 template <typename T>
 class MemoryPoolForwardIterator;
 
+namespace DisableMemoryPool
+{
+//if true -> Pool allocation is not used when calling Allocate/Free, just use regular dynamic allocation. 
+//if false -> Use pool allocation.
+//Should default to false, unless the DisableMemoryPool is true in the Config.ini files.
+extern bool Value;
+}
+
 //This is the class to use if you want to allocate blocks (slots) of raw memory, with a fixed maximum size (stride).
 //Additionally, if you know that every memory-block will contain one object of a specific type, (i.e. the stride for the slot 
 //will the size of the object type) you should use ObjectPool<T> instead, your life will become easier.
@@ -80,8 +88,8 @@ public:
 	//If element cannot be allocated in the pool, because the memory ran out, memory is allocated dynamically with malloc() "outside the pool".
 	char* Allocate()
 	{
-		for (; m_CurrentAllocSlot < m_NumSlots && m_SlotIsAllocated[m_CurrentAllocSlot]; ++m_CurrentAllocSlot);
-		if (m_CurrentAllocSlot < m_NumSlots) {
+		for (; m_CurrentAllocSlot < m_NumSlots && m_SlotIsAllocated[m_CurrentAllocSlot] && !DisableMemoryPool::Value; ++m_CurrentAllocSlot);
+		if (m_CurrentAllocSlot < m_NumSlots && !DisableMemoryPool::Value) {
 			if (m_LowestAllocatedSlot > m_CurrentAllocSlot)
 				m_LowestAllocatedSlot = m_CurrentAllocSlot;
 			//Mark the slot as allocated.
@@ -93,7 +101,9 @@ public:
 		else {
 			m_ExtraMemory.push_back((char*)malloc(m_Stride));
 			//We should preferably not enter here to avoid performance issues. Set more numMaxElements in constructor instead.
-			LOG_WARNING("Allocated slots exceed Pool size, extra memory allocated dynamically. Pool size: %u, dynamic size: %u.", m_NumSlots, m_ExtraMemory.size());
+            if (!DisableMemoryPool::Value) {
+			    LOG_WARNING("Allocated slots exceed Pool size, extra memory allocated dynamically. Pool size: %u, dynamic size: %u.", m_NumSlots, m_ExtraMemory.size());
+            }
 			return m_ExtraMemory.back();
 		}
 	}
@@ -108,7 +118,7 @@ public:
 		//(i.e. IsAllocatedInPool may give false positives)
 		//if it was malloc():ed 
 		//so, we may enter here even if we shouldn't.
-		if (IsAllocatedInPool(obj)) {
+		if (!DisableMemoryPool::Value && IsAllocatedInPool(obj)) {
 			--m_NumAllocatedSlots;
 			const size_t freeSlot = (obj - m_StartAddress) / m_Stride;
 			m_SlotIsAllocated[freeSlot] = false;

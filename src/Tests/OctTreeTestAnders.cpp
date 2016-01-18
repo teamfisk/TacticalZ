@@ -34,16 +34,12 @@ BOOST_AUTO_TEST_CASE(octTreeTest)
     BOOST_CHECK(someAABB.MaxCorner() == maxCorner);
     BOOST_CHECK(someAABB.Center() == 0.5f * (minCorner + maxCorner));
 
-    //simple OctTree constructor check
-    //OctTree someOctTree(someAABB, 5);
-    //BOOST_CHECK(someOctTree.m_Children[0] != nullptr);
-
     //simple destructor check in the end, just look for memleaks, then it didnt clear the AABB structure
 }
 
 BOOST_AUTO_TEST_CASE(octTreeTest2)
 {
-    //octtree ritningen osv
+    //octtree draw etc
     Game game(0, nullptr);
     while (game.Running()) {
         game.Tick();

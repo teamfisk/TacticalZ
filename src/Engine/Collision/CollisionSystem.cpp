@@ -2,35 +2,60 @@
 #include "Collision/CollisionSystem.h"
 #include "Core/AABB.h"
 
-void CollisionSystem::UpdateComponent(World * world, ComponentWrapper & cAABB, double dt)
+void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
-    //TODO: Update CollisionSystem system after PlayerSystem.
-
-    //Right now, cAABB is a component attached to any entity that should be collideable.
-    AABB thisBox;
-    if (!Collision::GetEntityBox(world, cAABB, thisBox)) {
+    if (!entity.HasComponent("Physics")) {
         return;
     }
+    ComponentWrapper& cPhysics = entity["Physics"];
+
+    boost::optional<AABB> boundingBox = Collision::EntityAbsoluteAABB(entity);
+    if (!boundingBox) {
+        return;
+    }
+    ComponentWrapper& cTransform = entity["Transform"];
+    AABB& boxA = *boundingBox;
+
     //Press 'Z' to enable/disable collision.
     if (zPress) {
         return;
     }
-    //Here, mover should be an object that moves, currently only players.
-    for (auto& mover : *world->GetComponents("Player")) {
-        if (cAABB.EntityID == mover.EntityID) {
+
+    // Collide against octree
+    std::vector<AABB> octreeResult;
+    m_Octree->BoxesInSameRegion(*boundingBox, octreeResult);
+    for (auto& boxB : octreeResult) {
+        glm::vec3 resolutionVector;
+        if (Collision::IsSameBoxProbably(boxA, boxB)) {
             continue;
         }
-        AABB otherBox;
-        if (!Collision::GetEntityBox(world, mover.EntityID, otherBox)) {
-            continue;
-        }
-        glm::vec3 resolveTranslation;
-        if (Collision::AABBVsAABB(otherBox, thisBox, resolveTranslation)) {
-            ComponentWrapper& trans = world->GetComponent(mover.EntityID, "Transform");
-            //TODO: Special treatment if both are movers.
-            trans["Position"] = (glm::vec3)trans["Position"] + resolveTranslation;
+        if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
+            (glm::vec3&)cTransform["Position"] += resolutionVector;
+            cPhysics["Velocity"] = glm::vec3(0, 0, 0);
         }
     }
+
+    // HACK: Temporarily collide against all collidable models since they're not in the octree yet
+    //auto otherCollidables = world->GetComponents("Model");
+    //for (auto& cModel : *otherCollidables) {
+    //    if (cModel.EntityID == entity) {
+    //        continue;
+    //    }
+    //    if (!world->HasComponent(cModel.EntityID, "Collidable")) {
+    //        continue;
+    //    }
+
+    //    auto absPosition = RenderQueueFactory::AbsolutePosition(world, cModel.EntityID);
+    //    auto absOrientation = RenderQueueFactory::AbsoluteOrientation(world, cModel.EntityID);
+    //    auto absScale = RenderQueueFactory::AbsoluteScale(world, cModel.EntityID);
+    //    glm::mat4 modelMatrix = glm::translate(absPosition); // *glm::toMat4(absOrientation) * glm::scale(absScale);
+
+    //    auto model = ResourceManager::Load<Model>(cModel["Resource"]);
+    //    glm::vec3 resolutionVector;
+    //    if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, resolutionVector)) {
+    //        (glm::vec3&)cTransform["Position"] += resolutionVector;
+    //    }
+    //}
 }
 
 bool CollisionSystem::OnKeyUp(const Events::KeyUp & event)
