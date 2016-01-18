@@ -227,7 +227,7 @@ void Server::parseOnInputCommand(Packet& packet)
             e.PlayerID = playerID; // Set correct player id
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
-            LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+            //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         }
     }
 }
@@ -239,7 +239,7 @@ void Server::parseOnPlayerDamage(Packet & packet)
     e.PlayerDamagedID = packet.ReadPrimitive<EntityID>();
     e.TypeOfDamage = packet.ReadString();
     m_EventBroker->Publish(e);
-    LOG_DEBUG("Server::parseOnPlayerDamage: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
+    //LOG_DEBUG("Server::parseOnPlayerDamage: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
 }
 
 void Server::parseConnect(Packet& packet)

@@ -40,7 +40,7 @@ void Packet::WriteString(const std::string& str)
     // Message, add one extra byte for null terminator
     int sizeOfString = str.size() + 1;
     if (m_Offset + sizeOfString > m_MaxPacketSize) {
-        LOG_WARNING("Package::WriteString(): Data size in packet exceeded maximum package size. New size is %i bytes\n", m_MaxPacketSize*2);
+        //LOG_WARNING("Package::WriteString(): Data size in packet exceeded maximum package size. New size is %i bytes\n", m_MaxPacketSize*2);
         resizeData();
     }
     memcpy(m_Data + m_Offset, str.data(), sizeOfString * sizeof(char));
@@ -50,7 +50,7 @@ void Packet::WriteString(const std::string& str)
 void Packet::WriteData(char * data, int sizeOfData)
 {
     if (m_Offset + sizeOfData > m_MaxPacketSize) {
-        LOG_WARNING("Packet::WriteData(): Data size in packet exceeded maximum packet size. New size is %i bytes\n", m_MaxPacketSize*2);
+        //LOG_WARNING("Packet::WriteData(): Data size in packet exceeded maximum packet size. New size is %i bytes\n", m_MaxPacketSize*2);
         resizeData();
     }
     memcpy(m_Data + m_Offset, data, sizeOfData);
@@ -61,7 +61,7 @@ std::string Packet::ReadString()
 {
     std::string returnValue(m_Data + m_ReturnDataOffset);
     if (m_Offset < m_ReturnDataOffset + returnValue.size()) {
-        LOG_WARNING("packet ReadString(): Oh no! You are trying to remove things outside my memory kingdom");
+        //LOG_WARNING("packet ReadString(): Oh no! You are trying to remove things outside my memory kingdom");
         return "PopFrontString Failed";
     }
     // +1 for null terminator.
@@ -72,7 +72,7 @@ std::string Packet::ReadString()
 char * Packet::ReadData(int SizeOfData)
 {
     if (m_Offset < m_ReturnDataOffset + SizeOfData) {
-        LOG_WARNING("packet ReadData(): Oh no! You are trying to remove things outside my memory kingdom");
+        //LOG_WARNING("packet ReadData(): Oh no! You are trying to remove things outside my memory kingdom");
         return nullptr;
     }
     unsigned int oldReturnDataOffset = m_ReturnDataOffset;

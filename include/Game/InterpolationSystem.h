@@ -12,15 +12,14 @@
 
 #include "Network/EInterpolate.h"
 
-struct Transform {
-    glm::vec3 Position;
-    glm::vec3 Scale;
-    glm::vec3 Orientation;
-    double interpolationTime;
-};
-
 class InterpolationSystem : public PureSystem
 {
+    struct Transform {
+        glm::vec3 Position;
+        glm::vec3 Scale;
+        glm::vec3 Orientation;
+        double interpolationTime;
+    };
 public:
     InterpolationSystem(EventBroker* eventbroker)
         : PureSystem(eventbroker, "Transform")
@@ -31,7 +30,8 @@ public:
 
     virtual void UpdateComponent(World* world, ComponentWrapper& transform, double dt) override;
 private:
-    std::unordered_map<EntityID, std::queue<Transform>> m_InterpolationPoints;
+    //std::unordered_map<EntityID, std::queue<Transform>> m_InterpolationPoints;
+    std::unordered_map<EntityID, Transform> m_InterpolationPoints;
 
     glm::vec3 vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime);
 
