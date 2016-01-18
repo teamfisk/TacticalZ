@@ -1,4 +1,7 @@
 #include "Core/ResourceManager.h"
+#include "boost/thread/thread.hpp"
+#include "boost/thread/mutex.hpp"
+#include "boost/thread/lock_guard.hpp"
 
 std::unordered_map<std::string, std::string> ResourceManager::m_CompilerTypenameToResourceType;
 std::unordered_map<std::string, std::function<Resource*(std::string)>> ResourceManager::m_FactoryFunctions;
@@ -6,10 +9,13 @@ std::unordered_map<std::pair<std::string, std::string>, Resource*> ResourceManag
 std::unordered_map<std::string, Resource*> ResourceManager::m_ResourceFromName;
 std::unordered_map<Resource*, Resource*> ResourceManager::m_ResourceParents;
 unsigned int ResourceManager::m_CurrentResourceTypeID = 0;
+bool ResourceManager::UseThreading = false;
 std::unordered_map<std::string, unsigned int> ResourceManager::m_ResourceTypeIDs;
 std::unordered_map<unsigned int, unsigned int> ResourceManager::m_ResourceCount;
-bool ResourceManager::m_Preloading = false;
 FileWatcher ResourceManager::m_FileWatcher;
+std::unordered_map<std::pair<std::string, std::string>, boost::thread> ResourceManager::m_LoadingThreads;
+std::unordered_map<std::pair<std::string, std::string>, std::exception_ptr> ResourceManager::m_LoadingThreadExceptions;
+boost::recursive_mutex ResourceManager::m_Mutex;
 
 unsigned int ResourceManager::GetTypeID(std::string resourceType)
 {
@@ -74,63 +80,65 @@ void ResourceManager::Update()
 	m_FileWatcher.Check();
 }
 
-void ResourceManager::Preload(std::string resourceType, std::string resourceName)
-{
-	if (IsResourceLoaded(resourceType, resourceName)) {
-		//LOG_WARNING("Attempted to preload resource \"%s\" multiple times!", resourceName.c_str());
-		return;
-	}
-
-	m_Preloading = true;
-	LOG_INFO("Preloading resource \"%s\"", resourceName.c_str());
-	CreateResource(resourceType, resourceName, nullptr);
-	m_Preloading = false;
-}
-
-Resource* ResourceManager::Load(std::string resourceType, std::string resourceName, Resource* parent /*= nullptr*/)
-{
-	auto it = m_ResourceCache.find(std::make_pair(resourceType, resourceName));
-	if (it != m_ResourceCache.end()) {
-		return it->second;
-	}
-
-	if (m_Preloading) {
-		LOG_INFO("Preloading resource \"%s\"", resourceName.c_str());
-	} else {
-		LOG_WARNING("Hot-loading resource \"%s\"", resourceName.c_str());
-	}
-
-    return CreateResource(resourceType, resourceName, parent);
-}
-
-Resource* ResourceManager::CreateResource(std::string resourceType, std::string resourceName, Resource* parent)
+Resource* ResourceManager::createResource(const std::string& resourceType, const std::string& resourceName, Resource* parent, std::exception_ptr& exception)
 {
 	auto facIt = m_FactoryFunctions.find(resourceType);
 	if (facIt == m_FactoryFunctions.end()) {
 		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": type not registered", resourceName.c_str(), resourceType.c_str());
-		return nullptr;
+        cacheResource(nullptr, resourceType, resourceName, parent);
+		//This basically throws an exception.
+        exception = std::make_exception_ptr(Resource::FailedLoadingException()); return nullptr;
 	}
 
 	// Call the factory function
-    Resource* resource;
     try {
-        resource = facIt->second(resourceName);
+        return cacheResource(facIt->second(resourceName), resourceType, resourceName, parent);
+    } catch (const Resource::StillLoadingException&) {
+        exception = std::current_exception(); return nullptr;
+    } catch (const std::exception& e) {
+		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": %s", resourceName.c_str(), resourceType.c_str(), e.what());
+        cacheResource(nullptr, resourceType, resourceName, parent);
+        exception = std::current_exception(); return nullptr;
+    }
+}
+
+
+Resource* ResourceManager::createResourceThrowing(const std::string& resourceType, const std::string& resourceName, Resource* parent)
+{
+    std::exception_ptr exception;
+    Resource* res = createResource(resourceType, resourceName, parent, exception);
+    if (exception) {
+        std::rethrow_exception(exception);
+    }
+    return res;
+}
+
+Resource* ResourceManager::cacheResource(Resource* resource, const std::string& resourceType, const std::string& resourceName, Resource* parent)
+{
+    //Lock the mutex immediately, and unlock it when leaving the code block.
+    boost::lock_guard<decltype(m_Mutex)> guard(m_Mutex);
+    if (resource != nullptr) {
         // Store IDs
         resource->TypeID = GetTypeID(resourceType);
         resource->ResourceID = GetNewResourceID(resource->TypeID);
-    } catch (const std::exception& e) {
-        resource = nullptr;
-		LOG_ERROR("Failed to load resource \"%s\" of type \"%s\": %s", resourceName.c_str(), resourceType.c_str(), e.what());
     }
-	// Cache
-	m_ResourceCache[std::make_pair(resourceType, resourceName)] = resource;
-	m_ResourceFromName[resourceName] = resource;
-	if (parent != nullptr) {
-		m_ResourceParents[resource] = parent;
-	}
-	if (!boost::filesystem::is_directory(resourceName)) {
-		LOG_DEBUG("Adding watch for %s", resourceName.c_str());
-		m_FileWatcher.AddWatch(resourceName, fileWatcherCallback);
-	}
-	return resource;
+
+    // Cache
+    m_ResourceCache[std::make_pair(resourceType, resourceName)] = resource;
+    m_ResourceFromName[resourceName] = resource;
+    if (parent != nullptr) {
+        m_ResourceParents[resource] = parent;
+    }
+
+    //if (!boost::filesystem::is_directory(resourceName)) {
+    //    LOG_DEBUG("Adding watch for %s", resourceName.c_str());
+    //    m_FileWatcher.AddWatch(resourceName, fileWatcherCallback);
+    //}
+    return resource;
+}
+
+bool ResourceManager::IsMainThread()
+{
+    static boost::thread::id MainThreadId = boost::this_thread::get_id();
+    return boost::this_thread::get_id() == MainThreadId;
 }

@@ -43,7 +43,7 @@ public:
 
     ComponentPool(const ::ComponentInfo& ci) 
         : m_ComponentInfo(ci)
-        , m_Pool(ci.Meta.Allocation, sizeof(EntityID) + ci.Meta.Stride)
+        , m_Pool(ci.Meta->Allocation, sizeof(EntityID) + ci.Stride)
     { }
 	ComponentPool(const ComponentPool& other) = delete;
 	ComponentPool(const ComponentPool&& other) = delete;

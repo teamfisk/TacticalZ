@@ -1,6 +1,8 @@
 #ifndef PickingPass_h__
 #define PickingPass_h__
 
+
+
 #include "IRenderer.h"
 #include "PickingPassState.h"
 #include "FrameBuffer.h"
@@ -8,6 +10,8 @@
 #include "Util/UnorderedMapiVec2.h"
 #include "../Core/EventBroker.h"
 #include "../Core/World.h"
+
+
 
 class PickingPass
 {
@@ -20,7 +24,6 @@ public:
 
     void Draw(RenderScene& scene);
     void ClearPicking();
-
 
     //Getters
     const ShaderProgram& PickingProgram() const { return *m_PickingProgram; }
