@@ -12,7 +12,7 @@ namespace Events
 struct Interpolate : Event
 {
     EntityID Entity;
-    boost::shared_array<char*> DataArray;
+    boost::shared_array<char> DataArray;
 };
 
 }
