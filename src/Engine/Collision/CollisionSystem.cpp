@@ -30,10 +30,8 @@ void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, Compo
             continue;
         }
         if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
-            if (entity.HasComponent("Physics")) {
-                (glm::vec3&)cTransform["Position"] += resolutionVector;
-                cPhysics["Velocity"] = glm::vec3(0, 0, 0);
-            }
+            (glm::vec3&)cTransform["Position"] += resolutionVector;
+            cPhysics["Velocity"] = glm::vec3(0, 0, 0);
         }
     }
 

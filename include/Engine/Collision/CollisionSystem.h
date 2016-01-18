@@ -15,7 +15,7 @@ class CollisionSystem : public PureSystem
 public:
     CollisionSystem(EventBroker* eventBroker, Octree* octree)
         : System(eventBroker)
-        , PureSystem("AABB")
+        , PureSystem("Collidable")
         , m_Octree(octree)
         , zPress(false)
     {
