@@ -112,6 +112,21 @@ void Client::parseServerPing()
     send(packet);
 }
 
+// Fields with strings will not work right now
+void Client::InterpolateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
+{
+    int sizeOfFields = 0;
+    for (auto field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        sizeOfFields = fieldInfo.Stride;
+    }
+    // Is the size correct?
+    boost::shared_array<char> eventData(new char[componentInfo.Meta.Stride]);
+    memcpy(eventData.get(), packet.ReadData(componentInfo.Meta.Stride), componentInfo.Meta.Stride);
+    //Send event to interpolat system
+
+}
+
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
 {
     for (auto field : componentInfo.FieldsInOrder) {
@@ -125,7 +140,6 @@ void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, co
     }
 }
 
-// Field parse
 void Client::parseSnapshot(Packet& packet)
 {
     std::string componentType = packet.ReadString();
@@ -142,7 +156,11 @@ void Client::parseSnapshot(Packet& packet)
             // Check if the component exists
             if (m_World->HasComponent(entityID, componentType)) {
                 // If the entity and the component exists update it
-                updateFields(packet, componentInfo, entityID, componentType);
+                if (componentType == "Transform") {
+                    InterpolateFields(packet, componentInfo, entityID, componentType);
+                } else {
+                    updateFields(packet, componentInfo, entityID, componentType);
+                }
                 // if entity exists but not the component
             } else {
                 // Create component

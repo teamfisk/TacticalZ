@@ -4,9 +4,11 @@
 #include <string>
 #include <ctime>
 #include <limits>
+#include <queue>
 
 #include <glm/common.hpp>
 #include <boost/asio.hpp>
+#include <boost/shared_array.hpp>
 
 #include "Network/Network.h"
 #include "Network/MessageType.h"
@@ -68,10 +70,11 @@ private:
     void ping();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
-    void parseConnect(Packet& packet);
+     void parseConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
     void parseServerPing();
+    void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     bool isConnected();
