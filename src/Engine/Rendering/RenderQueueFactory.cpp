@@ -90,7 +90,7 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
         }
 
         for (auto texGroup : model->TextureGroups) {
-            bool hasDeathComp = world->HasComponent(modelC.EntityID, "CoolDeathAnim");
+            bool hasDeathComp = world->HasComponent(modelC.EntityID, "ExplosionEffect");
             if (!hasDeathComp) {
                 ModelJob job;
 
@@ -110,9 +110,9 @@ void RenderQueueFactory::FillModels(World* world, RenderQueue* renderQueue)
                 renderQueue->Add(job);
             }
             else {
-                CoolDeathAnimationJob job;
+                ExplosionEffectJob job;
 
-                auto deathComp = world->GetComponent(modelC.EntityID, "CoolDeathAnim");
+                auto deathComp = world->GetComponent(modelC.EntityID, "ExplosionEffect");
 
                 job.ExplosionOrigin = (glm::vec3)deathComp["ExplosionOrigin"];
                 job.TimeSinceDeath = (double)deathComp["TimeSinceDeath"];

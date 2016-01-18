@@ -57,7 +57,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<EditorSystem>(m_Renderer);
     m_SystemPipeline->AddSystem<CollisionSystem>();
     m_SystemPipeline->AddSystem<TriggerSystem>();
-    m_SystemPipeline->AddSystem<CoolDeathAnimationSystem>();
+    m_SystemPipeline->AddSystem<ExplosionEffectSystem>();
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {

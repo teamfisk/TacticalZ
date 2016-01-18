@@ -21,12 +21,12 @@ void DrawScenePass::InitializeShaderPrograms()
     m_BasicForwardProgram->Compile();
     m_BasicForwardProgram->Link();
 
-    m_CoolDeathAnimProgram = ResourceManager::Load<ShaderProgram>("#CoolDeathAnimProgram");
-    m_CoolDeathAnimProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/CoolDeathAnim.vert.glsl")));
-    m_CoolDeathAnimProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/CoolDeathAnim.geom.glsl")));
-    m_CoolDeathAnimProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/CoolDeathAnim.frag.glsl")));
-    m_CoolDeathAnimProgram->Compile();
-    m_CoolDeathAnimProgram->Link();
+    m_ExplosionEffectProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectProgram");
+    m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ExplosionEffect.vert.glsl")));
+    m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/ExplosionEffect.geom.glsl")));
+    m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ExplosionEffect.frag.glsl")));
+    m_ExplosionEffectProgram->Compile();
+    m_ExplosionEffectProgram->Link();
     
 }
 
@@ -41,46 +41,46 @@ void DrawScenePass::Draw(RenderQueueCollection& rq)
 
     //TODO: Render: Add code for more jobs than modeljobs.
     for (auto &job : rq.Forward) {
-        auto coolDeathAnimationJob = std::dynamic_pointer_cast<CoolDeathAnimationJob>(job);
-        if (coolDeathAnimationJob) {
-            GLuint ShaderHandle = m_CoolDeathAnimProgram->GetHandle(); //---
+        auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
+        if (explosionEffectJob) {
+            GLuint ShaderHandle = m_ExplosionEffectProgram->GetHandle(); //---
 
-            m_CoolDeathAnimProgram->Bind();
+            m_ExplosionEffectProgram->Bind();
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(coolDeathAnimationJob->ModelMatrix));
+            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(explosionEffectJob->ModelMatrix));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ProjectionMatrix()));
-            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(coolDeathAnimationJob->Color));
-            glUniform3fv(glGetUniformLocation(ShaderHandle, "ExplosionOrigin"), 1, glm::value_ptr(coolDeathAnimationJob->ExplosionOrigin));
-            glUniform1f(glGetUniformLocation(ShaderHandle, "TimeSinceDeath"), coolDeathAnimationJob->TimeSinceDeath);
-            glUniform1f(glGetUniformLocation(ShaderHandle, "ExplosionDuration"), coolDeathAnimationJob->ExplosionDuration);
-            //glUniform1i(glGetUniformLocation(ShaderHandle, "Gravity"), coolDeathAnimationJob->Gravity);
-            //glUniform1f(glGetUniformLocation(ShaderHandle, "GravityForce"), coolDeathAnimationJob->GravityForce);
-            //glUniform1f(glGetUniformLocation(ShaderHandle, "ObjectRadius"), coolDeathAnimationJob->ObjectRadius);
-            glUniform4fv(glGetUniformLocation(ShaderHandle, "EndColor"), 1, glm::value_ptr(coolDeathAnimationJob->EndColor));
-            glUniform1i(glGetUniformLocation(ShaderHandle, "Randomness"), coolDeathAnimationJob->Randomness);
-            glUniform1fv(glGetUniformLocation(ShaderHandle, "RandomNumbers"), 20, coolDeathAnimationJob->RandomNumbers.data());
-            glUniform1f(glGetUniformLocation(ShaderHandle, "RandomnessScalar"), coolDeathAnimationJob->RandomnessScalar);
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "Velocity"), 1, glm::value_ptr(coolDeathAnimationJob->Velocity));
-            glUniform1i(glGetUniformLocation(ShaderHandle, "ColorByDistance"), coolDeathAnimationJob->ColorByDistance);
-            //glUniform1i(glGetUniformLocation(ShaderHandle, "ReverseAnimation"), coolDeathAnimationJob->ReverseAnimation);
-            //glUniform1i(glGetUniformLocation(ShaderHandle, "Wireframe"), coolDeathAnimationJob->Wireframe);
-            glUniform1i(glGetUniformLocation(ShaderHandle, "ExponentialAccelaration"), coolDeathAnimationJob->ExponentialAccelaration);
+            glUniform4fv(glGetUniformLocation(ShaderHandle, "Color"), 1, glm::value_ptr(explosionEffectJob->Color));
+            glUniform3fv(glGetUniformLocation(ShaderHandle, "ExplosionOrigin"), 1, glm::value_ptr(explosionEffectJob->ExplosionOrigin));
+            glUniform1f(glGetUniformLocation(ShaderHandle, "TimeSinceDeath"), explosionEffectJob->TimeSinceDeath);
+            glUniform1f(glGetUniformLocation(ShaderHandle, "ExplosionDuration"), explosionEffectJob->ExplosionDuration);
+            //glUniform1i(glGetUniformLocation(ShaderHandle, "Gravity"), explosionEffectJob->Gravity);
+            //glUniform1f(glGetUniformLocation(ShaderHandle, "GravityForce"), explosionEffectJob->GravityForce);
+            //glUniform1f(glGetUniformLocation(ShaderHandle, "ObjectRadius"), explosionEffectJob->ObjectRadius);
+            glUniform4fv(glGetUniformLocation(ShaderHandle, "EndColor"), 1, glm::value_ptr(explosionEffectJob->EndColor));
+            glUniform1i(glGetUniformLocation(ShaderHandle, "Randomness"), explosionEffectJob->Randomness);
+            glUniform1fv(glGetUniformLocation(ShaderHandle, "RandomNumbers"), 20, explosionEffectJob->RandomNumbers.data());
+            glUniform1f(glGetUniformLocation(ShaderHandle, "RandomnessScalar"), explosionEffectJob->RandomnessScalar);
+            glUniform2fv(glGetUniformLocation(ShaderHandle, "Velocity"), 1, glm::value_ptr(explosionEffectJob->Velocity));
+            glUniform1i(glGetUniformLocation(ShaderHandle, "ColorByDistance"), explosionEffectJob->ColorByDistance);
+            //glUniform1i(glGetUniformLocation(ShaderHandle, "ReverseAnimation"), explosionEffectJob->ReverseAnimation);
+            //glUniform1i(glGetUniformLocation(ShaderHandle, "Wireframe"), explosionEffectJob->Wireframe);
+            glUniform1i(glGetUniformLocation(ShaderHandle, "ExponentialAccelaration"), explosionEffectJob->ExponentialAccelaration);
 
 
 
 
             //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
-            if (coolDeathAnimationJob->DiffuseTexture != nullptr) {
+            if (explosionEffectJob->DiffuseTexture != nullptr) {
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, coolDeathAnimationJob->DiffuseTexture->m_Texture);
+                glBindTexture(GL_TEXTURE_2D, explosionEffectJob->DiffuseTexture->m_Texture);
             } else {
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
             }
-            glBindVertexArray(coolDeathAnimationJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, coolDeathAnimationJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, coolDeathAnimationJob->EndIndex - coolDeathAnimationJob->StartIndex + 1, GL_UNSIGNED_INT, 0, coolDeathAnimationJob->StartIndex);
+            glBindVertexArray(explosionEffectJob->Model->VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
+            glDrawElementsBaseVertex(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, 0, explosionEffectJob->StartIndex);
             continue;
         }
         

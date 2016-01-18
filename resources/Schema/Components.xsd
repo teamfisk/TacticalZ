@@ -8,5 +8,5 @@
 	<xs:include schemaLocation="Components/Player.xsd"/>
 	<xs:include schemaLocation="Components/AABB.xsd"/>
 	<xs:include schemaLocation="Components/Trigger.xsd"/>
-	<xs:include schemaLocation="Components/CoolDeathAnim.xsd"/>
+	<xs:include schemaLocation="Components/ExplosionEffect.xsd"/>
 </xs:schema>

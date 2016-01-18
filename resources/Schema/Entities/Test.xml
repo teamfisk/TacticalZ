@@ -72,7 +72,7 @@
 							<Resource>Models/Core/UnitRaptor.obj</Resource>
 							<Color R="1" G="0.4" B="0.8"/>
 						</c:Model>
-						<c:CoolDeathAnim>
+						<c:ExplosionEffect>
 							<ExplosionOrigin X="0" Y="0" Z="0"/>
 							<TimeSinceDeath>0</TimeSinceDeath>
 							<ExplosionDuration>2</ExplosionDuration>
@@ -87,7 +87,7 @@
 							<!--<ReverseAnimation>0</ReverseAnimation>-->
 							<!--<Wireframe>0</Wireframe>-->
 							<ExponentialAccelaration>0</ExponentialAccelaration>
-						</c:CoolDeathAnim>
+						</c:ExplosionEffect>
 					</Components>
 					<Children>
 						<Entity>

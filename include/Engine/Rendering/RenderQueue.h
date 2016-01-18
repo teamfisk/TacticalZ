@@ -64,7 +64,7 @@ struct ModelJob : RenderJob
 };
 
 // Cool Death Animation
-struct CoolDeathAnimationJob : ModelJob
+struct ExplosionEffectJob : ModelJob
 {
     glm::vec3 ExplosionOrigin;
     double TimeSinceDeath = 0.f; //Seconds

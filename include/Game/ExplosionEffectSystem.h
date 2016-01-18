@@ -1,16 +1,16 @@
 #include "Common.h"
 #include "Core/System.h"
 
-class CoolDeathAnimationSystem : public PureSystem
+class ExplosionEffectSystem : public PureSystem
 {
 public:
-    CoolDeathAnimationSystem(EventBroker* eventBroker)
-        : PureSystem(eventBroker, "CoolDeathAnim")
+    ExplosionEffectSystem(EventBroker* eventBroker)
+        : PureSystem(eventBroker, "ExplosionEffect")
     { }
 
     virtual void UpdateComponent(World* world, ComponentWrapper& object, double dt) override
     {
-        ComponentWrapper& Component = world->GetComponent(object.EntityID, "CoolDeathAnim");
+        ComponentWrapper& Component = world->GetComponent(object.EntityID, "ExplosionEffect");
 
         if ((double)Component["TimeSinceDeath"] > (double)Component["ExplosionDuration"]) {
             (double)Component["TimeSinceDeath"] = 0.f;

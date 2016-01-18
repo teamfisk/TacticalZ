@@ -119,7 +119,7 @@ private:
     ShaderProgram* m_CalculateFrustumProgram;
     ShaderProgram* m_LightCullProgram;
 
-    ShaderProgram* m_CoolDeathAnimProgram;
+    ShaderProgram* m_ExplosionEffectProgram;
 
 };
 

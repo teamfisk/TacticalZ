@@ -31,7 +31,7 @@ private:
 
     ShaderProgram* m_BasicForwardProgram;
 
-    ShaderProgram* m_CoolDeathAnimProgram;
+    ShaderProgram* m_ExplosionEffectProgram;
 };
 
 #endif 

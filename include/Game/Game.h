@@ -16,7 +16,7 @@
 #include "Core/EntityXMLFile.h"
 #include "Core/SystemPipeline.h"
 #include "RaptorCopterSystem.h"
-#include "CoolDeathAnimationSystem.h"
+#include "ExplosionEffectSystem.h"
 #include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
 
