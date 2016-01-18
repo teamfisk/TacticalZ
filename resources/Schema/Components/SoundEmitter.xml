@@ -1,4 +1,5 @@
-<c:SoundEmitter>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<SoundEmitter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SoundEmitter.xsd">
 	<FilePath></FilePath>
 	<Gain>1.0</Gain>
 	<Pitch>1.0</Pitch>
@@ -6,4 +7,4 @@
 	<MaxDistance>20.0</MaxDistance>
 	<RollOffFactor>1.0</RollOffFactor>
 	<ReferenceDistance>1.0</ReferenceDistance>
-</c:SoundEmitter>
+</SoundEmitter>

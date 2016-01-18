@@ -13,7 +13,7 @@ bool RayAABBIntr(const Ray& ray, const AABB& box)
 {
     glm::vec3 w = 75.0f * ray.Direction();
     glm::vec3 v = glm::abs(w);
-    glm::vec3 c = ray.Origin() - box.Center() + w;
+    glm::vec3 c = ray.Origin() - box.Origin() + w;
     glm::vec3 half = box.HalfSize();
 
     if (abs(c.x) > v.x + half.x) {
@@ -68,8 +68,8 @@ bool RayVsAABB(const Ray& ray, const AABB& box, float& outDistance)
 
 bool AABBVsAABB(const AABB& a, const AABB& b)
 {
-    const glm::vec3& aCenter = a.Center();
-    const glm::vec3& bCenter = b.Center();
+    const glm::vec3& aCenter = a.Origin();
+    const glm::vec3& bCenter = b.Origin();
     const glm::vec3& aHSize = a.HalfSize();
     const glm::vec3& bHSize = b.HalfSize();
     //Test will probably exit because of the X and Z axes more often, so test them first.
@@ -199,11 +199,51 @@ bool RayVsModel(const Ray& ray,
     return hit;
 }
 
+bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
+{
+    bool hit = false;
+    
+    const glm::vec3& origin = box.Origin();
+    const glm::vec3& min = box.MinCorner();
+    const glm::vec3& max = box.MaxCorner();
+
+    outResolutionVector.x = INFINITY;
+
+    for (int i = 0; i < modelIndices.size(); ++i) {
+        glm::vec3 p = modelVertices[i].Position;
+        p = glm::vec3(modelMatrix * glm::vec4(p.x, p.y, p.z, 1));
+
+        float distFromOrigin = glm::abs(origin.x - p.x);
+        float penetration = box.HalfSize().x - distFromOrigin;
+        if (penetration > 0 && penetration < glm::abs(outResolutionVector.x)) {
+            if (p.x > origin.x) {
+                outResolutionVector.x = -penetration;
+            } else {
+                outResolutionVector.x = penetration;
+            }
+            hit = true;
+        }
+        //glm::vec3 pLocal = origin - p;
+        //for (int axis = 0; axis < 3; ++axis) {
+        //    if (p[axis] < min[axis] || p[axis] > max[axis]) {
+        //        continue;
+        //    }
+
+        //    if (glm::abs(pLocal[axis]) < box.HalfSize()[axis]) {
+        //        outResolutionVector[axis] = (glm::sign(pLocal[axis]) * box.HalfSize()[axis]) - pLocal[axis];
+        //        hit = true;
+        //    }
+        //}
+    }
+
+    return hit;
+}
+
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)
 {
     const glm::vec3& ma1 = first.MaxCorner();
-    const glm::vec3& ma2 = first.MaxCorner();
-    const glm::vec3& mi1 = second.MinCorner();
+    const glm::vec3& ma2 = second.MaxCorner();
+    const glm::vec3& mi1 = first.MinCorner();
     const glm::vec3& mi2 = second.MinCorner();
     return (std::abs(ma1.x - ma2.x) < epsilon) &&
         (std::abs(mi1.x - mi2.x) < epsilon) &&
@@ -238,45 +278,23 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
         mini.y = std::min(wPos.y, mini.y);
         mini.z = std::min(wPos.z, mini.z);
     }
-    collision["BoxCenter"] = 0.5f * (maxi + mini);
-    collision["BoxSize"] = maxi - mini;
+    collision["Origin"] = 0.5f * (maxi + mini);
+    collision["Size"] = maxi - mini;
     return true;
 }
 
-bool GetEntityBox(World* world, ComponentWrapper& AABBComponent, AABB& outBox)
+boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity)
 {
-    ComponentWrapper& cTrans = world->GetComponent(AABBComponent.EntityID, "Transform");
-    ComponentWrapper model = world->GetComponent(AABBComponent.EntityID, "Model");
-    Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
-    outBox.CreateFromCenter(AABBComponent["BoxCenter"], AABBComponent["BoxSize"]);
-    glm::vec3 mini = outBox.MinCorner();
-    glm::vec3 maxi = outBox.MaxCorner();
-
-    if (modelRes == nullptr) {
-        return false;
-    }
-    glm::mat4 modelMatrix = modelRes->Matrix() *
-        glm::translate(glm::mat4(), (glm::vec3)cTrans["Position"]) *
-        glm::scale((glm::vec3)cTrans["Scale"]);
-
-    outBox = AABB(modelMatrix * glm::vec4(mini.x, mini.y, mini.z, 1),
-        modelMatrix * glm::vec4(maxi.x, maxi.y, maxi.z, 1));
-    return true;
-}
-
-bool GetEntityBox(World* world, EntityID entity, AABB& outBox, bool forceBoxFromModel)
-{
-    if (!world->HasComponent(entity, "AABB")) {
-        if (forceBoxFromModel) {
-            if (!attachAABBComponentFromModel(world, entity))
-                return false;
-        } else {
-            return false;
-        }
+    if (!entity.HasComponent("AABB")) {
+        return boost::none;
     }
 
-    ComponentWrapper& cBox = world->GetComponent(entity, "AABB");
-    return GetEntityBox(world, cBox, outBox);
+    ComponentWrapper& cAABB = entity["AABB"];
+    glm::vec3 absPosition = Transform::AbsolutePosition(entity.World, entity.ID);
+    glm::vec3 absScale = Transform::AbsoluteScale(entity.World, entity.ID);
+    glm::vec3 origin = absPosition + (glm::vec3)cAABB["Origin"];
+    glm::vec3 size = (glm::vec3)cAABB["Size"] * absScale;
+    return AABB::FromOriginSize(origin, size);
 }
 
 }

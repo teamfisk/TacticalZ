@@ -54,7 +54,7 @@ OctTree::OctTree(const AABB& octTreeBounds, int subDivisions)
             glm::vec3 minPos, maxPos;
             const glm::vec3& parentMin = m_Box.MinCorner();
             const glm::vec3& parentMax = m_Box.MaxCorner();
-            const glm::vec3& parentCenter = m_Box.Center();
+            const glm::vec3& parentCenter = m_Box.Origin();
             std::bitset<3> bits(i);
             //If child is 4,5,6,7.
             if (bits.test(2)) {
@@ -172,7 +172,7 @@ bool OctTree::RayCollides(const Ray& ray, Output& data) const
             std::vector<ChildInfo> childInfos;
             childInfos.reserve(8);
             for (int i = 0; i < 8; ++i) {
-                childInfos.push_back({ i, glm::distance(ray.Origin(), m_Children[i]->m_Box.Center()) });
+                childInfos.push_back({ i, glm::distance(ray.Origin(), m_Children[i]->m_Box.Origin()) });
             }
             std::sort(childInfos.begin(), childInfos.end(), isFirstLower);
             //Loop through the children, starting with the one closest to the ray origin. I.e the first to be hit.
@@ -279,7 +279,7 @@ void OctTree::ClearDynamicObjects()
 //    z : - + - + - + - +
 int OctTree::childIndexContainingPoint(const glm::vec3& point) const
 {
-    const glm::vec3& c = m_Box.Center();
+    const glm::vec3& c = m_Box.Origin();
     return (1 << 2) * (point.x >= c.x) | (1 << 1) * (point.y >= c.y) | (point.z >= c.z);
 }
 

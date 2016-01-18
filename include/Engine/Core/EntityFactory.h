@@ -285,7 +285,7 @@ private:
 
 					XSValue::Status status;
 					XSValue* val = XSValue::getActualValue(child->getNodeValue(), XSValue::dt_integer, status);
-					compInfo.Meta.Allocation += val->fData.fValue.f_int;
+					compInfo.Meta->Allocation += val->fData.fValue.f_int;
 				}
 
 				// Save documentation string
@@ -293,11 +293,11 @@ private:
 				if (documentationTags->getLength() != 0) {
 					auto child = documentationTags->item(0)->getFirstChild();
 					if (child != nullptr) {
-						compInfo.Meta.Annotation = XSTR(child->getNodeValue());
+						compInfo.Meta->Annotation = XSTR(child->getNodeValue());
 					}
 				}
 				// TODO: Parse annotation string XML
-				// compInfo.Meta.Allocation = ...
+				// compInfo.Meta->Allocation = ...
 			} else {
 				std::cout << "Warning: Component is missing an annotation!" << std::endl;
 			}
@@ -344,7 +344,7 @@ private:
 				fieldOffset += getTypeStride(type);
 			}
 
-            compInfo.Meta.Stride = fieldOffset;
+            compInfo.Stride = fieldOffset;
 			m_ComponentInfo[compInfo.Name] = compInfo;
 		}
 	}
@@ -367,14 +367,14 @@ private:
 
 			std::string componentName = XSTR(component->getLocalName());
 			auto& compInfo = m_ComponentInfo.at(componentName);
-			compInfo.Meta.Allocation += 1;
+			compInfo.Meta->Allocation += 1;
 		}
 
 		std::cout << "COMPONENT INFO" << std::endl;
 		for (auto& pair : m_ComponentInfo) {
 			ComponentInfo& ci = pair.second;
-			std::cout << "Component: " << ci.Name << " (" << ci.Meta.Annotation << ")" << std::endl;
-			std::cout << "  Allocation: " << ci.Meta.Allocation << std::endl;
+			std::cout << "Component: " << ci.Name << " (" << ci.Meta->Annotation << ")" << std::endl;
+			std::cout << "  Allocation: " << ci.Meta->Allocation << std::endl;
 			std::cout << "  Fields:" << std::endl;
 
 			// Calculate component size
@@ -393,7 +393,7 @@ private:
 			cs.ComponentName = ci.Name;
 			cs.Stride = stride;
 			cs.Info = ci;
-			cs.Data = new char[stride*ci.Meta.Allocation];
+			cs.Data = new char[stride*ci.Meta->Allocation];
 			m_ComponentStore[cs.ComponentName] = cs;
 		}
 	}

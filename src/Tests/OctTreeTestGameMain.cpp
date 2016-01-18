@@ -7,7 +7,7 @@ using boost::unit_test_framework::test_case;
 #include "Engine/Core/AABB.h"
 #include "Engine/Core/Ray.h"
 #include <stdlib.h>//srand
-#include "Engine/Core/OctTree.h"
+#include "Engine/Core/Octree.h"
 
 //vs memleaks
 //#define _CRTDBG_MAP_ALLOC

@@ -1,14 +1,15 @@
 #include "Rendering/RenderSystem.h"
 
-RenderSystem::RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame) :ImpureSystem(eventBrokerer)
+RenderSystem::RenderSystem(EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame)
+    : System(eventBroker)
+    , m_Renderer(renderer)
+    , m_RenderFrame(renderFrame)
 {
-    m_Renderer = renderer;
-    m_RenderFrame = renderFrame;
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
 
     m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
-    m_DebugCameraInputController = new DebugCameraInputController<RenderSystem>(eventBrokerer, -1);
+    m_DebugCameraInputController = new DebugCameraInputController<RenderSystem>(eventBroker, -1);
 }
 
 RenderSystem::~RenderSystem()

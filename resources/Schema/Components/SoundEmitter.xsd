@@ -7,18 +7,24 @@
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="FilePath" type="t:string" minOccurs="0"/>
-				<xs:element name="Gain" type="t:double" minOccurs="0"/>
-				<xs:annotation><xs:documentation>The "volume" of the emitter. A value betweeen 0-1</xs:documentation></xs:annotation>
-				<xs:element name="Pitch" type="t:double" minOccurs="0"/>
-				<xs:annotation><xs:documentation>The pitch of the emitter. A value betweeen 0-1</xs:documentation></xs:annotation>
-				<xs:element name="Loop" type="t:bool" minOccurs="0"/>
-				<xs:annotation><xs:documentation>If the sound should loop or not.</xs:documentation></xs:annotation>
-				<xs:element name="MaxDistance" type="t:double" minOccurs="0"/>
-				<xs:annotation><xs:documentation>The distance where there will no longer be any attenuation.</xs:documentation></xs:annotation>
-				<xs:element name="RollOffFactor" type="t:double" minOccurs="0"/>
-				<xs:annotation><xs:documentation>The rolloff rate of the source.</xs:documentation></xs:annotation>
-				<xs:element name="ReferenceDistance" type="t:double" minOccurs="0"/>
-				<xs:annotation><xs:documentation>The distance that the source will be the loudest.</xs:documentation></xs:annotation>
+				<xs:element name="Gain" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The "volume" of the emitter. A value betweeen 0-1</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Pitch" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The pitch of the emitter. A value betweeen 0-1</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Loop" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If the sound should loop or not.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="MaxDistance" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The distance where there will no longer be any attenuation.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="RollOffFactor" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The rolloff rate of the source.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="ReferenceDistance" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The distance that the source will be the loudest.</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
