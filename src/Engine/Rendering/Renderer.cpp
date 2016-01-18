@@ -160,7 +160,8 @@ void Renderer::InitializeRenderPasses()
 //Temp func
 void Renderer::FillDepth(RenderScene& scene)
 {
-    for (auto job : scene.ForwardJobs) {
+    // HACK: FIX ME TOBIAS
+    /*for (auto job : scene.ForwardJobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
         if(! modelJob) {
             return;
@@ -171,5 +172,5 @@ void Renderer::FillDepth(RenderScene& scene)
         glm::vec3 worldpos = glm::vec3(scene.Camera->ViewMatrix() * glm::vec4(abspos, 1));
         modelJob->Depth = worldpos.z;
     }
-    scene.ForwardJobs.sort(Renderer::DepthSort);
+    scene.ForwardJobs.sort(Renderer::DepthSort);*/
 }

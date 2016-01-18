@@ -38,6 +38,8 @@ private:
     // GUI callbacks
     void OnEntitySelected(EntityWrapper entity);
     void OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath);
+    EntityWrapper OnEntityCreate(EntityWrapper parent);
+    void OnEntityDelete(EntityWrapper entity);
     void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
 };

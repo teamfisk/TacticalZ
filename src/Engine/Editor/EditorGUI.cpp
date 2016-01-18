@@ -29,10 +29,7 @@ void EditorGUI::drawEntities(World* world)
 
     float buttonWidth = (ImGui::GetContentRegionAvailWidth() - 10.f) / 3.f ;
     if (ImGui::Button("Create", ImVec2(buttonWidth, 0))) {
-        if (m_OnEntityCreate != nullptr) {
-            EntityWrapper newEntity = m_OnEntityCreate(EntityWrapper(world, EntityID_Invalid));
-            SelectEntity(newEntity);
-        }
+        entityCreate(world, m_CurrentSelection);
     }
     ImGui::SameLine(0.f, 5.f);
     if (ImGui::Button("Import", ImVec2(buttonWidth, 0))) {
@@ -115,16 +112,12 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
         if (ImGui::BeginPopupContextItem("entity context menu")) {
             if (ImGui::Button("Save")) {
                 entitySave(entity);
+                ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
             if (ImGui::Button("Delete")) {
-                if (m_OnEntityDelete != nullptr) {
-                    m_OnEntityDelete(entity);
-                    ImGui::CloseCurrentPopup();
-                } 
-                if (!m_CurrentSelection.Valid()) {
-                    SelectEntity(EntityWrapper::Invalid);
-                }
+                entityDelete(entity);
+                ImGui::CloseCurrentPopup();
             }
             drawModals();
             ImGui::EndPopup();
@@ -454,5 +447,28 @@ void EditorGUI::entitySave(EntityWrapper entity)
     } catch (const std::exception& e) {
         m_LastErrorMessage = e.what();
         ImGui::OpenPopup("Save failed");
+    }
+}
+
+void EditorGUI::entityCreate(World* world, EntityWrapper parent)
+{
+    if (m_OnEntityCreate != nullptr) {
+        // Create the new entity in the world we're drawing for
+        if (parent.World == nullptr) {
+            parent.World = world;
+        }
+        EntityWrapper newEntity = m_OnEntityCreate(parent);
+        SelectEntity(newEntity);
+    }
+}
+
+void EditorGUI::entityDelete(EntityWrapper entity)
+{
+    if (m_OnEntityDelete != nullptr) {
+        m_OnEntityDelete(entity);
+        m_EntityFiles.erase(entity);
+    }
+    if (!m_CurrentSelection.Valid()) {
+        SelectEntity(EntityWrapper::Invalid);
     }
 }

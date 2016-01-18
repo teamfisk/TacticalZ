@@ -45,7 +45,7 @@ public:
     void SetEntityCreateCallback(OnEntityCreate_t f) { m_OnEntityCreate = f; }
     // Called when the user means to delete an entity.
     typedef std::function<void(EntityWrapper)> OnEntityDelete_t;
-    void SetEntityCreateCallback(OnEntityDelete_t f) { m_OnEntityDelete = f; }
+    void SetEntityDeleteCallback(OnEntityDelete_t f) { m_OnEntityDelete = f; }
     // Called when the user means to attach a new component to an entity.
     typedef std::function<void(EntityWrapper, const std::string&)> OnComponentAttach_t;
     void SetComponentAttachCallback(OnComponentAttach_t f) { m_OnComponentAttach = f; }
@@ -80,6 +80,8 @@ private:
     // Entity file handling methods
     void entityImport(World* world);
     void entitySave(EntityWrapper entity);
+    void entityCreate(World* world, EntityWrapper parent);
+    void entityDelete(EntityWrapper entity);
     
     // UI drawing methods
     void drawMenu();

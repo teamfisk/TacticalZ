@@ -23,6 +23,8 @@ EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer, Render
     m_EditorGUI->SetEntitySelectedCallback(std::bind(&EditorSystem::OnEntitySelected, this, std::placeholders::_1));
     m_EditorGUI->SetEntityImportCallback(std::bind(&EditorSystem::importEntity, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetEntitySaveCallback(std::bind(&EditorSystem::OnEntitySave, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetEntityCreateCallback(std::bind(&EditorSystem::OnEntityCreate, this, std::placeholders::_1));
+    m_EditorGUI->SetEntityDeleteCallback(std::bind(&EditorSystem::OnEntityDelete, this, std::placeholders::_1));
     m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -63,6 +65,18 @@ void EditorSystem::OnEntitySave(EntityWrapper entity, boost::filesystem::path fi
 {
     EntityFileWriter writer(filePath);
     writer.WriteEntity(entity.World, entity.ID);
+}
+
+EntityWrapper EditorSystem::OnEntityCreate(EntityWrapper parent)
+{
+    EntityID entity = parent.World->CreateEntity(parent.ID);
+    parent.World->AttachComponent(entity, "Transform");
+    return EntityWrapper(parent.World, entity);
+}
+
+void EditorSystem::OnEntityDelete(EntityWrapper entity)
+{
+    entity.World->DeleteEntity(entity.ID);
 }
 
 void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& componentType)
