@@ -102,22 +102,39 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
 void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
 {
     auto pointLights = world->GetComponents("PointLight");
-    if (pointLights == nullptr) {
-        return;
+    if (pointLights != nullptr) {
+        for (auto& pointlightC : *pointLights) {
+            bool visible = pointlightC["Visible"];
+            if (!visible) {
+                continue;
+            }
+            auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
+            if (&transformC == nullptr) {
+                continue;
+            }
+
+            std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
+            jobs.push_back(pointLightJob);
+        }
     }
 
-    for (auto& pointlightC : *pointLights) {
-        bool visible = pointlightC["Visible"];
-        if (!visible) {
-            continue;
-        }
-        auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
-        if (&transformC == nullptr) {
-            return;
-        }
 
-        std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
-        jobs.push_back(pointLightJob);
+    auto directionalLights = world->GetComponents("DirectionalLight");
+    if (directionalLights != nullptr) {
+        for (auto& directionalLightC : *directionalLights) {
+            bool visable = directionalLightC["Visible"];
+            if (!visable) {
+                continue;
+            }
+
+            auto transformC = world->GetComponent(directionalLightC.EntityID, "Transform");
+            if(&transformC == nullptr) {
+                continue;
+            }
+
+            std::shared_ptr<DirectionalLightJob> directionalLightJob = std::shared_ptr<DirectionalLightJob>(new DirectionalLightJob(transformC, directionalLightC, m_World));
+            jobs.push_back(directionalLightJob);
+        }
     }
 }
 
