@@ -10,7 +10,9 @@
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="Name" type="t:string" minOccurs="0"/>
-				<xs:element name="FOV" type="t:double" minOccurs="0"/>
+				<xs:element name="FOV" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Vertical Field of View in degrees</xs:documentation></xs:annotation>
+				</xs:element>
 				<xs:element name="NearClip" type="t:double" minOccurs="0"/>
 				<xs:element name="FarClip" type="t:double" minOccurs="0"/>
 			</xs:all>

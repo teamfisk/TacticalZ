@@ -3,7 +3,7 @@
 
 #include "../Core/ResourceManager.h"
 
-class BaseTexture : public Resource
+class BaseTexture : public ThreadUnsafeResource
 {
 	friend class ResourceManager;
 

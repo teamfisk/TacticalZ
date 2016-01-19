@@ -73,88 +73,15 @@ public:
         ComponentField
     };
 
-    EntityFileSAXHandler(const EntityFileHandler* handler, xercesc::SAX2XMLReader* reader)
-        : m_Handler(handler)
-        , m_Reader(reader)
-    {
-        // 0 is imaginary world entity
-        m_EntityStack.push(0);
-        m_StateStack.push(State::Unknown);
-    }
+    EntityFileSAXHandler(const EntityFileHandler* handler, xercesc::SAX2XMLReader* reader);
 
-    void startElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname, const xercesc::Attributes& attrs) override
-    {
-        std::string name = XS::ToString(_localName);
+    void startElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname, const xercesc::Attributes& attrs) override;
+    void characters(const XMLCh* const chars, const XMLSize_t length) override;
+    void endElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname) override;
 
-        if (m_StateStack.top() == State::Unknown || m_StateStack.top() == State::Entity) {
-            if (name == "Entity") {
-                m_StateStack.push(State::Entity);
-                onStartEntity(attrs);
-                return;
-            }
-            if (name == "EntityRef") {
-                onStartEntityRef(attrs);
-                return;
-            }
-        }
-
-        std::string uri = XS::ToString(_uri);
-        if (m_StateStack.top() == State::Entity) {
-            if (uri == "components") {
-                m_StateStack.push(State::Component);
-                onStartComponent(name);
-                return;
-            }
-        }
-        
-        if (m_StateStack.top() == State::Component) {
-            m_StateStack.push(State::ComponentField);
-            onStartComponentField(name, attrs);
-            return;
-        }
-    }
-
-    void characters(const XMLCh* const chars, const XMLSize_t length) override
-    {
-        if (m_StateStack.top() == State::ComponentField) {
-            char* transcoded = xercesc::XMLString::transcode(chars);
-            onFieldData(transcoded);
-        }
-    }
-
-    void endElement(const XMLCh* const _uri, const XMLCh* const _localName, const XMLCh* const _qname) override
-    {
-        std::string name = XS::ToString(_localName);
-        if (m_StateStack.top() == State::Entity) {
-            if (name == "Entity") {
-                m_StateStack.pop();
-                onEndEntity();
-                return;
-            }
-        }
-        
-        std::string uri = XS::ToString(_uri);
-        if (m_StateStack.top() == State::Component) {
-            //if (uri == "components") {
-                m_StateStack.pop();
-                onEndComponent(name);
-                return;
-            //}
-        }
-
-        if (m_StateStack.top() == State::ComponentField) {
-            m_StateStack.pop();
-            onEndComponentField(name);
-            return;
-        }
-    }
-
-    void fatalError(const xercesc::SAXParseException& e) 
-    {
-        XS::ToString s(e.getMessage());
-        LOG_ERROR("SAXParseException: %s", ((std::string)s).c_str());
-        //throw e;
-    }
+    void warning(const xercesc::SAXParseException& e);
+    void error(const xercesc::SAXParseException& e);
+    void fatalError(const xercesc::SAXParseException& e);
 
 private:
     const EntityFileHandler* m_Handler;
@@ -168,73 +95,14 @@ private:
     std::string m_CurrentField;
     std::map<std::string, std::string> m_CurrentAttributes;
 
-    void onStartEntity(const xercesc::Attributes& attrs) 
-    {
-        EntityID parent = m_EntityStack.top();
-
-        if (m_Handler->m_OnStartEntityCallback) {
-            std::string name;
-            auto xName = attrs.getValue(XS::ToXMLCh("name"));
-            if (xName != nullptr) {
-                name = XS::ToString(xName);
-            }
-            m_Handler->m_OnStartEntityCallback(m_NextEntityID, parent, name);
-        }
-
-        m_EntityStack.push(m_NextEntityID);
-        m_NextEntityID++;
-    } 
-    void onEndEntity()
-    {
-        m_EntityStack.pop();
-    }
-    void onStartEntityRef(const xercesc::Attributes& attrs)
-    {
-        std::string path = XS::ToString(attrs.getValue(XS::ToXMLCh("file")));
-        
-        xercesc::SAX2XMLReader* parser = xercesc::XMLReaderFactory::createXMLReader();
-        parser->setContentHandler(this);
-        parser->setErrorHandler(this);
-        parser->parse(path.c_str());
-        delete parser;
-    }
-    void onStartComponent(const std::string& name)
-    {
-        //LOG_DEBUG("    Component: %s", name.c_str());
-        m_CurrentComponent = name;
-        if (m_Handler->m_OnStartComponentCallback) {
-            m_Handler->m_OnStartComponentCallback(m_EntityStack.top(), name);
-        }
-    }
-    void onEndComponent(const std::string& name) { }
-    void onStartComponentField(const std::string& field, const xercesc::Attributes& attrs) 
-    {
-        //LOG_DEBUG("        Field: %s", field.c_str());
-        m_CurrentField = field;
-        m_CurrentAttributes.clear();
-        for (int i = 0; i < attrs.getLength(); i++) {
-            auto name = attrs.getQName(i);
-            auto value = attrs.getValue(name);
-            //LOG_DEBUG("            %s = %s", (char*)XS::ToString(name), (char*)XS::ToString(value));
-            m_CurrentAttributes[XS::ToString(name).operator std::string()] = XS::ToString(value).operator std::string();
-        }
-
-        if (m_Handler->m_OnStartFieldCallback) {
-            m_Handler->m_OnStartFieldCallback(m_EntityStack.top(), m_CurrentComponent, field, m_CurrentAttributes);
-        }
-    }
-    void onEndComponentField(const std::string& field) { }
-
-    void onFieldData(char* data)
-    {
-        //LOG_DEBUG("            Data: %s", data);
-
-        if (m_Handler->m_OnStartFieldDataCallback) {
-            m_Handler->m_OnStartFieldDataCallback(m_EntityStack.top(), m_CurrentComponent, m_CurrentField, data);
-        }
-
-        xercesc::XMLString::release(&data);
-    }
+    void onStartEntity(const xercesc::Attributes& attrs); 
+    void onEndEntity();
+    void onStartEntityRef(const xercesc::Attributes& attrs);
+    void onStartComponent(const std::string& name);
+    void onEndComponent(const std::string& name);
+    void onStartComponentField(const std::string& field, const xercesc::Attributes& attrs);
+    void onEndComponentField(const std::string& field);
+    void onFieldData(char* data);
 };
 
 class EntityFileXMLErrorHandler : public xercesc::ErrorHandler
@@ -269,6 +137,7 @@ private:
 class EntityFile : public Resource
 {
     friend class ResourceManager;
+    friend class EntityFileSAXHandler;
 private:
     EntityFile(boost::filesystem::path path);
     ~EntityFile();
@@ -288,6 +157,8 @@ private:
     xercesc::SAX2XMLReader* m_SAX2XMLReader;
 	//std::map<std::string, ::ComponentInfo> m_ComponentInfo;
     //std::vector<std::string> m_EntityReferences;
+
+    static void setReaderFeatures(xercesc::SAX2XMLReader* reader);
 };
 
 #endif

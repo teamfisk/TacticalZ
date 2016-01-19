@@ -1,18 +1,27 @@
 #include "Game.h"
+#include "Collision/CollidableOctreeSystem.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
-#include "Game/HealthSystem.h"
+#include "Systems/RaptorCopterSystem.h"
+#include "Systems/HealthSystem.h"
+#include "Systems/PlayerMovementSystem.h"
+#include "Systems/SpawnerSystem.h"
+#include "Systems/PlayerSpawnSystem.h"
 #include "Core/EntityFileWriter.h"
 
 Game::Game(int argc, char* argv[])
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
+    ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
+    ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+    ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
+    DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
 
     // Create the core event broker
@@ -58,21 +67,27 @@ Game::Game(int argc, char* argv[])
     //SO MUCH TEMP PLEASE REMOVE ME OMFG VIKTOR HELP
     m_Renderer->m_World = m_World;
 
+    // Create Octrees
+    m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeFrustrumCulling = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    
 
-    //All systems with orderlevel 0 will be updated first.
+    // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
-
-    //Collision and TriggerSystem should update after player.
+    m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
+    // Populate Octree with collidables
     ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);
+    // Collision and TriggerSystem should update after player.
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
@@ -81,12 +96,19 @@ Game::Game(int argc, char* argv[])
         //boost::thread workerThread(&Game::networkFunction, this);
         networkFunction();
     }
+
+    // Invoke sound system
+    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
+
     m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
     delete m_SystemPipeline;
+    delete m_SoundSystem;
+    delete m_OctreeFrustrumCulling;
+    delete m_OctreeCollision;
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;
@@ -120,9 +142,10 @@ void Game::Tick()
     }
     // Iterate through systems and update world!
     m_SystemPipeline->Update(m_World, dt);
+    debugTick(dt);
     m_Renderer->Update(dt);
     m_EventBroker->Process<Client>();
-
+    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
     GLERROR("Game::Tick m_Renderer->Draw");

@@ -2,8 +2,8 @@
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="components" elementFormDefault="qualified">
 	<xs:include schemaLocation="Components/Transform.xsd"/>
+	<xs:include schemaLocation="Components/Physics.xsd"/>
 	<xs:include schemaLocation="Components/Model.xsd"/>
-	<xs:include schemaLocation="Components/Test.xsd"/>
 	<xs:include schemaLocation="Components/RaptorCopter.xsd"/>
 	<xs:include schemaLocation="Components/Player.xsd"/>
 	<xs:include schemaLocation="Components/Camera.xsd"/>
@@ -12,4 +12,11 @@
 	<xs:include schemaLocation="Components/DirectionalLight.xsd"/>
 	<xs:include schemaLocation="Components/Trigger.xsd"/>
 	<xs:include schemaLocation="Components/Health.xsd"/>
+	<xs:include schemaLocation="Components/Listener.xsd"/>
+	<xs:include schemaLocation="Components/SoundEmitter.xsd"/>
+	<xs:include schemaLocation="Components/Collidable.xsd"/>
+	<xs:include schemaLocation="Components/Spawner.xsd"/>
+	<xs:include schemaLocation="Components/SpawnPoint.xsd"/>
+	<xs:include schemaLocation="Components/PlayerSpawn.xsd"/>
+	<xs:include schemaLocation="Components/Team.xsd"/>
 </xs:schema>

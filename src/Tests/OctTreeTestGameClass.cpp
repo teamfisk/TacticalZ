@@ -91,7 +91,7 @@ void Game::Tick()
         frameCounter = 0;
     }
     ComponentWrapper transform = m_World->GetComponent(m_World->anotherBoxTransformId, "Transform");
-    transform["Position"] = boxi.Center();
+    transform["Position"] = boxi.Origin();
 
     //check all children again in the tree if they have a box in them or not, and colormark them if they do
     //contentboxarna får man ut - inte childboxarna!
@@ -110,7 +110,7 @@ void Game::Tick()
         //REQUIRED: childIndicesContainingBox must be public to test this!
         for each (auto someBoxIndex in boxIndex)
         {
-            glm::vec3 pos = m_World->someOctTree.m_Root->m_Children[someBoxIndex]->m_Box.Center();
+            glm::vec3 pos = m_World->someOctTree.m_Root->m_Children[someBoxIndex]->m_Box.Origin();
             if (abs(pos.x - oneLinkedObject.posxyz.x) < 0.005f &&
                 abs(pos.y - oneLinkedObject.posxyz.y) < 0.005f &&
                 abs(pos.z - oneLinkedObject.posxyz.z) < 0.005f) {

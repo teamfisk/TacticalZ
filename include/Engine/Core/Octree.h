@@ -1,11 +1,12 @@
-#ifndef OctTree_h__
-#define OctTree_h__
+#ifndef Octree_h__
+#define Octree_h__
 
-#include "Core/AABB.h"
+#include "../Common.h"
+#include "AABB.h"
 
 class Ray;
 
-class OctTree
+class Octree
 {
 public:
     struct Output
@@ -13,16 +14,16 @@ public:
         float CollideDistance;
     };
 
-    OctTree();
-    ~OctTree();
-    //For the root OctTree, [octTreeBounds] should be a box containing the entire level.
-    OctTree(const AABB& octTreeBounds, int subDivisions);
+    Octree() = delete;
+    ~Octree();
+    //For the root Octree, [octreeBounds] should be a box containing the entire level.
+    Octree(const AABB& octreeBounds, int subDivisions);
 
-    //We cannot copy the OctTree as of now, because of the recursive dynamic allocation.
-    //Define these if the OctTree suddenly needs to be copied, think of the children OctChild* ptrs. 
-    OctTree(const OctTree& other) = delete;
-    OctTree(const OctTree&& other) = delete;
-    OctTree& operator= (const OctTree& other) = delete;
+    //We cannot copy the Octree as of now, because of the recursive dynamic allocation.
+    //Define these if the Octree suddenly needs to be copied, think of the children Child* ptrs. 
+    Octree(const Octree& other) = delete;
+    Octree(const Octree&& other) = delete;
+    Octree& operator= (const Octree& other) = delete;
     //Add a dynamic object (one that moves around) into the tree.
     void AddDynamicObject(const AABB& box);
     //Add a static object (that does not move) into the tree.
@@ -42,7 +43,7 @@ public:
     bool BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected);
 
 private:
-    struct OctChild;    //Fwd declaration;
+    struct Child;    //Fwd declaration;
     struct ContainedObject
     {
         ContainedObject()
@@ -56,7 +57,7 @@ private:
         AABB Box;
         bool Checked;
     };
-    OctChild* m_Root;
+    Child* m_Root;
     std::vector<ContainedObject> m_StaticObjects;
     std::vector<ContainedObject> m_DynamicObjects;
 
@@ -67,16 +68,16 @@ private:
 
     void falsifyObjectChecks();
 
-    struct OctChild
+    struct Child
     {
-        ~OctChild();
-        OctChild(const AABB& octTreeBounds, 
+        ~Child();
+        Child(const AABB& octTreeBounds, 
             int subDivisions, 
-            std::vector<OctTree::ContainedObject>& staticObjects, 
-            std::vector<OctTree::ContainedObject>& dynamicObjects);
-        OctChild(const OctChild& other) = delete;
-        OctChild(const OctChild&& other) = delete;
-        OctChild& operator= (const OctChild& other) = delete;
+            std::vector<Octree::ContainedObject>& staticObjects, 
+            std::vector<Octree::ContainedObject>& dynamicObjects);
+        Child(const Child& other) = delete;
+        Child(const Child&& other) = delete;
+        Child& operator= (const Child& other) = delete;
         void AddDynamicObject(const AABB& box);
         void AddStaticObject(const AABB& box);
         void BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const;
@@ -85,14 +86,14 @@ private:
         bool RayCollides(const Ray& ray, Output& data) const;
         bool BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const;
 
-        OctChild* m_Children[8];
-        //Indices into the lists in OctTree.
+        Child* m_Children[8];
+        //Indices into the lists in Octree.
         std::vector<int> m_StaticObjIndices;
         std::vector<int> m_DynamicObjIndices;
         AABB m_Box;
-        //Reference to the lists in OctTree.
-        std::vector<OctTree::ContainedObject>& m_StaticObjectsRef;
-        std::vector<OctTree::ContainedObject>& m_DynamicObjectsRef;
+        //Reference to the lists in Octree.
+        std::vector<Octree::ContainedObject>& m_StaticObjectsRef;
+        std::vector<Octree::ContainedObject>& m_DynamicObjectsRef;
 
         inline bool hasChildren() const;
         int childIndexContainingPoint(const glm::vec3& point) const;
