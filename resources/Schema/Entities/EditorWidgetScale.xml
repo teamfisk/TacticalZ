@@ -12,7 +12,9 @@
     <Entity name="X">
       <Components>
         <c:EditorWidget>
-          <Type>3</Type>
+          <Type>
+            <Scale/>
+          </Type>
           <Axis X="1" Y="0" Z="0"/>
         </c:EditorWidget>
         <c:Model>
@@ -25,7 +27,9 @@
     <Entity name="Y">
       <Components>
         <c:EditorWidget>
-          <Type>3</Type>
+          <Type>
+            <Scale/>
+          </Type>
           <Axis X="0" Y="1" Z="0"/>
         </c:EditorWidget>
         <c:Model>
@@ -38,7 +42,9 @@
     <Entity name="Z">
       <Components>
         <c:EditorWidget>
-          <Type>3</Type>
+          <Type>
+            <Scale/>
+          </Type>
           <Axis X="0" Y="0" Z="1"/>
         </c:EditorWidget>
         <c:Model>

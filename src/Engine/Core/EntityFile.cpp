@@ -86,23 +86,26 @@ void EntityFile::WriteAttributeData(char* outData, const ComponentInfo::Field_t&
 
 void EntityFile::WriteValueData(char* outData, const ComponentInfo::Field_t& field, const char* valueData)
 {
-    if (field.Type == "int" || field.Type == "enum") {
-        int value = boost::lexical_cast<int>(valueData);
-        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
-    } else if (field.Type == "float") {
-        float value = boost::lexical_cast<float>(valueData);
-        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
-    } else if (field.Type == "double") {
-        double value = boost::lexical_cast<double>(valueData);
-        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
-    } else if (field.Type == "bool") {
-        bool value = (valueData[0] == 't'); // Lazy bool evaluation
-        memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
-    } else if (field.Type == "string") {
-        new (outData) std::string(valueData);
-    } else {
-        LOG_WARNING("Unknown value data type: %s", field.Type.c_str());
-    }
+    // Catch and ignore casting errors so whitespace around string enums won't mess anything up
+    try {
+        if (field.Type == "int" || field.Type == "enum") {
+            int value = boost::lexical_cast<int>(valueData);
+            memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+        } else if (field.Type == "float") {
+            float value = boost::lexical_cast<float>(valueData);
+            memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+        } else if (field.Type == "double") {
+            double value = boost::lexical_cast<double>(valueData);
+            memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+        } else if (field.Type == "bool") {
+            bool value = (valueData[0] == 't'); // Lazy bool evaluation
+            memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+        } else if (field.Type == "string") {
+            new (outData) std::string(valueData);
+        } else {
+            LOG_WARNING("Unknown value data type: %s", field.Type.c_str());
+        }
+    } catch (const boost::bad_lexical_cast&) { }
 }
 
 EntityFileSAXHandler::EntityFileSAXHandler(const EntityFileHandler* handler, xercesc::SAX2XMLReader* reader) : m_Handler(handler)
