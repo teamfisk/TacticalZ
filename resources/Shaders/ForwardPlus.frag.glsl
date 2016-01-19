@@ -86,9 +86,9 @@ LightResult CalcPointLightSource(vec4 lightPos, float lightRadius, vec4 lightCol
 	return result;
 }
 
-LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensity, vec4 viewVec, vec4 vertPosition, vec4 vertNormal)
+LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensity, vec4 viewVec, vec4 vertNormal)
 {
-	vec4 L = normalize( vec4(direction.xyz, 1) );
+	vec4 L = normalize( -direction );
 
 	LightResult result;
 	result.Diffuse = CalcDiffuse(color, L, vertNormal) * intensity;
@@ -105,8 +105,8 @@ void main()
 	vec4 viewVec = normalize(-position); 
 
 	vec2 tilePos;
-	tilePos.x = int(gl_FragCoord.x/16);
-	tilePos.y = int(gl_FragCoord.y/16);
+	tilePos.x = int(gl_FragCoord.x/TILE_SIZE);
+	tilePos.y = int(gl_FragCoord.y/TILE_SIZE);
 
 	LightResult totalLighting;
 	totalLighting.Diffuse = scene_ambient;
@@ -117,12 +117,13 @@ void main()
 	//for(int i = 0; i < 3; i++)
 	for(int i = start; i < start + amount; i++) {
 		int l = int(LightIndex[i]);
+		LightSource light = LightSources.List[l];
 		LightResult result;
 
-		if(LightSources.List[i].Type == 1) { // point
-			result = CalcPointLightSource(V * LightSources.List[l].Position, LightSources.List[l].Radius, LightSources.List[l].Color, LightSources.List[l].Intensity, viewVec, position, normal, LightSources.List[i].Falloff);
-		} else if (LightSources.List[i].Type == 2) { //Directional
-			result = CalcDirectionalLightSource(V * LightSources.List[l].Direction, LightSources.List[i].Color, LightSources.List[i].Intensity, viewVec, position, normal);
+		if(light.Type == 1) { // point
+			result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
+		} else if (light.Type == 2) { //Directional
+			result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 		}
 		totalLighting.Diffuse += result.Diffuse;
 		totalLighting.Specular += result.Specular;
@@ -132,8 +133,9 @@ void main()
 	//fragmentColor += Input.DiffuseColor;
 	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
 	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
-	//fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Start/.0, 0, 1);
+	//fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;
+	//fragmentColor += vec4(currentTile/3600.f, 0, 0, 1);
 	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 ) {
 		//fragmentColor += vec4(0.5, 0, 0, 0);
 	} else {

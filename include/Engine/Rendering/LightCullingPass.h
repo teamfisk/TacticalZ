@@ -46,8 +46,8 @@ private:
     int m_NumberOfTiles = 0;
 
     struct Plane {
-        glm::vec3 Normal;
-        float d;
+        glm::vec3 Normal = glm::vec3(0.f);
+        float d = 0;
     };
 
     struct Frustum {
@@ -68,9 +68,9 @@ private:
     std::vector<LightSource> m_LightSources;
 
     struct LightGrid {
-        float Start;
-        float Amount;
-        glm::vec2 Padding;
+        float Start = 0;
+        float Amount = 0;
+        glm::vec2 Padding = glm::vec2(1.f, 2.f);
     };
 
     LightGrid* m_LightGrid;

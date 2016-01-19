@@ -40,15 +40,14 @@ void LightCullingPass::OnResolutionChange()
 
 void LightCullingPass::SetSSBOSizes()
 {
-    m_NumberOfTiles = (int)(m_Renderer->Resolution().Width*m_Renderer->Resolution().Height)/TILE_SIZE;
-
-    //m_Frustums = new Frustum[s];
-    //m_LightGrid = new LightGrid[s];
-    //m_LightIndex = new float[s*200];
+    m_NumberOfTiles = (int)(m_Renderer->Resolution().Width/TILE_SIZE) * (int)(m_Renderer->Resolution().Height/TILE_SIZE);
 
     m_Frustums = new Frustum[m_NumberOfTiles];
     m_LightGrid = new LightGrid[m_NumberOfTiles];
     m_LightIndex = new float[m_NumberOfTiles*MAX_LIGHTS_PER_TILE];
+    for (int i = 0; i < m_NumberOfTiles*MAX_LIGHTS_PER_TILE; i++) {
+        m_LightIndex[i] = -1;
+    }
 }
 
 void LightCullingPass::CullLights(RenderScene& scene)
@@ -75,7 +74,7 @@ void LightCullingPass::CullLights(RenderScene& scene)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
-    glDispatchCompute(m_Renderer->Resolution().Width / TILE_SIZE, m_Renderer->Resolution().Height / TILE_SIZE, 1);
+    glDispatchCompute(glm::ceil(m_Renderer->Resolution().Width / TILE_SIZE), glm::ceil(m_Renderer->Resolution().Height / TILE_SIZE), 1);
 
     GLERROR("CullLights Error: End");
 }
@@ -117,24 +116,21 @@ void LightCullingPass::InitializeSSBOs()
 {
     glGenBuffers(1, &m_FrustumSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_FrustumSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Frustum)*m_NumberOfTiles, m_Frustums, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(Frustum)*m_NumberOfTiles, nullptr, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_FrustumSSBO");
 
     glGenBuffers(1, &m_LightSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightSSBO);
-    if(m_LightSources.size() > 0) {
-        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSource) * m_LightSources.size(), &(m_LightSources[0]), GL_DYNAMIC_COPY);
-    }
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightSource) * 200, nullptr, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightSSBO");
 
     glGenBuffers(1, &m_LightGridSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightGridSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightGrid)*m_NumberOfTiles, m_LightGrid, GL_DYNAMIC_COPY);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(LightGrid)*m_NumberOfTiles, nullptr, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     GLERROR("m_LightGridSSBO");
-
 
     glGenBuffers(1, &m_LightOffsetSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_LightOffsetSSBO);
