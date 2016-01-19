@@ -88,7 +88,7 @@ LightResult CalcPointLightSource(vec4 lightPos, float lightRadius, vec4 lightCol
 
 LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensity, vec4 viewVec, vec4 vertNormal)
 {
-	vec4 L = normalize( -direction );
+	vec4 L = normalize( -vec4(direction.xyz, 0) );
 
 	LightResult result;
 	result.Diffuse = CalcDiffuse(color, L, vertNormal) * intensity;

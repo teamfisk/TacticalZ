@@ -13,6 +13,7 @@
         </c:Model>
         <c:Transform>
           <Scale X="100" Y="1" Z="100"/>
+          <Orientation X="0" Y="2.59200001" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -45,9 +46,58 @@
     <Entity>
       <Components>
         <c:Camera/>
+        <c:Listener/>
         <c:Transform>
-          <Position X="5.85247707" Y="3.8454349" Z="-1.14486957"/>
-          <Orientation X="2.51327395" Y="1.23916209" Z="-3.1415925"/>
+          <Position X="-3.7727046" Y="4.42466021" Z="5.32631207"/>
+          <Orientation X="-0.174533114" Y="-0.62824142" Z="-6.35425181e-07"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:DirectionalLight/>
+        <c:Model>
+          <Resource>Models/DirectionalLightWidget.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="1.37382936" Z="0"/>
+          <Orientation X="1.4920001" Y="1.96300006" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Assault.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-2.00568962" Y="0.527161121" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/SecondaryWeapon4.fbx</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.545270562" Y="0.859505534" Z="0.188573226"/>
+              <Orientation X="1.47266471" Y="0.524984181" Z="1.243698"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="3.70000029" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
