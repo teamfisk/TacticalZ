@@ -14,8 +14,6 @@
 #include "Core/EKeyDown.h"
 #include "Core/EntityFile.h"
 #include "Core/SystemPipeline.h"
-#include "RaptorCopterSystem.h"
-#include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
 
 class GameHealthSystemTest

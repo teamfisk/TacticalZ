@@ -27,7 +27,6 @@ set(SOURCE_FILES
     "Game.cpp"
     ${SOURCE_FILES_Systems}
 	${SOURCE_FILES_Events}
-    "CapturePointSystem.cpp"
 )
 
 set(LIBRARIES

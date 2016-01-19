@@ -8,7 +8,7 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Core/EntityFileWriter.h"
-#include "Game/CapturePointSystem.h"
+#include "Game/Systems/CapturePointSystem.h"
 
 Game::Game(int argc, char* argv[])
 {

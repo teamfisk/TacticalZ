@@ -3,7 +3,7 @@ using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 
 #include "HealthSystemTest.h"
-#include "Game/HealthSystem.h"
+#include "Game/Systems/HealthSystem.h"
 
 BOOST_AUTO_TEST_SUITE(HealthSystemSuite)
 
@@ -52,7 +52,6 @@ GameHealthSystemTest::GameHealthSystemTest()
 
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    m_SystemPipeline->AddSystem<PlayerSystem>(0);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
 
     //The Test

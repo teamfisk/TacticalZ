@@ -20,7 +20,7 @@ public:
     CapturePointSystem(EventBroker* eventBroker);
 
     //updatecomponent
-    virtual void UpdateComponent(World* world, ComponentWrapper& capturePoint, double dt) override;
+    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& capturePoint, double dt) override;
 
 private:
     //methods which will take care of specific events

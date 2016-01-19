@@ -39,7 +39,7 @@
 							<xs:element name="EntityRef" minOccurs="0" maxOccurs="unbounded">
 								<xs:complexType>
 									<xs:all>
-										<xs:attribute name="file" type="xs:string" minOccurs="0"/>
+<!--										<xs:attribute name="file" type="xs:string" minOccurs="0"/> -->
 									</xs:all>
 								</xs:complexType>
 							</xs:element>
@@ -48,7 +48,7 @@
 				</xs:element>
 			</xs:all>
 			<xs:attribute ref="xml:base"/>
-			<xs:attribute name="name" type="xs:string" minOccurs="0" default=""/>
+<!--			<xs:attribute name="name" type="xs:string" minOccurs="0" default=""/> -->
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

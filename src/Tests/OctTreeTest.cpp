@@ -43,7 +43,7 @@ template<typename Tree>
 void RegionTest(Tree& tree)
 {
     AABB aabb;
-    aabb.CreateFromCenter(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
+    aabb.FromOriginSize(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
         glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE));
     std::vector<AABB> outVec;
     tree.BoxesInSameRegion(aabb, outVec);
@@ -63,7 +63,7 @@ void BoxTest(Tree& tree)
 {
     AABB outBox;
     AABB aabb;
-    aabb.CreateFromCenter(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
+    aabb.FromOriginSize(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
         glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE));
     tree.BoxCollides(aabb, outBox);
 }
@@ -88,14 +88,14 @@ void TestLoop(TestFunction xTest)
         for (int i = 0; i < NUM_STATICS; ++i) {
             center = glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS);
             size = glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE);
-            aabb.CreateFromCenter(center, size);
+            aabb.FromOriginSize(center, size);
             tree.AddStaticObject(aabb);
         }
         for (int fr = 0; fr < TEST_FRAMES; ++fr) {
             for (int i = 0; i < NUM_DYNAMICS; ++i) {
                 center = glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS);
                 size = glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE);
-                aabb.CreateFromCenter(center, size);
+                aabb.FromOriginSize(center, size);
                 tree.AddDynamicObject(aabb);
             }
 

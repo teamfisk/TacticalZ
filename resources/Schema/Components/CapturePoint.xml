@@ -1,6 +1,5 @@
-<c:CapturePoint>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<CapturePoint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CapturePoint.xsd">
 	<CapturePointNumber>0</CapturePointNumber>
 	<CaptureTimer>0</CaptureTimer>
-	<OwnedBy>0</OwnedBy>
-	<IsHomeCapturePointForTeamNumber>0</IsHomeCapturePointForTeamNumber>
-</c:CapturePoint>
+</CapturePoint>

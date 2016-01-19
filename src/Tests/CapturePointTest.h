@@ -11,7 +11,6 @@
 #include "Core/EKeyDown.h"
 #include "Core/EntityFile.h"
 #include "Core/SystemPipeline.h"
-#include "PlayerSystem.h"
 
 #include "Core/EntityFilePreprocessor.h"
 #include "Core/EntityFileParser.h"
@@ -58,9 +57,10 @@ private:
     EventBroker* m_EventBroker;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    EntityID m_PlayerID, m_PlayerID2, m_CapturePointID, m_CapturePointID2, m_CapturePointID3;
+    EntityID m_RedTeamPlayer, m_BlueTeamPlayer, m_CapturePointID, m_CapturePointID2, m_CapturePointID3;
     int m_RunTestNumber;
     bool phase1Success = false, phase2Success = false, phase3Success = false, phase4Success = false;
+    int m_RedTeam, m_BlueTeam;
 };
 
 #endif

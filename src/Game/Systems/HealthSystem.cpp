@@ -27,7 +27,7 @@ void HealthSystem::UpdateComponent(World* world, EntityWrapper& entity, Componen
             m_DeltaHealthVector.erase(m_DeltaHealthVector.begin() + i - 1);
             //check if health is <= 0
             if ((double)component["Health"] <= 0.0f) {
-                health["Health"] = 0.0;
+                component["Health"] = 0.0;
                 //publish death event
                 Events::PlayerDeath e;
                 e.PlayerID = player.EntityID;

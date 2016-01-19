@@ -14,7 +14,6 @@
 				<xs:element name="Left" type="t:bool" minOccurs="0"/>
 				<xs:element name="Back" type="t:bool" minOccurs="0"/>
 				<xs:element name="Right" type="t:bool" minOccurs="0"/>
-				<xs:element name="TeamNumber" type="t:int" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
