@@ -148,7 +148,9 @@ void RawModel::ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned
             throw Resource::FailedLoadingException("Reading Material texture path failed");
         }
 
-        newMaterial.TexturePath = (fileData + offset);
+        newMaterial.TexturePath = "Textures/";
+        newMaterial.TexturePath += (fileData + offset);
+        newMaterial.TexturePath += ".png";
         offset += nameLengths[0];
     }
 

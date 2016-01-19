@@ -69,9 +69,10 @@ public:
         for (auto aVertex : Vertices) {
             aVertex.WriteBinary(out);
         }
-        //for (auto aIndex : Indices) {
-        for (std::map<std::string, std::vector<int>>::reverse_iterator aIndex = Indices.rbegin(); aIndex != Indices.rend(); aIndex++){
-            out.write((char*)(*aIndex).second.data(), sizeof(int) * (*aIndex).second.size());
+        for (auto aIndex : Indices) {
+        //for (std::map<std::string, std::vector<int>>::reverse_iterator aIndex = Indices.rbegin(); aIndex != Indices.rend(); aIndex++){
+            //out.write((char*)(*aIndex).second.data(), sizeof(int) * (*aIndex).second.size());
+            out.write((char*)aIndex.second.data(), sizeof(int) * aIndex.second.size());
         }
     }
 
