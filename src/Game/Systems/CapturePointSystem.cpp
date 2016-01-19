@@ -60,7 +60,13 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     }
 
     int ownedBy = teamComponent["Team"];
-
+    //Probably want to distinguish the capturepoint depending on team affiliation.
+    if (entity.HasComponent("Model")) {
+        //Now sets team color to the capturepoint, or white if it is uncaptured.
+        entity["Model"]["Color"] = ownedBy == blueTeam ? glm::vec4(0, 0.2f, 1, 1) : 
+            ownedBy == redTeam ? glm::vec4(1, 0.2f, 0, 1) : 
+            glm::vec4(1, 1, 1, 1);
+    }
     //om ej next satt, förvänta sig att en capturepoint med en viss team färg kommer in...
     //sätt isåfall next och kör på..
     //gör inget tills man fått den infon
@@ -109,6 +115,9 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
         //B. at most one of the teams have players inside (this means datavariable currentTeam is not 0)
         //if capturePoint is not owned by the take-over team, just modify the CaptureTimer accordingly
         if (ownedBy != currentTeam) {
+            if (abs((double)capturePoint["CaptureTimer"]) < 0.001f) {
+                LOG_DEBUG("Point is being captured by team %i", currentTeam);   //Remove when we tested sufficiently.
+            }
             capturePoint["CaptureTimer"] = (double)capturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //if capturePoint is owned by the team, and the other team has been trying to take it, then increase/decrease the timer towards 0.0
@@ -121,6 +130,7 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
             teamComponent["Team"] = currentTeam;
             capturePoint["CaptureTimer"] = 0.0;
             //publish Captured event
+            LOG_DEBUG("Point is captured by team %i!", currentTeam);    //Remove when we tested sufficiently.
             Events::Captured e;
             e.CapturePointID = capturePoint.EntityID;
             e.TeamNumberThatCapturedCapturePoint = currentTeam;
