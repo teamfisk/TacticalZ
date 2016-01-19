@@ -18,7 +18,7 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     if (!hasTeamComponent) {
         world->AttachComponent(capturePoint.EntityID, "Team");
         ComponentWrapper& teamComponent = world->GetComponent(capturePoint.EntityID, "Team");
-        teamComponent["Team"] = 0;
+        teamComponent["Team"] = (int)teamComponent["Team"].Enum("Spectator");
     }
     ComponentWrapper& teamComponent = world->GetComponent(capturePoint.EntityID, "Team");
     int firstTeamPlayersStandingInside = 0;
@@ -49,7 +49,7 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
                 }
             }
             //check team - spectatorNumber = "no team"
-            int teamNumber = world->GetComponent(playerID, "Player")["Team"];
+            int teamNumber = world->GetComponent(playerID, "Team")["Team"];
             if (teamNumber == redTeam) {
                 firstTeamPlayersStandingInside++;
             } else if (teamNumber == blueTeam) {
@@ -69,11 +69,19 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     no capturepoint taken yet for at least one of the teams <->
     at the start of the match the system is unaware of what capturePoint is the first one for each team*/
     if (m_Team1NextPossibleCapturePoint == m_NotACapturePoint && (int)teamComponent["Team"] == redTeam) {
-        m_Team1NextPossibleCapturePoint = capturePoint["CapturePointNumber"];
         m_Team1HomeCapturePoint = capturePoint["CapturePointNumber"];//needed to calculate next m_Team1NextPossibleCapturePoint
+        if (m_Team1HomeCapturePoint == 0) {
+            m_Team1NextPossibleCapturePoint = 1;
+        } else {
+            m_Team1NextPossibleCapturePoint = (int)capturePoint["CapturePointNumber"] - 1;
+        }
     } else if (m_Team2NextPossibleCapturePoint == m_NotACapturePoint && (int)teamComponent["Team"] == blueTeam) {
-        m_Team2NextPossibleCapturePoint = capturePoint["CapturePointNumber"];
         m_Team2HomeCapturePoint = capturePoint["CapturePointNumber"];//needed to calculate next m_Team2NextPossibleCapturePoint
+        if (m_Team2HomeCapturePoint == 0) {
+            m_Team2NextPossibleCapturePoint = 1;
+        } else {
+            m_Team2NextPossibleCapturePoint = (int)capturePoint["CapturePointNumber"] - 1;
+        }
     }
     //at least one capturepoint has been taken over
     //do nothing, its being handled inside the next code:
@@ -86,12 +94,12 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
         && m_Team1NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"])
     {
         timerDeltaChange = firstTeamPlayersStandingInside*dt;
-        currentTeam = blueTeam;
+        currentTeam = redTeam;
     } else if (firstTeamPlayersStandingInside == 0 && secondTeamPlayersStandingInside > 0
         && m_Team2NextPossibleCapturePoint == (int)capturePoint["CapturePointNumber"])
     {
         timerDeltaChange = -secondTeamPlayersStandingInside*dt;
-        currentTeam = redTeam;
+        currentTeam = blueTeam;
     }
 
     if (firstTeamPlayersStandingInside == 0 && secondTeamPlayersStandingInside == 0) {

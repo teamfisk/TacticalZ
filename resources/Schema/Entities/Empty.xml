@@ -5,6 +5,52 @@
     <c:Transform/>
   </Components>
 
-  <Children/>
+  <Children>
+    <Entity>
+      <Components>
+        <c:Health/>
+        <c:AABB/>
+        <c:Player/>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <CaptureTimer>-0.049999997019767761</CaptureTimer>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitBox.obj</Resource>
+        </c:Model>
+        <c:Team/>
+        <c:Transform>
+          <Position X="0" Y="0" Z="-1.3012079"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Camera/>
+        <c:Listener/>
+        <c:Transform>
+          <Position X="-3.49205208" Y="1.56239843" Z="0.419225603"/>
+          <Orientation X="-0.296706051" Y="-0.87263751" Z="1.15912798e-07"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>../assets/Models/DummyScene.obj</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
 
 </Entity>

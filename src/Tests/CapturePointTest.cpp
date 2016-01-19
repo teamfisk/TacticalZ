@@ -142,22 +142,19 @@ CapturePointTest::CapturePointTest(int runTestNumber)
     m_CapturePointID = capturePointID;
     ComponentWrapper& capturePoint = m_World->AttachComponent(capturePointID, "CapturePoint");
     ComponentWrapper& capturePointHomeTeam = m_World->AttachComponent(capturePointID, "Team");
-    //this capturePoint is homeBase for team 2
     capturePointHomeTeam["Team"] = m_BlueTeam;
     capturePoint["CapturePointNumber"] = 0;
 
     EntityID capturePointID2 = m_World->CreateEntity();
     m_CapturePointID2 = capturePointID2;
     ComponentWrapper& capturePoint2 = m_World->AttachComponent(capturePointID2, "CapturePoint");
-    //ComponentWrapper& capturePointHomeTeam2 = m_World->AttachComponent(capturePointID2, "Team");
-    //capturePointHomeTeam2["Team"] = m_BlueTeam;
+    //no team component for this capturepoint since nobody owns it (yet)
     capturePoint2["CapturePointNumber"] = 1;
 
     EntityID capturePointID3 = m_World->CreateEntity();
     m_CapturePointID3 = capturePointID3;
     ComponentWrapper& capturePoint3 = m_World->AttachComponent(capturePointID3, "CapturePoint");
     ComponentWrapper& capturePointHomeTeam3 = m_World->AttachComponent(capturePointID3, "Team");
-    //this capturePoint is homeBase for team 1
     capturePointHomeTeam3["Team"] = m_RedTeam;
     capturePoint3["CapturePointNumber"] = 2;
 
@@ -214,7 +211,7 @@ void CapturePointTest::TestSetup1_OnePlayerOnCapturePoint()
     Events::TriggerTouch touchEvent;
     Events::TriggerLeave leaveEvent;
 
-    //player touches,leaves,touches m_CapturePointID. and enters m_CapturePointID3
+    //redPlayer touches,leaves,touches m_CapturePointID. and enters m_CapturePointID3
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
     DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID);
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
@@ -225,12 +222,12 @@ void CapturePointTest::TestSetup2_TwoPlayersOnCapturePoint()
     Events::TriggerTouch touchEvent;
     Events::TriggerLeave leaveEvent;
 
-    //player touches,leaves m_CapturePointID. and enters m_CapturePointID3
+    //redPlayer touches,leaves m_CapturePointID. and enters m_CapturePointID3
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
     DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID);
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
 
-    //player2 touches m_CapturePointID,m_CapturePointID2
+    //blueplayer touches m_CapturePointID,m_CapturePointID2
     DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID);
     DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID2);
 }
@@ -245,46 +242,35 @@ void CapturePointTest::TestSetup4_TwoCapturePointsBeingCaptured()
 {
     Events::TriggerTouch touchEvent;
 
-    //player1 touches m_CapturePointID3
+    //redPlayer touches m_CapturePointID3
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
 
-    //player2 touches m_CapturePointID
+    //blueplayer touches m_CapturePointID
     DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID);
 }
 void CapturePointTest::TestSetup5_SameCapturePointContestedAndTakenOver()
 {
     //contested same, player1 touches the contested
-    //player1 touches m_CapturePointID2
+    //redPlayer touches m_CapturePointID2
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
 }
 void CapturePointTest::TestSetup6_Team1CapturedTheLastPointAndWon()
 {
-    //player1 touches m_CapturePointID3
-    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
-
     //TODO: this should be in UPDATE instead
 
-    //player1 touches m_CapturePointID2
+    //redPlayer touches m_CapturePointID2
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
 
-    //player1 touches m_CapturePointID
+    //redPlayer touches m_CapturePointID
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
 
-    //player2 does nothing
+    //blueplayer does nothing
 }
 void CapturePointTest::TestSetup7()
 {
-    //2 owns 1
-    DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID);
-    //1 owns 3
-    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
 }
 void CapturePointTest::TestSetup8()
 {
-    //2 owns 3
-    DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID3);
-    //1 owns 1
-    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
 }
 void CapturePointTest::DoTouchEvent(EntityID whoDidSomething, EntityID onWhatObject) {
     Events::TriggerTouch touchEvent;
@@ -375,9 +361,9 @@ void CapturePointTest::TestSuccess7() {
     }
 }
 void CapturePointTest::TestSuccess8() {
-    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "CapturePoint")["Team"];
-    int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "CapturePoint")["Team"];
-    int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "CapturePoint")["Team"];
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
+    int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
+    int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
 
     if (NumLoops < 20 && ownedByID3 == m_BlueTeam & ownedByID1 == m_RedTeam) {
         phase1Success = true;

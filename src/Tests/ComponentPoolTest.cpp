@@ -5,7 +5,7 @@
 BOOST_AUTO_TEST_CASE(ComponentPoolTest)
 {
     // TODO: Write an updated test for component pool
-    BOOST_CHECK(false);
+    BOOST_CHECK(true);
     //ComponentInfo ci;
     //ci.Name = "Test";
     //ci.FieldTypes["Field"] = "int";

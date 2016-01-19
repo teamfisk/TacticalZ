@@ -12,7 +12,6 @@ HealthSystem::HealthSystem(EventBroker* eventBroker)
 void HealthSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     //if entityID of health is 9 then the players ID is also 9 (player,health are connected to the same entity)
-    ComponentWrapper player = world->GetComponent(component.EntityID, "Player");
     double maxHealth = (double)component["MaxHealth"];
 
     //process the DeltaHealthVector and change the entitys health accordingly
@@ -20,7 +19,7 @@ void HealthSystem::UpdateComponent(World* world, EntityWrapper& entity, Componen
     {
         auto deltaHP = m_DeltaHealthVector[i - 1];
         //if we have a healthchange for the current player and health is greater than 0, then apply it
-        if (std::get<0>(deltaHP) == player.EntityID && (double)component["Health"] > 0.0f) {
+        if (std::get<0>(deltaHP) == component.EntityID && (double)component["Health"] > 0.0f) {
             //get the deltaHP value from the tuple and make sure you dont get more than maxHealth
             double newHealth = std::min((double)component["Health"] + (double)std::get<1>(deltaHP), maxHealth);
             component["Health"] = newHealth;
@@ -30,12 +29,12 @@ void HealthSystem::UpdateComponent(World* world, EntityWrapper& entity, Componen
                 component["Health"] = 0.0;
                 //publish death event
                 Events::PlayerDeath e;
-                e.PlayerID = player.EntityID;
+                e.PlayerID = component.EntityID;
                 m_EventBroker->Publish(e);
                 //clear the remaining hpDeltas for the dead player
                 for (size_t j = m_DeltaHealthVector.size(); j > 0; j--)
                 {
-                    if (std::get<0>(m_DeltaHealthVector[j - 1]) == player.EntityID)
+                    if (std::get<0>(m_DeltaHealthVector[j - 1]) == component.EntityID)
                         m_DeltaHealthVector.erase(m_DeltaHealthVector.begin() + j - 1);
                 }
                 //break the loop if the player is dead
