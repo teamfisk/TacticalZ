@@ -49,7 +49,7 @@
         <c:Listener/>
         <c:Transform>
           <Position X="1.36896265" Y="4.4259491" Z="10.6640663"/>
-          <Orientation X="-0.0349078104" Y="0.157154545" Z="-2.60020244e-07"/>
+          <Orientation X="-0.0349078141" Y="0.157154545" Z="-2.60252193e-07"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -80,7 +80,7 @@
         <Entity>
           <Components>
             <c:Model>
-              <Resource>Models/SecondaryWeapon4.fbx</Resource>
+              <Resource>Models/SecondaryWeapon.fbx</Resource>
             </c:Model>
             <c:Transform>
               <Position X="-0.546139359" Y="0.853016734" Z="0.177482292"/>
