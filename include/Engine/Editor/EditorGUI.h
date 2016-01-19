@@ -10,6 +10,7 @@
 #include "../GLM.h"
 #include <glm/gtx/common.hpp>
 
+#include "EditorWidgetSystem.h"
 #include "../Core/EventBroker.h"
 #include "../Core/World.h"
 #include "../Core/EntityWrapper.h"
@@ -21,6 +22,13 @@ class EditorGUI
 {
 public:
     EditorGUI(World* world, EventBroker* eventBroker);
+
+    enum class WidgetMode
+    {
+        Translate,
+        Rotate,
+        Scale
+    };
 
     void Draw();
 
@@ -59,6 +67,9 @@ public:
     // Called when the user means to delete a component off an entity.
     typedef std::function<void(EntityWrapper, const std::string&)> OnComponentDelete_t;
     void SetComponentDeleteCallback(OnComponentDelete_t f) { m_OnComponentDelete = f; }
+    // Called when the user selects a widget mode.
+    typedef std::function<void(WidgetMode)> OnWidgetMode_t;
+    void SetWidgetModeCallback(OnWidgetMode_t f) { m_OnWidgetMode = f; }
 
 private:
     World* m_World;
@@ -72,6 +83,7 @@ private:
     std::unordered_map<EntityWrapper, boost::filesystem::path> m_EntityFiles;
     EntityWrapper m_CurrentlyDragging = EntityWrapper::Invalid;
     std::string m_LastErrorMessage;
+    WidgetMode m_CurrentWidgetMode = WidgetMode::Translate;
 
     // Callbacks
     OnEntitySelectedCallback_t m_OnEntitySelected = nullptr;
@@ -83,6 +95,7 @@ private:
     OnEntityChangeName_t m_OnEntityChangeName = nullptr;
     OnComponentAttach_t m_OnComponentAttach = nullptr;
     OnComponentDelete_t m_OnComponentDelete = nullptr;
+    OnWidgetMode_t m_OnWidgetMode = nullptr;
 
     // Utility functions
     boost::filesystem::path fileOpenDialog();

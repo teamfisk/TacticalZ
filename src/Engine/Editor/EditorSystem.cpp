@@ -12,9 +12,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
     
-    m_Widget = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/EditorWidget.xml");
-
-    m_Camera = EntityWrapper(m_EditorWorld, m_EditorWorld->CreateEntity());
+    m_Camera = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/Empty.xml");
     m_EditorWorld->AttachComponent(m_Camera.ID, "Transform");
     m_EditorWorld->AttachComponent(m_Camera.ID, "Camera");
     m_DebugCameraInputController = new DebugCameraInputController<EditorSystem>(m_EventBroker, -1);
@@ -29,6 +27,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorGUI->SetEntityChangeNameCallback(std::bind(&EditorSystem::OnEntityChangeName, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
 
     m_EditorStats = new EditorStats();
 
@@ -60,7 +59,8 @@ void EditorSystem::Update(double dt)
 
 void EditorSystem::OnEntitySelected(EntityWrapper entity)
 {
-    m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(entity.World, entity.ID);
+    m_CurrentSelection = entity;
+    setWidgetMode(m_WidgetMode);
 }
 
 void EditorSystem::OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath)
@@ -118,4 +118,36 @@ EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem
     } catch (const std::exception&) {
         return EntityWrapper::Invalid;
     }
+}
+
+void EditorSystem::setWidgetMode(EditorGUI::WidgetMode mode)
+{
+    if (mode == m_WidgetMode && m_Widget.Valid() && m_CurrentSelection.Valid()) {
+        return;
+    }
+
+    if (m_Widget.Valid()) {
+        m_Widget.World->DeleteEntity(m_Widget.ID);
+        m_Widget = EntityWrapper::Invalid;
+    }
+
+    if (!m_CurrentSelection.Valid()) {
+        return;
+    }
+
+    switch (mode) {
+    case EditorGUI::WidgetMode::Translate:
+        m_Widget = importEntity(EntityWrapper(m_World, EntityID_Invalid), "Schema/Entities/EditorWidgetTranslate.xml");
+        break;
+    case EditorGUI::WidgetMode::Rotate:
+        m_Widget = importEntity(EntityWrapper(m_World, EntityID_Invalid), "Schema/Entities/EditorWidgetRotate.xml");
+        break;
+    case EditorGUI::WidgetMode::Scale:
+        m_Widget = importEntity(EntityWrapper(m_World, EntityID_Invalid), "Schema/Entities/EditorWidgetScale.xml");
+        break;
+    }
+
+    m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
+
+    m_WidgetMode = mode;
 }

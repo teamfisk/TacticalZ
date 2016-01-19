@@ -36,13 +36,55 @@ void EditorGUI::drawTools()
     }
 
     // Translate widget button
-    ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Translate.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
+    if (ImGui::ImageButton(
+            (void*)tryLoadTexture("Textures/Icons/Translate.png"), 
+            ImVec2(24, 24), 
+            ImVec2(0, 1), 
+            ImVec2(1, 0), 
+            -1, 
+            ImVec4(0, 0, 0, 0), 
+            (m_CurrentWidgetMode == WidgetMode::Translate) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
+        )
+    ) {
+        m_CurrentWidgetMode = WidgetMode::Translate;
+        if (m_OnWidgetMode != nullptr) {
+            m_OnWidgetMode(m_CurrentWidgetMode);
+        }
+    }
     // Rotate widget button
     ImGui::SameLine();
-    ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Rotate.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
+    if (ImGui::ImageButton(
+            (void*)tryLoadTexture("Textures/Icons/Rotate.png"), 
+            ImVec2(24, 24), 
+            ImVec2(0, 1), 
+            ImVec2(1, 0), 
+            -1, 
+            ImVec4(0, 0, 0, 0), 
+            (m_CurrentWidgetMode == WidgetMode::Rotate) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
+        )
+    ) {
+        m_CurrentWidgetMode = WidgetMode::Rotate;
+        if (m_OnWidgetMode != nullptr) {
+            m_OnWidgetMode(m_CurrentWidgetMode);
+        }
+    }
     // Scale widget button
     ImGui::SameLine();
-    ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Scale.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
+    if (ImGui::ImageButton(
+            (void*)tryLoadTexture("Textures/Icons/Scale.png"), 
+            ImVec2(24, 24), 
+            ImVec2(0, 1), 
+            ImVec2(1, 0), 
+            -1, 
+            ImVec4(0, 0, 0, 0), 
+            (m_CurrentWidgetMode == WidgetMode::Scale) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
+        )
+    ) {
+        m_CurrentWidgetMode = WidgetMode::Scale;
+        if (m_OnWidgetMode != nullptr) {
+            m_OnWidgetMode(m_CurrentWidgetMode);
+        }
+    }
 
     ImGui::SameLine();
     ImGui::ItemSize(ImVec2(5, 0));
@@ -83,7 +125,7 @@ void EditorGUI::drawEntities(World* world)
         entityImport(world);
     }
     ImGui::SameLine(0.f, 5.f);
-    ImGui::Button("Reference", ImVec2(buttonWidth, 0));
+    ImGui::ButtonEx("Reference", ImVec2(buttonWidth, 0), ImGuiButtonFlags_Disabled);
 
     // Naming
     char buffer[256];
