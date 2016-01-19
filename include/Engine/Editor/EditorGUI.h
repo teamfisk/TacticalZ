@@ -131,6 +131,7 @@ private:
 
     // Custom UI elements
     bool createDeleteButton(const std::string& componentType);
+    void createWidgetToolButton(WidgetMode mode);
 };
 
 #endif

@@ -126,6 +126,8 @@ void EditorSystem::setWidgetMode(EditorGUI::WidgetMode mode)
         return;
     }
 
+    m_WidgetMode = mode;
+
     if (m_Widget.Valid()) {
         m_Widget.World->DeleteEntity(m_Widget.ID);
         m_Widget = EntityWrapper::Invalid;
@@ -137,17 +139,15 @@ void EditorSystem::setWidgetMode(EditorGUI::WidgetMode mode)
 
     switch (mode) {
     case EditorGUI::WidgetMode::Translate:
-        m_Widget = importEntity(EntityWrapper(m_World, EntityID_Invalid), "Schema/Entities/EditorWidgetTranslate.xml");
+        m_Widget = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/EditorWidgetTranslate.xml");
         break;
     case EditorGUI::WidgetMode::Rotate:
-        m_Widget = importEntity(EntityWrapper(m_World, EntityID_Invalid), "Schema/Entities/EditorWidgetRotate.xml");
+        m_Widget = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/EditorWidgetRotate.xml");
         break;
     case EditorGUI::WidgetMode::Scale:
-        m_Widget = importEntity(EntityWrapper(m_World, EntityID_Invalid), "Schema/Entities/EditorWidgetScale.xml");
+        m_Widget = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/EditorWidgetScale.xml");
         break;
     }
 
     m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
-
-    m_WidgetMode = mode;
 }

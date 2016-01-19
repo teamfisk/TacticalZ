@@ -6,17 +6,15 @@
       <Resource>Models/TranslationWidgetOrigin.obj</Resource>
     </c:Model>
     <c:Transform/>
+    <c:UniformScale>
+      <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+    </c:UniformScale>
   </Components>
 
   <Children>
     <Entity name="X">
       <Components>
-        <c:EditorWidget>
-          <Type>
-            <Translate/>
-          </Type>
-          <Axis X="1" Y="0" Z="0"/>
-        </c:EditorWidget>
+        <c:EditorWidget/>
         <c:Model>
           <Resource>Models/TranslationWidgetX.obj</Resource>
         </c:Model>
@@ -26,12 +24,7 @@
     </Entity>
     <Entity name="Y">
       <Components>
-        <c:EditorWidget>
-          <Type>
-            <Translate/>
-          </Type>
-          <Axis X="0" Y="1" Z="0"/>
-        </c:EditorWidget>
+        <c:EditorWidget/>
         <c:Model>
           <Resource>Models/TranslationWidgetY.obj</Resource>
         </c:Model>
@@ -41,12 +34,7 @@
     </Entity>
     <Entity name="Z">
       <Components>
-        <c:EditorWidget>
-          <Type>
-            <Translate/>
-          </Type>
-          <Axis X="0" Y="0" Z="1"/>
-        </c:EditorWidget>
+        <c:EditorWidget/>
         <c:Model>
           <Resource>Models/TranslationWidgetZ.obj</Resource>
         </c:Model>
@@ -56,12 +44,7 @@
     </Entity>
     <Entity name="XPlane">
       <Components>
-        <c:EditorWidget>
-          <Type>
-            <Translate/>
-          </Type>
-          <Axis X="0" Y="1" Z="1"/>
-        </c:EditorWidget>
+        <c:EditorWidget/>
         <c:Model>
           <Resource>Models/WidgetPlaneX.obj</Resource>
         </c:Model>
@@ -71,12 +54,7 @@
     </Entity>
     <Entity name="YPlane">
       <Components>
-        <c:EditorWidget>
-          <Type>
-            <Translate/>
-          </Type>
-          <Axis X="1" Y="0" Z="1"/>
-        </c:EditorWidget>
+        <c:EditorWidget/>
         <c:Model>
           <Resource>Models/WidgetPlaneY.obj</Resource>
         </c:Model>
@@ -86,12 +64,7 @@
     </Entity>
     <Entity name="ZPlane">
       <Components>
-        <c:EditorWidget>
-          <Type>
-            <Translate/>
-          </Type>
-          <Axis X="1" Y="1" Z="0"/>
-        </c:EditorWidget>
+        <c:EditorWidget/>
         <c:Model>
           <Resource>Models/WidgetPlaneZ.obj</Resource>
         </c:Model>

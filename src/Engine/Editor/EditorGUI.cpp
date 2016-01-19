@@ -35,57 +35,20 @@ void EditorGUI::drawTools()
         return;
     }
 
-    // Translate widget button
-    if (ImGui::ImageButton(
-            (void*)tryLoadTexture("Textures/Icons/Translate.png"), 
-            ImVec2(24, 24), 
-            ImVec2(0, 1), 
-            ImVec2(1, 0), 
-            -1, 
-            ImVec4(0, 0, 0, 0), 
-            (m_CurrentWidgetMode == WidgetMode::Translate) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
-        )
-    ) {
-        m_CurrentWidgetMode = WidgetMode::Translate;
-        if (m_OnWidgetMode != nullptr) {
-            m_OnWidgetMode(m_CurrentWidgetMode);
-        }
+    createWidgetToolButton(WidgetMode::Translate);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Translate");
     }
-    // Rotate widget button
     ImGui::SameLine();
-    if (ImGui::ImageButton(
-            (void*)tryLoadTexture("Textures/Icons/Rotate.png"), 
-            ImVec2(24, 24), 
-            ImVec2(0, 1), 
-            ImVec2(1, 0), 
-            -1, 
-            ImVec4(0, 0, 0, 0), 
-            (m_CurrentWidgetMode == WidgetMode::Rotate) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
-        )
-    ) {
-        m_CurrentWidgetMode = WidgetMode::Rotate;
-        if (m_OnWidgetMode != nullptr) {
-            m_OnWidgetMode(m_CurrentWidgetMode);
-        }
+    createWidgetToolButton(WidgetMode::Rotate);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Rotate");
     }
-    // Scale widget button
     ImGui::SameLine();
-    if (ImGui::ImageButton(
-            (void*)tryLoadTexture("Textures/Icons/Scale.png"), 
-            ImVec2(24, 24), 
-            ImVec2(0, 1), 
-            ImVec2(1, 0), 
-            -1, 
-            ImVec4(0, 0, 0, 0), 
-            (m_CurrentWidgetMode == WidgetMode::Scale) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
-        )
-    ) {
-        m_CurrentWidgetMode = WidgetMode::Scale;
-        if (m_OnWidgetMode != nullptr) {
-            m_OnWidgetMode(m_CurrentWidgetMode);
-        }
+    createWidgetToolButton(WidgetMode::Scale);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip("Scale");
     }
-
     ImGui::SameLine();
     ImGui::ItemSize(ImVec2(5, 0));
 
@@ -497,6 +460,36 @@ bool EditorGUI::createDeleteButton(const std::string& componentType)
     return pressed;
 }
 
+void EditorGUI::createWidgetToolButton(WidgetMode mode)
+{
+    GLuint texture = 0;
+    switch (mode) {
+    case WidgetMode::Translate:
+        texture = tryLoadTexture("Textures/Icons/Translate.png");
+        break;
+    case WidgetMode::Rotate:
+        texture = tryLoadTexture("Textures/Icons/Rotate.png");
+        break;
+    case WidgetMode::Scale:
+        texture = tryLoadTexture("Textures/Icons/Scale.png");
+        break;
+    }
+    if (ImGui::ImageButton(
+            (void*)texture, 
+            ImVec2(24, 24), 
+            ImVec2(0, 1), 
+            ImVec2(1, 0), 
+            -1, 
+            ImVec4(0, 0, 0, 0), 
+            (m_CurrentWidgetMode == mode) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
+        )
+    ) {
+        if (m_OnWidgetMode != nullptr) {
+            m_OnWidgetMode(mode);
+        }
+        m_CurrentWidgetMode = mode;
+    }
+}
 
 boost::filesystem::path EditorGUI::fileOpenDialog()
 {
