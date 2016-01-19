@@ -68,8 +68,8 @@ Game::Game(int argc, char* argv[])
     m_Renderer->m_World = m_World;
 
     // Create Octrees
-    m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
-    m_OctreeFrustrumCulling = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeCollision = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeFrustrumCulling = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
 

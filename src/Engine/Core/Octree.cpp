@@ -21,72 +21,11 @@ bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
 
 }
 
-Octree::Octree(const AABB& octTreeBounds, int subDivisions)
-    : m_Root(new Child(octTreeBounds, subDivisions, m_StaticObjects, m_DynamicObjects))
-    , m_UpdatedOnce(false)
-{ }
-
-Octree::~Octree()
+namespace OctSpace
 {
-    delete m_Root;
-}
 
-void Octree::AddDynamicObject(const AABB& box)
-{
-    m_Root->AddDynamicObject(box);
-    m_DynamicObjects.push_back(box);
-}
-
-void Octree::AddStaticObject(const AABB& box)
-{
-    m_Root->AddStaticObject(box);
-    m_StaticObjects.push_back(box);
-}
-
-void Octree::BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes)
-{
-    falsifyObjectChecks();
-    m_Root->BoxesInSameRegion(box, outBoxes);
-}
-
-void Octree::ClearObjects()
-{
-    m_StaticObjects.clear();
-    m_DynamicObjects.clear();
-    m_Root->ClearObjects();
-}
-
-void Octree::ClearDynamicObjects()
-{
-    m_DynamicObjects.clear();
-    m_Root->ClearDynamicObjects();
-}
-
-bool Octree::RayCollides(const Ray& ray, Output& data)
-{
-    falsifyObjectChecks();
-    data.CollideDistance = -1;
-    return m_Root->RayCollides(ray, data);
-}
-
-bool Octree::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected)
-{
-    falsifyObjectChecks();
-    return m_Root->BoxCollides(boxToTest, outBoxIntersected);
-}
-
-void Octree::falsifyObjectChecks()
-{
-    for (auto& obj : m_StaticObjects) {
-        obj.Checked = false;
-    }
-    for (auto& obj : m_DynamicObjects) {
-        obj.Checked = false;
-    }
-}
-
-Octree::Child::Child(const AABB& octTreeBounds,
-    int subDivisions, 
+Child::Child(const AABB& octTreeBounds,
+    int subDivisions,
     std::vector<ContainedObject>& staticObjects,
     std::vector<ContainedObject>& dynamicObjects)
     : m_Box(octTreeBounds)
@@ -135,7 +74,7 @@ Octree::Child::Child(const AABB& octTreeBounds,
     }
 }
 
-Octree::Child::~Child()
+Child::~Child()
 {
     for (Child*& c : m_Children) {
         if (c != nullptr) {
@@ -145,7 +84,7 @@ Octree::Child::~Child()
     }
 }
 
-bool Octree::Child::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
+bool Child::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
 {
     if (hasChildren()) {
         for (int i : childIndicesContainingBox(boxToTest)) {
@@ -155,7 +94,7 @@ bool Octree::Child::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) 
     } else {
         for (int i : m_StaticObjIndices) {
             if (!m_StaticObjectsRef[i].Checked) {
-                const AABB& objBox = m_StaticObjectsRef[i].Box;
+                const AABB& objBox = *m_StaticObjectsRef[i].Box;
                 if (Collision::AABBVsAABB(boxToTest, objBox)) {
                     outBoxIntersected = objBox;
                     return true;
@@ -165,7 +104,7 @@ bool Octree::Child::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) 
         }
         for (int i : m_DynamicObjIndices) {
             if (!m_DynamicObjectsRef[i].Checked) {
-                const AABB& objBox = m_DynamicObjectsRef[i].Box;
+                const AABB& objBox = *m_DynamicObjectsRef[i].Box;
                 if (!Collision::IsSameBoxProbably(boxToTest, objBox) &&
                     Collision::AABBVsAABB(boxToTest, objBox)) {
                     outBoxIntersected = objBox;
@@ -178,7 +117,7 @@ bool Octree::Child::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) 
     return false;
 }
 
-bool Octree::Child::RayCollides(const Ray& ray, Output& data) const
+bool Child::RayCollides(const Ray& ray, OctSpace::Output& data) const
 {
     //If the node AABB is missed, everything it contains is missed.
     if (Collision::RayAABBIntr(ray, m_Box)) {
@@ -205,7 +144,7 @@ bool Octree::Child::RayCollides(const Ray& ray, Output& data) const
                 float dist;
                 //If we haven't tested against this object before, and the ray hits.
                 if (!m_StaticObjectsRef[i].Checked &&
-                    Collision::RayVsAABB(ray, m_StaticObjectsRef[i].Box, dist)) {
+                    Collision::RayVsAABB(ray, *m_StaticObjectsRef[i].Box, dist)) {
                     minDist = std::min(dist, minDist);
                     intersected = true;
                 }
@@ -215,7 +154,7 @@ bool Octree::Child::RayCollides(const Ray& ray, Output& data) const
                 float dist;
                 //If we haven't tested against this object before, and the ray hits.
                 if (!m_DynamicObjectsRef[i].Checked &&
-                    Collision::RayVsAABB(ray, m_DynamicObjectsRef[i].Box, dist)) {
+                    Collision::RayVsAABB(ray, *m_DynamicObjectsRef[i].Box, dist)) {
                     minDist = std::min(dist, minDist);
                     intersected = true;
                 }
@@ -230,7 +169,7 @@ bool Octree::Child::RayCollides(const Ray& ray, Output& data) const
 }
 
 
-void Octree::Child::AddDynamicObject(const AABB& box)
+void Child::AddDynamicObject(const AABB& box)
 {
     if (hasChildren()) {
         for (auto i : childIndicesContainingBox(box)) {
@@ -242,7 +181,7 @@ void Octree::Child::AddDynamicObject(const AABB& box)
     }
 }
 
-void Octree::Child::AddStaticObject(const AABB& box)
+void Child::AddStaticObject(const AABB& box)
 {
     if (hasChildren()) {
         for (auto i : childIndicesContainingBox(box)) {
@@ -254,41 +193,7 @@ void Octree::Child::AddStaticObject(const AABB& box)
     }
 }
 
-void Octree::Child::BoxesInSameRegion(const AABB& box, std::vector<AABB>& outBoxes) const
-{
-    if (hasChildren()) {
-        for (auto i : childIndicesContainingBox(box)) {
-            m_Children[i]->BoxesInSameRegion(box, outBoxes);
-        }
-    } else {
-        size_t startIndex = outBoxes.size();
-        int numDuplicates = 0;
-        outBoxes.resize(outBoxes.size() + m_StaticObjIndices.size() + m_DynamicObjIndices.size());
-        for (size_t i = 0; i < m_StaticObjIndices.size(); ++i){
-            ContainedObject& obj = m_StaticObjectsRef[m_StaticObjIndices[i]];
-            if (obj.Checked) {
-                ++numDuplicates;
-            } else {
-                obj.Checked = true;
-                outBoxes[startIndex + i - numDuplicates] = obj.Box;
-            }
-        }
-        for (size_t i = 0; i < m_DynamicObjIndices.size(); ++i) {
-            ContainedObject& obj = m_DynamicObjectsRef[m_DynamicObjIndices[i]];
-            if (obj.Checked) {
-                ++numDuplicates;
-            } else {
-                obj.Checked = true;
-                outBoxes[startIndex + i - numDuplicates] = obj.Box;
-            }
-        }
-        for (size_t i = 0; i < numDuplicates; ++i) {
-            outBoxes.pop_back();
-        }
-    }
-}
-
-void Octree::Child::ClearObjects()
+void Child::ClearObjects()
 {
     if (hasChildren()) {
         for (Child*& c : m_Children) {
@@ -300,11 +205,11 @@ void Octree::Child::ClearObjects()
     }
 }
 
-void Octree::Child::ClearDynamicObjects()
+void Child::ClearDynamicObjects()
 {
     if (hasChildren()) {
         for (Child*& c : m_Children) {
-            c->ClearObjects();
+            c->ClearDynamicObjects();
         }
     } else {
         m_DynamicObjIndices.clear();
@@ -323,13 +228,13 @@ void Octree::Child::ClearDynamicObjects()
 //    x : - - - - + + + +
 //    y : - - + + - - + +
 //    z : - + - + - + - +
-int Octree::Child::childIndexContainingPoint(const glm::vec3& point) const
+int Child::childIndexContainingPoint(const glm::vec3& point) const
 {
     const glm::vec3& c = m_Box.Origin();
     return (1 << 2) * (point.x >= c.x) | (1 << 1) * (point.y >= c.y) | (point.z >= c.z);
 }
 
-std::vector<int> Octree::Child::childIndicesContainingBox(const AABB& box) const
+std::vector<int> Child::childIndicesContainingBox(const AABB& box) const
 {
     int minInd = childIndexContainingPoint(box.MinCorner());
     int maxInd = childIndexContainingPoint(box.MaxCorner());
@@ -371,7 +276,9 @@ std::vector<int> Octree::Child::childIndicesContainingBox(const AABB& box) const
     }
 }
 
-inline bool Octree::Child::hasChildren() const
+inline bool Child::hasChildren() const
 {
     return m_Children[0] != nullptr;
+}
+
 }
