@@ -4,4 +4,5 @@
 	<Resource></Resource>
 	<Color R="1" G="1" B="1" A="1"/>
 	<Visible>true</Visible>
+	<Alignment><Center/></Alignment>
 </Text>

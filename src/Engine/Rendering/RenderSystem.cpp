@@ -154,11 +154,16 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
             continue;
         }
 
-        Font* font = ResourceManager::Load<Font>(textComponent["Resource"]);
-        if (font == nullptr) {
-            font = ResourceManager::Load<Font>("Fonts/DroidSans.ttf");
+        Font* font;
+        try {
+            font = ResourceManager::Load<Font>(resource);
+        } catch (const std::exception&) {
+            try {
+                font = ResourceManager::Load<Font>("Fonts/DroidSans.ttf,16");
+            } catch (const std::exception&) {
+                continue;
+            }
         }
-
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(textComponent.EntityID, world);
         std::shared_ptr<TextJob> modelJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));

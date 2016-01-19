@@ -19,10 +19,11 @@ Font::Font(std::string path)
                 FontSize = boost::lexical_cast<int>((*it).c_str());
             } catch (boost::bad_lexical_cast const&) {
                 LOG_ERROR("input string did not have a valid font resolution");
+                throw std::runtime_error("");
             }
         }
     } else {
-        return;
+        throw std::runtime_error("");;
     }
 
 
@@ -30,12 +31,12 @@ Font::Font(std::string path)
 
     if (FT_Init_FreeType(&library)) {
         LOG_ERROR("FreeType error: init failed");
-        return;
+        throw std::runtime_error("");;
     }
 
     if (FT_New_Face(library, filePath.c_str(), 0, &Face)) {
         LOG_ERROR("FreeType error: loading font");
-        return;
+        throw std::runtime_error("");;
     }
 
     FT_Set_Char_Size(Face, 0, FontSize*64, 300, 300); // temp
@@ -43,7 +44,7 @@ Font::Font(std::string path)
 
     if (FT_Load_Char(Face, 'X', FT_LOAD_RENDER)) {
         LOG_ERROR("FreeType error: loading char");
-        return;
+        throw std::runtime_error("");;
     }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -87,6 +88,8 @@ Font::Font(std::string path)
 
         m_Characters.insert(std::pair<GLchar, Character>(c, character));
     }
+
+    
     FT_Done_FreeType(library);
     GLERROR("Font Load");
 }

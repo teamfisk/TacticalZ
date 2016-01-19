@@ -34,12 +34,13 @@ void TextRenderer::Draw(RenderScene& scene)
     for (auto &job : scene.TextJobs) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
-            RenderText(textJob->Content, textJob->Resource, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
+
+            RenderText(textJob->Content, textJob->Resource, textJob->Alignment, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
         }
     }
 }
 
-void TextRenderer::RenderText(std::string text, Font* font, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+void TextRenderer::RenderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
     GLfloat penX = 0;
     GLfloat penY = 0;
@@ -60,7 +61,14 @@ void TextRenderer::RenderText(std::string text, Font* font, glm::vec4 color, glm
         stringWidth += (ch.Advance >> 6) * scale;
     }
 
-    penX = -stringWidth/2.f;
+    if(alignment == TextJob::AlignmentEnum::Center) {
+        penX = -stringWidth/2.f;
+    } else if (alignment == TextJob::AlignmentEnum::Right) {
+        penX = -stringWidth;
+    } else {
+        penX = 0;
+    }
+    
 
     // Activate corresponding render state	
     

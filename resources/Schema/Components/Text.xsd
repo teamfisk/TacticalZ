@@ -3,6 +3,18 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
+	<xs:complexType name="AlignmentEnum" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="t:enum">
+				<xs:choice>
+					<xs:element name="Right" type="xs:integer" fixed="0" minOccurs="0"/>
+					<xs:element name="Left" type="xs:integer" fixed="1" minOccurs="0"/>
+					<xs:element name="Center" type="xs:integer" fixed="2" minOccurs="0"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
 	<xs:element name="Text">
 		<xs:annotation>
 			<xs:documentation>A visible font loaded from disk</xs:documentation>
@@ -20,6 +32,9 @@
 				</xs:element>
 				<xs:element name="Visible" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Wether the text is visible or not</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Alignment" type="AlignmentEnum" minOccurs="0">
+					<xs:annotation><xs:documentation>Text alignment</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>
