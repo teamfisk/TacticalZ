@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <boost/shared_array.hpp>
 #include <glm/common.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include "Common.h"
 #include "Core/System.h"
@@ -12,6 +13,7 @@
 
 #include "Network/EInterpolate.h"
 
+#define SNAPSHOTINTERVAL 0.05f
 
 class InterpolationSystem : public PureSystem
 {
@@ -19,7 +21,7 @@ class InterpolationSystem : public PureSystem
     {
         glm::vec3 Position;
         glm::vec3 Scale;
-        glm::vec3 Orientation;
+        glm::quat Orientation;
         double interpolationTime;
     };
 public:
@@ -35,7 +37,14 @@ private:
     //std::unordered_map<EntityID, std::queue<Transform>> m_InterpolationPoints;
     std::unordered_map<EntityID, Transform> m_InterpolationPoints;
 
-    glm::vec3 vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime);
+    //glm::vec3 vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime);
+    template <typename T>
+    T vectorInterpolation(T prev, T next, double currentTime)
+    {
+        T difference = next - prev;
+        T vector = (difference / SNAPSHOTINTERVAL) * static_cast<float>(currentTime);
+        return vector;
+    }
 
     EventRelay<InterpolationSystem, Events::Interpolate> m_EInterpolate;
     bool InterpolationSystem::OnInterpolate(const Events::Interpolate& e);
