@@ -50,6 +50,9 @@ public:
     // Called when the user means to change the parent of an entity.
     typedef std::function<void(EntityWrapper, EntityWrapper)> OnEntityChangeParent_t;
     void SetEntityChangeParentCallback(OnEntityChangeParent_t f) { m_OnEntityChangeParent = f; }
+    // Called when the user means to rename an entity.
+    typedef std::function<void(EntityWrapper, const std::string&)> OnEntityChangeName_t;
+    void SetEntityChangeNameCallback(OnEntityChangeName_t f) { m_OnEntityChangeName = f; }
     // Called when the user means to attach a new component to an entity.
     typedef std::function<void(EntityWrapper, const std::string&)> OnComponentAttach_t;
     void SetComponentAttachCallback(OnComponentAttach_t f) { m_OnComponentAttach = f; }
@@ -77,6 +80,7 @@ private:
     OnEntityCreate_t m_OnEntityCreate = nullptr;
     OnEntityDelete_t m_OnEntityDelete = nullptr;
     OnEntityChangeParent_t m_OnEntityChangeParent = nullptr;
+    OnEntityChangeName_t m_OnEntityChangeName = nullptr;
     OnComponentAttach_t m_OnComponentAttach = nullptr;
     OnComponentDelete_t m_OnComponentDelete = nullptr;
 

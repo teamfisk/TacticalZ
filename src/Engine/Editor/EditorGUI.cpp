@@ -101,6 +101,31 @@ void EditorGUI::drawEntities(World* world)
     ImGui::SameLine(0.f, 5.f);
     ImGui::Button("Reference", ImVec2(buttonWidth, 0));
 
+    // Naming
+    char buffer[256];
+    buffer[0] = '\0';
+    buffer[255] = '\0';
+    std::size_t nameLength = 0;
+    ImGuiInputTextFlags flags = ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll;
+    if (m_CurrentSelection.Valid()) {
+        std::string name = world->GetName(m_CurrentSelection.ID);
+        nameLength = name.length();
+        if (!name.empty()) {
+            memcpy(buffer, name.c_str(), std::min(sizeof(buffer) - 1, name.length() + 1));
+        }
+    } else {
+        flags |= ImGuiInputTextFlags_ReadOnly;
+    }
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 7.f);
+    if (ImGui::InputText("", &buffer[0], sizeof(buffer), flags)) {
+        if (m_CurrentSelection.Valid()) {
+            if (m_OnEntityChangeName != nullptr) {
+                m_OnEntityChangeName(m_CurrentSelection, std::string(buffer));
+            }
+        }
+    }
+    ImGui::PopItemWidth();
+
     ImGui::ItemSize(ImVec2(0, 3));
 
     drawEntitiesRecursive(world, EntityID_Invalid);
@@ -487,7 +512,7 @@ const std::string EditorGUI::formatEntityName(EntityWrapper entity)
 
     std::stringstream name;
 
-    const std::string& entityName = entity.World->GetName(entity);
+    std::string entityName = entity.World->GetName(entity.ID);
     if (!entityName.empty()) {
         name << entityName;
     } else {

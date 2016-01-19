@@ -26,6 +26,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorGUI->SetEntityCreateCallback(std::bind(&EditorSystem::OnEntityCreate, this, std::placeholders::_1));
     m_EditorGUI->SetEntityDeleteCallback(std::bind(&EditorSystem::OnEntityDelete, this, std::placeholders::_1));
     m_EditorGUI->SetEntityChangeParentCallback(std::bind(&EditorSystem::OnEntityChangeParent, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetEntityChangeNameCallback(std::bind(&EditorSystem::OnEntityChangeName, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
 
@@ -83,6 +84,11 @@ void EditorSystem::OnEntityDelete(EntityWrapper entity)
 void EditorSystem::OnEntityChangeParent(EntityWrapper entity, EntityWrapper parent)
 {
     entity.World->SetParent(entity.ID, parent.ID);
+}
+
+void EditorSystem::OnEntityChangeName(EntityWrapper entity, const std::string& name)
+{
+    entity.World->SetName(entity.ID, name);
 }
 
 void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& componentType)

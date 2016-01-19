@@ -41,6 +41,7 @@ private:
     EntityWrapper OnEntityCreate(EntityWrapper parent);
     void OnEntityDelete(EntityWrapper entity);
     void OnEntityChangeParent(EntityWrapper entity, EntityWrapper parent);
+    void OnEntityChangeName(EntityWrapper entity, const std::string& name);
     void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
 };
