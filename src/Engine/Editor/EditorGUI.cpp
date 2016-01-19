@@ -367,6 +367,7 @@ void EditorGUI::drawComponentField_enum(ComponentWrapper &c, const ComponentInfo
         if (val == kv.second) {
             selectedItem = i;
         }
+        i++;
     }
     if (ImGui::Combo("", &selectedItem, enumKeys.str().c_str())) {
         val = enumValues.at(selectedItem);
