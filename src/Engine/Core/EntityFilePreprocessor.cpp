@@ -7,23 +7,23 @@ EntityFilePreprocessor::EntityFilePreprocessor(const EntityFile* entityFile)
     handler.SetStartComponentCallback(std::bind(&EntityFilePreprocessor::onStartComponent, this, std::placeholders::_1, std::placeholders::_2));
     m_EntityFile->Parse(&handler);
 
-    LOG_DEBUG("___ COMPONENT DEFINITIONS ___");
-    for (auto& kv : m_ComponentCounts) {
-        LOG_DEBUG("%s: %i", kv.first.c_str(), kv.second);
-    }
+    //LOG_DEBUG("___ COMPONENT DEFINITIONS ___");
+    //for (auto& kv : m_ComponentCounts) {
+    //    LOG_DEBUG("%s: %i", kv.first.c_str(), kv.second);
+    //}
 
     parseComponentInfo();
 
-    for (auto& kv : m_ComponentInfo) {
-        auto& info = kv.second;
-        LOG_DEBUG("Component: %s (%s)", info.Name.c_str(), info.Meta->Annotation.c_str());
-        LOG_DEBUG("Stride: %i", info.Stride);
-        LOG_DEBUG("Allocation: %i", info.Meta->Allocation);
-        for (auto& kv : info.Fields) {
-            auto& field = kv.second;
-            LOG_DEBUG("\t%i\t%s %s", field.Offset, field.Type.c_str(), kv.first.c_str());
-        }
-    }
+    //for (auto& kv : m_ComponentInfo) {
+    //    auto& info = kv.second;
+    //    LOG_DEBUG("Component: %s (%s)", info.Name.c_str(), info.Meta->Annotation.c_str());
+    //    LOG_DEBUG("Stride: %i", info.Stride);
+    //    LOG_DEBUG("Allocation: %i", info.Meta->Allocation);
+    //    for (auto& kv : info.Fields) {
+    //        auto& field = kv.second;
+    //        LOG_DEBUG("\t%i\t%s %s", field.Offset, field.Type.c_str(), kv.first.c_str());
+    //    }
+    //}
 
     parseDefaults();
 }
@@ -50,7 +50,6 @@ void EntityFilePreprocessor::parseComponentInfo()
     auto xsModel = grammarPool->getXSModel(whateverTheFuckThisIs);
 
     // Find component xsd element declarations
-    std::cout << "Enumerating components..." << std::endl;
     // <xs:element name="ComponentName">
     auto topLevelElements = xsModel->getComponents(XSConstants::ELEMENT_DECLARATION);
     for (unsigned int i = 0; i < topLevelElements->getLength(); ++i) {
@@ -73,7 +72,7 @@ void EntityFilePreprocessor::parseComponentInfo()
         if (componentAnnotation != nullptr) {
             compInfo.Meta->Annotation = parseAnnotationXML(componentAnnotation->getAnnotationString());
         } else {
-            LOG_WARNING("Component \"%s\" is missing an annotation!", compInfo.Name.c_str());
+            //LOG_WARNING("Component \"%s\" is missing an annotation!", compInfo.Name.c_str());
         }
 
         // <xs:complexType>
@@ -91,7 +90,7 @@ void EntityFilePreprocessor::parseComponentInfo()
         // <xs:all>
         auto modelGroupParticle = complexTypeDefinition->getParticle();
         if (modelGroupParticle == nullptr || modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
-            LOG_ERROR("Failed to parse component definition for \"%s\": Model group particle was null or wasn't TERM_MODELGROUP!", compInfo.Name.c_str());
+            //LOG_ERROR("Failed to parse component definition for \"%s\": Model group particle was null or wasn't TERM_MODELGROUP!", compInfo.Name.c_str());
             continue;
         }
         auto modelGroup = modelGroupParticle->getModelGroupTerm();
@@ -103,7 +102,7 @@ void EntityFilePreprocessor::parseComponentInfo()
         for (unsigned int i = 0; i < particles->size(); ++i) {
             auto particle = particles->elementAt(i);
             if (particle->getTermType() != XSParticle::TERM_ELEMENT) {
-                LOG_ERROR("Failed to parse a field definition in component \"%s\": Particle wasn't TERM_ELEMENT! Skipping.", compInfo.Name.c_str());
+                //LOG_ERROR("Failed to parse a field definition in component \"%s\": Particle wasn't TERM_ELEMENT! Skipping.", compInfo.Name.c_str());
                 continue;
             }
             auto elementDeclaration = particle->getElementTerm();
@@ -129,7 +128,7 @@ void EntityFilePreprocessor::parseComponentInfo()
             if (fieldAnnotation != nullptr) {
                 compInfo.Meta->FieldAnnotations[name] = parseAnnotationXML(fieldAnnotation->getAnnotationString());
             } else {
-                LOG_WARNING("Component field \"%s.%s\" is missing an annotation!", compInfo.Name.c_str(), name.c_str());
+                //LOG_WARNING("Component field \"%s.%s\" is missing an annotation!", compInfo.Name.c_str(), name.c_str());
             }
 
             if (effectiveType == "enum") {
@@ -147,7 +146,7 @@ void EntityFilePreprocessor::parseComponentInfo()
                         std::string enumName = XS::ToString(enumElement->getName());
                         std::string enumValue = XS::ToString(enumElement->getConstraintValue());
                         compInfo.Meta->FieldEnumDefinitions[name][enumName] = boost::lexical_cast<ComponentInfo::EnumType>(enumValue);
-                        LOG_DEBUG("ENUM %s = %s", enumName.c_str(), enumValue.c_str());
+                        //LOG_DEBUG("ENUM %s = %s", enumName.c_str(), enumValue.c_str());
                     }
                 }
             }
@@ -190,7 +189,7 @@ void EntityFilePreprocessor::parseDefaults()
         //std::string namespaceSchema = schemaLocation.string();
         //parser.setExternalNoNamespaceSchemaLocation("Teamasdasdasdasd.xsd");
 
-        LOG_DEBUG("Parsing defaults for component %s", componentName.c_str());
+        //LOG_DEBUG("Parsing defaults for component %s", componentName.c_str());
         boost::filesystem::path defaultsFile = "Schema/Components/" + componentName + ".xml";
 
         parser.parse(defaultsFile.string().c_str());
