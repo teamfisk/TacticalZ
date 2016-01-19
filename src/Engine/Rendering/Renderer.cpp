@@ -98,9 +98,8 @@ void Renderer::Draw(RenderFrame& frame)
 
     m_PickingPass->ClearPicking();
     for (auto scene : frame.RenderScenes){
-    
         m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
-        FillDepth(*scene);
+        SortRenderJobsByDepth(*scene);
         m_PickingPass->Draw(*scene);
         m_LightCullingPass->GenerateNewFrustum(*scene);
         m_LightCullingPass->FillLightList(*scene);
@@ -147,6 +146,13 @@ void Renderer::InitializeTextures()
     m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
 }
 
+
+void Renderer::SortRenderJobsByDepth(RenderScene *scene)
+{
+    //Sort all forward jobs so transparency is good.
+    scene->ForwardJobs.sort(Renderer::DepthSort);
+}
+
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
 {
     glGenTextures(1, texture);
@@ -165,21 +171,4 @@ void Renderer::InitializeRenderPasses()
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
-}
-
-//Temp func
-void Renderer::FillDepth(RenderScene& scene)
-{
-    for (auto job : scene.ForwardJobs) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-        if(! modelJob) {
-            return;
-        }
-
-
-        glm::vec3 abspos = Transform::AbsolutePosition(modelJob->World, modelJob->Entity);
-        glm::vec3 worldpos = glm::vec3(scene.Camera->ViewMatrix() * glm::vec4(abspos, 1));
-        modelJob->Depth = worldpos.z;
-    }
-    scene.ForwardJobs.sort(Renderer::DepthSort);
 }

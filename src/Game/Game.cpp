@@ -64,8 +64,7 @@ Game::Game(int argc, char* argv[])
         EntityFileParser fp(file);
         fp.MergeEntities(m_World);
     }
-    //SO MUCH TEMP PLEASE REMOVE ME OMFG VIKTOR HELP
-    m_Renderer->m_World = m_World;
+
 
     // Create Octrees
     m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
