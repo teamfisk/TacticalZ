@@ -34,8 +34,8 @@ public:
     ~InterpolationSystem() { }
     virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& transform, double dt) override;
 private:
-    //std::unordered_map<EntityID, std::queue<Transform>> m_InterpolationPoints;
-    std::unordered_map<EntityID, Transform> m_InterpolationPoints;
+    std::unordered_map<EntityID, Transform> m_NextTransform;
+    std::unordered_map<EntityID, Transform> m_LastReceivedTransform;
 
     //glm::vec3 vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime);
     template <typename T>

@@ -22,9 +22,20 @@
 
 void InterpolationSystem::UpdateComponent(World * world, EntityWrapper& entity, ComponentWrapper & transform, double dt)
 {
-    if (m_InterpolationPoints.find(transform.EntityID) != m_InterpolationPoints.end()) { // Exists in map
-        Transform& sTransform = m_InterpolationPoints[transform.EntityID];
-        sTransform.interpolationTime += dt;
+    if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
+        m_NextTransform[transform.EntityID].interpolationTime += dt;
+        Transform sTransform = m_NextTransform[transform.EntityID];
+        double time = sTransform.interpolationTime;
+        if (time > SNAPSHOTINTERVAL) {
+            if (m_LastReceivedTransform.find(transform.EntityID) != m_LastReceivedTransform.end()) {
+                m_NextTransform[transform.EntityID] = m_LastReceivedTransform[transform.EntityID];
+                m_NextTransform[transform.EntityID].interpolationTime = time - SNAPSHOTINTERVAL;
+                sTransform = m_NextTransform[transform.EntityID];
+                m_LastReceivedTransform.erase(transform.EntityID);
+            } else {
+                m_NextTransform.erase(transform.EntityID);
+            }
+        }
         if (transform.Info.Name == "Transform") {
             // Position
             glm::vec3 nextPosition = sTransform.Position;
@@ -38,22 +49,9 @@ void InterpolationSystem::UpdateComponent(World * world, EntityWrapper& entity, 
             glm::vec3 nextScale = sTransform.Scale;
             glm::vec3 currentScale = static_cast<glm::vec3>(transform["Scale"]);
             (glm::vec3&)transform["Scale"] += vectorInterpolation<glm::vec3>(currentScale, nextScale, sTransform.interpolationTime);
-            int testVar = 0;
-            if (glm::isnan(resize.r) || glm::isnan(resize.g) || glm::isnan(resize.b)) {
-                //(glm::vec3&)transform["Scale"] = currentScale;
-                return;
-            }
-             += resize;
         }
     }
 }
-
-//glm::vec3 InterpolationSystem::vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime)
-//{
-//    glm::vec3 difference = next - prev;
-//    glm::vec3 position = difference / SNAPSHOTINTERVAL * static_cast<float>(currentTime);
-//    return position;
-//}
 
 bool InterpolationSystem::OnInterpolate(const Events::Interpolate & e)
 {
@@ -68,7 +66,12 @@ bool InterpolationSystem::OnInterpolate(const Events::Interpolate & e)
     offset += sizeof(glm::vec3);
     memcpy(&transform.Scale, e.DataArray.get() + offset, sizeof(glm::vec3));
     transform.interpolationTime = 0.0f;
-    m_InterpolationPoints[e.Entity] = transform;
+
+    if (m_NextTransform.find(e.Entity) != m_NextTransform.end()) { // Did exist
+        m_LastReceivedTransform[e.Entity] = transform;
+    } else { // Did not
+        m_NextTransform[e.Entity] = transform;
+    }
     // Check if queue already exists
     //if (m_InterpolationPoints.find(e.Entity) != m_InterpolationPoints.end()) { // Did exist, push to queue
     //    m_InterpolationPoints[e.Entity].push(transform);
