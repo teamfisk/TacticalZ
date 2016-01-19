@@ -3,7 +3,8 @@
 #include <imgui/imgui_internal.h>
 
 EditorSystem::EditorSystem(EventBroker* eventBroker, IRenderer* renderer) 
-    : ImpureSystem(eventBroker)
+    : System(eventBroker)
+    , ImpureSystem()
     , m_Renderer(renderer)
 {
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
@@ -483,8 +484,8 @@ void EditorSystem::drawUI(World* world, double dt)
                 }
 
                 if (ImGui::CollapsingHeader(componentType.c_str())) {
-                    if (!ci.Meta.Annotation.empty()) {
-                        ImGui::Text(ci.Meta.Annotation.c_str());
+                    if (!ci.Meta->Annotation.empty()) {
+                        ImGui::Text(ci.Meta->Annotation.c_str());
                     }
 
                     auto& component = world->GetComponent(m_Selection, componentType);
@@ -492,9 +493,10 @@ void EditorSystem::drawUI(World* world, double dt)
                         const std::string& fieldName = kv.first;
                         auto& field = kv.second;
                         
-                        ImGui::PushID(fieldName.c_str());
+                        std::string uniqueID = componentType + fieldName;
+                        ImGui::PushID(uniqueID.c_str());
                         if (field.Type == "Vector") {
-                            auto& val = component.Property<glm::vec3>(fieldName);
+                            auto& val = component.Field<glm::vec3>(fieldName);
                             if (fieldName == "Scale") {
                                 ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
                             } else if (fieldName == "Orientation") {
@@ -506,10 +508,10 @@ void EditorSystem::drawUI(World* world, double dt)
                                 ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
                             }
                         } else if (field.Type == "Color") {
-                            auto& val = component.Property<glm::vec4>(fieldName);
+                            auto& val = component.Field<glm::vec4>(fieldName);
                             ImGui::ColorEdit4("", glm::value_ptr(val), true);
                         } else if (field.Type == "string") {
-                            std::string& val = component.Property<std::string>(fieldName);
+                            std::string& val = component.Field<std::string>(fieldName);
                             char tempString[1024];
                             memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString)));
                             if (ImGui::InputText("", tempString, sizeof(tempString))) {
@@ -523,12 +525,32 @@ void EditorSystem::drawUI(World* world, double dt)
                             }
 
                         } else if (field.Type == "double") {
-                            float tempVal = static_cast<float>(component.Property<double>(fieldName));
+                            float tempVal = static_cast<float>(component.Field<double>(fieldName));
                             if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
-                                component.SetProperty(fieldName, static_cast<double>(tempVal));
+                                component.SetField(fieldName, static_cast<double>(tempVal));
+                            }
+                        } else if (field.Type == "int") {
+                            int val = component.Field<int>(fieldName);
+                            ImGui::InputInt("", &val);
+                        } else if (field.Type == "enum") {
+                            int currentValue = component.Field<int>(fieldName);
+                            int item = -1;
+                            std::stringstream enumKeys;
+                            std::vector<int> enumValues;
+                            int i = 0;
+                            for (auto& kv : ci.Meta->FieldEnumDefinitions.at(fieldName)) {
+                                enumKeys << kv.first << " (" << kv.second << ")" << '\0';
+                                enumValues.push_back(kv.second);
+                                if (currentValue == kv.second) {
+                                    item = i;
+                                }
+                                i++;
+                            }
+                            if (ImGui::Combo("", &item, enumKeys.str().c_str())) {
+                                component.SetField(fieldName, enumValues.at(item));
                             }
                         } else if (field.Type == "bool") {
-                            auto& val = component.Property<bool>(fieldName);
+                            auto& val = component.Field<bool>(fieldName);
                             ImGui::Checkbox("", &val);
                         } else {
                             ImGui::TextDisabled(field.Type.c_str());

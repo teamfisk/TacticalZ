@@ -1,14 +1,15 @@
 #include "Rendering/RenderSystem.h"
 
-RenderSystem::RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame) :ImpureSystem(eventBrokerer)
+RenderSystem::RenderSystem(EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame)
+    : System(eventBroker)
+    , m_Renderer(renderer)
+    , m_RenderFrame(renderFrame)
 {
-    m_Renderer = renderer;
-    m_RenderFrame = renderFrame;
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
 
     m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
-    m_DebugCameraInputController = new DebugCameraInputController<RenderSystem>(eventBrokerer, -1);
+    m_DebugCameraInputController = new DebugCameraInputController<RenderSystem>(eventBroker, -1);
 }
 
 RenderSystem::~RenderSystem()
@@ -113,25 +114,45 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
 }
 
 
-void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
 {
     auto pointLights = world->GetComponents("PointLight");
-    if (pointLights == nullptr) {
-        return;
+    if (pointLights != nullptr) {
+        for (auto& pointlightC : *pointLights) {
+            bool visible = pointlightC["Visible"];
+            if (!visible) {
+                continue;
+            }
+            auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
+            if (&transformC == nullptr) {
+                continue;
+            }
+
+            std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
+            jobs.push_back(pointLightJob);
+        }
     }
+}
 
-    for (auto& pointlightC : *pointLights) {
-        bool visible = pointlightC["Visible"];
-        if (!visible) {
-            continue;
-        }
-        auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
-        if (&transformC == nullptr) {
-            return;
-        }
 
-        std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
-        jobs.push_back(pointLightJob);
+void RenderSystem::fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+{
+    auto directionalLights = world->GetComponents("DirectionalLight");
+    if (directionalLights != nullptr) {
+        for (auto& directionalLightC : *directionalLights) {
+            bool visable = directionalLightC["Visible"];
+            if (!visable) {
+                continue;
+            }
+
+            auto transformC = world->GetComponent(directionalLightC.EntityID, "Transform");
+            if (&transformC == nullptr) {
+                continue;
+            }
+
+            std::shared_ptr<DirectionalLightJob> directionalLightJob = std::shared_ptr<DirectionalLightJob>(new DirectionalLightJob(transformC, directionalLightC, m_World));
+            jobs.push_back(directionalLightJob);
+        }
     }
 }
 
@@ -159,7 +180,8 @@ void RenderSystem::Update(World* world, double dt)
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
     fillModels(scene.ForwardJobs, world);
-    fillLight(scene.PointLightJobs, world);
+    fillPointLights(scene.PointLightJobs, world);
+    fillDirectionalLights(scene.DirectionalLightJobs, world);
     m_RenderFrame->Add(scene);
    
 }

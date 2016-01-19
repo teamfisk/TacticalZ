@@ -1,6 +1,7 @@
 #ifndef InputProxy_h__
 #define InputProxy_h__
 
+#include <boost/tokenizer.hpp>
 #include "../Common.h"
 #include "../Core/ResourceManager.h"
 #include "../Core/ConfigFile.h"

@@ -12,7 +12,14 @@
 				<xs:element name="Color" type="t:Color" minOccurs="0"/>
 				<xs:element name="Radius" type="t:double" minOccurs="0"/>
 				<xs:element name="Intensity" type="t:double" minOccurs="0"/>
-				<xs:element name="Falloff" type="t:double" minOccurs="0" minInclusive="0" maxInclusive="1"/>
+				<xs:element name="Falloff">
+					<xs:simpleType>
+						<xs:restriction base="t:double">
+							<xs:minInclusive value="0"/>
+							<xs:maxInclusive value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
 				<xs:element name="Visible" type="t:bool" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>

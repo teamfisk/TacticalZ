@@ -11,14 +11,23 @@
 					<xs:complexType>
 						<xs:all>
 							<xs:element ref="c:Transform" minOccurs="0"/>
+							<xs:element ref="c:Physics" minOccurs="0"/>
 							<xs:element ref="c:Model" minOccurs="0"/>
-							<xs:element ref="c:Test" minOccurs="0"/>
 							<xs:element ref="c:RaptorCopter" minOccurs="0"/>
 							<xs:element ref="c:Player" minOccurs="0"/>
+							<xs:element ref="c:Camera" minOccurs="0"/>
+							<xs:element ref="c:AABB" minOccurs="0"/>
+							<xs:element ref="c:Trigger" minOccurs="0"/>
 							<xs:element ref="c:Health" minOccurs="0"/>
 							<xs:element ref="c:PointLight" minOccurs="0"/>
 							<xs:element ref="c:Listener" minOccurs="0"/>
 							<xs:element ref="c:SoundEmitter" minOccurs="0"/>
+							<xs:element ref="c:Collidable" minOccurs="0"/>
+							<xs:element ref="c:Spawner" minOccurs="0"/>
+							<xs:element ref="c:SpawnPoint" minOccurs="0"/>
+							<xs:element ref="c:PlayerSpawn" minOccurs="0"/>
+							<xs:element ref="c:Team" minOccurs="0"/>
+							<xs:element ref="c:DirectionalLight" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

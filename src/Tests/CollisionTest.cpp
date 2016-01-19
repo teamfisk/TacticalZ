@@ -7,7 +7,7 @@ using boost::unit_test_framework::test_case;
 #include "Engine/Core/AABB.h"
 #include "Engine/Core/Ray.h"
 #include <stdlib.h>//srand
-#include "Engine/Core/OctTree.h"
+#include "Engine/Core/Octree.h"
 //vs model
 #include <sstream>
 #include <string>
@@ -205,9 +205,9 @@ BOOST_AUTO_TEST_CASE(octTest)
 {
     glm::vec3 mini = glm::vec3(-1, -1, -1);
     glm::vec3 maxi = glm::vec3(1, 1, 1);
-    OctTree tree(AABB(mini, maxi), 2);
+    Octree tree(AABB(mini, maxi), 2);
     tree.AddDynamicObject(AABB(mini, -0.9f*maxi));
-    OctTree::Output data;
+    Octree::Output data;
     glm::vec3 origin = 3.0f * mini;
     bool rayIntersected = tree.RayCollides(Ray(origin , mini - origin), data);
     BOOST_CHECK(rayIntersected);

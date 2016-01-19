@@ -55,7 +55,7 @@ private:
     glm::quat m_PrevOri;
 
     glm::vec3 worldSize = glm::vec3(50, 50, 50);
-    OctTree someOctTree;
+    Octree someOctTree;
 
 };
 
