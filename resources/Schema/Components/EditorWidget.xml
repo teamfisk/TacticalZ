@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<EditorWidget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EditorWidget.xsd">
+	<Type><None/></Type>
+	<Axis X="0" Y="0" Z="0"/>
+</EditorWidget>
