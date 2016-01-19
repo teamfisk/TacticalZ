@@ -7,7 +7,6 @@ Font::Font(std::string path)
     boost::char_separator<char> sep(",");
     tokenizer tok(path, sep);
 
-    int fontSize = 16;
 
     tokenizer::iterator it = tok.begin();
     std::string filePath = "";
@@ -17,7 +16,7 @@ Font::Font(std::string path)
         it++;
         if (it != tok.end()) {
             try {
-                fontSize = boost::lexical_cast<int>((*it).c_str());
+                FontSize = boost::lexical_cast<int>((*it).c_str());
             } catch (boost::bad_lexical_cast const&) {
                 LOG_ERROR("input string did not have a valid font resolution");
             }
@@ -39,8 +38,8 @@ Font::Font(std::string path)
         return;
     }
 
-    FT_Set_Char_Size(Face, 0, fontSize*64, 300, 300); // temp
-    FT_Set_Pixel_Sizes(Face, 0, fontSize);            //
+    FT_Set_Char_Size(Face, 0, FontSize*64, 300, 300); // temp
+    FT_Set_Pixel_Sizes(Face, 0, FontSize);            //
 
     if (FT_Load_Char(Face, 'X', FT_LOAD_RENDER)) {
         LOG_ERROR("FreeType error: loading char");
@@ -88,14 +87,13 @@ Font::Font(std::string path)
 
         m_Characters.insert(std::pair<GLchar, Character>(c, character));
     }
-
-    FT_Done_Face(Face);
     FT_Done_FreeType(library);
     GLERROR("Font Load");
 }
 
 Font::~Font()
 {
+    FT_Done_Face(Face);
     for (auto c : m_Characters) {
         glDeleteTextures(1, &c.second.TextureID);
     }

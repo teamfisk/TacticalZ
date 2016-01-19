@@ -34,21 +34,39 @@ void TextRenderer::Draw(RenderScene& scene)
     for (auto &job : scene.TextJobs) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
-            RenderText(textJob->Content, textJob->Resource, 0.01f, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
+            RenderText(textJob->Content, textJob->Resource, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
         }
     }
 }
 
-void TextRenderer::RenderText(std::string text, Font* font, GLfloat scale, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+void TextRenderer::RenderText(std::string text, Font* font, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
-    GLfloat x = 0;
-    GLfloat y = 0;
+    GLfloat penX = 0;
+    GLfloat penY = 0;
+    float scale = 1.0/font->FontSize;
 
+
+    FT_Bool use_kerning = FT_HAS_KERNING(font->Face);
+    FT_UInt previous = 0;
+    FT_UInt num_glyphs = 0;
+    FT_UInt glyph_index;
+
+    FT_Vector pos[128];
+
+    GLfloat stringWidth = 0.f;
+
+    for (std::string::const_iterator c = text.begin(); c != text.end(); c++) {
+        Font::Character ch = font->m_Characters[*c];
+        stringWidth += (ch.Advance >> 6) * scale;
+    }
+
+    penX = -stringWidth/2.f;
 
     // Activate corresponding render state	
     
     glEnable(GL_BLEND);
     glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_TextProgram->Bind();
@@ -59,13 +77,12 @@ void TextRenderer::RenderText(std::string text, Font* font, GLfloat scale, glm::
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 
-    // Iterate through all characters
-    std::string::const_iterator c;
-    for (c = text.begin(); c != text.end(); c++) {
+
+    for (std::string::const_iterator c = text.begin(); c != text.end(); c++) {
         Font::Character ch = font->m_Characters[*c];
 
-        GLfloat xpos = x + ch.Bearing.x * scale;
-        GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+        GLfloat xpos = penX + ch.Bearing.x * scale;
+        GLfloat ypos = penY - (ch.Size.y - ch.Bearing.y) * scale;
 
         GLfloat w = ch.Size.x * scale;
         GLfloat h = ch.Size.y * scale;
@@ -89,7 +106,7 @@ void TextRenderer::RenderText(std::string text, Font* font, GLfloat scale, glm::
         // Render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
         // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
+        penX += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);

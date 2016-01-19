@@ -25,7 +25,7 @@ private:
    
     GLuint VAO, VBO;
 
-    void RenderText(std::string text, Font* font, GLfloat scale, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
+    void RenderText(std::string text, Font* font, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 
     ShaderProgram* m_TextProgram;
 

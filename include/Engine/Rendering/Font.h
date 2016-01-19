@@ -27,6 +27,7 @@ public:
 
     FT_Face Face;
 
+    int FontSize = 16;
 
     ~Font();
 

@@ -13,28 +13,58 @@
         </c:Camera>
         <c:Model>
           <Resource>Models/Camera.obj</Resource>
-          <Visible>false</Visible>
         </c:Model>
         <c:Transform>
-          <Position X="0.624614298" Y="0.345819205" Z="5.40656805"/>
-          <Orientation X="0.0523599274" Y="-0.104719244" Z="8.8963592e-09"/>
+          <Position X="3.57542324" Y="3.61114573" Z="9.16725922"/>
+          <Orientation X="-0.488691777" Y="0.575939536" Z="-3.55363916e-08"/>
         </c:Transform>
       </Components>
-      <Children/>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Text>
+              <Content>Camera 1</Content>
+              <Resource>Fonts/DroidSans.ttf,24</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0.298732847" Y="0.296712071" Z="-1"/>
+              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
     <Entity>
       <Components>
         <c:Camera>
           <Name>ActionCamera</Name>
         </c:Camera>
+        <c:Listener/>
         <c:Model>
           <Resource>Models/Camera.obj</Resource>
+          <Visible>false</Visible>
         </c:Model>
         <c:Transform>
-          <Position X="5" Y="1" Z="5"/>
+          <Position X="7.20140934" Y="2.30552006" Z="8.67392826"/>
+          <Orientation X="-0.296705663" Y="0.767948866" Z="2.27869563e-07"/>
         </c:Transform>
       </Components>
-      <Children/>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Text>
+              <Content>Camera 2</Content>
+              <Resource>Fonts/DroidSans.ttf,24</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0.286911726" Y="0.310270816" Z="-1"/>
+              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
     <Entity>
       <Components>
@@ -42,7 +72,7 @@
           <Resource>Models/Core/UnitPlane.obj</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="-1" Z="0"/>
+          <Position X="0" Y="-1" Z="0.600000024"/>
           <Scale X="100" Y="1" Z="100"/>
         </c:Transform>
       </Components>
@@ -60,10 +90,12 @@
     <Entity>
       <Components>
         <c:Text>
-          <Content>asdasdasdasdasd</Content>
-          <Resource>Fonts/DroidSans.ttf</Resource>
+          <Content>Welcome!</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
         </c:Text>
-        <c:Transform/>
+        <c:Transform>
+          <Position X="0" Y="0" Z="0.700000048"/>
+        </c:Transform>
       </Components>
       <Children/>
     </Entity>

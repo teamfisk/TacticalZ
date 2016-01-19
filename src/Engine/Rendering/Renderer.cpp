@@ -117,6 +117,7 @@ void Renderer::Draw(RenderFrame& frame)
         m_TextRenderer->Draw(*scene);
 
     }
+    
 
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
