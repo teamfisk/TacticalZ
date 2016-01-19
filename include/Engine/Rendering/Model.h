@@ -19,9 +19,10 @@ public:
 
 	GLuint VAO;
 	GLuint ElementBuffer;
+    RawModel* m_RawModel;
 
 private:
-    RawModel* m_RawModel;
+    
 	GLuint VertexBuffer;
 	GLuint NormalBuffer;
 	GLuint TangentNormalsBuffer;

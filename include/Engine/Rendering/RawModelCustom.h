@@ -22,7 +22,7 @@ class RawModel : public Resource
     friend class ResourceManager;
 
 protected:
-    RawModel(std::string fileName);
+    RawModel(std::string& fileName);
 
 public:
     ~RawModel();
@@ -63,12 +63,18 @@ public:
     glm::mat4 m_Matrix;
 
 private:
+   
 
+    void ReadMeshFile(std::string filePath);
     void ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
     void ReadMesh(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
     void ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
     void ReadIndices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
 
+    void ReadMaterialFile(std::string filePath);
+    void ReadMaterials(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+    void ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+    
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
 

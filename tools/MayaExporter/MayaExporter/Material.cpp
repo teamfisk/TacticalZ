@@ -166,36 +166,42 @@ std::vector<std::string>* Material::TexturePaths()
 }
 
 // Traverse the DAG and grab all the materials
-std::vector<MaterialNode>* Material::DoIt()
+std::vector<MaterialNode>* Material::DoIt(Mesh mesh)
 {
 	// All materials we care about inherit from Lambert
 	MItDependencyNodes matIt(MFn::kLambert);
     m_AllMaterials.clear();
+    int totalIndices = 0;
 	while (!matIt.isDone()) {
 		MFnDependencyNode MaterialFnDN(matIt.thisNode());
 		MaterialNode MaterialStorage;
+        bool meshHasMaterial = false;
+        //Mesh Indices is a map with <string : MaterialName, vector<int> : indices>
+        for (auto aMeshMaterial : mesh.Indices) {
+            if (aMeshMaterial.first.compare(MaterialFnDN.name().asChar()) == 0) {
+                meshHasMaterial = true;
+                MaterialStorage.IndexStart = totalIndices;
+                MaterialStorage.IndexEnd = totalIndices + aMeshMaterial.second.size() - 1;
+                totalIndices += aMeshMaterial.second.size();
+                break;
+            }
+        }
+        if (meshHasMaterial) {
+            grabLambertProperties(MaterialStorage, MaterialFnDN);
 
-		if (matIt.thisNode().hasFn(MFn::kPhong)) {
-			grabLambertProperties(MaterialStorage, MaterialFnDN);
-			grabPhongProperties(MaterialStorage, MaterialFnDN);
+            if (matIt.thisNode().hasFn(MFn::kPhong)) {         
+                grabPhongProperties(MaterialStorage, MaterialFnDN);
 
-			m_AllMaterials.push_back(MaterialStorage);
-		}
-		else if (matIt.thisNode().hasFn(MFn::kBlinn)) {
-			grabLambertProperties(MaterialStorage, MaterialFnDN);
-			grabBlinnProperties(MaterialStorage, MaterialFnDN);
+            } else if (matIt.thisNode().hasFn(MFn::kBlinn)) {
+                grabBlinnProperties(MaterialStorage, MaterialFnDN);
 
-			m_AllMaterials.push_back(MaterialStorage);
-		}
-		else if (matIt.thisNode().hasFn(MFn::kLambert)) {
-			grabLambertProperties(MaterialStorage, MaterialFnDN);
+            } else if (matIt.thisNode().hasFn(MFn::kLambert)) {
+                MaterialStorage.ReflectionFactor = 0.0f;
+                MaterialStorage.SpecularExponent = 0.0f;      
+            }
 
-			MaterialStorage.ReflectionFactor = 0.0f;
-			MaterialStorage.SpecularExponent = 0.0f;
-
-			m_AllMaterials.push_back(MaterialStorage);
-		}
-
+            m_AllMaterials.push_back(MaterialStorage);
+        }
 		matIt.next();
 	}
 

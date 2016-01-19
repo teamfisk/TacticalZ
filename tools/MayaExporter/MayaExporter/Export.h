@@ -27,7 +27,7 @@ public:
     bool Animations(std::string pathName, std::vector<AnimationInfo> animInfo);
 
 private:
-    bool GetMeshData(MObject object);
+    bool GetMeshData(MObjectArray object);
     bool GetMaterialData();
     bool GetAnimationData(AnimationInfo info);
 
@@ -46,7 +46,7 @@ private:
     WriteToFile m_MtrlFile;
 
     //Mesh Data
-    std::vector<Mesh> meshes;
+    Mesh meshes;
 
     //Animation Data
     std::vector<BindPoseSkeletonNode> allBindPoses;

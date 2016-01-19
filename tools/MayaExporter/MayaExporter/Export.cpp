@@ -11,8 +11,8 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
         MGlobal::displayError(MString() + "Export::Meshes() got no pathName. Do not know where to write file");
         return false;
     }
-    meshes.clear();
 
+    MObjectArray Objects;
     if (selectedOnly) {
         // Retrieving the objects we currently have selected
         MSelectionList selected;
@@ -25,7 +25,7 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
 
             if (object.hasFn(MFn::kMesh)) {
                 MFnDependencyNode thisNode(object);
-                GetMeshData(object);
+                Objects.append(object);
             }
         }
     } else {
@@ -48,9 +48,10 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
             if (next)
                 continue;
 
-            GetMeshData(node);
+            Objects.append(node);
         }
     }
+    GetMeshData(Objects);
     WriteMeshData(pathName);
     return true;
 }
@@ -87,19 +88,16 @@ bool Export::Animations(std::string pathName, std::vector<AnimationInfo> animInf
     return true;
 }
 
-bool Export::GetMeshData(MObject object)
+bool Export::GetMeshData(MObjectArray object)
 { 
-    if (!object.hasFn(MFn::kMesh))
-        return false;
-
-    meshes.push_back(m_MeshHandler.GetMeshData(object));
+    meshes = m_MeshHandler.GetMeshData(object);
     return true;
 }
 
 bool Export::GetMaterialData()
 { 
     // Traverse scene and return vector with all materials
-    AllMaterials = m_MaterialHandler.DoIt();
+    AllMaterials = m_MaterialHandler.DoIt(meshes);
 
     return true;
 }
@@ -126,9 +124,7 @@ void Export::WriteMeshData(std::string pathName)
 
     m_MeshFile.OpenFiles();
 
-    for (auto aMesh : meshes) {
-        m_MeshFile.writeToFiles((OutputData*)&aMesh);
-    }
+    m_MeshFile.writeToFiles((OutputData*)&meshes);
 
     m_MeshFile.CloseFiles();
 }

@@ -67,9 +67,9 @@ public:
         out << "IndexStart: " << IndexStart << endl;
         out << "IndexEnd: " << IndexEnd << endl;
 
-        out << "ColorMapFile length: " << ColorMapFileLength << endl;
         if (ColorMapFileLength > 0)
             out << "ColorMapFile: " << ColorMapFile << endl;
+
         if (NormalMapFileLength > 0)
             out << "NormalMapFile: " << NormalMapFile << endl;
         
@@ -86,7 +86,7 @@ class Material
 public:
 	Material() {};
 	~Material() {};
-	std::vector<MaterialNode>* DoIt();
+	std::vector<MaterialNode>* DoIt(Mesh mesh);
 	std::vector<std::string>* TexturePaths();
 private:
 	MPlug m_Plug;

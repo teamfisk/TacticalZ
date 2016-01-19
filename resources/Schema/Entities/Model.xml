@@ -19,7 +19,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>models/coolTriangle.mesh</Resource>
+          <Resource>models/Baljj</Resource>
         </c:Model>
         <c:Transform/>
       </Components>

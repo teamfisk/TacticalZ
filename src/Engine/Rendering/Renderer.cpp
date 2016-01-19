@@ -101,10 +101,10 @@ void Renderer::Draw(RenderFrame& frame)
     
         m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
         FillDepth(*scene);
-        m_PickingPass->Draw(*scene);
-        m_LightCullingPass->GenerateNewFrustum(*scene);
-        m_LightCullingPass->FillLightList(*scene);
-        m_LightCullingPass->CullLights(*scene);
+        //m_PickingPass->Draw(*scene);
+        //m_LightCullingPass->GenerateNewFrustum(*scene);
+        //m_LightCullingPass->FillLightList(*scene);
+        //m_LightCullingPass->CullLights(*scene);
         m_DrawFinalPass->Draw(*scene);
         //m_DrawScenePass->Draw(rq);
 
