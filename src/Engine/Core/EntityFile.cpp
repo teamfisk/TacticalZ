@@ -47,7 +47,7 @@ std::size_t EntityFile::GetTypeStride(std::string typeName)
         { "float", sizeof(float) },
         { "double", sizeof(double) },
         { "string", sizeof(std::string) },
-        { "enum", sizeof(int) },
+        { "enum", sizeof(ComponentInfo::EnumType) },
         { "Vector", sizeof(glm::vec3) },
         { "Quaternion", sizeof(glm::quat) },
         { "Color", sizeof(glm::vec4) }
@@ -88,8 +88,11 @@ void EntityFile::WriteValueData(char* outData, const ComponentInfo::Field_t& fie
 {
     // Catch and ignore casting errors so whitespace around string enums won't mess anything up
     try {
-        if (field.Type == "int" || field.Type == "enum") {
+        if (field.Type == "int") {
             int value = boost::lexical_cast<int>(valueData);
+            memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
+        } else if (field.Type == "enum") {
+            ComponentInfo::EnumType value = boost::lexical_cast<ComponentInfo::EnumType>(valueData);
             memcpy(outData, reinterpret_cast<char*>(&value), field.Stride);
         } else if (field.Type == "float") {
             float value = boost::lexical_cast<float>(valueData);

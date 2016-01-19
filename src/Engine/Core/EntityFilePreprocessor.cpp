@@ -146,7 +146,7 @@ void EntityFilePreprocessor::parseComponentInfo()
                         auto enumElement = xsChoiceParticles->elementAt(i)->getElementTerm();
                         std::string enumName = XS::ToString(enumElement->getName());
                         std::string enumValue = XS::ToString(enumElement->getConstraintValue());
-                        compInfo.Meta->FieldEnumDefinitions[name][enumName] = boost::lexical_cast<int>(enumValue);
+                        compInfo.Meta->FieldEnumDefinitions[name][enumName] = boost::lexical_cast<ComponentInfo::EnumType>(enumValue);
                         LOG_DEBUG("ENUM %s = %s", enumName.c_str(), enumValue.c_str());
                     }
                 }

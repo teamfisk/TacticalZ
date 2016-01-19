@@ -118,7 +118,7 @@ void EntityFileWriter::appentEntityComponents(xercesc::DOMElement* parentElement
                 const int& value = c[fieldName];
                 fieldElement->appendChild(doc->createTextNode(X(boost::lexical_cast<std::string>(value))));
             } else if (field.Type == "enum") {
-                const int& value = c[fieldName];
+                const ComponentInfo::EnumType& value = c[fieldName];
                 auto& enumDef = c.Info.Meta->FieldEnumDefinitions.at(fieldName);
                 for (auto& kv : enumDef) {
                     if (kv.second == value) {
