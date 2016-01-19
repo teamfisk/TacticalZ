@@ -31,8 +31,10 @@ ECHO Deploying %1 binaries to %DeployLocation%
 COPY "deps\bin\%1\x64\*.dll" "%DeployLocation%"
 
 :: Licenses
-::ECHO Copying licenses %DeployLocation%
+ECHO Copying licenses to %DeployLocation%
 ::COPY "libs\assimp-3.1.1\LICENSE" "%ConfigPath%\Assimp License.txt"
 ::COPY "libs\glew-1.11.0\LICENSE.txt" "%ConfigPath%\GLEW License.txt"
 ::COPY "libs\glm-0.9.5.4\copying.txt" "%ConfigPath%\GLM License.txt"
 ::COPY "libs\assimp-3.1.1\LICENSE" "%ConfigPath%\Assimp License.txt"
+RMDIR "%DeployLocation%\Licenses"
+MKLINK "%DeployLocation%\Licenses\" "resources\Licenses\" /J

@@ -5,6 +5,7 @@
 #include <xercesc/framework/psvi/XSComplexTypeDefinition.hpp>
 #include <xercesc/framework/psvi/XSParticle.hpp>
 #include <xercesc/framework/psvi/XSModelGroup.hpp>
+#include <xercesc/framework/psvi/XSModelGroupDefinition.hpp>
 #include <xercesc/framework/psvi/XSAnnotation.hpp>
 #include <xercesc/framework/psvi/XSValue.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
@@ -31,6 +32,7 @@ private:
 	void onStartComponent(EntityID entity, std::string type);
     void parseComponentInfo();
     void parseDefaults();
+    std::string parseAnnotationXML(const XMLCh* xml);
 };
 
 #endif

@@ -43,7 +43,7 @@ template <typename ContextType, typename EventType>
 class EventRelay : public BaseEventRelay
 {
 public:
-    typedef std::function<bool(const EventType&)> CallbackType;
+    typedef std::function<bool(EventType&)> CallbackType;
 
     EventRelay()
         : m_Callback(nullptr)
@@ -65,7 +65,7 @@ template <typename ContextType, typename EventType>
 bool EventRelay<ContextType, EventType>::Receive(const std::shared_ptr<Event> event)
 {
     if (m_Callback != nullptr) {
-        return m_Callback(*static_cast<const EventType*>(event.get()));
+        return m_Callback(*static_cast<EventType*>(event.get()));
     } else {
         return false;
     }

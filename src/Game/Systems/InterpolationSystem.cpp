@@ -1,4 +1,4 @@
-#include "InterpolationSystem.h"
+#include "Systems/InterpolationSystem.h"
 
 //void InterpolationSystem::UpdateComponent(World * world, ComponentWrapper & transform, double dt)
 //{
@@ -20,23 +20,32 @@
 //    }
 //}
 
-void InterpolationSystem::UpdateComponent(World * world, ComponentWrapper & transform, double dt)
+void InterpolationSystem::UpdateComponent(World * world, EntityWrapper& entity, ComponentWrapper & transform, double dt)
 {
-    Transform& sTransform = m_InterpolationPoints[transform.EntityID];
-    sTransform.interpolationTime += dt;
-    // Position
-    glm::vec3 nextPosition = sTransform.Position;
-    glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
-    (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
-    // Orientation
-    glm::quat nextOrientation = sTransform.Orientation;
-    glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
-    (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, sTransform.interpolationTime / SNAPSHOTINTERVAL));
-    // Scale
-    glm::vec3 nextScale = sTransform.Scale;
-    glm::vec3 currentScale = static_cast<glm::vec3>(transform["Scale"]);
-    //glm::vec3 resize = vectorInterpolation<glm::vec3>(currentScale, nextScale, sTransform.interpolationTime);
-    (glm::vec3&)transform["Scale"] += vectorInterpolation<glm::vec3>(currentScale, nextScale, sTransform.interpolationTime);
+    if (m_InterpolationPoints.find(transform.EntityID) != m_InterpolationPoints.end()) { // Exists in map
+        Transform& sTransform = m_InterpolationPoints[transform.EntityID];
+        sTransform.interpolationTime += dt;
+        if (transform.Info.Name == "Transform") {
+            // Position
+            glm::vec3 nextPosition = sTransform.Position;
+            glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
+            (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
+            // Orientation
+            glm::quat nextOrientation = sTransform.Orientation;
+            glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
+            (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, sTransform.interpolationTime / SNAPSHOTINTERVAL));
+            // Scale
+            glm::vec3 nextScale = sTransform.Scale;
+            glm::vec3 currentScale = static_cast<glm::vec3>(transform["Scale"]);
+            (glm::vec3&)transform["Scale"] += vectorInterpolation<glm::vec3>(currentScale, nextScale, sTransform.interpolationTime);
+            int testVar = 0;
+            if (glm::isnan(resize.r) || glm::isnan(resize.g) || glm::isnan(resize.b)) {
+                //(glm::vec3&)transform["Scale"] = currentScale;
+                return;
+            }
+             += resize;
+        }
+    }
 }
 
 //glm::vec3 InterpolationSystem::vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime)
@@ -57,14 +66,14 @@ bool InterpolationSystem::OnInterpolate(const Events::Interpolate & e)
     memcpy(&tempOrientation, e.DataArray.get() + offset, sizeof(glm::vec3));
     transform.Orientation = glm::quat(tempOrientation);
     offset += sizeof(glm::vec3);
-    memcpy(&transform.Scale, e.DataArray.get() + offset, sizeof(glm::vec3));    
+    memcpy(&transform.Scale, e.DataArray.get() + offset, sizeof(glm::vec3));
     transform.interpolationTime = 0.0f;
     m_InterpolationPoints[e.Entity] = transform;
     // Check if queue already exists
     //if (m_InterpolationPoints.find(e.Entity) != m_InterpolationPoints.end()) { // Did exist, push to queue
     //    m_InterpolationPoints[e.Entity].push(transform);
     //} 
-    
+
     //else { // Did not exist, create queue
     //    std::queue<Transform> transformQueue;
     //    transformQueue.push(transform);

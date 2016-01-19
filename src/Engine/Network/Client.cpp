@@ -122,8 +122,8 @@ void Client::InterpolateFields(Packet& packet, const ComponentInfo& componentInf
         sizeOfFields += fieldInfo.Stride;
     }
     // Is the size correct?
-    boost::shared_array<char> eventData(new char[componentInfo.Meta.Stride]);
-    memcpy(eventData.get(), packet.ReadData(componentInfo.Meta.Stride), componentInfo.Meta.Stride);
+    boost::shared_array<char> eventData(new char[componentInfo.Stride]);
+    memcpy(eventData.get(), packet.ReadData(componentInfo.Stride), componentInfo.Stride);
     //Send event to interpolat system
     Events::Interpolate e;
     e.Entity = entityID;

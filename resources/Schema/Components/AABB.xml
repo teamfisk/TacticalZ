@@ -1,4 +1,5 @@
-<c:AABB>
-	<BoxCenter X="0" Y="0" Z="0"/>
-	<BoxSize X="1" Y="1" Z="1"/>
-</c:AABB>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<AABB xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="AABB.xsd">
+	<Origin X="0" Y="0" Z="0"/>
+	<Size X="1" Y="1" Z="1"/>
+</AABB>

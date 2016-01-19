@@ -11,7 +11,7 @@
 #include "Camera.h"
 #include "RenderJob.h"
 #include "ModelJob.h"
-
+#include "PointLightJob.h"
 
 
 /*
@@ -34,11 +34,12 @@ struct SpriteJob : RenderJob
 
 struct PointLightJob : RenderJob
 {
-	glm::vec3 Position;
-	glm::vec3 SpecularColor = glm::vec3(1, 1, 1);
-	glm::vec3 DiffuseColor = glm::vec3(1, 1, 1);
-	float Radius = 1.f;
-    float Intensity = 0.8f;
+    glm::vec4 Position;
+	glm::vec4 Color;
+	float Radius;
+    float Intensity;
+    float Falloff;
+    float padding = 123;
 
 	void CalculateHash() override
 	{
@@ -51,13 +52,13 @@ struct RenderScene
 {
     ::Camera* Camera;
     std::list<std::shared_ptr<RenderJob>> ForwardJobs;
-    std::list<std::shared_ptr<RenderJob>> LightJobs;
+    std::list<std::shared_ptr<RenderJob>> PointLightJobs;
     Rectangle Viewport;
 
 	void Clear()
 	{
         ForwardJobs.clear();
-        LightJobs.clear();
+        PointLightJobs.clear();
 	}
 };
 

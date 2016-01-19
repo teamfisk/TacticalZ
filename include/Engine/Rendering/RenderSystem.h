@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "ModelJob.h"
 #include "Renderer.h"
+#include "PointLightJob.h"
 #include "../Core/Transform.h"
 #include "DebugCameraInputController.h"
 
@@ -45,6 +46,7 @@ private:
     void updateProjectionMatrix(ComponentWrapper& cameraComponent);
     
     void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
+    void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
 
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
