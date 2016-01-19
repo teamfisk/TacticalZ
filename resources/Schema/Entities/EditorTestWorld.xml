@@ -48,8 +48,8 @@
         <c:Camera/>
         <c:Listener/>
         <c:Transform>
-          <Position X="-3.7727046" Y="4.42466021" Z="5.32631207"/>
-          <Orientation X="-0.174533114" Y="-0.62824142" Z="-6.35425181e-07"/>
+          <Position X="1.36896265" Y="4.4259491" Z="10.6640663"/>
+          <Orientation X="-0.0349078104" Y="0.157154545" Z="-2.60020244e-07"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -61,8 +61,8 @@
           <Resource>Models/DirectionalLightWidget.obj</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="1.37382936" Z="0"/>
-          <Orientation X="1.4920001" Y="1.96300006" Z="0"/>
+          <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
+          <Orientation X="4.32000017" Y="4.6340003" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -83,7 +83,7 @@
               <Resource>Models/SecondaryWeapon4.fbx</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="-0.545270562" Y="0.859505534" Z="0.188573226"/>
+              <Position X="-0.546139359" Y="0.853016734" Z="0.177482292"/>
               <Orientation X="1.47266471" Y="0.524984181" Z="1.243698"/>
             </c:Transform>
           </Components>

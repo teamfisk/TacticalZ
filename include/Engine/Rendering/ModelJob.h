@@ -12,6 +12,7 @@
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
 #include "../Core/World.h"
+#include "../Core/Transform.h"
 
 struct ModelJob : RenderJob
 {

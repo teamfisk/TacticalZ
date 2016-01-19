@@ -29,7 +29,7 @@ Game::Game(int argc, char* argv[])
 
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker, m_World);
+    m_Renderer = new Renderer(m_EventBroker);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
