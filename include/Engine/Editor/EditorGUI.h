@@ -88,6 +88,7 @@ private:
     boost::filesystem::path fileOpenDialog();
     boost::filesystem::path fileSaveDialog();
     const std::string formatEntityName(EntityWrapper entity);
+    GLuint tryLoadTexture(std::string filePath);
 
     // Entity file handling methods
     void entityImport(World* world);

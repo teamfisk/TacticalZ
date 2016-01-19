@@ -35,46 +35,30 @@ void EditorGUI::drawTools()
         return;
     }
 
-    GLuint translateIcon = 0;
-    try {
-        translateIcon = ResourceManager::Load<Texture>("Textures/Icons/Translate.png")->m_Texture;
-    } catch (const std::exception&) { }
-    GLuint rotateIcon = 0;
-    try {
-        rotateIcon = ResourceManager::Load<Texture>("Textures/Icons/Rotate.png")->m_Texture;
-    } catch (const std::exception&) { }
-    GLuint scaleIcon = 0;
-    try {
-        scaleIcon = ResourceManager::Load<Texture>("Textures/Icons/Scale.png")->m_Texture;
-    } catch (const std::exception&) { }
+    // Translate widget button
+    ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Translate.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
+    // Rotate widget button
+    ImGui::SameLine();
+    ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Rotate.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
+    // Scale widget button
+    ImGui::SameLine();
+    ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Scale.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
 
-    ImGui::ImageButton((void*)translateIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::SameLine();
-    ImGui::ImageButton((void*)rotateIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
-    ImGui::SameLine();
-    ImGui::ImageButton((void*)scaleIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0));
     ImGui::SameLine();
     ImGui::ItemSize(ImVec2(5, 0));
+
+    // Play button
     ImGui::SameLine();
-
-    GLuint playIcon = 0;
-    try {
-        playIcon = ResourceManager::Load<Texture>("Textures/Icons/Play.png")->m_Texture;
-    } catch (const std::exception&) { }
-    GLuint pauseIcon = 0;
-    try {
-        pauseIcon = ResourceManager::Load<Texture>("Textures/Icons/Pause.png")->m_Texture;
-    } catch (const std::exception&) { }
-
     static bool paused = false;
-    if (ImGui::ImageButton((void*)playIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Play.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Resume e;
         e.World = m_World;
         m_EventBroker->Publish(e);
         paused = false;
     }
+    // Pause button
     ImGui::SameLine();
-    if (ImGui::ImageButton((void*)pauseIcon, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Pause.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Pause e;
         e.World = m_World;
         m_EventBroker->Publish(e);
@@ -524,6 +508,15 @@ const std::string EditorGUI::formatEntityName(EntityWrapper entity)
     }
 
     return name.str();
+}
+
+GLuint EditorGUI::tryLoadTexture(std::string filePath)
+{
+    GLuint texture = 0;
+    try {
+        texture = ResourceManager::Load<Texture>(filePath)->m_Texture;
+    } catch (const std::exception&) { }
+    return texture;
 }
 
 void EditorGUI::entityImport(World* world)
