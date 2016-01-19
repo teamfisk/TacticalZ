@@ -30,7 +30,7 @@ Game::Game(int argc, char* argv[])
 
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker, m_World);
+    m_Renderer = new Renderer(m_EventBroker);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -65,8 +65,7 @@ Game::Game(int argc, char* argv[])
         EntityFileParser fp(file);
         fp.MergeEntities(m_World);
     }
-    //SO MUCH TEMP PLEASE REMOVE ME OMFG VIKTOR HELP
-    m_Renderer->m_World = m_World;
+
 
     // Create Octrees
     m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);

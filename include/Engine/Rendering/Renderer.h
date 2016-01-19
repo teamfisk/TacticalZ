@@ -24,9 +24,8 @@
 class Renderer : public IRenderer
 {
 public:
-    Renderer(EventBroker* eventBroker, World* world) 
+    Renderer(EventBroker* eventBroker) 
         : m_EventBroker(eventBroker)
-        , m_World(world)
     { }
 
     virtual void Initialize() override;
@@ -38,7 +37,6 @@ public:
 private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
-    World* m_World;
     TextRenderer* m_TextRenderer;
 
     Texture* m_ErrorTexture;
@@ -65,7 +63,7 @@ private:
     void DrawScreenQuad(GLuint textureToDraw);
 
     static bool DepthSort(const std::shared_ptr<RenderJob> &i, const std::shared_ptr<RenderJob> &j) { return (i->Depth < j->Depth); }
-    void FillDepth(RenderScene& scene);
+    void SortRenderJobsByDepth(RenderScene &scene);
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
 	ShaderProgram* m_BasicForwardProgram;
