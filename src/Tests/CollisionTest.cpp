@@ -205,9 +205,9 @@ BOOST_AUTO_TEST_CASE(octTest)
 {
     glm::vec3 mini = glm::vec3(-1, -1, -1);
     glm::vec3 maxi = glm::vec3(1, 1, 1);
-    Octree tree(AABB(mini, maxi), 2);
+    Octree<AABB> tree(AABB(mini, maxi), 2);
     tree.AddDynamicObject(AABB(mini, -0.9f*maxi));
-    Octree::Output data;
+    OctSpace::Output data;
     glm::vec3 origin = 3.0f * mini;
     bool rayIntersected = tree.RayCollides(Ray(origin , mini - origin), data);
     BOOST_CHECK(rayIntersected);
