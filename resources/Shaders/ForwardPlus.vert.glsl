@@ -21,6 +21,7 @@ out VertexData{
 	vec3 Normal;
 	vec2 TextureCoordinate;
 	vec4 DiffuseColor;
+	vec4 ExplosionColor;
 }Output;
 
 void main()
@@ -31,4 +32,5 @@ void main()
 	Output.TextureCoordinate = TextureCoords;
 	Output.Normal = Normal;
 	Output.DiffuseColor = DiffuseVertexColor;
+	Output.ExplosionColor = vec4(0.0);
 }

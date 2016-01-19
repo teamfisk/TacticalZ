@@ -11,7 +11,7 @@ uniform float ExplosionDuration;
 //uniform float ObjectRadius;
 uniform vec4 EndColor;
 uniform bool Randomness;
-uniform float RandomNumbers[20];
+uniform float RandomNumbers[50];
 uniform float RandomnessScalar;
 uniform vec2 Velocity;
 uniform bool ColorByDistance;
@@ -24,13 +24,16 @@ in VertexData{
 	vec3 Normal;
 	vec2 TextureCoordinate;
 	vec4 DiffuseColor;
+	vec4 ExplosionColor;
 }Input[];
 
-out vec3 Normal;
-out vec3 Position;
-out vec2 TextureCoordinate;
-out vec4 DiffuseColor;
-out vec4 ExplosionColor;
+out VertexData{
+	vec3 Position;
+	vec3 Normal;
+	vec2 TextureCoordinate;
+	vec4 DiffuseColor;
+	vec4 ExplosionColor;
+}Output;
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
@@ -38,7 +41,7 @@ layout(triangle_strip, max_vertices = 3) out;
 // returns a "random" number based on input parameter
 float GetRandomNumber(int polygon_index)
 {
-	int randomIndex = int(mod(polygon_index, 20));
+	int randomIndex = int(mod(polygon_index, 50));
 	
 	switch (randomIndex)
 	{
@@ -62,6 +65,36 @@ float GetRandomNumber(int polygon_index)
 		case 17: return RandomNumbers[17];
 		case 18: return RandomNumbers[18];
 		case 19: return RandomNumbers[19];
+		case 20: return RandomNumbers[20];
+		case 21: return RandomNumbers[21];
+		case 22: return RandomNumbers[22];
+		case 23: return RandomNumbers[23];
+		case 24: return RandomNumbers[24];
+		case 25: return RandomNumbers[25];
+		case 26: return RandomNumbers[26];
+		case 27: return RandomNumbers[27];
+		case 28: return RandomNumbers[28];
+		case 29: return RandomNumbers[29];
+		case 30: return RandomNumbers[30];
+		case 31: return RandomNumbers[31];
+		case 32: return RandomNumbers[32];
+		case 33: return RandomNumbers[33];
+		case 34: return RandomNumbers[34];
+		case 35: return RandomNumbers[35];
+		case 36: return RandomNumbers[36];
+		case 37: return RandomNumbers[37];
+		case 38: return RandomNumbers[38];
+		case 39: return RandomNumbers[39];
+		case 40: return RandomNumbers[40];
+		case 41: return RandomNumbers[41];
+		case 42: return RandomNumbers[42];
+		case 43: return RandomNumbers[43];
+		case 44: return RandomNumbers[44];
+		case 45: return RandomNumbers[45];
+		case 46: return RandomNumbers[46];
+		case 47: return RandomNumbers[47];
+		case 48: return RandomNumbers[48];
+		case 49: return RandomNumbers[49];
 	}
 }
 
@@ -102,8 +135,16 @@ void main()
 	// time percentage until end of explosion (0.0-1.0)
 	float timePercetage = TimeSinceDeath / ExplosionDuration;
 	
+		// get a random number if randomness is enabled, otherwise the random number will be zero and won't affect the other algorithms
+	if (Randomness == true)
+	{
+		randomDistance = GetRandomNumber(gl_PrimitiveIDIn) * RandomnessScalar;
+	}
+	
+	vec2 randomVelocity = Velocity * (randomDistance + 1.0);
+	
 	// accelaration to use on current frame. is a interpolation between start and end value
-	float currentVelocity = mix(Velocity.x, Velocity.y, timePercetage);
+	float currentVelocity = mix(randomVelocity.x, randomVelocity.y, timePercetage);
 	
 	if (ExponentialAccelaration == true)
 	{
@@ -112,12 +153,6 @@ void main()
 	
 	// distance between origin and the center of the current triangle
 	float origin2TriangleCenterDistance = length(origin2TriangleCenterVector);
-	
-	// get a random number if randomness is enabled, otherwise the random number will be zero and won't affect the other algorithms
-	if (Randomness == true)
-	{
-		randomDistance = GetRandomNumber(gl_PrimitiveIDIn) * RandomnessScalar;
-	}
 	
 	// the distance from origin to the triangle center with eventual randomness added
 	float fullDistanceWithRandomness = origin2TriangleCenterDistance + randomDistance;
@@ -130,20 +165,20 @@ void main()
 	{
 		float maxRadius = max(TimeSinceDeath * currentVelocity, (ExplosionDuration * currentVelocity));
 		
-		float a = (Velocity.y - Velocity.x) / ExplosionDuration;
+		float a = (randomVelocity.y - randomVelocity.x) / ExplosionDuration;
 		//float t = sqrt((2 * origin2TriangleCenterDistance) / a);
 		
 		// if explosion color should be affected by distance instead of time...
 		if (ColorByDistance == true)
 		{
 			// calculate the max distance (s) the triangle will move
-			float s = (Velocity.x * ExplosionDuration) + (0.5 * a * pow(ExplosionDuration, 2));
+			float s = (randomVelocity.x * ExplosionDuration) + (0.5 * a * pow(ExplosionDuration, 2));
 			
-			ExplosionColor = EndColor * (length(triangleCenter2ExplosionRadius) / s);
+			Output.ExplosionColor = EndColor * (length(triangleCenter2ExplosionRadius) / s);
 		}
 		else
 		{
-			ExplosionColor = EndColor * timePercetage;
+			Output.ExplosionColor = EndColor * timePercetage;
 		}
 		
 		// for every vertex on the triangle...
@@ -153,10 +188,10 @@ void main()
 			vec3 ExplodedPosition = Input[i].Position + triangleCenter2ExplosionRadius;
 			
 			// pass through vertex data
-			Normal = Input[i].Normal;
-			Position = Input[i].Position;
-			TextureCoordinate = Input[i].TextureCoordinate;
-			DiffuseColor = Input[i].DiffuseColor;
+			Output.Normal = Input[i].Normal;
+			Output.Position = Input[i].Position;
+			Output.TextureCoordinate = Input[i].TextureCoordinate;
+			Output.DiffuseColor = Input[i].DiffuseColor;
 			
 			// convert to model space for the gravity to always be in -y
 			vec4 ExplodedPositionInModelSpace = M * vec4(ExplodedPosition, 1.0);
@@ -179,25 +214,27 @@ void main()
 		// if explosion color should be affected by distance instead of time...
 		if (ColorByDistance == true)
 		{
-			ExplosionColor = vec4(0.0);
+			Output.ExplosionColor = vec4(0.0);
 		}
 		else
 		{
-			ExplosionColor = EndColor * timePercetage;
+			Output.ExplosionColor = EndColor * timePercetage;
 		}
 		
 		// for every vertex on the triangle...
 		for(int i = 0; i < gl_in.length(); i++)
 		{
 			// pass through vertex data
-			Normal = Input[i].Normal;
-			Position = Input[i].Position;
-			TextureCoordinate = Input[i].TextureCoordinate;
-			DiffuseColor = Input[i].DiffuseColor;
+			Output.Normal = Input[i].Normal;
+			Output.Position = Input[i].Position;
+			Output.TextureCoordinate = Input[i].TextureCoordinate;
+			Output.DiffuseColor = Input[i].DiffuseColor;
 			
 			// no change in position, pass through vertex
 			gl_Position = gl_in[i].gl_Position;
 			EmitVertex();
 		}
-	}	
+	}
+	
+	//EndPrimitive();
 }

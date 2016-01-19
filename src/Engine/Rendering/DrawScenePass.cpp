@@ -21,11 +21,11 @@ void DrawScenePass::InitializeShaderPrograms()
     m_BasicForwardProgram->Compile();
     m_BasicForwardProgram->Link();
     m_ExplosionEffectProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectProgram");
-    m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ExplosionEffect.vert.glsl")));
+   /* m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ExplosionEffect.vert.glsl")));
     m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/ExplosionEffect.geom.glsl")));
     m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ExplosionEffect.frag.glsl")));
     m_ExplosionEffectProgram->Compile();
-    m_ExplosionEffectProgram->Link();
+    m_ExplosionEffectProgram->Link();*/
 }
 
 void DrawScenePass::Draw(RenderScene& scene)
@@ -55,7 +55,7 @@ void DrawScenePass::Draw(RenderScene& scene)
             //glUniform1f(glGetUniformLocation(ShaderHandle, "ObjectRadius"), explosionEffectJob->ObjectRadius);
             glUniform4fv(glGetUniformLocation(ShaderHandle, "EndColor"), 1, glm::value_ptr(explosionEffectJob->EndColor));
             glUniform1i(glGetUniformLocation(ShaderHandle, "Randomness"), explosionEffectJob->Randomness);
-            glUniform1fv(glGetUniformLocation(ShaderHandle, "RandomNumbers"), 20, explosionEffectJob->RandomNumbers.data());
+            glUniform1fv(glGetUniformLocation(ShaderHandle, "RandomNumbers"), 50, explosionEffectJob->RandomNumbers.data());
             glUniform1f(glGetUniformLocation(ShaderHandle, "RandomnessScalar"), explosionEffectJob->RandomnessScalar);
             glUniform2fv(glGetUniformLocation(ShaderHandle, "Velocity"), 1, glm::value_ptr(explosionEffectJob->Velocity));
             glUniform1i(glGetUniformLocation(ShaderHandle, "ColorByDistance"), explosionEffectJob->ColorByDistance);

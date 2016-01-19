@@ -7,17 +7,19 @@ uniform vec4 Color;
 
 uniform sampler2D texture0;
 
-in vec3 Normal;
-in vec3 Position;
-in vec2 TextureCoordinate;
-in vec4 DiffuseColor;
-in vec4 ExplosionColor;
+in VertexData{
+	vec3 Position;
+	vec3 Normal;
+	vec2 TextureCoordinate;
+	vec4 DiffuseColor;
+	vec4 ExplosionColor;
+}Input;
 
 out vec4 fragmentColor;
 
 
 void main()
 {
-	vec4 texel = texture2D(texture0, TextureCoordinate);
-	fragmentColor = texel * DiffuseColor * Color + ExplosionColor;
+	vec4 texel = texture2D(texture0, Input.TextureCoordinate);
+	fragmentColor = texel * Input.DiffuseColor * Color + Input.ExplosionColor;
 }
