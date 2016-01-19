@@ -95,7 +95,6 @@ void LightCullingPass::FillLightList(RenderScene& scene)
             //p.Padding = 123.f;
             p.Type = LightSource::Point;
             m_LightSources.push_back(p);
-
         }
     }
     for(auto &job : scene.DirectionalLightJobs) {
@@ -107,7 +106,6 @@ void LightCullingPass::FillLightList(RenderScene& scene)
             p.Intensity = directionalLightJob->Intensity;
             p.Type = LightSource::Directional;
             m_LightSources.push_back(p);
-
         }
     }
 }

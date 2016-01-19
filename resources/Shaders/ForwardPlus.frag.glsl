@@ -114,12 +114,13 @@ void main()
 
 	int start = int(LightGrids.Data[currentTile].Start);
 	int amount = int(LightGrids.Data[currentTile].Amount);
-	//for(int i = 0; i < 3; i++)
+
 	for(int i = start; i < start + amount; i++) {
+
 		int l = int(LightIndex[i]);
 		LightSource light = LightSources.List[l];
-		LightResult result;
 
+		LightResult result;
 		if(light.Type == 1) { // point
 			result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
@@ -136,12 +137,15 @@ void main()
 	//fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;
 	//fragmentColor += vec4(currentTile/3600.f, 0, 0, 1);
-	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 ) {
-		//fragmentColor += vec4(0.5, 0, 0, 0);
-	} else {
-		//fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/3.0, 0, 0, 1);
-	}
 
+	//Tiled Debug Code
+	/*
+	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 ) {
+		fragmentColor += vec4(0.5, 0, 0, 0);
+	} else {
+		fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/LightSources.List.length(), 0, 0, 1);
+	}
+	*/
 }
 
 
