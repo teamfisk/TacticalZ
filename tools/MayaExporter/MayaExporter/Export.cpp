@@ -11,7 +11,9 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
         MGlobal::displayError(MString() + "Export::Meshes() got no pathName. Do not know where to write file");
         return false;
     }
-
+    MSelectionList selectedOnStart;
+    MGlobal::getActiveSelectionList(selectedOnStart);
+   
     MObjectArray Objects;
     if (selectedOnly) {
         // Retrieving the objects we currently have selected
@@ -36,17 +38,13 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
             MFnDependencyNode thisNode(node);
             MPlugArray connections;
             thisNode.findPlug("inMesh").connectedTo(connections, true, true);
-            bool next = false;
 
             for (unsigned int i = 0; i < connections.length(); i++) {
                 if (connections[i].node().apiType() == MFn::kSkinClusterFilter) {
-                    next = true;
-                    break;
+                    MGlobal::select(node);
+                    MGlobal::executeCommand("gotoBindPose");
                 }
             }
-
-            if (next)
-                continue;
 
             Objects.append(node);
         }
@@ -139,6 +137,7 @@ void Export::WriteAnimData(std::string pathName)
         int size = allBindPoses.size();
         m_AnimFile.writeToFiles(&size);
 
+        
         size = allAnimations.size();
         m_AnimFile.writeToFiles(&size);
 

@@ -19,7 +19,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>models/Baljj</Resource>
+          <Resource>models/Baljj.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>

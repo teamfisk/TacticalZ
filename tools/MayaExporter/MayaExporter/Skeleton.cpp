@@ -70,6 +70,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 	Animation returnData;
 	double oneDivSixty = 1 / 60.0;
 	returnData.Name = animationName;
+    returnData.nameLength = animationName.size() + 1;
 	returnData.Duration = (endFrame - startFrame) * oneDivSixty;
 
 	MItDag jointIt(MItDag::TraversalType::kDepthFirst, MFn::kJoint);
@@ -132,7 +133,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 	}
 
 	int currentFrame = startFrame;
-	while (currentFrame != endFrame) {
+	while (currentFrame != endFrame + 1) { // ANDREAS
 		Animation::Keyframe thisKeyFrame;
 		thisKeyFrame.Index = currentFrame - startFrame;
 		thisKeyFrame.Time = thisKeyFrame.Index * oneDivSixty;
@@ -188,7 +189,6 @@ std::vector<BindPoseSkeletonNode> Skeleton::GetBindPoses()
 
 	MItDag jointIt(MItDag::TraversalType::kDepthFirst, MFn::kJoint);
 	BindPoseSkeletonNode SkeletonStorage;
-
 	while (!jointIt.isDone()) {
 		MFnTransform MayaJoint(jointIt.currentItem());
 		BindPoseSkeletonNode::BindPoseJoint NewJoint;
@@ -227,7 +227,8 @@ std::vector<BindPoseSkeletonNode> Skeleton::GetBindPoses()
 		}
 
 		NewJoint.Name = MayaJoint.name().asChar();
-
+        NewJoint.NameLength = MayaJoint.name().length() + 1;
+        NewJoint.ID = SkeletonStorage.Joints.size();
 		//double tmp[3];
 		//((MTransformationMatrix)Matrix).eulerRotation().asVector().get(tmp);
 		//NewJoint.Rotation[0] = tmp[0];
@@ -242,9 +243,9 @@ std::vector<BindPoseSkeletonNode> Skeleton::GetBindPoses()
 		//NewJoint.Translation[1] = tmp[1];
 		//NewJoint.Translation[2] = tmp[2];
 		SkeletonStorage.Joints.push_back(NewJoint);
+        SkeletonStorage.numBones++;
 		jointIt.next();
 	}
-
 	m_AllSkeletons.push_back(SkeletonStorage);
 
 	return m_AllSkeletons;

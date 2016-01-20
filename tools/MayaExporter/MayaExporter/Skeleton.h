@@ -13,32 +13,35 @@ public:
 	{
 		struct JointProperty
 		{
-			int ID;
-			float Position[3];
-			float Rotation[4];
-			float Scale[3];
+			int ID = 0;
+            float Position[3]{ 0 };
+            float Rotation[4]{ 0 };
+            float Scale[3]{ 0 };
 		};
 
-		int Index;
-		double Time;
+		int Index = 0;
+		float Time = 0;
 		std::vector<JointProperty> JointProperties;
 	};
 
 	std::string Name;
-	double Duration;
-    int NumKeyFrames;
-    int NumberOfJoints;
+    int nameLength = 0;
+	float Duration = 0;
+    int NumKeyFrames = 0;
+    int NumberOfJoints = 0;
 	std::vector<Keyframe> Keyframes;
 
 	virtual void WriteBinary(std::ostream& out)
 	{
+        out.write((char*)&nameLength, sizeof(int));
 		out.write(Name.c_str(), Name.size() + 1);
-		out.write((char*)&Duration, sizeof(double));
+		out.write((char*)&Duration, sizeof(float));
         out.write((char*)&NumKeyFrames, sizeof(int));
         out.write((char*)&NumberOfJoints, sizeof(int));
+        //Här under loopas alla key frames igenom
 		for (auto aKeyframe : Keyframes) {
 			out.write((char*)&aKeyframe.Index, sizeof(int));
-			out.write((char*)&aKeyframe.Time, sizeof(double));
+			out.write((char*)&aKeyframe.Time, sizeof(float));
 			for (auto aJoint : aKeyframe.JointProperties) {
 				out.write((char*)&aJoint.ID, sizeof(int));
 				out.write((char*)aJoint.Position, sizeof(float) * 3);
@@ -72,20 +75,24 @@ class BindPoseSkeletonNode : public OutputData {
 public:
 	struct BindPoseJoint
 	{
-		int ParentID;
+        int NameLength;
 		std::string Name;
-		float OffsetMatrix[4][4];
+        float OffsetMatrix[4][4]{ 0 };
+        int ID = 0;
+        int ParentID = 0;
 	};
-
+    int numBones = 0;
 	std::string Name;
 	std::vector<BindPoseJoint> Joints;
 	virtual void WriteBinary(std::ostream& out)
 	{
-		out.write(Name.c_str(), Name.size() + 1);
+        out.write((char*)&numBones, sizeof(int));
 		for (auto Joint:Joints)
 		{	
+            out.write((char*)&Joint.NameLength, sizeof(int));
 			out.write(Joint.Name.c_str(), Joint.Name.size() + 1);
 			out.write((char*)&Joint.OffsetMatrix, sizeof(float) * 4 * 4);
+            out.write((char*)&Joint.ID, sizeof(int));
 			out.write((char*)&Joint.ParentID, sizeof(int));
 		}
 
@@ -93,16 +100,19 @@ public:
 
 	virtual void WriteASCII(std::ostream& out) const
 	{
-		out << "Bind Pose: " << Name << endl;
+		out << "Bind Pose: " << Name << " _ not in binary" << endl;
+        out << "numberOfBones: " << numBones << endl;
 		for (auto Joint : Joints)
 		{
-			out << Joint.Name << endl;
+            out << "Joint NameLength " << Joint.NameLength << endl;
+			out << "Joint name " << Joint.Name << endl;
 			for (int i = 0; i < 4; i++) {
 				for (int j = 0; j < 4; j++){
 					out << Joint.OffsetMatrix[i][j] << " ";
 				}
 				out << endl;
 			}
+            out << Joint.ID << endl;
 			out << Joint.ParentID << endl;
 		}
 	};

@@ -22,7 +22,7 @@ class RawModel : public Resource
     friend class ResourceManager;
 
 protected:
-    RawModel(std::string& fileName);
+    RawModel(std::string fileName);
 
 public:
     ~RawModel();
@@ -74,6 +74,13 @@ private:
     void ReadMaterialFile(std::string filePath);
     void ReadMaterials(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
     void ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+
+    void ReadAnimationFile(std::string filePath);
+    void ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+    void ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+    void ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips);
+    void ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex);
+    void ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfJoints, Skeleton::Animation& animation);
     
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };

@@ -38,9 +38,9 @@ public:
 			, OffsetMatrix(offsetMatrix)
 		{ }
 
-		int ID;
 		std::string Name;
 		glm::mat4 OffsetMatrix;
+        int ID;
 
 		Bone* Parent;
 		std::vector<Bone*> Children;

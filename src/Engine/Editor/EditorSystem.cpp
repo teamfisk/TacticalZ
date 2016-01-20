@@ -292,21 +292,21 @@ void EditorSystem::createWidget()
         m_WidgetPlaneX = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneX, "Transform");
         m_World->AttachComponent(m_WidgetPlaneX, "Model");
-        m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/coolCube"; // 360NoScope widgetPlaneX
+        m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/coolCube.mesh"; // 360NoScope widgetPlaneX
         m_WidgetY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetY, "Transform");
         m_World->AttachComponent(m_WidgetY, "Model");
         m_WidgetPlaneY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneY, "Transform");
         m_World->AttachComponent(m_WidgetPlaneY, "Model");
-        m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/coolCube"; // 360NoScope  widgetPlaneY
+        m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/coolCube.mesh"; // 360NoScope  widgetPlaneY
         m_WidgetZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetZ, "Transform");
         m_World->AttachComponent(m_WidgetZ, "Model");
         m_WidgetPlaneZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneZ, "Transform");
         m_World->AttachComponent(m_WidgetPlaneZ, "Model");
-        m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/coolCube"; // 360NoScope  widgetPlaneZ
+        m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/coolCube.mesh"; // 360NoScope  widgetPlaneZ
         m_WidgetOrigin = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetOrigin, "Transform");
         m_World->AttachComponent(m_WidgetOrigin, "Model");

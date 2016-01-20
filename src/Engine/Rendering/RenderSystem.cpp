@@ -96,10 +96,10 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
             model = ResourceManager::Load<::Model, true>(resource);
         } catch (const Resource::StillLoadingException&) {
             //continue;
-            model = ResourceManager::Load<::Model>("Models/coolCube"); // 360NoScope StillLoading mesh
+            model = ResourceManager::Load<::Model>("Models/coolCube.mesh"); // 360NoScope StillLoading mesh
         } catch (const std::exception&) {
             try {
-                model = ResourceManager::Load<::Model>("Models/coolCube"); // 360NoScope Error mesh
+                model = ResourceManager::Load<::Model>("Models/coolCube.mesh"); // 360NoScope Error mesh
             } catch (const std::exception&) {
                 continue;
             }

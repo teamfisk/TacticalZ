@@ -1,9 +1,12 @@
 #include "Rendering/RawModelCustom.h"
 
-RawModel::RawModel(std::string& fileName)
+RawModel::RawModel(std::string fileName)
 {
+    fileName = fileName.erase(fileName.find_last_of("."), fileName.find_last_of(".") - fileName.size());
     ReadMeshFile(fileName);
     ReadMaterialFile(fileName);
+    ReadAnimationFile(fileName);
+    int k = 0;
 }
 
 void RawModel::ReadMeshFile(std::string filePath)
@@ -53,8 +56,7 @@ void RawModel::ReadVertices(unsigned int& offset, char* fileData, unsigned int& 
     if (offset +  m_Vertices.size() * sizeof(Vertex) > fileByteSize) {
         throw Resource::FailedLoadingException("Reading vertices failed");
     }
-    unsigned int i = sizeof(Vertex);
-    unsigned int ii = sizeof(unsigned int);
+
     memcpy(&m_Vertices[0], fileData + offset, m_Vertices.size() * sizeof(Vertex));
     offset += m_Vertices.size() * sizeof(Vertex);
 #else
@@ -185,6 +187,178 @@ void RawModel::ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned
 #endif
 
     MaterialGroups.push_back(newMaterial);
+}
+
+void RawModel::ReadAnimationFile(std::string filePath)
+{ 
+    char* fileData;
+    filePath += ".anim";
+    std::ifstream in(filePath.c_str(), std::ios_base::binary | std::ios_base::ate);
+
+    if (!in.is_open()) {
+        //throw Resource::FailedLoadingException("Open animation file failed");
+        return; // AJABAJA!!!!!!!!
+    }
+
+    unsigned int fileByteSize = in.tellg();
+    in.seekg(0, std::ios_base::beg);
+
+    fileData = new char[fileByteSize];
+    in.read(fileData, fileByteSize);
+    in.close();
+
+    unsigned int offset = 0;
+    if (fileByteSize > 0) {
+        m_Skeleton = new Skeleton();
+
+#ifdef BOOST_LITTLE_ENDIAN
+        unsigned int numBindPoses = *(unsigned int*)(fileData);
+        offset += sizeof(unsigned int);
+        unsigned int numAnimations = *(unsigned int*)(fileData);
+        offset += sizeof(unsigned int);
+#else
+#endif
+
+        ReadAnimationBindPoses(offset, fileData, fileByteSize);
+        ReadAnimationClips(offset, fileData, fileByteSize, numAnimations);
+    }
+    delete fileData;
+}
+
+void RawModel::ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+{
+#ifdef BOOST_LITTLE_ENDIAN
+    unsigned int* numBones = (unsigned int*)(fileData + offset);
+    offset += sizeof(unsigned int);
+
+    for (unsigned int i = 0; i < *numBones; i++) {
+        ReadAnimationJoint(offset, fileData, fileByteSize);
+    }
+#else
+#endif
+}
+
+void RawModel::ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+{
+#ifdef BOOST_LITTLE_ENDIAN
+    if (offset + sizeof(unsigned int) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading Joint name length failed");
+    }
+    unsigned int jointNameLength = *(unsigned int*)(fileData + offset);
+    offset += sizeof(unsigned int);
+
+    if (offset + jointNameLength > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading Joint name failed");
+    }
+    std::string jointName = (fileData + offset);
+    offset += jointNameLength;
+
+    if (offset + sizeof(float) * 4 * 4 > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading Joint offset matrix failed");
+    }
+    glm::mat4 offsetMatrix;
+    memcpy(&offsetMatrix, fileData + offset, sizeof(float) * 4 * 4);
+    offset += sizeof(float) * 4 * 4;
+
+    if (offset + sizeof(int) > fileByteSize) { 
+        throw Resource::FailedLoadingException("Reading Joint ID failed");
+    }
+    int jointID = *(int*)(fileData + offset);
+    offset += sizeof(int);
+
+    if (offset + sizeof(int) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading Joint Parent ID failed");
+    }
+    int jointParentID = *(int*)(fileData + offset);
+    offset += sizeof(int);
+
+    // Adding joint to the Skeleton
+    m_Skeleton->CreateBone(jointID, jointParentID, jointName, offsetMatrix);
+
+
+#else
+#endif
+}
+
+void RawModel::ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips)
+{
+    for (unsigned int i = 0; i < numberOfClips; i++) {
+        ReadAnimationClipSingle(offset, fileData, fileByteSize, i);
+    }
+}
+
+void RawModel::ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex)
+{
+#ifdef BOOST_LITTLE_ENDIAN
+    Skeleton::Animation newAnimation;
+
+    if (offset + sizeof(unsigned int) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationClip name length failed");
+    }
+    unsigned int clipNameLength = *(unsigned int*)(fileData + offset);
+    offset += sizeof(unsigned int);
+
+    if (offset + clipNameLength > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationClip name failed");
+    }
+    newAnimation.Name = (fileData + offset);
+    offset += clipNameLength;
+
+    if (offset + sizeof(float) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationClip duration failed");
+    }
+
+    newAnimation.Duration = *(float*)(fileData + offset);
+    offset += sizeof(float);
+
+    if (offset + sizeof(unsigned int) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationClip NrOfKeyframes failed");
+    }
+    unsigned int nrOfKeyframes = *(unsigned int*)(fileData + offset);
+    offset += sizeof(unsigned int);
+
+    if (offset + sizeof(unsigned int) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationClip NrOfJoints failed");
+    }
+    unsigned int nrOfJoints = *(unsigned int*)(fileData + offset);
+    offset += sizeof(unsigned int);
+
+    newAnimation.Keyframes.reserve(nrOfKeyframes);
+    for (unsigned int i = 0; i < nrOfKeyframes; i++) { 
+        ReadAnimationKeyFrame(offset, fileData, fileByteSize, nrOfJoints, newAnimation);
+    }
+    m_Skeleton->Animations[newAnimation.Name] = newAnimation;
+#else
+#endif
+}
+
+void RawModel::ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int nrOfJoints, Skeleton::Animation& animation)
+{
+    Skeleton::Animation::Keyframe newKeyFrame;
+
+    if (offset + sizeof(int) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationKeyFrame index failed");
+    }
+    newKeyFrame.Index = *(int*)(fileData + offset);
+    offset += sizeof(int);
+
+    if (offset + sizeof(float) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationKeyFrame time failed");
+    }
+    newKeyFrame.Time = *(float*)(fileData + offset);
+    offset += sizeof(float);
+
+    if (offset + sizeof(Skeleton::Animation::Keyframe::BoneProperty) * nrOfJoints> fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationKeyFrame joints failed");
+    }
+
+    Skeleton::Animation::Keyframe::BoneProperty newBone;
+    for (unsigned int i = 0; i < nrOfJoints; i++) {
+        memcpy(&newBone, (fileData + offset), sizeof(Skeleton::Animation::Keyframe::BoneProperty));
+        offset += sizeof(Skeleton::Animation::Keyframe::BoneProperty);
+        newKeyFrame.BoneProperties[i] = newBone;
+    }
+    animation.Keyframes.push_back(newKeyFrame);
 }
 
 RawModel::~RawModel()
