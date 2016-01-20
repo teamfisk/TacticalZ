@@ -9,6 +9,7 @@
 	<xs:include schemaLocation="Components/Camera.xsd"/>
 	<xs:include schemaLocation="Components/AABB.xsd"/>
 	<xs:include schemaLocation="Components/PointLight.xsd"/>
+	<xs:include schemaLocation="Components/DirectionalLight.xsd"/>
 	<xs:include schemaLocation="Components/Trigger.xsd"/>
 	<xs:include schemaLocation="Components/Health.xsd"/>
 	<xs:include schemaLocation="Components/CapturePoint.xsd"/>

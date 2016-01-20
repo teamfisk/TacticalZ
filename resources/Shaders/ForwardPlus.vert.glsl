@@ -29,6 +29,6 @@ void main()
 
 	Output.Position = Position;
 	Output.TextureCoordinate = TextureCoords;
-	Output.Normal = Normal;
+	Output.Normal = vec3(M * vec4(Normal, 0.0));
 	Output.DiffuseColor = DiffuseVertexColor;
 }
