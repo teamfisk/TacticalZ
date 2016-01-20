@@ -29,7 +29,7 @@
         </c:Team>
         <c:Transform>
           <Position X="-0.151326105" Y="13.5594187" Z="12.5957394"/>
-          <Orientation X="-0.872664392" Y="0.157068729" Z="4.90324332e-08"/>
+          <Orientation X="-0.872664511" Y="0.157068729" Z="3.01738083e-08"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -62,11 +62,9 @@
         </c:CapturePoint>
         <c:Model>
           <Resource>../assets/Models/Core/UnitSphere.obj</Resource>
-          <Color A="1" B="0" G="1" R="1"/>
+          <Color A="1" B="1" G="1" R="0"/>
         </c:Model>
-        <c:Team>
-          <Team>3</Team>
-        </c:Team>
+        <c:Team/>
         <c:Transform>
           <Position X="1.91470337" Y="2.32191443" Z="0"/>
         </c:Transform>
@@ -82,11 +80,9 @@
         </c:CapturePoint>
         <c:Model>
           <Resource>../assets/Models/Core/UnitSphere.obj</Resource>
-          <Color A="1" B="1" G="1" R="0"/>
+          <Color A="1" B="0" G="1" R="1"/>
         </c:Model>
-        <c:Team>
-          <Team>2</Team>
-        </c:Team>
+        <c:Team/>
         <c:Transform>
           <Position X="-1.31178355" Y="2.16289616" Z="0"/>
         </c:Transform>
@@ -128,7 +124,7 @@
           <Team>2</Team>
         </c:Team>
         <c:Transform>
-          <Position X="-1.67672658" Y="2.23822045" Z="-0.0577065349"/>
+          <Position X="-5.74354839" Y="2.23822045" Z="-0.0577065349"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -146,7 +142,7 @@
           <Team>3</Team>
         </c:Team>
         <c:Transform>
-          <Position X="2.40398169" Y="2.02053547" Z="-0.0348547697"/>
+          <Position X="6.96941662" Y="2.02053547" Z="-0.0348547697"/>
         </c:Transform>
       </Components>
       <Children/>
