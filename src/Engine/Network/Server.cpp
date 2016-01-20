@@ -189,7 +189,7 @@ void Server::checkForTimeOuts()
     for (size_t i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() != boost::asio::ip::address()) {
             int stopPing = 1000 * m_PlayerDefinitions[i].StopTime /
-                 static_cast<double>(CLOCKS_PER_SEC);
+                static_cast<double>(CLOCKS_PER_SEC);
             if (startPing > stopPing + timeOutTimeMs) {
                 LOG_INFO("Player %i timed out!", i);
                 disconnect(i);
@@ -201,7 +201,7 @@ void Server::checkForTimeOuts()
 void Server::disconnect(int i)
 {
     //broadcast("A player disconnected");
-    LOG_INFO("Player %i disconnected/timed out", i);
+    LOG_INFO("Player %s disconnected/timed out", m_PlayerDefinitions[i].Name.c_str());
 
     // Remove enteties and stuff
     m_PlayerDefinitions[i].Endpoint = boost::asio::ip::udp::endpoint();
@@ -216,7 +216,7 @@ void Server::parseOnInputCommand(Packet& packet)
     // Check which player it was who sent the message
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         // if the player is connected set playerID to the correct PlayerID
-        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address() 
+        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()
             && m_PlayerDefinitions[i].Endpoint.port() == m_ReceiverEndpoint.port()) {
             playerID = i;
             break;
@@ -248,13 +248,11 @@ void Server::parseConnect(Packet& packet)
 {
     LOG_INFO("Parsing connections");
     // Check if player is already connected
-    for (int i = 0; i < MAXCONNECTIONS; i++) {
-        if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address() && 
-            m_PlayerDefinitions[i].Endpoint.port() == m_ReceiverEndpoint.port()) {
-            return;
-        }
+    if (GetPlayerIDFromEndpoint(m_ReceiverEndpoint) != -1) {
+        return;
     }
 
+    // Find an empty spot to put the player in
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == boost::asio::ip::address()) {
             // Create new player
@@ -298,13 +296,13 @@ void Server::parseClientPing()
 {
     LOG_INFO("%i: Parsing ping", m_PacketID);
     int playerID = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
-    if (playerID == -1) { 
+    if (playerID == -1) {
         return;
     }
     // Return ping
     Packet packet(MessageType::ClientPing, m_PlayerDefinitions[playerID].PacketID);
     packet.WriteString("Ping received");
-    send(packet); 
+    send(packet);
 }
 
 void Server::parseServerPing()
@@ -351,6 +349,6 @@ int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
 
 bool Server::OnInputCommand(const Events::InputCommand & e)
 {
-    //LOG_INFO("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    //LOG_DEBUG("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
     return true;
 }
