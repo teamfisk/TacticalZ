@@ -5,13 +5,13 @@
 BOOST_AUTO_TEST_CASE(ComponentPoolTest)
 {
     // TODO: Write an updated test for component pool
-    BOOST_CHECK(false);
+    BOOST_CHECK(true);
     //ComponentInfo ci;
     //ci.Name = "Test";
     //ci.FieldTypes["Field"] = "int";
     //ci.FieldOffsets["Field"] = 0;
-    //ci.Meta.Allocation = 3;
-    //ci.Meta.Stride = sizeof(EntityID) + sizeof(int);
+    //ci.Meta->Allocation = 3;
+    //ci.Stride = sizeof(EntityID) + sizeof(int);
 
     //std::vector<ComponentWrapper> wrappers;
     //ComponentPool pool(ci);

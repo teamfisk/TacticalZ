@@ -1,49 +1,107 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
-<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd" xmlns:c="components">
-	<Components>
-		<c:Transform>
-			<Position X="0" Y="0" Z="0"/>
-			<Orientation X="0" Y="0" Z="0"/>
-		</c:Transform>
-	</Components>
-	<Children>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="0" Y="0" Z="0"/>
-					<Scale X="100" Y="1" Z="100"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/Core/UnitPlane.obj</Resource>
-				</c:Model>
-			</Components>
-		</Entity>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="1" Y="1" Z="0"/>
-					<Orientation X="0" Y="0.78539" Z="0"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>An error</Resource>
-				</c:Model>
-			</Components>
-			<Children>
-				<Entity>
-					<Components>
-						<c:Transform>
-							<Position X="2" Y="0" Z="0"/>
-							<Orientation X="0" Y="0.78539" Z="0"/>
-						</c:Transform>
-						<c:Model>
-							<Resource>An error</Resource>
-						</c:Model>
-					</Components>
-					<Children>
-					</Children>
-				</Entity>
-			</Children>
-		</Entity>
-	</Children>
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Scale X="100" Y="1" Z="100"/>
+          <Orientation X="0" Y="2.59200001" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>An error</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="1" Y="1" Z="0"/>
+          <Orientation X="0" Y="0.785390019" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>An error</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="2" Y="0" Z="0"/>
+              <Orientation X="0" Y="0.785390019" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Camera/>
+        <c:Listener/>
+        <c:Transform>
+          <Position X="1.36896265" Y="4.4259491" Z="10.6640663"/>
+          <Orientation X="-0.0349078141" Y="0.157154545" Z="-2.60252193e-07"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:DirectionalLight/>
+        <c:Model>
+          <Resource>Models/DirectionalLightWidget.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
+          <Orientation X="4.32000017" Y="4.6340003" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Assault.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-2.00568962" Y="0.527161121" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/SecondaryWeapon.fbx</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.546139359" Y="0.853016734" Z="0.177482292"/>
+              <Orientation X="1.47266471" Y="0.524984181" Z="1.243698"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="3.70000029" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
 </Entity>

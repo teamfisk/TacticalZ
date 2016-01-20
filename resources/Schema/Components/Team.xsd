@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:complexType name="TeamEnum" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="t:enum">
+				<xs:choice>
+					<xs:element name="Spectator" type="xs:integer" fixed="1" minOccurs="0"/>
+					<xs:element name="Red" type="xs:integer" fixed="2" minOccurs="0"/>
+					<xs:element name="Blue" type="xs:integer" fixed="3" minOccurs="0"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="Team">
+		<xs:annotation>
+			<xs:documentation>Represents entity team affiliation</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Team" type="TeamEnum" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

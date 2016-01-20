@@ -2,7 +2,7 @@
 #define Ray_h__
 
 #include "../GLM.h"
-#include "Common.h"
+#include "../Common.h"
 
 class Ray
 {

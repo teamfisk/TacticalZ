@@ -43,70 +43,109 @@ void PickingPass::InitializeShaderPrograms()
     m_PickingProgram->Link();
 }
 
-void PickingPass::Draw(RenderQueueCollection& rq)
+void PickingPass::Draw(RenderScene& scene)
 {
-    m_PickingColorsToEntity.clear();
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
-    int r = 0;
-    int g = 0;
+    
     //TODO: Render: Add code for more jobs than modeljobs.
 
     GLuint ShaderHandle = m_PickingProgram->GetHandle();
     m_PickingProgram->Bind();
 
-    std::map<EntityID, glm::vec2> entityColors;
+    
 
-    for (auto &job : rq.Forward) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+        m_Camera = scene.Camera;
 
-        if (modelJob) {
-            int pickColor[2] = { r, g };
-            auto color = entityColors.find(modelJob->Entity);
-            if (color != entityColors.end()) {
-                pickColor[0] = color->second[0];
-                pickColor[1] = color->second[1];
-            } else {
-                entityColors[modelJob->Entity] = glm::vec2(pickColor[0], pickColor[1]);
-                if (r + 10 > 255) {
-                    r = 0;
-                    g += 1;
+        for (auto &job : scene.ForwardJobs) {
+            auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+
+            if (modelJob) {
+                int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
+
+                PickingInfo pickInfo;
+                pickInfo.Entity = modelJob->Entity;
+                pickInfo.World = modelJob->World;
+                pickInfo.Camera = scene.Camera;
+
+                auto color = m_EntityColors.find(std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera));
+                if (color != m_EntityColors.end()) {
+                    pickColor[0] = color->second[0];
+                    pickColor[1] = color->second[1];
                 } else {
-                    r += 1;
+                    m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
+                    if (m_ColorCounter[0] > 255) {
+                        m_ColorCounter[0] = 0;
+                        m_ColorCounter[1]++;;
+                    } else {
+                        m_ColorCounter[0]++;;
+                    }
                 }
-            }
-            m_PickingColorsToEntity[glm::vec2(pickColor[0], pickColor[1])] = modelJob->Entity;
-            
-            //Render picking stuff
-            //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->ModelMatrix));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ProjectionMatrix()));
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
-            glBindVertexArray(modelJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
+                m_PickingColorsToEntity[glm::ivec2(pickColor[0], pickColor[1])] = pickInfo;
+
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glBindVertexArray(modelJob->Model->VAO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+                glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
+            }
         }
-    }
+    
+    
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
 
-    //Publish pick event every frame with the pick data that can be picked by the event
+
+    delete state;
+}
+
+
+
+void PickingPass::ClearPicking()
+{
+    m_PickingColorsToEntity.clear();
+    m_EntityColors.clear();
+    m_ColorCounter[0] = 1;
+    m_ColorCounter[1] = 0;
+
+    m_PickingBuffer.Bind();
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_PickingBuffer.Unbind();
+}
+
+PickData PickingPass::Pick(glm::vec2 screenCoord)
+{
     int fbWidth;
     int fbHeight;
     glfwGetFramebufferSize(m_Renderer->Window(), &fbWidth, &fbHeight);
-    Events::Picking pickEvent = Events::Picking(
-        &m_PickingBuffer,
-        &m_DepthBuffer,
-        m_Renderer->Camera()->ProjectionMatrix(),
-        m_Renderer->Camera()->ViewMatrix(),
-        Rectangle(fbWidth, fbHeight),
-        &m_PickingColorsToEntity);
 
-    m_EventBroker->Publish(pickEvent);
+    Rectangle resolution = Rectangle(fbWidth, fbHeight);
+    PickData pickData;
+    // Invert screen y coordinate
+    screenCoord.y = resolution.Height - screenCoord.y;
+    ScreenCoords::PixelData data = ScreenCoords::ToPixelData(screenCoord, &m_PickingBuffer, m_DepthBuffer);
+    pickData.Depth = data.Depth;
 
-    delete state;
+    PickingInfo pickInfo;
+
+    auto it = m_PickingColorsToEntity.find(glm::ivec2(data.Color[0], data.Color[1]));
+    if (it != m_PickingColorsToEntity.end()) {
+        pickInfo = it->second;
+    } else {
+        pickData.Entity = EntityID_Invalid;
+        return pickData;
+    }
+
+    pickData.Position = ScreenCoords::ToWorldPos(screenCoord.x, screenCoord.y, data.Depth, resolution, pickInfo.Camera->ProjectionMatrix(), pickInfo.Camera->ViewMatrix());
+    pickData.Entity = pickInfo.Entity;
+    pickData.Camera = pickInfo.Camera;
+    pickData.World = pickInfo.World;
+    return pickData;
 }
 
 void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const

@@ -23,7 +23,6 @@ public:
     ~Client();
     void Start(World* world, EventBroker* eventBroker) override;
     void Update() override;
-    void Close();
 private:
     // Assio UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
@@ -32,7 +31,7 @@ private:
 
     // Sending message to server logic
     int bytesRead = -1;
-    char readBuf[1024] = { 0 };
+    char readBuf[INPUTSIZE] = { 0 };
     int snapshotInterval = 33;
     std::clock_t previousSnapshotMessage = std::clock();
 
@@ -49,7 +48,6 @@ private:
     // Network logic
     PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
     SnapshotDefinitions m_NextSnapshot;
-    bool m_ThreadIsRunning = true;
     double m_DurationOfPingTime;
     std::clock_t m_StartPingTime;
     // Use to check if we should send disconnect message
@@ -59,7 +57,7 @@ private:
     // Private member functions
     void readFromServer();
     void sendSnapshotToServer();
-    int receive(char* data, size_t length);
+    int  receive(char* data, size_t length);
     void send(Packet& packet);
     void connect();
     void disconnect();
@@ -67,6 +65,7 @@ private:
     void moveMessageHead(char*& data, size_t& length, size_t stepSize);
     void parseMessageType(Packet& packet);
     void parseEventMessage(Packet& packet);
+    void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
     void parseConnect(Packet& packet);
     void parsePing();
     void parseServerPing();

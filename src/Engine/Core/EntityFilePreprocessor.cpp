@@ -16,12 +16,12 @@ EntityFilePreprocessor::EntityFilePreprocessor(const EntityFile* entityFile)
 
     for (auto& kv : m_ComponentInfo) {
         auto& info = kv.second;
-        LOG_DEBUG("Component: %s (%s)", info.Name.c_str(), info.Meta.Annotation.c_str());
-        LOG_DEBUG("Stride: %i", info.Meta.Stride);
-        LOG_DEBUG("Allocation: %i", info.Meta.Allocation);
+        LOG_DEBUG("Component: %s (%s)", info.Name.c_str(), info.Meta->Annotation.c_str());
+        LOG_DEBUG("Stride: %i", info.Stride);
+        LOG_DEBUG("Allocation: %i", info.Meta->Allocation);
         for (auto& kv : info.Fields) {
             auto& field = kv.second;
-            LOG_DEBUG("\t%i\t%s %s", field.Offset, field.Type, kv.first.c_str());
+            LOG_DEBUG("\t%i\t%s %s", field.Offset, field.Type.c_str(), kv.first.c_str());
         }
     }
 
@@ -62,62 +62,36 @@ void EntityFilePreprocessor::parseComponentInfo()
         }
 
         ComponentInfo compInfo;
+        compInfo.Meta = std::make_shared<ComponentInfo::Meta_t>();
 
         // Name
         compInfo.Name = XS::ToString(element->getName());
         // Known allocation
-        compInfo.Meta.Allocation = m_ComponentCounts[compInfo.Name];
+        compInfo.Meta->Allocation = m_ComponentCounts[compInfo.Name];
         // Annotation
         auto componentAnnotation = element->getAnnotation();
         if (componentAnnotation != nullptr) {
-            // Parse annotation XML
-            char* annotationString = XMLString::transcode(componentAnnotation->getAnnotationString());
-            MemBufInputSource annotationInput(reinterpret_cast<const XMLByte*>(annotationString), strlen(annotationString), "MemBuf: Annotation String");
-            XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager, grammarPool);
-            parser.setErrorHandler(&errorHandler);
-            parser.parse(annotationInput);
-            XMLString::release(&annotationString);
-            auto doc = parser.getDocument();
-
-            // TODO: Add allocation estimations from external file on map-to-map basis
-            // Add allocation estimation(s)
-            //auto allocationTags = doc->getElementsByTagName(XSTR("meta:allocation"));
-            //for (int i = 0; i < allocationTags->getLength(); ++i) {
-            //    auto allocation = dynamic_cast<DOMElement*>(allocationTags->item(i));
-            //    auto child = allocation->getFirstChild();
-            //    if (child == nullptr) {
-            //        continue;
-            //    }
-
-            //    XSValue::Status status;
-            //    XSValue* val = XSValue::getActualValue(child->getNodeValue(), XSValue::dt_integer, status);
-            //    compInfo.Meta.Allocation += val->fData.fValue.f_int;
-            //}
-
-            // Save documentation string
-            auto documentationTags = doc->getElementsByTagName(XS::ToXMLCh("xs:documentation"));
-            if (documentationTags->getLength() != 0) {
-                auto child = documentationTags->item(0)->getFirstChild();
-                if (child != nullptr) {
-                    compInfo.Meta.Annotation = XS::ToString(child->getNodeValue());
-                }
-            }
+            compInfo.Meta->Annotation = parseAnnotationXML(componentAnnotation->getAnnotationString());
         } else {
-            LOG_WARNING("Component is missing an annotation!");
+            LOG_WARNING("Component \"%s\" is missing an annotation!", compInfo.Name.c_str());
         }
 
         // <xs:complexType>
         auto typeDefinition = element->getTypeDefinition();
+        // Allow empty components
+        if (typeDefinition == nullptr) {
+            continue;
+        }
         if (typeDefinition->getTypeCategory() != XSTypeDefinition::COMPLEX_TYPE) {
-            LOG_ERROR("Type definition wasn't COMPLEX_TYPE! Skipping.");
+            LOG_ERROR("Failed to parse component definition for \"%s\": Type definition wasn't COMPLEX_TYPE!", compInfo.Name.c_str());
             continue;
         }
         auto complexTypeDefinition = dynamic_cast<XSComplexTypeDefinition*>(typeDefinition);
 
         // <xs:all>
         auto modelGroupParticle = complexTypeDefinition->getParticle();
-        if (modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
-            LOG_ERROR("Model group particle wasn't TERM_MODELGROUP! Skipping.");
+        if (modelGroupParticle == nullptr || modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
+            LOG_ERROR("Failed to parse component definition for \"%s\": Model group particle was null or wasn't TERM_MODELGROUP!", compInfo.Name.c_str());
             continue;
         }
         auto modelGroup = modelGroupParticle->getModelGroupTerm();
@@ -129,30 +103,65 @@ void EntityFilePreprocessor::parseComponentInfo()
         for (unsigned int i = 0; i < particles->size(); ++i) {
             auto particle = particles->elementAt(i);
             if (particle->getTermType() != XSParticle::TERM_ELEMENT) {
-                LOG_ERROR("Particle wasn't TERM_ELEMENT! Skipping.");
+                LOG_ERROR("Failed to parse a field definition in component \"%s\": Particle wasn't TERM_ELEMENT! Skipping.", compInfo.Name.c_str());
                 continue;
             }
             auto elementDeclaration = particle->getElementTerm();
 
             std::string name = XS::ToString(elementDeclaration->getName());
             std::string type = XS::ToString(elementDeclaration->getTypeDefinition()->getName());
+            std::string typeNamespace = XS::ToString(elementDeclaration->getTypeDefinition()->getNamespace());
+            std::string baseType = XS::ToString(elementDeclaration->getTypeDefinition()->getBaseType()->getName());
 
+            std::string effectiveType = type;
             size_t stride = EntityFile::GetTypeStride(type);
             if (stride == 0) {
-                std::cout << "Warning: Field \"" << name << "\" in component \"" << compInfo.Name << "\" uses unexpected field type \"" << type << "\". Skipping." << std::endl;
-                continue;
+                stride = EntityFile::GetTypeStride(baseType);
+                if (stride == 0) {
+                    LOG_WARNING("Field \"%s\" in component \"%s\" uses unexpected field type \"%s\" with base type \"%s\". Skipping.", name.c_str(), compInfo.Name.c_str(), type.c_str(), baseType.c_str());
+                    continue;
+                }
+                effectiveType = baseType;
+            }
+
+            // Annotation
+            auto fieldAnnotation = elementDeclaration->getAnnotation();
+            if (fieldAnnotation != nullptr) {
+                compInfo.Meta->FieldAnnotations[name] = parseAnnotationXML(fieldAnnotation->getAnnotationString());
+            } else {
+                LOG_WARNING("Component field \"%s.%s\" is missing an annotation!", compInfo.Name.c_str(), name.c_str());
+            }
+
+            if (effectiveType == "enum") {
+                // Parse potential enum type definition for field type
+                if (compInfo.Meta->FieldEnumDefinitions.count(name) == 0) {
+                    auto enumTypeDefinition = xsModel->getTypeDefinition(XS::ToXMLCh(type), XS::ToXMLCh("components"));
+                    auto xsComplexType = dynamic_cast<XSComplexTypeDefinition*>(enumTypeDefinition);
+                    auto xsComplexContent = xsComplexType->getParticle();
+                    auto xsExtension = xsComplexContent->getModelGroupTerm();
+                    auto xsExtensionParticles = xsExtension->getParticles();
+                    auto xsChoice = xsExtensionParticles->elementAt(0)->getModelGroupTerm();
+                    auto xsChoiceParticles = xsChoice->getParticles();
+                    for (int i = 0; i < xsChoiceParticles->size(); ++i) {
+                        auto enumElement = xsChoiceParticles->elementAt(i)->getElementTerm();
+                        std::string enumName = XS::ToString(enumElement->getName());
+                        std::string enumValue = XS::ToString(enumElement->getConstraintValue());
+                        compInfo.Meta->FieldEnumDefinitions[name][enumName] = boost::lexical_cast<int>(enumValue);
+                        LOG_DEBUG("ENUM %s = %s", enumName.c_str(), enumValue.c_str());
+                    }
+                }
             }
 
             auto& field = compInfo.Fields[name];
-            field.Type = type;
+            field.Name = name;
+            field.Type = effectiveType;
             field.Offset = fieldOffset;
             field.Stride = stride;
-            compInfo.FieldsInOrder.push_back(&field);
-
+            compInfo.FieldsInOrder.push_back(name);
             fieldOffset += stride;
         }
 
-        compInfo.Meta.Stride = fieldOffset;
+        compInfo.Stride = fieldOffset;
         m_ComponentInfo[compInfo.Name] = compInfo;
     }
 }
@@ -165,13 +174,22 @@ void EntityFilePreprocessor::parseDefaults()
 
     for (auto& ci : m_ComponentInfo) {
         // Allocate memory for default values
-        ci.second.Defaults = std::shared_ptr<char>(new char[ci.second.Meta.Stride]);
-        memset(ci.second.Defaults.get(), 0, ci.second.Meta.Stride);
-
-        XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager);
-        parser.setErrorHandler(&errorHandler);
+        ci.second.Defaults = std::shared_ptr<char>(new char[ci.second.Stride]);
+        memset(ci.second.Defaults.get(), 0, ci.second.Stride);
 
         std::string componentName = ci.first;
+
+        XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager);
+        parser.setDoSchema(true);
+        parser.setDoNamespaces(true);
+        parser.setErrorHandler(&errorHandler);
+        parser.setValidationScheme(XercesDOMParser::Val_Always);
+        parser.setValidationSchemaFullChecking(true);
+        //parser.setDoNamespaces(true);
+        //boost::filesystem::path schemaLocation = "Schema/Components/" + componentName + ".xsd";
+        //std::string namespaceSchema = schemaLocation.string();
+        //parser.setExternalNoNamespaceSchemaLocation("Teamasdasdasdasd.xsd");
+
         LOG_DEBUG("Parsing defaults for component %s", componentName.c_str());
         boost::filesystem::path defaultsFile = "Schema/Components/" + componentName + ".xml";
 
@@ -183,7 +201,7 @@ void EntityFilePreprocessor::parseDefaults()
         }
 
         // Find the node in the components namespace matching the component name
-        std::string tagName = "c:" + componentName;
+        std::string tagName = componentName;
         auto rootNodes = doc->getElementsByTagName(XS::ToXMLCh(tagName));
         if (rootNodes->getLength() == 0) {
             LOG_ERROR("Couldn't find defaults for component \"%s\"! Skipping.", componentName.c_str());
@@ -216,9 +234,19 @@ void EntityFilePreprocessor::parseDefaults()
                 EntityFile::WriteAttributeData(data, field, attributes);
             }
 
-            // Handle potential field values
             auto childNode = fieldElement->getFirstChild();
-            if (childNode != nullptr && childNode->getNodeType() == DOMNode::TEXT_NODE) {
+            if (childNode == nullptr) {
+                continue;
+            }
+
+            // An enum will either have an element node with a text node inside,
+            // or contain a text node directly.
+            if (childNode->getNodeType() == DOMNode::ELEMENT_NODE) {
+                childNode = childNode->getFirstChild();
+            }
+
+            // Handle potential field values
+            if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
                 char* cstrValue = XMLString::transcode(childNode->getNodeValue());
                 EntityFile::WriteValueData(data, field, cstrValue);
                 XMLString::release(&cstrValue);
@@ -227,3 +255,27 @@ void EntityFilePreprocessor::parseDefaults()
     }
 }
 
+std::string EntityFilePreprocessor::parseAnnotationXML(const XMLCh* xml)
+{
+    using namespace xercesc;
+
+    // Parse annotation XML
+    char* annotationString = XMLString::transcode(xml);
+    MemBufInputSource annotationInput(reinterpret_cast<const XMLByte*>(annotationString), strlen(annotationString), "MemBuf: Annotation String");
+    XercesDOMParser parser(nullptr, XMLPlatformUtils::fgMemoryManager);
+    //parser.setErrorHandler(&errorHandler);
+    parser.parse(annotationInput);
+    XMLString::release(&annotationString);
+    auto doc = parser.getDocument();
+
+    // Save documentation string
+    auto documentationTags = doc->getElementsByTagName(XS::ToXMLCh("xs:documentation"));
+    if (documentationTags->getLength() != 0) {
+        auto child = documentationTags->item(0)->getFirstChild();
+        if (child != nullptr) {
+            return XS::ToString(child->getNodeValue());
+        }
+    }
+
+    return std::string();
+}

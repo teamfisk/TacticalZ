@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:complexType name="TeamEnum" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="t:enum">
+				<xs:choice>
+					<xs:element name="Spectator" type="xs:integer" fixed="1" minOccurs="0"/>
+					<xs:element name="Red" type="xs:integer" fixed="2" minOccurs="0"/>
+					<xs:element name="Blue" type="xs:integer" fixed="3" minOccurs="0"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name="CapturePoint">
+		<xs:annotation>
+			<xs:documentation>A Capture Point. Add a Team Component to specify who currently owns it</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="CaptureTimer" type="t:double" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>CaptureTimer handled by Capture Point System</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="CapturePointNumber" type="t:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>CapturePointNumber specify an int number for this</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+
+				<xs:element name="HomePointForTeam" type="TeamEnum" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Specify if this is a HomePoint for either team</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

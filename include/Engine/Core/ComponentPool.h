@@ -43,7 +43,7 @@ public:
 
     ComponentPool(const ::ComponentInfo& ci) 
         : m_ComponentInfo(ci)
-        , m_Pool(ci.Meta.Allocation, sizeof(EntityID) + ci.Meta.Stride)
+        , m_Pool(ci.Meta->Allocation, sizeof(EntityID) + ci.Stride)
     { }
 	ComponentPool(const ComponentPool& other) = delete;
 	ComponentPool(const ComponentPool&& other) = delete;
@@ -61,6 +61,7 @@ public:
 
 	iterator begin() const;
 	iterator end() const;
+    size_t size() const;
 
 	//Dumps information about what the pool memory looks like right now 
 	//into an output stream (e.g. file/std::cout, anything that has an operator<<)

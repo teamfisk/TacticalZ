@@ -3,7 +3,7 @@ using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 #include <stdlib.h>//srand
 
-#include "Engine/Core/OctTree.h"
+#include "Engine/Core/Octree.h"
 #include "Engine/Core/Ray.h"
 #include "OldOctTree.h"
 
@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE(octSameRegionTest)
 {
     glm::vec3 mini = glm::vec3(-1, -1, -1);
     glm::vec3 maxi = glm::vec3(1, 1, 1);
-    OctTree tree(AABB(mini, maxi), 2);
+    Octree tree(AABB(mini, maxi), 2);
     AABB firstQuadrant(mini, 0.8f*mini);
     tree.AddStaticObject(firstQuadrant);
     AABB testBox(0.9f*mini, 0.8f*mini);
@@ -21,9 +21,9 @@ BOOST_AUTO_TEST_CASE(octSameRegionTest)
     tree.BoxesInSameRegion(testBox, region);
     BOOST_REQUIRE(region.size() == 1);
     AABB& box = region[0];
-    BOOST_CHECK_CLOSE_FRACTION(box.Center().x, firstQuadrant.Center().x, 0.00001f);
-    BOOST_CHECK_CLOSE_FRACTION(box.Center().y, firstQuadrant.Center().y, 0.00001f);
-    BOOST_CHECK_CLOSE_FRACTION(box.Center().z, firstQuadrant.Center().z, 0.00001f);
+    BOOST_CHECK_CLOSE_FRACTION(box.Origin().x, firstQuadrant.Origin().x, 0.00001f);
+    BOOST_CHECK_CLOSE_FRACTION(box.Origin().y, firstQuadrant.Origin().y, 0.00001f);
+    BOOST_CHECK_CLOSE_FRACTION(box.Origin().z, firstQuadrant.Origin().z, 0.00001f);
     BOOST_CHECK_CLOSE_FRACTION(box.HalfSize().x, firstQuadrant.HalfSize().x, 0.00001f);
     BOOST_CHECK_CLOSE_FRACTION(box.HalfSize().y, firstQuadrant.HalfSize().y, 0.00001f);
     BOOST_CHECK_CLOSE_FRACTION(box.HalfSize().z, firstQuadrant.HalfSize().z, 0.00001f);
@@ -43,7 +43,7 @@ template<typename Tree>
 void RegionTest(Tree& tree)
 {
     AABB aabb;
-    aabb.CreateFromCenter(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
+    aabb.FromOriginSize(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
         glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE));
     std::vector<AABB> outVec;
     tree.BoxesInSameRegion(aabb, outVec);
@@ -63,7 +63,7 @@ void BoxTest(Tree& tree)
 {
     AABB outBox;
     AABB aabb;
-    aabb.CreateFromCenter(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
+    aabb.FromOriginSize(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
         glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE));
     tree.BoxCollides(aabb, outBox);
 }
@@ -88,14 +88,14 @@ void TestLoop(TestFunction xTest)
         for (int i = 0; i < NUM_STATICS; ++i) {
             center = glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS);
             size = glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE);
-            aabb.CreateFromCenter(center, size);
+            aabb.FromOriginSize(center, size);
             tree.AddStaticObject(aabb);
         }
         for (int fr = 0; fr < TEST_FRAMES; ++fr) {
             for (int i = 0; i < NUM_DYNAMICS; ++i) {
                 center = glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS);
                 size = glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE);
-                aabb.CreateFromCenter(center, size);
+                aabb.FromOriginSize(center, size);
                 tree.AddDynamicObject(aabb);
             }
 
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(octRegionPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octRegionPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(RegionTest<OctTree>);
+    TestLoop<Octree>(RegionTest<Octree>);
     BOOST_CHECK(true);
 }
 
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(octBoxPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octBoxPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(BoxTest<OctTree>);
+    TestLoop<Octree>(BoxTest<Octree>);
     BOOST_CHECK(true);
 }
 
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(octRayPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octRayPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(RayTest<OctTree>);
+    TestLoop<Octree>(RayTest<Octree>);
     BOOST_CHECK(true);
 }
 
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(octNopPerfTestWithDuplicates)
 
 BOOST_AUTO_TEST_CASE(octNopPerfTestNoDuplicates)
 {
-    TestLoop<OctTree>(NopTest<OctTree>);
+    TestLoop<Octree>(NopTest<Octree>);
     BOOST_CHECK(true);
 }
 

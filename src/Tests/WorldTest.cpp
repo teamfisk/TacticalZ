@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(WorldTestSingleAllocation, * boost::unit_test::tolerance(0.
     ComponentWrapper c = w.AttachComponent(e, "Test");
 
     // Check default values
-    BOOST_TEST((int)c["TestInteger"] == c.Property<int>("TestInteger"));
+    BOOST_TEST((int)c["TestInteger"] == c.Field<int>("TestInteger"));
     BOOST_TEST((int)c["TestInteger"] == 1337);
     BOOST_TEST((double)c["TestDouble"] == 13.37);
     BOOST_TEST((std::string)c["TestString"] == "Carlito");

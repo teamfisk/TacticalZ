@@ -8,18 +8,17 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
-#include "Rendering/RenderQueueFactory.h"
 #include "Input/InputProxy.h"
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
 #include "Core/EntityFilePreprocessor.h"
 #include "Core/SystemPipeline.h"
-#include "RaptorCopterSystem.h"
-#include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
+#include "Rendering/RenderSystem.h"
 #include "Core/EntityFileParser.h"
+#include "Core/Octree.h"
 
 // Network
 #include <boost/thread.hpp>
@@ -27,6 +26,8 @@
 #include "Network/Server.h"
 #include "Network/Client.h"
 
+// Sound
+#include "Sound/SoundSystem.h"
 
 class Game
 {
@@ -46,8 +47,10 @@ private:
     InputProxy* m_InputProxy;
 	GUI::Frame* m_FrameStack;
     World* m_World;
+    Octree* m_OctreeCollision;
+    Octree* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
-    RenderQueueFactory* m_RenderQueueFactory;
+    RenderFrame* m_RenderFrame;
     // Network variables
     boost::thread m_NetworkThread;
 
@@ -56,8 +59,11 @@ private:
     Network* m_ClientOrServer;
     bool m_IsClientOrServer = false;
 
-    EventRelay<Game, Events::InputCommand> m_EInputCommand;
-    bool debugOnInputCommand(const Events::InputCommand& e);
+    // Sound
+    SoundSystem* m_SoundSystem;
+
+    //EventRelay<Game, Events::InputCommand> m_EInputCommand;
+    //bool debugOnInputCommand(const Events::InputCommand& e);
 
     void debugInitialize();
     void debugTick(double dt);
