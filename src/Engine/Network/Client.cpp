@@ -57,9 +57,7 @@ void Client::parseMessageType(Packet& packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    if (m_PacketID <= m_PreviousPacketID)
-        return;
-    //IdentifyPacketLoss();
+    identifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
@@ -240,8 +238,7 @@ void Client::connect()
 
 void Client::disconnect()
 {
-    Packet packet(MessageType::Connect, m_SendPacketID);
-    packet.WriteString("+Disconnect");
+    Packet packet(MessageType::Disconnect, m_SendPacketID);
     send(packet);
 }
 
@@ -256,8 +253,15 @@ void Client::ping()
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "ConnectToServer") { // Connect for now
-        connect();
+        if (e.Value > 0) {
+            connect();
+        }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        return true;
+    } else if (e.Command == "DisconnectFromServer") {
+        if (e.Value > 0) {
+            disconnect();
+        }
         return true;
     } else {
         m_InputCommandBuffer.push_back(e);
@@ -282,7 +286,7 @@ void Client::identifyPacketLoss()
     // if no packets lost, difference should be equal to 1
     int difference = m_PacketID - m_PreviousPacketID;
     if (difference != 1) {
-        LOG_INFO("%i Packet(s) were lost...", difference);
+        LOG_INFO("%i Packet(s) were lost...", difference - 1);
     }
 }
 
