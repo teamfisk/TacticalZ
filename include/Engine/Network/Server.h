@@ -43,16 +43,14 @@ private:
 
     //Timers
     std::clock_t m_StartPingTime;
-    std::clock_t m_StopTimes[8];
 
     // Game logic
     World* m_World;
     EventBroker* m_EventBroker;
     
     // Packet loss logic
-    unsigned int m_PacketID;
-    unsigned int m_PreviousPacketID;
-    unsigned int m_SendPacketID;
+    unsigned int m_PacketID = 0;
+    unsigned int m_PreviousPacketID = 0;
 
     // Private member functions
     int  receive(char* data, size_t length);
@@ -73,8 +71,8 @@ private:
     void parseServerPing();
     void identifyPacketLoss();
     EntityID createPlayer();
+    int GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
     // Debug event
-
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
 };

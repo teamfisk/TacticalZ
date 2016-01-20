@@ -17,20 +17,26 @@ Packet::Packet(char* data, const int sizeOfPacket)
     m_Offset = sizeOfPacket;
 }
 
+Packet::Packet(MessageType type)
+{
+    m_Data = new char[m_MaxPacketSize];
+    unsigned int dummy = 0;
+    Init(type, dummy);
+}
+
 Packet::~Packet()
 {
     delete[] m_Data;
 }
 
 void Packet::Init(MessageType type, unsigned int & packetID)
-{ 
+{
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
     // Add message type
     int messageType = static_cast<int>(type);
     Packet::WritePrimitive<int>(messageType);
-    packetID = packetID % 1000; // Packet id modulos
     Packet::WritePrimitive<int>(packetID);
     packetID++;
 }
@@ -80,14 +86,21 @@ char * Packet::ReadData(int SizeOfData)
     return (m_Data + oldReturnDataOffset);
 }
 
+void Packet::ChangePacketID(unsigned int & packetID)
+{
+    packetID = packetID + 1;
+    // Overwrite old PacketID
+    memcpy(m_Data + sizeof(int), &packetID, sizeof(int));
+}
+
 void Packet::resizeData()
-{ 
+{
 
     // Allocate memory to store our data in
     char* holdData = new char[m_MaxPacketSize];
     // Copy our data to the newly allocated memory
     memcpy(holdData, m_Data, m_Offset);
-   // Increase max packet size
+    // Increase max packet size
     m_MaxPacketSize = m_MaxPacketSize * 2;
     // Delete our data
     delete m_Data;

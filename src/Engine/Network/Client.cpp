@@ -57,9 +57,7 @@ void Client::parseMessageType(Packet& packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    if (m_PacketID <= m_PreviousPacketID)
-        return;
-    //IdentifyPacketLoss();
+    identifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
@@ -282,7 +280,7 @@ void Client::identifyPacketLoss()
     // if no packets lost, difference should be equal to 1
     int difference = m_PacketID - m_PreviousPacketID;
     if (difference != 1) {
-        LOG_INFO("%i Packet(s) were lost...", difference);
+        LOG_INFO("%i Packet(s) were lost...", difference -1);
     }
 }
 
