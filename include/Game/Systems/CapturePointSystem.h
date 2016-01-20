@@ -44,7 +44,6 @@ private:
 
     //std::vector<ComponentWrapper>
 
-    std::map<std::string, int> m_NextPossibleCapturePoint;
     const double m_CaptureTimeToTakeOver = 15.0;
 
     //vectors which will keep track of enter/leave changes

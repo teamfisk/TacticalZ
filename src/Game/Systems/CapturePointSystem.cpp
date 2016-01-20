@@ -57,34 +57,35 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     }
 
     //calculate next possible capturePoint for both teams
-    m_NextPossibleCapturePoint["Red"] = -1;
-    m_NextPossibleCapturePoint["Blue"] = -1;
+    std::map<std::string, int> nextPossibleCapturePoint;
+    nextPossibleCapturePoint["Red"] = -1;
+    nextPossibleCapturePoint["Blue"] = -1;
     for (size_t i = 0; i < m_NumberOfCapturePoints; i++)
     {
         ComponentWrapper& capturePointOwnedBy = world->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
         if ((int)capturePointOwnedBy["Team"] == redTeam && m_RedTeamHomeCapturePoint == 0) {
-            m_NextPossibleCapturePoint["Red"] = i + 1;
+            nextPossibleCapturePoint["Red"] = i + 1;
         }
         if ((int)capturePointOwnedBy["Team"] == blueTeam && m_BlueTeamHomeCapturePoint == 0) {
-            m_NextPossibleCapturePoint["Blue"] = i + 1;
+            nextPossibleCapturePoint["Blue"] = i + 1;
         }
     }
     for (int i = m_NumberOfCapturePoints - 1; i >= 0; i--)
     {
         ComponentWrapper& capturePointOwnedBy = world->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
         if ((int)capturePointOwnedBy["Team"] == redTeam && m_RedTeamHomeCapturePoint != 0) {
-            m_NextPossibleCapturePoint["Red"] = i - 1;
+            nextPossibleCapturePoint["Red"] = i - 1;
         }
         if ((int)capturePointOwnedBy["Team"] == blueTeam && m_BlueTeamHomeCapturePoint != 0) {
-            m_NextPossibleCapturePoint["Blue"] = i - 1;
+            nextPossibleCapturePoint["Blue"] = i - 1;
         }
     }
 
     //colorize next possible capturepoint
-    if (m_NextPossibleCapturePoint["Red"] == capturePointNumber) {
+    if (nextPossibleCapturePoint["Red"] == capturePointNumber) {
         entity["Model"]["Color"] = glm::vec4(1, 1, 0, 1);
     }
-    if (m_NextPossibleCapturePoint["Blue"] == capturePointNumber) {
+    if (nextPossibleCapturePoint["Blue"] == capturePointNumber) {
         entity["Model"]["Color"] = glm::vec4(0, 1, 1, 1);
     }
 
@@ -127,12 +128,12 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     if (redTeamPlayersStandingInside > 0 && blueTeamPlayersStandingInside == 0) {
         timerDeltaChange = redTeamPlayersStandingInside*dt;
         currentTeam = redTeam;
-        canCapture = m_NextPossibleCapturePoint["Red"] == capturePointNumber;
+        canCapture = nextPossibleCapturePoint["Red"] == capturePointNumber;
     }
     if (redTeamPlayersStandingInside == 0 && blueTeamPlayersStandingInside > 0) {
         timerDeltaChange = -blueTeamPlayersStandingInside*dt;
         currentTeam = blueTeam;
-        canCapture = m_NextPossibleCapturePoint["Blue"] == capturePointNumber;
+        canCapture = nextPossibleCapturePoint["Blue"] == capturePointNumber;
     }
 
     if (redTeamPlayersStandingInside == 0 && blueTeamPlayersStandingInside == 0) {
