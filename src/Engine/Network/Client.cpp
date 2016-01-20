@@ -85,11 +85,8 @@ void Client::parseMessageType(Packet& packet)
 
 void Client::parseConnect(Packet& packet)
 {
-    // Set your own player id
-    m_PlayerID = packet.ReadPrimitive<int>();
-    m_ServerEntityID = packet.ReadPrimitive<EntityID>();
     // Map ServerEntityID and your PlayerID
-    LOG_INFO("%i: I am player: %i", m_PacketID, m_PlayerID);
+    LOG_INFO("I be connected PogChamp");
 }
 
 void Client::parsePlayerConnected(Packet & packet)

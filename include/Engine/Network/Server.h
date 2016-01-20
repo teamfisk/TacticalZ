@@ -27,9 +27,10 @@ private:
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::socket m_Socket;
-    PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
 
     // Sending messages to client logic
+    PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
+    std::vector<PlayerDefinition> m_ConnectedUsers;
     char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
     // time for previouse message
