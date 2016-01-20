@@ -8,7 +8,7 @@ DrawFinalPassState::DrawFinalPassState()
     BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     Enable(GL_DEPTH_TEST);
     Enable(GL_CULL_FACE);
-    ClearColor(glm::vec4(200.f / 255, 0.f / 255, 200.f / 255, 0.f));
+    ClearColor(glm::vec4(155.f / 255, 0.f / 255, 155.f / 255, 0.f));
     Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

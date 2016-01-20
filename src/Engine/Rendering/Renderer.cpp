@@ -99,8 +99,8 @@ void Renderer::Draw(RenderFrame& frame)
         m_LightCullingPass->FillLightList(*scene);
         m_LightCullingPass->CullLights(*scene);
         m_DrawFinalPass->Draw(*scene);
-        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_SceneTexture);
-        //m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_BloomTexture);
+        //m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_SceneTexture);
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_BloomTexture);
         //m_DrawScenePass->Draw(rq);
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");

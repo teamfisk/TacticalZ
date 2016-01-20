@@ -70,10 +70,8 @@ void FrameBuffer::Generate()
         }
     }
         
-   
-    
     GLenum* bufferTextures = &attachments[0];
-    glDrawBuffers(1, bufferTextures);
+    glDrawBuffers(attachments.size(), bufferTextures);
 
     if (GLenum frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         LOG_ERROR("FrameBuffer incomplete: 0x%x\n", frameBufferStatus);

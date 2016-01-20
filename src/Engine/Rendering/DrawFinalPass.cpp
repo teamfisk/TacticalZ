@@ -27,6 +27,7 @@ void DrawFinalPass::InitializeFrameBuffers()
     m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
     m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
     m_BloomFrameBuffer.Generate();
+
 }
 
 void DrawFinalPass::InitializeShaderPrograms()
@@ -79,8 +80,8 @@ void DrawFinalPass::Draw(RenderScene& scene)
             continue;
         }
     }
+    m_BloomFrameBuffer.Unbind();
     GLERROR("DrawFinalPass::Draw: END");
-
 }
 
 void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const

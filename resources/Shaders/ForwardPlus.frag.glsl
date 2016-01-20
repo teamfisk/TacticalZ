@@ -132,18 +132,17 @@ void main()
 		totalLighting.Specular += result.Specular;
 	}
 
-
 	//sceneColor += Input.DiffuseColor;
 	vec4 fragment = Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
-	bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
+	//bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
 	sceneColor = vec4(fragment.xyz, 1.0);
 	//These if statements should be removed.
-/*
-	if(fragment.x > 0.5 || fragment.y > 0.5 || fragment.z > 0.5) {
-		bloomColor = fragment;
+
+	if(fragment.x > 1 || fragment.y > 1 || fragment.z > 1) {
+		bloomColor = vec4(fragment.xyz, 1.0);
 	} else {
-		bloomColor = vec4(0.3, 0.5, 0.8, 1.0);
-	}*/
+		bloomColor = vec4(0.0, 0.0, 0.0, 1.0);
+	}
 	
 	//sceneColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
 	//sceneColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
