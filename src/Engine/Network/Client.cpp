@@ -35,6 +35,9 @@ void Client::Update()
 {
     m_EventBroker->Process<Client>();
     readFromServer();
+    if (m_IsConnected) { 
+        hasServerTimedOut();
+    }
 }
 
 void Client::readFromServer()
@@ -86,10 +89,8 @@ void Client::parseMessageType(Packet& packet)
 void Client::parseConnect(Packet& packet)
 {
     // Set your own player id
-    m_PlayerID = packet.ReadPrimitive<int>();
-    m_ServerEntityID = packet.ReadPrimitive<EntityID>();
     // Map ServerEntityID and your PlayerID
-    LOG_INFO("%i: I am player: %i", m_PacketID, m_PlayerID);
+    LOG_INFO("I are connected PogChamp");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -100,12 +101,18 @@ void Client::parsePlayerConnected(Packet & packet)
 
 void Client::parsePing()
 {
-    m_DurationOfPingTime = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
-    LOG_INFO("%i: response time with ctime(ms): %f", m_PacketID, m_DurationOfPingTime);
+
 }
 
 void Client::parseServerPing()
 {
+    // Might miss connect message so set it here instead.
+    m_IsConnected = true;
+    // Time since last ping was received
+    m_DurationOfPingTime = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
+    LOG_INFO("%i: response time with ctime(ms): %f", m_PacketID, m_DurationOfPingTime);
+    m_StartPingTime = std::clock();
+
     Packet packet(MessageType::ServerPing, m_SendPacketID);
     packet.WriteString("Ping recieved");
     send(packet);
@@ -238,16 +245,18 @@ void Client::connect()
 
 void Client::disconnect()
 {
+    m_PreviousPacketID = 0;
+    m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
     send(packet);
 }
 
 void Client::ping()
 {
-    Packet packet(MessageType::Connect, m_SendPacketID);
-    packet.WriteString("Ping");
-    m_StartPingTime = std::clock();
-    send(packet);
+    //Packet packet(MessageType::Connect, m_SendPacketID);
+    //packet.WriteString("Ping");
+    //m_StartPingTime = std::clock();
+    //send(packet);
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
@@ -290,12 +299,15 @@ void Client::identifyPacketLoss()
     }
 }
 
-bool Client::isConnected()
+bool Client::hasServerTimedOut()
 {
-    if (m_PlayerID != -1) {
-        if (m_PlayerDefinitions[m_PlayerID].EntityID != -1) {
-            return true;
-        }
+    // Time in ms
+    float timeSincePing = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
+    if (timeSincePing > TIMEOUTMS) {
+        // Clear everything and go to menu.
+        LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
+        m_IsConnected = false;
+        return true;
     }
     return false;
 }

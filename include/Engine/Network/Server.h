@@ -11,7 +11,7 @@
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"
-#include "Network/Network.h"
+#include "../Network/Network.h"
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 
