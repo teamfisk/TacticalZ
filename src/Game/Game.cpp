@@ -8,6 +8,7 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Core/EntityFileWriter.h"
+#include "Game/Systems/CapturePointSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -88,6 +89,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
     ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     // Invoke network
