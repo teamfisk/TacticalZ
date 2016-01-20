@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+	<xs:element name="DirectionalLight">
+		<xs:annotation>
+			<xs:documentation>A directional light that shines bright like the future.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Color" type="t:Color" minOccurs="0"/>
+				<xs:element name="Intensity" type="t:double" minOccurs="0"/>
+				<xs:element name="Visible" type="t:bool" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
