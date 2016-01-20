@@ -181,7 +181,6 @@ void Server::sendPing()
 
 void Server::checkForTimeOuts()
 {
-    int timeOutTimeMs = 5000;
     int startPing = 1000 * m_StartPingTime
         / static_cast<double>(CLOCKS_PER_SEC);
 
@@ -189,7 +188,7 @@ void Server::checkForTimeOuts()
         if (m_ConnectedUsers[i].Endpoint.address() != boost::asio::ip::address()) {
             int stopPing = 1000 * m_ConnectedUsers[i].StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
-            if (startPing > stopPing + timeOutTimeMs) {
+            if (startPing > stopPing + TIMEOUTMS) {
                 LOG_INFO("User %i timed out!", i);
                 disconnect(i);
             }

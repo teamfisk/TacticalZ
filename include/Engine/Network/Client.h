@@ -48,6 +48,7 @@ private:
     std::string m_PlayerName;
     int m_PlayerID = -1;
     EntityID m_ServerEntityID = std::numeric_limits<EntityID>::max();
+    bool m_IsConnected = false;
     // Server Client Lookup map
     // Assumes that root node for client and server is EntityID 0.
 
@@ -71,14 +72,14 @@ private:
     void ping();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
-     void parseConnect(Packet& packet);
+    void parseConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
     void parseServerPing();
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
-    bool isConnected();
+    bool hasServerTimedOut();
     EntityID createPlayer();
     void sendInputCommands();
     // Mapping Logic
