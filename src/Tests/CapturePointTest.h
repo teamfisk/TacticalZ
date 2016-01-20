@@ -57,9 +57,8 @@ private:
     EventBroker* m_EventBroker;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    EntityID m_RedTeamPlayer, m_BlueTeamPlayer, m_CapturePointID, m_CapturePointID2, m_CapturePointID3;
+    EntityID m_RedTeamPlayer, m_BlueTeamPlayer, m_CapturePointID0, m_CapturePointID1, m_CapturePointID2, m_CapturePointID3, m_CapturePointID4;
     int m_RunTestNumber;
-    bool phase1Success = false, phase2Success = false, phase3Success = false, phase4Success = false;
     int m_RedTeam, m_BlueTeam;
 };
 

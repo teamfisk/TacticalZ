@@ -17,62 +17,53 @@ BOOST_AUTO_TEST_CASE(CapturePointTest1_OnePlayerOnCapturePoint)
 {
     CapturePointTest game(1);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest2_TwoPlayersOnCapturePoint)
 {
     CapturePointTest game(2);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest3_NoPlayersOnCapturePoint)
 {
     CapturePointTest game(3);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest4_TwoCapturePointsBeingCaptured)
 {
     CapturePointTest game(4);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest5_SameCapturePointContestedAndTakenOver)
 {
     CapturePointTest game(5);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest6_Team1CapturedTheLastPointAndWon)
 {
     CapturePointTest game(6);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest7_Team1ForcesTeam2sNextCapturePointToGoBackwards1Step)
 {
     CapturePointTest game(7);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_CASE(CapturePointTest8_Team2ForcesTeam1sNextCapturePointToGoForwards1Step)
 {
     CapturePointTest game(8);
     bool success = game.CapturePoint_Game_Loop_OneHundredTimes();
-    //The system will process the events, hence it will take a while before we can read anything
     BOOST_TEST(success);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
 bool CapturePointTest::CapturePoint_Game_Loop_OneHundredTimes() {
-    //CapturePointTest game(testNumber);
     //100 loops will be more than enough to do the test
     int loops = 100;
     bool success = false;
@@ -80,8 +71,8 @@ bool CapturePointTest::CapturePoint_Game_Loop_OneHundredTimes() {
         Tick();
         NumLoops++;
         if (TestSucceeded) {
-            //success = true;
-            //break;
+            success = true;
+            break;
         }
         loops--;
     }
@@ -114,14 +105,6 @@ CapturePointTest::CapturePointTest(int runTestNumber)
     EntityFileParser fp(file);
     fp.MergeEntities(m_World);
 
-    /*
-    ---TESTSETUP---
-    default: 2 players
-    healthcomponent
-    3 capturepoints
-    capturepoint(1) = home for team number 2
-    capturepoint3 = home for team number 1
-    */
     EntityID playerID = m_World->CreateEntity();
     m_RedTeamPlayer = playerID;
     ComponentWrapper& player = m_World->AttachComponent(m_RedTeamPlayer, "Player");
@@ -138,25 +121,43 @@ CapturePointTest::CapturePointTest(int runTestNumber)
     ComponentWrapper& playerTeam2 = m_World->AttachComponent(m_BlueTeamPlayer, "Team");
     playerTeam2["Team"] = m_BlueTeam;
 
-    EntityID capturePointID = m_World->CreateEntity();
-    m_CapturePointID = capturePointID;
-    ComponentWrapper& capturePoint = m_World->AttachComponent(capturePointID, "CapturePoint");
-    ComponentWrapper& capturePointHomeTeam = m_World->AttachComponent(capturePointID, "Team");
-    capturePointHomeTeam["Team"] = m_BlueTeam;
-    capturePoint["CapturePointNumber"] = 0;
+    EntityID capturePointID0 = m_World->CreateEntity();
+    m_CapturePointID0 = capturePointID0;
+    ComponentWrapper& capturePoint0 = m_World->AttachComponent(capturePointID0, "CapturePoint");
+    ComponentWrapper& capturePointTeamOwner0 = m_World->AttachComponent(capturePointID0, "Team");
+
+    capturePointTeamOwner0["Team"] = m_BlueTeam;
+    capturePoint0["CapturePointNumber"] = 0;
+    capturePoint0["HomePointForTeam"] = m_BlueTeam;
+
+    EntityID capturePointID1 = m_World->CreateEntity();
+    m_CapturePointID1 = capturePointID1;
+    ComponentWrapper& capturePoint1 = m_World->AttachComponent(capturePointID1, "CapturePoint");
+    ComponentWrapper& capturePointTeamOwner1 = m_World->AttachComponent(capturePointID1, "Team");
+    capturePoint1["CapturePointNumber"] = 1;
+    capturePointTeamOwner1["Team"] = 0;
 
     EntityID capturePointID2 = m_World->CreateEntity();
     m_CapturePointID2 = capturePointID2;
     ComponentWrapper& capturePoint2 = m_World->AttachComponent(capturePointID2, "CapturePoint");
-    //no team component for this capturepoint since nobody owns it (yet)
-    capturePoint2["CapturePointNumber"] = 1;
+    ComponentWrapper& capturePointTeamOwner2 = m_World->AttachComponent(capturePointID2, "Team");
+    capturePoint2["CapturePointNumber"] = 2;
+    capturePointTeamOwner2["Team"] = 0;
 
     EntityID capturePointID3 = m_World->CreateEntity();
     m_CapturePointID3 = capturePointID3;
     ComponentWrapper& capturePoint3 = m_World->AttachComponent(capturePointID3, "CapturePoint");
-    ComponentWrapper& capturePointHomeTeam3 = m_World->AttachComponent(capturePointID3, "Team");
-    capturePointHomeTeam3["Team"] = m_RedTeam;
-    capturePoint3["CapturePointNumber"] = 2;
+    ComponentWrapper& capturePointTeamOwner3 = m_World->AttachComponent(capturePointID3, "Team");
+    capturePoint3["CapturePointNumber"] = 3;
+    capturePointTeamOwner3["Team"] = 0;
+
+    EntityID capturePointID4 = m_World->CreateEntity();
+    m_CapturePointID4 = capturePointID4;
+    ComponentWrapper& capturePoint4 = m_World->AttachComponent(capturePointID4, "CapturePoint");
+    ComponentWrapper& capturePointTeamOwner4 = m_World->AttachComponent(capturePointID4, "Team");
+    capturePointTeamOwner4["Team"] = m_RedTeam;
+    capturePoint4["CapturePointNumber"] = 4;
+    capturePoint4["HomePointForTeam"] = m_RedTeam;
 
     m_RunTestNumber = runTestNumber;
 
@@ -187,8 +188,10 @@ CapturePointTest::CapturePointTest(int runTestNumber)
         break;
     case 8:
         //switch sides
-        capturePointHomeTeam["Team"] = m_RedTeam;
-        capturePointHomeTeam3["Team"] = m_BlueTeam;
+        capturePoint0["HomePointForTeam"] = m_RedTeam;
+        capturePointTeamOwner0["Team"] = m_RedTeam;
+        capturePoint4["HomePointForTeam"] = m_BlueTeam;
+        capturePointTeamOwner4["Team"] = m_BlueTeam;
         TestSetup8();
         break;
     default:
@@ -208,63 +211,41 @@ CapturePointTest::~CapturePointTest()
 
 void CapturePointTest::TestSetup1_OnePlayerOnCapturePoint()
 {
-    Events::TriggerTouch touchEvent;
-    Events::TriggerLeave leaveEvent;
-
-    //redPlayer touches,leaves,touches m_CapturePointID. and enters m_CapturePointID3
-    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
-    DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID);
-    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
 }
 void CapturePointTest::TestSetup2_TwoPlayersOnCapturePoint()
 {
-    Events::TriggerTouch touchEvent;
-    Events::TriggerLeave leaveEvent;
-
-    //redPlayer touches,leaves m_CapturePointID. and enters m_CapturePointID3
-    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
-    DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID);
+    DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID1);
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
-
-    //blueplayer touches m_CapturePointID,m_CapturePointID2
-    DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID);
+    //contested point
+    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
     DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID2);
 }
 void CapturePointTest::TestSetup3_NoPlayersOnCapturePoint()
 {
-    Events::TriggerTouch touchEvent;
-    Events::TriggerLeave leaveEvent;
-    DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID);
-    DoLeaveEvent(m_BlueTeamPlayer, m_CapturePointID3);
+    DoLeaveEvent(m_BlueTeamPlayer, m_CapturePointID0);
+    DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID4);
 }
 void CapturePointTest::TestSetup4_TwoCapturePointsBeingCaptured()
 {
-    Events::TriggerTouch touchEvent;
-
-    //redPlayer touches m_CapturePointID3
+    //blue = 0
+    DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID1);
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
-
-    //blueplayer touches m_CapturePointID
-    DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID);
 }
 void CapturePointTest::TestSetup5_SameCapturePointContestedAndTakenOver()
 {
-    //contested same, player1 touches the contested
-    //redPlayer touches m_CapturePointID2
+    DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID1);
+    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
+    //contested point
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
 }
 void CapturePointTest::TestSetup6_Team1CapturedTheLastPointAndWon()
 {
-    //TODO: this should be in UPDATE instead
-
-    //redPlayer touches m_CapturePointID2
+    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID4);
+    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
     DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
-
-    //redPlayer touches m_CapturePointID
-    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
-
-    //blueplayer does nothing
+    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID1);
+    DoTouchEvent(m_RedTeamPlayer, m_CapturePointID0);
 }
 void CapturePointTest::TestSetup7()
 {
@@ -286,146 +267,129 @@ void CapturePointTest::DoLeaveEvent(EntityID whoDidSomething, EntityID onWhatObj
 }
 void CapturePointTest::TestSuccess1() {
     //TestSetup1_OnePlayerOnCapturePoint
-
-    //if ammocount reaches -- we know the test has succeeded, i.e. a shot has been fired
     int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
     if (ownedByID3 == m_RedTeam)
         TestSucceeded = true;
 }
 void CapturePointTest::TestSuccess2() {
     //TestSetup2_TwoPlayersOnCapturePoint
-    int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
-    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
-    if (ownedByID3 == m_RedTeam && ownedByID1 == m_BlueTeam)
-        TestSucceeded = true;
+    if (NumLoops == 95) {
+        int ownedByID1 = m_World->GetComponent(m_CapturePointID1, "Team")["Team"];
+        int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
+        int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
+        if (ownedByID1 == m_BlueTeam && ownedByID2 == 0 && ownedByID3 == m_RedTeam)
+            TestSucceeded = true;
+    }
 }
 void CapturePointTest::TestSuccess3() {
     //TestSetup3_NoPlayersOnCapturePoint
-    //only do this test if were at the final loopcount
-    //if any capturePoint changed then, its a failure else a success
     if (NumLoops == 95) {
         TestSucceeded = true;
-        int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
+        int ownedByID1 = m_World->GetComponent(m_CapturePointID1, "Team")["Team"];
         int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
         int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
-        if (ownedByID1 != m_BlueTeam || ownedByID2 == m_RedTeam || ownedByID2 == m_BlueTeam || ownedByID3 !=m_RedTeam)
-            TestSucceeded = false;
+        if (ownedByID1 == 0 && ownedByID2 == 0 && ownedByID3 == 0)
+            TestSucceeded = true;
     }
 }
 void CapturePointTest::TestSuccess4() {
+    //blue = 0
     //TestSetup4_TwoCapturePointsBeingCaptured
-    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
-    int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID1, "Team")["Team"];
     int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
     if (ownedByID1 == m_BlueTeam && ownedByID3 == m_RedTeam)
         TestSucceeded = true;
 }
 void CapturePointTest::TestSuccess5() {
+    //blue = 0
     //TestSetup5_SameCapturePointContestedAndTakenOver
-    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID1, "Team")["Team"];
     int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
     int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
-    if (ownedByID1 == m_BlueTeam && ownedByID2 == m_RedTeam && ownedByID3 == m_RedTeam)
+    if (ownedByID3 == m_RedTeam && ownedByID2 == m_RedTeam && ownedByID1 == m_BlueTeam)
         TestSucceeded = true;
 }
 void CapturePointTest::TestSuccess6() {
     //NOTE: the actual win-event will have to be manually checked if it triggered or not
     //TestSetup6_Team1CapturedTheLastPointAndWon
-    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
+    int ownedByID0 = m_World->GetComponent(m_CapturePointID0, "Team")["Team"];
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID1, "Team")["Team"];
     int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
     int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
-    if (ownedByID1 == m_RedTeam && ownedByID2 == m_RedTeam && ownedByID3 == m_RedTeam)
+    int ownedByID4 = m_World->GetComponent(m_CapturePointID4, "Team")["Team"];
+    if (ownedByID1 == m_RedTeam && ownedByID2 == m_RedTeam && ownedByID3 == m_RedTeam && ownedByID4 == m_RedTeam)
         TestSucceeded = true;
 }
 void CapturePointTest::TestSuccess7() {
-    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
+    //blue = 0
+    int ownedByID0 = m_World->GetComponent(m_CapturePointID0, "Team")["Team"];
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID1, "Team")["Team"];
     int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
     int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
+    int ownedByID4 = m_World->GetComponent(m_CapturePointID4, "Team")["Team"];
 
-    if (NumLoops < 20 && ownedByID1 == m_BlueTeam & ownedByID3 == m_RedTeam) {
-        phase1Success = true;
-    }
-    if (NumLoops < 40 && NumLoops > 20 && ownedByID2 == m_RedTeam) {
-        phase2Success = true;
-    }
-    if (NumLoops < 60 && NumLoops > 40 && ownedByID1 == m_RedTeam) {
-        phase3Success = true;
-    }
-    if (NumLoops < 90 && NumLoops > 60 && ownedByID2 != m_BlueTeam) {
-        phase4Success = true;
-    }
+    //    //red has 1,2,3,4 - blue tries to take 2... when it only has 0
 
     if (NumLoops == 99) {
-        if (phase1Success && phase2Success && phase3Success &&phase4Success)
+        if (ownedByID0 == m_BlueTeam && ownedByID1 == m_RedTeam && ownedByID2 == m_RedTeam && ownedByID3 == m_RedTeam && ownedByID4 == m_RedTeam)
             TestSucceeded = true;
     }
 }
 void CapturePointTest::TestSuccess8() {
-    int ownedByID1 = m_World->GetComponent(m_CapturePointID, "Team")["Team"];
+    //blue = 4
+    int ownedByID0 = m_World->GetComponent(m_CapturePointID0, "Team")["Team"];
+    int ownedByID1 = m_World->GetComponent(m_CapturePointID1, "Team")["Team"];
     int ownedByID2 = m_World->GetComponent(m_CapturePointID2, "Team")["Team"];
     int ownedByID3 = m_World->GetComponent(m_CapturePointID3, "Team")["Team"];
+    int ownedByID4 = m_World->GetComponent(m_CapturePointID4, "Team")["Team"];
 
-    if (NumLoops < 20 && ownedByID3 == m_BlueTeam & ownedByID1 == m_RedTeam) {
-        phase1Success = true;
-    }
-    if (NumLoops < 40 && NumLoops > 20 && ownedByID2 == m_RedTeam) {
-        phase2Success = true;
-    }
-    if (NumLoops < 60 && NumLoops > 40 && ownedByID3 == m_RedTeam) {
-        phase3Success = true;
-    }
-    if (NumLoops < 90 && NumLoops > 60 && ownedByID2 != m_BlueTeam) {
-        phase4Success = true;
-    }
-
+    //red has 0,1,2,3 - blue tries to take 2... when it only has 0
     if (NumLoops == 99) {
-        if (phase1Success && phase2Success && phase3Success &&phase4Success)
+        if (ownedByID0 == m_RedTeam && ownedByID1 == m_RedTeam && ownedByID2 == m_RedTeam && ownedByID3 == m_RedTeam && ownedByID4 == m_BlueTeam)
             TestSucceeded = true;
     }
 }
 void CapturePointTest::UpdateTest7() {
-    //loop 1 = team1 has 3, team 2 has 1
-    //loop 20 = team1 takes 2, team 1 leaves 1 -> team1 next = 1, team2 next = still 2
+    //blue = 0
     if (NumLoops == 20) {
         //leave previous
-        DoLeaveEvent(m_BlueTeamPlayer, m_CapturePointID);
-        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID3);
+        DoLeaveEvent(m_BlueTeamPlayer, m_CapturePointID0);
+        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID4);
 
-        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
+        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
+        DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID1);
     }
-    //loop 40 = team1 takes 1, team2:s next cap point should now be 1 (instead of 2)
     if (NumLoops == 40) {
         //leave previous, take next
-        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID2);
-        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID);
+        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID3);
+        DoLeaveEvent(m_BlueTeamPlayer, m_CapturePointID1);
+        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
+        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID1);
     }
-    //loop 60 = team2 tries to take 2, this shouldnt work now
+    //red has 1,2,3,4 - blue tries to take 2... when it only has 0
     if (NumLoops == 60) {
-        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID);
         DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID2);
     }
 }
 void CapturePointTest::UpdateTest8() {
-    //2 owns 3
-    //1 owns 1
-
-    //loop 20 = team1 takes 2, team 1 leaves 1 -> team1 next = 1, team2 next = still 2
+    //blue = 4
     if (NumLoops == 20) {
         //leave previous
-        DoLeaveEvent(m_BlueTeamPlayer, m_CapturePointID3);
-        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID);
+        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID0);
+        DoLeaveEvent(m_BlueTeam, m_CapturePointID4);
 
-        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
+        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID1);
+        DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID3);
     }
-    //loop 40 = team1 takes 3, team2:s next cap point should now be 1 (instead of 2)
     if (NumLoops == 40) {
         //leave previous, take next
-        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID2);
+        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID1);
+        DoLeaveEvent(m_BlueTeamPlayer, m_CapturePointID3);
+        DoTouchEvent(m_RedTeamPlayer, m_CapturePointID2);
         DoTouchEvent(m_RedTeamPlayer, m_CapturePointID3);
     }
-    //loop 60 = team2 tries to take 2, this shouldnt work now
+    //red has 0,1,2,3 - blue tries to take 2... when it only has 0
     if (NumLoops == 60) {
-        DoLeaveEvent(m_RedTeamPlayer, m_CapturePointID3);
         DoTouchEvent(m_BlueTeamPlayer, m_CapturePointID2);
     }
 }
