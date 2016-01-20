@@ -29,7 +29,7 @@
         </c:Team>
         <c:Transform>
           <Position X="-2.38960934" Y="11.7122087" Z="11.4659815"/>
-          <Orientation X="-0.715584457" Y="0.122161396" Z="1.65143504e-07"/>
+          <Orientation X="-0.645771146" Y="-1.17512627e-05" Z="1.76718231e-07"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -39,6 +39,7 @@
         <c:AABB/>
         <c:CapturePoint>
           <HomePointForTeam>3</HomePointForTeam>
+          <CaptureTimer>6.9158446328696002</CaptureTimer>
         </c:CapturePoint>
         <c:Model>
           <Resource>../assets/Models/Core/UnitSphere.obj</Resource>
@@ -58,7 +59,7 @@
       <Components>
         <c:AABB/>
         <c:CapturePoint>
-          <CaptureTimer>-3.9175623281664684</CaptureTimer>
+          <CaptureTimer>-13.234195338196177</CaptureTimer>
           <CapturePointNumber>1</CapturePointNumber>
         </c:CapturePoint>
         <c:Model>
@@ -79,7 +80,6 @@
       <Components>
         <c:AABB/>
         <c:CapturePoint>
-          <CaptureTimer>-1.8667072838033221</CaptureTimer>
           <CapturePointNumber>2</CapturePointNumber>
         </c:CapturePoint>
         <c:Model>
@@ -130,7 +130,7 @@
           <Team>2</Team>
         </c:Team>
         <c:Transform>
-          <Position X="-0.154032111" Y="2.23822045" Z="-0.0577065349"/>
+          <Position X="4.99647331" Y="2.23822045" Z="1.80651212"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -148,7 +148,7 @@
           <Team>3</Team>
         </c:Team>
         <c:Transform>
-          <Position X="3.2779336" Y="2.02053547" Z="-0.0348547697"/>
+          <Position X="2.7091608" Y="2.02053547" Z="-0.0348547697"/>
         </c:Transform>
       </Components>
       <Children/>

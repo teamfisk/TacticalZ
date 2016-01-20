@@ -45,6 +45,7 @@ private:
     //std::vector<ComponentWrapper>
 
     const double m_CaptureTimeToTakeOver = 15.0;
+    bool m_ResetTimers = false;
 
     //vectors which will keep track of enter/leave changes
     std::vector<std::tuple<EntityID, EntityID>> m_ETriggerTouchVector;

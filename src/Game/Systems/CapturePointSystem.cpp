@@ -8,12 +8,16 @@ CapturePointSystem::CapturePointSystem(EventBroker* eventBroker)
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
+    EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
 }
 
 //here all capturepoints will update their component
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
 void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& capturePoint, double dt)
 {
+    if (m_WinnerWasFound) {
+        return;
+    }
     const int capturePointNumber = capturePoint["CapturePointNumber"];
     const bool hasTeamComponent = world->HasComponent(capturePoint.EntityID, "Team");
 
@@ -79,6 +83,19 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
         if ((int)capturePointOwnedBy["Team"] == blueTeam && m_BlueTeamHomeCapturePoint != 0) {
             nextPossibleCapturePoint["Blue"] = i - 1;
         }
+    }
+
+    //reset timers and reset the bool that triggers this
+    if (m_ResetTimers) {
+        for (size_t i = 0; i < m_NumberOfCapturePoints; i++)
+        {
+            ComponentWrapper& capturePoint = world->GetComponent(m_CapturePointNumberToEntityIDMap[i], "CapturePoint");
+            if ((int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Red"] &&
+                (int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Blue"]) {
+                capturePoint["CaptureTimer"] = 0.0;
+            }
+        }
+        m_ResetTimers = false;
     }
 
     //colorize next possible capturepoint
@@ -213,5 +230,7 @@ bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e)
 }
 bool CapturePointSystem::OnCaptured(const Events::Captured& e)
 {
+    //reset the timers in the next update since a capture has changed the "nextCapturePoint" for 1-2 teams
+    m_ResetTimers = true;
     return true;
 }
