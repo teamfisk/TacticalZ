@@ -199,30 +199,93 @@ bool RayVsModel(const Ray& ray,
     return hit;
 }
 
-bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
+bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, glm::vec3& outResolutionVector)
 {
-    bool hit = false;
-    
     const glm::vec3& origin = box.Origin();
     const glm::vec3& min = box.MinCorner();
     const glm::vec3& max = box.MaxCorner();
+    const glm::vec3& half = box.HalfSize();
 
-    outResolutionVector.x = INFINITY;
+    const glm::vec3 triPos[] = {
+        v0, v1, v2
+    };
 
-    for (int i = 0; i < modelIndices.size(); ++i) {
-        glm::vec3 p = modelVertices[i].Position;
+    for (int ax = 0; ax < 3; ++ax) {
+        auto outsideMinPlane = glm::tvec3<bool>(false);
+        auto outsideMaxPlane = glm::tvec3<bool>(false);
+        for (int pos = 0; pos < 3; ++pos) {
+            outsideMinPlane[pos] = (min[ax] > triPos[pos][ax]);
+            outsideMaxPlane[pos] = (triPos[pos][ax] > max[ax]);
+        }
+        if (glm::all(outsideMinPlane) || glm::all(outsideMaxPlane)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
+{
+    bool hit = false;
+    for (int i = 0; i < modelIndices.size(); i += 3) {
+        glm::vec3 resVec;
+        hit = AABBvsTriangle(
+            box, 
+            modelVertices[modelIndices[i]].Position, 
+            modelVertices[modelIndices[i + 1]].Position,
+            modelVertices[modelIndices[i + 2]].Position,
+            resVec
+            );
+        if (hit) {
+            break;
+        }
+    }
+    return hit;
+    //TODO: Remove old code.
+
+    /*
+    auto hit = glm::tvec3<bool>(false);
+    const glm::vec3& origin = box.Origin();
+    const glm::vec3& min = box.MinCorner();
+    const glm::vec3& max = box.MaxCorner();
+    const glm::vec3& half = box.HalfSize();
+
+    float minResolution = INFINITY;
+    outResolutionVector = glm::vec3(0.f);
+    //TODO: Don't need indices? Remove?
+    for (const auto& v : modelVertices) {
+        glm::vec3 p = v.Position;
         p = glm::vec3(modelMatrix * glm::vec4(p.x, p.y, p.z, 1));
 
-        float distFromOrigin = glm::abs(origin.x - p.x);
-        float penetration = box.HalfSize().x - distFromOrigin;
-        if (penetration > 0 && penetration < glm::abs(outResolutionVector.x)) {
-            if (p.x > origin.x) {
-                outResolutionVector.x = -penetration;
-            } else {
-                outResolutionVector.x = penetration;
+        const glm::vec3 diffO = origin - p;
+        const glm::vec3 distO = glm::abs(diffO);
+        for (int axis = 0; axis < 3; ++axis) {
+            float penetration = half[axis] - distO[axis];
+            if (penetration > 0){
+                if (penetration < minResolution) {
+                    minResolution = penetration;
+                    outResolutionVector = glm::vec3(0.f);
+                    if (p[axis] > origin[axis]) {
+                        outResolutionVector[axis] = -penetration;
+                    } else {
+                        outResolutionVector[axis] = penetration;
+                    }
+                }
+                hit[axis] = true;
             }
-            hit = true;
         }
+
+        //float distFromOrigin = glm::abs(origin.x - p.x);
+        //float penetration = box.HalfSize().x - distFromOrigin;
+        //if (penetration > 0 && penetration < glm::abs(outResolutionVector.x)) {
+        //    if (p.x > origin.x) {
+        //        outResolutionVector.x = -penetration;
+        //    } else {
+        //        outResolutionVector.x = penetration;
+        //    }
+        //    hit = true;
+        //}
+
         //glm::vec3 pLocal = origin - p;
         //for (int axis = 0; axis < 3; ++axis) {
         //    if (p[axis] < min[axis] || p[axis] > max[axis]) {
@@ -236,7 +299,13 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
         //}
     }
 
-    return hit;
+    //for (int axis = 0; axis < 3; ++axis) {
+    //    if (glm::isinf(outResolutionVector[axis])) {
+    //        outResolutionVector[axis] = 0.f;
+    //    }
+    //}
+
+    return glm::all(hit);*/
 }
 
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)
