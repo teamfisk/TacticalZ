@@ -13,7 +13,8 @@ enum class MessageType
 	Snapshot,
     OnInputCommand,
     OnPlayerDamage,
-    PlayerConnected
+    PlayerConnected,
+    BecomePlayer
 };
 
 #endif

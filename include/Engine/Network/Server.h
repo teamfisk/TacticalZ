@@ -71,7 +71,7 @@ private:
     void parseClientPing();
     void parseServerPing();
     void identifyPacketLoss();
-    EntityID createPlayer();
+    void createPlayer();
     int GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;

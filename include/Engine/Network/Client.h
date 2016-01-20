@@ -82,6 +82,7 @@ private:
     bool hasServerTimedOut();
     EntityID createPlayer();
     void sendInputCommands();
+    void becomePlayer();
     // Mapping Logic
     // Returns if local EntityID exist in map
     bool clientServerMapsHasEntity(EntityID clientEntityID);

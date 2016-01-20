@@ -35,7 +35,7 @@ void Client::Update()
 {
     m_EventBroker->Process<Client>();
     readFromServer();
-    if (m_IsConnected) { 
+    if (m_IsConnected) {
         hasServerTimedOut();
     }
 }
@@ -271,6 +271,10 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
             disconnect();
         }
         return true;
+    } else if (e.Command == "SwitchToPlayer") {
+        if (e.Value > 0) {
+            becomePlayer();
+        }
     } else {
         m_InputCommandBuffer.push_back(e);
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -332,6 +336,12 @@ void Client::sendInputCommands()
         send(packet);
         m_InputCommandBuffer.clear();
     }
+}
+
+void Client::becomePlayer()
+{
+    Packet packet = Packet(MessageType::BecomePlayer, m_SendPacketID);
+    send(packet);
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

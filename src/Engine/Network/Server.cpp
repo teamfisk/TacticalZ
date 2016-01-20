@@ -89,6 +89,9 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::OnPlayerDamage:
         parseOnPlayerDamage(packet);
         break;
+    case MessageType::BecomePlayer:
+        createPlayer();
+        break;
     default:
         break;
     }
@@ -123,8 +126,8 @@ void Server::send(Packet & packet)
 
 void Server::broadcast(Packet& packet)
 {
-        for (int i = 0; i < m_ConnectedUsers.size(); i++) {
-            if (m_ConnectedUsers[i].Endpoint.address() != boost::asio::ip::address()) {
+    for (int i = 0; i < m_ConnectedUsers.size(); i++) {
+        if (m_ConnectedUsers[i].Endpoint.address() != boost::asio::ip::address()) {
             packet.ChangePacketID(m_ConnectedUsers[i].PacketID);
             send(packet, i);
         }
@@ -167,7 +170,7 @@ void Server::sendPing()
     for (int i = 0; i < m_ConnectedUsers.size(); i++) {
         if (m_ConnectedUsers[i].Endpoint.address() != boost::asio::ip::address()) {
             int ping = 1000 * (m_ConnectedUsers[i].StopTime - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
-            LOG_INFO("Last packetID received %i: User %i's ping: %i", m_ConnectedUsers[i].PacketID, i, ping);
+            LOG_INFO("Last packetID received %i: User %i's ping: %i", m_ConnectedUsers[i].PacketID, i, std::abs(ping));
         }
     }
     // Create ping message
@@ -319,16 +322,41 @@ void Server::identifyPacketLoss()
     }
 }
 
-EntityID Server::createPlayer()
+void Server::createPlayer()
 {
-    EntityID entityID = m_World->CreateEntity();
-    ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
-    transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
-    ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.obj";
-    model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
-    ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
-    return entityID;
+    if (GetPlayerIDFromEndpoint(m_ReceiverEndpoint) != -1) {
+        // Already connected as player
+        LOG_WARNING("Already connected!");
+        return;
+    }
+    int userIndex;
+    for (userIndex = 0; userIndex < m_ConnectedUsers.size(); userIndex++) {
+        if (m_ConnectedUsers[userIndex].Endpoint.address() == m_ReceiverEndpoint.address() &&
+            m_ConnectedUsers[userIndex].Endpoint.port() == m_ReceiverEndpoint.port()) {
+            // Found user
+            break;
+        }
+    }
+    if (userIndex == m_ConnectedUsers.size()) {
+        LOG_WARNING("Not a recognized user!");
+        return;
+    }
+    for (int playerIndex = 0; playerIndex < MAXCONNECTIONS; playerIndex++) {
+        if (m_PlayerDefinitions[playerIndex].Endpoint.address() == boost::asio::ip::address()) {
+            m_PlayerDefinitions[playerIndex] = m_ConnectedUsers[userIndex];
+            EntityID entityID = m_World->CreateEntity();
+            ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
+            transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
+            ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
+            model["Resource"] = "Models/Core/UnitSphere.obj";
+            model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
+            ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
+            m_PlayerDefinitions[playerIndex].EntityID = entityID;
+            return;
+        }
+    }
+    LOG_WARNING("Server is full!");
+ 
 }
 
 int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
