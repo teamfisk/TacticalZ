@@ -10,22 +10,43 @@ MeshClass::MeshClass()
 
 std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
 {
+    MS status;
     map<int, WeightInfo> weightMap;
 
 	MItDependencyNodes it(MFn::kSkinClusterFilter);
 
 	while (!it.isDone()) {
 
-        MObject object = it.item();
-        MFnSkinCluster skinCluster(object);
+        MObject object = it.thisNode(&status);
+        if (status != MS::kSuccess) {
+            MGlobal::displayError(MString() + " it.thisNode() ERROR: " + status.errorString());
+            break;
+        }
+        MFnSkinCluster skinCluster(object, &status);
+        if (status != MS::kSuccess) {
+            MGlobal::displayError(MString() + "skinCluster() ERROR: " + status.errorString());
+            break;
+        }
         MDagPathArray influences;
 
-        unsigned int nrOfInfluences = skinCluster.influenceObjects(influences);
+        unsigned int nrOfInfluences = skinCluster.influenceObjects(influences,&status);
+        if (status != MS::kSuccess) {
+            MGlobal::displayError(MString() + "skinCluster.influenceObjects() ERROR: " + status.errorString());
+            break;
+        }
 
         unsigned int index;
-        index = skinCluster.indexForOutputConnection(0);
+        index = skinCluster.indexForOutputConnection(0,&status);
+        if (status != MS::kSuccess) {
+            MGlobal::displayError(MString() + "skinCluster.indexForOutputConnection() ERROR: " + status.errorString());
+            break;
+        }
         MDagPath skinPath;
-        skinCluster.getPathAtIndex(index, skinPath);
+        status = skinCluster.getPathAtIndex(index, skinPath);
+        if (status != MS::kSuccess) {
+            MGlobal::displayError(MString() + "skinCluster.getPathAtIndex() ERROR: " + status.errorString());
+            break;
+        }
 
         MItGeometry geomIter(skinPath);
         //for (unsigned int i = 0; i < nrOfInfluences; i++) {
@@ -34,10 +55,18 @@ std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
         WeightInfo weightInfo;
 
         while (!geomIter.isDone()) {
-            MObject comp = geomIter.component();
+            MObject comp = geomIter.component(&status);
+            if (status != MS::kSuccess) {
+                MGlobal::displayError(MString() + "geomIter.component() ERROR: " + status.errorString());
+                break;
+            }
             MFloatArray weights;
             unsigned int influenceCount;
-            skinCluster.getWeights(skinPath, comp, weights, influenceCount);
+            status = skinCluster.getWeights(skinPath, comp, weights, influenceCount);
+            if (status != MS::kSuccess) {
+                MGlobal::displayError(MString() + "skinCluster.getWeights() ERROR: " + status.errorString());
+                break;
+            }
             MFnDependencyNode test(comp);
 
             unsigned int nrOfWeights = 0;
@@ -64,10 +93,7 @@ std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
                 //MGlobal::displayInfo(MString() + "influence: " + weightInfo.BoneIndices[k] + " weight: " + weightInfo.BoneWeights[k]);
             }
             geomIter.next();
-
-
         }
-
         it.next();
 	}
     return weightMap;
@@ -75,6 +101,7 @@ std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
 
 Mesh MeshClass::GetMeshData(MObjectArray object)
 {
+    MS status;
     Mesh newMesh;
     vector<VertexLayout>& vertexList = newMesh.Vertices;
     map<string, vector<int>>& indexLists = newMesh.Indices;
@@ -85,11 +112,21 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         // In here, we retrieve triangulated polygons from the mesh
         MFnMesh mesh(object[ObjectID]);
         MDagPathArray dagPaths;
-        MDagPath::getAllPathsTo(object[ObjectID], dagPaths);
+        status = MDagPath::getAllPathsTo(object[ObjectID], dagPaths);
+        if (status != MS::kSuccess) {
+            MGlobal::displayError(MString() + "MDagPath::getAllPathsTo() ERROR: " + status.errorString());
+            break;
+        }
+
         for (int pathID = 0; pathID < dagPaths.length(); pathID++) {
             MGlobal::displayInfo(dagPaths[pathID].fullPathName());
             MDagPath thisMeshPath(dagPaths[pathID]);
-            MMatrix transformMatrix = thisMeshPath.inclusiveMatrix();
+
+            MMatrix transformMatrix = thisMeshPath.inclusiveMatrix(&status);
+            if (status != MS::kSuccess) {
+                MGlobal::displayError(MString() + "thisMeshPath.inclusiveMatrix() ERROR: " + status.errorString() + " for " + thisMeshPath.fullPathName());
+                break;
+            }
 
             map<unsigned int, vector<unsigned int>> vertexToIndex;;
 
@@ -106,28 +143,57 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
 
             MObjectArray shaderList;
             MIntArray shaderIndexList;
-            mesh.getConnectedShaders(0, shaderList, shaderIndexList);
+            status = mesh.getConnectedShaders(0, shaderList, shaderIndexList);
+            if (status != MS::kSuccess) {
+                MGlobal::displayError(MString() + "mesh.getConnectedShaders() ERROR: " + status.errorString()  + " for " + thisMeshPath.fullPathName());
+                break;
+            }
 
+            if (shaderList.length() == 0) {
+                MGlobal::displayError(MString() + "Object: \"" + thisMeshPath.fullPathName() + "\" have no material and will not be exported");
+                break;
+            }
             map<string, vector<int>> materialFaceIDs;
             MGlobal::displayInfo(MString() + "shaderIndexList: " + shaderIndexList.length());
             MGlobal::displayInfo(MString() + "shaderList: " + shaderList.length());
             MPlugArray plugArray;
             for (int i = 0; i < shaderIndexList.length(); i++) {
                 MFnDependencyNode shader(shaderList[shaderIndexList[i]]);
-                MPlug p_Plug = shader.findPlug("surfaceShader");
-                if (p_Plug.connectedTo(plugArray, true, false)) {
+                MPlug p_Plug = shader.findPlug("surfaceShader", status);
+                if (status != MS::kSuccess) {
+                    MGlobal::displayError(MString() + "shader.findPlug(\"surfaceShader\") ERROR: " + status.errorString()  + " for " + thisMeshPath.fullPathName());
+                    continue;
+                }
+                if (p_Plug.connectedTo(plugArray, true, false, &status)) {
+                    if (status != MS::kSuccess) {
+                        MGlobal::displayError(MString() + "p_Plug.connectedTo() ERROR in if: " + status.errorString()  + " for " + thisMeshPath.fullPathName());
+                        continue;
+                    }
                     MFnDependencyNode node = plugArray[0].node();
                     materialFaceIDs[node.name().asChar()].push_back(i);
+                }
+                if (status != MS::kSuccess) {
+                    MGlobal::displayError(MString() + "p_Plug.connectedTo() ERROR: " + status.errorString()  + " for " + thisMeshPath.fullPathName());
+                    continue;
                 }
             }
 
             map<int, WeightInfo> vertexWeights = GetWeightData();
-
-            mesh.getTangents(Tangents, MSpace::kTransform, NULL);
-            mesh.getBinormals(biNormals, MSpace::kTransform, NULL);
-
+            status = mesh.getTangents(Tangents, MSpace::kObject);
+            if (status != MS::kSuccess) {
+                MGlobal::displayError(MString() + "mesh.getTangents ERROR: " + status.errorString()  + " for " + thisMeshPath.fullPathName());
+                continue;
+            }
+            status = mesh.getBinormals(biNormals, MSpace::kObject);
+            if (status != MS::kSuccess) {
+                MGlobal::displayError(MString() + "mesh.getBinormals ERROR: " + status.errorString()  + " for " + thisMeshPath.fullPathName());
+                continue;
+            }
+            if(Tangents.length() == 0 || biNormals.length() == 0){
+                MGlobal::displayError(MString() + "Unknown ERROR with " + thisMeshPath.fullPathName());
+                continue;
+            }
             MItMeshFaceVertex faceVert(object[ObjectID]);
-
             int intDummy = 0;
 
             MItMeshPolygon meshPolyIter(object[ObjectID]);
@@ -137,17 +203,40 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
 
             for (auto aMaterial : materialFaceIDs) {
                 for (auto faceID : aMaterial.second) {
-
                     vector<array<unsigned int, 2>> localVertexToGlobalIndex;
-                    meshPolyIter.setIndex(faceID, intDummy);
 
-                    meshPolyIter.getVertices(vertices);
-                    meshPolyIter.getTriangles(dummy, triangleList);
+                    status = meshPolyIter.setIndex(faceID, intDummy);
+                    if (status != MS::kSuccess) {
+                        MGlobal::displayError(MString() + " meshPolyIter.setIndex() ERROR: " + status.errorString() +  " for faceID " + faceID + " in mesh " + thisMeshPath.fullPathName());
+                        break;
+                    }
+
+                    status = meshPolyIter.getVertices(vertices);
+                    if (status != MS::kSuccess) {
+                        MGlobal::displayError(MString() + "  meshPolyIter.getVertices() ERROR: " + status.errorString() +  " for faceID " + faceID + " in mesh " + thisMeshPath.fullPathName());
+                        break;
+                    }
+
+                    status = meshPolyIter.getTriangles(dummy, triangleList);
+                    if (status != MS::kSuccess) {
+                        MGlobal::displayError(MString() + "  meshPolyIter.getTriangles() ERROR: " + status.errorString() +  " for faceID " + faceID + " in mesh " + thisMeshPath.fullPathName());
+                        break;
+                    }
                     //MGlobal::displayInfo("Befor Second Loop");
                     for (unsigned int i = 0; i < vertices.length(); i++) {
                         VertexLayout thisVertex;
-                        vertexIndex = meshPolyIter.vertexIndex(i);
-                        faceVert.setIndex(meshPolyIter.index(), i, intDummy, intDummy);
+
+                        vertexIndex = meshPolyIter.vertexIndex(i, &status);
+                        if (status != MS::kSuccess) {
+                            MGlobal::displayError(MString() + "  meshPolyIter.vertexIndex() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
+                            break;
+                        }
+
+                        status = faceVert.setIndex(meshPolyIter.index(), i, intDummy, intDummy);
+                        if (status != MS::kSuccess) {
+                            MGlobal::displayError(MString() + "faceVert.setIndex() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
+                            break;
+                        }
                         //MGlobal::displayInfo("In Second Loop");
                         //pos = faceVert.position(MSpace::kTransform);
                         //mesh.getPoint(vertexIndex, pos, MSpace::kPostTransform);
@@ -160,7 +249,11 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         if (abs(pos.z) > 0.0001)
                             thisVertex.Pos[2] = pos.z;
 
-                        faceVert.getNormal(normal, MSpace::kTransform);
+                        status = faceVert.getNormal(normal, MSpace::kObject);
+                        if (status != MS::kSuccess) {
+                            MGlobal::displayError(MString() + "faceVert.getNormal() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
+                            break;
+                        }
                         if (abs(normal[0]) > 0.0001)
                             thisVertex.Normal[0] = normal[0];
                         if (abs(normal[1]) > 0.0001)
@@ -187,7 +280,11 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         if (abs(biNormal[2]) > 0.0001)
                             thisVertex.BiNormal[2] = biNormal[2];
 
-                        faceVert.getUV(UV);
+                        status = faceVert.getUV(UV);
+                        if (status != MS::kSuccess) {
+                            MGlobal::displayError(MString() + " faceVert.getUV() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
+                            break;
+                        }
                         thisVertex.Uv[0] = UV[0];
                         thisVertex.Uv[1] = UV[1];
 
@@ -195,7 +292,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         thisVertex.BoneIndices[1] = vertexWeights[faceVert.vertId()].BoneIndices[1];
                         thisVertex.BoneIndices[2] = vertexWeights[faceVert.vertId()].BoneIndices[2];
                         thisVertex.BoneIndices[3] = vertexWeights[faceVert.vertId()].BoneIndices[3];
-
                         if (abs(vertexWeights[faceVert.vertId()].BoneWeights[0]) > 0.0001)
                             thisVertex.BoneWeights[0] = vertexWeights[faceVert.vertId()].BoneWeights[0];
                         if (abs(vertexWeights[faceVert.vertId()].BoneWeights[1]) > 0.0001)
