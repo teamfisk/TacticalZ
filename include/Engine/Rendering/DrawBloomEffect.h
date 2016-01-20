@@ -17,13 +17,11 @@ public:
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
+
     void Draw(RenderScene& scene);
 
-    //Todo: Should not be public
-    FrameBuffer m_BloomFrameBuffer;
-    GLuint m_BloomTexture;
-    GLuint m_SceneTexture;
-    GLuint m_DepthBuffer;
+    //Getters
+
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
@@ -34,6 +32,7 @@ private:
     const LightCullingPass* m_LightCullingPass;
 
     ShaderProgram* m_ForwardPlusProgram;
+
 };
 
 #endif 

@@ -14,6 +14,7 @@
 #include "DrawScenePass.h"
 #include "LightCullingPass.h"
 #include "DrawFinalPass.h"
+#include "DrawScreenQuadPass.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
@@ -48,6 +49,7 @@ private:
     LightCullingPass* m_LightCullingPass;
     ImGuiRenderPass* m_ImGuiRenderPass;
     DrawFinalPass* m_DrawFinalPass;
+    DrawScreenQuadPass* m_DrawScreenQuadPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
@@ -57,14 +59,13 @@ private:
     //TODO: Renderer: Get InputUpdate out of renderer
     void InputUpdate(double dt);
     //void PickingPass(RenderQueueCollection& rq);
-    void DrawScreenQuad(GLuint textureToDraw);
+    //void DrawScreenQuad(GLuint textureToDraw);
 
     static bool DepthSort(const std::shared_ptr<RenderJob> &i, const std::shared_ptr<RenderJob> &j) { return (i->Depth < j->Depth); }
     void SortRenderJobsByDepth(RenderScene &scene);
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
-	ShaderProgram* m_BasicForwardProgram;
-    ShaderProgram* m_DrawScreenQuadProgram;
+    ShaderProgram* m_BasicForwardProgram;
 };
 
 #endif

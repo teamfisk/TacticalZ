@@ -6,27 +6,11 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
     m_LightCullingPass = lightCullingPass;
     InitializeTextures();
     InitializeShaderPrograms();
-    InitializeFrameBuffers();
 }
 
 void DrawFinalPass::InitializeTextures()
 {
     m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
-}
-
-void DrawFinalPass::InitializeFrameBuffers()
-{
-    glGenRenderbuffers(1, &m_DepthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
-
-    GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    
-    m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
-    m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
-    m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
-    m_BloomFrameBuffer.Generate();
 }
 
 void DrawFinalPass::InitializeShaderPrograms()
@@ -41,8 +25,6 @@ void DrawFinalPass::InitializeShaderPrograms()
 void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("DrawFinalPass::Draw: Pre");
-
-    m_BloomFrameBuffer.Bind(); //in i state
 
     DrawFinalPassState state;
     m_ForwardPlusProgram->Bind();
@@ -81,16 +63,4 @@ void DrawFinalPass::Draw(RenderScene& scene)
     }
     GLERROR("DrawFinalPass::Draw: END");
 
-}
-
-void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
-{
-    glGenTextures(1, texture);
-    glBindTexture(GL_TEXTURE_2D, *texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
-    GLERROR("Texture initialization failed");
 }

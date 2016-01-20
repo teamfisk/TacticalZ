@@ -69,12 +69,6 @@ void Renderer::InitializeWindow()
 void Renderer::InitializeShaders()
 {
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
-
-    m_DrawScreenQuadProgram = ResourceManager::Load<ShaderProgram>("#DrawScreenQuadProgram");
-    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
-    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
-    m_DrawScreenQuadProgram->Compile();
-    m_DrawScreenQuadProgram->Link();
 }
 
 void Renderer::InputUpdate(double dt)
@@ -105,6 +99,8 @@ void Renderer::Draw(RenderFrame& frame)
         m_LightCullingPass->FillLightList(*scene);
         m_LightCullingPass->CullLights(*scene);
         m_DrawFinalPass->Draw(*scene);
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_SceneTexture);
+        //m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_BloomTexture);
         //m_DrawScenePass->Draw(rq);
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
@@ -117,27 +113,6 @@ void Renderer::Draw(RenderFrame& frame)
 PickData Renderer::Pick(glm::vec2 screenCoord)
 {
     return m_PickingPass->Pick(screenCoord);
-}
-
-void Renderer::DrawScreenQuad(GLuint textureToDraw)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-
-    m_DrawScreenQuadProgram->Bind();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureToDraw);
-
-    glBindVertexArray(m_ScreenQuad->VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
-    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].EndIndex - m_ScreenQuad->MaterialGroups()[0].StartIndex +1
-        , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].StartIndex);
 }
 
 void Renderer::InitializeTextures()
@@ -171,4 +146,5 @@ void Renderer::InitializeRenderPasses()
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
+    m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
 }

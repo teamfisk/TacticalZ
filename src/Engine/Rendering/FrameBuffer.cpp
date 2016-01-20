@@ -55,8 +55,9 @@ void FrameBuffer::Generate()
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
             GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
             if ( (*it)->m_Attachment != GL_COLOR_ATTACHMENT0 ||
+                (*it)->m_Attachment != GL_COLOR_ATTACHMENT1 ||
                 (*it)->m_Attachment != GL_DEPTH_ATTACHMENT ||
-                (*it)->m_Attachment != GL_STENCIL_ATTACHMENT)
+                (*it)->m_Attachment != GL_STENCIL_ATTACHMENT) //TODO: Viktor: Fixa detta
             {
                 LOG_ERROR("RenderBuffer Attachment not valid.");
             }

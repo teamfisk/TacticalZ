@@ -48,7 +48,8 @@ in VertexData{
 	vec4 DiffuseColor;
 }Input;
 
-out vec4 fragmentColor;
+out vec4 sceneColor;
+out vec4 bloomColor;
 
 vec4 scene_ambient = vec4(0.3,0.3,0.3,1);
 
@@ -121,6 +122,7 @@ void main()
 		LightSource light = LightSources.List[l];
 
 		LightResult result;
+		//These if statements should be removed.
 		if(light.Type == 1) { // point
 			result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
@@ -131,19 +133,29 @@ void main()
 	}
 
 
-	//fragmentColor += Input.DiffuseColor;
-	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
-	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
-	//fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
-	//fragmentColor = texel * Input.DiffuseColor * Color;
-	//fragmentColor += vec4(currentTile/3600.f, 0, 0, 1);
+	//sceneColor += Input.DiffuseColor;
+	vec4 fragment = Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
+	bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
+	sceneColor = vec4(fragment.xyz, 1.0);
+	//These if statements should be removed.
+/*
+	if(fragment.x > 0.5 || fragment.y > 0.5 || fragment.z > 0.5) {
+		bloomColor = fragment;
+	} else {
+		bloomColor = vec4(0.3, 0.5, 0.8, 1.0);
+	}*/
+	
+	//sceneColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
+	//sceneColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
+	//sceneColor = texel * Input.DiffuseColor * Color;
+	//sceneColor += vec4(currentTile/3600.f, 0, 0, 1);
 
 	//Tiled Debug Code
 	/*
 	if(int(gl_FragCoord.x)%16 == 0 || int(gl_FragCoord.y)%16 == 0 ) {
-		fragmentColor += vec4(0.5, 0, 0, 0);
+		sceneColor += vec4(0.5, 0, 0, 0);
 	} else {
-		fragmentColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/LightSources.List.length(), 0, 0, 1);
+		sceneColor += vec4(LightGrids.Data[int(tilePos.x + tilePos.y*80)].Amount/LightSources.List.length(), 0, 0, 1);
 	}
 	*/
 }

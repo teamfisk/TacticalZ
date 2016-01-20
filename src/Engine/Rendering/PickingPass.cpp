@@ -46,14 +46,11 @@ void PickingPass::InitializeShaderPrograms()
 void PickingPass::Draw(RenderScene& scene)
 {
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
-
     
     //TODO: Render: Add code for more jobs than modeljobs.
 
     GLuint ShaderHandle = m_PickingProgram->GetHandle();
     m_PickingProgram->Bind();
-
-    
 
         m_Camera = scene.Camera;
 
@@ -95,10 +92,8 @@ void PickingPass::Draw(RenderScene& scene)
             }
         }
     
-    
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
-
 
     delete state;
 }

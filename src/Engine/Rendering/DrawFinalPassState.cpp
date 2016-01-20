@@ -3,7 +3,7 @@
 
 DrawFinalPassState::DrawFinalPassState()
 {
-    BindFramebuffer(0);
+    //BindFramebuffer(0);
     Enable(GL_BLEND);
     BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     Enable(GL_DEPTH_TEST);
