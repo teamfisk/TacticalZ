@@ -28,15 +28,23 @@ private:
     bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e);
     EventRelay<CapturePointSystem, Events::TriggerLeave> m_ETriggerLeave;
     bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e);
+    EventRelay<CapturePointSystem, Events::Captured> m_ECaptured;
+    bool CapturePointSystem::OnCaptured(const Events::Captured& e);
 
     bool m_WinnerWasFound = false;
     //need to track these variables for the captureSystem to work as per design!
     const int m_NotACapturePoint = 999;
-    int m_Team1NextPossibleCapturePoint = m_NotACapturePoint;
-    int m_Team2NextPossibleCapturePoint = m_NotACapturePoint;
-    int m_Team1HomeCapturePoint = m_NotACapturePoint;
-    int m_Team2HomeCapturePoint = m_NotACapturePoint;
+    int m_RedTeamNextPossibleCapturePoint = m_NotACapturePoint;
+    int m_BlueTeamNextPossibleCapturePoint = m_NotACapturePoint;
+    int m_RedTeamHomeCapturePoint = m_NotACapturePoint;
+    int m_BlueTeamHomeCapturePoint = m_NotACapturePoint;
 
+    int m_NumberOfCapturePoints = 0;
+    std::map<int, EntityID> m_CapturePointNumberToEntityIDMap;
+
+    //std::vector<ComponentWrapper>
+
+    std::map<std::string, int> m_NextPossibleCapturePoint;
     const double m_CaptureTimeToTakeOver = 15.0;
 
     //vectors which will keep track of enter/leave changes

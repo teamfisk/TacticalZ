@@ -80,8 +80,8 @@ bool CapturePointTest::CapturePoint_Game_Loop_OneHundredTimes() {
         Tick();
         NumLoops++;
         if (TestSucceeded) {
-            success = true;
-            break;
+            //success = true;
+            //break;
         }
         loops--;
     }

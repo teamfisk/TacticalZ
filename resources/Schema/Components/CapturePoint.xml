@@ -2,4 +2,5 @@
 <CapturePoint xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CapturePoint.xsd">
 	<CapturePointNumber>0</CapturePointNumber>
 	<CaptureTimer>0</CaptureTimer>
+	<HomePointForTeam><Spectator/></HomePointForTeam>
 </CapturePoint>
