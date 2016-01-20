@@ -149,7 +149,7 @@ void Game::Tick()
         ComponentWrapper transform = m_World->AttachComponent(m_BoxID, "Transform");
         transform["Scale"] = boxSize;
         ComponentWrapper model = m_World->AttachComponent(m_BoxID, "Model");
-        model["Resource"] = "Models/Core/UnitBox.obj";
+        model["Resource"] = "Models/Core/UnitBox.obj"; // 360NoScope UnitBox
         m_World->createTestEntitiesTest2();
     }
 

@@ -112,7 +112,7 @@ void OctTree::Update(float dt, World* world, Camera* cam)
         ComponentWrapper transform = world->AttachComponent(m_BoxID, "Transform");
         transform["Scale"] = boxSize;
         ComponentWrapper model = world->AttachComponent(m_BoxID, "Model");
-        model["Resource"] = "Models/Core/UnitBox.obj";
+        model["Resource"] = "Models/Core/UnitBox.obj"; // 360NoScope UnitBox
         m_UpdatedOnce = true;
     }
 

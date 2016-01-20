@@ -112,7 +112,7 @@ private:
         ComponentWrapper transform = world.AttachComponent(entityCollisionBox, "Transform");
         transform["Position"] = glm::vec3(0.f, 2.f, 0.f);
         ComponentWrapper model = world.AttachComponent(entityCollisionBox, "Model");
-        model["Resource"] = "Models/Core/UnitBox.obj";
+        model["Resource"] = "Models/Core/UnitBox.obj"; // 360NoScope UnitBox
     }
 
     void AddBoxModel(const glm::vec3 &center, const float &halfSize, Octree::Child* child, EntityID &outEntityId) {
@@ -124,7 +124,7 @@ private:
         transform["Position"] = center;
         transform["Scale"] = glm::vec3(1.0f, 1.0f, 1.0f)*halfSize*2.0f*0.97f;
         ComponentWrapper model = world.AttachComponent(entityDummyScene, "Model");
-        model["Resource"] = "Models/Core/UnitBox.obj";
+        model["Resource"] = "Models/Core/UnitBox.obj"; // 360NoScope unitBox
         model["Color"] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
         if (child->m_DynamicObjIndices.size() != 0)
             model["Color"] = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);

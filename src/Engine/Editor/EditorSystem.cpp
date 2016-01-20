@@ -292,21 +292,21 @@ void EditorSystem::createWidget()
         m_WidgetPlaneX = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneX, "Transform");
         m_World->AttachComponent(m_WidgetPlaneX, "Model");
-        m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/coolCube";
+        m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/coolCube"; // 360NoScope widgetPlaneX
         m_WidgetY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetY, "Transform");
         m_World->AttachComponent(m_WidgetY, "Model");
         m_WidgetPlaneY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneY, "Transform");
         m_World->AttachComponent(m_WidgetPlaneY, "Model");
-        m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/coolCube";
+        m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/coolCube"; // 360NoScope  widgetPlaneY
         m_WidgetZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetZ, "Transform");
         m_World->AttachComponent(m_WidgetZ, "Model");
         m_WidgetPlaneZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneZ, "Transform");
         m_World->AttachComponent(m_WidgetPlaneZ, "Model");
-        m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/coolCube";
+        m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/coolCube"; // 360NoScope  widgetPlaneZ
         m_WidgetOrigin = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetOrigin, "Transform");
         m_World->AttachComponent(m_WidgetOrigin, "Model");
@@ -351,7 +351,7 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
     m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = false;
 
     if (newMode == WidgetMode::Translate) {
-        //m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/TranslationWidgetX.obj";
+        //m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/TranslationWidgetX.obj"; // 360NoScope TranslationWidgets mesh
         //m_World->GetComponent(m_WidgetY, "Model")["Resource"] = "Models/TranslationWidgetY.obj";
         //m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/TranslationWidgetZ.obj";
         // Temporarily disabled for local space until I can figure out what's wrong with the math 
@@ -367,17 +367,17 @@ void EditorSystem::setWidgetMode(WidgetMode newMode)
             }
         }
     } else if (newMode == WidgetMode::Scale) {
-        //m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/ScaleWidgetX.obj";
+        //m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/ScaleWidgetX.obj"; // 360NoScope ScaleWidgets mesh
         //m_World->GetComponent(m_WidgetY, "Model")["Resource"] = "Models/ScaleWidgetY.obj";
         //m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/ScaleWidgetZ.obj";
         m_World->GetComponent(m_WidgetOrigin, "Model")["Visible"] = true;
-        //m_World->GetComponent(m_WidgetOrigin, "Model")["Resource"] = "Models/ScaleWidgetOrigin.obj";
+        //m_World->GetComponent(m_WidgetOrigin, "Model")["Resource"] = "Models/ScaleWidgetOrigin.obj"; // 360NoScope ScaleWidgetOrigin mesh
         if (m_Selection != EntityID_Invalid) {
             auto selectionTransform = m_World->GetComponent(m_Selection, "Transform");
             widgetTransform["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(m_World, m_Selection));
         }
     } else if (newMode == WidgetMode::Rotate) {
-        //m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/RotationWidgetX.obj";
+        //m_World->GetComponent(m_WidgetX, "Model")["Resource"] = "Models/RotationWidgetX.obj"; // 360NoScope  RotationWidget mesh
         //m_World->GetComponent(m_WidgetY, "Model")["Resource"] = "Models/RotationWidgetY.obj";
         //m_World->GetComponent(m_WidgetZ, "Model")["Resource"] = "Models/RotationWidgetZ.obj";
         if (m_Selection != EntityID_Invalid) {

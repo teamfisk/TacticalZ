@@ -349,7 +349,7 @@ EntityID Server::createPlayer()
     ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
     transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
     ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.obj";
+    model["Resource"] = "Models/Core/UnitSphere.obj"; // 360NoScope UnitSphere
     model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
     ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
     return entityID;

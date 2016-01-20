@@ -331,7 +331,7 @@ EntityID Client::createPlayer()
     EntityID entityID = m_World->CreateEntity();
     ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
     ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.obj";
+    model["Resource"] = "Models/Core/UnitSphere.obj"; // 360NoScope UnitSphere mesh
     ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
     return entityID;
 }

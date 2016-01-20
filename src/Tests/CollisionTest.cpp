@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(collisionTest2)
 BOOST_AUTO_TEST_CASE(rayVsModelTest)
 {
     //simple box test
-    RayTest("Models/Core/UnitCube.obj");
+    RayTest("Models/Core/UnitCube.obj"); // 360NoScope Unitcube
 }
 
 BOOST_AUTO_TEST_CASE(rayVsModelTest2)
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
     someAABB = AABB(minPos, maxPos);
     //using a rawmodel here, else we have to init the renderingsystem
     ResourceManager::RegisterType<RawModel>("RawModel");
-    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitCube.obj");
+    auto unitBox = ResourceManager::Load<RawModel>("Models/Core/UnitCube.obj"); // 360NoScope unitcube
     BOOST_CHECK(unitBox != nullptr);
 
     for (size_t i = 0; i < 1000000; i++)
@@ -187,19 +187,19 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
 BOOST_AUTO_TEST_CASE(rayVsModelTest3)
 {
     //simple test
-    RayTest("Models/Core/UnitSphere.obj");
+    RayTest("Models/Core/UnitSphere.obj"); // 360NoScope unitSphere
 }
 
 BOOST_AUTO_TEST_CASE(rayVsModelTest4)
 {
     //simple test
-    RayTest("Models/Core/UnitCylinder.obj");
+    RayTest("Models/Core/UnitCylinder.obj"); // 360NoScope unitCylinder
 }
 
 BOOST_AUTO_TEST_CASE(rayVsModelTest5)
 {
     //simple test
-    RayTest("Models/Core/UnitRaptor.obj");
+    RayTest("Models/Core/UnitRaptor.obj"); // 360NoScope unitRaptor
 }
 BOOST_AUTO_TEST_CASE(octTest)
 {
