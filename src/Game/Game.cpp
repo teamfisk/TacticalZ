@@ -79,6 +79,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     // Populate Octree with collidables
@@ -145,7 +146,6 @@ void Game::Tick()
     m_SystemPipeline->Update(m_World, dt);
     debugTick(dt);
     m_Renderer->Update(dt);
-    m_EventBroker->Process<Client>();
     m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);

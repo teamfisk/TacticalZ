@@ -19,7 +19,7 @@
 #include "Rendering/RenderSystem.h"
 #include "Core/EntityFileParser.h"
 #include "Core/Octree.h"
-
+#include "Systems/InterpolationSystem.h"
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"

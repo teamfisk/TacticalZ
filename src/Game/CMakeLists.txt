@@ -26,7 +26,9 @@ set(SOURCE_FILES
     ${SOURCE_FILES}
     "Game.cpp"
     ${SOURCE_FILES_Systems}
-	${SOURCE_FILES_Events}
+    ${SOURCE_FILES_Events}
+
+    
 )
 
 set(LIBRARIES
