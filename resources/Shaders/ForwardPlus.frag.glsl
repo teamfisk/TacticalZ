@@ -102,7 +102,7 @@ void main()
 {
 	vec4 texel = texture2D(texture0, Input.TextureCoordinate);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
-	vec4 normal = V  * vec4(Input.Normal, 0.0);
+	vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position); 
 
 	vec2 tilePos;
