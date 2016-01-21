@@ -32,7 +32,6 @@ private:
     const LightCullingPass* m_LightCullingPass;
 
     ShaderProgram* m_ForwardPlusProgram;
-
 };
 
 #endif 

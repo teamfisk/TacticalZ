@@ -3,10 +3,10 @@
 #include "Core/AABB.h"
 #include "Rendering/Model.h"
 
-void TriggerSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void TriggerSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     //Currently only players can trigger things.
-    auto players = world->GetComponents("Player");
+    auto players = m_World->GetComponents("Player");
     if (players == nullptr) {
         return;
     }
@@ -18,7 +18,7 @@ void TriggerSystem::UpdateComponent(World* world, EntityWrapper& entity, Compone
     }
     for (auto& pc : *players) {
         EntityID pId = pc.EntityID;
-        boost::optional<AABB> playerBox = Collision::EntityAbsoluteAABB(EntityWrapper(world, pId));
+        boost::optional<AABB> playerBox = Collision::EntityAbsoluteAABB(EntityWrapper(m_World, pId));
         //The player can't trigger anything without an AABB.
         if (!playerBox) {
             continue;

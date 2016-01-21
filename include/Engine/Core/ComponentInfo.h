@@ -5,12 +5,14 @@
 
 struct ComponentInfo
 {
+    typedef int EnumType;
+
 	struct Meta_t
 	{
 		std::string Annotation;
 		unsigned int Allocation = 0;
         std::map<std::string, std::string> FieldAnnotations;
-        std::map<std::string, std::map<std::string, int>> FieldEnumDefinitions;
+        std::map<std::string, std::map<std::string, EnumType>> FieldEnumDefinitions;
 	};
 
     struct Field_t

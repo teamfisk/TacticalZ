@@ -2,7 +2,7 @@
 #include "Collision/CollisionSystem.h"
 #include "Core/AABB.h"
 
-void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     if (!entity.HasComponent("Physics")) {
         return;

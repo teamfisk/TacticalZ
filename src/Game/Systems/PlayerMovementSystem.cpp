@@ -1,6 +1,6 @@
 #include "Systems/PlayerMovementSystem.h"
 
-void PlayerMovementSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     ComponentWrapper& cTransform = entity["Transform"];
     if (!entity.HasComponent("Physics")) {
