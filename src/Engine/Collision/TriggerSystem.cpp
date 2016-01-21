@@ -34,9 +34,12 @@ void TriggerSystem::UpdateComponent(World* world, EntityWrapper& entity, Compone
             throwLeaveIfWasInTrigger(m_EntitiesCompletelyInTrigger[tId], pId, tId);
         } else {
             //Entity is at least touching the trigger.
-            AABB completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * (*playerBox).Size());
-            if (Collision::AABBVsAABB(completelyInsideBox, *playerBox) &&
-                glm::all(glm::greaterThan((*triggerBox).Size(), (*playerBox).Size()))) {
+            AABB completelyInsideBox;
+            bool playerFitsInTrigger = glm::all(glm::greaterThan((*triggerBox).Size(), (*playerBox).Size()));
+            if (playerFitsInTrigger) {
+                completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * (*playerBox).Size());
+            }
+            if (playerFitsInTrigger && Collision::AABBVsAABB(completelyInsideBox, *playerBox)) {
                 //Entity is completely inside the trigger.
                 //If it was only touching before, it is erased.
                 m_EntitiesTouchingTrigger[tId].erase(pId);

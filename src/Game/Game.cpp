@@ -8,6 +8,7 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Core/EntityFileWriter.h"
+#include "Game/Systems/CapturePointSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -68,8 +69,8 @@ Game::Game(int argc, char* argv[])
 
 
     // Create Octrees
-    m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
-    m_OctreeFrustrumCulling = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeCollision = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeFrustrumCulling = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_EventBroker);
 
@@ -79,6 +80,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     // Populate Octree with collidables
@@ -89,6 +91,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
     ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     // Invoke network
@@ -144,7 +147,6 @@ void Game::Tick()
     m_SystemPipeline->Update(m_World, dt);
     debugTick(dt);
     m_Renderer->Update(dt);
-    m_EventBroker->Process<Client>();
     m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
