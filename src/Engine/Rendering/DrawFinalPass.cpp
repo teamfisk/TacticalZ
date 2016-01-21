@@ -31,6 +31,10 @@ void DrawFinalPass::Draw(RenderScene& scene)
     m_ForwardPlusProgram->Bind();
     GLuint shaderHandle = m_ForwardPlusProgram->GetHandle();
 
+    if (scene.ClearDepth) {
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightCullingPass->LightSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());

@@ -87,9 +87,7 @@ void Renderer::Draw(RenderFrame& frame)
 
     m_PickingPass->ClearPicking();
     for (auto scene : frame.RenderScenes){
-        if (scene->ClearDepth) {
-            glClear(GL_DEPTH_BUFFER_BIT);
-        }
+        
         SortRenderJobsByDepth(*scene);
         m_PickingPass->Draw(*scene);
         m_LightCullingPass->GenerateNewFrustum(*scene);
