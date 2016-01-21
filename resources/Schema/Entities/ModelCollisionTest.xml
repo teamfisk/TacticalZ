@@ -11,8 +11,8 @@
         <c:Camera/>
         <c:Listener/>
         <c:Transform>
-          <Position X="5.59488058" Y="4.13046598" Z="6.74478388"/>
-          <Orientation X="-0.383969575" Y="0.802773356" Z="1.33006881e-06"/>
+          <Position X="5.01875639" Y="2.58534265" Z="3.01552486"/>
+          <Orientation X="-0.331608921" Y="1.01212442" Z="1.23717996e-06"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -22,10 +22,10 @@
         <c:Collidable/>
         <c:Model>
           <Resource>../assets/Models/Core/UnitCube.obj</Resource>
+          <Color A="1" B="0" G="0" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="-0.665447116" Z="0"/>
-          <Scale X="1" Y="0.200000003" Z="1"/>
+          <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -39,7 +39,7 @@
           <Resource>../assets/Models/Core/UnitCube.obj</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="2.27028751" Y="0.393286705" Z="-2.67389679"/>
+          <Position X="1.96935618" Y="1.31790924" Z="-1.02448177"/>
         </c:Transform>
       </Components>
       <Children/>

@@ -50,3 +50,7 @@ glm::mat4 Transform::ModelMatrix(EntityID entity, World* world)
     return modelMatrix;
 }
 
+glm::vec3 Transform::TransformPoint(const glm::vec3& point, const glm::mat4& matrix)
+{
+    return glm::vec3(matrix * glm::vec4(point.x, point.y, point.z, 1));
+}

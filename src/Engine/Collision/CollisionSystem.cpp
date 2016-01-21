@@ -49,14 +49,12 @@ void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, Compo
         auto absPosition = Transform::AbsolutePosition(world, cModel.EntityID);
         auto absOrientation = Transform::AbsoluteOrientation(world, cModel.EntityID);
         auto absScale = Transform::AbsoluteScale(world, cModel.EntityID);
-        glm::mat4 modelMatrix = glm::translate(absPosition); // *glm::toMat4(absOrientation) * glm::scale(absScale);
+        glm::mat4 modelMatrix = glm::translate(absPosition) * glm::toMat4(absOrientation) * glm::scale(absScale);
 
         RawModel* model = ResourceManager::Load<RawModel>(cModel["Resource"]);
         glm::vec3 resolutionVector;
         if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, resolutionVector)) {
-            //TODO: remove Temp.
-            (glm::vec3&)cTransform["Position"] = glm::vec3(2, 2, 2);
-            //(glm::vec3&)cTransform["Position"] += resolutionVector;
+            (glm::vec3&)cTransform["Position"] += resolutionVector;
         }
     }
 }
