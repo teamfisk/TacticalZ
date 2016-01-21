@@ -5,7 +5,8 @@ uniform mat4 V;
 uniform mat4 P;
 uniform vec4 Color;
 uniform vec2 ScreenDimensions;
-uniform sampler2D texture0;
+layout (binding = 0) uniform sampler2D DiffuseTexture;
+layout (binding = 1) uniform sampler2D GlowMap;
 
 #define TILE_SIZE 16
 
@@ -100,7 +101,8 @@ LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensi
 
 void main()
 {
-	vec4 texel = texture2D(texture0, Input.TextureCoordinate);
+	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate);
+	vec4 glowTexel = texture2D(GlowMap, Input.TextureCoordinate);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
 	vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position); 
@@ -121,32 +123,32 @@ void main()
 		int l = int(LightIndex[i]);
 		LightSource light = LightSources.List[l];
 
-		LightResult result;
+		LightResult light_result;
 		//These if statements should be removed.
 		if(light.Type == 1) { // point
-			result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
+			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
-			result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
+			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 		}
-		totalLighting.Diffuse += result.Diffuse;
-		totalLighting.Specular += result.Specular;
+		totalLighting.Diffuse += light_result.Diffuse;
+		totalLighting.Specular += light_result.Specular;
 	}
 
 	//sceneColor += Input.DiffuseColor;
-	vec4 fragment = Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
+	vec4 color_result = Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
 	//bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
-	sceneColor = vec4(fragment.xyz, 1.0);
-	//These if statements should be removed.
-
-	if(fragment.x > 1 || fragment.y > 1 || fragment.z > 1) {
-		bloomColor = vec4(fragment.xyz, 1.0);
+	sceneColor = vec4(color_result.xyz, 1.0);
+	//These if statements should be removed if they are slow.
+	color_result += glowTexel;
+	if(color_result.x > 1 || color_result.y > 1 || color_result.z > 1) {
+		bloomColor = vec4(color_result.xyz, 1.0);
 	} else {
 		bloomColor = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 	
-	//sceneColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
+	//sceneColor += Input.DiffuseColor * (totalLighting.Diffuse) * diffuseTexel * Color;
 	//sceneColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
-	//sceneColor = texel * Input.DiffuseColor * Color;
+	//sceneColor = diffuseTexel * Input.DiffuseColor * Color;
 	//sceneColor += vec4(currentTile/3600.f, 0, 0, 1);
 
 	//Tiled Debug Code

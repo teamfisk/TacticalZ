@@ -12,6 +12,8 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
 void DrawFinalPass::InitializeTextures()
 {
     m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+    m_BlackTexture = ResourceManager::Load<Texture>("Textures/Core/Black.png");
+    TEMP_glowTestTexture = ResourceManager::Load<Texture>("Textures/Core/UnitRaptor_glow.png");
 }
 
 void DrawFinalPass::InitializeFrameBuffers()
@@ -65,13 +67,20 @@ void DrawFinalPass::Draw(RenderScene& scene)
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
 
+            glActiveTexture(GL_TEXTURE0);
             if(modelJob->DiffuseTexture != nullptr) {
-                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
             } else {
-                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
             }
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+
+            /*if(modelJob->GlowMap != nullptr) {
+                glBindTexture(GL_TEXTURE_2D, modelJob->GlowMap->m_Texture);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+            }*/
 
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
