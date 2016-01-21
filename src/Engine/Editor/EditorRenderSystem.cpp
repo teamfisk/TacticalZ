@@ -48,7 +48,7 @@ void EditorRenderSystem::Update(double dt)
             EntityWrapper entity(m_World, cModel.EntityID);
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
-                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, nullptr, modelMatrix, matGroup, cModel, entity.World);
+                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World);
                 scene.ForwardJobs.push_back(modelJob);
             }
         }

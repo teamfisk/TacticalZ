@@ -20,24 +20,26 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& comp
     {
         auto deltaHP = m_DeltaHealthVector[i - 1];
         //if we have a healthchange for the current player and health is greater than 0, then apply it
-        if (std::get<0>(deltaHP) == player.EntityID && (double)component["Health"] > 0.0f) {
+        if (std::get<0>(deltaHP) == component.EntityID && (double)component["Health"] > 0.0f) {
             //get the deltaHP value from the tuple and make sure you dont get more than maxHealth
             double newHealth = std::min((double)component["Health"] + (double)std::get<1>(deltaHP), maxHealth);
             component["Health"] = newHealth;
             m_DeltaHealthVector.erase(m_DeltaHealthVector.begin() + i - 1);
             //check if health is <= 0
             if ((double)component["Health"] <= 0.0f) {
+                component["Health"] = 0.0;
                 //publish death event
                 Events::PlayerDeath e;
-                e.PlayerID = player.EntityID;
+                e.PlayerID = component.EntityID;
                 m_EventBroker->Publish(e);
                 //clear the remaining hpDeltas for the dead player
                 for (size_t j = m_DeltaHealthVector.size(); j > 0; j--)
                 {
-                    if (std::get<0>(m_DeltaHealthVector[j - 1]) == player.EntityID)
+                    if (std::get<0>(m_DeltaHealthVector[j - 1]) == component.EntityID)
                         m_DeltaHealthVector.erase(m_DeltaHealthVector.begin() + j - 1);
                 }
-                //break the loop if the player is dead
+                //delete the player and break the loop
+                m_World->DeleteEntity(entity.ID);
                 break;
             }
         }
@@ -57,3 +59,4 @@ bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e)
     m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerHealedID, e.HealthAmount));
     return true;
 }
+

@@ -23,17 +23,15 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
 
     // Collide against octree
     std::vector<AABB> octreeResult;
-    m_Octree->BoxesInSameRegion(*boundingBox, octreeResult);
+    m_Octree->ObjectsInSameRegion(*boundingBox, octreeResult);
     for (auto& boxB : octreeResult) {
         glm::vec3 resolutionVector;
         if (Collision::IsSameBoxProbably(boxA, boxB)) {
             continue;
         }
         if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
-            if (entity.HasComponent("Physics")) {
-                (glm::vec3&)cTransform["Position"] += resolutionVector;
-                cPhysics["Velocity"] = glm::vec3(0, 0, 0);
-            }
+            (glm::vec3&)cTransform["Position"] += resolutionVector;
+            cPhysics["Velocity"] = glm::vec3(0, 0, 0);
         }
     }
 

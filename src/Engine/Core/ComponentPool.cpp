@@ -71,6 +71,11 @@ ComponentPool::iterator ComponentPool::end() const
     return iterator(m_ComponentInfo, m_Pool.end(), m_Pool.end());
 }
 
+size_t ComponentPool::size() const
+{
+    return m_Pool.size();
+}
+
 template <typename InterpretType /*= char*/>
 void ComponentPool::Dump() const
 {

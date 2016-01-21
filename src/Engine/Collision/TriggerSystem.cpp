@@ -34,9 +34,12 @@ void TriggerSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& com
             throwLeaveIfWasInTrigger(m_EntitiesCompletelyInTrigger[tId], pId, tId);
         } else {
             //Entity is at least touching the trigger.
-            AABB completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * (*playerBox).Size());
-            if (Collision::AABBVsAABB(completelyInsideBox, *playerBox) &&
-                glm::all(glm::greaterThan((*triggerBox).Size(), (*playerBox).Size()))) {
+            AABB completelyInsideBox;
+            bool playerFitsInTrigger = glm::all(glm::greaterThan((*triggerBox).Size(), (*playerBox).Size()));
+            if (playerFitsInTrigger) {
+                completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * (*playerBox).Size());
+            }
+            if (playerFitsInTrigger && Collision::AABBVsAABB(completelyInsideBox, *playerBox)) {
                 //Entity is completely inside the trigger.
                 //If it was only touching before, it is erased.
                 m_EntitiesTouchingTrigger[tId].erase(pId);
@@ -78,3 +81,20 @@ bool TriggerSystem::throwLeaveIfWasInTrigger(std::unordered_set<EntityID>& trigg
     return false;
 }
 
+bool TriggerSystem::OnTouch(const Events::TriggerTouch &event)
+{
+    LOG_INFO("Player entity %i touched trigger entity %i.", event.Entity, event.Trigger);
+    return true;
+}
+
+bool TriggerSystem::OnEnter(const Events::TriggerEnter &event)
+{
+    LOG_INFO("Player entity %i entered trigger entity %i.", event.Entity, event.Trigger);
+    return true;
+}
+
+bool TriggerSystem::OnLeave(const Events::TriggerLeave &event)
+{
+    LOG_INFO("Player entity %i left trigger entity %i.", event.Entity, event.Trigger);
+    return true;
+}

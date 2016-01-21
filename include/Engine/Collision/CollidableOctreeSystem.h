@@ -8,7 +8,7 @@
 class CollidableOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    CollidableOctreeSystem(World* world, EventBroker* eventBroker, Octree* octree)
+    CollidableOctreeSystem(World* world, EventBroker* eventBroker, Octree<AABB>* octree)
         : System(world, eventBroker)
         , PureSystem("Collidable")
         , m_Octree(octree)
@@ -18,7 +18,7 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
-    Octree* m_Octree;
+    Octree<AABB>* m_Octree;
 };
 
 #endif

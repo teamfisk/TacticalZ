@@ -91,7 +91,7 @@ public:
     void AddProperty(std::string fieldName, T defaultValue)
     {
         m_DefaultValues.push_back(defaultValue);
-        m_ComponentInfo.Fields[fieldName].Name = typeid(T).name();
+        m_ComponentInfo.Fields[fieldName].Type = typeid(T).name();
         m_ComponentInfo.Fields[fieldName].Offset = m_ComponentInfo.Stride;
         m_ComponentInfo.Fields[fieldName].Stride = sizeof(T);
         m_ComponentInfo.Stride += sizeof(T);

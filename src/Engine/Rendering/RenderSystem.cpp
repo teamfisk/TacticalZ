@@ -68,25 +68,45 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
     }
 }
 
-void RenderSystem::fillLight(std::list<std::shared_ptr<RenderJob>>& jobs)
+void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
 {
     auto pointLights = m_World->GetComponents("PointLight");
-    if (pointLights == nullptr) {
-        return;
+    if (pointLights != nullptr) {
+        for (auto& pointlightC : *pointLights) {
+            bool visible = pointlightC["Visible"];
+            if (!visible) {
+                continue;
+            }
+            auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
+            if (&transformC == nullptr) {
+                continue;
+            }
+
+            std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
+            jobs.push_back(pointLightJob);
+        }
     }
+}
 
-    for (auto& pointlightC : *pointLights) {
-        bool visible = pointlightC["Visible"];
-        if (!visible) {
-            continue;
-        }
-        auto transformC = m_World->GetComponent(pointlightC.EntityID, "Transform");
-        if (&transformC == nullptr) {
-            return;
-        }
 
-        std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
-        jobs.push_back(pointLightJob);
+void RenderSystem::fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+{
+    auto directionalLights = world->GetComponents("DirectionalLight");
+    if (directionalLights != nullptr) {
+        for (auto& directionalLightC : *directionalLights) {
+            bool visable = directionalLightC["Visible"];
+            if (!visable) {
+                continue;
+            }
+
+            auto transformC = world->GetComponent(directionalLightC.EntityID, "Transform");
+            if (&transformC == nullptr) {
+                continue;
+            }
+
+            std::shared_ptr<DirectionalLightJob> directionalLightJob = std::shared_ptr<DirectionalLightJob>(new DirectionalLightJob(transformC, directionalLightC, m_World));
+            jobs.push_back(directionalLightJob);
+        }
     }
 }
 
@@ -110,7 +130,8 @@ void RenderSystem::Update(double dt)
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
     fillModels(scene.ForwardJobs);
-    fillLight(scene.PointLightJobs);
+    fillPointLights(scene.PointLightJobs, m_World);
+    fillDirectionalLights(scene.DirectionalLightJobs, m_World);
     m_RenderFrame->Add(scene);
    
 }

@@ -12,6 +12,7 @@
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
 #include "../Core/World.h"
+#include "../Core/Transform.h"
 
 struct ModelJob : RenderJob
 {
@@ -28,6 +29,9 @@ struct ModelJob : RenderJob
         Matrix = matrix;
         Color = modelComponent["Color"];
         Entity = modelComponent.EntityID;
+        glm::vec3 abspos = Transform::AbsolutePosition(world, modelComponent.EntityID);
+        glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
+        Depth = worldpos.z;
         World = world;
     };
 
