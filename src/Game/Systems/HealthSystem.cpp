@@ -37,7 +37,8 @@ void HealthSystem::UpdateComponent(World* world, EntityWrapper& entity, Componen
                     if (std::get<0>(m_DeltaHealthVector[j - 1]) == component.EntityID)
                         m_DeltaHealthVector.erase(m_DeltaHealthVector.begin() + j - 1);
                 }
-                //break the loop if the player is dead
+                //delete the player and break the loop
+                world->DeleteEntity(entity.ID);
                 break;
             }
         }
@@ -57,3 +58,4 @@ bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e)
     m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerHealedID, e.HealthAmount));
     return true;
 }
+
