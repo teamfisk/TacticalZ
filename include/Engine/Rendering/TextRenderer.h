@@ -2,8 +2,7 @@
 #define TextRenderer_h__
 
 #include <ft2build.h>
-#include FT_FREETYPE_H  
-#include FT_GLYPH_H
+#include FT_FREETYPE_H
 
 #include "../OpenGL.h"
 #include "../GLM.h"
@@ -21,17 +20,11 @@ public:
     void Draw(RenderScene& scene);
 
 private:
+    void renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
+
     Font* font;
-   
     GLuint VAO, VBO;
-
-    void RenderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
-
     ShaderProgram* m_TextProgram;
-
-    std::string text = "";
-
-    int counter = 0;
 };
 
 

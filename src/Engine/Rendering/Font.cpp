@@ -15,6 +15,10 @@ Font::Font(std::string path)
         filePath = (*it).c_str();
         it++;
         if (it != tok.end()) {
+            if((*it).c_str() == "") {
+                throw std::runtime_error("");
+            }
+
             try {
                 FontSize = boost::lexical_cast<int>((*it).c_str());
             } catch (boost::bad_lexical_cast const&) {
@@ -28,21 +32,22 @@ Font::Font(std::string path)
 
 
     FT_Library library;
+    FT_Face face;
 
     if (FT_Init_FreeType(&library)) {
         LOG_ERROR("FreeType error: init failed");
         throw std::runtime_error("");;
     }
 
-    if (FT_New_Face(library, filePath.c_str(), 0, &Face)) {
+    if (FT_New_Face(library, filePath.c_str(), 0, &face)) {
         LOG_ERROR("FreeType error: loading font");
         throw std::runtime_error("");;
     }
 
-    FT_Set_Char_Size(Face, 0, FontSize*64, 300, 300); // temp
-    FT_Set_Pixel_Sizes(Face, 0, FontSize);            //
+    FT_Set_Char_Size(face, 0, FontSize*64, 300, 300); // temp
+    FT_Set_Pixel_Sizes(face, 0, FontSize);            //
 
-    if (FT_Load_Char(Face, 'X', FT_LOAD_RENDER)) {
+    if (FT_Load_Char(face, 'X', FT_LOAD_RENDER)) {
         LOG_ERROR("FreeType error: loading char");
         throw std::runtime_error("");;
     }
@@ -53,7 +58,7 @@ Font::Font(std::string path)
        
 
         //Load character glyph
-        if (FT_Load_Char(Face, c, FT_LOAD_RENDER)) {
+        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
             continue;
         }
 
@@ -66,12 +71,12 @@ Font::Font(std::string path)
             GL_TEXTURE_2D,
             0,
             GL_RED,
-            Face->glyph->bitmap.width,
-            Face->glyph->bitmap.rows,
+            face->glyph->bitmap.width,
+            face->glyph->bitmap.rows,
             0,
             GL_RED,
             GL_UNSIGNED_BYTE,
-            Face->glyph->bitmap.buffer
+            face->glyph->bitmap.buffer
             );
         // Set texture options
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -81,22 +86,22 @@ Font::Font(std::string path)
         // Now store character for later use
         Character character = {
             texture,
-            glm::ivec2(Face->glyph->bitmap.width, Face->glyph->bitmap.rows),
-            glm::ivec2(Face->glyph->bitmap_left, Face->glyph->bitmap_top),
-            Face->glyph->advance.x
+            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+            face->glyph->advance.x
         };
 
         m_Characters.insert(std::pair<GLchar, Character>(c, character));
     }
 
     
+    FT_Done_Face(face);
     FT_Done_FreeType(library);
     GLERROR("Font Load");
 }
 
 Font::~Font()
 {
-    FT_Done_Face(Face);
     for (auto c : m_Characters) {
         glDeleteTextures(1, &c.second.TextureID);
     }

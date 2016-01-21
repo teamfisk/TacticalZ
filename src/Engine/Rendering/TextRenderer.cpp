@@ -35,24 +35,16 @@ void TextRenderer::Draw(RenderScene& scene)
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
 
-            RenderText(textJob->Content, textJob->Resource, textJob->Alignment, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
+            renderText(textJob->Content, textJob->Resource, textJob->Alignment, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
         }
     }
 }
 
-void TextRenderer::RenderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+void TextRenderer::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
     GLfloat penX = 0;
     GLfloat penY = 0;
     float scale = 1.0/font->FontSize;
-
-
-    FT_Bool use_kerning = FT_HAS_KERNING(font->Face);
-    FT_UInt previous = 0;
-    FT_UInt num_glyphs = 0;
-    FT_UInt glyph_index;
-
-    FT_Vector pos[128];
 
     GLfloat stringWidth = 0.f;
 
@@ -67,10 +59,7 @@ void TextRenderer::RenderText(std::string text, Font* font, TextJob::AlignmentEn
         penX = -stringWidth;
     } else {
         penX = 0;
-    }
-    
-
-    // Activate corresponding render state	
+    }	
     
     glEnable(GL_BLEND);
     glDisable(GL_CULL_FACE);
@@ -94,7 +83,7 @@ void TextRenderer::RenderText(std::string text, Font* font, TextJob::AlignmentEn
 
         GLfloat w = ch.Size.x * scale;
         GLfloat h = ch.Size.y * scale;
-        // Update VBO for each character
+
         GLfloat vertices[6][4] = {
             { xpos, ypos + h, 0.0, 0.0 },
             { xpos, ypos, 0.0, 1.0 },
@@ -105,15 +94,12 @@ void TextRenderer::RenderText(std::string text, Font* font, TextJob::AlignmentEn
             { xpos + w, ypos + h, 1.0, 0.0 }
         };
 
-        // Render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-        // Update content of VBO memory
+
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        // Render quad
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        // Now advance cursors for next glyph (note that advance is number of 1/64 pixels)
         penX += (ch.Advance >> 6) * scale; // Bitshift by 6 to get value in pixels (2^6 = 64)
     }
     glBindVertexArray(0);

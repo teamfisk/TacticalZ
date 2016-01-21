@@ -25,7 +25,7 @@ public:
         GLuint     Advance;    // Offset to advance to next glyph
     };
 
-    FT_Face Face;
+    
 
     int FontSize = 16;
 
