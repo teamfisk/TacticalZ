@@ -3,6 +3,9 @@
 
   <Components>
     <c:Transform/>
+    <c:UniformScale>
+      <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+    </c:UniformScale>
   </Components>
 
   <Children>
