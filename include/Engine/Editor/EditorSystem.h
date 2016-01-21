@@ -9,7 +9,7 @@
 #include "../Core/EntityFilePreprocessor.h"
 #include "../Core/EntityFileParser.h"
 #include "../Core/EntityFileWriter.h"
-#include "../Core/EMouseRelease.h"
+#include "../Core/EMousePress.h"
 #include "EditorGUI.h"
 #include "EditorStats.h"
 
@@ -52,8 +52,8 @@ private:
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
 
     // Events
-    EventRelay<EditorSystem, Events::MouseRelease> m_EMouseRelease;
-    bool OnMouseRelease(const Events::MouseRelease& e);
+    EventRelay<EditorSystem, Events::MousePress> m_EMousePress;
+    bool OnMousePress(const Events::MousePress& e);
     EventRelay<EditorSystem, Events::WidgetDelta> m_EWidgetDelta;
     bool OnWidgetDelta(const Events::WidgetDelta& e);
 };

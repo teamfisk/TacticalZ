@@ -31,7 +31,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
 
-    EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &EditorSystem::OnMouseRelease);
+    EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorSystem::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EWidgetDelta, &EditorSystem::OnWidgetDelta);
 
     m_EditorStats = new EditorStats();
@@ -121,9 +121,10 @@ void EditorSystem::OnComponentDelete(EntityWrapper entity, const std::string& co
     }
 }
 
-bool EditorSystem::OnMouseRelease(const Events::MouseRelease& e)
+bool EditorSystem::OnMousePress(const Events::MousePress& e)
 {
-    if (e.Button == GLFW_MOUSE_BUTTON_1) {
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureMouse && !io.WantCaptureKeyboard && e.Button == GLFW_MOUSE_BUTTON_1) {
         PickData pick = m_Renderer->Pick(glm::vec2(e.X, e.Y));
         if (pick.World == m_World) {
             m_CurrentSelection = EntityWrapper(m_World, pick.Entity);
