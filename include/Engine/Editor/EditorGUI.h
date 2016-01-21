@@ -6,6 +6,7 @@
 #include <imgui/imgui_internal.h>
 #include <nativefiledialog/nfd.h>
 #include <boost/filesystem.hpp>
+#include <boost/any.hpp>
 #include "../Common.h"
 #include "../GLM.h"
 #include <glm/gtx/common.hpp>
@@ -16,6 +17,7 @@
 #include "../Core/EntityWrapper.h"
 #include "../Core/ResourceManager.h"
 #include "../Core/EPause.h"
+#include "../Core/EKeyDown.h"
 #include "../Rendering/Texture.h"
 
 class EditorGUI
@@ -33,6 +35,7 @@ public:
     void Draw();
 
     void SelectEntity(EntityWrapper entity);
+    void SetDirty(EntityWrapper entity);
 
     // Called when an entity is selected in the entity tree
     typedef std::function<void(EntityWrapper)> OnEntitySelectedCallback_t;
@@ -75,15 +78,23 @@ private:
     World* m_World;
     EventBroker* m_EventBroker;
 
+    struct EntityFileInfo
+    {
+        boost::filesystem::path Path;
+        bool Dirty = false;
+    };
+
     // Config variables
     const boost::filesystem::path m_DefaultEntityPath = boost::filesystem::path("Schema") / boost::filesystem::path("Entities");
 
-    // State variables
+    // State
     EntityWrapper m_CurrentSelection = EntityWrapper::Invalid;
-    std::unordered_map<EntityWrapper, boost::filesystem::path> m_EntityFiles;
+    std::unordered_map<EntityWrapper, EntityFileInfo> m_EntityFiles;
     EntityWrapper m_CurrentlyDragging = EntityWrapper::Invalid;
     std::string m_LastErrorMessage;
     WidgetMode m_CurrentWidgetMode = WidgetMode::Translate;
+    std::set<std::string> m_ModalsToOpen;
+    std::map<std::string, boost::any> m_ModalData;
 
     // Callbacks
     OnEntitySelectedCallback_t m_OnEntitySelected = nullptr;
@@ -97,11 +108,16 @@ private:
     OnComponentDelete_t m_OnComponentDelete = nullptr;
     OnWidgetMode_t m_OnWidgetMode = nullptr;
 
+    // Events
+    EventRelay<EditorGUI, Events::KeyDown> m_EKeyDown;
+    bool OnKeyDown(const Events::KeyDown& e);
+
     // Utility functions
     boost::filesystem::path fileOpenDialog();
     boost::filesystem::path fileSaveDialog();
     const std::string formatEntityName(EntityWrapper entity);
     GLuint tryLoadTexture(std::string filePath);
+    void openModal(const std::string& modal);
 
     // Entity file handling methods
     void entityImport(World* world);
@@ -118,15 +134,15 @@ private:
     bool drawEntityNode(EntityWrapper entity);
     void drawComponents(EntityWrapper entity);
     bool drawComponentNode(EntityWrapper entity, const ComponentInfo& componentType);
-    void drawComponentField(ComponentWrapper& c, const ComponentInfo::Field_t& field);
-    void drawComponentField_Vector(ComponentWrapper &c, const ComponentInfo::Field_t &field);
-    void drawComponentField_Color(ComponentWrapper &c, const ComponentInfo::Field_t &field);
-    void drawComponentField_int(ComponentWrapper &c, const ComponentInfo::Field_t &field);
-    void drawComponentField_enum(ComponentWrapper &c, const ComponentInfo::Field_t &field);
-    void drawComponentField_float(ComponentWrapper &c, const ComponentInfo::Field_t &field);
-    void drawComponentField_double(ComponentWrapper &c, const ComponentInfo::Field_t &field);
-    void drawComponentField_bool(ComponentWrapper &c, const ComponentInfo::Field_t &field);
-    void drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField(ComponentWrapper& c, const ComponentInfo::Field_t& field);
+    bool drawComponentField_Vector(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField_Color(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField_int(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField_enum(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField_float(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField_double(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField_bool(ComponentWrapper &c, const ComponentInfo::Field_t &field);
+    bool drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field);
     void drawModals();
 
     // Custom UI elements

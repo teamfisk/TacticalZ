@@ -10,7 +10,11 @@ bool EntityWrapper::HasComponent(const std::string& componentName)
 
 EntityWrapper EntityWrapper::Parent()
 {
-    return EntityWrapper(World, World->GetParent(ID));
+    if (this->World == nullptr || this->ID == EntityID_Invalid) {
+        return EntityWrapper::Invalid;
+    } else {
+        return EntityWrapper(this->World, this->World->GetParent(this->ID));
+    }
 }
 
 bool EntityWrapper::Valid()

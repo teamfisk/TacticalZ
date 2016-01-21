@@ -4,7 +4,7 @@ EditorGUI::EditorGUI(World* world, EventBroker* eventBroker)
     : m_World(world)
     , m_EventBroker(eventBroker)
 {
-
+    EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &EditorGUI::OnKeyDown);
 }
 
 void EditorGUI::Draw()
@@ -14,6 +14,7 @@ void EditorGUI::Draw()
     drawTools();
     drawEntities(m_World);
     drawComponents(m_CurrentSelection);
+    drawModals();
 }
 
 void EditorGUI::SelectEntity(EntityWrapper entity)
@@ -111,6 +112,7 @@ void EditorGUI::drawEntities(World* world)
         if (m_CurrentSelection.Valid()) {
             if (m_OnEntityChangeName != nullptr) {
                 m_OnEntityChangeName(m_CurrentSelection, std::string(buffer));
+                SetDirty(m_CurrentSelection);
             }
         }
     }
@@ -120,8 +122,6 @@ void EditorGUI::drawEntities(World* world)
 
     drawEntitiesRecursive(world, EntityID_Invalid);
 
-    // Draw any potential modals before ending this scope
-    drawModals();
     ImGui::End();
 }
 
@@ -167,10 +167,10 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
             ImGui::Text(formatEntityName(entity).c_str());
             ImGui::End();
         }
-    } else if (m_CurrentlyDragging == entity) {
+    }/* else if (m_CurrentlyDragging == entity) {
         LOG_DEBUG("Stopped dragging %i", entity.ID);
         m_CurrentlyDragging = EntityWrapper::Invalid;
-    }
+    }*/
     // Entity context menu
     std::string contextMenuUniqueID = std::string("EntityContextMenu") + std::to_string(entity.ID);
     if (hovered && ImGui::IsMouseClicked(1)) {
@@ -190,7 +190,6 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
         if (ImGui::MenuItem("Move to root")) {
             entityChangeParent(entity, EntityWrapper::Invalid);
         }
-        drawModals();
         ImGui::EndPopup();
     }
 
@@ -242,6 +241,7 @@ void EditorGUI::drawComponents(EntityWrapper entity)
             if (m_OnComponentAttach != nullptr) {
                 std::string chosenComponentType(componentTypes.at(selectedItem));
                 m_OnComponentAttach(entity, chosenComponentType);
+                SetDirty(entity);
             }
         }
     }
@@ -287,7 +287,10 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
         const ComponentInfo::Field_t& field = kv.second;
 
         // Draw the field widget based on its type
-        drawComponentField(component, field);
+        bool dirty = drawComponentField(component, field);
+        if (dirty) {
+            SetDirty(entity);
+        }
         ImGui::SameLine();
         // Draw field name
         ImGui::Text(fieldName.c_str());
@@ -305,70 +308,76 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
     return true;
 }
 
-void EditorGUI::drawComponentField(ComponentWrapper& c, const ComponentInfo::Field_t& field)
+bool EditorGUI::drawComponentField(ComponentWrapper& c, const ComponentInfo::Field_t& field)
 {
     // Push an unique widget id so different components with fields with equal names are still counted as different
     ImGui::PushID((c.Info.Name + field.Name).c_str());
 
+    bool dirty = false;
+
     if (field.Type == "Vector") {
-        drawComponentField_Vector(c, field);
+        dirty = drawComponentField_Vector(c, field);
     } else if (field.Type == "Color") {
-        drawComponentField_Color(c, field);
+        dirty = drawComponentField_Color(c, field);
     //} else if (field.Type == "Quaternion") {
     } else if (field.Type == "int") {
-        drawComponentField_int(c, field);
+        dirty = drawComponentField_int(c, field);
     } else if (field.Type == "enum") {
-        drawComponentField_enum(c, field);
+        dirty = drawComponentField_enum(c, field);
     } else if (field.Type == "float") {
-        drawComponentField_float(c, field);
+        dirty = drawComponentField_float(c, field);
     } else if (field.Type == "double") {
-        drawComponentField_double(c, field);
+        dirty = drawComponentField_double(c, field);
     } else if (field.Type == "bool") {
-        drawComponentField_bool(c, field);
+        dirty = drawComponentField_bool(c, field);
     } else if (field.Type == "string") {
-        drawComponentField_string(c, field);
+        dirty = drawComponentField_string(c, field);
     } else {
         ImGui::TextDisabled(field.Type.c_str());
     }
 
     ImGui::PopID();
+
+    return dirty;
 }
 
-void EditorGUI::drawComponentField_Vector(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_Vector(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     auto& val = c.Field<glm::vec3>(field.Name);
     if (field.Name == "Scale") {
         // Limit scale values to a minimum of 0
-        ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
+        return ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
     } else if (field.Name == "Orientation") {
         // Make orentations have a period of 2*Pi
         glm::vec3 tempVal = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
         if (ImGui::SliderFloat3("", glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
             val = tempVal;
+            return true;
+        } else {
+            return false;
         }
     } else {
-        ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
+        return ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
     }
 }
 
-void EditorGUI::drawComponentField_Color(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_Color(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     auto& val = c.Field<glm::vec4>(field.Name);
-    ImGui::ColorEdit4("", glm::value_ptr(val), true);
+    return ImGui::ColorEdit4("", glm::value_ptr(val), true);
 }
 
-void EditorGUI::drawComponentField_int(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_int(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     auto& val = c.Field<int>(field.Name);
-    ImGui::InputInt("", &val);
+    return ImGui::InputInt("", &val);
 }
 
-void EditorGUI::drawComponentField_enum(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_enum(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     auto fieldEnumDefIt = c.Info.Meta->FieldEnumDefinitions.find(field.Name);
     if (fieldEnumDefIt == c.Info.Meta->FieldEnumDefinitions.end()) {
-        drawComponentField_int(c, field);
-        return;
+        return drawComponentField_int(c, field);
     }
 
     auto& val = c.Field<int>(field.Name);
@@ -386,30 +395,36 @@ void EditorGUI::drawComponentField_enum(ComponentWrapper &c, const ComponentInfo
     }
     if (ImGui::Combo("", &selectedItem, enumKeys.str().c_str())) {
         val = enumValues.at(selectedItem);
+        return true;
+    } else {
+        return false;
     }
 }
 
-void EditorGUI::drawComponentField_float(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_float(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     auto& val = c.Field<float>(field.Name);
-    ImGui::InputFloat("", &val, 0.01f, 1.f);
+    return ImGui::InputFloat("", &val, 0.01f, 1.f);
 }
 
-void EditorGUI::drawComponentField_double(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_double(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     float tempVal = static_cast<float>(c.Field<double>(field.Name));
     if (ImGui::InputFloat("", &tempVal, 0.01f, 1.f)) {
         c.SetField(field.Name, static_cast<double>(tempVal));
+        return true;
+    } else {
+        return false;
     }
 }
 
-void EditorGUI::drawComponentField_bool(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_bool(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     auto& val = c.Field<bool>(field.Name);
-    ImGui::Checkbox("", &val);
+    return ImGui::Checkbox("", &val);
 }
 
-void EditorGUI::drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field)
+bool EditorGUI::drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
     auto& val = c.Field<std::string>(field.Name);
     char tempString[1024]; // Let's just hope this is an sufficiently large buffer for strings :)
@@ -418,12 +433,20 @@ void EditorGUI::drawComponentField_string(ComponentWrapper &c, const ComponentIn
     memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString) - 1));
     if (ImGui::InputText("", tempString, sizeof(tempString))) {
         val = std::string(tempString);
+        return true;
+    } else {
+        return false;
     }
     // TODO: Handle drag and drop of files
 }
 
 void EditorGUI::drawModals()
 {
+    for (auto& modal : m_ModalsToOpen) {
+        ImGui::OpenPopup(modal.c_str());
+    }
+    m_ModalsToOpen.clear();
+
     if (ImGui::BeginPopupModal("Import failed", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::Text("Entity import failed. Check console for more information.\n\n");
         ImGui::SetCursorPosX(ImGui::GetContentRegionAvailWidth() - 120);
@@ -437,6 +460,26 @@ void EditorGUI::drawModals()
         ImGui::Text("Entity save failed on an exception.\nMessage: %s\n\n", m_LastErrorMessage.c_str());
         ImGui::SetCursorPosX(ImGui::GetContentRegionAvailWidth() - 120);
         if (ImGui::Button("OK", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopupModal("Confirm deletion", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (m_ModalData.count("Confirm deletion") == 0) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::Text("Are you sure you want to delete entity \"%s\"?", formatEntityName(m_CurrentSelection).c_str());
+        ImGui::ItemSize(ImVec2(5.f, 0.f));
+        ImGui::SetCursorPosX(ImGui::GetContentRegionAvailWidth() - 2*60);
+        if (ImGui::Button("Delete (Del)", ImVec2(60, 0))) {
+            entityDelete(boost::any_cast<EntityWrapper>(m_ModalData.at("Confirm deletion")));
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(60, 0))) {
+            m_ModalData.erase("Confirm deletion");
             ImGui::CloseCurrentPopup(); 
         }
         ImGui::EndPopup();
@@ -492,6 +535,35 @@ void EditorGUI::createWidgetToolButton(WidgetMode mode)
     }
 }
 
+bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
+{
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_S) {
+        if (m_CurrentSelection.Valid()) {
+            EntityWrapper baseParent = m_CurrentSelection;
+            while (baseParent.Parent().Valid()) {
+                baseParent = baseParent.Parent();
+            }
+            entitySave(baseParent);
+        }
+    }
+
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_N) {
+        entityCreate(m_World, m_CurrentSelection);
+    }
+
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_O) {
+        entityImport(m_World);
+    }
+
+    if (e.KeyCode == GLFW_KEY_DELETE) {
+        if (m_CurrentSelection.Valid()) {
+            entityDelete(m_CurrentSelection);
+        }
+    }
+
+    return true;
+}
+
 boost::filesystem::path EditorGUI::fileOpenDialog()
 {
     namespace bfs = boost::filesystem;
@@ -540,7 +612,10 @@ const std::string EditorGUI::formatEntityName(EntityWrapper entity)
     }
 
     if (m_EntityFiles.count(entity) == 1) {
-        name << " (" << m_EntityFiles.at(entity).filename().string() << ")";
+        name << " (" << m_EntityFiles.at(entity).Path.filename().string() << ")";
+        if (m_EntityFiles.at(entity).Dirty) {
+            name << "*";
+        }
     }
 
     return name.str();
@@ -555,6 +630,22 @@ GLuint EditorGUI::tryLoadTexture(std::string filePath)
     return texture;
 }
 
+void EditorGUI::openModal(const std::string& modal)
+{
+    m_ModalsToOpen.insert(modal);
+}
+
+void EditorGUI::SetDirty(EntityWrapper entity)
+{
+    EntityWrapper baseParent = entity;
+    while (baseParent.Parent().Valid()) {
+        baseParent = baseParent.Parent();
+    }
+    if (m_EntityFiles.find(baseParent) != m_EntityFiles.end()) {
+        m_EntityFiles.at(baseParent).Dirty = true;
+    }
+}
+
 void EditorGUI::entityImport(World* world)
 {
     boost::filesystem::path filePath = fileOpenDialog();
@@ -564,10 +655,10 @@ void EditorGUI::entityImport(World* world)
 
     EntityWrapper entity = m_OnEntityImport(EntityWrapper(world, EntityID_Invalid), filePath);
     if (entity.Valid()) {
-        m_EntityFiles[entity] = filePath;
+        m_EntityFiles[entity].Path = filePath;
         SelectEntity(entity);
     } else {
-        ImGui::OpenPopup("Import failed");
+        openModal("Import failed");
     }
 }
 
@@ -575,7 +666,7 @@ void EditorGUI::entitySave(EntityWrapper entity, bool saveAs /* = false */)
 {
     boost::filesystem::path filePath;
     if (!saveAs && m_EntityFiles.count(entity) == 1) {
-        filePath = m_EntityFiles.at(entity);
+        filePath = m_EntityFiles.at(entity).Path;
     } else {
         filePath = fileSaveDialog();
     }
@@ -586,10 +677,11 @@ void EditorGUI::entitySave(EntityWrapper entity, bool saveAs /* = false */)
 
     try {
         m_OnEntitySave(entity, filePath);
-        m_EntityFiles[entity] = filePath;
+        m_EntityFiles[entity].Path = filePath;
+        m_EntityFiles[entity].Dirty = false;
     } catch (const std::exception& e) {
         m_LastErrorMessage = e.what();
-        ImGui::OpenPopup("Save failed");
+        openModal("Save failed");
     }
 }
 
@@ -607,12 +699,24 @@ void EditorGUI::entityCreate(World* world, EntityWrapper parent)
 
 void EditorGUI::entityDelete(EntityWrapper entity)
 {
-    if (m_OnEntityDelete != nullptr) {
-        m_OnEntityDelete(entity);
-        m_EntityFiles.erase(entity);
-    }
-    if (!m_CurrentSelection.Valid()) {
-        SelectEntity(EntityWrapper::Invalid);
+    std::string modalName = "Confirm deletion";
+
+    if (m_ModalData.count(modalName) == 0) {
+        m_ModalData[modalName] = entity;
+        openModal(modalName);
+    } else {
+        if (boost::any_cast<EntityWrapper>(m_ModalData[modalName]) == entity) {
+            EntityWrapper parent = entity.Parent();
+            if (m_OnEntityDelete != nullptr) {
+                SetDirty(entity);
+                m_OnEntityDelete(entity);
+                m_EntityFiles.erase(entity);
+            }
+            if (!m_CurrentSelection.Valid()) {
+                SelectEntity(parent);
+            }
+        }
+        m_ModalData.erase(modalName);
     }
 }
 
@@ -623,6 +727,7 @@ void EditorGUI::entityChangeParent(EntityWrapper entity, EntityWrapper parent)
     }
 
     if (m_OnEntityChangeParent != nullptr) {
+        SetDirty(entity);
         m_OnEntityChangeParent(entity, parent);
         LOG_DEBUG("Changed parent of %i to %i", entity.ID, parent.ID);
     }

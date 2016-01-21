@@ -52,6 +52,7 @@ EditorSystem::~EditorSystem()
 
 void EditorSystem::Update(double dt)
 {
+    m_EventBroker->Process<EditorGUI>();
     m_EditorGUI->Draw();
     m_EditorStats->Draw(dt);
 
@@ -87,27 +88,37 @@ EntityWrapper EditorSystem::OnEntityCreate(EntityWrapper parent)
 
 void EditorSystem::OnEntityDelete(EntityWrapper entity)
 {
-    entity.World->DeleteEntity(entity.ID);
+    if (entity.Valid()) {
+        entity.World->DeleteEntity(entity.ID);
+    }
 }
 
 void EditorSystem::OnEntityChangeParent(EntityWrapper entity, EntityWrapper parent)
 {
-    entity.World->SetParent(entity.ID, parent.ID);
+    if (entity.Valid()) {
+        entity.World->SetParent(entity.ID, parent.ID);
+    }
 }
 
 void EditorSystem::OnEntityChangeName(EntityWrapper entity, const std::string& name)
 {
-    entity.World->SetName(entity.ID, name);
+    if (entity.Valid()) {
+        entity.World->SetName(entity.ID, name);
+    }
 }
 
 void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& componentType)
 {
-    entity.World->AttachComponent(entity.ID, componentType);
+    if (entity.Valid()) {
+        entity.World->AttachComponent(entity.ID, componentType);
+    }
 }
 
 void EditorSystem::OnComponentDelete(EntityWrapper entity, const std::string& componentType)
 {
-    entity.World->DeleteComponent(entity.ID, componentType);
+    if (entity.Valid()) {
+        entity.World->DeleteComponent(entity.ID, componentType);
+    }
 }
 
 bool EditorSystem::OnMouseRelease(const Events::MouseRelease& e)
@@ -126,6 +137,7 @@ bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
 {
     if (m_CurrentSelection.Valid()) {
         (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += glm::inverse(Transform::AbsoluteOrientation(m_CurrentSelection.World, m_CurrentSelection.ID)) * e.Translation;
+        m_EditorGUI->SetDirty(m_CurrentSelection);
     }
     return true;
 }
