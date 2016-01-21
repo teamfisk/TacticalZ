@@ -80,7 +80,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
             glDrawElementsBaseVertex(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, 0, explosionEffectJob->StartIndex);
             GLERROR("DrawFinalPass::ExplosionEffect: END");
             m_ExplosionEffectProgram->Unbind();
-            continue;
+         
         } else {
              auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
              if (modelJob) {
@@ -112,7 +112,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
                  glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
                  GLERROR("DrawFinalPass::Model: END");
                  m_ForwardPlusProgram->Unbind();
-                 continue;
+                
              }
         }
         

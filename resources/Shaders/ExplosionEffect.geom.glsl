@@ -43,59 +43,7 @@ float GetRandomNumber(int polygon_index)
 {
 	int randomIndex = int(mod(polygon_index, 50));
 	
-	switch (randomIndex)
-	{
-		case 0: return RandomNumbers[0];
-		case 1: return RandomNumbers[1];
-		case 2: return RandomNumbers[2];
-		case 3: return RandomNumbers[3];
-		case 4: return RandomNumbers[4];
-		case 5: return RandomNumbers[5];
-		case 6: return RandomNumbers[6];
-		case 7: return RandomNumbers[7];
-		case 8: return RandomNumbers[8];
-		case 9: return RandomNumbers[9];
-		case 10: return RandomNumbers[10];
-		case 11: return RandomNumbers[11];
-		case 12: return RandomNumbers[12];
-		case 13: return RandomNumbers[13];
-		case 14: return RandomNumbers[14];
-		case 15: return RandomNumbers[15];
-		case 16: return RandomNumbers[16];
-		case 17: return RandomNumbers[17];
-		case 18: return RandomNumbers[18];
-		case 19: return RandomNumbers[19];
-		case 20: return RandomNumbers[20];
-		case 21: return RandomNumbers[21];
-		case 22: return RandomNumbers[22];
-		case 23: return RandomNumbers[23];
-		case 24: return RandomNumbers[24];
-		case 25: return RandomNumbers[25];
-		case 26: return RandomNumbers[26];
-		case 27: return RandomNumbers[27];
-		case 28: return RandomNumbers[28];
-		case 29: return RandomNumbers[29];
-		case 30: return RandomNumbers[30];
-		case 31: return RandomNumbers[31];
-		case 32: return RandomNumbers[32];
-		case 33: return RandomNumbers[33];
-		case 34: return RandomNumbers[34];
-		case 35: return RandomNumbers[35];
-		case 36: return RandomNumbers[36];
-		case 37: return RandomNumbers[37];
-		case 38: return RandomNumbers[38];
-		case 39: return RandomNumbers[39];
-		case 40: return RandomNumbers[40];
-		case 41: return RandomNumbers[41];
-		case 42: return RandomNumbers[42];
-		case 43: return RandomNumbers[43];
-		case 44: return RandomNumbers[44];
-		case 45: return RandomNumbers[45];
-		case 46: return RandomNumbers[46];
-		case 47: return RandomNumbers[47];
-		case 48: return RandomNumbers[48];
-		case 49: return RandomNumbers[49];
-	}
+	return RandomNumbers[randomIndex];
 }
 
 float randomNumber = 0.0;
@@ -120,7 +68,7 @@ void main()
 	
 	mat3 matrisA = mat3(vecA, dir2, vecB);
 	
-	float lengthA = length(cross(dir1, dir2));
+	float lengthA = length(vecB);
 	lengthA = lengthA * lengthA;
 
 	float s = determinant(matrisA) / lengthA;
