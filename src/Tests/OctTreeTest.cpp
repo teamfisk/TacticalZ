@@ -52,8 +52,7 @@ void RegionTestOld(Tree& tree)
 template<typename Tree>
 void RegionTest(Tree& tree)
 {
-    AABB aabb;
-    aabb.CreateFromCenter(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
+    AABB aabb = AABB::FromOriginSize(glm::vec3(rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS, rand() % LEVEL_BOUNDS),
         glm::vec3(rand() % MAXSIZE, rand() % MAXSIZE, rand() % MAXSIZE));
     std::vector<AABB> outVec;
     tree.ObjectsInSameRegion(aabb, outVec);

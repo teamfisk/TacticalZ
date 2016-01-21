@@ -1,7 +1,7 @@
 #include "Systems/WeaponSystem.h"
 
-WeaponSystem::WeaponSystem(EventBroker* eventBroker, IRenderer* renderer)
-    : System(eventBroker)
+WeaponSystem::WeaponSystem(World* world, EventBroker* eventBroker, IRenderer* renderer)
+    : System(world, eventBroker)
     , ImpureSystem()
     , m_Renderer(renderer)
 {
@@ -9,7 +9,7 @@ WeaponSystem::WeaponSystem(EventBroker* eventBroker, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EShoot, &WeaponSystem::OnShoot);
 }
 
-void WeaponSystem::Update(World* world, double dt)
+void WeaponSystem::Update(double dt)
 {
     for (int i = m_EShootVector.size(); i > 0; i--)
     {
@@ -22,7 +22,7 @@ void WeaponSystem::Update(World* world, double dt)
             continue;
         }
         //if its a player, do PlayerDamage event
-        const bool hasPlayerComponent = world->HasComponent(pickDataFromShot.Entity, "Player");
+        const bool hasPlayerComponent = m_World->HasComponent(pickDataFromShot.Entity, "Player");
         if (hasPlayerComponent) {
             Events::PlayerDamage ePlayerDamage;
             //TODO: damage based on weapontype/class?
