@@ -18,9 +18,9 @@
 class WeaponSystem : public ImpureSystem
 {
 public:
-    WeaponSystem(EventBroker* eventBroker, IRenderer* renderer);
+    WeaponSystem(World* world, EventBroker* eventBroker, IRenderer* renderer);
 
-    virtual void Update(World* world, double dt) override;
+    virtual void Update(double dt) override;
 
 private:
     //methods which will take care of specific events
