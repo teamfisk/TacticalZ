@@ -10,6 +10,18 @@
 #include "../Core/EMousePress.h"
 #include "../Core/EMouseRelease.h"
 
+namespace Events
+{
+
+struct WidgetDelta : Event
+{
+    glm::vec3 Translation;
+    glm::vec3 Rotation;
+    glm::vec3 Scale;
+};
+
+}
+
 class EditorWidgetSystem : public ImpureSystem, PureSystem
 {
 public:

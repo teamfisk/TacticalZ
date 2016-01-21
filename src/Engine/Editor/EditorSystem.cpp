@@ -31,6 +31,9 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
 
+    EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &EditorSystem::OnMouseRelease);
+    EVENT_SUBSCRIBE_MEMBER(m_EWidgetDelta, &EditorSystem::OnWidgetDelta);
+
     m_EditorStats = new EditorStats();
 
     Events::SetCamera e;
@@ -49,10 +52,14 @@ EditorSystem::~EditorSystem()
 
 void EditorSystem::Update(double dt)
 {
-    m_EditorWorldSystemPipeline->Update(dt);
-
     m_EditorGUI->Draw();
     m_EditorStats->Draw(dt);
+
+    if (m_CurrentSelection.Valid() && m_Widget.Valid()) {
+        (glm::vec3&)m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
+    }
+
+    m_EditorWorldSystemPipeline->Update(dt);
 
     m_DebugCameraInputController->Update(dt);
     m_Camera["Transform"]["Position"] = m_DebugCameraInputController->Position();
@@ -101,6 +108,26 @@ void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& co
 void EditorSystem::OnComponentDelete(EntityWrapper entity, const std::string& componentType)
 {
     entity.World->DeleteComponent(entity.ID, componentType);
+}
+
+bool EditorSystem::OnMouseRelease(const Events::MouseRelease& e)
+{
+    if (e.Button == GLFW_MOUSE_BUTTON_1) {
+        PickData pick = m_Renderer->Pick(glm::vec2(e.X, e.Y));
+        if (pick.World == m_World) {
+            m_CurrentSelection = EntityWrapper(m_World, pick.Entity);
+            m_EditorGUI->SelectEntity(m_CurrentSelection);
+        }
+    }
+    return true;
+}
+
+bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
+{
+    if (m_CurrentSelection.Valid()) {
+        (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += glm::inverse(Transform::AbsoluteOrientation(m_CurrentSelection.World, m_CurrentSelection.ID)) * e.Translation;
+    }
+    return true;
 }
 
 EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem::path filePath)

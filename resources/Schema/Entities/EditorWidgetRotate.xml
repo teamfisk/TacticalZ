@@ -9,6 +9,7 @@
     <Entity name="X">
       <Components>
         <c:EditorWidget>
+          <MouseAxis X="0" Y="1" Z="0"/>
           <Type>
             <Rotate/>
           </Type>
@@ -24,6 +25,7 @@
     <Entity name="Y">
       <Components>
         <c:EditorWidget>
+          <MouseAxis X="1" Y="0" Z="0"/>
           <Type>
             <Rotate/>
           </Type>
@@ -39,6 +41,7 @@
     <Entity name="Z">
       <Components>
         <c:EditorWidget>
+          <MouseAxis X="1" Y="1" Z="0"/>
           <Type>
             <Rotate/>
           </Type>

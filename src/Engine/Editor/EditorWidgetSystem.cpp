@@ -21,19 +21,30 @@ void EditorWidgetSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper
         return;
     }
     
+    Events::WidgetDelta e;
+
     EntityWrapper moveEntity = entity.Parent();
     if (!moveEntity.Valid()) {
         moveEntity = entity;
     }
 
+    auto camera = m_PickData.Camera;
+    glm::vec3 axis = cEditorWidget["Axis"];
+    glm::vec2 axisScreen = camera->WorldToScreen(axis, m_Renderer->Resolution()) - camera->WorldToScreen(glm::vec3(0, 0, 0), m_Renderer->Resolution());
+    float dot = glm::dot(m_MouseDelta, glm::normalize(axisScreen)) / glm::length(axisScreen);
+    glm::vec3 worldMovement = dot * axis;
+
     ComponentWrapper::SubscriptProxy& type = cEditorWidget["Type"];
     if ((ComponentInfo::EnumType)type == type.Enum("Translate")) {
-        auto camera = m_PickData.Camera;
-        glm::vec3 axis = cEditorWidget["Axis"];
-        glm::vec2 axisScreen = camera->WorldToScreen(axis, m_Renderer->Resolution()) - camera->WorldToScreen(glm::vec3(0, 0, 0), m_Renderer->Resolution());
-        float dot = glm::dot(m_MouseDelta, glm::normalize(axisScreen)) / glm::length(axisScreen);
-        glm::vec3 worldMovement = dot * axis;
-        (glm::vec3&)moveEntity["Transform"]["Position"] += worldMovement;
+        e.Translation += worldMovement;
+        m_EventBroker->Publish(e);
+    } else if ((ComponentInfo::EnumType)type == type.Enum("Rotate")) {
+        //if (glm::length(worldMovement) > 0) {
+        //    glm::vec3& orientation = moveEntity["Transform"]["Orientation"];
+        //    glm::quat q = glm::quat(orientation);
+        //    q *= glm::quat(glm::vec3(worldMovement));
+        //    orientation = glm::eulerAngles(q);
+        //}
     }
 
     m_MouseDelta = glm::vec2(0);
