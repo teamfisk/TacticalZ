@@ -9,7 +9,9 @@ void PlayerMovementSystem::UpdateComponent(World* world, EntityWrapper& entity, 
     ComponentWrapper& cPhysics = entity["Physics"];
 
     glm::vec3& velocity = cPhysics["Velocity"];
-    velocity.y -= 9.82 * dt;
+    if (cPhysics["Gravity"]) {
+        velocity.y -= 9.82 * dt;
+    }
 
     glm::vec3& position = cTransform["Position"];
     position += velocity * (float)dt;

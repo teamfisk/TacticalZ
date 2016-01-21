@@ -14,7 +14,7 @@ class AABB;
 class TriggerSystem : public PureSystem
 {
 public:
-    TriggerSystem(EventBroker* eventBroker, Octree* octree)
+    TriggerSystem(EventBroker* eventBroker, Octree<AABB>* octree)
         : System(eventBroker)
         , PureSystem("Trigger")
         , m_Octree(octree)
@@ -27,7 +27,7 @@ public:
     virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
-    Octree* m_Octree;
+    Octree<AABB>* m_Octree;
     std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesTouchingTrigger;
     std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesCompletelyInTrigger;
 

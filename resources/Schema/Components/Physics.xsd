@@ -10,6 +10,7 @@
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="Velocity" type="t:Vector" minOccurs="0"/>
+				<xs:element name="Gravity" type="t:bool" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
