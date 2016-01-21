@@ -33,7 +33,6 @@ private:
     IRenderer* m_Renderer;
 
     std::vector<std::tuple<EntityID, glm::vec2>> m_EShootVector;
-    double m_TestDamageTotal = 0.0;
 };
 
 #endif

@@ -31,13 +31,6 @@ void WeaponSystem::Update(World* world, double dt)
             ePlayerDamage.PlayerDamagedID = somePickData.Entity;
             ePlayerDamage.TypeOfDamage = "Some Weapon";
             m_EventBroker->Publish(ePlayerDamage);
-            //tests:color
-            m_TestDamageTotal += 0.25f;
-            if (m_TestDamageTotal > 6.0f) {
-                m_TestDamageTotal = 0.25f;
-            }
-            ComponentWrapper& playerModel = world->GetComponent(somePickData.Entity, "Model");
-            playerModel["Color"] = glm::vec4(m_TestDamageTotal, 0, 0, 1);
         }
         m_EShootVector.erase(m_EShootVector.begin() + i - 1);
     }
