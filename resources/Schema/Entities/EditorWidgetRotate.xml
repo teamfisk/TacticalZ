@@ -3,9 +3,6 @@
 
   <Components>
     <c:Transform/>
-    <c:UniformScale>
-      <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-    </c:UniformScale>
   </Components>
 
   <Children>
@@ -15,6 +12,7 @@
           <Type>
             <Rotate/>
           </Type>
+          <Axis X="1" Y="0" Z="0"/>
         </c:EditorWidget>
         <c:Model>
           <Resource>Models/RotationWidgetX.obj</Resource>
@@ -29,6 +27,7 @@
           <Type>
             <Rotate/>
           </Type>
+          <Axis X="0" Y="1" Z="0"/>
         </c:EditorWidget>
         <c:Model>
           <Resource>Models/RotationWidgetY.obj</Resource>
@@ -43,6 +42,7 @@
           <Type>
             <Rotate/>
           </Type>
+          <Axis X="0" Y="0" Z="1"/>
         </c:EditorWidget>
         <c:Model>
           <Resource>Models/RotationWidgetZ.obj</Resource>

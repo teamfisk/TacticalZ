@@ -171,7 +171,7 @@ void EntityFileSAXHandler::endElement(const XMLCh* const _uri, const XMLCh* cons
         //}
     }
 
-    if (m_StateStack.top() == State::ComponentField) {
+    if (m_StateStack.top() == State::ComponentField && name == m_CurrentField) {
         m_StateStack.pop();
         onEndComponentField(name);
         return;
