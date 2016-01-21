@@ -24,6 +24,7 @@ struct EntityWrapper
     static const EntityWrapper Invalid;
 
     bool HasComponent(const std::string& componentName);
+    EntityWrapper Parent();
     bool Valid();
 
     ComponentWrapper operator[](const char* componentName);

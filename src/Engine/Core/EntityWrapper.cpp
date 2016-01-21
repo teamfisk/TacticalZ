@@ -8,6 +8,11 @@ bool EntityWrapper::HasComponent(const std::string& componentName)
     return World->HasComponent(ID, componentName);
 }
 
+EntityWrapper EntityWrapper::Parent()
+{
+    return EntityWrapper(World, World->GetParent(ID));
+}
+
 bool EntityWrapper::Valid()
 {
     if (this->World == nullptr) {
@@ -38,7 +43,7 @@ ComponentWrapper EntityWrapper::operator[](const char* componentName)
 
 bool EntityWrapper::operator==(const EntityWrapper& e) const
 {
-    return (this->World == e.World) && (this->ID == e.ID);
+    return (this->ID == e.ID) && (this->World == e.World);
 }
 
 bool EntityWrapper::operator!=(const EntityWrapper& e) const
