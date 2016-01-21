@@ -1,6 +1,7 @@
 #include "Systems/SpawnerSystem.h"
 
-SpawnerSystem::SpawnerSystem(EventBroker* eventBroker) : System(eventBroker)
+SpawnerSystem::SpawnerSystem(World* world, EventBroker* eventBroker) 
+    : System(world, eventBroker)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnSpawnerSpawn, &SpawnerSystem::OnSpawnerSpawn);
 }

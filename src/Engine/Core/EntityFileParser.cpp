@@ -28,14 +28,14 @@ void EntityFileParser::onStartEntity(EntityID entity, EntityID parent, const std
         m_World->SetName(realEntity, name);
     }
     m_EntityIDMapper[entity] = realEntity;
-    LOG_DEBUG("Created entity #%i (%i) with parent %i (%i)", entity, realEntity, parent, realParent);
+    //LOG_DEBUG("Created entity #%i (%i) with parent %i (%i)", entity, realEntity, parent, realParent);
 }
 
 void EntityFileParser::onStartComponent(EntityID entity, const std::string& component)
 {
     EntityID realEntity = m_EntityIDMapper.at(entity);
     m_World->AttachComponent(realEntity, component);
-    LOG_DEBUG("Attached component of type \"%s\" to entity #%i (%i)", component.c_str(), entity, realEntity);
+    //LOG_DEBUG("Attached component of type \"%s\" to entity #%i (%i)", component.c_str(), entity, realEntity);
 }
 
 void EntityFileParser::onStartComponentField(EntityID entity, const std::string& componentType, const std::string& fieldName, const std::map<std::string, std::string>& attributes)
@@ -49,11 +49,11 @@ void EntityFileParser::onStartComponentField(EntityID entity, const std::string&
     }
     auto& field = fieldIt->second;
 
-    LOG_DEBUG("Field \"%s\" type \"%s\"", fieldName.c_str(), field.Type.c_str());
-    LOG_DEBUG("Attributes:");
-    for (auto& kv : attributes) {
-        LOG_DEBUG("\t%s = %s", kv.first.c_str(), kv.second.c_str());
-    }
+    //LOG_DEBUG("Field \"%s\" type \"%s\"", fieldName.c_str(), field.Type.c_str());
+    //LOG_DEBUG("Attributes:");
+    //for (auto& kv : attributes) {
+    //    LOG_DEBUG("\t%s = %s", kv.first.c_str(), kv.second.c_str());
+    //}
 
     char* data = component.Data + field.Offset;
     EntityFile::WriteAttributeData(data, field, attributes);

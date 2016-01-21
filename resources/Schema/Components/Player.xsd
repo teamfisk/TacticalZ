@@ -4,6 +4,9 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
 	<xs:element name="Player">
+		<xs:annotation>
+			<xs:documentation>The player charachter</xs:documentation>
+		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="Velocity" type="t:Vector" minOccurs="0"/>

@@ -2,20 +2,14 @@
 #define Events_SetCamera_h__
 
 #include "../Core/EventBroker.h"
-#include "../Core/Entity.h"
-#include <string.h>
+#include "../Core/EntityWrapper.h"
 
 namespace Events
 {
 
 struct SetCamera : Event
 {
-public:
-    SetCamera() { };
-    std::string Name;
-
-private:
-
+    EntityWrapper CameraEntity;
 };
 
 }

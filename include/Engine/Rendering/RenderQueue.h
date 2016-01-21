@@ -51,11 +51,12 @@ struct PointLightJob : RenderJob
 
 struct RenderScene
 {
-    ::Camera* Camera;
+    ::Camera* Camera = nullptr;
     std::list<std::shared_ptr<RenderJob>> ForwardJobs;
     std::list<std::shared_ptr<RenderJob>> PointLightJobs;
     std::list<std::shared_ptr<RenderJob>> DirectionalLightJobs;
     Rectangle Viewport;
+    bool ClearDepth = false;
 
 	void Clear()
 	{

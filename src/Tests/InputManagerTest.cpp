@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
-#include "Engine\Core\InputManager.h"
+#include "Engine/Core/InputManager.h"
 
 BOOST_AUTO_TEST_SUITE(inputManagerTests)
 

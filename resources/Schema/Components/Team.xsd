@@ -14,7 +14,7 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-
+	
 	<xs:element name="Team">
 		<xs:annotation>
 			<xs:documentation>Represents entity team affiliation</xs:documentation>
