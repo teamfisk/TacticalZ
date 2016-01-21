@@ -16,20 +16,19 @@ void WeaponSystem::Update(World* world, double dt)
         //TODO: check if player has enough ammo and if weapon has a cooldown or not
 
         //pick the object
-        PickData somePickData = m_Renderer->Pick(std::get<1>(m_EShootVector[i - 1]));
-        if (somePickData.Entity == EntityID_Invalid) {
+        PickData pickDataFromShot = m_Renderer->Pick(std::get<1>(m_EShootVector[i - 1]));
+        if (pickDataFromShot.Entity == EntityID_Invalid) {
             m_EShootVector.erase(m_EShootVector.begin() + i - 1);
             continue;
         }
         //if its a player, do PlayerDamage event
-        const bool hasPlayerComponent = world->HasComponent(somePickData.Entity, "Player");
+        const bool hasPlayerComponent = world->HasComponent(pickDataFromShot.Entity, "Player");
         if (hasPlayerComponent) {
             Events::PlayerDamage ePlayerDamage;
             //TODO: damage based on weapontype/class?
             //TODO: multiple shots at the same time? (shotgunner)
             ePlayerDamage.DamageAmount = 25;
-            ePlayerDamage.PlayerDamagedID = somePickData.Entity;
-            ePlayerDamage.TypeOfDamage = "Some Weapon";
+            ePlayerDamage.PlayerDamagedID = pickDataFromShot.Entity;
             m_EventBroker->Publish(ePlayerDamage);
         }
         m_EShootVector.erase(m_EShootVector.begin() + i - 1);

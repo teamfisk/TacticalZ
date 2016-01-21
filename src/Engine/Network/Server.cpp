@@ -240,7 +240,6 @@ void Server::parseOnPlayerDamage(Packet & packet)
     Events::PlayerDamage e;
     e.DamageAmount = packet.ReadPrimitive<double>();
     e.PlayerDamagedID = packet.ReadPrimitive<EntityID>();
-    e.TypeOfDamage = packet.ReadString();
     m_EventBroker->Publish(e);
     //LOG_DEBUG("Server::parseOnPlayerDamage: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
 }
