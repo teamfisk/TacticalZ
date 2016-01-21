@@ -136,7 +136,12 @@ bool EditorSystem::OnMouseRelease(const Events::MouseRelease& e)
 bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
 {
     if (m_CurrentSelection.Valid()) {
-        (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += glm::inverse(Transform::AbsoluteOrientation(m_CurrentSelection.World, m_CurrentSelection.ID)) * e.Translation;
+        glm::quat parentOrientation;
+        EntityWrapper parent = m_CurrentSelection.Parent();
+        if (parent.Valid()) {
+            parentOrientation = glm::inverse(Transform::AbsoluteOrientation(parent.World, parent.ID));
+        }
+        (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation;
         m_EditorGUI->SetDirty(m_CurrentSelection);
     }
     return true;
