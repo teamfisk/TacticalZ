@@ -76,6 +76,7 @@ void EditorGUI::drawTools()
 void EditorGUI::drawEntities(World* world)
 {
     if (!ImGui::Begin("Entities")) {
+        ImGui::End();
         return;
     }
 

@@ -1,6 +1,7 @@
 #include "Editor/EditorSystem.h"
 #include "Core/UniformScaleSystem.h"
 #include "Editor/EditorRenderSystem.h"
+#include "Editor/EditorWidgetSystem.h"
 
 EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
     : System(world, eventBroker)
@@ -10,6 +11,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorWorld = new World();
     m_EditorWorldSystemPipeline = new SystemPipeline(m_EditorWorld, eventBroker);
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
+    m_EditorWorldSystemPipeline->AddSystem<EditorWidgetSystem>(0, m_Renderer);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
     
     m_Camera = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/Empty.xml");
