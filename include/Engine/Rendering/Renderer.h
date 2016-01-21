@@ -15,6 +15,8 @@
 #include "LightCullingPass.h"
 #include "DrawFinalPass.h"
 #include "DrawScreenQuadPass.h"
+#include "DrawBloomPass.h"
+#include "DrawColorCorrectionPass.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
@@ -50,6 +52,8 @@ private:
     ImGuiRenderPass* m_ImGuiRenderPass;
     DrawFinalPass* m_DrawFinalPass;
     DrawScreenQuadPass* m_DrawScreenQuadPass;
+    DrawBloomPass* m_DrawBloomPass;
+    DrawColorCorrectionPass* m_DrawColorCorrectionPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
