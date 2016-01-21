@@ -3,6 +3,8 @@
 
 #include <imgui/imgui.h>
 #include "../Input/FirstPersonInputController.h"
+#include "../Core/EMousePress.h"
+#include "../Core/EMouseRelease.h"
 
 template <typename EventContext>
 class DebugCameraInputController : public FirstPersonInputController<EventContext>
@@ -10,7 +12,10 @@ class DebugCameraInputController : public FirstPersonInputController<EventContex
 public:
     DebugCameraInputController(EventBroker* eventBroker, unsigned int playerID)
         : FirstPersonInputController(eventBroker, playerID)
-    { }
+    {
+        EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &DebugCameraInputController::OnMousePress);
+        EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &DebugCameraInputController::OnMouseRelease);
+    }
 
     void SetPosition(const glm::vec3 position) { m_Position = position; }
     void SetOrientation(const glm::quat orientation) { m_Orientation = orientation; }
@@ -21,17 +26,6 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override
     {
         ImGuiIO& io = ImGui::GetIO();
-
-        if (e.Command == "PrimaryFire") {
-            if (e.Value > 0) {
-                if (!io.WantCaptureMouse) {
-                    LockMouse();
-                }
-            } else {
-                UnlockMouse();
-            }
-            return false;
-        }
 
         if (!io.WantCaptureKeyboard) {
             if (e.Command == "Right") {
@@ -66,6 +60,25 @@ protected:
     glm::vec3 m_Velocity = glm::vec3(0, 0, 0);
     float m_BaseSpeed = 2.0f;
     float m_Speed = m_BaseSpeed;
+    EventRelay<EventContext, Events::MousePress> m_EMousePress;
+    bool OnMousePress(const Events::MousePress& e)
+    {
+        if (e.Button == GLFW_MOUSE_BUTTON_2) {
+            ImGuiIO& io = ImGui::GetIO();
+            if (!io.WantCaptureMouse) {
+                LockMouse();
+            }
+        }
+        return true;
+    }
+    EventRelay<EventContext, Events::MouseRelease> m_EMouseRelease;
+    bool OnMouseRelease(const Events::MouseRelease& e)
+    {
+        if (e.Button == GLFW_MOUSE_BUTTON_2) {
+            UnlockMouse();
+        }
+        return true;
+    }
 };
 
 #endif

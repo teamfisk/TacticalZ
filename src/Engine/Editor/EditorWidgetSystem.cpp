@@ -50,19 +50,6 @@ void EditorWidgetSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper
     m_MouseDelta = glm::vec2(0);
 }
 
-void EditorWidgetSystem::debugPrintVector(const char* name, glm::vec2 axisNDC)
-{
-    ImGui::Text("%s: (%f, %f)", name, axisNDC.x, axisNDC.y);
-}
-void EditorWidgetSystem::debugPrintVector(const char* name, glm::vec4 axisNDC)
-{
-    ImGui::Text("%s: (%f, %f, %f, %f)", name, axisNDC.x, axisNDC.y, axisNDC.z, axisNDC.w);
-}
-void EditorWidgetSystem::debugPrintVector(const char* name, glm::vec3 axisNDC)
-{
-    ImGui::Text("%s: (%f, %f, %f)", name, axisNDC.x, axisNDC.y, axisNDC.z);
-}
-
 bool EditorWidgetSystem::OnMouseMove(const Events::MouseMove& e)
 {
     m_MouseDelta = glm::vec2((float)e.DeltaX, (float)-e.DeltaY);
@@ -71,7 +58,7 @@ bool EditorWidgetSystem::OnMouseMove(const Events::MouseMove& e)
 
 bool EditorWidgetSystem::OnMousePress(const Events::MousePress & e)
 {
-    if (e.Button == GLFW_MOUSE_BUTTON_2) {
+    if (e.Button == GLFW_MOUSE_BUTTON_1) {
         m_PickData = m_Renderer->Pick(glm::vec2(e.X, e.Y));
         if (m_PickData.Entity != EntityID_Invalid && m_PickData.World == m_World) {
             m_PickEntity = EntityWrapper(m_World, m_PickData.Entity);

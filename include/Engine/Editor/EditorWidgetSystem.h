@@ -30,10 +30,6 @@ public:
     virtual void Update(double dt) override;
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cEditorWidget, double dt) override;
 
-    void debugPrintVector(const char* name, glm::vec3 axisNDC);
-
-    void debugPrintVector(const char* name, glm::vec4 axisNDC);
-    void debugPrintVector(const char* name, glm::vec2 axisNDC);
 private:
     IRenderer* m_Renderer;
 
