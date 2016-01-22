@@ -72,8 +72,8 @@ void EditorSystem::Update(double dt)
 
         ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
         glm::vec3& ori = cameraTransform["Orientation"];
-        ori.x = m_EditorCameraInputController->Orientation().x;
-        ori.y = m_EditorCameraInputController->Orientation().y;
+        ori.x = m_EditorCameraInputController->Rotation().x;
+        ori.y = m_EditorCameraInputController->Rotation().y;
         glm::vec3& pos = cameraTransform["Position"];
         pos += m_EditorCameraInputController->Movement() * glm::inverse(glm::quat(ori)) * (float)actualDelta;
     }
@@ -81,6 +81,8 @@ void EditorSystem::Update(double dt)
 
 void EditorSystem::Enable()
 {
+    m_EditorCameraInputController->Enable();
+    m_EventBroker->Publish(Events::UnlockMouse());
     Events::SetCamera e;
     e.CameraEntity = m_EditorCamera;
     m_EventBroker->Publish(e);
@@ -90,6 +92,8 @@ void EditorSystem::Enable()
 
 void EditorSystem::Disable()
 {
+    m_EditorCameraInputController->Disable();
+    m_EventBroker->Publish(Events::LockMouse());
     Events::SetCamera e;
     e.CameraEntity = m_ActualCamera;
     m_EventBroker->Publish(e);
@@ -179,6 +183,10 @@ bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
 
 bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
 {
+    if (e.PlayerID != -1) {
+        return false;
+    }
+
     if (e.Command == "ToggleEditor" && e.Value > 0) {
         if (m_Enabled) {
             Disable();

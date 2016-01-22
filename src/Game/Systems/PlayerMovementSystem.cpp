@@ -27,16 +27,17 @@ void PlayerMovementSystem::Update(double dt)
         EntityWrapper cameraEntity = player.FirstChildByName("Camera");
         if (cameraEntity.Valid()) {
             glm::vec3& cameraOrientation = cameraEntity["Transform"]["Orientation"];
-            cameraOrientation.x = controller->Orientation().x;
+            cameraOrientation.x += controller->Rotation().x;
         }
 
         ComponentWrapper& cTransform = player["Transform"];
         glm::vec3& ori = cTransform["Orientation"];
-        ori.y = controller->Orientation().y;
+        ori.y += controller->Rotation().y;
 
         glm::vec3& pos = cTransform["Position"];
         pos += controller->Movement() * glm::inverse(glm::quat(ori)) * (float)player["Player"]["MovementSpeed"] * (float)dt;
-
+        
+        controller->Reset();
     }
 }
 

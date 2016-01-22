@@ -23,13 +23,17 @@ public:
         m_SpeedMultiplier = m_Config->Get<float>("Editor.CameraSpeed", 3.f);
     }
     
-    virtual const glm::vec3 Movement() const override
-    {
-        return m_Movement * m_SpeedMultiplier;
-    }
+    virtual const glm::vec3 Movement() const override { return m_Movement * m_SpeedMultiplier; }
+
+    void Enable() { m_Enabled = true; }
+    void Disable() { m_Enabled = false; }
 
     virtual bool OnCommand(const Events::InputCommand& e) override
     {
+        if (!m_MouseLocked) {
+            return false;
+        }
+
         ImGuiIO& io = ImGui::GetIO();
         if (glm::abs(e.Value) > 0 && (io.WantCaptureKeyboard || io.WantCaptureMouse)) {
             return false;
@@ -64,11 +68,16 @@ public:
 
 protected:
     ConfigFile* m_Config;
+    bool m_Enabled = false;
     float m_SpeedMultiplier = 1.f;
 
     EventRelay<EventContext, Events::MousePress> m_EMousePress;
     bool OnMousePress(const Events::MousePress& e)
     {
+        if (!m_Enabled) {
+            return false;
+        }
+
         if (e.Button == GLFW_MOUSE_BUTTON_2) {
             ImGuiIO& io = ImGui::GetIO();
             if (!io.WantCaptureMouse) {
@@ -80,6 +89,10 @@ protected:
     EventRelay<EventContext, Events::MouseRelease> m_EMouseRelease;
     bool OnMouseRelease(const Events::MouseRelease& e)
     {
+        if (!m_Enabled) {
+            return false;
+        }
+
         if (e.Button == GLFW_MOUSE_BUTTON_2) {
             UnlockMouse();
         }
@@ -88,6 +101,10 @@ protected:
     EventRelay<EventContext, Events::MouseScroll> m_EMouseScroll;
     bool OnMouseScroll(const Events::MouseScroll& e)
     {
+        if (!m_Enabled) {
+            return false;
+        }
+
         m_SpeedMultiplier += e.DeltaY * (0.1f * m_SpeedMultiplier);
         m_Config->Set("Editor.CameraSpeed", m_SpeedMultiplier);
         m_Config->SaveToDisk();

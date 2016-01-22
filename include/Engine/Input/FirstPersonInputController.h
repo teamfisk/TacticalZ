@@ -18,7 +18,7 @@ public:
     }
 
     virtual const glm::vec3 Movement() const { return m_Movement; }
-    virtual const glm::vec3 Orientation() const { return m_Orientation; }
+    virtual const glm::vec3 Rotation() const { return m_Rotation; }
     
     void LockMouse()
     {
@@ -40,21 +40,19 @@ public:
             return false;
         }
 
-        if (m_MouseLocked) {
-            if (e.Command == "Pitch") {
-                float val = glm::radians(e.Value);
-                m_Orientation.x += -val;
-                m_Orientation.x = glm::clamp(m_Orientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
-                //m_Orientation = m_Orientation * glm::angleAxis<float>(-val, glm::vec3(1.f, 0, 0));
-                return true;
-            }
+        if (e.Command == "Pitch") {
+            float val = glm::radians(e.Value);
+            m_Rotation.x += -val;
+            m_Rotation.x = glm::clamp(m_Rotation.x, -glm::half_pi<float>(), glm::half_pi<float>());
+            //m_Rotation = m_Rotation * glm::angleAxis<float>(-val, glm::vec3(1.f, 0, 0));
+            return true;
+        }
 
-            if (e.Command == "Yaw") {
-                float val = glm::radians(e.Value);
-                m_Orientation.y += -val;
-                //m_Orientation = glm::angleAxis<float>(-val, glm::vec3(0, 1.f, 0)) * m_Orientation;
-                return true;
-            }
+        if (e.Command == "Yaw") {
+            float val = glm::radians(e.Value);
+            m_Rotation.y += -val;
+            //m_Rotation = glm::angleAxis<float>(-val, glm::vec3(0, 1.f, 0)) * m_Rotation;
+            return true;
         }
 
         if (e.Command == "Forward" || e.Command == "Right") {
@@ -75,11 +73,16 @@ public:
 
         return false;
     }
+    
+    virtual void Reset()
+    {
+        m_Rotation = glm::vec3(0.f, 0.f, 0.f);
+    }
 
 protected:
     const int m_PlayerID;
     bool m_MouseLocked = false;
-    glm::vec3 m_Orientation;
+    glm::vec3 m_Rotation;
     glm::vec3 m_Movement;
     
     EventRelay<EventContext, Events::LockMouse> m_ELockMouse;
