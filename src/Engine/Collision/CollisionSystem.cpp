@@ -51,7 +51,13 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
         auto absScale = Transform::AbsoluteScale(m_World, cModel.EntityID);
         glm::mat4 modelMatrix = glm::translate(absPosition) * glm::toMat4(absOrientation) * glm::scale(absScale);
 
-        RawModel* model = ResourceManager::Load<RawModel>(cModel["Resource"]);
+        RawModel* model;
+        try {
+            model = ResourceManager::Load<RawModel, true>(cModel["Resource"]);
+        } catch (const std::exception&) {
+            continue;
+        }
+
         glm::vec3 resolutionVector;
         if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, resolutionVector)) {
             (glm::vec3&)cTransform["Position"] += resolutionVector;

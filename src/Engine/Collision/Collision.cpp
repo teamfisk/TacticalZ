@@ -299,7 +299,7 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
     //closest to being perpendicular to the plane of the polygon.
 
     triNormal = glm::normalize(triNormal);
-    glm::vec3 diagonal = signNonZero(triNormal) * half;
+    glm::vec3 diagonal = -signNonZero(triNormal) * half;
 #define EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
 #ifdef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
     //The triangle plane contains all points P in dot(triNormal, P) == dot(triNormal, v0)
@@ -323,9 +323,9 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
             return false;
         }
 #endif
-        float dist = glm::dot(triNormal, origin + diagonal - v0);
-        outResolutionVector = dist * triNormal;
-        LOG_DEBUG("Triangle collision corner");
+        //Distance between triangle plane, and the diagonal corner, multiplied by the normal.
+        //Signed distance, positive if on the same side as the normal.
+        outResolutionVector = -glm::dot(triNormal, origin + diagonal - v0) * triNormal;
         return true;
     }
     return false;
