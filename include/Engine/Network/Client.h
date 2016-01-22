@@ -39,14 +39,14 @@ private:
     char readBuf[INPUTSIZE] = { 0 };
 
     // Packet loss logic
-    unsigned int m_PacketID = 0;
-    unsigned int m_PreviousPacketID = 0;
-    unsigned int m_SendPacketID = 0;
+    PacketID m_PacketID = 0;
+    PacketID m_PreviousPacketID = 0;
+    PacketID m_SendPacketID = 0;
 
     // Game logic
     World* m_World;
     std::string m_PlayerName;
-    int m_PlayerID = -1;
+    PlayerID m_PlayerID = -1;
     EntityID m_ServerEntityID = std::numeric_limits<EntityID>::max();
     bool m_IsConnected = false;
     // Server Client Lookup map
@@ -76,6 +76,7 @@ private:
     void parseConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
+    void parseKick();
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();

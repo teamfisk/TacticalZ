@@ -13,7 +13,8 @@ enum class MessageType
     OnInputCommand,
     OnPlayerDamage,
     PlayerConnected,
-    BecomePlayer
+    BecomePlayer,
+    Kick
 };
 
 #endif

@@ -89,6 +89,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::PlayerConnected:
         parsePlayerConnected(packet);
+    case MessageType::Kick:
+        parseKick();
+        break;
     default:
         break;
     }
@@ -118,6 +121,12 @@ void Client::parsePing()
     Packet packet(MessageType::Ping, m_SendPacketID);
     packet.WriteString("Ping recieved");
     send(packet);
+}
+
+void Client::parseKick()
+{ 
+    LOG_WARNING("You have been kicked from the server.");
+    m_IsConnected = false;
 }
 
 // Fields with strings will not work right now

@@ -118,11 +118,11 @@ int Server::receive(char * data)
     return length;
 }
 
-void Server::send(Packet& packet, int userID)
+void Server::send(Packet& packet, UserID user)
 {
     int bytesSent = m_Socket.send_to(
         boost::asio::buffer(packet.Data(), packet.Size()),
-        m_ConnectedUsers[userID].Endpoint,
+        m_ConnectedUsers[user].Endpoint,
         0);
     // Network Debug data
     if (isReadingData) {
@@ -224,40 +224,40 @@ void Server::checkForTimeOuts()
     }
 }
 
-void Server::disconnect(int i)
+void Server::disconnect(UserID user)
 {
     //broadcast("A player disconnected");
-    LOG_INFO("User %s disconnected/timed out", m_PlayerDefinitions[i].Name.c_str());
+    LOG_INFO("User %s disconnected/timed out", m_PlayerDefinitions[user].Name.c_str());
     // Remove enteties and stuff (When we can remove entity, remove it and tell clients to remove the copy they have)
     Events::PlayerDisconnected e;
-    e.Entity = m_PlayerDefinitions[i].EntityID;
-    e.PlayerID = i;
+    e.Entity = m_PlayerDefinitions[user].EntityID;
+    e.PlayerID = user;
     m_EventBroker->Publish(e);
 
-    m_PlayerDefinitions[i].Endpoint = boost::asio::ip::udp::endpoint();
-    m_PlayerDefinitions[i].EntityID = -1;
-    m_PlayerDefinitions[i].Name = "";
-    m_PlayerDefinitions[i].PacketID = 0;
-    m_ConnectedUsers.erase(m_ConnectedUsers.begin() + i);
+    m_PlayerDefinitions[user].Endpoint = boost::asio::ip::udp::endpoint();
+    m_PlayerDefinitions[user].EntityID = -1;
+    m_PlayerDefinitions[user].Name = "";
+    m_PlayerDefinitions[user].PacketID = 0;
+    m_ConnectedUsers.erase(m_ConnectedUsers.begin() + user);
 }
 
 void Server::parseOnInputCommand(Packet& packet)
 {
-    int playerID = -1;
+    PlayerID player = -1;
     // Check which player it was who sent the message
     for (int i = 0; i < m_MaxConnections; i++) {
         // if the player is connected set playerID to the correct PlayerID
         if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()
             && m_PlayerDefinitions[i].Endpoint.port() == m_ReceiverEndpoint.port()) {
-            playerID = i;
+            player = i;
             break;
         }
     }
-    if (playerID != -1) {
+    if (player != -1) {
         while (packet.DataReadSize() < packet.Size()) {
             Events::InputCommand e;
             e.Command = packet.ReadString();
-            e.PlayerID = playerID; // Set correct player id
+            e.PlayerID = player; // Set correct player id
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -322,12 +322,12 @@ void Server::parseDisconnect()
 void Server::parseClientPing()
 {
     LOG_INFO("%i: Parsing ping", m_PacketID);
-    int playerID = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
-    if (playerID == -1) {
+    PlayerID player = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
+    if (player == -1) {
         return;
     }
     // Return ping
-    Packet packet(MessageType::Ping, m_PlayerDefinitions[playerID].PacketID);
+    Packet packet(MessageType::Ping, m_PlayerDefinitions[player].PacketID);
     packet.WriteString("Ping received");
     send(packet);
 }
@@ -358,7 +358,7 @@ void Server::createPlayer()
         LOG_WARNING("Already connected!");
         return;
     }
-    int userIndex;
+    UserID userIndex;
     for (userIndex = 0; userIndex < m_ConnectedUsers.size(); userIndex++) {
         if (m_ConnectedUsers[userIndex].Endpoint.address() == m_ReceiverEndpoint.address() &&
             m_ConnectedUsers[userIndex].Endpoint.port() == m_ReceiverEndpoint.port()) {
@@ -370,7 +370,7 @@ void Server::createPlayer()
         LOG_WARNING("Not a recognized user!");
         return;
     }
-    for (int playerIndex = 0; playerIndex < m_MaxConnections; playerIndex++) {
+    for (PlayerID playerIndex = 0; playerIndex < m_MaxConnections; playerIndex++) {
         if (m_PlayerDefinitions[playerIndex].Endpoint.address() == boost::asio::ip::address()) {
             m_PlayerDefinitions[playerIndex] = m_ConnectedUsers[userIndex];
             EntityID entityID = m_World->CreateEntity();
@@ -388,7 +388,14 @@ void Server::createPlayer()
 
 }
 
-int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
+void Server::kick(PlayerID player)
+{
+    disconnect(player);
+    Packet packet = Packet(MessageType::Kick);
+    send(packet);
+}
+
+PlayerID Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
 {
     for (int i = 0; i < m_MaxConnections; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == endpoint.address() &&
@@ -409,5 +416,9 @@ bool Server::OnInputCommand(const Events::InputCommand & e)
         isReadingData = !isReadingData;
         m_SaveDataTimer = std::clock();
     }
+    if (e.Command == "KickPlayer" && e.Value > 0) {
+        kick(0);
+    }
+
     return true;
 }

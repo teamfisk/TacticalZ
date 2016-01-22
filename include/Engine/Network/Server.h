@@ -51,19 +51,19 @@ private:
     EventBroker* m_EventBroker;
     
     // Packet loss logic
-    unsigned int m_PacketID = 0;
-    unsigned int m_PreviousPacketID = 0;
+    PacketID m_PacketID = 0;
+    PacketID m_PreviousPacketID = 0;
 
     // Private member functions
     int  receive(char* data);
     void readFromClients();
-    void send(Packet& packet, int playerID);
+    void send(Packet& packet, UserID user);
     void send(Packet& packet);
     void broadcast(Packet& packet);
     void sendSnapshot();
     void sendPing();
     void checkForTimeOuts();
-    void disconnect(int i);
+    void disconnect(UserID user);
     void parseMessageType(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseOnPlayerDamage(Packet& packet);
@@ -73,7 +73,8 @@ private:
     void parsePing();
     void identifyPacketLoss();
     void createPlayer();
-    int GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
+    void kick(PlayerID player);
+    PlayerID GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
