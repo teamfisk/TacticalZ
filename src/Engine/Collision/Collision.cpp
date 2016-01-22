@@ -217,11 +217,6 @@ bool RayVsModel(const Ray& ray,
     return hit;
 }
 
-constexpr inline int squareOf(float x)
-{
-    return x * x;
-}
-
 constexpr inline int signNonZero(float x)
 {
     return x < 0 ? -1 : 1;
@@ -236,101 +231,17 @@ inline glm::vec3 signNonZero(const glm::vec3& x)
     return r;
 }
 
-bool lineIntersectsBox(const AABB& box, const glm::vec3& v0, const glm::vec3& v1)
-{
-    const glm::vec3 edgevec = v1 - v0;
-    glm::vec3 edgevec_signs = signNonZero(edgevec);
-
-    for (int i = 0; i < 3; ++i)
-        edgevec_signs[i] = signNonZero(edgevec[i]);
-
-    /*
-    * Test the three cube faces on the v1-ward side of the cube--
-    * if v0 is outside any of their planes then there is no intersection.
-    * Also test the three cube faces on the v0-ward side of the cube--
-    * if v1 is outside any of their planes then there is no intersection.
-    */
-
-    for (int i = 0; i < 3; ++i)
-    {
-        if (v0[i] * edgevec_signs[i] > .5) return false;
-        if (v1[i] * edgevec_signs[i] < -.5) return false;
-    }
-
-    /*
-    * Okay, that's the six easy faces of the rhombic dodecahedron
-    * out of the way.  Six more to go.
-    * The remaining six planes bound an infinite hexagonal prism
-    * joining the petrie polygons (skew hexagons) of the two cubes
-    * centered at the endpoints.
-    */
-
-    for (int i = 0; i < 3; ++i)
-    {
-        float rhomb_normal_dot_v0, rhomb_normal_dot_cubedge;
-
-        int iplus1 = (i + 1) % 3;
-        int iplus2 = (i + 2) % 3;
-
-#ifdef THE_EASY_TO_UNDERSTAND_WAY
-
-        {
-            real rhomb_normal[3], cubedge_midpoint[3];
-
-            /*
-            * rhomb_normal = VXV3(edgevec, unit vector in direction i),
-            * being cavalier about which direction it's facing
-            */
-            rhomb_normal[i] = 0;
-            rhomb_normal[iplus1] = edgevec[iplus2];
-            rhomb_normal[iplus2] = -edgevec[iplus1];
-
-            /*
-            *  We now are describing a plane parallel to
-            *  both segment and the cube edge in question.
-            *  if |DOT3(rhomb_normal, an arbitrary point on the segment)| >
-            *  |DOT3(rhomb_normal, an arbitrary point on the cube edge in question|
-            *  then the origin is outside this pair of opposite faces.
-            *  (This is equivalent to saying that the line
-            *  containing the segment is "outside" (i.e. further away from the
-            *  origin than) the line containing the cube edge.
-            */
-
-            cubedge_midpoint[i] = 0;
-            cubedge_midpoint[iplus1] = edgevec_signs[iplus1] * .5;
-            cubedge_midpoint[iplus2] = -edgevec_signs[iplus2] * .5;
-
-            rhomb_normal_dot_v0 = DOT3(rhomb_normal, v0);
-            rhomb_normal_dot_cubedge = DOT3(rhomb_normal, cubedge_midpoint);
-        }
-
-#else /* the efficient way */
-
-        rhomb_normal_dot_v0 = edgevec[iplus2] * v0[iplus1]
-            - edgevec[iplus1] * v0[iplus2];
-
-        rhomb_normal_dot_cubedge = .5 *
-            (edgevec[iplus2] * edgevec_signs[iplus1] +
-                edgevec[iplus1] * edgevec_signs[iplus2]);
-
-#endif /* the efficient way */
-
-        if (squareOf(rhomb_normal_dot_v0) > squareOf(rhomb_normal_dot_cubedge))
-            return false;	/* origin is outside this pair of opposite planes */
-    }
-    return true;
-}
 
 bool vectorHasLength(const glm::vec3& vec)
 {
-    return glm::all(glm::lessThan(glm::abs(vec), glm::vec3(0.0001f, 0.0001f, 0.0001f)));
+    return glm::any(glm::greaterThan(glm::abs(vec), glm::vec3(0.0001f, 0.0001f, 0.0001f)));
 }
 
 bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, glm::vec3& outResolutionVector)
 {
     //Check so we don't have a zero area triangle when calculating the normal.
     glm::vec3 triNormal = glm::cross(v1 - v0, v2 - v0);
-    if (vectorHasLength(triNormal)) {
+    if (!vectorHasLength(triNormal)) {
         return false;
     }
 
@@ -366,14 +277,15 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
         return true;    //TODO: Resolve.
     }
 
-    glm::vec3 triPosInBoxSpace[3];
-    for (int i = 0; i < 3; ++i) {
-        triPosInBoxSpace[i] = (triPos[i] - origin) / (2.0f * half);
-    }
+    Ray ray;
     //All triangle lines.
     //Check if each line on the triangle intersects any plane on the box.
     for (int l = 0; l < 3; ++l) {
-        if (lineIntersectsBox(box, triPosInBoxSpace[l], triPosInBoxSpace[(l + 1) % 3])) {
+        glm::vec3 edge = triPos[(l + 1) % 3] - triPos[l];
+        ray.SetOrigin(triPos[l]);
+        ray.SetDirection(edge);
+        float dist;
+        if (RayVsAABB(ray, box, dist) && dist <= glm::length(edge)) {
             outResolutionVector = glm::vec3(0.f);
             LOG_DEBUG("Triangle collision lines");
             return true;    //TODO: Resolve.
@@ -402,7 +314,8 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
 #endif
 
     //Check if intersection point is on the triangle.
-    Ray ray(origin, diagonal);
+    ray.SetOrigin(origin);
+    ray.SetDirection(diagonal);
     float dist = INFINITY, u, v;
     if (RayVsTriangle(ray, v0, v1, v2, dist, u, v, true)) {
 #ifndef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
@@ -421,6 +334,7 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
 bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
 {
     bool hit = false;
+    outResolutionVector = glm::vec3(INFINITY);
     for (int i = 0; i < modelIndices.size(); i += 3) {
         glm::vec3 resVec;
         if (AABBvsTriangle(
@@ -438,72 +352,11 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
             }
         }
     }
-    return hit;
-    //TODO: Remove old code.
-
-    /*
-    auto hit = glm::tvec3<bool>(false);
-    const glm::vec3& origin = box.Origin();
-    const glm::vec3& min = box.MinCorner();
-    const glm::vec3& max = box.MaxCorner();
-    const glm::vec3& half = box.HalfSize();
-
-    float minResolution = INFINITY;
-    outResolutionVector = glm::vec3(0.f);
-    //TODO: Don't need indices? Remove?
-    for (const auto& v : modelVertices) {
-        glm::vec3 p = v.Position;
-        p = glm::vec3(modelMatrix * glm::vec4(p.x, p.y, p.z, 1));
-
-        const glm::vec3 diffO = origin - p;
-        const glm::vec3 distO = glm::abs(diffO);
-        for (int axis = 0; axis < 3; ++axis) {
-            float penetration = half[axis] - distO[axis];
-            if (penetration > 0){
-                if (penetration < minResolution) {
-                    minResolution = penetration;
-                    outResolutionVector = glm::vec3(0.f);
-                    if (p[axis] > origin[axis]) {
-                        outResolutionVector[axis] = -penetration;
-                    } else {
-                        outResolutionVector[axis] = penetration;
-                    }
-                }
-                hit[axis] = true;
-            }
-        }
-
-        //float distFromOrigin = glm::abs(origin.x - p.x);
-        //float penetration = box.HalfSize().x - distFromOrigin;
-        //if (penetration > 0 && penetration < glm::abs(outResolutionVector.x)) {
-        //    if (p.x > origin.x) {
-        //        outResolutionVector.x = -penetration;
-        //    } else {
-        //        outResolutionVector.x = penetration;
-        //    }
-        //    hit = true;
-        //}
-
-        //glm::vec3 pLocal = origin - p;
-        //for (int axis = 0; axis < 3; ++axis) {
-        //    if (p[axis] < min[axis] || p[axis] > max[axis]) {
-        //        continue;
-        //    }
-
-        //    if (glm::abs(pLocal[axis]) < box.HalfSize()[axis]) {
-        //        outResolutionVector[axis] = (glm::sign(pLocal[axis]) * box.HalfSize()[axis]) - pLocal[axis];
-        //        hit = true;
-        //    }
-        //}
+    //TODO: Unnecessary later, remove it.
+    if (glm::any(glm::isinf(outResolutionVector))) {
+        outResolutionVector = glm::vec3(0, 0, 0);
     }
-
-    //for (int axis = 0; axis < 3; ++axis) {
-    //    if (glm::isinf(outResolutionVector[axis])) {
-    //        outResolutionVector[axis] = 0.f;
-    //    }
-    //}
-
-    return glm::all(hit);*/
+    return hit;
 }
 
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)

@@ -37,18 +37,18 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     //}
 
     // HACK: Temporarily collide against all collidable models since they're not in the octree yet
-    auto otherCollidables = world->GetComponents("Model");
+    auto otherCollidables = m_World->GetComponents("Model");
     for (auto& cModel : *otherCollidables) {
-        if (cModel.EntityID == EntityID(entity)) {
+        if (cModel.EntityID == entity.ID) {
             continue;
         }
-        if (!world->HasComponent(cModel.EntityID, "Collidable")) {
+        if (!m_World->HasComponent(cModel.EntityID, "Collidable")) {
             continue;
         }
 
-        auto absPosition = Transform::AbsolutePosition(world, cModel.EntityID);
-        auto absOrientation = Transform::AbsoluteOrientation(world, cModel.EntityID);
-        auto absScale = Transform::AbsoluteScale(world, cModel.EntityID);
+        auto absPosition = Transform::AbsolutePosition(m_World, cModel.EntityID);
+        auto absOrientation = Transform::AbsoluteOrientation(m_World, cModel.EntityID);
+        auto absScale = Transform::AbsoluteScale(m_World, cModel.EntityID);
         glm::mat4 modelMatrix = glm::translate(absPosition) * glm::toMat4(absOrientation) * glm::scale(absScale);
 
         RawModel* model = ResourceManager::Load<RawModel>(cModel["Resource"]);
