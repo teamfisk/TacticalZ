@@ -2,6 +2,7 @@
 #include "Input/EInputCommand.h"
 #include "Systems/SpawnerSystem.h"
 #include "Events/ESpawnerSpawn.h"
+#include "Events/EPlayerSpawned.h"
 
 class PlayerSpawnSystem : public ImpureSystem
 {
@@ -11,8 +12,14 @@ public:
     virtual void Update(double dt) override;
 
 private:
+    struct SpawnRequest
+    {
+        int PlayerID;
+        ComponentInfo::EnumType Team;
+    };
+
     EventRelay<PlayerSpawnSystem, Events::InputCommand> m_OnInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
 
-    std::vector<int> m_SpawnRequests;
+    std::vector<SpawnRequest> m_SpawnRequests;
 };
