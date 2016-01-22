@@ -11,6 +11,7 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
 void DrawFinalPass::InitializeTextures()
 {
     m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+	m_NeutralNormalMap = ResourceManager::Load<Texture>("Textures/Core/NeutralNormalMap.png");
 }
 
 void DrawFinalPass::InitializeShaderPrograms()
@@ -58,6 +59,15 @@ void DrawFinalPass::Draw(RenderScene& scene)
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
             }
+
+			if (modelJob->NormalTexture != nullptr) {
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, modelJob->NormalTexture->m_Texture);
+			}
+			else {
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, m_NeutralNormalMap->m_Texture);
+			}
 
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);

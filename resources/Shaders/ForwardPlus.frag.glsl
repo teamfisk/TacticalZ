@@ -5,7 +5,8 @@ uniform mat4 V;
 uniform mat4 P;
 uniform vec4 Color;
 uniform vec2 ScreenDimensions;
-uniform sampler2D texture0;
+layout(binding = 0) uniform sampler2D DiffuseTexture;
+layout(binding = 1) uniform sampler2D NormalMapTexture;
 
 #define TILE_SIZE 16
 
@@ -44,6 +45,8 @@ layout (std430, binding = 4) buffer LightIndexBuffer
 in VertexData{
 	vec3 Position;
 	vec3 Normal;
+	vec3 Tangent;
+	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 DiffuseColor;
 }Input;
@@ -96,12 +99,18 @@ LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensi
 	return result;
 }
 
+vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textureCoordinate, sampler2D normalMap)
+{
+	mat3 TBN = mat3(tangent, bitangent, normal);
+	vec3 NormalMap = texture(normalMap, textureCoordinate).xyz * 2.0 - vec3(1.0);
+	return vec4(TBN * normalize(NormalMap), 0.0);
+}
 
 void main()
 {
-	vec4 texel = texture2D(texture0, Input.TextureCoordinate);
+	vec4 texel = texture2D(DiffuseTexture, Input.TextureCoordinate);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
-	vec4 normal = V  * vec4(Input.Normal, 0.0);
+	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, NormalMapTexture);
 	vec4 viewVec = normalize(-position); 
 
 	vec2 tilePos;

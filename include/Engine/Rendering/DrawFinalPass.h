@@ -27,6 +27,7 @@ private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
 
     Texture* m_WhiteTexture;
+	Texture* m_NeutralNormalMap;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
