@@ -119,11 +119,12 @@ void RenderSystem::Update(double dt)
 {
     m_EventBroker->Process<RenderSystem>();
 
-    if (m_CurrentCamera) {
-        ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
-        m_Camera->SetPosition(cameraTransform["Position"]);
-        m_Camera->SetOrientation(glm::quat((const glm::vec3&)cameraTransform["Orientation"]));
+    // Update the current camera used for rendering
+    if (m_CurrentCamera.Valid()) {
+        m_Camera->SetPosition(Transform::AbsolutePosition(m_CurrentCamera));
+        m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
     }
+
     //Only supports opaque geometry atm
 
     RenderScene scene;

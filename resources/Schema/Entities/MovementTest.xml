@@ -6,14 +6,7 @@
   </Components>
 
   <Children>
-    <Entity>
-      <Components>
-        <c:Camera/>
-        <c:Transform/>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity>
+    <Entity name="Ground">
       <Components>
         <c:AABB/>
         <c:Collidable/>
@@ -22,46 +15,116 @@
           <Color A="1" B="0.513725519" G="0" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="2" Z="0"/>
-          <Scale X="5" Y="1" Z="5"/>
+          <Position X="7" Y="-0.727000058" Z="-1.22800004"/>
+          <Scale X="50" Y="1.45100009" Z="50"/>
         </c:Transform>
       </Components>
       <Children/>
     </Entity>
-    <Entity name="Player">
+    <Entity name="Spawner">
       <Components>
-        <c:AABB>
-          <Origin X="0" Y="0.773000062" Z="0"/>
-          <Size X="1" Y="1.60000002" Z="1"/>
-        </c:AABB>
-        <c:Collidable/>
-        <c:Physics/>
-        <c:Model>
-          <Resource>Models/Assault.obj</Resource>
-          <Color A="1" B="1" G="0" R="0"/>
-        </c:Model>
-        <c:Player/>
+        <c:PlayerSpawn/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
         <c:Transform>
-          <Position X="0" Y="2.52699995" Z="0.0542778969"/>
+          <Position X="0.300000012" Y="0.0270000007" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Assault.obj</Resource>
+              <Color A="1" B="0" G="0" R="1"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.800000012" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Assault.obj</Resource>
+              <Color A="1" B="0.0117647061" G="0" R="1"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.600000024" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="DirectionalLight">
+      <Components>
+        <c:DirectionalLight/>
+        <c:Model>
+          <Resource>Models/DirectionalLightWidget.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-6.00145912" Y="1.42697716" Z="3.04144025"/>
+          <Orientation X="5.69400024" Y="841.179565" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
     </Entity>
-    <Entity>
+    <Entity name="ObstacleCourse">
+      <Components>
+        <c:Model>
+          <Resource>Models/Test/ObstacleCourse.obj</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ObstacleCoursePlayerBox">
       <Components>
         <c:AABB/>
         <c:Collidable/>
-        <c:Physics>
-          <Velocity X="0" Y="-0.0934068039" Z="0"/>
-        </c:Physics>
         <c:Model>
           <Resource>Models/Core/UnitCube.obj</Resource>
-          <Color A="1" B="0" G="1" R="1"/>
         </c:Model>
-        <c:Player/>
         <c:Transform>
-          <Position X="0" Y="4.15580511" Z="0"/>
-          <Scale X="0.704558551" Y="0.115156889" Z="1"/>
+          <Position X="6.32800007" Y="0.807000041" Z="-2.2750001"/>
+          <Scale X="1" Y="1.60000002" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ObstacleCourse1uHigh">
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="9.11900043" Y="0.5" Z="-2.10900021"/>
+          <Scale X="1" Y="1" Z="8.1960001"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ObstacleCourseWhoTheFuckKnows">
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="13.2370005" Y="1.28600001" Z="-1.71700013"/>
+          <Scale X="2.58000016" Y="2.58300018" Z="21.1860008"/>
         </c:Transform>
       </Components>
       <Children/>

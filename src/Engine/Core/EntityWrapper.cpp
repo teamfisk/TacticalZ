@@ -17,6 +17,22 @@ EntityWrapper EntityWrapper::Parent()
     }
 }
 
+EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
+{
+    auto itPair = this->World->GetChildren(this->ID);
+    if (itPair.first == itPair.second) {
+        return EntityWrapper::Invalid;
+    }
+
+    for (auto it = itPair.first; it != itPair.second; ++it) {
+        if (this->World->GetName(it->second) == name) {
+            return EntityWrapper(this->World, it->second);
+        }
+    }
+
+    return EntityWrapper::Invalid;
+}
+
 bool EntityWrapper::Valid()
 {
     if (this->World == nullptr) {

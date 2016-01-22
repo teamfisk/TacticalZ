@@ -15,7 +15,6 @@
 #include "Renderer.h"
 #include "PointLightJob.h"
 #include "../Core/Transform.h"
-#include "DebugCameraInputController.h"
 
 class RenderSystem : public ImpureSystem
 {
