@@ -26,6 +26,12 @@ bool RayVsAABB(const Ray& ray, const AABB& box);
 //Return true if the ray hits the box, also outputs distance from ray origin to intersection point in [outDistance].
 bool RayVsAABB(const Ray& ray, const AABB& box, float& outDistance);
 
+//Return true if the ray hits the triangle.
+bool RayVsTriangle(const Ray& ray,
+    const glm::vec3& v0,
+    const glm::vec3& v1,
+    const glm::vec3& v2,
+    bool trueOnNegativeDistance = false);
 //Return true if the ray hits the triangle, and the distance is less than outDistance.
 bool RayVsTriangle(const Ray& ray,
     const glm::vec3& v0,

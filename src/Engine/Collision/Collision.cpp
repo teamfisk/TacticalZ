@@ -116,30 +116,41 @@ bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation)
     return glm::all(axisesIntersecting);
 }
 
+bool RayVsTriangle(const Ray& ray,
+    const glm::vec3& v0,
+    const glm::vec3& v1,
+    const glm::vec3& v2,
+    bool trueOnNegativeDistance)
+{
+    glm::vec3 e1 = v1 - v0;		//v1 - v0
+    glm::vec3 e2 = v2 - v0;		//v2 - v0
+    glm::vec3 m = ray.Origin() - v0;
+    glm::vec3 MxE1 = glm::cross(m, e1);
+    glm::vec3 DxE2 = glm::cross(ray.Direction(), e2);
+    float DetInv = glm::dot(e1, DxE2);
+    if (std::abs(DetInv) < FLT_EPSILON) {
+        return false;
+    }
+    DetInv = 1.0f / DetInv;
+    float u = glm::dot(m, DxE2) * DetInv;
+    float v = glm::dot(ray.Direction(), MxE1) * DetInv;
+    //u,v can be very close to 0 but still negative sometimes. added a deltafactor to compensate for that problem
+    if ((u + 0.001f) < 0 || (v + 0.001f) < 0 || 1 < u + v) {
+        return false;
+    }
+    //Here, u and v are positive, u+v <= 1, and if distance is positive - triangle is hit.
+    return trueOnNegativeDistance || 0 <= glm::dot(e2, MxE1) * DetInv;
+}
+
 bool RayVsModel(const Ray& ray,
     const std::vector<RawModel::Vertex>& modelVertices,
     const std::vector<unsigned int>& modelIndices)
 {
     for (int i = 0; i < modelIndices.size(); ++i) {
         glm::vec3 v0 = modelVertices[modelIndices[i]].Position;
-        glm::vec3 e1 = modelVertices[modelIndices[++i]].Position - v0;		//v1 - v0
-        glm::vec3 e2 = modelVertices[modelIndices[++i]].Position - v0;		//v2 - v0
-        glm::vec3 m = ray.Origin() - v0;
-        glm::vec3 MxE1 = glm::cross(m, e1);
-        glm::vec3 DxE2 = glm::cross(ray.Direction(), e2);
-        float DetInv = glm::dot(e1, DxE2);
-        if (std::abs(DetInv) < FLT_EPSILON) {
-            continue;
-        }
-        DetInv = 1.0f / DetInv;
-        float u = glm::dot(m, DxE2) * DetInv;
-        float v = glm::dot(ray.Direction(), MxE1) * DetInv;
-        //u,v can be very close to 0 but still negative sometimes. added a deltafactor to compensate for that problem
-        if ((u + 0.001f) < 0 || (v + 0.001f) < 0 || 1 < u + v) {
-            continue;
-        }
-        //Here, u and v are positive, u+v <= 1, and if distance is positive - triangle is hit.
-        if (0 <= glm::dot(e2, MxE1) * DetInv) {
+        glm::vec3 v1 = modelVertices[modelIndices[++i]].Position;
+        glm::vec3 v2 = modelVertices[modelIndices[++i]].Position;
+        if (RayVsTriangle(ray, v0, v1, v2)) {
             return true;
         }
     }
@@ -300,7 +311,7 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
 
     triNormal = glm::normalize(triNormal);
     glm::vec3 diagonal = -signNonZero(triNormal) * half;
-#define EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
+#define EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK      //TODO: We should probably performance test with this on/off.
 #ifdef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
     //The triangle plane contains all points P in dot(triNormal, P) == dot(triNormal, v0)
     //The diagonal line contains all points P in P = origin + diagonal * t.
@@ -310,15 +321,16 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
     if (glm::abs(t) > 1) {
         return false;
     }
-    //glm::vec3 intersection = origin + t * diagonal;
 #endif
 
     //Check if intersection point is on the triangle.
     ray.SetOrigin(origin);
     ray.SetDirection(diagonal);
+#ifdef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
+    if (RayVsTriangle(ray, v0, v1, v2, true)) {
+#else
     float dist = INFINITY, u, v;
     if (RayVsTriangle(ray, v0, v1, v2, dist, u, v, true)) {
-#ifndef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
         if (glm::abs(dist) > glm::length(diagonal)) {
             return false;
         }
