@@ -4,6 +4,8 @@ PlayerSpawnSystem::PlayerSpawnSystem(World* m_World, EventBroker* eventBroker)
     : System(m_World, eventBroker)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_OnPlayerSpawnerd, &PlayerSpawnSystem::OnPlayerSpawned);
+    m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }
 
 void PlayerSpawnSystem::Update(double dt)
@@ -39,13 +41,6 @@ void PlayerSpawnSystem::Update(double dt)
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
 
-            // Set the camera to the correct entity
-            EntityWrapper cameraEntity = player.FirstChildByName("Camera");
-            if (cameraEntity.Valid()) {
-                Events::SetCamera e;
-                e.CameraEntity = cameraEntity;
-                m_EventBroker->Publish(e);
-            }
         }
     }
     m_SpawnRequests.clear();
@@ -54,6 +49,12 @@ void PlayerSpawnSystem::Update(double dt)
 bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
 {
     if (e.Command != "PickTeam") {
+        return false;
+    }
+
+    // Team picks should be processed ONLY server-side!
+    // Don't make a spawn request if PlayerID is -1, i.e. we're the client.
+    if (e.PlayerID == -1 && m_NetworkEnabled) {
         return false;
     }
 
@@ -67,3 +68,17 @@ bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
     return true;
 }
 
+bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
+{
+    // When a player is actually spawned (since the actual spawning is handled on the server)
+
+    // Set the camera to the correct entity
+    EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
+    if (cameraEntity.Valid()) {
+        Events::SetCamera e;
+        e.CameraEntity = cameraEntity;
+        m_EventBroker->Publish(e);
+    }
+
+    return true;
+}
