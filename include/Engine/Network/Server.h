@@ -16,6 +16,8 @@
 #include "Core/EPlayerDamage.h"
 #include "Network/EPlayerDisconnected.h"
 
+#include "Game/Events/EPlayerSpawned.h"
+
 class Server : public Network
 {
 public:
@@ -58,6 +60,7 @@ private:
     int  receive(char* data);
     void readFromClients();
     void send(Packet& packet, UserID user);
+    void send(Packet& packet, PlayerID player);
     void send(Packet& packet);
     void broadcast(Packet& packet);
     void sendSnapshot();
@@ -78,6 +81,8 @@ private:
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
+    EventRelay<Server, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(const Events::PlayerSpawned& e);
 };
 
 #endif

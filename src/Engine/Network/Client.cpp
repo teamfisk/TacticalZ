@@ -92,6 +92,9 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::Kick:
         parseKick();
         break;
+    case MessageType::OnPlayerSpawned:
+        parsePlayersSpawned();
+        break;
     default:
         break;
     }
@@ -127,6 +130,15 @@ void Client::parseKick()
 { 
     LOG_WARNING("You have been kicked from the server.");
     m_IsConnected = false;
+}
+
+void Client::parsePlayersSpawned(Packet& packet)
+{ 
+    Events::PlayerSpawned e;
+    e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    e.PlayerID = -1;
+    m_EventBroker->Publish(e);
 }
 
 // Fields with strings will not work right now

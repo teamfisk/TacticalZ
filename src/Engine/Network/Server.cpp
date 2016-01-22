@@ -132,6 +132,20 @@ void Server::send(Packet& packet, UserID user)
     }
 }
 
+void Server::send(Packet& packet, PlayerID player)
+{
+    int bytesSent = m_Socket.send_to(
+        boost::asio::buffer(packet.Data(), packet.Size()),
+        m_PlayerDefinitions[player].Endpoint,
+        0);
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataSent += packet.Size();
+        m_NetworkData.DataSentThisInterval += packet.Size();
+        m_NetworkData.AmountOfMessagesSent++;
+    }
+}
+
 void Server::send(Packet & packet)
 {
     m_Socket.send_to(
@@ -421,4 +435,13 @@ bool Server::OnInputCommand(const Events::InputCommand & e)
     }
 
     return true;
+}
+
+bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
+{
+    Packet packet = Packet(MessageType::OnPlayerSpawned);
+    packet.WritePrimitive<EntityID>(e.Player.ID);
+    packet.WritePrimitive<EntityID>(e.Spawner.ID);
+    send(packet, e.PlayerID);
+    return false;
 }

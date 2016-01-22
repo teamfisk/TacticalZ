@@ -20,6 +20,7 @@
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 #include "Network/EInterpolate.h"
+#include "Game/Events/EPlayerSpawned.h"
 
 class Client : public Network
 {
@@ -77,6 +78,7 @@ private:
     void parsePlayerConnected(Packet& packet);
     void parsePing();
     void parseKick();
+    void parsePlayersSpawned(Packet& packet);
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
