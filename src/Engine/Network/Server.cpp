@@ -1,6 +1,6 @@
 #include "Network/Server.h"
 
-Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 13))
+Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 27666))
 {
     Network::initialize();
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
@@ -20,6 +20,7 @@ void Server::Start(World* world, EventBroker* eventBroker)
     m_EventBroker = eventBroker;
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
     for (size_t i = 0; i < m_MaxConnections; i++) {
         m_PlayerDefinitions[i].StopTime = std::clock();
     }
@@ -180,9 +181,12 @@ void Server::sendSnapshot()
         Packet packet(MessageType::Snapshot);
         ComponentPool* componentPool = it.second;
         ComponentInfo componentInfo = componentPool->ComponentInfo();
+
         // Component Type
         packet.WriteString(componentInfo.Name);
         for (auto& componentWrapper : *componentPool) {
+            // HACK: Send entity name
+            packet.WriteString(m_World->GetName(componentWrapper.EntityID));
             // Components EntityID
             packet.WritePrimitive(componentWrapper.EntityID);
             // Parents EntityID

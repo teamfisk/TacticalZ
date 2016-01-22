@@ -89,6 +89,7 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::PlayerConnected:
         parsePlayerConnected(packet);
+        break;
     case MessageType::Kick:
         parseKick();
         break;
@@ -177,8 +178,12 @@ void Client::parseSnapshot(Packet& packet)
 {
     std::string componentType = packet.ReadString();
     while (packet.DataReadSize() < packet.Size()) {
+        // HACK
+        std::string entityName = packet.ReadString();
         // Components EntityID
         EntityID receivedEntityID = packet.ReadPrimitive<EntityID>();
+        // HACK
+        m_World->SetName(receivedEntityID, entityName);
         // Parents EntityID 
         EntityID receivedParentEntityID = packet.ReadPrimitive<EntityID>();
         ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
