@@ -5,10 +5,10 @@
 class PlayerMovementSystem : public PureSystem
 {
 public:
-    PlayerMovementSystem(EventBroker* eventBroker)
-        : System(eventBroker)
+    PlayerMovementSystem(World* world, EventBroker* eventBroker)
+        : System(world, eventBroker)
         , PureSystem("Player")
     { }
 
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt);
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt);
 };

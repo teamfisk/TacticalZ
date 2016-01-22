@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="WidgetScale" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Model>
+      <Resource>Models/ScaleWidgetOrigin.obj</Resource>
+    </c:Model>
+    <c:Transform/>
+    <c:UniformScale>
+      <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+    </c:UniformScale>
+  </Components>
+
+  <Children>
+    <Entity name="X">
+      <Components>
+        <c:EditorWidget>
+          <Type>
+            <Scale/>
+          </Type>
+        </c:EditorWidget>
+        <c:Model>
+          <Resource>Models/ScaleWidgetX.obj</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Y">
+      <Components>
+        <c:EditorWidget>
+          <Type>
+            <Scale/>
+          </Type>
+        </c:EditorWidget>
+        <c:Model>
+          <Resource>Models/ScaleWidgetY.obj</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Z">
+      <Components>
+        <c:EditorWidget>
+          <Type>
+            <Scale/>
+          </Type>
+        </c:EditorWidget>
+        <c:Model>
+          <Resource>Models/ScaleWidgetZ.obj</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Light">
+      <Components>
+        <c:PointLight/>
+        <c:Transform>
+          <Position X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

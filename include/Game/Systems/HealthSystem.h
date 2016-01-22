@@ -16,10 +16,10 @@
 class HealthSystem : public PureSystem
 {
 public:
-    HealthSystem(EventBroker* eventBroker);
+    HealthSystem(World* world, EventBroker* eventBroker);
 
     //updatecomponent
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     //methods which will take care of specific events

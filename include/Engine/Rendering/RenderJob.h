@@ -14,7 +14,6 @@ struct RenderJob
     friend class RenderQueue;
 
 public:
-
     float Depth;
 
 protected:
