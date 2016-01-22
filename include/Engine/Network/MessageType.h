@@ -7,8 +7,7 @@ enum class MessageType
 {
 	Connect,
 	Disconnect,
-	ClientPing,
-	ServerPing,
+	Ping,
 	Message,
 	Snapshot,
     OnInputCommand,

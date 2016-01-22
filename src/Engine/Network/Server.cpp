@@ -24,14 +24,17 @@ void Server::Update()
 {
     readFromClients();
     m_EventBroker->Process<Server>();
-}
+    if (isReadingData) {
+        Network::Update();
+    }
 
+}
 
 void Server::readFromClients()
 {
     while (m_Socket.available()) {
         try {
-            bytesRead = receive(readBuffer, INPUTSIZE);
+            bytesRead = receive(readBuffer);
             Packet packet(readBuffer, bytesRead);
             parseMessageType(packet);
         } catch (const std::exception& err) {
@@ -70,11 +73,8 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::Connect:
         parseConnect(packet);
         break;
-    case MessageType::ClientPing:
-        //parseClientPing();
-        break;
-    case MessageType::ServerPing:
-        parseServerPing();
+    case MessageType::Ping:
+        parsePing();
         break;
     case MessageType::Message:
         break;
@@ -97,12 +97,18 @@ void Server::parseMessageType(Packet& packet)
     }
 }
 
-int Server::receive(char * data, size_t length)
+int Server::receive(char * data)
 {
-    length = m_Socket.receive_from(
+    unsigned int length = m_Socket.receive_from(
         boost::asio::buffer((void*)data
-            , length)
+            , INPUTSIZE)
         , m_ReceiverEndpoint, 0);
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataReceived += length;
+        m_NetworkData.DataReceivedThisInterval += length;
+        m_NetworkData.AmountOfMessagesReceived++;
+    }
     return length;
 }
 
@@ -112,6 +118,12 @@ void Server::send(Packet& packet, int userID)
         boost::asio::buffer(packet.Data(), packet.Size()),
         m_ConnectedUsers[userID].Endpoint,
         0);
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataSent += packet.Size();
+        m_NetworkData.DataSentThisInterval += packet.Size();
+        m_NetworkData.AmountOfMessagesSent++;
+    }
 }
 
 void Server::send(Packet & packet)
@@ -122,6 +134,11 @@ void Server::send(Packet & packet)
             packet.Size()),
         m_ReceiverEndpoint,
         0);
+    if (isReadingData) {
+        // Network Debug data
+        m_NetworkData.TotalDataSent += packet.Size();
+        m_NetworkData.DataSentThisInterval += packet.Size();
+    }
 }
 
 void Server::broadcast(Packet& packet)
@@ -160,7 +177,9 @@ void Server::sendSnapshot()
                 }
             }
         }
-        broadcast(packet);
+        if (packet.Size() > packet.HeaderSize() + componentInfo.Name.size()) {
+            broadcast(packet);
+        }
     }
 }
 
@@ -174,7 +193,7 @@ void Server::sendPing()
         }
     }
     // Create ping message
-    Packet packet(MessageType::ServerPing);
+    Packet packet(MessageType::Ping);
     packet.WriteString("Ping from server");
     // Time message
     m_StartPingTime = std::clock();
@@ -298,12 +317,12 @@ void Server::parseClientPing()
         return;
     }
     // Return ping
-    Packet packet(MessageType::ClientPing, m_PlayerDefinitions[playerID].PacketID);
+    Packet packet(MessageType::Ping, m_PlayerDefinitions[playerID].PacketID);
     packet.WriteString("Ping received");
     send(packet);
 }
 
-void Server::parseServerPing()
+void Server::parsePing()
 {
     for (int i = 0; i < m_ConnectedUsers.size(); i++) {
         if (m_ConnectedUsers[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
@@ -356,7 +375,7 @@ void Server::createPlayer()
         }
     }
     LOG_WARNING("Server is full!");
- 
+
 }
 
 int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
@@ -373,5 +392,12 @@ int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
 bool Server::OnInputCommand(const Events::InputCommand & e)
 {
     //LOG_DEBUG("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    if (e.Command == "LogNetworkBandwidth" && e.Value > 0) {
+        if (isReadingData) {
+            saveToFile();
+        }
+        isReadingData = !isReadingData;
+        m_SaveDataTimer = std::clock();
+    }
     return true;
 }

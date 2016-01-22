@@ -61,21 +61,21 @@ private:
     SnapshotDefinitions m_NextSnapshot;
     double m_DurationOfPingTime;
     std::clock_t m_StartPingTime;
+    std::clock_t m_TimeSinceSentInputs;
+    unsigned int m_SendInputIntervalMs = 33;
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
     void readFromServer();
-    int  receive(char* data, size_t length);
+    int  receive(char* data);
     void send(Packet& packet);
     void connect();
     void disconnect();
-    void ping();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
     void parseConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
-    void parseServerPing();
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();

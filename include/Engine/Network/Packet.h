@@ -55,12 +55,14 @@ public:
     char* Data() { return m_Data; };
     unsigned int DataReadSize() { return m_ReturnDataOffset; }
     unsigned int MaxSize() { return m_MaxPacketSize; }
+    unsigned int HeaderSize() { return m_HeaderSize; }
 
 private:
     char* m_Data;
     unsigned int m_ReturnDataOffset = 0;
     int m_Offset = 0;
     unsigned int m_MaxPacketSize = 512;
+    unsigned int m_HeaderSize = 0;
     void resizeData();
 };
 

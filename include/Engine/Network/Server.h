@@ -54,7 +54,7 @@ private:
     unsigned int m_PreviousPacketID = 0;
 
     // Private member functions
-    int  receive(char* data, size_t length);
+    int  receive(char* data);
     void readFromClients();
     void send(Packet& packet, int playerID);
     void send(Packet& packet);
@@ -69,7 +69,7 @@ private:
     void parseConnect(Packet& packet);
     void parseDisconnect();
     void parseClientPing();
-    void parseServerPing();
+    void parsePing();
     void identifyPacketLoss();
     void createPlayer();
     int GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);

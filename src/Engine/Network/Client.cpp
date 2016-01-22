@@ -7,6 +7,8 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 {
     // Asumes root node is EntityID 0
     insertIntoServerClientMaps(0, 0);
+    // Init timer
+    m_TimeSinceSentInputs = std::clock();
     // Default is local host
     std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
     int port = config->Get<int>("Networking.Port", 13);
@@ -37,19 +39,24 @@ void Client::Update()
     readFromServer();
     if (m_IsConnected) {
         hasServerTimedOut();
+        // Don't sent 1 input in 1 packet, bunch em up.
+        if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
+            sendInputCommands();
+            m_TimeSinceSentInputs = std::clock();
+        }
     }
+    Network::Update();
 }
 
 void Client::readFromServer()
 {
     while (m_Socket.available()) {
-        bytesRead = receive(readBuf, INPUTSIZE);
+        bytesRead = receive(readBuf);
         if (bytesRead > 0) {
             Packet packet(readBuf, bytesRead);
             parseMessageType(packet);
         }
     }
-    sendInputCommands();
 }
 
 void Client::parseMessageType(Packet& packet)
@@ -66,11 +73,8 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::Connect:
         parseConnect(packet);
         break;
-    case MessageType::ClientPing:
+    case MessageType::Ping:
         parsePing();
-        break;
-    case MessageType::ServerPing:
-        parseServerPing();
         break;
     case MessageType::Message:
         break;
@@ -100,11 +104,6 @@ void Client::parsePlayerConnected(Packet & packet)
 
 void Client::parsePing()
 {
-
-}
-
-void Client::parseServerPing()
-{
     // Might miss connect message so set it here instead.
     m_IsConnected = true;
     // Time since last ping was received
@@ -112,7 +111,7 @@ void Client::parseServerPing()
     LOG_INFO("%i: response time with ctime(ms): %f", m_PacketID, m_DurationOfPingTime);
     m_StartPingTime = std::clock();
 
-    Packet packet(MessageType::ServerPing, m_SendPacketID);
+    Packet packet(MessageType::Ping, m_SendPacketID);
     packet.WriteString("Ping recieved");
     send(packet);
 }
@@ -211,15 +210,20 @@ void Client::parseSnapshot(Packet& packet)
     }
 }
 
-int Client::receive(char* data, size_t length)
+int Client::receive(char* data)
 {
     boost::system::error_code error;
 
     int bytesReceived = m_Socket.receive_from(boost
-        ::asio::buffer((void*)data, length),
+        ::asio::buffer((void*)data, INPUTSIZE),
         m_ReceiverEndpoint,
         0, error);
-
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataReceived += bytesReceived;
+        m_NetworkData.DataReceivedThisInterval += bytesReceived;
+        m_NetworkData.AmountOfMessagesReceived++;
+    }
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
@@ -232,6 +236,12 @@ void Client::send(Packet& packet)
         packet.Data(),
         packet.Size()),
         m_ReceiverEndpoint, 0);
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataSent += packet.Size();
+        m_NetworkData.DataSentThisInterval += packet.Size();
+        m_NetworkData.AmountOfMessagesSent++;
+    }
 }
 
 void Client::connect()
@@ -250,14 +260,6 @@ void Client::disconnect()
     send(packet);
 }
 
-void Client::ping()
-{
-    //Packet packet(MessageType::Connect, m_SendPacketID);
-    //packet.WriteString("Ping");
-    //m_StartPingTime = std::clock();
-    //send(packet);
-}
-
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "ConnectToServer") { // Connect for now
@@ -274,6 +276,15 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
     } else if (e.Command == "SwitchToPlayer") {
         if (e.Value > 0) {
             becomePlayer();
+        }
+    } else if (e.Command == "LogNetworkBandwidth") {
+        if (e.Value > 0) {
+            // Save to file if we no longer want to read data.
+            if (isReadingData) {
+                saveToFile();
+            }
+            isReadingData = !isReadingData;
+            m_SaveDataTimer = std::clock();
         }
     } else {
         m_InputCommandBuffer.push_back(e);
