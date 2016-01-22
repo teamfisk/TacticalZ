@@ -3,6 +3,7 @@
 #include "Systems/SpawnerSystem.h"
 #include "Events/ESpawnerSpawn.h"
 #include "Events/EPlayerSpawned.h"
+#include "Rendering/ESetCamera.h"
 
 class PlayerSpawnSystem : public ImpureSystem
 {

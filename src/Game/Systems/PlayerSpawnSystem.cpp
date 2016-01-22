@@ -38,6 +38,14 @@ void PlayerSpawnSystem::Update(double dt)
             e.Player = player;
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
+
+            // Set the camera to the correct entity
+            EntityWrapper cameraEntity = player.FirstChildByName("Camera");
+            if (cameraEntity.Valid()) {
+                Events::SetCamera e;
+                e.CameraEntity = cameraEntity;
+                m_EventBroker->Publish(e);
+            }
         }
     }
     m_SpawnRequests.clear();
