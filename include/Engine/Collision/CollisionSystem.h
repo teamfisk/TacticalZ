@@ -13,8 +13,8 @@
 class CollisionSystem : public PureSystem
 {
 public:
-    CollisionSystem(EventBroker* eventBroker, Octree* octree)
-        : System(eventBroker)
+    CollisionSystem(World* world, EventBroker* eventBroker, Octree<AABB>* octree)
+        : System(world, eventBroker)
         , PureSystem("Collidable")
         , m_Octree(octree)
         , zPress(false)
@@ -23,10 +23,10 @@ public:
         EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &CollisionSystem::OnKeyUp);
     }
 
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
-    Octree* m_Octree;
+    Octree<AABB>* m_Octree;
     bool zPress;
 
     EventRelay<CollisionSystem, Events::KeyUp> m_EKeyUp;

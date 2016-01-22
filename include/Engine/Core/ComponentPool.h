@@ -61,6 +61,7 @@ public:
 
 	iterator begin() const;
 	iterator end() const;
+    size_t size() const;
 
 	//Dumps information about what the pool memory looks like right now 
 	//into an output stream (e.g. file/std::cout, anything that has an operator<<)

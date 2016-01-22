@@ -6,9 +6,9 @@
 class PlayerSpawnSystem : public ImpureSystem
 {
 public:
-    PlayerSpawnSystem(EventBroker* eventBroker);
+    PlayerSpawnSystem(World* world, EventBroker* eventBroker);
 
-    virtual void Update(World* world, double dt) override;
+    virtual void Update(double dt) override;
 
 private:
     EventRelay<PlayerSpawnSystem, Events::InputCommand> m_OnInputCommand;

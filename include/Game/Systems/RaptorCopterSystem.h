@@ -4,14 +4,14 @@
 class RaptorCopterSystem : public PureSystem
 {
 public:
-    RaptorCopterSystem(EventBroker* eventBroker)
-        : System(eventBroker)
+    RaptorCopterSystem(World* world, EventBroker* eventBroker)
+        : System(world, eventBroker)
         , PureSystem("RaptorCopter")
     { }
 
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override
     {
-        ComponentWrapper& transform = world->GetComponent(component.EntityID, "Transform");
+        ComponentWrapper& transform = m_World->GetComponent(component.EntityID, "Transform");
         (glm::vec3&)transform["Orientation"] += (float)(double)component["Speed"] * (float)dt * (glm::vec3)component["Axis"];
     }
 };

@@ -9,12 +9,11 @@
 			<Resource>Models/DummyScene.obj</Resource>
 		</c:Model>
 	</Components>
-</Entity>
 	<Children>
 		<Entity>
 			<Components>
 				<c:Transform>
-					<Position X="0" Y="-0"/>
+					<Position X="0" Y="0" Z="-2"/>
 					<Scale X="1" Y="1" Z="1"/>
 				</c:Transform>
 				<c:Camera>
@@ -24,4 +23,6 @@
 				</c:Model>
 			</Components>
 		</Entity>
+		<EntityRef file="Schema/Entities/EditorWidget.xml"/>
 	</Children>
+</Entity>

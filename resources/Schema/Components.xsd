@@ -12,6 +12,7 @@
 	<xs:include schemaLocation="Components/DirectionalLight.xsd"/>
 	<xs:include schemaLocation="Components/Trigger.xsd"/>
 	<xs:include schemaLocation="Components/Health.xsd"/>
+	<xs:include schemaLocation="Components/CapturePoint.xsd"/>
 	<xs:include schemaLocation="Components/Listener.xsd"/>
 	<xs:include schemaLocation="Components/SoundEmitter.xsd"/>
 	<xs:include schemaLocation="Components/Collidable.xsd"/>
@@ -19,4 +20,6 @@
 	<xs:include schemaLocation="Components/SpawnPoint.xsd"/>
 	<xs:include schemaLocation="Components/PlayerSpawn.xsd"/>
 	<xs:include schemaLocation="Components/Team.xsd"/>
+	<xs:include schemaLocation="Components/UniformScale.xsd"/>
+	<xs:include schemaLocation="Components/EditorWidget.xsd"/>
 </xs:schema>

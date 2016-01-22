@@ -44,12 +44,6 @@ bool RenderState::ClearColor(glm::vec4 color)
     return !GLERROR("RenderState::ClearColor");
 }
 
-bool RenderState::Clear(GLbitfield mask)
-{
-    glClear(mask);
-    return !GLERROR("RenderState::Clear");
-}
-
 bool RenderState::BindFramebuffer(GLint framebuffer)
 {
     GLint originalRead;
@@ -89,6 +83,15 @@ bool RenderState::BlendFunc(GLenum sfactor, GLenum dfactor)
     m_ResetFunctions.push_back(std::bind(glBlendFuncSeparate, originalSrcRGB, originalSrcAlpha, originalDestRGB, originalDestAlpha));
     glBlendFunc(sfactor, dfactor);
     return !GLERROR("RenderState::BlendFunc");
+}
+
+bool RenderState::DepthMask(GLboolean flag)
+{
+    GLboolean original;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &original);
+    m_ResetFunctions.push_back(std::bind(glDepthMask, original));
+    glDepthMask(flag);
+    return !GLERROR("RenderState::DepthMask");
 }
 
 RenderState::~RenderState()

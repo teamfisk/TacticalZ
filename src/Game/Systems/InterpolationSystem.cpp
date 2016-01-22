@@ -20,7 +20,7 @@
 //    }
 //}
 
-void InterpolationSystem::UpdateComponent(World * world, EntityWrapper& entity, ComponentWrapper & transform, double dt)
+void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt)
 {
     if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
         m_NextTransform[transform.EntityID].interpolationTime += dt;

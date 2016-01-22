@@ -11,6 +11,9 @@ struct KeyUp : Event
 {
 	/** GLFW key code */
 	int KeyCode;
+    bool ModCtrl;
+    bool ModAlt;
+    bool ModShift;
 };
 
 }
