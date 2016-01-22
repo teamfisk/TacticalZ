@@ -223,6 +223,11 @@ void Server::disconnect(int i)
     //broadcast("A player disconnected");
     LOG_INFO("User %s disconnected/timed out", m_PlayerDefinitions[i].Name.c_str());
     // Remove enteties and stuff (When we can remove entity, remove it and tell clients to remove the copy they have)
+    Events::PlayerDisconnected e;
+    e.Entity = m_PlayerDefinitions[i].EntityID;
+    e.PlayerID = i;
+    m_EventBroker->Publish(e);
+
     m_PlayerDefinitions[i].Endpoint = boost::asio::ip::udp::endpoint();
     m_PlayerDefinitions[i].EntityID = -1;
     m_PlayerDefinitions[i].Name = "";

@@ -14,6 +14,7 @@
 #include "../Network/Network.h"
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
+#include "Network/EPlayerDisconnected.h"
 
 class Server : public Network
 {
