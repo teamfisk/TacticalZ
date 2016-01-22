@@ -30,7 +30,7 @@ private:
     boost::asio::ip::udp::socket m_Socket;
 
     // Sending messages to client logic
-    PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
+    PlayerDefinition m_PlayerDefinitions[8]; // 
     std::vector<PlayerDefinition> m_ConnectedUsers;
     char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
@@ -39,8 +39,8 @@ private:
     std::clock_t previousSnapshotMessage = std::clock();
     std::clock_t timOutTimer = std::clock();
     // How often we send messages (milliseconds)
-    int intervalMs = 1000;
-    int snapshotInterval = 50;
+    int pingIntervalMs;
+    int snapshotInterval;
     int checkTimeOutInterval = 100;
 
     //Timers

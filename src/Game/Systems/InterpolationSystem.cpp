@@ -1,35 +1,15 @@
 #include "Systems/InterpolationSystem.h"
 
-//void InterpolationSystem::UpdateComponent(World * world, ComponentWrapper & transform, double dt)
-//{
-//    if (m_InterpolationPoints[transform.EntityID].size() > 0) {
-//        Transform& sTransform = m_InterpolationPoints[transform.EntityID].front();
-//        sTransform.interpolationTime += dt;
-//        if (sTransform.interpolationTime > 0.05) {
-//            double time = std::fmod(sTransform.interpolationTime, 0.05f);
-//            m_InterpolationPoints[transform.EntityID].pop();
-//            if (m_InterpolationPoints[transform.EntityID].size() <= 0) {
-//                return;
-//            }
-//            sTransform = m_InterpolationPoints[transform.EntityID].front();
-//            sTransform.interpolationTime = time;
-//        }
-//        glm::vec3 nextPosition = sTransform.Position;
-//        glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
-//        transform["Position"] = vectorInterpolation(currentPosition, nextPosition, sTransform.interpolationTime);
-//    }
-//}
-
 void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt)
 {
     if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
         m_NextTransform[transform.EntityID].interpolationTime += dt;
         Transform sTransform = m_NextTransform[transform.EntityID];
         double time = sTransform.interpolationTime;
-        if (time > SNAPSHOTINTERVAL) {
+        if (time > m_SnapshotInterval) {
             if (m_LastReceivedTransform.find(transform.EntityID) != m_LastReceivedTransform.end()) {
                 m_NextTransform[transform.EntityID] = m_LastReceivedTransform[transform.EntityID];
-                m_NextTransform[transform.EntityID].interpolationTime = time - SNAPSHOTINTERVAL;
+                m_NextTransform[transform.EntityID].interpolationTime = time - m_SnapshotInterval;
                 sTransform = m_NextTransform[transform.EntityID];
                 m_LastReceivedTransform.erase(transform.EntityID);
             } else {
@@ -44,7 +24,7 @@ void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
             // Orientation
             glm::quat nextOrientation = sTransform.Orientation;
             glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
-            (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, sTransform.interpolationTime / SNAPSHOTINTERVAL));
+            (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, sTransform.interpolationTime / m_SnapshotInterval));
             // Scale
             glm::vec3 nextScale = sTransform.Scale;
             glm::vec3 currentScale = static_cast<glm::vec3>(transform["Scale"]);
@@ -72,15 +52,5 @@ bool InterpolationSystem::OnInterpolate(const Events::Interpolate & e)
     } else { // Did not
         m_NextTransform[e.Entity] = transform;
     }
-    // Check if queue already exists
-    //if (m_InterpolationPoints.find(e.Entity) != m_InterpolationPoints.end()) { // Did exist, push to queue
-    //    m_InterpolationPoints[e.Entity].push(transform);
-    //} 
-
-    //else { // Did not exist, create queue
-    //    std::queue<Transform> transformQueue;
-    //    transformQueue.push(transform);
-    //    m_InterpolationPoints[e.Entity] = transformQueue;
-    //}
     return false;
 }

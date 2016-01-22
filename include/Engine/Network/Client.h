@@ -57,12 +57,12 @@ private:
     std::unordered_map<EntityID, EntityID> m_ClientIDToServerID;
 
     // Network logic
-    PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
+    PlayerDefinition m_PlayerDefinitions[8];
     SnapshotDefinitions m_NextSnapshot;
     double m_DurationOfPingTime;
     std::clock_t m_StartPingTime;
     std::clock_t m_TimeSinceSentInputs;
-    unsigned int m_SendInputIntervalMs = 33;
+    unsigned int m_SendInputIntervalMs;
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions

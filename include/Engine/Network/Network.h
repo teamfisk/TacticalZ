@@ -7,12 +7,12 @@
 #include "Core/EventBroker.h"
 #include "Network/Packet.h"
 #include "Network/NetworkData.h"
+#include "Core/ResourceManager.h"
+#include "Core/ConfigFile.h"
 #include <fstream>
 #include <iostream>
 
-#define MAXCONNECTIONS 8
 #define INPUTSIZE 4097
-#define TIMEOUTMS 15000
 
 class Network
 {
@@ -26,8 +26,11 @@ protected:
     NetworkData m_NetworkData;
     unsigned int m_SaveDataIntervalMs = 1000;
     std::clock_t m_SaveDataTimer;
+    unsigned int m_MaxConnections;
+    unsigned int m_TimeoutMs;
     void saveToFile();
     void updateNetworkData();
+    void initialize();
 };
 
 #endif
