@@ -58,7 +58,8 @@ bool EditorWidgetSystem::OnMouseMove(const Events::MouseMove& e)
 
 bool EditorWidgetSystem::OnMousePress(const Events::MousePress & e)
 {
-    if (e.Button == GLFW_MOUSE_BUTTON_1) {
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureMouse && !io.WantCaptureKeyboard && e.Button == GLFW_MOUSE_BUTTON_1) {
         m_PickData = m_Renderer->Pick(glm::vec2(e.X, e.Y));
         if (m_PickData.Entity != EntityID_Invalid && m_PickData.World == m_World) {
             m_PickEntity = EntityWrapper(m_World, m_PickData.Entity);
