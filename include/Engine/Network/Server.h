@@ -60,7 +60,7 @@ private:
     int  receive(char* data);
     void readFromClients();
     void send(Packet& packet, UserID user);
-    void send(Packet& packet, PlayerID player);
+    void send(PlayerID player, Packet& packet);
     void send(Packet& packet);
     void broadcast(Packet& packet);
     void sendSnapshot();

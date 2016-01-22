@@ -93,7 +93,7 @@ void Client::parseMessageType(Packet& packet)
         parseKick();
         break;
     case MessageType::OnPlayerSpawned:
-        parsePlayersSpawned();
+        parsePlayersSpawned(packet);
         break;
     default:
         break;

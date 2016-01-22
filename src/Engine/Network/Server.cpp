@@ -132,7 +132,7 @@ void Server::send(Packet& packet, UserID user)
     }
 }
 
-void Server::send(Packet& packet, PlayerID player)
+void Server::send(PlayerID player, Packet& packet)
 {
     int bytesSent = m_Socket.send_to(
         boost::asio::buffer(packet.Data(), packet.Size()),
@@ -442,6 +442,6 @@ bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
     Packet packet = Packet(MessageType::OnPlayerSpawned);
     packet.WritePrimitive<EntityID>(e.Player.ID);
     packet.WritePrimitive<EntityID>(e.Spawner.ID);
-    send(packet, e.PlayerID);
+    send(e.PlayerID, packet);
     return false;
 }
