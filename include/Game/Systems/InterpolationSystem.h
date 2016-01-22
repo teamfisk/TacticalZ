@@ -10,10 +10,10 @@
 #include "Common.h"
 #include "Core/System.h"
 #include "Core/EventBroker.h"
+#include "Core/ResourceManager.h"
+#include "Core/ConfigFile.h"
 
 #include "Network/EInterpolate.h"
-
-#define SNAPSHOTINTERVAL 0.05f
 
 class InterpolationSystem : public PureSystem
 {
@@ -29,6 +29,8 @@ public:
         : System(world, eventBroker)
         , PureSystem("Transform")
     {
+        ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+        m_SnapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05);
         EVENT_SUBSCRIBE_MEMBER(m_EInterpolate, &InterpolationSystem::OnInterpolate);
     }
     ~InterpolationSystem() { }
@@ -42,9 +44,10 @@ private:
     T vectorInterpolation(T prev, T next, double currentTime)
     {
         T difference = next - prev;
-        T vector = (difference / SNAPSHOTINTERVAL) * static_cast<float>(currentTime);
+        T vector = (difference / m_SnapshotInterval) * static_cast<float>(currentTime);
         return vector;
     }
+    float m_SnapshotInterval;
 
     EventRelay<InterpolationSystem, Events::Interpolate> m_EInterpolate;
     bool InterpolationSystem::OnInterpolate(const Events::Interpolate& e);

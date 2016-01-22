@@ -1,7 +1,13 @@
 #include "Network/Server.h"
 
 Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 13))
-{ }
+{
+    Network::initialize();
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05);
+    pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
+
+}
 
 Server::~Server()
 {
@@ -14,7 +20,7 @@ void Server::Start(World* world, EventBroker* eventBroker)
     m_EventBroker = eventBroker;
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
-    for (size_t i = 0; i < MAXCONNECTIONS; i++) {
+    for (size_t i = 0; i < m_MaxConnections; i++) {
         m_PlayerDefinitions[i].StopTime = std::clock();
     }
     LOG_INFO("I am Server. BIP BOP\n");
@@ -49,7 +55,7 @@ void Server::readFromClients()
     }
 
     // Send pings each 
-    if (intervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
         sendPing();
         previousePingMessage = currentTime;
     }
@@ -210,7 +216,7 @@ void Server::checkForTimeOuts()
         if (m_ConnectedUsers[i].Endpoint.address() != boost::asio::ip::address()) {
             int stopPing = 1000 * m_ConnectedUsers[i].StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
-            if (startPing > stopPing + TIMEOUTMS) {
+            if (startPing > stopPing + m_TimeoutMs) {
                 LOG_INFO("User %i timed out!", i);
                 disconnect(i);
             }
@@ -239,7 +245,7 @@ void Server::parseOnInputCommand(Packet& packet)
 {
     int playerID = -1;
     // Check which player it was who sent the message
-    for (int i = 0; i < MAXCONNECTIONS; i++) {
+    for (int i = 0; i < m_MaxConnections; i++) {
         // if the player is connected set playerID to the correct PlayerID
         if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()
             && m_PlayerDefinitions[i].Endpoint.port() == m_ReceiverEndpoint.port()) {
@@ -364,7 +370,7 @@ void Server::createPlayer()
         LOG_WARNING("Not a recognized user!");
         return;
     }
-    for (int playerIndex = 0; playerIndex < MAXCONNECTIONS; playerIndex++) {
+    for (int playerIndex = 0; playerIndex < m_MaxConnections; playerIndex++) {
         if (m_PlayerDefinitions[playerIndex].Endpoint.address() == boost::asio::ip::address()) {
             m_PlayerDefinitions[playerIndex] = m_ConnectedUsers[userIndex];
             EntityID entityID = m_World->CreateEntity();
@@ -384,7 +390,7 @@ void Server::createPlayer()
 
 int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
 {
-    for (int i = 0; i < MAXCONNECTIONS; i++) {
+    for (int i = 0; i < m_MaxConnections; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == endpoint.address() &&
             m_PlayerDefinitions[i].Endpoint.port() == endpoint.port()) {
             return i;

@@ -5,6 +5,8 @@ using namespace boost::asio::ip;
 
 Client::Client(ConfigFile* config) : m_Socket(m_IOService)
 {
+    Network::initialize();
+
     // Asumes root node is EntityID 0
     insertIntoServerClientMaps(0, 0);
     // Init timer
@@ -15,6 +17,8 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
     // Set up network stream
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
+    m_SendInputIntervalMs = config->Get<int>("Networking.SendInputIntervalMs", 33);
+
 }
 
 Client::~Client()
@@ -316,7 +320,7 @@ bool Client::hasServerTimedOut()
 {
     // Time in ms
     float timeSincePing = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
-    if (timeSincePing > TIMEOUTMS) {
+    if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
         m_IsConnected = false;

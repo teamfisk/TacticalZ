@@ -59,3 +59,10 @@ void Network::updateNetworkData()
         m_NetworkData.DataReceivedThisInterval = 0;
     }
 }
+
+void Network::initialize()
+{ 
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_MaxConnections = config->Get<int>("Networking.MaxConnections", 8);
+    m_TimeoutMs = config->Get<int>("Networking.TimeoutMs", 20000);
+}
