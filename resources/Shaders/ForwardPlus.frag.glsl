@@ -140,11 +140,13 @@ void main()
 	sceneColor = vec4(color_result.xyz, 1.0);
 	//These if statements should be removed if they are slow.
 	color_result += glowTexel;
+	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
+	/*
 	if(color_result.x > 1 || color_result.y > 1 || color_result.z > 1) {
 		bloomColor = vec4(color_result.xyz, 1.0);
 	} else {
 		bloomColor = vec4(0.0, 0.0, 0.0, 1.0);
-	}
+	} */
 	
 	//sceneColor += Input.DiffuseColor * (totalLighting.Diffuse) * diffuseTexel * Color;
 	//sceneColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
