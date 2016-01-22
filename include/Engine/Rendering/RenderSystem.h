@@ -15,6 +15,7 @@
 #include "Renderer.h"
 #include "PointLightJob.h"
 #include "../Core/Transform.h"
+#include "../../Game/Events/EPlayerSpawned.h"
 
 class RenderSystem : public ImpureSystem
 {
@@ -29,6 +30,7 @@ private:
     RenderFrame* m_RenderFrame;
     Camera* m_Camera;
     EntityWrapper m_CurrentCamera = EntityWrapper::Invalid;
+    EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(Events::SetCamera &event);
@@ -40,6 +42,9 @@ private:
 
     void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
+
+    EventRelay<RenderSystem, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(Events::PlayerSpawned& e);
 };
 
 #endif

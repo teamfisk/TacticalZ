@@ -30,7 +30,7 @@ public:
 
     virtual bool OnCommand(const Events::InputCommand& e) override
     {
-        if (!m_MouseLocked) {
+        if (glm::abs(e.Value) > 0 && !m_MouseLocked) {
             return false;
         }
 

@@ -1,5 +1,15 @@
 #include "Systems/InterpolationSystem.h"
 
+InterpolationSystem::InterpolationSystem(World* world, EventBroker* eventBroker) 
+    : System(world, eventBroker)
+    , PureSystem("Transform")
+{
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_SnapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05);
+    EVENT_SUBSCRIBE_MEMBER(m_EInterpolate, &InterpolationSystem::OnInterpolate);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &InterpolationSystem::OnPlayerSpawned);
+}
+
 void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt)
 {
     if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
@@ -17,20 +27,33 @@ void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
             }
         }
         if (transform.Info.Name == "Transform") {
+            bool isLocalPlayer = entity == m_LocalPlayer || entity.Parent() == m_LocalPlayer;
             // Position
             glm::vec3 nextPosition = sTransform.Position;
             glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
+            if (isLocalPlayer && glm::length(nextPosition - currentPosition) < 1.f) {
+                return;
+            }
             (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
             // Orientation
-            glm::quat nextOrientation = sTransform.Orientation;
-            glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
-            (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, sTransform.interpolationTime / m_SnapshotInterval));
+            //bool isPlayer = entity.HasComponent("Player") || entity.Parent().HasComponent("Player");
+            if (!isLocalPlayer) {
+                glm::quat nextOrientation = sTransform.Orientation;
+                glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
+                (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, sTransform.interpolationTime / m_SnapshotInterval));
+            }
             // Scale
             glm::vec3 nextScale = sTransform.Scale;
             glm::vec3 currentScale = static_cast<glm::vec3>(transform["Scale"]);
             (glm::vec3&)transform["Scale"] += vectorInterpolation<glm::vec3>(currentScale, nextScale, sTransform.interpolationTime);
         }
     }
+}
+
+bool InterpolationSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
+{
+    m_LocalPlayer = e.Player;
+    return true;
 }
 
 bool InterpolationSystem::OnInterpolate(const Events::Interpolate & e)

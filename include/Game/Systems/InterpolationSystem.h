@@ -12,6 +12,7 @@
 #include "Core/EventBroker.h"
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
+#include "Events/EPlayerSpawned.h"
 
 #include "Network/EInterpolate.h"
 
@@ -25,19 +26,13 @@ class InterpolationSystem : public PureSystem
         double interpolationTime;
     };
 public:
-    InterpolationSystem(World* world, EventBroker* eventBroker)
-        : System(world, eventBroker)
-        , PureSystem("Transform")
-    {
-        ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
-        m_SnapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05);
-        EVENT_SUBSCRIBE_MEMBER(m_EInterpolate, &InterpolationSystem::OnInterpolate);
-    }
+    InterpolationSystem(World* world, EventBroker* eventBroker);
     ~InterpolationSystem() { }
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt) override;
 private:
     std::unordered_map<EntityID, Transform> m_NextTransform;
     std::unordered_map<EntityID, Transform> m_LastReceivedTransform;
+    EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
 
     //glm::vec3 vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime);
     template <typename T>
@@ -51,6 +46,8 @@ private:
 
     EventRelay<InterpolationSystem, Events::Interpolate> m_EInterpolate;
     bool InterpolationSystem::OnInterpolate(const Events::Interpolate& e);
+    EventRelay<InterpolationSystem, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(Events::PlayerSpawned& e);
 };
 
 #endif
