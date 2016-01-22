@@ -4,6 +4,7 @@
 #include "Events/ESpawnerSpawn.h"
 #include "Events/EPlayerSpawned.h"
 #include "Rendering/ESetCamera.h"
+#include "Core/ConfigFile.h"
 
 class PlayerSpawnSystem : public ImpureSystem
 {
@@ -19,8 +20,11 @@ private:
         ComponentInfo::EnumType Team;
     };
 
+    bool m_NetworkEnabled = false;
+    std::vector<SpawnRequest> m_SpawnRequests;
+
     EventRelay<PlayerSpawnSystem, Events::InputCommand> m_OnInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
-
-    std::vector<SpawnRequest> m_SpawnRequests;
+    EventRelay<PlayerSpawnSystem, Events::PlayerSpawned> m_OnPlayerSpawnerd;
+    bool OnPlayerSpawned(Events::PlayerSpawned& e);
 };
