@@ -18,7 +18,7 @@ struct ComponentWrapper
     const ::EntityID EntityID;
     char* Data;
 
-    int Enum(const char* fieldName, const char* enumKey)
+    ComponentInfo::EnumType Enum(const char* fieldName, const char* enumKey)
     {
         return Info.Meta->FieldEnumDefinitions.at(fieldName).at(enumKey);
     }
@@ -58,7 +58,7 @@ struct ComponentWrapper
 
     public:
         // Return the integer value of an enum type key for this field
-        int Enum(const char* enumKey) { return m_Component->Enum(m_PropertyName.c_str(), enumKey); }
+        ComponentInfo::EnumType Enum(const char* enumKey) { return m_Component->Enum(m_PropertyName.c_str(), enumKey); }
 
         template <typename T>
         operator T&() { return m_Component->Field<T>(m_PropertyName); }

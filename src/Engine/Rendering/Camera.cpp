@@ -79,6 +79,19 @@ void Camera::UpdateProjectionMatrix()
 	m_ProjectionMatrix = glm::perspective(m_FOV, m_AspectRatio, m_NearClip, m_FarClip);
 }
 
+glm::vec2 Camera::WorldToScreen(glm::vec3 worldCoord, Rectangle resolution)
+{
+    glm::vec4 screenCoord = m_ProjectionMatrix * m_ViewMatrix * glm::vec4(worldCoord, 1.f);
+    if (screenCoord.w != 0) {
+        screenCoord.x /= screenCoord.w;
+        screenCoord.y /= screenCoord.w;
+        screenCoord.z /= screenCoord.w;
+    }
+    screenCoord.x = screenCoord.x * (resolution.Width / 2.f);
+    screenCoord.y = screenCoord.y * (resolution.Height / 2.f);
+    return glm::vec2(screenCoord);
+}
+
 void Camera::UpdateViewMatrix()
 {
 	m_ViewMatrix = glm::toMat4(glm::inverse(m_Orientation))

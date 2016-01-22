@@ -51,7 +51,9 @@ void PickingPass::Draw(RenderScene& scene)
     GLuint ShaderHandle = m_PickingProgram->GetHandle();
     m_PickingProgram->Bind();
 
-    
+    if (scene.ClearDepth) {
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
         m_Camera = scene.Camera;
 

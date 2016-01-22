@@ -18,15 +18,6 @@ void Renderer::Initialize()
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
-
-
-    // Create default camera
-    m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
-    m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
-    if (m_Camera == nullptr) {
-        m_Camera = m_DefaultCamera;
-    }
-
 }
 
 void Renderer::InitializeWindow()
@@ -96,13 +87,11 @@ void Renderer::Update(double dt)
 void Renderer::Draw(RenderFrame& frame)
 {
     glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
-    
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
 
     m_PickingPass->ClearPicking();
     for (auto scene : frame.RenderScenes){
-        m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
+        
         SortRenderJobsByDepth(*scene);
         m_PickingPass->Draw(*scene);
         m_LightCullingPass->GenerateNewFrustum(*scene);
@@ -175,7 +164,6 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
 
 void Renderer::InitializeRenderPasses()
 {
-    m_DrawScenePass = new DrawScenePass(this);
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);

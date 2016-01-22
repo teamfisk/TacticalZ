@@ -11,7 +11,6 @@
 #include "FrameBuffer.h"
 #include "../Core/World.h"
 #include "PickingPass.h"
-#include "DrawScenePass.h"
 #include "LightCullingPass.h"
 #include "DrawFinalPass.h"
 #include "../Core/EventBroker.h"
@@ -46,7 +45,6 @@ private:
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-    DrawScenePass* m_DrawScenePass;
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
     ImGuiRenderPass* m_ImGuiRenderPass;

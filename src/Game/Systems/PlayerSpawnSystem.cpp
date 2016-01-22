@@ -1,21 +1,21 @@
 #include "Systems/PlayerSpawnSystem.h"
 
-PlayerSpawnSystem::PlayerSpawnSystem(EventBroker* eventBroker) 
-    : System(eventBroker)
+PlayerSpawnSystem::PlayerSpawnSystem(World* m_World, EventBroker* eventBroker) 
+    : System(m_World, eventBroker)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
 }
 
-void PlayerSpawnSystem::Update(World* world, double dt)
+void PlayerSpawnSystem::Update(double dt)
 {
-    auto playerSpawns = world->GetComponents("PlayerSpawn");
+    auto playerSpawns = m_World->GetComponents("PlayerSpawn");
     if (playerSpawns == nullptr) {
         return;
     }
 
     for (auto& team : m_SpawnRequests) {
         for (auto& cPlayerSpawn : *playerSpawns) {
-            EntityWrapper spawner(world, cPlayerSpawn.EntityID);
+            EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
             if (!spawner.HasComponent("Spawner")) {
                 continue;
             }

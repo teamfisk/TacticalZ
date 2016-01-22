@@ -30,6 +30,8 @@
 							<xs:element ref="c:PlayerSpawn" minOccurs="0"/>
 							<xs:element ref="c:Team" minOccurs="0"/>
 							<xs:element ref="c:DirectionalLight" minOccurs="0"/>
+							<xs:element ref="c:UniformScale" minOccurs="0"/>
+							<xs:element ref="c:EditorWidget" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>
@@ -40,9 +42,7 @@
 							<xs:element ref="Entity" minOccurs="0" maxOccurs="unbounded"/>
 							<xs:element name="EntityRef" minOccurs="0" maxOccurs="unbounded">
 								<xs:complexType>
-									<xs:all>
 										<xs:attribute name="file" type="xs:string" minOccurs="0"/> 
-									</xs:all>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>

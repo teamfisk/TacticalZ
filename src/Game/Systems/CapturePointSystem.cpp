@@ -1,9 +1,9 @@
 #include "Systems/CapturePointSystem.h"
 #include <algorithm>
 
-CapturePointSystem::CapturePointSystem(EventBroker* eventBroker)
-    : System(eventBroker),
-    PureSystem("CapturePoint")
+CapturePointSystem::CapturePointSystem(World* world, EventBroker* eventBroker) 
+    : System(world, eventBroker)
+    , PureSystem("CapturePoint")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
@@ -13,22 +13,22 @@ CapturePointSystem::CapturePointSystem(EventBroker* eventBroker)
 
 //here all capturepoints will update their component
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
-void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& capturePoint, double dt)
+void CapturePointSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt)
 {
     if (m_WinnerWasFound) {
         return;
     }
     const int capturePointNumber = capturePoint["CapturePointNumber"];
-    const bool hasTeamComponent = world->HasComponent(capturePoint.EntityID, "Team");
+    const bool hasTeamComponent = m_World->HasComponent(capturePoint.EntityID, "Team");
 
     //if point doesnt have a teamComponent yet, add one. since:
     //what if capture point has no team -> we cant get/use the team enum from it...
     if (!hasTeamComponent) {
-        world->AttachComponent(capturePoint.EntityID, "Team");
-        ComponentWrapper& teamComponent = world->GetComponent(capturePoint.EntityID, "Team");
+        m_World->AttachComponent(capturePoint.EntityID, "Team");
+        ComponentWrapper& teamComponent = m_World->GetComponent(capturePoint.EntityID, "Team");
         teamComponent["Team"] = (int)teamComponent["Team"].Enum("Spectator");
     }
-    ComponentWrapper& teamComponent = world->GetComponent(capturePoint.EntityID, "Team");
+    ComponentWrapper& teamComponent = m_World->GetComponent(capturePoint.EntityID, "Team");
     const int redTeam = (int)teamComponent["Team"].Enum("Red");
     const int blueTeam = (int)teamComponent["Team"].Enum("Blue");
     const int spectatorTeam = (int)teamComponent["Team"].Enum("Spectator");
@@ -66,7 +66,7 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     nextPossibleCapturePoint["Blue"] = -1;
     for (size_t i = 0; i < m_NumberOfCapturePoints; i++)
     {
-        ComponentWrapper& capturePointOwnedBy = world->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
+        ComponentWrapper& capturePointOwnedBy = m_World->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
         if ((int)capturePointOwnedBy["Team"] == redTeam && m_RedTeamHomeCapturePoint == 0) {
             nextPossibleCapturePoint["Red"] = i + 1;
         }
@@ -76,7 +76,7 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     }
     for (int i = m_NumberOfCapturePoints - 1; i >= 0; i--)
     {
-        ComponentWrapper& capturePointOwnedBy = world->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
+        ComponentWrapper& capturePointOwnedBy = m_World->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
         if ((int)capturePointOwnedBy["Team"] == redTeam && m_RedTeamHomeCapturePoint != 0) {
             nextPossibleCapturePoint["Red"] = i - 1;
         }
@@ -89,7 +89,7 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
     if (m_ResetTimers) {
         for (size_t i = 0; i < m_NumberOfCapturePoints; i++)
         {
-            ComponentWrapper& capturePoint = world->GetComponent(m_CapturePointNumberToEntityIDMap[i], "CapturePoint");
+            ComponentWrapper& capturePoint = m_World->GetComponent(m_CapturePointNumberToEntityIDMap[i], "CapturePoint");
             if ((int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Red"] &&
                 (int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Blue"]) {
                 capturePoint["CaptureTimer"] = 0.0;
@@ -113,21 +113,21 @@ void CapturePointSystem::UpdateComponent(World* world, EntityWrapper& entity, Co
         if (std::get<1>(triggerTouched) == capturePoint.EntityID) {
             //some player has touched this - lets figure out: what team, health
             EntityID playerID = std::get<0>(triggerTouched);
-            if (!world->HasComponent(playerID, "Player")) {
+            if (!m_World->HasComponent(playerID, "Player")) {
                 //if a non-player has entered the capturePoint, just erase that event and continue
                 m_ETriggerTouchVector.erase(m_ETriggerTouchVector.begin() + i - 1);
                 continue;
             }
-            bool hasHealthComponent = world->HasComponent(playerID, "Health");
+            bool hasHealthComponent = m_World->HasComponent(playerID, "Health");
             if (hasHealthComponent) {
-                double currentHealth = world->GetComponent(playerID, "Health")["Health"];
+                double currentHealth = m_World->GetComponent(playerID, "Health")["Health"];
                 //check if player is dead
                 if ((int)currentHealth == 0) {
                     continue;
                 }
             }
             //check team - spectatorNumber = "no team"
-            int teamNumber = world->GetComponent(playerID, "Team")["Team"];
+            int teamNumber = m_World->GetComponent(playerID, "Team")["Team"];
             if (teamNumber == redTeam) {
                 redTeamPlayersStandingInside++;
             } else if (teamNumber == blueTeam) {

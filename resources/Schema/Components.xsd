@@ -21,4 +21,6 @@
 	<xs:include schemaLocation="Components/SpawnPoint.xsd"/>
 	<xs:include schemaLocation="Components/PlayerSpawn.xsd"/>
 	<xs:include schemaLocation="Components/Team.xsd"/>
+	<xs:include schemaLocation="Components/UniformScale.xsd"/>
+	<xs:include schemaLocation="Components/EditorWidget.xsd"/>
 </xs:schema>
