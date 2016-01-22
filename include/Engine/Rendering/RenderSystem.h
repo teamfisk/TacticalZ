@@ -32,6 +32,7 @@ private:
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(Events::SetCamera &event);
+    void fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;

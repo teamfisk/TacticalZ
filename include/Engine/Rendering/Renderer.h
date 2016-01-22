@@ -18,6 +18,8 @@
 #include "Camera.h"
 #include "../Core/Transform.h"
 
+#include "TextRenderer.h"
+
 class Renderer : public IRenderer
 {
 public:
@@ -34,6 +36,7 @@ public:
 private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
+    TextRenderer* m_TextRenderer;
 
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
