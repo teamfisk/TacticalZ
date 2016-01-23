@@ -27,10 +27,10 @@ void DrawFinalPass::InitializeFrameBuffers()
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_FLOAT, 4);
     
-    m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
-    m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
-    m_BloomFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
-    m_BloomFrameBuffer.Generate();
+    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
+    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
+    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
+    m_FinalPassFrameBuffer.Generate();
 
 }
 
@@ -47,9 +47,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("DrawFinalPass::Draw: Pre");
 
-    m_BloomFrameBuffer.Bind(); //in i state
-
-    DrawFinalPassState state;
+    DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
 
     m_ForwardPlusProgram->Bind();
     GLuint shaderHandle = m_ForwardPlusProgram->GetHandle();
@@ -96,8 +94,17 @@ void DrawFinalPass::Draw(RenderScene& scene)
             continue;
         }
     }
-    m_BloomFrameBuffer.Unbind();
+    m_FinalPassFrameBuffer.Unbind();
     GLERROR("DrawFinalPass::Draw: END");
+}
+
+
+void DrawFinalPass::ClearBuffer()
+{
+    m_FinalPassFrameBuffer.Bind();
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_FinalPassFrameBuffer.Unbind();
 }
 
 void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const

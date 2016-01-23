@@ -20,6 +20,7 @@
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
 #include "../Core/Transform.h"
+#include "imgui/imgui.h"
 
 class Renderer : public IRenderer
 {
@@ -44,6 +45,8 @@ private:
     Model* m_ScreenQuad;
     Model* m_UnitQuad;
     Model* m_UnitSphere;
+
+    int m_DebugTextureToDraw = 0;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;

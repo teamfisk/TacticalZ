@@ -25,6 +25,7 @@ void DrawScreenQuadPass::Draw(GLuint texture)
 
     DrawScreenQuadPassState state = DrawScreenQuadPassState();
     m_DrawQuadProgram->Bind();
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);

@@ -76,10 +76,16 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking");
+    //clear buffer 0
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    //Clear other buffers
     m_PickingPass->ClearPicking();
+    m_DrawFinalPass->ClearBuffer();
+    m_DrawBloomPass->ClearBuffer();
+
     for (auto scene : frame.RenderScenes){
         
         SortRenderJobsByDepth(*scene);
@@ -88,15 +94,28 @@ void Renderer::Draw(RenderFrame& frame)
         m_LightCullingPass->FillLightList(*scene);
         m_LightCullingPass->CullLights(*scene);
         m_DrawFinalPass->Draw(*scene);
-        //m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_SceneTexture);
-        //m_DrawScreenQuadPass->Draw(m_DrawFinalPass->m_BloomTexture);
-        m_DrawBloomPass->Draw(m_DrawFinalPass->m_BloomTexture);
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->m_SceneTexture, m_DrawBloomPass->m_GaussianTexture_vert);
-        //m_DrawScreenQuadPass->Draw(m_DrawBloomPass->m_GaussianTexture_vert);
-        //m_DrawScenePass->Draw(rq);
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
     }
+    m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
+    if(m_DebugTextureToDraw == 0) {
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture());
+    }
+    if (m_DebugTextureToDraw == 1) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
+    }
+    if (m_DebugTextureToDraw == 2) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTexture());
+    }
+    if (m_DebugTextureToDraw == 3) {
+        m_DrawScreenQuadPass->Draw(m_DrawBloomPass->GaussianTexture());
+    }
+    if (m_DebugTextureToDraw == 4) {
+        m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
+    }
+
+    //m_DrawBloomPass->Draw(m_DrawFinalPass->m_BloomTexture);
+    //m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->m_SceneTexture, m_DrawBloomPass->m_GaussianTexture_vert);
 
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);

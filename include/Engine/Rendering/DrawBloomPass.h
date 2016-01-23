@@ -18,14 +18,16 @@ public:
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
     void InitializeBuffers();
+    void ClearBuffer();
 
     void FillGaussianBuffer(FrameBuffer* fb);
 
     void Draw(GLuint texture);
 
     //Getters
-    GLuint m_GaussianTexture_horiz;
-    GLuint m_GaussianTexture_vert;
+    //Return the blurred result of the texture that was sent into draw
+    GLuint GaussianTexture() const { return m_GaussianTexture_vert; }
+
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
@@ -36,6 +38,9 @@ private:
     const IRenderer* m_Renderer;
     //const LightCullingPass* m_LightCullingPass 
     GLuint m_iterations = 9;
+
+    GLuint m_GaussianTexture_horiz;
+    GLuint m_GaussianTexture_vert;
 
     FrameBuffer m_GaussianFrameBuffer_horiz;
     FrameBuffer m_GaussianFrameBuffer_vert;

@@ -18,12 +18,12 @@ public:
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
     void Draw(RenderScene& scene);
+    void ClearBuffer();
 
-    //Todo: Should not be public
-    FrameBuffer m_BloomFrameBuffer;
-    GLuint m_BloomTexture;
-    GLuint m_SceneTexture;
-    GLuint m_DepthBuffer;
+    //Return the texture that is used in later stages to apply the bloom effect
+    GLuint BloomTexture() const { return m_BloomTexture; }
+    //Return the texture with diffuse and lighting of the scene.
+    GLuint SceneTexture() const { return m_SceneTexture; }
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
@@ -32,6 +32,11 @@ private:
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;
     Texture* TEMP_glowTestTexture;
+
+    FrameBuffer m_FinalPassFrameBuffer;
+    GLuint m_BloomTexture;
+    GLuint m_SceneTexture;
+    GLuint m_DepthBuffer;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;

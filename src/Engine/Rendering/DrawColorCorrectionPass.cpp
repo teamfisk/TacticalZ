@@ -26,7 +26,7 @@ void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture)
 
     DrawScreenQuadPassState state = DrawScreenQuadPassState();
     m_ColorCorrectionProgram->Bind();
-
+    glClear(GL_COLOR_BUFFER_BIT);
     glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Exposure"), m_Exposure);
 
     glActiveTexture(GL_TEXTURE0);
