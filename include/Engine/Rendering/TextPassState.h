@@ -6,7 +6,7 @@
 class TextPassState : public RenderState
 {
 public:
-    TextPassState();
+    TextPassState(GLuint frameBuffer);
     ~TextPassState();
 private:
 
