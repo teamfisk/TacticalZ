@@ -39,6 +39,8 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ForwardPlusProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
     m_ForwardPlusProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlus.frag.glsl")));
     m_ForwardPlusProgram->Compile();
+    m_ForwardPlusProgram->BindFragDataLocation(0, "sceneColor");
+    m_ForwardPlusProgram->BindFragDataLocation(1, "bloomColor");
     m_ForwardPlusProgram->Link();
 }
 
