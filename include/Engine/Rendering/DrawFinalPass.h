@@ -24,7 +24,7 @@ public:
     GLuint BloomTexture() const { return m_BloomTexture; }
     //Return the texture with diffuse and lighting of the scene.
     GLuint SceneTexture() const { return m_SceneTexture; }
-    FrameBuffer FinalPassFrameBuffer() { return m_FinalPassFrameBuffer; }
+    FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
 
 
 private:

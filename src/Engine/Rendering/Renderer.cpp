@@ -101,7 +101,7 @@ void Renderer::Draw(RenderFrame& frame)
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
 
-        m_TextPass->Draw(*scene, m_DrawFinalPass->FinalPassFrameBuffer());
+        m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
 
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
