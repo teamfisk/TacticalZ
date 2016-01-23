@@ -17,11 +17,6 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     ComponentWrapper& cTransform = entity["Transform"];
     AABB& boxA = *boundingBox;
 
-    //Press 'Z' to enable/disable collision.
-    if (zPress) {
-        return;
-    }
-
     // Collide against octree
     //std::vector<AABB> octreeResult;
     //m_Octree->ObjectsInSameRegion(*boundingBox, octreeResult);
@@ -63,12 +58,4 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
             (glm::vec3&)cTransform["Position"] += resolutionVector;
         }
     }
-}
-
-bool CollisionSystem::OnKeyUp(const Events::KeyUp & event)
-{
-    if (event.KeyCode == GLFW_KEY_Z) {
-        zPress = !zPress;
-    }
-    return false;
 }

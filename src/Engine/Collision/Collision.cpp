@@ -248,7 +248,12 @@ bool vectorHasLength(const glm::vec3& vec)
     return glm::any(glm::greaterThan(glm::abs(vec), glm::vec3(0.0001f, 0.0001f, 0.0001f)));
 }
 
-bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2, glm::vec3& outResolutionVector)
+bool AABBvsTriangle(const AABB& box, 
+    const glm::vec3& v0, 
+    const glm::vec3& v1, 
+    const glm::vec3& v2, 
+    glm::vec3& outVector,
+    int& lineHit)
 {
     //Check so we don't have a zero area triangle when calculating the normal.
     glm::vec3 triNormal = glm::cross(v1 - v0, v2 - v0);
@@ -283,23 +288,22 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
         insideAllPlanes[ax] = glm::all(insidePlanes);
     }
     if (glm::all(insideAllPlanes)) {
-        outResolutionVector = glm::vec3(0.f);
-        LOG_DEBUG("Triangle collision inside");
-        return true;    //TODO: Resolve.
+        return false;    //If a triangle is completely inside the box, we call it a non-intersection.
     }
 
+    triNormal = glm::normalize(triNormal);
     Ray ray;
-    //All triangle lines.
-    //Check if each line on the triangle intersects any plane on the box.
+    //All triangle edges.
+    //Check if any edge on the triangle intersects the box.
     for (int l = 0; l < 3; ++l) {
         glm::vec3 edge = triPos[(l + 1) % 3] - triPos[l];
         ray.SetOrigin(triPos[l]);
         ray.SetDirection(edge);
         float dist;
         if (RayVsAABB(ray, box, dist) && dist <= glm::length(edge)) {
-            outResolutionVector = glm::vec3(0.f);
-            LOG_DEBUG("Triangle collision lines");
-            return true;    //TODO: Resolve.
+            outVector = triNormal;
+            lineHit = l;
+            return true;
         }
     }
 
@@ -309,7 +313,6 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
     //intersect the cube diagonal that comes
     //closest to being perpendicular to the plane of the polygon.
 
-    triNormal = glm::normalize(triNormal);
     glm::vec3 diagonal = -signNonZero(triNormal) * half;
 #define EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK      //TODO: We should probably performance test with this on/off.
 #ifdef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
@@ -337,7 +340,7 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
 #endif
         //Distance between triangle plane, and the diagonal corner, multiplied by the normal.
         //Signed distance, positive if on the same side as the normal.
-        outResolutionVector = -glm::dot(triNormal, origin + diagonal - v0) * triNormal;
+        outVector = -glm::dot(triNormal, origin + diagonal - v0) * triNormal;
         return true;
     }
     return false;
@@ -345,28 +348,59 @@ bool AABBvsTriangle(const AABB& box, const glm::vec3& v0, const glm::vec3& v1, c
 
 bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
 {
+    struct Triangle
+    {
+        glm::vec3 v0, v1, v2;
+    };
     bool hit = false;
-    outResolutionVector = glm::vec3(INFINITY);
+    bool cornerHitTODO = false;
+    outResolutionVector = glm::vec3(0.f);
+    std::vector<Triangle> hitTriangles;
+    std::vector<glm::vec3> hitNormals;
     for (int i = 0; i < modelIndices.size(); i += 3) {
-        glm::vec3 resVec;
-        if (AABBvsTriangle(
-            box, 
-            Transform::TransformPoint(modelVertices[modelIndices[i]].Position, modelMatrix), 
-            Transform::TransformPoint(modelVertices[modelIndices[i + 1]].Position, modelMatrix),
-            Transform::TransformPoint(modelVertices[modelIndices[i + 2]].Position, modelMatrix),
-            resVec
-            ))
+        glm::vec3 outVec;
+        glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        int lineHit = -1;
+        if (AABBvsTriangle(box, v0, v1, v2, outVec, lineHit))
         {
             hit = true;
-            //If resolution distance is smaller than previous, and is non-zero.
-            if (glm::length(resVec) < glm::length(outResolutionVector) && vectorHasLength(resVec)) {
-                outResolutionVector = resVec;
+            if (lineHit == -1) {
+                outResolutionVector += outVec;
+                //TODO: We might be able to return here instead, having only convex geometry. 
+                cornerHitTODO = true;
+                //return true;
+            }
+            else {
+                const glm::vec3 triPos[] = {
+                    v0, v1, v2
+                };
+                glm::vec3 edge = triPos[(lineHit + 1) % 3] - triPos[lineHit];
+                hitTriangles.push_back({v0, v1, v2});
+                hitNormals.push_back(outVec);
             }
         }
     }
-    //TODO: Unnecessary later, remove it.
-    if (glm::any(glm::isinf(outResolutionVector))) {
-        outResolutionVector = glm::vec3(0, 0, 0);
+    if (hitTriangles.size() > 0) {
+        if (cornerHitTODO) {
+            LOG_DEBUG("Both edges and corners was hit on the same model.");
+            return true;
+        }
+        for (const glm::vec3& norm : hitNormals) {
+            outResolutionVector += norm;
+        }
+        //Normalize.
+        outResolutionVector /= hitNormals.size();
+        const glm::vec3& origin = box.Origin();
+        const glm::vec3& half = box.HalfSize();
+        float maxDist = -10;
+        for (const Triangle& tri : hitTriangles) {
+            float d = glm::dot(outResolutionVector, 0.333f * (tri.v0 + tri.v1 + tri.v2) - origin);
+            maxDist = std::max(maxDist, d);
+        }
+        glm::vec3 tmp = glm::clamp(2.0f * outResolutionVector, glm::vec3(-1, -1, -1), glm::vec3(1, 1, 1));
+        outResolutionVector *= maxDist + glm::length(tmp * half);
     }
     return hit;
 }
