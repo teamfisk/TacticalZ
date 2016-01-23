@@ -13,7 +13,7 @@
 					<Position X="0" Y="1" Z="10"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/Camera.obj</Resource>
+					<Resource>Models/Camera.mesh</Resource>
 				</c:Model>
 				<c:Camera>
 					<Name>MainCamera</Name>
@@ -26,7 +26,7 @@
 					<Position X="5" Y="1" Z="5"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/Camera.obj</Resource>
+					<Resource>Models/Camera.mesh</Resource>
 				</c:Model>
 				<c:Camera>
 					<Name>ActionCamera</Name>
@@ -40,7 +40,7 @@
 					<Scale X="100" Y="1" Z="100"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/Core/UnitPlane.obj</Resource>
+					<Resource>Models/Core/UnitPlane.mesh</Resource>
 				</c:Model>
 			</Components>
 		</Entity>

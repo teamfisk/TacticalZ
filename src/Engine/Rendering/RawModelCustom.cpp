@@ -162,8 +162,9 @@ void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, un
         if (offset + nameLengths[1] > fileByteSize) {
             throw Resource::FailedLoadingException("Reading Material NormalMap path failed");
         }
-
-        newMaterial.NormalMapPath = (fileData + offset);
+        newMaterial.NormalMapPath = "Textures/";
+        newMaterial.NormalMapPath += (fileData + offset);
+        newMaterial.NormalMapPath += ".png";
         offset += nameLengths[1];
     }
 
@@ -171,8 +172,9 @@ void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, un
         if (offset + nameLengths[2] > fileByteSize) {
             throw Resource::FailedLoadingException("Reading Material SpecularMap path failed");
         }
-
-        newMaterial.SpecularMapPath = (fileData + offset);
+        newMaterial.SpecularMapPath = "Textures/";
+        newMaterial.SpecularMapPath += (fileData + offset);
+        newMaterial.SpecularMapPath += ".png";
         offset += nameLengths[2];
     }
 
@@ -180,8 +182,9 @@ void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, un
         if (offset + nameLengths[3] > fileByteSize) {
             throw Resource::FailedLoadingException("Reading Material IncandescenceMap path failed");
         }
-
-        newMaterial.IncandescenceMapPath = (fileData + offset);
+        newMaterial.IncandescenceMapPath = "Textures/";
+        newMaterial.IncandescenceMapPath += (fileData + offset);
+        newMaterial.IncandescenceMapPath += ".png";
         offset += nameLengths[3];
     }
 

@@ -18,7 +18,7 @@
         <c:AABB/>
         <c:Collidable/>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="0.513725519" G="0" R="1"/>
         </c:Model>
         <c:Transform>
@@ -37,7 +37,7 @@
         <c:Collidable/>
         <c:Physics/>
         <c:Model>
-          <Resource>Models/Assault.obj</Resource>
+          <Resource>Models/Assault.mesh</Resource>
           <Color A="1" B="1" G="0" R="0"/>
         </c:Model>
         <c:Player/>
@@ -55,7 +55,7 @@
           <Velocity X="0" Y="-0.0934068039" Z="0"/>
         </c:Physics>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="0" G="1" R="1"/>
         </c:Model>
         <c:Player/>

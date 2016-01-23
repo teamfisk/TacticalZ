@@ -61,6 +61,6 @@ public:
 protected:
     glm::vec3 m_Position = glm::vec3(0, 0, 0);
     glm::vec3 m_Velocity = glm::vec3(0, 0, 0);
-    float m_BaseSpeed = 50.0f;//2.0f;
+    float m_BaseSpeed = 2.0f;
     float m_Speed = m_BaseSpeed;
 };

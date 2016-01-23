@@ -57,22 +57,27 @@ void Material::grabPhongProperties(MaterialNode& material_node, MFnDependencyNod
 bool Material::findColorTexture(MaterialNode& material_node, MFnDependencyNode& node)
 {
 	MPlugArray AllConnections;
-
+  
 	m_Plug = node.findPlug("color", true);
 	m_Plug.connectedTo(AllConnections, true, false);
 
 	for (int i = 0; i < AllConnections.length(); i++) {
 		if (AllConnections[i].node().hasFn(MFn::kFileTexture)) {
 			MFnDependencyNode TextureNode(AllConnections[i].node());
-			
-			std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
+            
+			std::string FullPath = TextureNode.findPlug("fileTextureName").asString().asChar();
 			m_TexturePaths.push_back(FullPath);
 
-            FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+            MString workspace;
+            MStatus status = MGlobal::executeCommand(MString("workspace -q -rd;"),
+                workspace);
+            FullPath = FullPath.substr(workspace.length());
+            FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
 			material_node.ColorMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 
             material_node.ColorMapFileLength = material_node.ColorMapFile.length() + 1;
 			// Test
+            MGlobal::displayInfo(MString() + "getAbsolutePathToResources: " + workspace);
 			MGlobal::displayInfo(MString() + "Texture file: " + FullPath.c_str());
 			return true;
 		}
@@ -101,7 +106,11 @@ bool Material::findNormalTexture(MaterialNode& material_node, MFnDependencyNode&
 					std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 					m_TexturePaths.push_back(FullPath);
 
-                    FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+                    MString workspace;
+                    MStatus status = MGlobal::executeCommand(MString("workspace -q -rd;"),
+                        workspace);
+                    FullPath = FullPath.substr(workspace.length());
+                    FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
                     material_node.NormalMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
                     material_node.NormalMapFileLength = material_node.NormalMapFile.length() + 1;
 					return true;
@@ -127,7 +136,11 @@ bool Material::findSpecularTexture(MaterialNode& material_node, MFnDependencyNod
 			std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 			m_TexturePaths.push_back(FullPath);
 
-            FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+            MString workspace;
+            MStatus status = MGlobal::executeCommand(MString("workspace -q -rd;"),
+                workspace);
+            FullPath = FullPath.substr(workspace.length());
+            FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
             material_node.SpecularMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
             material_node.SpecularMapFileLength = material_node.SpecularMapFile.length() + 1;
 			return true;
@@ -150,7 +163,11 @@ bool Material::findIncandescenceTexture(MaterialNode& material_node, MFnDependen
 			std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 			m_TexturePaths.push_back(FullPath);
 
-            FullPath = FullPath.substr(FullPath.find_last_of("/") + 1);
+            MString workspace;
+            MStatus status = MGlobal::executeCommand(MString("workspace -q -rd;"),
+                workspace);
+            FullPath = FullPath.substr(workspace.length());
+            FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
             material_node.IncandescenceMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
             material_node.IncandescenceMapFileLength = material_node.IncandescenceMapFile.length() + 1;
 			return true;

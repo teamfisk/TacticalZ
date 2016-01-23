@@ -22,8 +22,6 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ForwardPlusProgram->Link();
 }
 
-static double tempFrameCounter = 6.348;
-
 void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("DrawFinalPass::Draw: Pre");
@@ -40,7 +38,6 @@ void DrawFinalPass::Draw(RenderScene& scene)
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_Renderer->Camera()->ProjectionMatrix()));
     glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
 
-    //tempFrameCounter += 0.01;
     //TODO: Render: Add code for more jobs than modeljobs.
     for (auto &job : scene.ForwardJobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
@@ -57,21 +54,18 @@ void DrawFinalPass::Draw(RenderScene& scene)
                 glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
             }
 
+            //TODO: Fixa så att modelsJobs kan spela upp olika animationer och så att den kan få in en tid istället för 1.0f - Hälsningar Johan och Andreas :)
             if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-#ifdef USING_ASSIMP_AS_IMPORTER
-                auto animation = modelJob->Model->m_RawModel->m_Skeleton->GetAnimation("combinedAnim_0");
-#else
                 auto animation = modelJob->Model->m_RawModel->m_Skeleton->GetAnimation("running");
-#endif
                 if (animation != nullptr) {
                     std::vector<glm::mat4> frameBones = modelJob->Model->m_RawModel->m_Skeleton->GetFrameBones(
                         *animation,
-                        tempFrameCounter
+                        1.0f
                         );
                     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
             }
-             // -3 - 9
+            
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
             glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));

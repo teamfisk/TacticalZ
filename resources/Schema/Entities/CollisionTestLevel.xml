@@ -6,7 +6,7 @@
 			<Orientation X="0" Y="0" Z="0"/>
 		</c:Transform>
 		<c:Model>
-			<Resource>Models/DummyScene.obj</Resource>
+			<Resource>Models/DummyScene.mesh</Resource>
 		</c:Model>
 	</Components>
 	<Children>
@@ -17,7 +17,7 @@
 					<Scale X="1" Y="1" Z="1"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/Core/UnitSphere.obj</Resource>
+					<Resource>Models/Core/UnitSphere.mesh</Resource>
 				</c:Model>
 			</Components>
 		</Entity>
@@ -28,7 +28,7 @@
 					<Scale X="2" Y="2" Z="2"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/RotationWidgetX.obj</Resource>
+					<Resource>Models/RotationWidgetX.mesh</Resource>
 				</c:Model>
 				<c:Trigger>
 				</c:Trigger>
@@ -43,7 +43,7 @@
 					<Position X="2.5"/>
 				</c:Transform>
 				<c:Model>
-					<Resource>Models/Core/UnitCube.obj</Resource>
+					<Resource>Models/Core/UnitCube.mesh</Resource>
 				</c:Model>
 				<c:AABB>
 				</c:AABB>
@@ -69,7 +69,7 @@
 							<Orientation X="0.0" Y="0" Z="1.0"/>
 						</c:Transform>
 						<c:Model>
-							<Resource>Models/Core/UnitRaptor.obj</Resource>
+							<Resource>Models/Core/UnitRaptor.mesh</Resource>
 							<Color R="1" G="0.4" B="0.8"/>
 						</c:Model>
 					</Components>
@@ -94,7 +94,7 @@
 											<Orientation X="0" Y="0" Z="0"/>
 										</c:Transform>
 										<c:Model>
-											<Resource>Models/Core/UnitCube.obj</Resource>
+											<Resource>Models/Core/UnitCube.mesh</Resource>
 											<Color R="1" G="0.4" B="0.8"/>
 										</c:Model>
 									</Components>
@@ -107,7 +107,7 @@
 											<Orientation X="0" Y="1.57" Z="0"/>
 										</c:Transform>
 										<c:Model>
-											<Resource>Models/Core/UnitCube.obj</Resource>
+											<Resource>Models/Core/UnitCube.mesh</Resource>
 											<Color R="1" G="0.4" B="0.8"/>
 										</c:Model>
 									</Components>

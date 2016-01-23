@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_CASE(resourceManagerTest)
 
     //configfile without register
     //check so output says "EE failed to load: type not registered..."
-    auto m_ScreenQuadNoRegister = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj"); // 360NoScope ScreenQuad
-    BOOST_CHECK(!ResourceManager::IsResourceLoaded("Model", "Models/Core/ScreenQuad.obj"));
+    auto m_ScreenQuadNoRegister = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh"); // 360NoScope ScreenQuad
+    BOOST_CHECK(!ResourceManager::IsResourceLoaded("Model", "Models/Core/ScreenQuad.mesh"));
 
     //there is no error feedback to check if you try to release the wrong resources - hence that cant be tested either
 }

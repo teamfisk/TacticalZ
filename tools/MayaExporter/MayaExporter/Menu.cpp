@@ -60,7 +60,7 @@ Menu::Menu(QDialog* dialog)
 
 	m_ExportPath = new QLineEdit;
 	m_FileDialog = new QFileDialog;
-    QString tmpPath("C:/Users/Nickelodion/Desktop/animTest");
+    QString tmpPath("C:/Users/Nickelodion/Desktop/workspace/tacticalZ/assets/models/");
     m_ExportPath->setText(tmpPath);
 	QLabel* exportLabel = new QLabel;
 	exportLabel->setText("Export Path:");
