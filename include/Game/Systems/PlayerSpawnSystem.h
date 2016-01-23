@@ -2,7 +2,7 @@
 #include "Input/EInputCommand.h"
 #include "Systems/SpawnerSystem.h"
 #include "Events/ESpawnerSpawn.h"
-#include "Events/EPlayerSpawned.h"
+#include "Core/EPlayerSpawned.h"
 #include "Rendering/ESetCamera.h"
 #include "Core/ConfigFile.h"
 

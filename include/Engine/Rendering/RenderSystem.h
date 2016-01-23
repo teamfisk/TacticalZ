@@ -15,7 +15,7 @@
 #include "Renderer.h"
 #include "PointLightJob.h"
 #include "../Core/Transform.h"
-#include "../../Game/Events/EPlayerSpawned.h"
+#include "../Core/EPlayerSpawned.h"
 
 class RenderSystem : public ImpureSystem
 {

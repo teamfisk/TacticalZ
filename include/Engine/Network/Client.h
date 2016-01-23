@@ -20,7 +20,7 @@
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 #include "Network/EInterpolate.h"
-#include "Game/Events/EPlayerSpawned.h"
+#include "Core/EPlayerSpawned.h"
 
 class Client : public Network
 {

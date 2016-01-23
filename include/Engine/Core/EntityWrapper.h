@@ -26,6 +26,7 @@ struct EntityWrapper
     bool HasComponent(const std::string& componentName);
     EntityWrapper Parent();
     EntityWrapper FirstChildByName(const std::string& name);
+    bool IsChildOf(EntityWrapper potentialParent);
     bool Valid();
 
     ComponentWrapper operator[](const char* componentName);

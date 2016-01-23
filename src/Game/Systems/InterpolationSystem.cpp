@@ -27,16 +27,17 @@ void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
             }
         }
         if (transform.Info.Name == "Transform") {
-            bool isLocalPlayer = entity == m_LocalPlayer || entity.Parent() == m_LocalPlayer;
+            bool isLocalPlayer = entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer);
             // Position
             glm::vec3 nextPosition = sTransform.Position;
             glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
+            // HACK: Hardcoded tolerance value for player position desync = 1
             if (isLocalPlayer && glm::length(nextPosition - currentPosition) < 1.f) {
                 return;
             }
             (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
             // Orientation
-            //bool isPlayer = entity.HasComponent("Player") || entity.Parent().HasComponent("Player");
+            // Don't force orientation for players
             if (!isLocalPlayer) {
                 glm::quat nextOrientation = sTransform.Orientation;
                 glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));

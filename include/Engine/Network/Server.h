@@ -15,8 +15,7 @@
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 #include "Network/EPlayerDisconnected.h"
-
-#include "Game/Events/EPlayerSpawned.h"
+#include "Core/EPlayerSpawned.h"
 
 class Server : public Network
 {

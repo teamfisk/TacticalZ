@@ -12,7 +12,7 @@
 #include "Core/EventBroker.h"
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
-#include "Events/EPlayerSpawned.h"
+#include "Core/EPlayerSpawned.h"
 
 #include "Network/EInterpolate.h"
 
