@@ -31,7 +31,6 @@ private:
 
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;
-    Texture* TEMP_glowTestTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
     GLuint m_BloomTexture;

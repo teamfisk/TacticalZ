@@ -13,7 +13,6 @@ void DrawFinalPass::InitializeTextures()
 {
     m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
     m_BlackTexture = ResourceManager::Load<Texture>("Textures/Core/Black.png");
-    TEMP_glowTestTexture = ResourceManager::Load<Texture>("Textures/Core/UnitRaptor_glow.png");
 }
 
 void DrawFinalPass::InitializeFrameBuffers()

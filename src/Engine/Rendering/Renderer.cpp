@@ -121,9 +121,6 @@ void Renderer::Draw(RenderFrame& frame)
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
 
-    //m_DrawBloomPass->Draw(m_DrawFinalPass->m_BloomTexture);
-    //m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->m_SceneTexture, m_DrawBloomPass->m_GaussianTexture_vert);
-
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);
 }
