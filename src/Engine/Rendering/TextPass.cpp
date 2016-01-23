@@ -21,6 +21,8 @@ void TextPass::Initialize()
     m_TextProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Text.vert.glsl")));
     m_TextProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Text.frag.glsl")));
     m_TextProgram->Compile();
+    m_TextProgram->BindFragDataLocation(0, "sceneColor");
+    m_TextProgram->BindFragDataLocation(1, "bloomColor");
     m_TextProgram->Link();
 }
 
@@ -29,8 +31,10 @@ void TextPass::Update()
 
 }
 
-void TextPass::Draw(RenderScene& scene)
+void TextPass::Draw(RenderScene& scene, FrameBuffer& frameBuffer)
 {
+    GLERROR("Derp1");
+    TextPassState* state = new TextPassState(frameBuffer.GetHandle());
     for (auto &job : scene.TextJobs) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
@@ -38,6 +42,8 @@ void TextPass::Draw(RenderScene& scene)
             renderText(textJob->Content, textJob->Resource, textJob->Alignment, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
         }
     }
+    GLERROR("Derp2");
+    delete state;
 }
 
 void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
@@ -61,10 +67,10 @@ void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum a
         penX = 0;
     }	
     
-    TextPassState state;
+    
 
     m_TextProgram->Bind();
-    glUniform3f(glGetUniformLocation(m_TextProgram->GetHandle(), "textColor"), color.x, color.y, color.z);
+    glUniform4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "textColor"), 1, glm::value_ptr(color));
     glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "M"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "V"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "P"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));

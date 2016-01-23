@@ -24,6 +24,8 @@ public:
     GLuint BloomTexture() const { return m_BloomTexture; }
     //Return the texture with diffuse and lighting of the scene.
     GLuint SceneTexture() const { return m_SceneTexture; }
+    FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
+
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;

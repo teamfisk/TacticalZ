@@ -101,6 +101,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
     }
     m_FinalPassFrameBuffer.Unbind();
     GLERROR("DrawFinalPass::Draw: END");
+    delete state;
 }
 
 

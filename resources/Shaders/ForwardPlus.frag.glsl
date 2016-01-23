@@ -147,7 +147,7 @@ void main()
 		color_result += FillColor;
 	}
 	//bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
-	sceneColor = vec4(color_result.xyz, 1.0);
+	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 	//These if statements should be removed if they are slow.
 	color_result += glowTexel;
 
