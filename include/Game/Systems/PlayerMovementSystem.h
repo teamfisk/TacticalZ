@@ -1,7 +1,7 @@
 #include "Common.h"
 #include "GLM.h"
 #include "Core/System.h"
-#include "Events/EPlayerSpawned.h"
+#include "Core/EPlayerSpawned.h"
 #include "Input/FirstPersonInputController.h"
 
 class PlayerMovementSystem : public ImpureSystem, PureSystem
