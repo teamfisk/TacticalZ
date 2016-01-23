@@ -3,6 +3,7 @@
 #include "Core/System.h"
 #include "Core/EPlayerSpawned.h"
 #include "Input/FirstPersonInputController.h"
+#include <imgui/imgui.h>
 
 class PlayerMovementSystem : public ImpureSystem, PureSystem
 {
