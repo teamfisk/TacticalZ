@@ -13,6 +13,7 @@
         <c:Model>
           <Resource>Models/Core/UnitCube.obj</Resource>
           <Color A="1" B="0.513725519" G="0" R="1"/>
+          <Visible>false</Visible>
         </c:Model>
         <c:Transform>
           <Position X="7" Y="-0.727000058" Z="-1.22800004"/>
@@ -93,6 +94,7 @@
         <c:Collidable/>
         <c:Model>
           <Resource>Models/Core/UnitCube.obj</Resource>
+          <Visible>false</Visible>
         </c:Model>
         <c:Transform>
           <Position X="6.32800007" Y="0.807000041" Z="-2.2750001"/>
@@ -107,6 +109,7 @@
         <c:Collidable/>
         <c:Model>
           <Resource>Models/Core/UnitCube.obj</Resource>
+          <Visible>false</Visible>
         </c:Model>
         <c:Transform>
           <Position X="9.11900043" Y="0.5" Z="-2.10900021"/>
@@ -121,6 +124,7 @@
         <c:Collidable/>
         <c:Model>
           <Resource>Models/Core/UnitCube.obj</Resource>
+          <Visible>false</Visible>
         </c:Model>
         <c:Transform>
           <Position X="13.2370005" Y="1.28600001" Z="-1.71700013"/>

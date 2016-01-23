@@ -10,6 +10,7 @@
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="MovementSpeed" type="t:float" minOccurs="0"/>
+				<xs:element name="CrouchSpeed" type="t:float" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

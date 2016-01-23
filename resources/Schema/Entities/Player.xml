@@ -7,6 +7,9 @@
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
     <c:Collidable/>
+    <c:Model>
+      <Resource></Resource>
+    </c:Model>
     <c:Physics/>
     <c:Player>
       <MovementSpeed>3</MovementSpeed>
@@ -17,7 +20,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="0" Y="0" Z="7.38143063"/>
+      <Position X="0" Y="0.0264999978" Z="7.38143063"/>
     </c:Transform>
   </Components>
 
@@ -27,19 +30,18 @@
         <c:Camera/>
         <c:Transform>
           <Position X="0" Y="1.37700009" Z="0"/>
-          <Orientation X="6.28300047" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
         <Entity name="PlayerName">
           <Components>
             <c:Text>
-              <Content></Content>
               <Resource>Fonts/DroidSans.ttf,100</Resource>
               <Color A="1" B="0" G="1" R="0"/>
+              <Visible>false</Visible>
             </c:Text>
             <c:Transform>
-              <Position X="0" Y="0.0263664704" Z="-0.447885782"/>
+              <Position X="0" Y="0.247910097" Z="-0.447844714"/>
               <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
               <Orientation X="0" Y="3.14199996" Z="0"/>
             </c:Transform>
@@ -81,6 +83,33 @@
         </c:Model>
         <c:Transform>
           <Orientation X="0" Y="3.14159274" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="AABBStanding">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Color A="0.427450985" B="1" G="1" R="1"/>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0.772000015" Z="0"/>
+          <Scale X="1" Y="1.60000002" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="AABBCrouching">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Color A="0.745098054" B="1" G="0" R="1"/>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0.772000015" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>

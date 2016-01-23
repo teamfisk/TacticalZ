@@ -37,12 +37,27 @@ void PlayerMovementSystem::Update(double dt)
         ori.y += controller->Rotation().y;
 
         glm::vec3& pos = cTransform["Position"];
-        pos += controller->Movement() * glm::inverse(glm::quat(ori)) * (float)player["Player"]["MovementSpeed"] * (float)dt;
+        float speed;
+        if (controller->Crouching()) {
+            speed = player["Player"]["CrouchSpeed"];
+        } else {
+            speed = player["Player"]["MovementSpeed"];
+        }
+        pos += controller->Movement() * glm::inverse(glm::quat(ori)) * speed * (float)dt;
 
         if (player.HasComponent("Physics")) {
-            if (controller->Jumping()) {
-                glm::vec3& velocity = player["Physics"]["Velocity"];
-                velocity.y += 10.f;
+            glm::vec3& velocity = player["Physics"]["Velocity"];
+            if (controller->Jumping() && !controller->Crouching() && velocity.y == 0.f) {
+                velocity.y += 4.f;
+            }
+        }
+
+        if (player.HasComponent("AABB")) {
+            glm::vec3& size = player["AABB"]["Size"];
+            if (controller->Crouching()) {
+                size = glm::vec3(1.f, 1.f, 1.f);
+            } else {
+                size = glm::vec3(1.f, 1.6f, 1.f);
             }
         }
         

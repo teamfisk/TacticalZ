@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <Player xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Player.xsd">
-	<MovementSpeed>0.2</MovementSpeed>
+	<MovementSpeed>3</MovementSpeed>
+	<CrouchSpeed>1.5</CrouchSpeed>
 </Player>
