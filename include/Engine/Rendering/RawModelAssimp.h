@@ -1,6 +1,8 @@
 #ifndef RawModelAssimp_h__
 #define RawModelAssimp_h__
 
+#ifdef USING_ASSIMP_AS_IMPORTER
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -18,15 +20,17 @@
 #include "Texture.h"
 #include "Skeleton.h"
 
-class RawModel : public Resource
+#define RawModel RawModelAssimp
+
+class RawModelAssimp : public Resource
 {
 	friend class ResourceManager;
 
 protected:
-    RawModel(std::string fileName);
+    RawModelAssimp(std::string fileName);
 
 public:
-	~RawModel();
+	~RawModelAssimp();
 
 	struct Vertex
 	{
@@ -71,4 +75,5 @@ private:
 	void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
 
+#endif
 #endif

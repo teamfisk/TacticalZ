@@ -96,10 +96,18 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World
             model = ResourceManager::Load<::Model, true>(resource);
         } catch (const Resource::StillLoadingException&) {
             //continue;
+#ifdef USING_ASSIMP_AS_IMPORTER
+            model = ResourceManager::Load<::Model>("Models/WidgetPlaneZ.obj"); // 360NoScope StillLoading mesh
+#else
             model = ResourceManager::Load<::Model>("Models/coolCube.mesh"); // 360NoScope StillLoading mesh
+#endif
         } catch (const std::exception&) {
             try {
+#ifdef USING_ASSIMP_AS_IMPORTER
+                model = ResourceManager::Load<::Model>("Models/WidgetPlaneZ.obj"); // 360NoScope Error mesh
+#else
                 model = ResourceManager::Load<::Model>("Models/coolCube.mesh"); // 360NoScope Error mesh
+#endif
             } catch (const std::exception&) {
                 continue;
             }

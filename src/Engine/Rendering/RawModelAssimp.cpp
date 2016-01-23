@@ -1,6 +1,8 @@
 #include "Rendering/RawModelAssimp.h"
 
-RawModel::RawModel(std::string fileName)
+#ifdef USING_ASSIMP_AS_IMPORTER
+
+RawModelAssimp::RawModelAssimp(std::string fileName)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(fileName, aiProcess_CalcTangentSpace | aiProcess_Triangulate);
@@ -271,16 +273,17 @@ RawModel::RawModel(std::string fileName)
 
 		m_Skeleton->Animations[animationName] = skelAnim;
 	}
+    int k = 0;
 }
 
-RawModel::~RawModel()
+RawModelAssimp::~RawModelAssimp()
 {
 	if (m_Skeleton) {
 		delete m_Skeleton;
 	}
 }
 
-void RawModel::CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID)
+void RawModelAssimp::CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID)
 {
 	std::string nodeName = node->mName.C_Str();
 
@@ -300,3 +303,5 @@ void RawModel::CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &b
 		CreateSkeleton(boneInfo, boneNameMapping, child, parentID);
 	}
 }
+
+#endif

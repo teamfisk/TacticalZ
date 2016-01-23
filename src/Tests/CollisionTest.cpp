@@ -27,7 +27,9 @@ using boost::unit_test_framework::test_case;
 void RayTest(std::string fileName) {
     //simple box test
     Ray ray(glm::vec3(-50, 0, 0), glm::vec3(1, 0, 0));
-    //using a rawmodel here, else we have to init the renderingsystem
+    //using a 
+    
+    here, else we have to init the renderingsystem
     ResourceManager::RegisterType<RawModel>("RawModel");
     auto unitBox = ResourceManager::Load<RawModel>(fileName);
     BOOST_REQUIRE(unitBox != nullptr);

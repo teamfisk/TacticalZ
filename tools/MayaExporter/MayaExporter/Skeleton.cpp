@@ -64,6 +64,7 @@ std::string attr[9] = { "scaleX", "scaleY", "scaleZ", "translateX", "translateY"
 
 Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int endFrame)
 {
+    MStatus status;
     std::vector<MObject> animatedJoints;
     std::vector<MObject> m_Hierarchy;
 
@@ -121,7 +122,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 					MFnMatrixData MartixFn(DataHandle.data());
 					MMatrix BindPoseMatrix = MartixFn.matrix();
 
-					if (BindPoseMatrix != MayaJoint.transformationMatrix())
+					if (!BindPoseMatrix.isEquivalent(MayaJoint.transformationMatrix()))
 					{
 						MGlobal::displayError(MString() + animationName.c_str() + " is using " + MayaJoint.name() + " that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
 					}
@@ -153,19 +154,43 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 				MGlobal::displayError(MString() + "Could not find joint ID for: " + thisJoint.name());
 			}
 			
-			MMatrix Matrix = thisJoint.transformationMatrix();
-			
+			MTransformationMatrix Matrix = thisJoint.transformation();
+            MPlug BindPose = thisJoint.findPlug("bindPose");
+            MDataHandle DataHandle;
+            BindPose.getValue(DataHandle);
+            MFnMatrixData MartixFn(DataHandle.data());
+            MMatrix BindPoseMatrix = MartixFn.matrix();
+            Matrix = Matrix.asMatrix();
+            
+            MObject jointOrientObj = thisJoint.attribute("jointOrient");
+            MFnNumericAttribute jointOrient(jointOrientObj);
+            double jointOrientDouble[3];
+            jointOrient.getDefault(jointOrientDouble[0], jointOrientDouble[1], jointOrientDouble[2]);
+            //MGlobal::displayError(MString() + "Joint Matrix: ");
+            //MGlobal::displayError(MString() + Matrix.asMatrix()[0][0] + " " + Matrix.asMatrix()[0][1] + " " + Matrix.asMatrix()[0][2] + " " + Matrix.asMatrix()[0][3]);
+            //MGlobal::displayError(MString() + Matrix.asMatrix()[1][0] + " " + Matrix.asMatrix()[1][1] + " " + Matrix.asMatrix()[1][2] + " " + Matrix.asMatrix()[1][3]);
+            //MGlobal::displayError(MString() + Matrix.asMatrix()[2][0] + " " + Matrix.asMatrix()[2][1] + " " + Matrix.asMatrix()[2][2] + " " + Matrix.asMatrix()[2][3]);
+            //MGlobal::displayError(MString() + Matrix.asMatrix()[3][0] + " " + Matrix.asMatrix()[3][1] + " " + Matrix.asMatrix()[3][2] + " " + Matrix.asMatrix()[3][3]);
+
+            MEulerRotation joEuler(jointOrientDouble[0], jointOrientDouble[1], jointOrientDouble[2]);
+            MQuaternion jo = joEuler.asQuaternion();
+
 			double tmp[4];
-			thisJoint.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
+            Matrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
+            MQuaternion rotation(tmp);
+
+            rotation = rotation * jo;
+            rotation.get(tmp);
+
 			joint.Rotation[0] = tmp[0];
 			joint.Rotation[1] = tmp[1];
 			joint.Rotation[2] = tmp[2];
 			joint.Rotation[3] = tmp[3];
-			thisJoint.getTranslation(MSpace::kPreTransform).get(tmp);
+            Matrix.getTranslation(MSpace::kTransform).get(tmp);
 			joint.Position[0] = tmp[0];
 			joint.Position[1] = tmp[1];
 			joint.Position[2] = tmp[2];
-			thisJoint.getScale(tmp);
+            Matrix.getScale(tmp, MSpace::kTransform);
 			joint.Scale[0] = tmp[0];
 			joint.Scale[1] = tmp[1];
 			joint.Scale[2] = tmp[2];
@@ -184,6 +209,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 
 std::vector<BindPoseSkeletonNode> Skeleton::GetBindPoses()
 {
+    MStatus status;
 	std::vector<BindPoseSkeletonNode> m_AllSkeletons;
 	std::vector<MObject> m_Hierarchy;
 
@@ -214,11 +240,75 @@ std::vector<BindPoseSkeletonNode> Skeleton::GetBindPoses()
 		}
 		m_Hierarchy.push_back(MayaJoint.object());
 
-		MPlug BindPose = MayaJoint.findPlug("bindPose");
+		MPlug BindPose = MayaJoint.findPlug("bindPose", &status);
+        if (status != MS::kSuccess) { 
+            MGlobal::displayError(MString() + "Could not find bindPose plug: " + status.errorString());
+        }
 		MDataHandle DataHandle;
 		BindPose.getValue(DataHandle);
 		MFnMatrixData MartixFn(DataHandle.data());
 		MMatrix Matrix = MartixFn.matrix();
+
+
+        MVector tmp = MayaJoint.transformation().getTranslation(MSpace::kObject);
+        MGlobal::displayError(MString() + "translation befor: " + tmp[0] + " " + tmp[1] + " " + tmp[2]);
+        //Matrix[3][0] *= -1;
+        //Matrix[3][2] *= -1;
+        //Matrix[3][1] *= -1;
+
+        double test[3];
+        MayaJoint.transformation().getScale(test, MSpace::kObject);
+        MGlobal::displayError(MString() + "scale: " + test[0] + " " + test[1] + " " + test[2]);
+
+        MTransformationMatrix::RotationOrder order = MTransformationMatrix::RotationOrder::kXYZ;
+        MayaJoint.transformation().getRotation(test, order);
+        MGlobal::displayError(MString() + "rotation: " + test[0] + " " + test[1] + " " + test[2]);
+       
+        //----- test
+
+
+        //MDataHandle DataHandle;
+        //MObject jointObject(jointIt.currentItem());
+        //MFnDependencyNode jointDependNode(jointObject);
+        //MPlug worldMatrixArray(jointObject, jointDependNode.attribute("worldMatrix"));
+
+        //MMatrix Matrix;
+        //for (int i = 0; i < worldMatrixArray.numElements(); i++) {
+        //    MPlugArray connections;
+
+        //    MPlug element = worldMatrixArray[i];
+        //    unsigned int logicalIndex = element.logicalIndex();
+
+        //    MItDependencyGraph it(element, MFn::kSkinClusterFilter);
+
+        //    for (; !it.isDone(); it.next()) {
+        //        MFnSkinCluster skinCluster(it.thisNode());
+
+        //        MPlug bindPreMatrixArrayPlug =
+        //            skinCluster.findPlug("bindPreMatrix", &status);
+
+        //        if (status != MS::kSuccess) {
+        //            MGlobal::displayError(MString() + "Could not find bindPreMatrix plug: " + status.errorString());
+        //            break;
+        //        }
+
+        //        MPlug bindPreMatrixPlug =
+        //            bindPreMatrixArrayPlug.elementByLogicalIndex(logicalIndex);
+        //        MObject dataObject;
+        //        bindPreMatrixPlug.getValue(dataObject);
+
+        //        MFnMatrixData matDataFn(dataObject);
+
+        //        MMatrix invMat = matDataFn.matrix();
+        //        Matrix = invMat.inverse();
+        //    }
+        //}
+
+
+        //----- end test
+
+
+        Matrix = Matrix.inverse();
 
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {

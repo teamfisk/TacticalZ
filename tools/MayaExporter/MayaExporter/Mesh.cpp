@@ -68,7 +68,6 @@ std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
                 break;
             }
             MFnDependencyNode test(comp);
-
             unsigned int nrOfWeights = 0;
 
             for (unsigned int j = 0; j < weights.length() && nrOfWeights != 4; j++) {
@@ -90,7 +89,7 @@ std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
 
 
             for (unsigned int k = 0; k!=nrOfWeights; k++) {
-                //MGlobal::displayInfo(MString() + "influence: " + weightInfo.BoneIndices[k] + " weight: " + weightInfo.BoneWeights[k]);
+                MGlobal::displayInfo(MString() + "influence: " + weightInfo.BoneIndices[k] + " weight: " + weightInfo.BoneWeights[k]);
             }
             geomIter.next();
         }
@@ -108,6 +107,26 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
     for (int ObjectID = 0; ObjectID < object.length(); ObjectID++) {
         if (!object[ObjectID].hasFn(MFn::kMesh))
             continue;
+
+        MObject node = object[ObjectID];
+        MFnDependencyNode thisNode(node);
+        MPlugArray connections;
+        thisNode.findPlug("inMesh").connectedTo(connections, true, true);
+        MGlobal::displayInfo(MString() + "inMesh");
+        bool hasSkin = false;
+        MPlug weightList, weights;
+        MObject weightListObject;
+        for (unsigned int i = 0; i < connections.length(); i++) {
+            if (connections[i].node().apiType() == MFn::kSkinClusterFilter) {
+                MFnSkinCluster skinCluster(connections[i].node());
+                weightList = skinCluster.findPlug("weightList", &status);
+                weightListObject = weightList.attribute();
+                weights = skinCluster.findPlug("weights");
+                hasSkin = true;
+                break;
+            }
+        }
+
 
         // In here, we retrieve triangulated polygons from the mesh
         MFnMesh mesh(object[ObjectID]);
@@ -178,7 +197,7 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                 }
             }
 
-            map<int, WeightInfo> vertexWeights = GetWeightData();
+           // map<int, WeightInfo> vertexWeights = GetWeightData();
             status = mesh.getTangents(Tangents, MSpace::kObject);
             if (status != MS::kSuccess) {
                 MGlobal::displayError(MString() + "mesh.getTangents ERROR: " + status.errorString()  + " for " + thisMeshPath.fullPathName());
@@ -288,26 +307,24 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         thisVertex.Uv[0] = UV[0];
                         thisVertex.Uv[1] = UV[1];
 
-                        thisVertex.BoneIndices[0] = vertexWeights[faceVert.vertId()].BoneIndices[0];
-                        thisVertex.BoneIndices[1] = vertexWeights[faceVert.vertId()].BoneIndices[1];
-                        thisVertex.BoneIndices[2] = vertexWeights[faceVert.vertId()].BoneIndices[2];
-                        thisVertex.BoneIndices[3] = vertexWeights[faceVert.vertId()].BoneIndices[3];
-                        if (abs(vertexWeights[faceVert.vertId()].BoneWeights[0]) > 0.0001)
-                            thisVertex.BoneWeights[0] = vertexWeights[faceVert.vertId()].BoneWeights[0];
-                        if (abs(vertexWeights[faceVert.vertId()].BoneWeights[1]) > 0.0001)
-                            thisVertex.BoneWeights[1] = vertexWeights[faceVert.vertId()].BoneWeights[1];
-                        if (abs(vertexWeights[faceVert.vertId()].BoneWeights[2]) > 0.0001)
-                            thisVertex.BoneWeights[2] = vertexWeights[faceVert.vertId()].BoneWeights[2];
-                        if (abs(vertexWeights[faceVert.vertId()].BoneWeights[3]) > 0.0001)
-                            thisVertex.BoneWeights[3] = vertexWeights[faceVert.vertId()].BoneWeights[3];
-
-                        float totalWeight = thisVertex.BoneWeights[0] + thisVertex.BoneWeights[1] + thisVertex.BoneWeights[2] + thisVertex.BoneWeights[3];
-                        if (totalWeight < 1.00f && totalWeight > 0.01f) {
-                            thisVertex.BoneWeights[0] /= totalWeight;
-                            thisVertex.BoneWeights[1] /= totalWeight;
-                            thisVertex.BoneWeights[2] /= totalWeight;
-                            thisVertex.BoneWeights[3] /= totalWeight;
+                        
+                        if (hasSkin) {
+                            MIntArray jointIDs /* ??? */;
+                            weights.selectAncestorLogicalIndex(vertexIndex, weightListObject);
+                            weights.getExistingArrayAttributeIndices(jointIDs);
+                            for (unsigned int i = 0; i < jointIDs.length() && i < 4; i++) {
+                                thisVertex.BoneIndices[i] = jointIDs[i];
+                                thisVertex.BoneWeights[i] = weights[i].asFloat();
+                            }
                         }
+
+                        //float totalWeight = thisVertex.BoneWeights[0] + thisVertex.BoneWeights[1] + thisVertex.BoneWeights[2] + thisVertex.BoneWeights[3];
+                        //if (totalWeight > 0.0001f) {
+                        //    thisVertex.BoneWeights[0] /= totalWeight;
+                        //    thisVertex.BoneWeights[1] /= totalWeight;
+                        //    thisVertex.BoneWeights[2] /= totalWeight;
+                        //    thisVertex.BoneWeights[3] /= totalWeight;
+                        //}
 
                         std::vector<VertexLayout>::iterator it = std::find(vertexList.begin(), vertexList.end(), thisVertex);
                         array<unsigned int, 2> tmp;

@@ -60,7 +60,7 @@ Menu::Menu(QDialog* dialog)
 
 	m_ExportPath = new QLineEdit;
 	m_FileDialog = new QFileDialog;
-    QString tmpPath("C:/Users/Nickelodion/Desktop/Baljj");
+    QString tmpPath("C:/Users/Nickelodion/Desktop/animTest");
     m_ExportPath->setText(tmpPath);
 	QLabel* exportLabel = new QLabel;
 	exportLabel->setText("Export Path:");
@@ -175,6 +175,13 @@ void Menu::ExportAll(bool)
         return;
     }
 
+    if (m_ExportMaterialButton->isChecked()) {
+        if (!m_Export.Materials(m_ExportPath->text().toLocal8Bit().constData())) {
+            MGlobal::displayError(MString() + "Could not export materials");
+            return;
+        }
+    }
+
     std::vector<Export::AnimationInfo> animations;
     for (unsigned int i = 0; i < m_AnimationClipName.size(); i++) {
         Export::AnimationInfo thisClip;
@@ -188,13 +195,6 @@ void Menu::ExportAll(bool)
         //Export Animations
         if (!m_Export.Animations(m_ExportPath->text().toLocal8Bit().constData(), animations)) {
             MGlobal::displayError(MString() + "Could not export animations");
-            return;
-        }
-    }
-
-    if (m_ExportMaterialButton->isChecked()) {
-        if (!m_Export.Materials(m_ExportPath->text().toLocal8Bit().constData())){ 
-            MGlobal::displayError(MString() + "Could not export materials");
             return;
         }
     }

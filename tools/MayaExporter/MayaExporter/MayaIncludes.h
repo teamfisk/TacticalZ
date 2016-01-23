@@ -42,6 +42,9 @@
 #include <maya/MItGeometry.h>
 #include <maya/MItMeshVertex.h>
 #include <maya/MFnWeightGeometryFilter.h>
+#include <maya/MItDependencyGraph.h>
+#include <maya/MQuaternion.h>
+#include <maya/MFnNumericAttribute.h>
 
 
 // Wrappers

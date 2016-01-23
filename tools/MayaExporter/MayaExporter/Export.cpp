@@ -7,26 +7,56 @@ Export::Export()
 
 bool Export::Meshes(std::string pathName, bool selectedOnly)
 { 
+    MStatus status;
     if (pathName.empty()) {
         MGlobal::displayError(MString() + "Export::Meshes() got no pathName. Do not know where to write file");
         return false;
     }
+
     MSelectionList selectedOnStart;
     MGlobal::getActiveSelectionList(selectedOnStart);
-   
+    if (selectedOnStart.length() > 0) {
+        for (int i = 0; i < selectedOnStart.length(); i++) {
+            MObject item;
+            selectedOnStart.getDependNode(i, item);
+            MGlobal::unselect(item);
+        }
+    }
+    MGlobal::displayInfo(MString() + "Disabel IKSolvers");
+    status = MGlobal::executeCommand("doEnableNodeItems false all;");
+    if (status != MS::kSuccess) {
+        MGlobal::displayError(MString() + "EnableNodeItems false all failed: " + status.errorString());
+    }
+    MGlobal::displayInfo(MString() + "Has disabel IKSolvers");
     MObjectArray Objects;
     if (selectedOnly) {
         // Retrieving the objects we currently have selected
-        MSelectionList selected;
-        MGlobal::getActiveSelectionList(selected);
 
         // Loop through or list of selection(s)
-        for (unsigned int i = 0; i < selected.length(); i++) {
+        for (unsigned int i = 0; i < selectedOnStart.length(); i++) {
             MObject object;
-            selected.getDependNode(i, object);
+            selectedOnStart.getDependNode(i, object);
 
             if (object.hasFn(MFn::kMesh)) {
-                MFnDependencyNode thisNode(object);
+                MFnMesh shape(object);
+                
+                for (unsigned int k = 0; k < shape.parentCount(); k++) {                 
+                    MFnDependencyNode thisNode(object);
+                    MPlugArray connections;
+                    thisNode.findPlug("inMesh").connectedTo(connections, true, true);
+
+                    for (unsigned int i = 0; i < connections.length(); i++) {
+                        if (connections[i].node().apiType() == MFn::kSkinClusterFilter) {
+                            MGlobal::select(shape.parent(i), MGlobal::kReplaceList);
+                            MGlobal::displayInfo(MString() + "Moving " + thisNode.name() + " to bindPose.");
+                            status = MGlobal::executeCommand("GoToBindPose;");
+                            if (status != MS::kSuccess) {
+                                MGlobal::displayError(MString() + "GoToBindPose: " + status.errorString());
+                            }
+                            MGlobal::displayInfo(MString() + "Has moved " + thisNode.name() + " to bindPose.");
+                        }
+                    }
+                }
                 Objects.append(object);
             }
         }
@@ -42,7 +72,9 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
             for (unsigned int i = 0; i < connections.length(); i++) {
                 if (connections[i].node().apiType() == MFn::kSkinClusterFilter) {
                     MGlobal::select(node);
-                    MGlobal::executeCommand("gotoBindPose");
+                    MGlobal::displayInfo(MString() + "Moving " + thisNode.name() + " to bindPose.");
+                    MGlobal::executeCommand("GoToBindPose");
+                    MGlobal::displayInfo(MString() + "Has moved " + thisNode.name() + " to bindPose.");
                 }
             }
 
@@ -51,6 +83,19 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
     }
     GetMeshData(Objects);
     WriteMeshData(pathName);
+    MGlobal::displayInfo(MString() + "Enabling IKSolvers");
+    status = MGlobal::executeCommand("doEnableNodeItems true all;");
+    if (status != MS::kSuccess) {
+        MGlobal::displayError(MString() + "doEnableNodeItems true all: " + status.errorString());
+    }
+    MGlobal::displayInfo(MString() + "Has enabling IKSolvers");
+    if (selectedOnStart.length() > 0) {
+        for (int i = 0; i < selectedOnStart.length(); i++) {
+            MObject item;
+            selectedOnStart.getDependNode(i, item);
+            MGlobal::select(item);
+        }
+    }
     return true;
 }
 

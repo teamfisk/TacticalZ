@@ -4,6 +4,7 @@
 #include <sstream>
 #include "Common.h"
 #include "../GLM.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 //struct Bone
 //{

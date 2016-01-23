@@ -292,21 +292,33 @@ void EditorSystem::createWidget()
         m_WidgetPlaneX = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneX, "Transform");
         m_World->AttachComponent(m_WidgetPlaneX, "Model");
+#ifdef USING_ASSIMP_AS_IMPORTER
+        m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/WidgetPlaneZ.obj"; // 360NoScope widgetPlaneX
+#else
         m_World->GetComponent(m_WidgetPlaneX, "Model")["Resource"] = "Models/coolCube.mesh"; // 360NoScope widgetPlaneX
+#endif
         m_WidgetY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetY, "Transform");
         m_World->AttachComponent(m_WidgetY, "Model");
         m_WidgetPlaneY = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneY, "Transform");
         m_World->AttachComponent(m_WidgetPlaneY, "Model");
+#ifdef USING_ASSIMP_AS_IMPORTER
+        m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/WidgetPlaneZ.obj"; // 360NoScope  widgetPlaneY
+#else
         m_World->GetComponent(m_WidgetPlaneY, "Model")["Resource"] = "Models/coolCube.mesh"; // 360NoScope  widgetPlaneY
+#endif
         m_WidgetZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetZ, "Transform");
         m_World->AttachComponent(m_WidgetZ, "Model");
         m_WidgetPlaneZ = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetPlaneZ, "Transform");
         m_World->AttachComponent(m_WidgetPlaneZ, "Model");
+#ifdef USING_ASSIMP_AS_IMPORTER
+        m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/WidgetPlaneZ.obj"; // 360NoScope  widgetPlaneZ
+#else
         m_World->GetComponent(m_WidgetPlaneZ, "Model")["Resource"] = "Models/coolCube.mesh"; // 360NoScope  widgetPlaneZ
+#endif
         m_WidgetOrigin = m_World->CreateEntity(m_Widget);
         m_World->AttachComponent(m_WidgetOrigin, "Transform");
         m_World->AttachComponent(m_WidgetOrigin, "Model");

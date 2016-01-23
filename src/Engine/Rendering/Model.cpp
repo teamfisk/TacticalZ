@@ -15,6 +15,9 @@ Model::Model(std::string fileName)
         if (!group.SpecularMapPath.empty()) {
             group.SpecularMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.SpecularMapPath));
         }
+        if (!group.IncandescenceMapPath.empty()) {
+            group.IncandescenceMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.IncandescenceMapPath));
+        }
     }
 
     // Generate GL buffers

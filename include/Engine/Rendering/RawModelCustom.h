@@ -1,6 +1,10 @@
 #ifndef RawModelCustom_h__
 #define RawModelCustom_h__
 
+#ifndef USING_ASSIMP_AS_IMPORTER
+
+#define RawModel RawModelCustom
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -17,15 +21,17 @@
 
 #include "boost\endian\buffers.hpp"
 
-class RawModel : public Resource
+
+
+class RawModelCustom : public Resource
 {
     friend class ResourceManager;
 
 protected:
-    RawModel(std::string fileName);
+    RawModelCustom(std::string fileName);
 
 public:
-    ~RawModel();
+    ~RawModelCustom();
     
     struct Vertex
     {
@@ -85,4 +91,9 @@ private:
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
 
+#else
+
+#include "RawModelAssimp.h"
+
+#endif
 #endif

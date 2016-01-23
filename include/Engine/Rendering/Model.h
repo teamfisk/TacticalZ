@@ -1,7 +1,8 @@
 #ifndef Model_h__
 #define Model_h__
 
-#include "RawModelCustom.h"
+#include "Rendering/RawModelCustom.h"
+//#include "Rendering/RawModelAssimp.h"
 #include "../OpenGL.h"
 
 class Model : public ThreadUnsafeResource

@@ -1,6 +1,8 @@
 #include "Rendering/RawModelCustom.h"
 
-RawModel::RawModel(std::string fileName)
+#ifndef USING_ASSIMP_AS_IMPORTER
+
+RawModelCustom::RawModelCustom(std::string fileName)
 {
     fileName = fileName.erase(fileName.find_last_of("."), fileName.find_last_of(".") - fileName.size());
     ReadMeshFile(fileName);
@@ -9,7 +11,7 @@ RawModel::RawModel(std::string fileName)
     int k = 0;
 }
 
-void RawModel::ReadMeshFile(std::string filePath)
+void RawModelCustom::ReadMeshFile(std::string filePath)
 { 
     char* fileData;
     filePath += ".mesh";
@@ -33,7 +35,7 @@ void RawModel::ReadMeshFile(std::string filePath)
     delete fileData;
 }
 
-void RawModel::ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     m_Vertices.resize(*(unsigned int*)(fileData + offset));
@@ -44,13 +46,13 @@ void RawModel::ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned
 #endif
 }
 
-void RawModel::ReadMesh(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMesh(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
     ReadVertices(offset, fileData, fileByteSize);
     ReadIndices(offset, fileData, fileByteSize);
 }
 
-void RawModel::ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     if (offset +  m_Vertices.size() * sizeof(Vertex) > fileByteSize) {
@@ -63,7 +65,7 @@ void RawModel::ReadVertices(unsigned int& offset, char* fileData, unsigned int& 
 #endif
 }
 
-void RawModel::ReadIndices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadIndices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     if (offset + m_Indices.size() * sizeof(unsigned int) > fileByteSize) {
@@ -77,7 +79,7 @@ void RawModel::ReadIndices(unsigned int& offset, char* fileData, unsigned int& f
 #endif
 }
 
-void RawModel::ReadMaterialFile(std::string filePath)
+void RawModelCustom::ReadMaterialFile(std::string filePath)
 { 
     char* fileData;
     filePath += ".mtrl";
@@ -100,7 +102,7 @@ void RawModel::ReadMaterialFile(std::string filePath)
     delete fileData;
 }
 
-void RawModel::ReadMaterials(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMaterials(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 { 
 #ifdef BOOST_LITTLE_ENDIAN
     unsigned int* numMaterials = (unsigned int*)(fileData);
@@ -114,7 +116,7 @@ void RawModel::ReadMaterials(unsigned int& offset, char* fileData, unsigned int&
 #endif
 }
 
-void RawModel::ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
 { 
     MaterialGroup newMaterial;
 
@@ -189,7 +191,7 @@ void RawModel::ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned
     MaterialGroups.push_back(newMaterial);
 }
 
-void RawModel::ReadAnimationFile(std::string filePath)
+void RawModelCustom::ReadAnimationFile(std::string filePath)
 { 
     char* fileData;
     filePath += ".anim";
@@ -214,7 +216,7 @@ void RawModel::ReadAnimationFile(std::string filePath)
 #ifdef BOOST_LITTLE_ENDIAN
         unsigned int numBindPoses = *(unsigned int*)(fileData);
         offset += sizeof(unsigned int);
-        unsigned int numAnimations = *(unsigned int*)(fileData);
+        unsigned int numAnimations = *(unsigned int*)(fileData + offset);
         offset += sizeof(unsigned int);
 #else
 #endif
@@ -225,7 +227,7 @@ void RawModel::ReadAnimationFile(std::string filePath)
     delete fileData;
 }
 
-void RawModel::ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     unsigned int* numBones = (unsigned int*)(fileData + offset);
@@ -238,7 +240,7 @@ void RawModel::ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsi
 #endif
 }
 
-void RawModel::ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     if (offset + sizeof(unsigned int) > fileByteSize) {
@@ -259,7 +261,7 @@ void RawModel::ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned
     glm::mat4 offsetMatrix;
     memcpy(&offsetMatrix, fileData + offset, sizeof(float) * 4 * 4);
     offset += sizeof(float) * 4 * 4;
-
+    
     if (offset + sizeof(int) > fileByteSize) { 
         throw Resource::FailedLoadingException("Reading Joint ID failed");
     }
@@ -280,14 +282,14 @@ void RawModel::ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned
 #endif
 }
 
-void RawModel::ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips)
+void RawModelCustom::ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips)
 {
     for (unsigned int i = 0; i < numberOfClips; i++) {
         ReadAnimationClipSingle(offset, fileData, fileByteSize, i);
     }
 }
 
-void RawModel::ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex)
+void RawModelCustom::ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     Skeleton::Animation newAnimation;
@@ -332,7 +334,7 @@ void RawModel::ReadAnimationClipSingle(unsigned int &offset, char* fileData, uns
 #endif
 }
 
-void RawModel::ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int nrOfJoints, Skeleton::Animation& animation)
+void RawModelCustom::ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int nrOfJoints, Skeleton::Animation& animation)
 {
     Skeleton::Animation::Keyframe newKeyFrame;
 
@@ -356,12 +358,16 @@ void RawModel::ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsig
     for (unsigned int i = 0; i < nrOfJoints; i++) {
         memcpy(&newBone, (fileData + offset), sizeof(Skeleton::Animation::Keyframe::BoneProperty));
         offset += sizeof(Skeleton::Animation::Keyframe::BoneProperty);
-        newKeyFrame.BoneProperties[i] = newBone;
+        newKeyFrame.BoneProperties[newBone.ID] = newBone;
     }
     animation.Keyframes.push_back(newKeyFrame);
 }
 
-RawModel::~RawModel()
+RawModelCustom::~RawModelCustom()
 {
-
+    if (m_Skeleton != nullptr) {
+        delete m_Skeleton;
+    }
 }
+
+#endif
