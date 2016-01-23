@@ -23,8 +23,8 @@ void DrawFinalPass::InitializeFrameBuffers()
 
     GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_FLOAT, 4);
+    GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RGB16F, GL_FLOAT, 4);
     
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
@@ -97,6 +97,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
     }
     m_FinalPassFrameBuffer.Unbind();
     GLERROR("DrawFinalPass::Draw: END");
+    delete state;
 }
 
 

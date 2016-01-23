@@ -1,9 +1,9 @@
 #include "Rendering/TextPassState.h"
 
 
-TextPassState::TextPassState()
+TextPassState::TextPassState(GLuint frameBuffer)
 {
-    BindFramebuffer(0);
+    BindFramebuffer(frameBuffer);
     glEnable(GL_BLEND);
     glDisable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
