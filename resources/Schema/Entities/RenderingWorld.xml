@@ -6,33 +6,126 @@
   </Components>
 
   <Children>
-    <Entity>
+    <Entity name="Player">
       <Components>
-        <c:Camera>
-          <Name>ActionCamera</Name>
-        </c:Camera>
-        <c:Model>
-          <Resource>Models/Camera.obj</Resource>
-        </c:Model>
+        <c:Health>
+          <Health>69.990005493164063</Health>
+        </c:Health>
+        <c:Player/>
         <c:Transform>
-          <Position X="-0.504807115" Y="6.00582743" Z="9.68687439"/>
-          <Orientation X="-0.733036518" Y="0.000105090476" Z="5.12391125e-07"/>
+          <Position X="0" Y="0" Z="2.5"/>
         </c:Transform>
       </Components>
       <Children>
-        <Entity>
+        <Entity name="Model">
           <Components>
-            <c:Text>
-              <Content>Camera #2</Content>
-              <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Alignment>0</Alignment>
-            </c:Text>
+            <c:Model>
+              <Resource>Models/Assault.obj</Resource>
+            </c:Model>
             <c:Transform>
-              <Position X="0.700063765" Y="0.310270816" Z="-1"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+              <Orientation X="0" Y="3.14159203" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
+        </Entity>
+        <Entity name="Camera">
+          <Components>
+            <c:Camera>
+              <FOV>80</FOV>
+            </c:Camera>
+            <c:Model>
+              <Resource>Models/Camera.obj</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="1.39121652" Z="-0.043014247"/>
+              <Orientation X="6.28300047" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="HUD">
+              <Components>
+                <c:Transform>
+                  <Position X="0" Y="-0.000463247066" Z="-0.744767368"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Hexagon">
+                  <Components>
+                    <c:HealthHUD/>
+                    <c:Fill>
+                      <Percentage>0.69990003108978271</Percentage>
+                      <Color A="0" B="0.699900031" G="0" R="0.300099969"/>
+                    </c:Fill>
+                    <c:Model>
+                      <Resource>Models/Core/UnitHexagon.obj</Resource>
+                      <Color A="0.313725501" B="0.70588237" G="0.70588237" R="0.70588237"/>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-0.287027329" Y="-0.282350302" Z="-1.52214652e-05"/>
+                      <Scale X="0.200000003" Y="0.200000003" Z="0.5"/>
+                      <Orientation X="0" Y="0.666000009" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="Hexagon2">
+                      <Components>
+                        <c:Model>
+                          <Resource>Models/Core/UnitHexagon.obj</Resource>
+                          <Color A="0.392156869" B="1" G="1" R="1"/>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="0.120033145" Y="0.0776480734" Z="-1.56768795e-06"/>
+                          <Scale X="0.5" Y="0.5" Z="0.5"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="SelectedWeaponUI">
+                          <Components>
+                            <c:Model>
+                              <Resource>Models/SecondaryWeapon.fbx</Resource>
+                              <Color A="0.784313738" B="1" G="1" R="1"/>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="-0.00400000019" Y="0.0138316695" Z="0.00813383237"/>
+                              <Scale X="2" Y="2" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Hexagon3">
+                      <Components>
+                        <c:Model>
+                          <Resource>Models/Core/UnitHexagon.obj</Resource>
+                          <Color A="0.392156869" B="1" G="1" R="1"/>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="0.119999997" Y="-0.0780000016" Z="0"/>
+                          <Scale X="0.5" Y="0.5" Z="0.5"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="UnselectedWeaponUI">
+                          <Components>
+                            <c:Model>
+                              <Resource>Models/SecondaryWeapon.fbx</Resource>
+                              <Color A="0.588235319" B="0" G="0" R="0"/>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="-0.00400000019" Y="0.0136327185" Z="0.00800000038"/>
+                              <Scale X="2" Y="2" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>
@@ -42,7 +135,7 @@
           <Resource>Models/Core/UnitPlane.obj</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="-1" Z="0.600000024"/>
+          <Position X="0" Y="-0.689623177" Z="0.600000024"/>
           <Scale X="100" Y="1" Z="100"/>
         </c:Transform>
       </Components>
@@ -79,7 +172,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="0" Y="2.37320328" Z="0"/>
-          <Orientation X="0" Y="8252.15918" Z="0"/>
+          <Orientation X="0" Y="14039.5469" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -197,38 +290,6 @@
         </c:Transform>
       </Components>
       <Children/>
-    </Entity>
-    <Entity>
-      <Components>
-        <c:Camera>
-          <Name>MainCamera</Name>
-        </c:Camera>
-        <c:Listener/>
-        <c:Model>
-          <Resource>Models/Camera.obj</Resource>
-          <Visible>false</Visible>
-        </c:Model>
-        <c:Transform>
-          <Position X="-1.27354908" Y="5.18422079" Z="10.6223917"/>
-          <Orientation X="-0.436328411" Y="-0.0523675606" Z="1.67869363e-08"/>
-        </c:Transform>
-      </Components>
-      <Children>
-        <Entity>
-          <Components>
-            <c:Text>
-              <Content>Taiwan #1</Content>
-              <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Alignment>0</Alignment>
-            </c:Text>
-            <c:Transform>
-              <Position X="0.716896772" Y="0.296712071" Z="-1"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
     </Entity>
     <Entity>
       <Components>

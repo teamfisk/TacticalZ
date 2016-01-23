@@ -10,6 +10,7 @@
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/WeaponSystem.h"
+#include "Game/Systems/PlayerHUD.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -86,6 +87,8 @@ Game::Game(int argc, char* argv[])
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
+
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);

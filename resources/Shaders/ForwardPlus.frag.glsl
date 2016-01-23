@@ -6,6 +6,8 @@ uniform mat4 P;
 uniform vec4 Color;
 uniform vec2 ScreenDimensions;
 uniform sampler2D texture0;
+uniform vec4 FillColor;
+uniform float FillPercentage;
 
 #define TILE_SIZE 16
 
@@ -133,6 +135,13 @@ void main()
 
 	//fragmentColor += Input.DiffuseColor;
 	fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
+
+	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
+
+	if(pos <= FillPercentage) {
+		fragmentColor += FillColor;
+	}
+
 	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
 	//fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
 	//fragmentColor = texel * Input.DiffuseColor * Color;

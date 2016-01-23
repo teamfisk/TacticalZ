@@ -23,4 +23,6 @@
 	<xs:include schemaLocation="Components/Team.xsd"/>
 	<xs:include schemaLocation="Components/UniformScale.xsd"/>
 	<xs:include schemaLocation="Components/EditorWidget.xsd"/>
+	<xs:include schemaLocation="Components/HealthHUD.xsd"/>
+	<xs:include schemaLocation="Components/Fill.xsd"/>
 </xs:schema>
