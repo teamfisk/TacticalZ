@@ -56,6 +56,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
         glm::vec3 resolutionVector;
         if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, resolutionVector)) {
             (glm::vec3&)cTransform["Position"] += resolutionVector;
+            cPhysics["Velocity"] = glm::vec3(0, 0, 0);
         }
     }
 }

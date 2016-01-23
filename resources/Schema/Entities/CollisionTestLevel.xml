@@ -1,122 +1,66 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
-<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xi="http://www.w3.org/2001/XInclude" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd" xmlns:c="components">
-	<Components>
-		<c:Transform>
-			<Orientation X="0" Y="0" Z="0"/>
-		</c:Transform>
-		<c:Model>
-			<Resource>Models/DummyScene.obj</Resource>
-		</c:Model>
-	</Components>
-	<Children>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="-1.5"/>
-					<Scale X="1" Y="1" Z="1"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/Core/UnitSphere.obj</Resource>
-				</c:Model>
-			</Components>
-		</Entity>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="1.5"/>
-					<Scale X="2" Y="2" Z="2"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/RotationWidgetX.obj</Resource>
-				</c:Model>
-				<c:Trigger>
-				</c:Trigger>
-			</Components>
-		</Entity>
-		<Entity>
-			<Components>
-				<c:Player>
-					<Velocity X="0" Y="0" Z="0"/>
-				</c:Player>
-				<c:Transform>
-					<Position X="2.5"/>
-				</c:Transform>
-				<c:Model>
-					<Resource>Models/Core/UnitCube.obj</Resource>
-				</c:Model>
-				<c:AABB>
-				</c:AABB>
-			</Components>
-		</Entity>
-		<Entity>
-			<Components>
-				<c:Transform>
-					<Position X="0" Y="-0"/>
-					<Scale X="1" Y="1" Z="1"/>
-				</c:Transform>
-				<!--<c:Move>
-					<Speed>1</Speed>
-					<Direction X="-1"/>
-					<Rotation Y="3.14"/>
-				</c:Move>-->
-			</Components>
-			<Children>
-				<Entity>
-					<Components>
-						<c:Transform>
-							<Position X="0" Y="0"/>
-							<Orientation X="0.0" Y="0" Z="1.0"/>
-						</c:Transform>
-						<c:Model>
-							<Resource>Models/Core/UnitRaptor.obj</Resource>
-							<Color R="1" G="0.4" B="0.8"/>
-						</c:Model>
-					</Components>
-					<Children>
-						<Entity>
-							<Components>
-								<c:Transform>
-									<Position X="-0.01" Y="0.55"/>
-									<Orientation X="0" Y="0" Z="-1"/>
-								</c:Transform>
-								<c:RaptorCopter>
-									<Speed>20</Speed>
-									<Axis Y="1"/>
-								</c:RaptorCopter>
-							</Components>
-							<Children>
-								<Entity>
-									<Components>
-										<c:Transform>
-											<Position X="0" Y="0"/>
-											<Scale X="1.7" Y="0.03" Z="0.1"/>
-											<Orientation X="0" Y="0" Z="0"/>
-										</c:Transform>
-										<c:Model>
-											<Resource>Models/Core/UnitCube.obj</Resource>
-											<Color R="1" G="0.4" B="0.8"/>
-										</c:Model>
-									</Components>
-								</Entity>
-								<Entity>
-									<Components>
-										<c:Transform>
-											<Position X="0" Y="0"/>
-											<Scale X="1.7" Y="0.03" Z="0.1"/>
-											<Orientation X="0" Y="1.57" Z="0"/>
-										</c:Transform>
-										<c:Model>
-											<Resource>Models/Core/UnitCube.obj</Resource>
-											<Color R="1" G="0.4" B="0.8"/>
-										</c:Model>
-									</Components>
-								</Entity>
-							</Children>
-						</Entity>
-					</Children>
-				</Entity>
-			</Children>
-		</Entity>
-	</Children>
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>../assets\Models\Test/ObstacleCourse.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0" Z="0.00638055196"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:DirectionalLight>
+          <Intensity>0.46000027656555176</Intensity>
+        </c:DirectionalLight>
+        <c:Transform>
+          <Orientation X="0" Y="2.59000015" Z="0.799000025"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>../assets\Models\Core\UnitCube.obj</Resource>
+        </c:Model>
+        <c:Physics>
+          <Gravity>false</Gravity>
+        </c:Physics>
+        <c:Player/>
+        <c:Transform>
+          <Position X="-2.31658864" Y="2.02328157" Z="4.50379515"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>../assets\Models\Core\colorbox.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-1.52309108" Y="5.72108126" Z="0"/>
+          <Scale X="5" Y="5" Z="5"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
 </Entity>
