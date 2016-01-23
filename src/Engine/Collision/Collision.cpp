@@ -278,8 +278,8 @@ bool AABBvsTriangle(const AABB& box,
 
     //Check if normal faces upwards, and if so, just push the box upwards on collision.
     triNormal = glm::normalize(triNormal);
-    if (triNormal.y > 0.5f || true) {
-        //TODO: Optimize calculation since x, z is 0.
+    if (triNormal.y > 0.5f) {
+        //TODO: Optimize calculation since x, z is 0, y is -1.
         //Ray ray(glm::vec3(origin.x, origin.y + half.y, origin.z), glm::vec3(0, -1, 0));
         //float dist = INFINITY, u, v;
         //if (RayVsTriangle(ray, v0, v1, v2, dist, u, v) && dist < 2.0f * half.y) {
@@ -290,7 +290,7 @@ bool AABBvsTriangle(const AABB& box,
             outHit = Ground;
             return true;
         }
-        //return false; //TODO: Uncomment?
+        return false;
     }
 
     const glm::vec3 triPos[] = {
@@ -300,7 +300,8 @@ bool AABBvsTriangle(const AABB& box,
     auto insideAllPlanes = glm::tvec3<bool>(false);
     //All triangle vertex points.
     //Check if the triangle is completely outside or inside the box.
-    for (int ax = 0; ax < 3; ++ax) {
+    //First test x, then z, lastly y, since y is least likely to result in a early false.
+    for (int ax : { 0, 2, 1 }) {
         auto outsideMinPlane = glm::tvec3<bool>(false);
         auto outsideMaxPlane = glm::tvec3<bool>(false);
         auto insidePlanes = glm::tvec3<bool>(false);
@@ -385,14 +386,13 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
     outResolutionVector = glm::vec3(0.f);
     std::vector<Triangle> hitTriangles;
     std::vector<glm::vec3> hitNormals;
-    for (int i = 0; i < modelIndices.size(); i += 3) {
+    for (int i = 0; i < modelIndices.size(); ) {
         glm::vec3 outVec;
         glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         BoxTriHit hitCase;
-        if (AABBvsTriangle(newBox, v0, v1, v2, outVec, hitCase))
-        {
+        if (AABBvsTriangle(newBox, v0, v1, v2, outVec, hitCase)) {
             hit = true;
             switch (hitCase) {
             case Collision::Line0:
@@ -403,7 +403,7 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
                 //    v0, v1, v2
                 //};
                 //glm::vec3 edge = triPos[(hitCase + 1) % 3] - triPos[hitCase];
-                hitTriangles.push_back({v0, v1, v2});
+                hitTriangles.push_back({ v0, v1, v2 });
                 hitNormals.push_back(outVec);
                 ImGui::Text("triangle edge collision.");
                 break;

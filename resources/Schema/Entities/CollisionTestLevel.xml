@@ -42,7 +42,8 @@
         </c:Physics>
         <c:Player/>
         <c:Transform>
-          <Position X="-2.31658864" Y="2.02328157" Z="4.50379515"/>
+          <Position X="-8.80904388" Y="1.82786822" Z="7.97052002"/>
+          <Scale X="0.100000001" Y="1" Z="0.100000001"/>
         </c:Transform>
       </Components>
       <Children/>
