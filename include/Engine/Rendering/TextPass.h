@@ -10,11 +10,12 @@
 #include "Font.h"
 #include "../Core/ResourceManager.h"
 #include "RenderQueue.h"
+#include "TextPassState.h"
 
-class TextRenderer
+class TextPass
 {
 public:
-    TextRenderer();
+    TextPass();
     void Initialize();
     void Update();
     void Draw(RenderScene& scene);
