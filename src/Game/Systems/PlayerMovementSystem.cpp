@@ -28,6 +28,8 @@ void PlayerMovementSystem::Update(double dt)
         if (cameraEntity.Valid()) {
             glm::vec3& cameraOrientation = cameraEntity["Transform"]["Orientation"];
             cameraOrientation.x += controller->Rotation().x;
+            // Limit camera pitch so we don't break our necks
+            cameraOrientation.x = glm::clamp(cameraOrientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
         }
 
         ComponentWrapper& cTransform = player["Transform"];
@@ -36,6 +38,13 @@ void PlayerMovementSystem::Update(double dt)
 
         glm::vec3& pos = cTransform["Position"];
         pos += controller->Movement() * glm::inverse(glm::quat(ori)) * (float)player["Player"]["MovementSpeed"] * (float)dt;
+
+        if (player.HasComponent("Physics")) {
+            if (controller->Jumping()) {
+                glm::vec3& velocity = player["Physics"]["Velocity"];
+                velocity.y += 10.f;
+            }
+        }
         
         controller->Reset();
     }
