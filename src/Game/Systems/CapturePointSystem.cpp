@@ -66,6 +66,9 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper
     nextPossibleCapturePoint["Blue"] = -1;
     for (size_t i = 0; i < m_NumberOfCapturePoints; i++)
     {
+        if (!m_World->HasComponent(m_CapturePointNumberToEntityIDMap[i], "Team")) {
+            continue;
+        }
         ComponentWrapper& capturePointOwnedBy = m_World->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
         if ((int)capturePointOwnedBy["Team"] == redTeam && m_RedTeamHomeCapturePoint == 0) {
             nextPossibleCapturePoint["Red"] = i + 1;
@@ -76,6 +79,9 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper
     }
     for (int i = m_NumberOfCapturePoints - 1; i >= 0; i--)
     {
+        if (!m_World->HasComponent(m_CapturePointNumberToEntityIDMap[i], "Team")) {
+            continue;
+        }
         ComponentWrapper& capturePointOwnedBy = m_World->GetComponent(m_CapturePointNumberToEntityIDMap[i], "Team");
         if ((int)capturePointOwnedBy["Team"] == redTeam && m_RedTeamHomeCapturePoint != 0) {
             nextPossibleCapturePoint["Red"] = i - 1;
