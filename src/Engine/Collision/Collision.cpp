@@ -275,103 +275,37 @@ bool AABBvsTriangle(const AABB& box,
     const glm::vec3& half = box.HalfSize();
     const glm::vec3& min = box.MinCorner();
     const glm::vec3& max = box.MaxCorner();
-
-    //Check if normal faces upwards, and if so, just push the box upwards on collision.
-    triNormal = glm::normalize(triNormal);
-    if (triNormal.y > 0.5f) {
-        //TODO: Optimize calculation since x, z is 0, y is -1.
-        //Ray ray(glm::vec3(origin.x, origin.y + half.y, origin.z), glm::vec3(0, -1, 0));
-        //float dist = INFINITY, u, v;
-        //if (RayVsTriangle(ray, v0, v1, v2, dist, u, v) && dist < 2.0f * half.y) {
-        Ray ray(origin, glm::vec3(0, -1, 0));
-        float dist = INFINITY, u, v;
-        if (RayVsTriangle(ray, v0, v1, v2, dist, u, v) && dist < half.y) {
-            outVector = glm::vec3(0, half.y - dist, 0);
-            outHit = Ground;
-            return true;
-        }
-        return false;
-    }
-
     const glm::vec3 triPos[] = {
         v0, v1, v2
     };
 
-    auto insideAllPlanes = glm::tvec3<bool>(false);
-    //All triangle vertex points.
-    //Check if the triangle is completely outside or inside the box.
-    //First test x, then z, lastly y, since y is least likely to result in a early false.
-    for (int ax : { 0, 2, 1 }) {
-        auto outsideMinPlane = glm::tvec3<bool>(false);
-        auto outsideMaxPlane = glm::tvec3<bool>(false);
-        auto insidePlanes = glm::tvec3<bool>(false);
-        for (int pos = 0; pos < 3; ++pos) {
-            outsideMinPlane[pos] = (min[ax] > triPos[pos][ax]);
-            outsideMaxPlane[pos] = (triPos[pos][ax] > max[ax]);
-            insidePlanes[pos] = !(outsideMinPlane[pos] || outsideMaxPlane[pos]);
-        }
-        if (glm::all(outsideMinPlane) || glm::all(outsideMaxPlane)) {
-            return false;
-        }
-        insideAllPlanes[ax] = glm::all(insidePlanes);
-    }
-    if (glm::all(insideAllPlanes)) {
-        return false;    //If a triangle is completely inside the box, we call it a non-intersection.
+    for (int axis : {1, 0, 2}) {
+        //2D Triangle.
+        //for axis=0,1,2: 2d point takes from xy,xz,yx.
+        int dim1 = axis == 2 ? 0 : 1;   //0,0,1
+        int dim2 = axis == 0 ? 1 : 2;   //1,2,2
+        glm::vec2 t0(triPos[0][dim1], triPos[0][dim2]);
+        glm::vec2 t1(triPos[1][dim1], triPos[1][dim2]);
+        glm::vec2 t2(triPos[2][dim1], triPos[2][dim2]);
+        //Project tri,
+        //Project box,
+        //if projections don't overlap, return false.
     }
 
-    Ray ray;
-    //All triangle edges.
-    //Check if any edge on the triangle intersects the box.
-    for (int l = 0; l < 3; ++l) {
-        glm::vec3 edge = triPos[(l + 1) % 3] - triPos[l];
-        ray.SetOrigin(triPos[l]);
-        ray.SetDirection(edge);
-        float dist;
-        if (RayVsAABB(ray, box, dist) && dist <= glm::length(edge)) {
-            outVector = triNormal;
-            outHit = (BoxTriHit)l;
-            return true;
-        }
-    }
-
-    //None of the polygon's edges intersects the cube, finally, check if any of the four 
-    //cube diagonals intersect the interior of the polygon.
     //If the polygon does intersect any of the cube diagonals, it will 
     //intersect the cube diagonal that comes
     //closest to being perpendicular to the plane of the polygon.
-
+    triNormal = glm::normalize(triNormal);
     glm::vec3 diagonal = -signNonZero(triNormal) * half;
-#define EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK      //TODO: We should probably performance test with this on/off.
-#ifdef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
     //The triangle plane contains all points P in dot(triNormal, P) == dot(triNormal, v0)
     //The diagonal line contains all points P in P = origin + diagonal * t.
     float t = glm::dot(triNormal, v0 - origin) / glm::dot(triNormal, diagonal);
-
-    //If intersection point between plane and diagonal is not within the box.
+    //If intersection point between plane and diagonal is within the box.
     if (glm::abs(t) > 1) {
         return false;
     }
-#endif
-
-    //Check if intersection point is on the triangle.
-    ray.SetOrigin(origin);
-    ray.SetDirection(diagonal);
-#ifdef EARLY_OUT_OR_MAYBE_JUST_EXTRA_WORK
-    if (RayVsTriangle(ray, v0, v1, v2, true)) {
-#else
-    float dist = INFINITY, u, v;
-    if (RayVsTriangle(ray, v0, v1, v2, dist, u, v, true)) {
-        if (glm::abs(dist) > glm::length(diagonal)) {
-            return false;
-        }
-#endif
-        //Distance between triangle plane, and the diagonal corner, multiplied by the normal.
-        //Signed distance, positive if on the same side as the normal.
-        outVector = -glm::dot(triNormal, origin + diagonal - v0) * triNormal;
-        outHit = Corner;
-        return true;
-    }
-    return false;
+    //TODO: Resolve it.
+    return true;
 }
 
 bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
