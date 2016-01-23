@@ -137,7 +137,7 @@ void main()
 	//sceneColor += Input.DiffuseColor;
 	vec4 color_result = Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
 	//bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
-	sceneColor = vec4(color_result.xyz, 1.0);
+	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 	//These if statements should be removed if they are slow.
 	color_result += glowTexel;
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
