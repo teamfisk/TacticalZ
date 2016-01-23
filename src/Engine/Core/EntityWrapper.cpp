@@ -36,6 +36,18 @@ EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
     return EntityWrapper::Invalid;
 }
 
+bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
+{
+    EntityWrapper entity = *this;
+    while (entity.Parent().Valid()) {
+        entity = entity.Parent();
+        if (entity == potentialParent) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool EntityWrapper::Valid()
 {
     if (this->World == nullptr) {

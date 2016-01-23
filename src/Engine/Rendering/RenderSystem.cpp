@@ -48,14 +48,9 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
         }
 
         EntityWrapper entity(m_World, modelComponent.EntityID);
-        bool isLocalPlayer = entity == m_LocalPlayer;
-        while (entity.Parent().Valid()) {
-            entity = entity.Parent();
-            if (entity == m_LocalPlayer) {
-                isLocalPlayer = true;
-            }
-        }
-        if (isLocalPlayer) {
+
+        // Don't render the local player
+        if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
             continue;
         }
 
@@ -146,18 +141,6 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
         }
         std::string resource = textComponent["Resource"];
         if (resource.empty()) {
-            continue;
-        }
-
-        EntityWrapper entity(m_World, textComponent.EntityID);
-        bool isLocalPlayer = entity == m_LocalPlayer;
-        while (entity.Parent().Valid()) {
-            entity = entity.Parent();
-            if (entity == m_LocalPlayer) {
-                isLocalPlayer = true;
-            }
-        }
-        if (isLocalPlayer) {
             continue;
         }
 
