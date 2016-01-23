@@ -1,11 +1,11 @@
-#include "Rendering/TextRenderer.h"
+#include "Rendering/TextPass.h"
 
-TextRenderer::TextRenderer()
+TextPass::TextPass()
 {
 
 }
 
-void TextRenderer::Initialize()
+void TextPass::Initialize()
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -24,12 +24,12 @@ void TextRenderer::Initialize()
     m_TextProgram->Link();
 }
 
-void TextRenderer::Update()
+void TextPass::Update()
 {
 
 }
 
-void TextRenderer::Draw(RenderScene& scene)
+void TextPass::Draw(RenderScene& scene)
 {
     for (auto &job : scene.TextJobs) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
@@ -40,11 +40,11 @@ void TextRenderer::Draw(RenderScene& scene)
     }
 }
 
-void TextRenderer::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
     GLfloat penX = 0;
     GLfloat penY = 0;
-    float scale = 1.0/font->FontSize;
+    GLfloat scale = 1.0/font->FontSize;
 
     GLfloat stringWidth = 0.f;
 
@@ -61,10 +61,7 @@ void TextRenderer::renderText(std::string text, Font* font, TextJob::AlignmentEn
         penX = 0;
     }	
     
-    glEnable(GL_BLEND);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    TextPassState state;
 
     m_TextProgram->Bind();
     glUniform3f(glGetUniformLocation(m_TextProgram->GetHandle(), "textColor"), color.x, color.y, color.z);

@@ -9,7 +9,7 @@ void Renderer::Initialize()
 	glfwSwapInterval(m_VSYNC);
 	InitializeShaders();
     InitializeTextures();
-    m_TextRenderer = new TextRenderer();
+    m_TextRenderer = new TextPass();
     m_TextRenderer->Initialize();
 
 
