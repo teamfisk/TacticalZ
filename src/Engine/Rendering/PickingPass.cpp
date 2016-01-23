@@ -54,48 +54,51 @@ void PickingPass::Draw(RenderScene& scene)
     if (scene.ClearDepth) {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
-    m_Camera = scene.Camera;
 
-    for (auto &job : scene.ForwardJobs) {
-        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+        m_Camera = scene.Camera;
 
-        if (modelJob) {
-            int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
+        for (auto &job : scene.ForwardJobs) {
+            auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
-            PickingInfo pickInfo;
-            pickInfo.Entity = modelJob->Entity;
-            pickInfo.World = modelJob->World;
-            pickInfo.Camera = scene.Camera;
+            if (modelJob) {
+                int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
 
-            auto color = m_EntityColors.find(std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera));
-            if (color != m_EntityColors.end()) {
-                pickColor[0] = color->second[0];
-                pickColor[1] = color->second[1];
-            } else {
-                m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
-                if (m_ColorCounter[0] > 255) {
-                    m_ColorCounter[0] = 0;
-                        m_ColorCounter[1]++;
+                PickingInfo pickInfo;
+                pickInfo.Entity = modelJob->Entity;
+                pickInfo.World = modelJob->World;
+                pickInfo.Camera = scene.Camera;
+
+                auto color = m_EntityColors.find(std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera));
+                if (color != m_EntityColors.end()) {
+                    pickColor[0] = color->second[0];
+                    pickColor[1] = color->second[1];
                 } else {
+                    m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
+                    if (m_ColorCounter[0] > 255) {
+                        m_ColorCounter[0] = 0;
+                        m_ColorCounter[1]++;
+                    } else {
                         m_ColorCounter[0]++;
+                    }
                 }
+
+                m_PickingColorsToEntity[glm::ivec2(pickColor[0], pickColor[1])] = pickInfo;
+
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+                glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glBindVertexArray(modelJob->Model->VAO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+                glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
             }
-
-            m_PickingColorsToEntity[glm::ivec2(pickColor[0], pickColor[1])] = pickInfo;
-
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
-
-            glBindVertexArray(modelJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
         }
-    }
+    
     
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");
+
 
     delete state;
 }
