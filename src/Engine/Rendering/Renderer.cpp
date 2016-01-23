@@ -9,6 +9,9 @@ void Renderer::Initialize()
 	glfwSwapInterval(m_VSYNC);
 	InitializeShaders();
     InitializeTextures();
+    m_TextPass = new TextPass();
+    m_TextPass->Initialize();
+
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
@@ -71,6 +74,7 @@ void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
     InputUpdate(dt);
+    m_TextPass->Update();
     m_ImGuiRenderPass->Update(dt);
 }
 
@@ -96,6 +100,9 @@ void Renderer::Draw(RenderFrame& frame)
         m_DrawFinalPass->Draw(*scene);
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+
+        m_TextPass->Draw(*scene);
+
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
     if(m_DebugTextureToDraw == 0) {

@@ -110,6 +110,42 @@ void RenderSystem::fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& 
     }
 }
 
+
+void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+{
+    auto texts = world->GetComponents("Text");
+    if (texts == nullptr) {
+        return;
+    }
+
+    for (auto& textComponent : *texts) {
+        bool visible = textComponent["Visible"];
+        if (!visible) {
+            continue;
+        }
+        std::string resource = textComponent["Resource"];
+        if (resource.empty()) {
+            continue;
+        }
+
+        Font* font;
+        try {
+            font = ResourceManager::Load<Font>(resource);
+        } catch (const std::exception&) {
+            try {
+                font = ResourceManager::Load<Font>("Fonts/DroidSans.ttf,16");
+            } catch (const std::exception&) {
+                continue;
+            }
+        }
+
+        glm::mat4 modelMatrix = Transform::ModelMatrix(textComponent.EntityID, world);
+        std::shared_ptr<TextJob> modelJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
+        jobs.push_back(modelJob);
+
+    }
+}
+
 bool RenderSystem::OnInputCommand(const Events::InputCommand& e)
 {
     return false;
@@ -132,6 +168,7 @@ void RenderSystem::Update(double dt)
     fillModels(scene.ForwardJobs);
     fillPointLights(scene.PointLightJobs, m_World);
     fillDirectionalLights(scene.DirectionalLightJobs, m_World);
+    fillText(scene.TextJobs, m_World);
     m_RenderFrame->Add(scene);
    
 }

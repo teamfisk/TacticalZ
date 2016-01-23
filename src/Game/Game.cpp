@@ -20,6 +20,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<Font>("FontFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
