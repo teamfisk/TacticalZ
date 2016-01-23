@@ -64,6 +64,7 @@ private:
     void send(Packet& packet);
     void broadcast(Packet& packet);
     void sendSnapshot();
+    void addChildrenToPacket(Packet& packet, EntityID entityID);
     void sendPing();
     void checkForTimeOuts();
     void disconnect(UserID user);

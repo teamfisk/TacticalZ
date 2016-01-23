@@ -175,35 +175,51 @@ void Server::broadcast(Packet& packet)
 // Send snapshot fields
 void Server::sendSnapshot()
 {
-    // Should time this
-    std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
-    for (auto& it : worldComponentPools) {
-        Packet packet(MessageType::Snapshot);
-        ComponentPool* componentPool = it.second;
-        ComponentInfo componentInfo = componentPool->ComponentInfo();
+    Packet packet(MessageType::Snapshot);
+    addChildrenToPacket(packet, EntityID_Invalid);
+    broadcast(packet);
+}
 
-        // Component Type
-        packet.WriteString(componentInfo.Name);
-        for (auto& componentWrapper : *componentPool) {
-            // HACK: Send entity name
-            packet.WriteString(m_World->GetName(componentWrapper.EntityID));
-            // Components EntityID
-            packet.WritePrimitive(componentWrapper.EntityID);
-            // Parents EntityID
-            packet.WritePrimitive(m_World->GetParent(componentWrapper.EntityID));
-            for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
-                ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(componentField);
-                if (fieldInfo.Type == "string") {
-                    std::string& value = componentWrapper[componentField];
-                    packet.WriteString(value);
-                } else {
-                    packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
+void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
+{
+    auto itPair = m_World->GetChildren(entityID);
+    std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
+    // Loop through every child
+    for (auto it = itPair.first; it != itPair.second; it++) {
+        EntityID childEntityID = it->second;
+        // Write EntityID and parentsID and Entity name
+        packet.WritePrimitive(childEntityID);
+        packet.WritePrimitive(entityID);
+        packet.WriteString(m_World->GetName(childEntityID));
+        // Write components to child
+        int numberOfComponents = 0;
+        for (auto& i : worldComponentPools) {
+            if (i.second->KnowsEntity(childEntityID)) {
+                numberOfComponents++;
+            }
+        }
+        // Write how many components should be read
+        packet.WritePrimitive(numberOfComponents);
+        for (auto& i : worldComponentPools) {
+            // If the entity exist in the pool
+            if (i.second->KnowsEntity(childEntityID)) {
+                ComponentWrapper componentWrapper = i.second->GetByEntity(childEntityID);
+                // ComponentType
+                packet.WriteString(componentWrapper.Info.Name);
+                // Loop through fields
+                for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
+                    ComponentInfo::Field_t fieldInfo = componentWrapper.Info.Fields.at(componentField);
+                    if (fieldInfo.Type == "string") {
+                        std::string& value = componentWrapper[componentField];
+                        packet.WriteString(value);
+                    } else {
+                        packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
+                    }
                 }
             }
         }
-        if (packet.Size() > packet.HeaderSize() + componentInfo.Name.size()) {
-            broadcast(packet);
-        }
+        // Go to to your children
+        addChildrenToPacket(packet, childEntityID);
     }
 }
 
