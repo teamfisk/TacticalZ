@@ -11,14 +11,12 @@
 #include "FrameBuffer.h"
 #include "../Core/World.h"
 #include "PickingPass.h"
-#include "DrawScenePass.h"
 #include "LightCullingPass.h"
 #include "DrawFinalPass.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
 #include "../Core/Transform.h"
-
 #include "TextPass.h"
 
 class Renderer : public IRenderer
@@ -37,7 +35,7 @@ public:
 private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
-    TextPass* m_TextRenderer;
+    TextPass* m_TextPass;
 
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
@@ -46,7 +44,6 @@ private:
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-    DrawScenePass* m_DrawScenePass;
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
     ImGuiRenderPass* m_ImGuiRenderPass;

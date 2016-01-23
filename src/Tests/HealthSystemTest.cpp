@@ -48,7 +48,7 @@ GameHealthSystemTest::GameHealthSystemTest()
     fp.MergeEntities(m_World);
 
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World,m_EventBroker);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
 
     //The Test
@@ -103,7 +103,7 @@ void GameHealthSystemTest::Tick()
     m_LastTime = currentTime;
 
     // Iterate through systems and update world!
-    m_SystemPipeline->Update(m_World, dt);
+    m_SystemPipeline->Update(dt);
 
     m_EventBroker->Swap();
     m_EventBroker->Clear();

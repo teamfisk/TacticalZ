@@ -94,7 +94,7 @@ CapturePointTest::CapturePointTest(int runTestNumber)
     m_World = new World();
 
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World,m_EventBroker);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
     m_SystemPipeline->AddSystem<CapturePointSystem>(1);
 
@@ -405,7 +405,7 @@ void CapturePointTest::Tick()
     double dt = 10.0;
 
     // Iterate through systems and update world!
-    m_SystemPipeline->Update(m_World, dt);
+    m_SystemPipeline->Update(dt);
 
     m_EventBroker->Swap();
     m_EventBroker->Clear();

@@ -1,7 +1,7 @@
 #include "Systems/HealthSystem.h"
 
-HealthSystem::HealthSystem(EventBroker* eventBroker)
-    : System(eventBroker)
+HealthSystem::HealthSystem(World* m_World, EventBroker* eventBroker)
+    : System(m_World, eventBroker)
     , PureSystem("Health")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
@@ -9,9 +9,10 @@ HealthSystem::HealthSystem(EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerHealthPickup, &HealthSystem::OnPlayerHealthPickup);
 }
 
-void HealthSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     //if entityID of health is 9 then the players ID is also 9 (player,health are connected to the same entity)
+    ComponentWrapper player = m_World->GetComponent(component.EntityID, "Player");
     double maxHealth = (double)component["MaxHealth"];
 
     //process the DeltaHealthVector and change the entitys health accordingly
@@ -37,7 +38,8 @@ void HealthSystem::UpdateComponent(World* world, EntityWrapper& entity, Componen
                     if (std::get<0>(m_DeltaHealthVector[j - 1]) == component.EntityID)
                         m_DeltaHealthVector.erase(m_DeltaHealthVector.begin() + j - 1);
                 }
-                //break the loop if the player is dead
+                //delete the player and break the loop
+                m_World->DeleteEntity(entity.ID);
                 break;
             }
         }
@@ -57,3 +59,4 @@ bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e)
     m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerHealedID, e.HealthAmount));
     return true;
 }
+

@@ -1,11 +1,11 @@
 #include "Collision/CollidableOctreeSystem.h"
 
-void CollidableOctreeSystem::Update(World* world, double dt)
+void CollidableOctreeSystem::Update(double dt)
 {
     m_Octree->ClearDynamicObjects();
 }
 
-void CollidableOctreeSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void CollidableOctreeSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     if (entity.HasComponent("AABB")) {
         boost::optional<AABB> absoluteAABB = Collision::EntityAbsoluteAABB(entity);

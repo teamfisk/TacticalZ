@@ -34,10 +34,16 @@ void InputManager::Update(double dt)
 			if (m_CurrentKeyState[i]) {
 				Events::KeyDown e;
 				e.KeyCode = i;
+                e.ModCtrl = glfwGetKey(m_GLFWWindow, GLFW_KEY_LEFT_CONTROL) || glfwGetKey(m_GLFWWindow, GLFW_KEY_RIGHT_CONTROL);
+                e.ModAlt = glfwGetKey(m_GLFWWindow, GLFW_KEY_LEFT_ALT) || glfwGetKey(m_GLFWWindow, GLFW_KEY_RIGHT_ALT);
+                e.ModShift = glfwGetKey(m_GLFWWindow, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(m_GLFWWindow, GLFW_KEY_RIGHT_SHIFT);
 				m_EventBroker->Publish(e);
 			} else {
 				Events::KeyUp e;
 				e.KeyCode = i;
+                e.ModCtrl = glfwGetKey(m_GLFWWindow, GLFW_KEY_LEFT_CONTROL) || glfwGetKey(m_GLFWWindow, GLFW_KEY_RIGHT_CONTROL);
+                e.ModAlt = glfwGetKey(m_GLFWWindow, GLFW_KEY_LEFT_ALT) || glfwGetKey(m_GLFWWindow, GLFW_KEY_RIGHT_ALT);
+                e.ModShift = glfwGetKey(m_GLFWWindow, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(m_GLFWWindow, GLFW_KEY_RIGHT_SHIFT);
 				m_EventBroker->Publish(e);
 			}
 		}

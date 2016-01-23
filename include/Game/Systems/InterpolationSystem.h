@@ -25,14 +25,14 @@ class InterpolationSystem : public PureSystem
         double interpolationTime;
     };
 public:
-    InterpolationSystem(EventBroker* eventBroker)
-        : System(eventBroker)
+    InterpolationSystem(World* world, EventBroker* eventBroker)
+        : System(world, eventBroker)
         , PureSystem("Transform")
     {
         EVENT_SUBSCRIBE_MEMBER(m_EInterpolate, &InterpolationSystem::OnInterpolate);
     }
     ~InterpolationSystem() { }
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& transform, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt) override;
 private:
     std::unordered_map<EntityID, Transform> m_NextTransform;
     std::unordered_map<EntityID, Transform> m_LastReceivedTransform;
