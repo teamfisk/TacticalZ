@@ -72,6 +72,12 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player is actually spawned (since the actual spawning is handled on the server)
 
+    // Check if a player already exists
+    if (m_PlayerEntities.count(e.PlayerID) != 0) {
+        // TODO: Disallow infinite respawning here
+        m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
+    }
+
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
     if (cameraEntity.Valid()) {
@@ -79,6 +85,9 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         e.CameraEntity = cameraEntity;
         m_EventBroker->Publish(e);
     }
+
+    // Store the player for future reference
+    m_PlayerEntities[e.PlayerID] = e.Player;
 
     return true;
 }

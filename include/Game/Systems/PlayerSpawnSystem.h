@@ -22,6 +22,7 @@ private:
 
     bool m_NetworkEnabled = false;
     std::vector<SpawnRequest> m_SpawnRequests;
+    std::map<int, EntityWrapper> m_PlayerEntities;
 
     EventRelay<PlayerSpawnSystem, Events::InputCommand> m_OnInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
