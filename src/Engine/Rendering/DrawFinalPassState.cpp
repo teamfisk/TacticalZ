@@ -1,14 +1,14 @@
 #include "Rendering/DrawFinalPassState.h"
 
 
-DrawFinalPassState::DrawFinalPassState()
+DrawFinalPassState::DrawFinalPassState(GLuint frameBuffer)
 {
-    BindFramebuffer(0);
+    BindFramebuffer(frameBuffer);
     Enable(GL_BLEND);
     BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     Enable(GL_DEPTH_TEST);
     Enable(GL_CULL_FACE);
-    ClearColor(glm::vec4(200.f / 255, 0.f / 255, 200.f / 255, 0.f));
+    ClearColor(glm::vec4(0.f, 0.f, 0.f, 0.f));
 }
 
 DrawFinalPassState::~DrawFinalPassState()
