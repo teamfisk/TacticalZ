@@ -2,17 +2,89 @@
 <Entity name="Player" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:AABB/>
-    <c:Physics/>
+    <c:AABB>
+      <Origin X="0" Y="0.772000015" Z="0"/>
+      <Size X="1" Y="1.60000002" Z="1"/>
+    </c:AABB>
     <c:Collidable/>
-    <c:Model>
-      <Resource>Models/Core/UnitSphere.obj</Resource>
-      <Color A="1" B="1" G="0" R="0"/>
-    </c:Model>
-    <c:Player/>
-    <c:Transform/>
+    <c:Physics/>
+    <c:Player>
+      <MovementSpeed>3</MovementSpeed>
+    </c:Player>
+    <c:Team>
+      <Team>
+        <Red/>
+      </Team>
+    </c:Team>
+    <c:Transform>
+      <Position X="0" Y="0" Z="7.38143063"/>
+    </c:Transform>
   </Components>
 
-  <Children/>
+  <Children>
+    <Entity name="Camera">
+      <Components>
+        <c:Camera/>
+        <c:Transform>
+          <Position X="0" Y="1.37700009" Z="0"/>
+          <Orientation X="6.28300047" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="PlayerName">
+          <Components>
+            <c:Text>
+              <Content></Content>
+              <Resource>Fonts/DroidSans.ttf,100</Resource>
+              <Color A="1" B="0" G="1" R="0"/>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="0.0263664704" Z="-0.447885782"/>
+              <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
+              <Orientation X="0" Y="3.14199996" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="CameraModel">
+          <Components>
+            <c:Model>
+              <Resource>Models/Camera.obj</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.0331346765" Z="-0.0792061687"/>
+              <Scale X="1.30000007" Y="1.50000012" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="ThirdPersonCamera">
+      <Components>
+        <c:Camera/>
+        <c:Model>
+          <Resource>Models/Camera.obj</Resource>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Transform>
+          <Position X="-0.284000009" Y="1.83800006" Z="1.18900001"/>
+          <Orientation X="5.95600033" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlayerModel">
+      <Components>
+        <c:Model>
+          <Resource>Models/AssaultHeadless.obj</Resource>
+        </c:Model>
+        <c:Transform>
+          <Orientation X="0" Y="3.14159274" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
 
 </Entity>

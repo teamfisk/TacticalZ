@@ -14,6 +14,9 @@
 #include "../Network/Network.h"
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
+#include "Network/EPlayerDisconnected.h"
+
+#include "Game/Events/EPlayerSpawned.h"
 
 class Server : public Network
 {
@@ -29,7 +32,7 @@ private:
     boost::asio::ip::udp::socket m_Socket;
 
     // Sending messages to client logic
-    PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
+    PlayerDefinition m_PlayerDefinitions[8]; // 
     std::vector<PlayerDefinition> m_ConnectedUsers;
     char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
@@ -38,8 +41,8 @@ private:
     std::clock_t previousSnapshotMessage = std::clock();
     std::clock_t timOutTimer = std::clock();
     // How often we send messages (milliseconds)
-    int intervalMs = 1000;
-    int snapshotInterval = 50;
+    int pingIntervalMs;
+    int snapshotInterval;
     int checkTimeOutInterval = 100;
 
     //Timers
@@ -50,32 +53,36 @@ private:
     EventBroker* m_EventBroker;
     
     // Packet loss logic
-    unsigned int m_PacketID = 0;
-    unsigned int m_PreviousPacketID = 0;
+    PacketID m_PacketID = 0;
+    PacketID m_PreviousPacketID = 0;
 
     // Private member functions
-    int  receive(char* data, size_t length);
+    int  receive(char* data);
     void readFromClients();
-    void send(Packet& packet, int playerID);
+    void send(Packet& packet, UserID user);
+    void send(PlayerID player, Packet& packet);
     void send(Packet& packet);
     void broadcast(Packet& packet);
     void sendSnapshot();
     void sendPing();
     void checkForTimeOuts();
-    void disconnect(int i);
+    void disconnect(UserID user);
     void parseMessageType(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseOnPlayerDamage(Packet& packet);
     void parseConnect(Packet& packet);
     void parseDisconnect();
     void parseClientPing();
-    void parseServerPing();
+    void parsePing();
     void identifyPacketLoss();
     void createPlayer();
-    int GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
+    void kick(PlayerID player);
+    PlayerID GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
+    EventRelay<Server, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(const Events::PlayerSpawned& e);
 };
 
 #endif
