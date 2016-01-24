@@ -17,7 +17,8 @@ enum class MessageType
     Kick,
     OnPlayerSpawned,
     EntityDeleted,
-    ComponentDeleted
+    ComponentDeleted,
+    PlayerTransform
 };
 
 #endif

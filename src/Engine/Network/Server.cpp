@@ -101,6 +101,9 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::BecomePlayer:
         createPlayer();
         break;
+    case MessageType::PlayerTransform:
+        parsePlayerTransform(packet);
+        break;
     default:
         break;
     }
@@ -487,4 +490,24 @@ bool Server::OnComponentDeleted(const Events::ComponentDeleted & e)
         broadcast(packet);
     }
     return false;
+}
+
+void Server::parsePlayerTransform(Packet& packet)
+{
+    glm::vec3 position;
+    glm::vec3 orientation;
+    position.x = packet.ReadPrimitive<float>();
+    position.y = packet.ReadPrimitive<float>();
+    position.z = packet.ReadPrimitive<float>();
+    orientation.x = packet.ReadPrimitive<float>();
+    orientation.y = packet.ReadPrimitive<float>();
+    orientation.z = packet.ReadPrimitive<float>();
+
+    PlayerID playerID = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
+    EntityWrapper player(m_World, m_PlayerDefinitions[playerID].EntityID);
+
+    if (player.Valid()) {
+        player["Transform"]["Position"] = position;
+        player["Transform"]["Orientation"] = orientation;
+    }
 }

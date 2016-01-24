@@ -31,7 +31,8 @@ void Client::Start(World* world, EventBroker* eventBroker)
 
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
-    EVENT_SUBSCRIBE_MEMBER(m_EPlayeDamage, &Client::OnPlayerDamage);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
 
     m_Socket.connect(m_ReceiverEndpoint);
     LOG_INFO("I am client. BIP BOP");
@@ -48,6 +49,7 @@ void Client::Update()
             sendInputCommands();
             m_TimeSinceSentInputs = std::clock();
         }
+        sendLocalPlayerTransform();
     }
     Network::Update();
 }
@@ -340,6 +342,33 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
     packet.WritePrimitive(e.Player.ID);
     send(packet);
     return false;
+}
+
+bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
+{
+    if (e.PlayerID == -1) {
+        m_LocalPlayer = e.Player;
+    }
+    return true;
+}
+
+void Client::sendLocalPlayerTransform()
+{
+    if (!m_LocalPlayer.Valid()) {
+        return;
+    }
+
+    ComponentWrapper cTransform = m_LocalPlayer["Transform"];
+    glm::vec3& position = cTransform["Position"];
+    glm::vec3& orientation = cTransform["Orientation"];
+    Packet packet(MessageType::PlayerTransform, m_SendPacketID);
+    packet.WritePrimitive(position.x);
+    packet.WritePrimitive(position.y);
+    packet.WritePrimitive(position.z);
+    packet.WritePrimitive(orientation.x);
+    packet.WritePrimitive(orientation.y);
+    packet.WritePrimitive(orientation.z);
+    send(packet);
 }
 
 void Client::identifyPacketLoss()
