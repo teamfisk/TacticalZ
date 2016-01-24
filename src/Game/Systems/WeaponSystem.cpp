@@ -22,8 +22,8 @@ void WeaponSystem::Update(double dt)
             continue;
         }
         //if its a player, do PlayerDamage event
-        const bool hasPlayerComponent = m_World->HasComponent(pickDataFromShot.Entity, "Player");
-        if (hasPlayerComponent) {
+        const bool hasHealthComponent = m_World->HasComponent(pickDataFromShot.Entity, "Health");
+        if (hasHealthComponent) {
             Events::PlayerDamage ePlayerDamage;
             //TODO: damage based on weapontype/class?
             //TODO: multiple shots at the same time? (shotgunner)
