@@ -8,7 +8,6 @@ RawModelCustom::RawModelCustom(std::string fileName)
     ReadMeshFile(fileName);
     ReadMaterialFile(fileName);
     ReadAnimationFile(fileName);
-    int k = 0;
 }
 
 void RawModelCustom::ReadMeshFile(std::string filePath)
