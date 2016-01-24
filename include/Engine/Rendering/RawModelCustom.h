@@ -48,9 +48,9 @@ public:
     {
         float SpecularExponent;
         float ReflectionFactor;
-        float DiffuseColor[3];
-        float SpecularColor[3];
-        float IncandescenceColor[3];
+        glm::vec4 DiffuseColor{ 1.0f, 1.0f, 1.0f, 1.0f };
+        glm::vec4 SpecularColor{ 1.0f, 1.0f, 1.0f, 1.0f };
+        glm::vec4 IncandescenceColor{ 1.0f, 1.0f, 1.0f, 1.0f };
         unsigned int StartIndex;
         unsigned int EndIndex;
         //float Transparency;

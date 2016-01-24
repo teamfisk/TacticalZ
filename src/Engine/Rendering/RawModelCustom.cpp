@@ -138,11 +138,11 @@ void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, un
     newMaterial.ReflectionFactor = *(float*)(fileData + offset);
     offset += sizeof(float);
 
-    memcpy(newMaterial.DiffuseColor, fileData + offset, sizeof(float) * 3);
+    memcpy(&newMaterial.DiffuseColor[0], fileData + offset, sizeof(float) * 3);
     offset += sizeof(float) * 3;
-    memcpy(newMaterial.SpecularColor, fileData + offset, sizeof(float) * 3);
+    memcpy(&newMaterial.SpecularColor[0], fileData + offset, sizeof(float) * 3);
     offset += sizeof(float) * 3;
-    memcpy(newMaterial.IncandescenceColor, fileData + offset, sizeof(float) * 3);
+    memcpy(&newMaterial.IncandescenceColor[0], fileData + offset, sizeof(float) * 3);
     offset += sizeof(float) * 3;
 
     newMaterial.StartIndex = *(unsigned int*)(fileData + offset);

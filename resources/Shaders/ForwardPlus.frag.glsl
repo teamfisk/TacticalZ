@@ -4,6 +4,7 @@ uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 uniform vec4 Color;
+uniform vec4 DiffuseColor;
 uniform vec2 ScreenDimensions;
 uniform sampler2D texture0;
 
@@ -129,7 +130,7 @@ void main()
 		totalLighting.Specular += result.Specular;
 	}
 
-	fragmentColor += (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
+	fragmentColor += DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * texel * Color;
 	//fragmentColor += Input.DiffuseColor;
 	//fragmentColor += Input.DiffuseColor * (totalLighting.Diffuse) * texel * Color;
 	//fragmentColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
