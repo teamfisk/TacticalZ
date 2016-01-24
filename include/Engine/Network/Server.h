@@ -33,8 +33,7 @@ private:
     boost::asio::ip::udp::socket m_Socket;
 
     // Sending messages to client logic
-    PlayerDefinition m_PlayerDefinitions[8]; // 
-    std::vector<PlayerDefinition> m_ConnectedUsers;
+    std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
     char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
     // time for previouse message
@@ -45,6 +44,7 @@ private:
     int pingIntervalMs;
     int snapshotInterval;
     int checkTimeOutInterval = 100;
+    int m_NextPlayerID = 0;
 
     //Timers
     std::clock_t m_StartPingTime;
@@ -60,7 +60,6 @@ private:
     // Private member functions
     int  receive(char* data);
     void readFromClients();
-    void send(Packet& packet, UserID user);
     void send(PlayerID player, Packet& packet);
     void send(Packet& packet);
     void broadcast(Packet& packet);
@@ -68,7 +67,7 @@ private:
     void addChildrenToPacket(Packet& packet, EntityID entityID);
     void sendPing();
     void checkForTimeOuts();
-    void disconnect(UserID user);
+    void disconnect(PlayerID playerID);
     void parseMessageType(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseOnPlayerDamage(Packet& packet);
@@ -77,7 +76,6 @@ private:
     void parseClientPing();
     void parsePing();
     void identifyPacketLoss();
-    void createPlayer();
     void kick(PlayerID player);
     PlayerID GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
     // Debug event

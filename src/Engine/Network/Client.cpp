@@ -153,10 +153,13 @@ void Client::parsePlayersSpawned(Packet& packet)
 void Client::parseEntityDeletion(Packet & packet)
 {
     EntityID entityToDelete = packet.ReadPrimitive<EntityID>();
-    EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
-    if (m_World->ValidEntity(localEntity)) {
-        m_World->DeleteEntity(localEntity);
-        deleteFromServerClientMaps(entityToDelete, localEntity);
+    // TODO: What if an entity that didn't previously exist comes as a delete request and later comes in a delayed snapshot?
+    if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
+        EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
+        if (m_World->ValidEntity(localEntity)) {
+            m_World->DeleteEntity(localEntity);
+            deleteFromServerClientMaps(entityToDelete, localEntity);
+        }
     }
 }
 
@@ -219,6 +222,9 @@ void Client::parseSnapshot(Packet& packet)
                     if (componentType == "Transform") {
                         // Interpolate only transform components
                         InterpolateFields(packet, componentInfo, localEntityID, componentType);
+                    } else if (componentType == "Physics" && m_World->HasComponent(localEntityID, "Player")) {
+                        // HACK: Ignore velocity of physics
+                        packet.ReadData(componentInfo.Stride);
                     } else {
                         // Set component values
                         updateFields(packet, componentInfo, localEntityID, componentType);
