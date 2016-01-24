@@ -41,7 +41,7 @@ struct ModelJob : RenderJob
 
         Skeleton = Model->m_RawModel->m_Skeleton;
 
-        if (world->HasComponent(Entity, "Animation")) {
+        if (world->HasComponent(Entity, "Animation") && Skeleton != nullptr) {
             auto animationComponent = world->GetComponent(Entity, "Animation");
             Animation = model->m_RawModel->m_Skeleton->GetAnimation(animationComponent["Name"]);
             AnimationTime = (double)animationComponent["Time"];

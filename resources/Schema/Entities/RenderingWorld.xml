@@ -80,7 +80,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="0" Y="2.37320328" Z="0"/>
-          <Orientation X="0" Y="9447.45117" Z="0"/>
+          <Orientation X="0" Y="9868.3418" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -275,7 +275,9 @@
     <Entity>
       <Components>
         <c:Animation>
-          <Name></Name>
+          <Name>running</Name>
+          <Time>0.93047409991569907</Time>
+          <Speed>1</Speed>
         </c:Animation>
         <c:Model>
           <Resource>Models/Animtest.mesh</Resource>
