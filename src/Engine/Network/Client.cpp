@@ -96,6 +96,12 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::OnPlayerSpawned:
         parsePlayersSpawned(packet);
         break;
+    case MessageType::EntityDeleted:
+        parseEntityDeletion(packet);
+        break;
+    case MessageType::ComponentDeleted:
+        parseComponentDeletion(packet);
+        break;
     default:
         break;
     }
@@ -140,6 +146,25 @@ void Client::parsePlayersSpawned(Packet& packet)
     e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
     e.PlayerID = -1;
     m_EventBroker->Publish(e);
+}
+
+void Client::parseEntityDeletion(Packet & packet)
+{
+    EntityID entityToDelete = packet.ReadPrimitive<EntityID>();
+    EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
+    if (m_World->ValidEntity(localEntity)) {
+        m_World->DeleteEntity(localEntity);
+        deleteFromServerClientMaps(entityToDelete, localEntity);
+    }
+}
+
+void Client::parseComponentDeletion(Packet & packet)
+{
+    EntityID entity = packet.ReadPrimitive<EntityID>();
+    std::string componentType = packet.ReadString();
+    if (m_World->HasComponent(entity, componentType)) {
+        m_World->DeleteComponent(m_ServerIDToClientID.at(entity), componentType);
+    }
 }
 
 // Fields with strings will not work right now
@@ -370,12 +395,26 @@ void Client::becomePlayer()
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)
 {
-    return m_ClientIDToServerID.find(clientEntityID) != m_ClientIDToServerID.end();
+    if (m_ClientIDToServerID.find(clientEntityID) != m_ClientIDToServerID.end()) {
+        if (m_World->ValidEntity(clientEntityID)) {
+            return true;
+        }
+        EntityID serverEntityID = m_ClientIDToServerID.at(clientEntityID);
+        deleteFromServerClientMaps(serverEntityID, clientEntityID);
+    }
+    return false;
 }
 
 bool Client::serverClientMapsHasEntity(EntityID serverEntityID)
 {
-    return m_ServerIDToClientID.find(serverEntityID) != m_ServerIDToClientID.end();
+    if (m_ServerIDToClientID.find(serverEntityID) != m_ServerIDToClientID.end()) {
+        EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
+        if (m_World->ValidEntity(localEntityID)) {
+            return true;
+        }
+        deleteFromServerClientMaps(serverEntityID, localEntityID);
+    }
+    return false;
 }
 
 void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)
@@ -383,4 +422,10 @@ void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID client
     m_ServerIDToClientID.insert(std::make_pair(serverEntityID, clientEntityID));
     m_ClientIDToServerID.insert(std::make_pair(clientEntityID, serverEntityID));
 
+}
+
+void Client::deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)
+{
+    m_ServerIDToClientID.erase(serverEntityID);
+    m_ClientIDToServerID.erase(clientEntityID);
 }

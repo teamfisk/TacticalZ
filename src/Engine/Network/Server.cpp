@@ -21,6 +21,8 @@ void Server::Start(World* world, EventBroker* eventBroker)
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &Server::OnEntityDeleted);
+    EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
     for (size_t i = 0; i < m_MaxConnections; i++) {
         m_PlayerDefinitions[i].StopTime = std::clock();
     }
@@ -463,5 +465,26 @@ bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
     packet.WritePrimitive<EntityID>(e.Player.ID);
     packet.WritePrimitive<EntityID>(e.Spawner.ID);
     send(e.PlayerID, packet);
+    return false;
+}
+
+bool Server::OnEntityDeleted(const Events::EntityDeleted & e)
+{
+    if (!e.Cascaded) {
+        Packet packet = Packet(MessageType::EntityDeleted);
+        packet.WritePrimitive<EntityID>(e.DeletedEntity);
+        broadcast(packet);
+    }
+    return false;
+}
+
+bool Server::OnComponentDeleted(const Events::ComponentDeleted & e)
+{
+    if (!e.Cascaded) {
+        Packet packet = Packet(MessageType::ComponentDeleted);
+        packet.WritePrimitive<EntityID>(e.Entity);
+        packet.WriteString(e.ComponentType);
+        broadcast(packet);
+    }
     return false;
 }

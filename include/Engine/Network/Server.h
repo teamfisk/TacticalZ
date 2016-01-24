@@ -16,6 +16,8 @@
 #include "Core/EPlayerDamage.h"
 #include "Network/EPlayerDisconnected.h"
 #include "Core/EPlayerSpawned.h"
+#include "Core/EEntityDeleted.h"
+#include "Core/EComponentDeleted.h"
 
 class Server : public Network
 {
@@ -83,6 +85,10 @@ private:
     bool OnInputCommand(const Events::InputCommand& e);
     EventRelay<Server, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
+    EventRelay<Server, Events::EntityDeleted> m_EEntityDeleted;
+    bool OnEntityDeleted(const Events::EntityDeleted& e);
+    EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
+    bool OnComponentDeleted(const Events::ComponentDeleted& e);
 };
 
 #endif
