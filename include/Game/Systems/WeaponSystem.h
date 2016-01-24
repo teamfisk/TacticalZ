@@ -9,6 +9,7 @@
 #include "Core/System.h"
 #include "Core/EPlayerDamage.h"
 #include "Core/EShoot.h"
+#include "Core/EPlayerSpawned.h"
 #include "Input/EInputCommand.h"
 
 #include <tuple>
@@ -23,16 +24,18 @@ public:
     virtual void Update(double dt) override;
 
 private:
-    //methods which will take care of specific events
-    EventRelay<WeaponSystem, Events::Shoot> m_EShoot;
-    bool WeaponSystem::OnShoot(const Events::Shoot& e);
-
-    EventRelay<WeaponSystem, Events::InputCommand> m_EInputCommand;
-    bool WeaponSystem::OnInputCommand(const Events::InputCommand& e);
-
     IRenderer* m_Renderer;
 
-    std::vector<std::tuple<EntityID, glm::vec2>> m_EShootVector;
+    // State
+    EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
+
+    // Events
+    EventRelay<WeaponSystem, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool WeaponSystem::OnPlayerSpawned(const Events::PlayerSpawned& e);
+    EventRelay<WeaponSystem, Events::Shoot> m_EShoot;
+    bool WeaponSystem::OnShoot(const Events::Shoot& e);
+    EventRelay<WeaponSystem, Events::InputCommand> m_EInputCommand;
+    bool WeaponSystem::OnInputCommand(const Events::InputCommand& e);
 };
 
 #endif

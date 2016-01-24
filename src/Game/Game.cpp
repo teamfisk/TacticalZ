@@ -58,7 +58,7 @@ Game::Game(int argc, char* argv[])
     m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
-    m_World = new World();
+    m_World = new World(m_EventBroker);
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
@@ -78,7 +78,7 @@ Game::Game(int argc, char* argv[])
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
+    //m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);

@@ -12,7 +12,6 @@ HealthSystem::HealthSystem(World* m_World, EventBroker* eventBroker)
 void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     //if entityID of health is 9 then the players ID is also 9 (player,health are connected to the same entity)
-    ComponentWrapper player = m_World->GetComponent(component.EntityID, "Player");
     double maxHealth = (double)component["MaxHealth"];
 
     //process the DeltaHealthVector and change the entitys health accordingly
@@ -49,7 +48,7 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& comp
 bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e)
 {
     //save the changed HP to a vector. it will be taken care of in UpdateComponent
-    m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerDamagedID, -e.DamageAmount));
+    //m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerDamagedID, -e.DamageAmount));
     return true;
 }
 
