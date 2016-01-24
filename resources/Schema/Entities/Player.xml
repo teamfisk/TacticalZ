@@ -7,7 +7,6 @@
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
     <c:Collidable/>
-    <c:Model/>
     <c:Physics/>
     <c:Player>
       <MovementSpeed>5</MovementSpeed>
@@ -18,8 +17,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="-0.246963501" Y="0.0265000071" Z="3.01600003"/>
-      <Orientation X="0" Y="2.14675093" Z="0"/>
+      <Position X="-0.246963501" Y="0.0264999941" Z="3.01600003"/>
     </c:Transform>
   </Components>
 
@@ -51,6 +49,7 @@
           <Components>
             <c:Model>
               <Resource>Models/Camera.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0.0331346765" Z="-0.0792061687"/>
@@ -77,13 +76,15 @@
     </Entity>
     <Entity name="PlayerModel">
       <Components>
+        <c:Animation>
+          <Name>Hold Pos</Name>
+          <Speed>1</Speed>
+        </c:Animation>
         <c:Model>
-          <Resource>Models/AssaultHeadless.mesh</Resource>
+          <Resource>Models/AssaultAnimated.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>
         </c:Model>
-        <c:Transform>
-          <Orientation X="0" Y="3.14159274" Z="0"/>
-        </c:Transform>
+        <c:Transform/>
       </Components>
       <Children/>
     </Entity>
