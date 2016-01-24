@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(resourceManagerTest)
     BOOST_CHECK(!ResourceManager::IsResourceLoaded("ConfigFile", "Config.ini"));
 
     //configfile without register
-    BOOST_CHECK_THROW(ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj"),Resource::FailedLoadingException);
+    BOOST_CHECK_THROW(ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh"),Resource::FailedLoadingException);
     //there is no error feedback to check if you try to release the wrong resources - hence that cant be tested either
 }
 

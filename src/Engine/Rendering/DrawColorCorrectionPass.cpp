@@ -4,7 +4,7 @@ DrawColorCorrectionPass::DrawColorCorrectionPass(IRenderer* renderer)
 {
     m_Renderer = renderer;
 
-    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
+    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh");
     m_Exposure = 0.4; //TODO: Renderer: Fixa så att denna går att ändra på genom komponent eller setting.
 
     InitializeShaderPrograms();

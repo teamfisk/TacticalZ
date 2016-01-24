@@ -5,6 +5,16 @@
     <c:Transform/>
   </Components>
 
-  <Children/>
+  <Children>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource></Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
 
 </Entity>

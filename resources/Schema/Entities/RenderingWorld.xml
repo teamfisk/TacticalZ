@@ -12,7 +12,7 @@
           <Name>ActionCamera</Name>
         </c:Camera>
         <c:Model>
-          <Resource>Models/Camera.obj</Resource>
+          <Resource>Models/Camera.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-0.504807115" Y="6.00582743" Z="9.68687439"/>
@@ -39,7 +39,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitPlane.obj</Resource>
+          <Resource>Models/Core/UnitPlane.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="0" Y="-1" Z="0.600000024"/>
@@ -51,7 +51,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Assault.obj</Resource>
+          <Resource>Models/Assault.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-2.5" Y="0" Z="1"/>
@@ -190,7 +190,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Assault.obj</Resource>
+          <Resource>Models/Assault.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="2.5" Y="0" Z="1"/>
@@ -205,7 +205,7 @@
         </c:Camera>
         <c:Listener/>
         <c:Model>
-          <Resource>Models/Camera.obj</Resource>
+          <Resource>Models/Camera.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>
@@ -237,7 +237,7 @@
           <Intensity>0.80000001192092896</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.obj</Resource>
+          <Resource>Models/DirectionalLightWidget.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-0.0013256073" Y="1.89540339" Z="6.53467274"/>
@@ -249,7 +249,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-5.4082036" Y="0" Z="-1.84950542"/>

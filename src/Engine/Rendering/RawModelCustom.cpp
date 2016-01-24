@@ -4,6 +4,9 @@
 
 RawModelCustom::RawModelCustom(std::string fileName)
 {
+    if(fileName.substr(fileName.find_last_of(".")).compare(".mesh") != 0) {
+        throw Resource::FailedLoadingException("Unknown model file format. Please use \".mesh\" files.");
+    }
     fileName = fileName.erase(fileName.find_last_of("."), fileName.find_last_of(".") - fileName.size());
     ReadMeshFile(fileName);
     ReadMaterialFile(fileName);
