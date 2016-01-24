@@ -8,9 +8,7 @@
   <Children>
     <Entity>
       <Components>
-        <c:Camera>
-          <Name>ActionCamera</Name>
-        </c:Camera>
+        <c:Camera/>
         <c:Model>
           <Resource>Models/Camera.mesh</Resource>
         </c:Model>
@@ -25,7 +23,9 @@
             <c:Text>
               <Content>Camera #2</Content>
               <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Alignment>0</Alignment>
+              <Alignment>
+                <Right/>
+              </Alignment>
             </c:Text>
             <c:Transform>
               <Position X="0.700063765" Y="0.310270816" Z="-1"/>
@@ -64,6 +64,7 @@
         <c:Text>
           <Content>Welcome!</Content>
           <Resource>Fonts/DroidSans.ttf,1280</Resource>
+          <Color A="0" B="1" G="7.84313726" R="1"/>
         </c:Text>
         <c:Transform>
           <Position X="0" Y="0" Z="0.700000048"/>
@@ -79,7 +80,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="0" Y="2.37320328" Z="0"/>
-          <Orientation X="0" Y="8252.15918" Z="0"/>
+          <Orientation X="0" Y="9868.3418" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -200,9 +201,7 @@
     </Entity>
     <Entity>
       <Components>
-        <c:Camera>
-          <Name>MainCamera</Name>
-        </c:Camera>
+        <c:Camera/>
         <c:Listener/>
         <c:Model>
           <Resource>Models/Camera.mesh</Resource>
@@ -219,7 +218,9 @@
             <c:Text>
               <Content>Taiwan #1</Content>
               <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Alignment>0</Alignment>
+              <Alignment>
+                <Right/>
+              </Alignment>
             </c:Text>
             <c:Transform>
               <Position X="0.716896772" Y="0.296712071" Z="-1"/>
@@ -253,6 +254,37 @@
         </c:Model>
         <c:Transform>
           <Position X="-5.4082036" Y="0" Z="-1.84950542"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Animation/>
+        <c:Model>
+          <Resource>asd</Resource>
+          <Color A="1" B="1" G="3.92156863" R="1"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0" Z="-6.38434124"/>
+          <Orientation X="5.046" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Animation>
+          <Name>running</Name>
+          <Time>0.93047409991569907</Time>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:Model>
+          <Resource>Models/Animtest.mesh</Resource>
+          <Color A="1" B="11.7647057" G="1" R="11.7647057"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="-1.42184281" Y="1.71298718" Z="-6.31712198"/>
         </c:Transform>
       </Components>
       <Children/>
