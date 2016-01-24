@@ -5,7 +5,7 @@ using boost::unit_test_framework::test_case;
 #include <stdlib.h>//srand
 
 //#define private public
-#include "Engine\Core\ConfigFile.h"
+#include "Engine/Core/ConfigFile.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>

@@ -7,6 +7,7 @@
 
 #define MAXCONNECTIONS 8
 #define INPUTSIZE 4097
+#define TIMEOUTMS 15000
 
 class Network
 {

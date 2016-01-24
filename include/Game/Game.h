@@ -19,7 +19,8 @@
 #include "Rendering/RenderSystem.h"
 #include "Core/EntityFileParser.h"
 #include "Core/Octree.h"
-
+#include "Rendering/Font.h"
+#include "Systems/InterpolationSystem.h"
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"
@@ -47,8 +48,8 @@ private:
     InputProxy* m_InputProxy;
 	GUI::Frame* m_FrameStack;
     World* m_World;
-    Octree* m_OctreeCollision;
-    Octree* m_OctreeFrustrumCulling;
+    Octree<AABB>* m_OctreeCollision;
+    Octree<AABB>* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
     RenderFrame* m_RenderFrame;
     // Network variables

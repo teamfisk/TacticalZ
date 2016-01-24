@@ -6,12 +6,14 @@
 	<xs:include schemaLocation="Components/Model.xsd"/>
 	<xs:include schemaLocation="Components/RaptorCopter.xsd"/>
 	<xs:include schemaLocation="Components/Player.xsd"/>
+	<xs:include schemaLocation="Components/Text.xsd"/>
 	<xs:include schemaLocation="Components/Camera.xsd"/>
 	<xs:include schemaLocation="Components/AABB.xsd"/>
 	<xs:include schemaLocation="Components/PointLight.xsd"/>
 	<xs:include schemaLocation="Components/DirectionalLight.xsd"/>
 	<xs:include schemaLocation="Components/Trigger.xsd"/>
 	<xs:include schemaLocation="Components/Health.xsd"/>
+	<xs:include schemaLocation="Components/CapturePoint.xsd"/>
 	<xs:include schemaLocation="Components/Listener.xsd"/>
 	<xs:include schemaLocation="Components/SoundEmitter.xsd"/>
 	<xs:include schemaLocation="Components/Collidable.xsd"/>
@@ -19,4 +21,6 @@
 	<xs:include schemaLocation="Components/SpawnPoint.xsd"/>
 	<xs:include schemaLocation="Components/PlayerSpawn.xsd"/>
 	<xs:include schemaLocation="Components/Team.xsd"/>
+	<xs:include schemaLocation="Components/UniformScale.xsd"/>
+	<xs:include schemaLocation="Components/EditorWidget.xsd"/>
 </xs:schema>

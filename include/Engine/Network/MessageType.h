@@ -11,7 +11,10 @@ enum class MessageType
 	ServerPing,
 	Message,
 	Snapshot,
-	Event,
+    OnInputCommand,
+    OnPlayerDamage,
+    PlayerConnected,
+    BecomePlayer
 };
 
 #endif

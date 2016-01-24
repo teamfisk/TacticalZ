@@ -14,6 +14,7 @@ public:
     Packet(MessageType type, unsigned int& packetID);
     // Used to create packet from already existing data buffer.
     Packet(char* data, const int sizeOfPacket);
+    Packet(MessageType type);
     ~Packet();
     void Init(MessageType type, unsigned int& packetID);
 
@@ -49,7 +50,7 @@ public:
     // Pops the first element as if it was a string.
     std::string ReadString();
     char* ReadData(int SizeOfData);
-
+    void ChangePacketID(unsigned int& packetID);
     int Size() { return m_Offset; };
     char* Data() { return m_Data; };
     unsigned int DataReadSize() { return m_ReturnDataOffset; }
