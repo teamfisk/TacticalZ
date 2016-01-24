@@ -59,7 +59,7 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
             model = ResourceManager::Load<::Model, true>(resource);
         } catch (const Resource::StillLoadingException&) {
             //continue;
-            model = ResourceManager::Load<::Model>("Models/Core/Error.mesh");
+            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.mesh");
         } catch (const std::exception&) {
             try {
                 model = ResourceManager::Load<::Model>("Models/Core/Error.mesh");
