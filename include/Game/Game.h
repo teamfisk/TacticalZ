@@ -19,6 +19,7 @@
 #include "Rendering/RenderSystem.h"
 #include "Core/EntityFileParser.h"
 #include "Core/Octree.h"
+#include "Rendering/Font.h"
 #include "Systems/InterpolationSystem.h"
 // Network
 #include <boost/thread.hpp>
