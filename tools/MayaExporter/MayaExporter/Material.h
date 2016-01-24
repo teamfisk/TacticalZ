@@ -19,15 +19,18 @@ public:
 	float ReflectionFactor;
     float SpecularExponent;
 
+    float DiffuseColor[3]{ 1.0f };
     unsigned int ColorMapFileLength = 0;
 	std::string ColorMapFile;
 
+    float SpecularColor[3]{ 1.0f };
     unsigned int SpecularMapFileLength = 0;
 	std::string SpecularMapFile;
 
     unsigned int NormalMapFileLength = 0;
 	std::string NormalMapFile;
 
+    float IncandescenceColor[3]{ 1.0f };
     unsigned int IncandescenceMapFileLength = 0;
 	std::string IncandescenceMapFile;
 
@@ -43,6 +46,9 @@ public:
 
         out.write((char*)&SpecularExponent, sizeof(float));
         out.write((char*)&ReflectionFactor, sizeof(float));
+        out.write((char*)&DiffuseColor, sizeof(float) * 3);
+        out.write((char*)&SpecularColor, sizeof(float) * 3);
+        out.write((char*)&IncandescenceColor, sizeof(float) * 3);
         out.write((char*)&IndexStart, sizeof(unsigned int));
         out.write((char*)&IndexEnd, sizeof(unsigned int));
 
@@ -64,6 +70,9 @@ public:
 
         out << "SpecularExponent: " << SpecularExponent << endl;
         out << "ReflectionFactor: " << ReflectionFactor << endl;
+        out << "DiffuseColor: " << DiffuseColor[0] << " "  << DiffuseColor[1] << " "  << DiffuseColor[2] << endl;
+        out << "SpecularColor: " << SpecularColor[0] << " "  << SpecularColor[1] << " "  << SpecularColor[2] << endl;
+        out << "IncandescenceColor: " << IncandescenceColor[0] << " "  << IncandescenceColor[1] << " "  << IncandescenceColor[2] << endl;
         out << "IndexStart: " << IndexStart << endl;
         out << "IndexEnd: " << IndexEnd << endl;
 

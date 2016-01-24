@@ -24,7 +24,7 @@ void main()
 
 
 	mat4 boneTransform = mat4(1);
-	if(BoneWeights[0] > 0.f){
+	if(BoneWeights[0] > 0.0f){
 	boneTransform = BoneWeights[0] * Bones[int(BoneIndices[0])]
 				  + BoneWeights[1] * Bones[int(BoneIndices[1])]
 				  + BoneWeights[2] * Bones[int(BoneIndices[2])]

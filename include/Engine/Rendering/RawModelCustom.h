@@ -48,6 +48,9 @@ public:
     {
         float SpecularExponent;
         float ReflectionFactor;
+        float DiffuseColor[3];
+        float SpecularColor[3];
+        float IncandescenceColor[3];
         unsigned int StartIndex;
         unsigned int EndIndex;
         //float Transparency;

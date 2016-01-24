@@ -5,23 +5,30 @@ void Material::grabLambertProperties(MaterialNode& material_node, MFnDependencyN
 	material_node.Name = node.name().asChar();
 
     if (!findColorTexture(material_node, node)) {
-        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no color texture. Please apply a texture insted of using a value");
+        node.findPlug("colorR").getValue(material_node.DiffuseColor[0]);
+        node.findPlug("colorG").getValue(material_node.DiffuseColor[1]);
+        node.findPlug("colorB").getValue(material_node.DiffuseColor[2]);
+
     }
 
 
-	if (findIncandescenceTexture(material_node, node)) {
-        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no Incandescence texture. Please apply a texture insted of using value");
+	if (!findIncandescenceTexture(material_node, node)) {
+        node.findPlug("incandescenceR").getValue(material_node.IncandescenceColor[0]);
+        node.findPlug("incandescenceG").getValue(material_node.IncandescenceColor[1]);
+        node.findPlug("incandescenceB").getValue(material_node.IncandescenceColor[2]);
 	}
 
     if (findNormalTexture(material_node, node)) {
-        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no normal texture. Please apply a texture to it");
+        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no normal texture.");
     }
 }
 
 void Material::grabBlinnProperties(MaterialNode& material_node, MFnDependencyNode& node)
 {
-	if (findSpecularTexture(material_node, node)) {
-        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no specular texture. Please apply a specular to it");
+	if (!findSpecularTexture(material_node, node)) {
+        node.findPlug("specularColorR").getValue(material_node.SpecularColor[0]);
+        node.findPlug("specularColorG").getValue(material_node.SpecularColor[1]);
+        node.findPlug("specularColorB").getValue(material_node.SpecularColor[2]);
 	}
 
 	m_Plug = node.findPlug("reflectivity");
@@ -43,8 +50,10 @@ void Material::grabBlinnProperties(MaterialNode& material_node, MFnDependencyNod
 
 void Material::grabPhongProperties(MaterialNode& material_node, MFnDependencyNode& node)
 {
-    if (findSpecularTexture(material_node, node)) {
-        MGlobal::displayWarning(MString() + "Material " + node.name() + " has no specular texture. Please apply a specular to it");
+    if (!findSpecularTexture(material_node, node)) {
+        node.findPlug("specularColorR").getValue(material_node.SpecularColor[0]);
+        node.findPlug("specularColorG").getValue(material_node.SpecularColor[1]);
+        node.findPlug("specularColorB").getValue(material_node.SpecularColor[2]);
     }
 
 	m_Plug = node.findPlug("reflectivity");
@@ -188,20 +197,21 @@ std::vector<MaterialNode>* Material::DoIt(Mesh mesh)
 	// All materials we care about inherit from Lambert
 	MItDependencyNodes matIt(MFn::kLambert);
     m_AllMaterials.clear();
-    int totalIndices = 0;
 	while (!matIt.isDone()) {
 		MFnDependencyNode MaterialFnDN(matIt.thisNode());
 		MaterialNode MaterialStorage;
         bool meshHasMaterial = false;
         //Mesh Indices is a map with <string : MaterialName, vector<int> : indices>
+        int totalIndices = 0;
         for (auto aMeshMaterial : mesh.Indices) {
+            MGlobal::displayInfo(MString() + "Material: " + aMeshMaterial.first.c_str() + " " + MaterialFnDN.name().asChar());
             if (aMeshMaterial.first.compare(MaterialFnDN.name().asChar()) == 0) {
                 meshHasMaterial = true;
                 MaterialStorage.IndexStart = totalIndices;
                 MaterialStorage.IndexEnd = totalIndices + aMeshMaterial.second.size() - 1;
-                totalIndices += aMeshMaterial.second.size();
                 break;
             }
+            totalIndices += aMeshMaterial.second.size();
         }
         if (meshHasMaterial) {
             grabLambertProperties(MaterialStorage, MaterialFnDN);

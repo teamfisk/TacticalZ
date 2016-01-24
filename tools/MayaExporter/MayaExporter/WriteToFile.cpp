@@ -25,10 +25,13 @@ bool WriteToFile::ASCIIFilePath(string filePathAndFileName)
 
 void WriteToFile::OpenFiles()
 {
-	if (binFile)
-		binFile.open(binFileName, ofstream::binary);
-	if (ASCIIFile)
+    if (binFile) {
+        binFile.open(binFileName, ofstream::binary);
+    }
+	if (ASCIIFile){
 		ASCIIFile.open(ASCIIFileName);
+        ASCIIFile << std::fixed << std::setprecision(3);
+    }
 }
 
 void WriteToFile::CloseFiles()

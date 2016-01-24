@@ -309,12 +309,22 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
 
                         
                         if (hasSkin) {
+                            float totalWeight = 0.0f;
+                            unsigned int totalBones = 0;
                             MIntArray jointIDs /* ??? */;
                             weights.selectAncestorLogicalIndex(vertexIndex, weightListObject);
                             weights.getExistingArrayAttributeIndices(jointIDs);
                             for (unsigned int i = 0; i < jointIDs.length() && i < 4; i++) {
-                                thisVertex.BoneIndices[i] = jointIDs[i];
-                                thisVertex.BoneWeights[i] = weights[i].asFloat();
+                                if (weights[i].asFloat() > 0.001f) {
+                                    thisVertex.BoneIndices[totalBones] = jointIDs[i];
+                                    thisVertex.BoneWeights[totalBones] = weights[i].asFloat();
+                                    totalWeight = totalWeight + weights[i].asFloat();
+                                    totalBones++;
+                                }
+                            }
+                           
+                            for (unsigned int i = 0; i < 4; i++) {
+                                thisVertex.BoneWeights[i] = thisVertex.BoneWeights[i] / totalWeight;
                             }
                         }
 

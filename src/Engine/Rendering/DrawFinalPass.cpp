@@ -21,7 +21,7 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ForwardPlusProgram->Compile();
     m_ForwardPlusProgram->Link();
 }
-
+static double tempTime = 0.0;
 void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("DrawFinalPass::Draw: Pre");
@@ -53,14 +53,14 @@ void DrawFinalPass::Draw(RenderScene& scene)
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
             }
-
+            tempTime += 0.01f;
             //TODO: Fixa så att modelsJobs kan spela upp olika animationer och så att den kan få in en tid istället för 1.0f - Hälsningar Johan och Andreas :)
             if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
                 auto animation = modelJob->Model->m_RawModel->m_Skeleton->GetAnimation("running");
                 if (animation != nullptr) {
                     std::vector<glm::mat4> frameBones = modelJob->Model->m_RawModel->m_Skeleton->GetFrameBones(
                         *animation,
-                        1.0f
+                        tempTime
                         );
                     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }

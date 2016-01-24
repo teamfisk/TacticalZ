@@ -129,8 +129,8 @@ void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, un
     unsigned int* nameLengths = (unsigned int*)(fileData + offset); 
     offset += sizeof(unsigned int) * 4;
 
-    if (offset + sizeof(float) * 2 > fileByteSize) {
-        throw Resource::FailedLoadingException("Reading Material specular and reflection values failed");
+    if (offset + sizeof(float) * 11 + sizeof(unsigned int) * 2 > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading Material specular, reflection, color and start and end index  values failed");
     }
 
     newMaterial.SpecularExponent = *(float*)(fileData + offset);
@@ -138,9 +138,12 @@ void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, un
     newMaterial.ReflectionFactor = *(float*)(fileData + offset);
     offset += sizeof(float);
 
-    if (offset + sizeof(unsigned int) * 2 > fileByteSize) {
-        throw Resource::FailedLoadingException("Reading Material start and end index values failed");
-    }
+    memcpy(newMaterial.DiffuseColor, fileData + offset, sizeof(float) * 3);
+    offset += sizeof(float) * 3;
+    memcpy(newMaterial.SpecularColor, fileData + offset, sizeof(float) * 3);
+    offset += sizeof(float) * 3;
+    memcpy(newMaterial.IncandescenceColor, fileData + offset, sizeof(float) * 3);
+    offset += sizeof(float) * 3;
 
     newMaterial.StartIndex = *(unsigned int*)(fileData + offset);
     offset += sizeof(unsigned int);
@@ -202,7 +205,7 @@ void RawModelCustom::ReadAnimationFile(std::string filePath)
 
     if (!in.is_open()) {
         //throw Resource::FailedLoadingException("Open animation file failed");
-        return; // AJABAJA!!!!!!!!
+        return;
     }
 
     unsigned int fileByteSize = in.tellg();

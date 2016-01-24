@@ -104,9 +104,10 @@ Menu::Menu(QDialog* dialog)
 	// Set the layout for our window
 	dialog->setLayout(baseLayout);
 
-	for (unsigned int i = 0; i < 3; i++) {
-		this->AddClipClicked(true);
-	}
+    this->AddClipClicked(true);
+	//for (unsigned int i = 0; i < 3; i++) {
+	//	this->AddClipClicked(true);
+	//}
 
 }
 
