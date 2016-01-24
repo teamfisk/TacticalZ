@@ -405,6 +405,8 @@ bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
     Packet packet = Packet(MessageType::OnPlayerSpawned);
     packet.WritePrimitive<EntityID>(e.Player.ID);
     packet.WritePrimitive<EntityID>(e.Spawner.ID);
+    // We don't send PlayerID here because it will always be set to -1
+    packet.WriteString(m_ConnectedPlayers[e.PlayerID].Name);
     send(e.PlayerID, packet);
     return false;
 }
