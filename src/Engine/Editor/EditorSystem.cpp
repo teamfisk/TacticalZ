@@ -203,7 +203,7 @@ bool EditorSystem::OnSetCamera(const Events::SetCamera& e)
         m_ActualCamera = e.CameraEntity;
         Events::SetCamera e2;
         e2.CameraEntity = m_EditorCamera;
-        m_EventBroker->Publish(e2);
+        //m_EventBroker->Publish(e2);
     }
     return true;
 }

@@ -4,6 +4,7 @@ RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRender
     : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
+    , m_World(world)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
@@ -51,7 +52,9 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 
         // Don't render the local player
         if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
-            continue;
+            if (!entity.HasComponent("HealthHUD")) { //Should work but needs to be fixed. Should only render the things "childed" to the local player camera
+                continue;
+            }
         }
 
         Model* model;
@@ -68,9 +71,21 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
             }
         }
 
+
+        float fillPercentage = 0.f;
+        glm::vec4 fillColor = glm::vec4(0);
+
+        if(m_World->HasComponent(modelComponent.EntityID, "Fill")) {
+            auto fillComponent = m_World->GetComponent(modelComponent.EntityID, "Fill");
+            fillPercentage = (float)(double)fillComponent["Percentage"];
+            fillColor = (glm::vec4)fillComponent["Color"];
+        }
+
+        
+
         glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, m_World);
         for (auto matGroup : model->MaterialGroups()) {
-            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, m_World));
+            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, m_World, fillColor, fillPercentage));
             jobs.push_back(modelJob);
         }
     }
@@ -156,8 +171,8 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(textComponent.EntityID, world);
-        std::shared_ptr<TextJob> modelJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
-        jobs.push_back(modelJob);
+        std::shared_ptr<TextJob> textJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
+        jobs.push_back(textJob);
 
     }
 }
@@ -177,7 +192,6 @@ void RenderSystem::Update(double dt)
         m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
     }
 
-    //Only supports opaque geometry atm
 
     RenderScene scene;
     scene.Camera = m_Camera;
