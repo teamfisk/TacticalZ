@@ -178,6 +178,123 @@
         </Entity>
       </Children>
     </Entity>
+    <Entity name="Player">
+      <Components>
+        <c:AABB>
+          <Origin X="0" Y="0.772000015" Z="0"/>
+          <Size X="1" Y="1.60000002" Z="1"/>
+        </c:AABB>
+        <c:Collidable/>
+        <c:Model/>
+        <c:Physics>
+          <Gravity>false</Gravity>
+        </c:Physics>
+        <c:Player>
+          <MovementSpeed>5</MovementSpeed>
+        </c:Player>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-0.246963501" Y="0.0264999866" Z="3.01600003"/>
+          <Orientation X="0" Y="2.14675093" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Camera">
+          <Components>
+            <c:Camera/>
+            <c:Transform>
+              <Position X="0" Y="1.37700009" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="PlayerName">
+              <Components>
+                <c:Text>
+                  <Resource>Fonts/DroidSans.ttf,100</Resource>
+                  <Color A="1" B="0" G="1" R="0"/>
+                  <Visible>false</Visible>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0.247910097" Z="-0.447844714"/>
+                  <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
+                  <Orientation X="0" Y="3.14199996" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="CameraModel">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Camera.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0.0331346765" Z="-0.0792061687"/>
+                  <Scale X="1.30000007" Y="1.50000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ThirdPersonCamera">
+          <Components>
+            <c:Camera/>
+            <c:Model>
+              <Resource>Models/Camera.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.284000009" Y="1.83800006" Z="1.18900001"/>
+              <Orientation X="5.95600033" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlayerModel">
+          <Components>
+            <c:Model>
+              <Resource>Models/AssaultHeadless.mesh</Resource>
+              <Color A="1" B="0" G="0" R="1"/>
+            </c:Model>
+            <c:Transform>
+              <Orientation X="0" Y="3.14159274" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AABBStanding">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+              <Color A="0.427450985" B="1" G="1" R="1"/>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.772000015" Z="0"/>
+              <Scale X="1" Y="1.60000002" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AABBCrouching">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+              <Color A="0.745098054" B="1" G="0" R="1"/>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.772000015" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
   </Children>
 
 </Entity>

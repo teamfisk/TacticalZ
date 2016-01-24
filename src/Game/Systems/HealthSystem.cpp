@@ -45,10 +45,16 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& comp
     }
 }
 
-bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e)
+bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
-    //save the changed HP to a vector. it will be taken care of in UpdateComponent
-    //m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerDamagedID, -e.DamageAmount));
+    ComponentWrapper cHealth = e.Player["Health"];
+    double& health = cHealth["Health"];
+    health -= e.Damage;
+    
+    if (health <= 0.0) {
+        m_World->DeleteEntity(e.Player.ID);
+    }
+
     return true;
 }
 
