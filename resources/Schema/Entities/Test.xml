@@ -6,7 +6,7 @@
 			<Orientation X="0" Y="0" Z="0"/>
 		</c:Transform>
 		<c:Model>
-			<Resource>Models/DummyScene.obj</Resource>
+			<Resource>Models/DummyScene.mesh</Resource>
 		</c:Model>
 	</Components>
 	<Children>
@@ -19,7 +19,7 @@
 				<c:Camera>
 				</c:Camera>
 				<c:Model>
-					<Resource>Models/Camera.obj</Resource>
+					<Resource>Models/Camera.mesh</Resource>
 				</c:Model>
 			</Components>
 		</Entity>

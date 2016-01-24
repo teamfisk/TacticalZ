@@ -5,6 +5,9 @@ const EntityWrapper EntityWrapper::Invalid = EntityWrapper(nullptr, EntityID_Inv
 
 bool EntityWrapper::HasComponent(const std::string& componentName)
 {
+    if (!Valid()) {
+        return false;
+    }
     return World->HasComponent(ID, componentName);
 }
 
@@ -15,6 +18,34 @@ EntityWrapper EntityWrapper::Parent()
     } else {
         return EntityWrapper(this->World, this->World->GetParent(this->ID));
     }
+}
+
+EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
+{
+    auto itPair = this->World->GetChildren(this->ID);
+    if (itPair.first == itPair.second) {
+        return EntityWrapper::Invalid;
+    }
+
+    for (auto it = itPair.first; it != itPair.second; ++it) {
+        if (this->World->GetName(it->second) == name) {
+            return EntityWrapper(this->World, it->second);
+        }
+    }
+
+    return EntityWrapper::Invalid;
+}
+
+bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
+{
+    EntityWrapper entity = *this;
+    while (entity.Parent().Valid()) {
+        entity = entity.Parent();
+        if (entity == potentialParent) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool EntityWrapper::Valid()

@@ -1,7 +1,13 @@
 #include "Network/Server.h"
 
-Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 13))
-{ }
+Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 27666))
+{
+    Network::initialize();
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05);
+    pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
+
+}
 
 Server::~Server()
 {
@@ -14,7 +20,8 @@ void Server::Start(World* world, EventBroker* eventBroker)
     m_EventBroker = eventBroker;
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
-    for (size_t i = 0; i < MAXCONNECTIONS; i++) {
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
+    for (size_t i = 0; i < m_MaxConnections; i++) {
         m_PlayerDefinitions[i].StopTime = std::clock();
     }
     LOG_INFO("I am Server. BIP BOP\n");
@@ -24,14 +31,17 @@ void Server::Update()
 {
     readFromClients();
     m_EventBroker->Process<Server>();
-}
+    if (isReadingData) {
+        Network::Update();
+    }
 
+}
 
 void Server::readFromClients()
 {
     while (m_Socket.available()) {
         try {
-            bytesRead = receive(readBuffer, INPUTSIZE);
+            bytesRead = receive(readBuffer);
             Packet packet(readBuffer, bytesRead);
             parseMessageType(packet);
         } catch (const std::exception& err) {
@@ -46,7 +56,7 @@ void Server::readFromClients()
     }
 
     // Send pings each 
-    if (intervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
         sendPing();
         previousePingMessage = currentTime;
     }
@@ -70,11 +80,8 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::Connect:
         parseConnect(packet);
         break;
-    case MessageType::ClientPing:
-        //parseClientPing();
-        break;
-    case MessageType::ServerPing:
-        parseServerPing();
+    case MessageType::Ping:
+        parsePing();
         break;
     case MessageType::Message:
         break;
@@ -97,21 +104,47 @@ void Server::parseMessageType(Packet& packet)
     }
 }
 
-int Server::receive(char * data, size_t length)
+int Server::receive(char * data)
 {
-    length = m_Socket.receive_from(
+    unsigned int length = m_Socket.receive_from(
         boost::asio::buffer((void*)data
-            , length)
+            , INPUTSIZE)
         , m_ReceiverEndpoint, 0);
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataReceived += length;
+        m_NetworkData.DataReceivedThisInterval += length;
+        m_NetworkData.AmountOfMessagesReceived++;
+    }
     return length;
 }
 
-void Server::send(Packet& packet, int userID)
+void Server::send(Packet& packet, UserID user)
 {
     int bytesSent = m_Socket.send_to(
         boost::asio::buffer(packet.Data(), packet.Size()),
-        m_ConnectedUsers[userID].Endpoint,
+        m_ConnectedUsers[user].Endpoint,
         0);
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataSent += packet.Size();
+        m_NetworkData.DataSentThisInterval += packet.Size();
+        m_NetworkData.AmountOfMessagesSent++;
+    }
+}
+
+void Server::send(PlayerID player, Packet& packet)
+{
+    int bytesSent = m_Socket.send_to(
+        boost::asio::buffer(packet.Data(), packet.Size()),
+        m_PlayerDefinitions[player].Endpoint,
+        0);
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataSent += packet.Size();
+        m_NetworkData.DataSentThisInterval += packet.Size();
+        m_NetworkData.AmountOfMessagesSent++;
+    }
 }
 
 void Server::send(Packet & packet)
@@ -122,6 +155,11 @@ void Server::send(Packet & packet)
             packet.Size()),
         m_ReceiverEndpoint,
         0);
+    if (isReadingData) {
+        // Network Debug data
+        m_NetworkData.TotalDataSent += packet.Size();
+        m_NetworkData.DataSentThisInterval += packet.Size();
+    }
 }
 
 void Server::broadcast(Packet& packet)
@@ -143,9 +181,12 @@ void Server::sendSnapshot()
         Packet packet(MessageType::Snapshot);
         ComponentPool* componentPool = it.second;
         ComponentInfo componentInfo = componentPool->ComponentInfo();
+
         // Component Type
         packet.WriteString(componentInfo.Name);
         for (auto& componentWrapper : *componentPool) {
+            // HACK: Send entity name
+            packet.WriteString(m_World->GetName(componentWrapper.EntityID));
             // Components EntityID
             packet.WritePrimitive(componentWrapper.EntityID);
             // Parents EntityID
@@ -160,7 +201,9 @@ void Server::sendSnapshot()
                 }
             }
         }
-        broadcast(packet);
+        if (packet.Size() > packet.HeaderSize() + componentInfo.Name.size()) {
+            broadcast(packet);
+        }
     }
 }
 
@@ -174,7 +217,7 @@ void Server::sendPing()
         }
     }
     // Create ping message
-    Packet packet(MessageType::ServerPing);
+    Packet packet(MessageType::Ping);
     packet.WriteString("Ping from server");
     // Time message
     m_StartPingTime = std::clock();
@@ -191,7 +234,7 @@ void Server::checkForTimeOuts()
         if (m_ConnectedUsers[i].Endpoint.address() != boost::asio::ip::address()) {
             int stopPing = 1000 * m_ConnectedUsers[i].StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
-            if (startPing > stopPing + TIMEOUTMS) {
+            if (startPing > stopPing + m_TimeoutMs) {
                 LOG_INFO("User %i timed out!", i);
                 disconnect(i);
             }
@@ -199,35 +242,40 @@ void Server::checkForTimeOuts()
     }
 }
 
-void Server::disconnect(int i)
+void Server::disconnect(UserID user)
 {
     //broadcast("A player disconnected");
-    LOG_INFO("User %s disconnected/timed out", m_PlayerDefinitions[i].Name.c_str());
+    LOG_INFO("User %s disconnected/timed out", m_PlayerDefinitions[user].Name.c_str());
     // Remove enteties and stuff (When we can remove entity, remove it and tell clients to remove the copy they have)
-    m_PlayerDefinitions[i].Endpoint = boost::asio::ip::udp::endpoint();
-    m_PlayerDefinitions[i].EntityID = -1;
-    m_PlayerDefinitions[i].Name = "";
-    m_PlayerDefinitions[i].PacketID = 0;
-    m_ConnectedUsers.erase(m_ConnectedUsers.begin() + i);
+    Events::PlayerDisconnected e;
+    e.Entity = m_PlayerDefinitions[user].EntityID;
+    e.PlayerID = user;
+    m_EventBroker->Publish(e);
+
+    m_PlayerDefinitions[user].Endpoint = boost::asio::ip::udp::endpoint();
+    m_PlayerDefinitions[user].EntityID = -1;
+    m_PlayerDefinitions[user].Name = "";
+    m_PlayerDefinitions[user].PacketID = 0;
+    m_ConnectedUsers.erase(m_ConnectedUsers.begin() + user);
 }
 
 void Server::parseOnInputCommand(Packet& packet)
 {
-    int playerID = -1;
+    PlayerID player = -1;
     // Check which player it was who sent the message
-    for (int i = 0; i < MAXCONNECTIONS; i++) {
+    for (int i = 0; i < m_MaxConnections; i++) {
         // if the player is connected set playerID to the correct PlayerID
         if (m_PlayerDefinitions[i].Endpoint.address() == m_ReceiverEndpoint.address()
             && m_PlayerDefinitions[i].Endpoint.port() == m_ReceiverEndpoint.port()) {
-            playerID = i;
+            player = i;
             break;
         }
     }
-    if (playerID != -1) {
+    if (player != -1) {
         while (packet.DataReadSize() < packet.Size()) {
             Events::InputCommand e;
             e.Command = packet.ReadString();
-            e.PlayerID = playerID; // Set correct player id
+            e.PlayerID = player; // Set correct player id
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -292,17 +340,17 @@ void Server::parseDisconnect()
 void Server::parseClientPing()
 {
     LOG_INFO("%i: Parsing ping", m_PacketID);
-    int playerID = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
-    if (playerID == -1) {
+    PlayerID player = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
+    if (player == -1) {
         return;
     }
     // Return ping
-    Packet packet(MessageType::ClientPing, m_PlayerDefinitions[playerID].PacketID);
+    Packet packet(MessageType::Ping, m_PlayerDefinitions[player].PacketID);
     packet.WriteString("Ping received");
     send(packet);
 }
 
-void Server::parseServerPing()
+void Server::parsePing()
 {
     for (int i = 0; i < m_ConnectedUsers.size(); i++) {
         if (m_ConnectedUsers[i].Endpoint.address() == m_ReceiverEndpoint.address()) {
@@ -328,7 +376,7 @@ void Server::createPlayer()
         LOG_WARNING("Already connected!");
         return;
     }
-    int userIndex;
+    UserID userIndex;
     for (userIndex = 0; userIndex < m_ConnectedUsers.size(); userIndex++) {
         if (m_ConnectedUsers[userIndex].Endpoint.address() == m_ReceiverEndpoint.address() &&
             m_ConnectedUsers[userIndex].Endpoint.port() == m_ReceiverEndpoint.port()) {
@@ -340,14 +388,14 @@ void Server::createPlayer()
         LOG_WARNING("Not a recognized user!");
         return;
     }
-    for (int playerIndex = 0; playerIndex < MAXCONNECTIONS; playerIndex++) {
+    for (PlayerID playerIndex = 0; playerIndex < m_MaxConnections; playerIndex++) {
         if (m_PlayerDefinitions[playerIndex].Endpoint.address() == boost::asio::ip::address()) {
             m_PlayerDefinitions[playerIndex] = m_ConnectedUsers[userIndex];
             EntityID entityID = m_World->CreateEntity();
             ComponentWrapper transform = m_World->AttachComponent(entityID, "Transform");
             transform["Position"] = glm::vec3(-1.5f, 0.f, 0.f);
             ComponentWrapper model = m_World->AttachComponent(entityID, "Model");
-            model["Resource"] = "Models/Core/UnitSphere.obj";
+    model["Resource"] = "Models/Core/UnitSphere.mesh"; 
             model["Color"] = glm::vec4(rand()%255 / 255.f, rand()%255 / 255.f, rand() %255 / 255.f, 1.f);
             ComponentWrapper player = m_World->AttachComponent(entityID, "Player");
             m_PlayerDefinitions[playerIndex].EntityID = entityID;
@@ -355,12 +403,19 @@ void Server::createPlayer()
         }
     }
     LOG_WARNING("Server is full!");
- 
+
 }
 
-int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
+void Server::kick(PlayerID player)
 {
-    for (int i = 0; i < MAXCONNECTIONS; i++) {
+    disconnect(player);
+    Packet packet = Packet(MessageType::Kick);
+    send(packet);
+}
+
+PlayerID Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
+{
+    for (int i = 0; i < m_MaxConnections; i++) {
         if (m_PlayerDefinitions[i].Endpoint.address() == endpoint.address() &&
             m_PlayerDefinitions[i].Endpoint.port() == endpoint.port()) {
             return i;
@@ -372,5 +427,25 @@ int Server::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
 bool Server::OnInputCommand(const Events::InputCommand & e)
 {
     //LOG_DEBUG("Server::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    if (e.Command == "LogNetworkBandwidth" && e.Value > 0) {
+        if (isReadingData) {
+            saveToFile();
+        }
+        isReadingData = !isReadingData;
+        m_SaveDataTimer = std::clock();
+    }
+    if (e.Command == "KickPlayer" && e.Value > 0) {
+        kick(0);
+    }
+
     return true;
+}
+
+bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
+{
+    Packet packet = Packet(MessageType::OnPlayerSpawned);
+    packet.WritePrimitive<EntityID>(e.Player.ID);
+    packet.WritePrimitive<EntityID>(e.Spawner.ID);
+    send(e.PlayerID, packet);
+    return false;
 }

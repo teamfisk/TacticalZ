@@ -7,7 +7,7 @@
 			<Orientation X="0.0" Y="0" Z="0.0"/>
 		</c:Transform>
 		<c:Model>
-			<Resource>Models/Core/UnitRaptor.obj</Resource>
+			<Resource>Models/Core/UnitRaptor.mesh</Resource>
 			<Color R="1" G="0.4" B="0.8"/>
 		</c:Model>
 	</Components>
@@ -31,7 +31,7 @@
 							<Scale X="0.1" Y="0.4" Z="0.1"/>
 						</c:Transform>
 						<c:Model>
-							<Resource>Models/Core/UnitCylinder.obj</Resource>
+							<Resource>Models/Core/UnitCylinder.mesh</Resource>
 							<Color R="1" G="0.4" B="0.8"/>
 						</c:Model>
 					</Components>
@@ -44,7 +44,7 @@
 							<Orientation X="0" Y="0" Z="0"/>
 						</c:Transform>
 						<c:Model>
-							<Resource>Models/Core/UnitCube.obj</Resource>
+							<Resource>Models/Core/UnitCube.mesh</Resource>
 							<Color R="1" G="0.4" B="0.8"/>
 						</c:Model>
 					</Components>
@@ -57,7 +57,7 @@
 							<Orientation X="0" Y="1.57" Z="0"/>
 						</c:Transform>
 						<c:Model>
-							<Resource>Models/Core/UnitCube.obj</Resource>
+							<Resource>Models/Core/UnitCube.mesh</Resource>
 							<Color R="1" G="0.4" B="0.8"/>
 						</c:Model>
 					</Components>

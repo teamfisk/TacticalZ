@@ -7,6 +7,7 @@ RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRender
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &RenderSystem::OnPlayerSpawned);
 
     m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
 }
@@ -46,15 +47,22 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
             continue;
         }
 
+        EntityWrapper entity(m_World, modelComponent.EntityID);
+
+        // Don't render the local player
+        if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
+            continue;
+        }
+
         Model* model;
         try {
             model = ResourceManager::Load<::Model, true>(resource);
         } catch (const Resource::StillLoadingException&) {
             //continue;
-            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.obj");
+            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.mesh");
         } catch (const std::exception&) {
             try {
-                model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+                model = ResourceManager::Load<::Model>("Models/Core/Error.mesh");
             } catch (const std::exception&) {
                 continue;
             }
@@ -66,6 +74,14 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
             jobs.push_back(modelJob);
         }
     }
+}
+
+bool RenderSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
+{
+    if (e.PlayerID == -1) {
+        m_LocalPlayer = e.Player;
+    }
+    return true;
 }
 
 void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
@@ -155,11 +171,12 @@ void RenderSystem::Update(double dt)
 {
     m_EventBroker->Process<RenderSystem>();
 
-    if (m_CurrentCamera) {
-        ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
-        m_Camera->SetPosition(cameraTransform["Position"]);
-        m_Camera->SetOrientation(glm::quat((const glm::vec3&)cameraTransform["Orientation"]));
+    // Update the current camera used for rendering
+    if (m_CurrentCamera.Valid()) {
+        m_Camera->SetPosition(Transform::AbsolutePosition(m_CurrentCamera));
+        m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
     }
+
     //Only supports opaque geometry atm
 
     RenderScene scene;

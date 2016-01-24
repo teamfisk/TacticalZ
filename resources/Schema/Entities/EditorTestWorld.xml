@@ -9,7 +9,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Scale X="100" Y="1" Z="100"/>
@@ -58,7 +58,7 @@
       <Components>
         <c:DirectionalLight/>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.obj</Resource>
+          <Resource>Models/DirectionalLightWidget.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
@@ -70,7 +70,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Assault.obj</Resource>
+          <Resource>Models/Assault.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-2.00568962" Y="0.527161121" Z="0"/>
@@ -94,7 +94,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitSphere.obj</Resource>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="0" Y="3.70000029" Z="0"/>

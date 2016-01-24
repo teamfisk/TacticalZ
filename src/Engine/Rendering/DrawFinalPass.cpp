@@ -65,6 +65,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
     glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
 
+
     //TODO: Render: Add code for more jobs than modeljobs.
     for (auto &job : scene.ForwardJobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
@@ -72,6 +73,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
             //TODO: Kolla upp "header/include/common" shader saken så man slipper skicka in asmycket uniforms
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
+            glUniform4fv(glGetUniformLocation(shaderHandle, "DiffuseColor"), 1, glm::value_ptr(modelJob->DiffuseColor));
 
             glActiveTexture(GL_TEXTURE0);
             if(modelJob->DiffuseTexture != nullptr) {
@@ -80,22 +82,35 @@ void DrawFinalPass::Draw(RenderScene& scene)
                 glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
             }
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
-
-            /*if(modelJob->GlowMap != nullptr) {
-                glBindTexture(GL_TEXTURE_2D, modelJob->GlowMap->m_Texture);
+            if (modelJob->IncandescenceTexture != nullptr) {
+                glBindTexture(GL_TEXTURE_2D, modelJob->IncandescenceTexture->m_Texture);
             } else {
                 glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+            }
+
+            /*if(modelJob->GlowMap != nullptr) {
+            glBindTexture(GL_TEXTURE_2D, modelJob->GlowMap->m_Texture);
+            } else {
+            glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
             }*/
+
+            //TODO: Fixa så att modelsJobs kan spela upp olika animationer och så att den kan få in en tid istället för 1.0f - Hälsningar Johan och Andreas :)
+            if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
+                auto animation = modelJob->Model->m_RawModel->m_Skeleton->GetAnimation("running");
+                if (animation != nullptr) {
+                    std::vector<glm::mat4> frameBones = modelJob->Model->m_RawModel->m_Skeleton->GetFrameBones(
+                        *animation,
+                        0.0f
+                        );
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                }
+            }
 
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, 0, modelJob->StartIndex);
-
-            continue;
+            glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
         }
     }
-    m_FinalPassFrameBuffer.Unbind();
     GLERROR("DrawFinalPass::Draw: END");
     delete state;
 }

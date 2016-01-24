@@ -198,7 +198,7 @@ bool SoundSystem::OnPlaySoundOnPosition(const Events::PlaySoundOnPosition & e)
     (float&)(double)emitter["RollOffFactor"] = e.RollOffFactor;
     (float&)(double)emitter["ReferenceDistance"] = e.ReferenceDistance;
     auto model = m_World->AttachComponent(emitterID, "Model");
-    (std::string&)model["Resource"] = "Models/Core/UnitCube.obj";
+    (std::string&)model["Resource"] = "Models/Core/UnitCube.mesh"; // 360NoScope UnitCube
     source->Type = SoundType::SFX;
     m_Sources[emitterID] = source;
     playSound(source);
