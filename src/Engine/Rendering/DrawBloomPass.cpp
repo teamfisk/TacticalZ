@@ -4,7 +4,7 @@ DrawBloomPass::DrawBloomPass(IRenderer* renderer)
 {
     m_Renderer = renderer;
 
-    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
+    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh");
 
     InitializeTextures();
     InitializeBuffers();

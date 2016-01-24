@@ -35,7 +35,7 @@
               <FOV>80</FOV>
             </c:Camera>
             <c:Model>
-              <Resource>Models/Camera.obj</Resource>
+              <Resource>Models/Camera.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="1.39121652" Z="-0.043014247"/>
@@ -58,70 +58,16 @@
                       <Color A="0" B="0.659900069" G="0" R="0.340099931"/>
                     </c:Fill>
                     <c:Model>
-                      <Resource>Models/Core/UnitHexagon.obj</Resource>
+                      <Resource>Models/Core/UnitHexagon.mesh</Resource>
                       <Color A="0.313725501" B="0.70588237" G="0.70588237" R="0.70588237"/>
                     </c:Model>
                     <c:Transform>
-                      <Position X="-0.287027329" Y="-0.282350302" Z="-1.52214652e-05"/>
+                      <Position X="-0.285538822" Y="-0.282350302" Z="-1.52214652e-05"/>
                       <Scale X="0.200000003" Y="0.200000003" Z="0.5"/>
                       <Orientation X="0" Y="0.666000009" Z="0"/>
                     </c:Transform>
                   </Components>
                   <Children>
-                    <Entity name="Hexagon2">
-                      <Components>
-                        <c:Model>
-                          <Resource>Models/Core/UnitHexagon.obj</Resource>
-                          <Color A="0.392156869" B="1" G="1" R="1"/>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="0.120033145" Y="0.0776480734" Z="-1.56768795e-06"/>
-                          <Scale X="0.5" Y="0.5" Z="0.5"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="SelectedWeaponUI">
-                          <Components>
-                            <c:Model>
-                              <Resource>Models/SecondaryWeapon.fbx</Resource>
-                              <Color A="0.423529416" B="1" G="3.92156863" R="1"/>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="-0.00400000019" Y="0.0138316695" Z="0.00813383237"/>
-                              <Scale X="2" Y="2" Z="1"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                    <Entity name="Hexagon3">
-                      <Components>
-                        <c:Model>
-                          <Resource>Models/Core/UnitHexagon.obj</Resource>
-                          <Color A="0.392156869" B="1" G="1" R="1"/>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="0.119999997" Y="-0.0780000016" Z="0"/>
-                          <Scale X="0.5" Y="0.5" Z="0.5"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="UnselectedWeaponUI">
-                          <Components>
-                            <c:Model>
-                              <Resource>Models/SecondaryWeapon.fbx</Resource>
-                              <Color A="0.466666669" B="0" G="0" R="0"/>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="-0.00400000019" Y="0.0136327185" Z="0.00800000038"/>
-                              <Scale X="2" Y="2" Z="1"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
                     <Entity name="Ammo">
                       <Components>
                         <c:Text>
@@ -165,25 +111,6 @@
                   </Components>
                   <Children/>
                 </Entity>
-                <Entity>
-                  <Components>
-                    <c:HealthHUD/>
-                    <c:Fill>
-                      <Percentage>0.65990006923675537</Percentage>
-                      <Color A="0" B="0.659900069" G="0" R="0.340099931"/>
-                    </c:Fill>
-                    <c:Model>
-                      <Resource>Models/Core/UnitRaptor.obj</Resource>
-                      <Color A="0.678431392" B="3.92156863" G="3.92156863" R="3.92156863"/>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0" Y="-0.118439019" Z="-0.165149197"/>
-                      <Scale X="0.100000001" Y="1" Z="0.200000003"/>
-                      <Orientation X="1.42800009" Y="1.61800003" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
               </Children>
             </Entity>
           </Children>
@@ -193,7 +120,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitPlane.obj</Resource>
+          <Resource>Models/Core/UnitPlane.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="0" Y="-0.689623177" Z="0.600000024"/>
@@ -205,7 +132,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Assault.obj</Resource>
+          <Resource>Models/Assault.mesh</Resource>
           <Color A="1" B="3.92156863" G="1" R="1"/>
         </c:Model>
         <c:Transform>
@@ -234,7 +161,7 @@
           <Axis X="0.200000003" Y="3.4000001" Z="0.5"/>
         </c:RaptorCopter>
         <c:Transform>
-          <Orientation X="676.517334" Y="19246.6816" Z="1116.82788"/>
+          <Orientation X="758.058899" Y="20632.8691" Z="1320.68018"/>
         </c:Transform>
       </Components>
       <Children>
@@ -381,7 +308,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Assault.obj</Resource>
+          <Resource>Models/Assault.mesh</Resource>
           <Color A="1" B="1" G="1" R="3.92156863"/>
         </c:Model>
         <c:Transform>
@@ -397,7 +324,7 @@
           <Intensity>0.10000000149011612</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.obj</Resource>
+          <Resource>Models/DirectionalLightWidget.mesh</Resource>
           <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
         </c:Model>
         <c:Transform>
@@ -410,7 +337,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="39.2156868" R="1"/>
         </c:Model>
         <c:Transform>

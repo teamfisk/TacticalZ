@@ -68,7 +68,7 @@ std::vector<glm::mat4> Skeleton::GetFrameBones(const Animation& animation, doubl
 
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe &currentFrame, const Animation::Keyframe &nextFrame, float progress, std::map<int, glm::mat4> &boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
 {
-	glm::mat4 boneMatrix;
+    glm::mat4 boneMatrix;
 
 	if (currentFrame.BoneProperties.find(bone->ID) != currentFrame.BoneProperties.end() || nextFrame.BoneProperties.find(bone->ID) != nextFrame.BoneProperties.end()) {
 		Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties.at(bone->ID);
@@ -84,10 +84,13 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyf
 			positionInterp.z = 0;
 		}
 
+
 		boneMatrix = parentMatrix * (glm::translate(positionInterp) * glm::toMat4(rotationInterp) * glm::scale(scaleInterp));
 		boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
 	} else {
-		boneMatrix = parentMatrix * bone->Parent->OffsetMatrix; // * glm::inverse(bone->OffsetMatrix);
+        if (bone->Parent) {
+            boneMatrix = parentMatrix; // * glm::inverse(bone->OffsetMatrix);
+        }
 		boneMatrices[bone->ID] = boneMatrix; // * bone->OffsetMatrix;
 	}
 
@@ -95,6 +98,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyf
 		std::string name = child->Name;
 		AccumulateBoneTransforms(noRootMotion, currentFrame, nextFrame, progress, boneMatrices, child, boneMatrix);
 	}
+
 }
 
 int Skeleton::GetBoneID(std::string name)

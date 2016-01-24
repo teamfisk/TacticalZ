@@ -13,9 +13,9 @@ void Renderer::Initialize()
     m_TextPass->Initialize();
 
 
-    m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
+   /* m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
-    m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");
+    m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");*/
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
 }

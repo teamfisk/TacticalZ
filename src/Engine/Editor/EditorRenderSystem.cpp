@@ -39,7 +39,7 @@ void EditorRenderSystem::Update(double dt)
                 continue;
             } catch (const std::exception&) {
                 try {
-                    model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+                    model = ResourceManager::Load<::Model>("Models/Core/Error.mesh");
                 } catch (const std::exception&) {
                     continue;
                 }

@@ -4,6 +4,7 @@ uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 uniform vec4 Color;
+uniform vec4 DiffuseColor;
 uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform float FillPercentage;
@@ -49,7 +50,6 @@ in VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
-	vec4 DiffuseColor;
 }Input;
 
 out vec4 sceneColor;
@@ -138,7 +138,7 @@ void main()
 	}
 
 	//sceneColor += Input.DiffuseColor;
-	vec4 color_result = Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
+	vec4 color_result = DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
 	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;

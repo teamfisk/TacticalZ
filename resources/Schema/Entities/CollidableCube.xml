@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:AABB/>
+    <c:Collidable/>
+    <c:Model>
+      <Resource>Models/Core/UnitCube.obj</Resource>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children/>
+
+</Entity>

@@ -16,6 +16,9 @@
 	<xs:simpleType name="double">
 		<xs:restriction base="xs:decimal"></xs:restriction>
 	</xs:simpleType>
+	<xs:simpleType name="float">
+		<xs:restriction base="xs:decimal"></xs:restriction>
+	</xs:simpleType>
 	<xs:simpleType name="string">
 		<xs:restriction base="xs:string"></xs:restriction>
 	</xs:simpleType>
