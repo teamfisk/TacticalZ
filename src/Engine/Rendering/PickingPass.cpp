@@ -75,9 +75,9 @@ void PickingPass::Draw(RenderScene& scene)
                 m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
                 if (m_ColorCounter[0] > 255) {
                     m_ColorCounter[0] = 0;
-                        m_ColorCounter[1] += 5;
+                        m_ColorCounter[1]++;
                 } else {
-                        m_ColorCounter[0] += 50;
+                        m_ColorCounter[0]++;
                 }
             }
 
