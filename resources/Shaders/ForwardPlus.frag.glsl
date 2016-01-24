@@ -4,6 +4,7 @@ uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 uniform vec4 Color;
+uniform vec4 DiffuseColor;
 uniform vec2 ScreenDimensions;
 layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D GlowMap;
@@ -46,7 +47,6 @@ in VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
-	vec4 DiffuseColor;
 }Input;
 
 out vec4 sceneColor;
@@ -135,7 +135,7 @@ void main()
 	}
 
 	//sceneColor += Input.DiffuseColor;
-	vec4 color_result = Input.DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
+	vec4 color_result = DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
 	//bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 	//These if statements should be removed if they are slow.

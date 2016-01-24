@@ -24,7 +24,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Core/UnitSphere.obj</Resource>
+              <Resource>Models/Core/UnitSphere.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="1.26689196"/>
@@ -37,7 +37,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Core/UnitSphere.obj</Resource>
+              <Resource>Models/Core/UnitSphere.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-1.14786315"/>
