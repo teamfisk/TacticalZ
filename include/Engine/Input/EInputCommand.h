@@ -9,7 +9,7 @@ namespace Events
 struct InputCommand : Event
 {
 	/** Numerical ID of the player. */
-	unsigned int PlayerID;
+	int PlayerID;
 	/** The command that was sent. */
 	std::string Command;
 	/** The value of the command. */
