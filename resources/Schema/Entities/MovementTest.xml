@@ -146,7 +146,6 @@
         </c:Team>
         <c:Transform>
           <Position X="0.300000012" Y="0.0270000007" Z="6.67400026"/>
-          <Orientation X="0" Y="3.20700026" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
