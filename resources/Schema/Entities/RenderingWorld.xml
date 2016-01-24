@@ -9,7 +9,7 @@
     <Entity name="Player">
       <Components>
         <c:Health>
-          <Health>69.990005493164063</Health>
+          <Health>65.990005493164063</Health>
         </c:Health>
         <c:Player/>
         <c:Transform>
@@ -21,6 +21,7 @@
           <Components>
             <c:Model>
               <Resource>Models/Assault.obj</Resource>
+              <Color A="1" B="3.92156863" G="3.92156863" R="3.92156863"/>
             </c:Model>
             <c:Transform>
               <Orientation X="0" Y="3.14159203" Z="0"/>
@@ -53,8 +54,8 @@
                   <Components>
                     <c:HealthHUD/>
                     <c:Fill>
-                      <Percentage>0.69990003108978271</Percentage>
-                      <Color A="0" B="0.699900031" G="0" R="0.300099969"/>
+                      <Percentage>0.65990006923675537</Percentage>
+                      <Color A="0" B="0.659900069" G="0" R="0.340099931"/>
                     </c:Fill>
                     <c:Model>
                       <Resource>Models/Core/UnitHexagon.obj</Resource>
@@ -83,7 +84,7 @@
                           <Components>
                             <c:Model>
                               <Resource>Models/SecondaryWeapon.fbx</Resource>
-                              <Color A="0.784313738" B="1" G="1" R="1"/>
+                              <Color A="0.423529416" B="1" G="3.92156863" R="1"/>
                             </c:Model>
                             <c:Transform>
                               <Position X="-0.00400000019" Y="0.0138316695" Z="0.00813383237"/>
@@ -110,7 +111,7 @@
                           <Components>
                             <c:Model>
                               <Resource>Models/SecondaryWeapon.fbx</Resource>
-                              <Color A="0.588235319" B="0" G="0" R="0"/>
+                              <Color A="0.466666669" B="0" G="0" R="0"/>
                             </c:Model>
                             <c:Transform>
                               <Position X="-0.00400000019" Y="0.0136327185" Z="0.00800000038"/>
@@ -121,7 +122,67 @@
                         </Entity>
                       </Children>
                     </Entity>
+                    <Entity name="Ammo">
+                      <Components>
+                        <c:Text>
+                          <Content>24</Content>
+                          <Resource>Fonts/DroidSans.ttf,60</Resource>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="-1.43861985e-06" Y="0.0125972452" Z="0.0100018298"/>
+                          <Scale X="0.349999994" Y="0.349999994" Z="0.200000003"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Text>
+                              <Content>262</Content>
+                              <Resource>Fonts/DroidSans.ttf,60</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-4.27209579e-06" Y="-0.0390000008" Z="5.43686883e-06"/>
+                              <Scale X="0.65200001" Y="0.643000007" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
                   </Children>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:HealthHUD/>
+                    <c:Text>
+                      <Content>65/100</Content>
+                      <Resource>Fonts/DroidSans.ttf,60</Resource>
+                      <Color A="1" B="0.659900069" G="0" R="0.340099931"/>
+                    </c:Text>
+                    <c:Transform>
+                      <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:HealthHUD/>
+                    <c:Fill>
+                      <Percentage>0.65990006923675537</Percentage>
+                      <Color A="0" B="0.659900069" G="0" R="0.340099931"/>
+                    </c:Fill>
+                    <c:Model>
+                      <Resource>Models/Core/UnitRaptor.obj</Resource>
+                      <Color A="0.678431392" B="3.92156863" G="3.92156863" R="3.92156863"/>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="-0.118439019" Z="-0.165149197"/>
+                      <Scale X="0.100000001" Y="1" Z="0.200000003"/>
+                      <Orientation X="1.42800009" Y="1.61800003" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
                 </Entity>
               </Children>
             </Entity>
@@ -145,6 +206,7 @@
       <Components>
         <c:Model>
           <Resource>Models/Assault.obj</Resource>
+          <Color A="1" B="3.92156863" G="1" R="1"/>
         </c:Model>
         <c:Transform>
           <Position X="-2.5" Y="0" Z="1"/>
@@ -157,6 +219,7 @@
         <c:Text>
           <Content>Welcome!</Content>
           <Resource>Fonts/DroidSans.ttf,1280</Resource>
+          <Color A="0" B="3.92156863" G="3.92156863" R="3.92156863"/>
         </c:Text>
         <c:Transform>
           <Position X="0" Y="0" Z="0.700000048"/>
@@ -167,32 +230,40 @@
     <Entity>
       <Components>
         <c:RaptorCopter>
-          <Speed>2</Speed>
-          <Axis X="0" Y="1" Z="0"/>
+          <Speed>3</Speed>
+          <Axis X="0.200000003" Y="3.4000001" Z="0.5"/>
         </c:RaptorCopter>
         <c:Transform>
-          <Position X="0" Y="2.37320328" Z="0"/>
-          <Orientation X="0" Y="14039.5469" Z="0"/>
+          <Orientation X="676.517334" Y="19246.6816" Z="1116.82788"/>
         </c:Transform>
       </Components>
       <Children>
         <Entity>
           <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.obj</Resource>
+              <Color A="1" B="7.84313726" G="0" R="7.84313726"/>
+            </c:Model>
             <c:PointLight>
               <Color A="1" B="1" G="0" R="1"/>
-              <Radius>6</Radius>
+              <Radius>70</Radius>
               <Intensity>0.5</Intensity>
             </c:PointLight>
             <c:Transform>
               <Position X="-2.5" Y="0" Z="0"/>
+              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
             </c:Transform>
           </Components>
           <Children>
             <Entity>
               <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.obj</Resource>
+                  <Color A="1" B="0" G="0" R="7.84313726"/>
+                </c:Model>
                 <c:PointLight>
                   <Color A="1" B="0" G="0" R="1"/>
-                  <Radius>8</Radius>
+                  <Radius>70</Radius>
                 </c:PointLight>
                 <c:Transform>
                   <Position X="-5" Y="0" Z="0"/>
@@ -204,21 +275,30 @@
         </Entity>
         <Entity>
           <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.obj</Resource>
+              <Color A="1" B="0" G="7.84313726" R="7.84313726"/>
+            </c:Model>
             <c:PointLight>
               <Color A="1" B="0" G="1" R="1"/>
-              <Radius>6</Radius>
+              <Radius>70</Radius>
               <Intensity>0.5</Intensity>
             </c:PointLight>
             <c:Transform>
               <Position X="0" Y="0" Z="-2.5"/>
+              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
             </c:Transform>
           </Components>
           <Children>
             <Entity>
               <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.obj</Resource>
+                  <Color A="1" B="0" G="7.84313726" R="0"/>
+                </c:Model>
                 <c:PointLight>
                   <Color A="1" B="0" G="1" R="0"/>
-                  <Radius>8</Radius>
+                  <Radius>70</Radius>
                 </c:PointLight>
                 <c:Transform>
                   <Position X="0" Y="0" Z="-5"/>
@@ -230,21 +310,30 @@
         </Entity>
         <Entity>
           <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.obj</Resource>
+              <Color A="1" B="7.84313726" G="7.84313726" R="0"/>
+            </c:Model>
             <c:PointLight>
               <Color A="1" B="1" G="1" R="0"/>
-              <Radius>6</Radius>
+              <Radius>70</Radius>
               <Intensity>0.5</Intensity>
             </c:PointLight>
             <c:Transform>
               <Position X="0" Y="0" Z="2.5"/>
+              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
             </c:Transform>
           </Components>
           <Children>
             <Entity>
               <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.obj</Resource>
+                  <Color A="1" B="7.84313726" G="0" R="0"/>
+                </c:Model>
                 <c:PointLight>
-                  <Color A="1" B="1" G="0.00784313772" R="0"/>
-                  <Radius>8</Radius>
+                  <Color A="1" B="1" G="0" R="0"/>
+                  <Radius>70</Radius>
                 </c:PointLight>
                 <c:Transform>
                   <Position X="0" Y="0" Z="5"/>
@@ -256,19 +345,28 @@
         </Entity>
         <Entity>
           <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.obj</Resource>
+              <Color A="1" B="7.84313726" G="7.84313726" R="7.84313726"/>
+            </c:Model>
             <c:PointLight>
-              <Radius>6</Radius>
+              <Radius>70</Radius>
               <Intensity>0.5</Intensity>
             </c:PointLight>
             <c:Transform>
               <Position X="2.5" Y="0" Z="0"/>
+              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
             </c:Transform>
           </Components>
           <Children>
             <Entity>
               <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.obj</Resource>
+                  <Color A="1" B="7.84313726" G="7.84313726" R="7.84313726"/>
+                </c:Model>
                 <c:PointLight>
-                  <Radius>8</Radius>
+                  <Radius>70</Radius>
                 </c:PointLight>
                 <c:Transform>
                   <Position X="5" Y="0" Z="0"/>
@@ -284,6 +382,7 @@
       <Components>
         <c:Model>
           <Resource>Models/Assault.obj</Resource>
+          <Color A="1" B="1" G="1" R="3.92156863"/>
         </c:Model>
         <c:Transform>
           <Position X="2.5" Y="0" Z="1"/>
@@ -291,14 +390,15 @@
       </Components>
       <Children/>
     </Entity>
-    <Entity>
+    <Entity name="DirectionalLight">
       <Components>
         <c:DirectionalLight>
           <Color A="1" B="0.996078432" G="1" R="1"/>
-          <Intensity>0.80000001192092896</Intensity>
+          <Intensity>0.10000000149011612</Intensity>
         </c:DirectionalLight>
         <c:Model>
           <Resource>Models/DirectionalLightWidget.obj</Resource>
+          <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
         </c:Model>
         <c:Transform>
           <Position X="-0.0013256073" Y="1.89540339" Z="6.53467274"/>
@@ -311,6 +411,7 @@
       <Components>
         <c:Model>
           <Resource>Models/Core/UnitCube.obj</Resource>
+          <Color A="1" B="1" G="39.2156868" R="1"/>
         </c:Model>
         <c:Transform>
           <Position X="-5.4082036" Y="0" Z="-1.84950542"/>
