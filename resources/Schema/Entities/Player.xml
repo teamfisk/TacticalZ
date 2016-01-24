@@ -6,12 +6,13 @@
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
+    <c:Collidable/>
     <c:Model/>
     <c:Physics>
-      <Gravity>false</Gravity>
+      <Velocity X="8.33307467e-09" Y="0" Z="9.82836834e-09"/>
     </c:Physics>
     <c:Player>
-      <MovementSpeed>7</MovementSpeed>
+      <MovementSpeed>5</MovementSpeed>
     </c:Player>
     <c:Team>
       <Team>
@@ -19,7 +20,8 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="0" Y="0" Z="7.38143063"/>
+      <Position X="2.84928203" Y="0.0264999866" Z="7.31610918"/>
+      <Orientation X="0" Y="2.14675093" Z="0"/>
     </c:Transform>
   </Components>
 
@@ -29,6 +31,7 @@
         <c:Camera/>
         <c:Transform>
           <Position X="0" Y="1.37700009" Z="0"/>
+          <Orientation X="0.921535373" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children>

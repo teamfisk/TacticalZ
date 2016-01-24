@@ -48,8 +48,12 @@ void PlayerMovementSystem::Update(double dt)
             }
             glm::vec3& velocity = cPhysics["Velocity"];
             ImGui::Text("velocity: (%f, %f, %f)", velocity.x, velocity.y, velocity.z);
-            ImGui::Text("wishDirection: (%f, %f, %f)", wishDirection.x, wishDirection.y, wishDirection.z);
-            float currentSpeedProj = glm::dot(velocity, wishDirection);
+            glm::vec3 groundVelocity(0.f, 0.f, 0.f);
+            groundVelocity.x = glm::dot(velocity, glm::vec3(1.f, 0.f, 0.f));
+            groundVelocity.z = glm::dot(velocity, glm::vec3(0.f, 0.f, 1.f));
+            ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(wishDirection));
+            ImGui::Text("wishDirection: (%f, %f, %f) |%f|", wishDirection.x, wishDirection.y, wishDirection.z, glm::length(wishDirection));
+            float currentSpeedProj = glm::dot(groundVelocity, wishDirection);
             float addSpeed = wishSpeed - currentSpeedProj;
             ImGui::Text("currentSpeedProj: %f", currentSpeedProj);
             ImGui::Text("wishSpeed: %f", wishSpeed);
@@ -58,20 +62,20 @@ void PlayerMovementSystem::Update(double dt)
             if (addSpeed > 0) {
                 static float accel = 15.f;
                 ImGui::InputFloat("accel", &accel);
-                float actualAccel = accel;
-                static float surfaceFriction = 1.f;
+                static float airAccel = 0.5f;
+                ImGui::InputFloat("airAccel", &airAccel);
+                float actualAccel = (velocity.y != 0) ? airAccel : accel;
+                static float surfaceFriction = 5.f;
                 ImGui::InputFloat("surfaceFriction", &surfaceFriction);
                 float accelerationSpeed = actualAccel * (float)dt * wishSpeed * surfaceFriction;
                 accelerationSpeed = glm::min(accelerationSpeed, addSpeed);
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
-            //pos += controller->Movement() * glm::inverse(glm::quat(ori)) * speed * (float)dt;
 
-            //glm::vec3& velocity = player["Physics"]["Velocity"];
-            //if (controller->Jumping() && !controller->Crouching() && velocity.y == 0.f) {
-            //    velocity.y += 4.f;
-            //}
+            if (controller->Jumping() && !controller->Crouching() && velocity.y == 0.f) {
+                velocity.y += 4.f;
+            }
 
             //if (player.HasComponent("AABB")) {
             //    glm::vec3& size = player["AABB"]["Size"];
@@ -93,20 +97,26 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     if (!entity.HasComponent("Physics")) {
         return;
     }
-    ComponentWrapper& cPhysics = entity["Physics"];
 
+    ComponentWrapper& cPhysics = entity["Physics"];
     glm::vec3& velocity = cPhysics["Velocity"];
-    if (cPhysics["Gravity"]) {
-        velocity.y -= 9.82f * (float)dt;
-    }
 
     // Ground friction
     float speed = glm::length(velocity);
-        static float groundFriction = 7.f;
+    static float groundFriction = 7.f;
     ImGui::InputFloat("groundFriction", &groundFriction);
+    static float airFriction = 0.f;
+    ImGui::InputFloat("airFriction", &airFriction);
+    float friction = (velocity.y != 0) ? airFriction : groundFriction;
     if (speed > 0) {
-        float drop = speed * groundFriction * (float)dt;
-        velocity *= glm::max(speed - drop, 0.f) / speed;
+        float drop = speed * friction * (float)dt;
+        float multiplier = glm::max(speed - drop, 0.f) / speed;
+        velocity.x *= multiplier;
+        velocity.z *= multiplier;
+    }
+
+    if (cPhysics["Gravity"]) {
+        velocity.y -= 9.82f * (float)dt;
     }
 
     glm::vec3& position = cTransform["Position"];
