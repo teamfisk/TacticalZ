@@ -1,11 +1,11 @@
-#include "Rendering/TextRenderer.h"
+#include "Rendering/TextPass.h"
 
-TextRenderer::TextRenderer()
+TextPass::TextPass()
 {
 
 }
 
-void TextRenderer::Initialize()
+void TextPass::Initialize()
 {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -21,16 +21,20 @@ void TextRenderer::Initialize()
     m_TextProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Text.vert.glsl")));
     m_TextProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Text.frag.glsl")));
     m_TextProgram->Compile();
+    m_TextProgram->BindFragDataLocation(0, "sceneColor");
+    m_TextProgram->BindFragDataLocation(1, "bloomColor");
     m_TextProgram->Link();
 }
 
-void TextRenderer::Update()
+void TextPass::Update()
 {
 
 }
 
-void TextRenderer::Draw(RenderScene& scene)
+void TextPass::Draw(RenderScene& scene, FrameBuffer& frameBuffer)
 {
+    GLERROR("Derp1");
+    TextPassState* state = new TextPassState(frameBuffer.GetHandle());
     for (auto &job : scene.TextJobs) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
@@ -38,13 +42,15 @@ void TextRenderer::Draw(RenderScene& scene)
             renderText(textJob->Content, textJob->Resource, textJob->Alignment, textJob->Color, textJob->Matrix, scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
         }
     }
+    GLERROR("Derp2");
+    delete state;
 }
 
-void TextRenderer::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
     GLfloat penX = 0;
     GLfloat penY = 0;
-    float scale = 1.0/font->FontSize;
+    GLfloat scale = 1.0/font->FontSize;
 
     GLfloat stringWidth = 0.f;
 
@@ -61,13 +67,10 @@ void TextRenderer::renderText(std::string text, Font* font, TextJob::AlignmentEn
         penX = 0;
     }	
     
-    glEnable(GL_BLEND);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
 
     m_TextProgram->Bind();
-    glUniform3f(glGetUniformLocation(m_TextProgram->GetHandle(), "textColor"), color.x, color.y, color.z);
+    glUniform4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "textColor"), 1, glm::value_ptr(color));
     glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "M"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "V"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "P"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));

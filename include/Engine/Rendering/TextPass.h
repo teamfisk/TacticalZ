@@ -10,14 +10,16 @@
 #include "Font.h"
 #include "../Core/ResourceManager.h"
 #include "RenderQueue.h"
+#include "TextPassState.h"
+#include "FrameBuffer.h"
 
-class TextRenderer
+class TextPass
 {
 public:
-    TextRenderer();
+    TextPass();
     void Initialize();
     void Update();
-    void Draw(RenderScene& scene);
+    void Draw(RenderScene& scene, FrameBuffer& frameBuffer);
 
 private:
     void renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
