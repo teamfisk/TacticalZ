@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="PointLight" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:PointLight>
+      <Radius>8</Radius>
+      <Intensity>2.7999999523162842</Intensity>
+    </c:PointLight>
+    <c:Transform>
+      <Position X="0.370978802" Y="1.88588905" Z="-0.55370003"/>
+    </c:Transform>
+  </Components>
+
+  <Children/>
+
+</Entity>
