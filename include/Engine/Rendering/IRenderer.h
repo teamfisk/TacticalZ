@@ -31,15 +31,19 @@ public:
 	void SetFullscreen(bool fullscreen) { m_Fullscreen = fullscreen; }
 	bool VSYNC() const { return m_VSYNC; }
 	void SetVSYNC(bool vsync) { m_VSYNC = vsync; }
+    Rectangle GetViewPortSize() const { return m_ViewPortWidth; }
+    void SetViewPortSize(const Rectangle& viewportWidth) { m_ViewPortWidth = viewportWidth; }
 	virtual void Initialize() = 0;
 	virtual void Update(double dt) = 0;
 	virtual void Draw(RenderFrame& rq) = 0;
     virtual PickData Pick(glm::vec2 screenCord) = 0;
 
+
     World* m_World; //Temp world, untill viktor merge.
 
 protected:
 	Rectangle m_Resolution = Rectangle::Rectangle(1280, 720);
+    Rectangle m_ViewPortWidth = Rectangle::Rectangle(1280, 720);
 	bool m_Fullscreen = false;
 	bool m_VSYNC = false;
 	int m_GLVersion[2];
