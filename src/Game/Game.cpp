@@ -57,7 +57,7 @@ Game::Game(int argc, char* argv[])
     m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
-    m_World = new World();
+    m_World = new World(m_EventBroker);
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
