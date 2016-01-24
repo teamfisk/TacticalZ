@@ -36,6 +36,18 @@ EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
     return EntityWrapper::Invalid;
 }
 
+EntityWrapper EntityWrapper::FirstParentWithComponent(const std::string& componentType)
+{
+    EntityWrapper entity = *this;
+    while (entity.Parent().Valid()) {
+        entity = entity.Parent();
+        if (entity.HasComponent(componentType)) {
+            return entity;
+        }
+    }
+    return EntityWrapper::Invalid;
+}
+
 bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
 {
     EntityWrapper entity = *this;

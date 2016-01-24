@@ -5,11 +5,15 @@
 #include "Entity.h"
 #include "ObjectPool.h"
 #include "ComponentPool.h"
+#include "EventBroker.h"
 
 class World
 {
 public:
     World() = default;
+    World(EventBroker* eventBroker) 
+        : m_EventBroker(eventBroker)
+    { }
     ~World();
 
     // Create empty entity
@@ -46,6 +50,7 @@ public:
     std::string GetName(EntityID entity) const;
 
 private:
+    EventBroker* m_EventBroker = nullptr;
     EntityID m_CurrentEntityID = 0;
 
     std::unordered_map<EntityID, EntityID> m_EntityParents;
@@ -55,6 +60,7 @@ private:
     std::unordered_map<EntityID, std::string> m_EntityNames;
 
     EntityID generateEntityID();
+    void deleteEntityRecursive(EntityID entity, bool cascaded = false);
 };
 
 #endif

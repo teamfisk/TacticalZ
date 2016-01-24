@@ -15,7 +15,6 @@
 #define INPUTSIZE 4097
 typedef unsigned int PlayerID;
 typedef unsigned int PacketID;
-typedef unsigned int UserID;
 
 class Network
 {

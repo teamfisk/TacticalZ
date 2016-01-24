@@ -15,7 +15,10 @@ enum class MessageType
     PlayerConnected,
     BecomePlayer,
     Kick,
-    OnPlayerSpawned
+    OnPlayerSpawned,
+    EntityDeleted,
+    ComponentDeleted,
+    PlayerTransform
 };
 
 #endif

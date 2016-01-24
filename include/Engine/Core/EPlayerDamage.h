@@ -2,15 +2,15 @@
 #define EPlayerDamage_h__
 
 #include "EventBroker.h"
-#include "../Core/Entity.h"
+#include "../Core/EntityWrapper.h"
 
 namespace Events
 {
 
 struct PlayerDamage : Event
 {
-    double DamageAmount;
-    EntityID PlayerDamagedID;
+    EntityWrapper Player;
+    double Damage;
 };
 
 }

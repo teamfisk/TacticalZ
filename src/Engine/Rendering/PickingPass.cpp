@@ -90,7 +90,7 @@ void PickingPass::Draw(RenderScene& scene)
 
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
+            glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
         }
     }
     
