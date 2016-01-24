@@ -78,6 +78,9 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
     }
 
+    // Store the player for future reference
+    m_PlayerEntities[e.PlayerID] = e.Player;
+
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
     if (cameraEntity.Valid()) {
@@ -86,8 +89,23 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         m_EventBroker->Publish(e);
     }
 
-    // Store the player for future reference
-    m_PlayerEntities[e.PlayerID] = e.Player;
+    // HACK: Set the player model color to team color
+    EntityWrapper playerModel = e.Player.FirstChildByName("PlayerModel");
+    if (playerModel.Valid() && e.Player.HasComponent("Team")) {
+        ComponentWrapper cTeam = e.Player["Team"];
+        ComponentWrapper cModel = playerModel["Model"];
+        if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Red")) {
+            cModel["Color"] = glm::vec3(1.f, 0.f, 0.f);
+        } else if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Blue")) {
+            cModel["Color"] = glm::vec3(0.f, 0.25f, 1.f);
+        }
+    }
+
+    // TODO: Set the player name to whatever
+    //EntityWrapper playerName = e.Player.FirstChildByName("PlayerName");
+    //if (playerName.Valid()) {
+    //    playerName["Text"]["Content"] = ???;
+    //}
 
     return true;
 }

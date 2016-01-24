@@ -22,7 +22,7 @@
       </Components>
       <Children/>
     </Entity>
-    <Entity name="Spawner">
+    <Entity name="RedSpawn">
       <Components>
         <c:PlayerSpawn/>
         <c:Spawner>
@@ -132,6 +132,51 @@
         </c:Transform>
       </Components>
       <Children/>
+    </Entity>
+    <Entity name="BlueSpawn">
+      <Components>
+        <c:PlayerSpawn/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="0.300000012" Y="0.0270000007" Z="6.67400026"/>
+          <Orientation X="0" Y="3.20700026" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Assault.obj</Resource>
+              <Color A="1" B="1" G="0.254901975" R="0"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.800000012" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Assault.obj</Resource>
+              <Color A="1" B="1" G="0.254901975" R="0"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.600000024" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
   </Children>
 
