@@ -243,16 +243,19 @@ inline glm::vec3 signNonZero(const glm::vec3& x)
     return r;
 }
 
-
-bool vectorHasLength(const glm::vec3& vec)
+template<typename T>
+bool vectorHasLength(const T& vec)
 {
-    return glm::any(glm::greaterThan(glm::abs(vec), glm::vec3(0.0001f, 0.0001f, 0.0001f)));
+    return glm::any(glm::greaterThan(glm::abs(vec), T(0.0001f)));
 }
 
-bool AARectangleVsTriangle(const glm::vec2& boxMin,
+bool rectangleVsTriangle(const glm::vec2& boxMin,
     const glm::vec2& boxMax,
-    const std::array<glm::vec2, 3>& triPos)
+    const std::array<glm::vec2, 3>& triPos,
+    glm::vec2& resolutionDirection,
+    float& resolutionDistance)
 {
+    resolutionDistance = INFINITY;
     //Project along box normals (coordinate axes, since it's axis-aligned).
     for (int ax = 0; ax < 2; ++ax) {
         float minTri = INFINITY;
@@ -263,6 +266,12 @@ bool AARectangleVsTriangle(const glm::vec2& boxMin,
         }
         if (minTri > boxMax[ax] || maxTri < boxMin[ax]) {
             return false;
+        }
+        float push = std::min(maxTri - boxMin[ax], boxMax[ax] - minTri);
+        if (push < resolutionDistance) {
+            resolutionDistance = push;
+            resolutionDirection[1 - ax] = 0.f;
+            resolutionDirection[ax] = resolutionDistance;
         }
     }
     //Project along triangle normals.
@@ -279,6 +288,9 @@ bool AARectangleVsTriangle(const glm::vec2& boxMin,
         boxMin
     };
     for (auto& normal : triNormals) {
+        if (!vectorHasLength(normal)) {
+            continue;
+        }
         //Rotate edge to a normal.
         normal = glm::vec2(-normal.y, normal.x);
         //Project triangle onto the normal.
@@ -294,18 +306,24 @@ bool AARectangleVsTriangle(const glm::vec2& boxMin,
         float maxBox = -INFINITY;
         for (const glm::vec2& point : boxPos) {
             float dot = glm::dot(normal, point);
-            minBox = std::min(dot, minTri);
-            maxBox = std::max(dot, maxTri);
+            minBox = std::min(dot, minBox);
+            maxBox = std::max(dot, maxBox);
         }
         if (maxBox < minTri || minBox > maxTri) {
             return false;
+        }
+        //Here: maxBox > minTri && minBox < maxTri
+        float push = std::min(maxTri - minBox, maxBox - minTri);
+        if (push < resolutionDistance) {
+            resolutionDistance = push;
+            resolutionDirection = resolutionDistance * glm::normalize(normal);
         }
     }
     return true;
 }
 
 //An array containing 3 int pairs { 0, 2 }, { 0, 1 }, { 1, 2 }
-constexpr std::array<std::pair<int, int>, 3> DimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
+constexpr std::array<std::pair<int, int>, 3> dimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
 
 bool AABBvsTriangle(const AABB& box, 
     const std::array<glm::vec3, 3>& triPos,
@@ -321,11 +339,11 @@ bool AABBvsTriangle(const AABB& box,
     const glm::vec3& half = box.HalfSize();
     const glm::vec3& min = box.MinCorner();
     const glm::vec3& max = box.MaxCorner();
-    glm::tvec3<bool> axisHit(false, false, false);
-    int i = 0;
-    for (std::pair<int, int> dim : DimensionPairs) {
+    float minimumTranslation = INFINITY;
+
+    //For each projection in xy-, xz-, and yx-planes.
+    for (std::pair<int, int> dim : dimensionPairs) {
         //2D Triangle.
-        //for axis=0,1,2: 2d point takes from xy,xz,yx.
         //Project triangle.
         std::array<glm::vec2, 3> t2D = {
             glm::vec2(triPos[0][dim.first], triPos[0][dim.second]),
@@ -335,33 +353,35 @@ bool AABBvsTriangle(const AABB& box,
         //Project box.
         glm::vec2 boxMin(min[dim.first], min[dim.second]);
         glm::vec2 boxMax(max[dim.first], max[dim.second]);
+        glm::vec2 resolutionVector;
+        float resolutionDist;
         //if projections don't overlap, return false.
-        if (!AARectangleVsTriangle(boxMin, boxMax, t2D)) {
-            //return false;
-        } else {
-            axisHit[i] = true;
-            ImGui::Text("Triangle collision: Box axis %s", i == 0 ? "y" : i == 1 ? "z" : "x");
+        if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector, resolutionDist)) {
+            return false;
+        } else if (resolutionDist < minimumTranslation) {
+            outVector = glm::vec3(0.f);
+            outVector[dim.first] = resolutionVector.x;
+            outVector[dim.second] = resolutionVector.y;
+            minimumTranslation = resolutionDist;
         }
-        ++i;
     }
 
     //If the triangle does intersect any of the cube diagonals, it will 
     //intersect the cube diagonal that comes
     //closest to being perpendicular to the plane of the triangle.
     triNormal = glm::normalize(triNormal);
-    glm::vec3 diagonal = -signNonZero(triNormal) * half;
+    glm::vec3 diagonal = signNonZero(triNormal) * half;
     //The triangle plane contains all points P in dot(triNormal, P) == dot(triNormal, v0)
     //The diagonal line contains all points P in P = origin + diagonal * t.
     float t = glm::dot(triNormal, triPos[0] - origin) / glm::dot(triNormal, diagonal);
     //If intersection point between plane and diagonal is within the box.
     if (glm::abs(t) > 1) {
         return false;
-    } else {
-        ImGui::Text("Triangle collision: Triangle axis.");
-        return glm::all(axisHit);
     }
-    //TODO: Resolve it.
-    outVector = glm::vec3(0.f);
+    glm::vec3 cornerResolution = (1+t) * diagonal;
+    if (glm::length(cornerResolution) < minimumTranslation) {
+        outVector = cornerResolution;
+    }
     return true;
 }
 
@@ -378,7 +398,6 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
         };
         glm::vec3 outVec;
         if (AABBvsTriangle(newBox, triVertices, outVec)) {
-            ImGui::Text("Triangle collision: True.");
             hit = true;
             outResolutionVector += outVec;
             newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
