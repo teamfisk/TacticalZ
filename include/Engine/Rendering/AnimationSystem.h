@@ -8,6 +8,7 @@
 #include "Core/ResourceManager.h"
 #include "Rendering/Model.h"
 #include "Rendering/EAnimationComplete.h"
+#include "Rendering/Skeleton.h"
 
 class AnimationSystem : public PureSystem
 {

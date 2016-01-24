@@ -64,6 +64,7 @@
         <c:Text>
           <Content>Welcome!</Content>
           <Resource>Fonts/DroidSans.ttf,1280</Resource>
+          <Color A="0" B="1" G="7.84313726" R="1"/>
         </c:Text>
         <c:Transform>
           <Position X="0" Y="0" Z="0.700000048"/>
@@ -79,7 +80,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="0" Y="2.37320328" Z="0"/>
-          <Orientation X="0" Y="8903.9668" Z="0"/>
+          <Orientation X="0" Y="9447.45117" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -261,7 +262,7 @@
       <Components>
         <c:Animation/>
         <c:Model>
-          <Resource>Models/Arm.dae</Resource>
+          <Resource>asd</Resource>
           <Color A="1" B="1" G="3.92156863" R="1"/>
         </c:Model>
         <c:Transform>
@@ -273,14 +274,15 @@
     </Entity>
     <Entity>
       <Components>
-        <c:Animation/>
+        <c:Animation>
+          <Name></Name>
+        </c:Animation>
         <c:Model>
-          <Resource>Models/Sid_Flying.dae</Resource>
+          <Resource>Models/Animtest.mesh</Resource>
           <Color A="1" B="11.7647057" G="1" R="11.7647057"/>
         </c:Model>
         <c:Transform>
           <Position X="-1.42184281" Y="1.71298718" Z="-6.31712198"/>
-          <Orientation X="4.66500044" Y="3.14159203" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>

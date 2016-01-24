@@ -13,6 +13,7 @@
 #include "Camera.h"
 #include "../Core/World.h"
 #include "../Core/Transform.h"
+#include "Skeleton.h"
 
 struct ModelJob : RenderJob
 {
@@ -37,6 +38,14 @@ struct ModelJob : RenderJob
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
         Depth = worldpos.z;
         World = world;
+
+        Skeleton = Model->m_RawModel->m_Skeleton;
+
+        if (world->HasComponent(Entity, "Animation")) {
+            auto animationComponent = world->GetComponent(Entity, "Animation");
+            Animation = model->m_RawModel->m_Skeleton->GetAnimation(animationComponent["Name"]);
+            AnimationTime = (double)animationComponent["Time"];
+        }
     };
 
     unsigned int TextureID;
@@ -51,6 +60,11 @@ struct ModelJob : RenderJob
     float Shininess = 0.f;
     glm::vec4 Color;
     const ::Model* Model = nullptr;
+    ::Skeleton* Skeleton = nullptr;
+    const ::Skeleton::Animation* Animation = nullptr;
+
+    float AnimationTime = 0.f;
+
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;
     glm::vec4 IncandescenceColor;
