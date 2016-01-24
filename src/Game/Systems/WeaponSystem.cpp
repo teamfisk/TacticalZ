@@ -46,6 +46,7 @@ bool WeaponSystem::OnInputCommand(const Events::InputCommand& e)
 
 bool WeaponSystem::OnShoot(const Events::Shoot& eShoot) {
     // Screen center, based on current resolution!
+    //TODO: check if player has enough ammo and if weapon has a cooldown or not
     Rectangle screenResolution = m_Renderer->Resolution();
     glm::vec2 centerScreen = glm::vec2(screenResolution.Width / 2, screenResolution.Height / 2);
 

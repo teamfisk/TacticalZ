@@ -79,6 +79,8 @@ private:
     void parsePing();
     void parseKick();
     void parsePlayersSpawned(Packet& packet);
+    void parseEntityDeletion(Packet& packet);
+    void parseComponentDeletion(Packet& packet);
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
@@ -92,6 +94,7 @@ private:
     // Returns if server EntityID exist in map
     bool serverClientMapsHasEntity(EntityID serverEntityID);
     void insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
+    void deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
 
     // Events
     EventBroker* m_EventBroker;
