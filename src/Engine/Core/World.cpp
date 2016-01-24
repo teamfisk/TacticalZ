@@ -137,6 +137,11 @@ EntityID World::generateEntityID()
 
 void World::deleteEntityRecursive(EntityID entity, bool cascaded /*= false*/)
 {
+    // Don't attempt to delete entities that don't exist anyway
+    if (!ValidEntity(entity)) {
+        return;
+    }
+
     if (m_EventBroker != nullptr) {
         Events::EntityDeleted e;
         e.DeletedEntity = entity;
