@@ -27,9 +27,8 @@
           <Color A="1" B="1" G="0.392156869" R="0"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.941270411" Y="-0.594426811" Z="2.90833044"/>
-          <Scale X="1.10000002" Y="1" Z="0.200000003"/>
-          <Orientation X="5.78700018" Y="2.59000015" Z="0"/>
+          <Scale X="2" Y="2" Z="0.200000003"/>
+          <Orientation X="2.70100021" Y="2.37000012" Z="0.266000003"/>
         </c:Transform>
       </Components>
       <Children>
@@ -56,7 +55,7 @@
         </c:Model>
         <c:Physics/>
         <c:Transform>
-          <Position X="-0.30590561" Y="-0.251752943" Z="2.13862514"/>
+          <Position X="-1.95333278" Y="0.296304941" Z="2.56487775"/>
         </c:Transform>
       </Components>
       <Children/>

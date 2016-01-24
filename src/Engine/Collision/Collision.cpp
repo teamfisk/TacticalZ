@@ -249,24 +249,70 @@ bool vectorHasLength(const glm::vec3& vec)
     return glm::any(glm::greaterThan(glm::abs(vec), glm::vec3(0.0001f, 0.0001f, 0.0001f)));
 }
 
-enum BoxTriHit
+bool AARectangleVsTriangle(const glm::vec2& boxMin,
+    const glm::vec2& boxMax,
+    const std::array<glm::vec2, 3>& triPos)
 {
-    Line0 = 0,
-    Line1,
-    Line2,
-    Ground,
-    Corner
-};
+    //Project along box normals (coordinate axes, since it's axis-aligned).
+    for (int ax = 0; ax < 2; ++ax) {
+        float minTri = INFINITY;
+        float maxTri = -INFINITY;
+        for (const glm::vec2& t : triPos) {
+            minTri = std::min(t[ax], minTri);
+            maxTri = std::max(t[ax], maxTri);
+        }
+        if (minTri > boxMax[ax] || maxTri < boxMin[ax]) {
+            return false;
+        }
+    }
+    //Project along triangle normals.
+    //Put edges into normal vector, make normals in the loop.
+    std::array<glm::vec2, 3> triNormals = {
+        triPos[1] - triPos[0],
+        triPos[2] - triPos[1],
+        triPos[0] - triPos[2]
+    };
+    std::array<glm::vec2, 4> boxPos = {
+        boxMax,
+        glm::vec2(boxMax.x, boxMin.y),
+        glm::vec2(boxMin.x, boxMax.y),
+        boxMin
+    };
+    for (auto& normal : triNormals) {
+        //Rotate edge to a normal.
+        normal = glm::vec2(-normal.y, normal.x);
+        //Project triangle onto the normal.
+        float minTri = INFINITY;
+        float maxTri = -INFINITY;
+        for (const glm::vec2& point : triPos) {
+            float dot = glm::dot(normal, point);
+            minTri = std::min(dot, minTri);
+            maxTri = std::max(dot, maxTri);
+        }
+        //Project box onto the normal.
+        float minBox = INFINITY;
+        float maxBox = -INFINITY;
+        for (const glm::vec2& point : boxPos) {
+            float dot = glm::dot(normal, point);
+            minBox = std::min(dot, minTri);
+            maxBox = std::max(dot, maxTri);
+        }
+        if (maxBox < minTri || minBox > maxTri) {
+            return false;
+        }
+    }
+    return true;
+}
+
+//An array containing 3 int pairs { 0, 2 }, { 0, 1 }, { 1, 2 }
+constexpr std::array<std::pair<int, int>, 3> DimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
 
 bool AABBvsTriangle(const AABB& box, 
-    const glm::vec3& v0, 
-    const glm::vec3& v1, 
-    const glm::vec3& v2, 
-    glm::vec3& outVector,
-    BoxTriHit& outHit)
+    const std::array<glm::vec3, 3>& triPos,
+    glm::vec3& outVector)
 {
     //Check so we don't have a zero area triangle when calculating the normal.
-    glm::vec3 triNormal = glm::cross(v1 - v0, v2 - v0);
+    glm::vec3 triNormal = glm::cross(triPos[1] - triPos[0], triPos[2] - triPos[0]);
     if (!vectorHasLength(triNormal)) {
         return false;
     }
@@ -275,110 +321,68 @@ bool AABBvsTriangle(const AABB& box,
     const glm::vec3& half = box.HalfSize();
     const glm::vec3& min = box.MinCorner();
     const glm::vec3& max = box.MaxCorner();
-    const glm::vec3 triPos[] = {
-        v0, v1, v2
-    };
-
-    for (int axis : {1, 0, 2}) {
+    glm::tvec3<bool> axisHit(false, false, false);
+    int i = 0;
+    for (std::pair<int, int> dim : DimensionPairs) {
         //2D Triangle.
         //for axis=0,1,2: 2d point takes from xy,xz,yx.
-        int dim1 = axis == 2 ? 0 : 1;   //0,0,1
-        int dim2 = axis == 0 ? 1 : 2;   //1,2,2
-        glm::vec2 t0(triPos[0][dim1], triPos[0][dim2]);
-        glm::vec2 t1(triPos[1][dim1], triPos[1][dim2]);
-        glm::vec2 t2(triPos[2][dim1], triPos[2][dim2]);
-        //Project tri,
-        //Project box,
+        //Project triangle.
+        std::array<glm::vec2, 3> t2D = {
+            glm::vec2(triPos[0][dim.first], triPos[0][dim.second]),
+            glm::vec2(triPos[1][dim.first], triPos[1][dim.second]),
+            glm::vec2(triPos[2][dim.first], triPos[2][dim.second])
+        };
+        //Project box.
+        glm::vec2 boxMin(min[dim.first], min[dim.second]);
+        glm::vec2 boxMax(max[dim.first], max[dim.second]);
         //if projections don't overlap, return false.
+        if (!AARectangleVsTriangle(boxMin, boxMax, t2D)) {
+            //return false;
+        } else {
+            axisHit[i] = true;
+            ImGui::Text("Triangle collision: Box axis %s", i == 0 ? "y" : i == 1 ? "z" : "x");
+        }
+        ++i;
     }
 
-    //If the polygon does intersect any of the cube diagonals, it will 
+    //If the triangle does intersect any of the cube diagonals, it will 
     //intersect the cube diagonal that comes
-    //closest to being perpendicular to the plane of the polygon.
+    //closest to being perpendicular to the plane of the triangle.
     triNormal = glm::normalize(triNormal);
     glm::vec3 diagonal = -signNonZero(triNormal) * half;
     //The triangle plane contains all points P in dot(triNormal, P) == dot(triNormal, v0)
     //The diagonal line contains all points P in P = origin + diagonal * t.
-    float t = glm::dot(triNormal, v0 - origin) / glm::dot(triNormal, diagonal);
+    float t = glm::dot(triNormal, triPos[0] - origin) / glm::dot(triNormal, diagonal);
     //If intersection point between plane and diagonal is within the box.
     if (glm::abs(t) > 1) {
         return false;
+    } else {
+        ImGui::Text("Triangle collision: Triangle axis.");
+        return glm::all(axisHit);
     }
     //TODO: Resolve it.
+    outVector = glm::vec3(0.f);
     return true;
 }
 
 bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
 {
     AABB newBox = box;
-    struct Triangle
-    {
-        glm::vec3 v0, v1, v2;
-    };
     bool hit = false;
-    bool cornerHitTODO = false;
     outResolutionVector = glm::vec3(0.f);
-    std::vector<Triangle> hitTriangles;
-    std::vector<glm::vec3> hitNormals;
     for (int i = 0; i < modelIndices.size(); ) {
+        std::array<glm::vec3, 3> triVertices = {
+            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
+        };
         glm::vec3 outVec;
-        glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        BoxTriHit hitCase;
-        if (AABBvsTriangle(newBox, v0, v1, v2, outVec, hitCase)) {
+        if (AABBvsTriangle(newBox, triVertices, outVec)) {
+            ImGui::Text("Triangle collision: True.");
             hit = true;
-            switch (hitCase) {
-            case Collision::Line0:
-            case Collision::Line1:
-            case Collision::Line2:
-                //TODO: Resolve.
-                //const glm::vec3 triPos[] = {
-                //    v0, v1, v2
-                //};
-                //glm::vec3 edge = triPos[(hitCase + 1) % 3] - triPos[hitCase];
-                hitTriangles.push_back({ v0, v1, v2 });
-                hitNormals.push_back(outVec);
-                ImGui::Text("triangle edge collision.");
-                break;
-            case Collision::Corner:
-                //TODO: We might be able to return here instead, having only convex geometry. 
-                cornerHitTODO = true;
-                //outResolutionVector += outVec;
-                //return true;
-                ImGui::Text("triangle corner collision.");
-                outResolutionVector += outVec;
-                newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
-                break;
-            case Collision::Ground:
-            default:
-                outResolutionVector += outVec;
-                newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
-                ImGui::Text("triangle ground collision.");
-                break;
-            }
+            outResolutionVector += outVec;
+            newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
         }
-    }
-    if (hitTriangles.size() > 0) {
-        if (cornerHitTODO) {
-            ImGui::Text("Both edges and corners was hit on the same model.");
-            return true;
-        }
-        glm::vec3 lineResolve(0.f);
-        for (const glm::vec3& norm : hitNormals) {
-            lineResolve += norm;
-        }
-        //Normalize.
-        lineResolve /= hitNormals.size();
-        const glm::vec3& origin = newBox.Origin();
-        const glm::vec3& half = newBox.HalfSize();
-        float maxDist = -10;
-        for (const Triangle& tri : hitTriangles) {
-            float d = glm::dot(lineResolve, 0.333f * (tri.v0 + tri.v1 + tri.v2) - origin);
-            maxDist = std::max(maxDist, d);
-        }
-        glm::vec3 tmp = glm::clamp(2.0f * lineResolve, glm::vec3(-1, -1, -1), glm::vec3(1, 1, 1));
-        outResolutionVector += lineResolve * (maxDist + glm::length(tmp * half));
     }
     return hit;
 }
