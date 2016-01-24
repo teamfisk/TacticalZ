@@ -2,15 +2,14 @@
 <Entity name="Player" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:Health/>
     <c:AABB>
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
     <c:Collidable/>
     <c:Model/>
-    <c:Physics>
-      <Velocity X="8.33307467e-09" Y="0" Z="9.82836834e-09"/>
-    </c:Physics>
+    <c:Physics/>
     <c:Player>
       <MovementSpeed>5</MovementSpeed>
     </c:Player>
@@ -19,10 +18,7 @@
         <Red/>
       </Team>
     </c:Team>
-    <c:Transform>
-      <Position X="2.84928203" Y="0.0264999866" Z="7.31610918"/>
-      <Orientation X="0" Y="2.14675093" Z="0"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
@@ -31,7 +27,6 @@
         <c:Camera/>
         <c:Transform>
           <Position X="0" Y="1.37700009" Z="0"/>
-          <Orientation X="0.921535373" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -62,6 +57,34 @@
           </Components>
           <Children/>
         </Entity>
+        <Entity name="HUD">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-0.5"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="HealthBar">
+              <Components>
+                <c:HealthHUD/>
+                <c:Fill>
+                  <Percentage>1</Percentage>
+                  <Color A="0" B="1" G="0" R="0"/>
+                </c:Fill>
+                <c:Model>
+                  <Resource>Models/Core/UnitHexagon.mesh</Resource>
+                  <Color A="1" B="0.70588237" G="0.70588237" R="0.70588237"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-0.383000016" Y="-0.185000002" Z="0"/>
+                  <Scale X="0.150000006" Y="0.150000006" Z="0.150000006"/>
+                  <Orientation X="0" Y="0.594000041" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
       </Children>
     </Entity>
     <Entity name="ThirdPersonCamera">
@@ -82,6 +105,7 @@
       <Components>
         <c:Model>
           <Resource>Models/AssaultHeadless.mesh</Resource>
+          <Color A="1" B="0" G="0" R="1"/>
         </c:Model>
         <c:Transform>
           <Orientation X="0" Y="3.14159274" Z="0"/>
