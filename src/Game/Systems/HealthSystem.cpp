@@ -49,7 +49,7 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& comp
 bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e)
 {
     //save the changed HP to a vector. it will be taken care of in UpdateComponent
-    m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerDamagedID, -e.DamageAmount));
+    //m_DeltaHealthVector.push_back(std::make_tuple(e.PlayerDamagedID, -e.DamageAmount));
     return true;
 }
 

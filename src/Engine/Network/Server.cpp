@@ -286,8 +286,8 @@ void Server::parseOnInputCommand(Packet& packet)
 void Server::parseOnPlayerDamage(Packet & packet)
 {
     Events::PlayerDamage e;
-    e.DamageAmount = packet.ReadPrimitive<double>();
-    e.PlayerDamagedID = packet.ReadPrimitive<EntityID>();
+    e.Damage = packet.ReadPrimitive<double>();
+    e.Player = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
     m_EventBroker->Publish(e);
     //LOG_DEBUG("Server::parseOnPlayerDamage: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
 }

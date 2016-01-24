@@ -327,8 +327,8 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
 {
     Packet packet(MessageType::OnInputCommand, m_SendPacketID);
-    packet.WritePrimitive(e.DamageAmount);
-    packet.WritePrimitive(e.PlayerDamagedID);
+    packet.WritePrimitive(e.Damage);
+    packet.WritePrimitive(e.Player.ID);
     send(packet);
     return false;
 }
