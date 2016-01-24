@@ -3,7 +3,7 @@
 
   <Components>
     <c:Model>
-      <Resource>Models/TranslationWidgetOrigin.obj</Resource>
+      <Resource>Models/TranslationWidgetOrigin.mesh</Resource>
     </c:Model>
     <c:Transform/>
     <c:UniformScale>
@@ -18,7 +18,7 @@
           <Axis X="1" Y="0" Z="0"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/TranslationWidgetX.obj</Resource>
+          <Resource>Models/TranslationWidgetX.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -30,7 +30,7 @@
           <Axis X="0" Y="1" Z="0"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/TranslationWidgetY.obj</Resource>
+          <Resource>Models/TranslationWidgetY.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -42,7 +42,7 @@
           <Axis X="0" Y="0" Z="1"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/TranslationWidgetZ.obj</Resource>
+          <Resource>Models/TranslationWidgetZ.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -54,7 +54,7 @@
           <Axis X="0" Y="1" Z="1"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/WidgetPlaneX.obj</Resource>
+          <Resource>Models/WidgetPlaneX.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -66,7 +66,7 @@
           <Axis X="1" Y="0" Z="1"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/WidgetPlaneY.obj</Resource>
+          <Resource>Models/WidgetPlaneY.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -78,7 +78,7 @@
           <Axis X="1" Y="1" Z="0"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/WidgetPlaneZ.obj</Resource>
+          <Resource>Models/WidgetPlaneZ.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>

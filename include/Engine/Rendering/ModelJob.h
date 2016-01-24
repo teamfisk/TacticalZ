@@ -24,6 +24,10 @@ struct ModelJob : RenderJob
         DiffuseTexture = matGroup.Texture.get();
         NormalTexture = matGroup.NormalMap.get();
         SpecularTexture = matGroup.SpecularMap.get();
+        IncandescenceTexture = matGroup.IncandescenceMap.get();
+        DiffuseColor = matGroup.DiffuseColor;
+        SpecularColor = matGroup.SpecularColor;
+        IncandescenceColor = matGroup.IncandescenceColor;
         StartIndex = matGroup.StartIndex;
         EndIndex = matGroup.EndIndex;
         Matrix = matrix;
@@ -43,9 +47,13 @@ struct ModelJob : RenderJob
     const Texture* DiffuseTexture;
     const Texture* NormalTexture;
     const Texture* SpecularTexture;
+    const Texture* IncandescenceTexture;
     float Shininess = 0.f;
     glm::vec4 Color;
     const ::Model* Model = nullptr;
+    glm::vec4 DiffuseColor;
+    glm::vec4 SpecularColor;
+    glm::vec4 IncandescenceColor;
     unsigned int StartIndex = 0;
     unsigned int EndIndex = 0;
     World* World;

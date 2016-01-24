@@ -30,6 +30,21 @@
 #include <maya/MItDependencyNodes.h>
 #include <maya/MFnNurbsCurve.h>
 #include <maya/MCommandMessage.h>
+#include <maya/MPlug.h>
+#include <maya/MAnimControl.h>
+#include <maya/MTime.h>
+#include <maya/MDataHandle.h>
+#include <maya/MTransformationMatrix.h>
+#include <maya/MFnMatrixData.h>
+#include <maya/MItMeshFaceVertex.h>
+#include <maya/MFnSkinCluster.h>
+#include <maya/MDagPathArray.h>
+#include <maya/MItGeometry.h>
+#include <maya/MItMeshVertex.h>
+#include <maya/MFnWeightGeometryFilter.h>
+#include <maya/MItDependencyGraph.h>
+#include <maya/MQuaternion.h>
+#include <maya/MFnNumericAttribute.h>
 
 
 // Wrappers
@@ -58,5 +73,6 @@
 #pragma comment(lib,"Foundation.lib")
 #pragma comment(lib,"OpenMaya.lib")
 #pragma comment(lib,"OpenMayaUI.lib")
+#pragma comment (lib, "OpenMayaAnim.lib")
 
 #endif

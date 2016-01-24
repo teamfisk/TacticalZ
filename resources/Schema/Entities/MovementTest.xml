@@ -11,7 +11,7 @@
         <c:AABB/>
         <c:Collidable/>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="0.513725519" G="0" R="1"/>
           <Visible>false</Visible>
         </c:Model>
@@ -42,7 +42,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Assault.obj</Resource>
+              <Resource>Models/Assault.mesh</Resource>
               <Color A="1" B="0" G="0" R="1"/>
             </c:Model>
             <c:Transform>
@@ -55,7 +55,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Assault.obj</Resource>
+              <Resource>Models/Assault.mesh</Resource>
               <Color A="1" B="0.0117647061" G="0" R="1"/>
             </c:Model>
             <c:Transform>
@@ -70,7 +70,7 @@
       <Components>
         <c:DirectionalLight/>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.obj</Resource>
+          <Resource>Models/DirectionalLightWidget.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-6.00145912" Y="1.42697716" Z="3.04144025"/>
@@ -82,7 +82,7 @@
     <Entity name="ObstacleCourse">
       <Components>
         <c:Model>
-          <Resource>Models/Test/ObstacleCourse.obj</Resource>
+          <Resource>Models/Test/ObstacleCourse.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -93,7 +93,7 @@
         <c:AABB/>
         <c:Collidable/>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>
@@ -108,7 +108,7 @@
         <c:AABB/>
         <c:Collidable/>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>
@@ -123,7 +123,7 @@
         <c:AABB/>
         <c:Collidable/>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>
@@ -154,7 +154,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Assault.obj</Resource>
+              <Resource>Models/Assault.mesh</Resource>
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>
@@ -167,7 +167,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Assault.obj</Resource>
+              <Resource>Models/Assault.mesh</Resource>
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>

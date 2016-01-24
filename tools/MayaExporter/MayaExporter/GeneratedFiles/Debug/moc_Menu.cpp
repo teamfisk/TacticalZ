@@ -22,7 +22,7 @@ static const uint qt_meta_data_Menu[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       7,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -30,22 +30,19 @@ static const uint qt_meta_data_Menu[] = {
        0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
-      14,    6,    5,    5, 0x08,
-      35,    5,    5,    5, 0x08,
-      59,    5,    5,    5, 0x08,
+       6,    5,    5,    5, 0x08,
+      30,    5,    5,    5, 0x08,
+      51,    5,    5,    5, 0x08,
       75,    5,    5,    5, 0x08,
-      95,    5,    5,    5, 0x08,
-     116,    5,    5,    5, 0x08,
-     137,    5,    5,    5, 0x08,
+      91,    5,    5,    5, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_Menu[] = {
-    "Menu\0\0checked\0ExportSelected(bool)\0"
-    "ExportPathClicked(bool)\0ExportAll(bool)\0"
-    "CancelClicked(bool)\0Button1Clicked(bool)\0"
-    "Button2Clicked(bool)\0Button3Clicked(bool)\0"
+    "Menu\0\0ExportPathClicked(bool)\0"
+    "AddClipClicked(bool)\0RemoveClipClicked(bool)\0"
+    "ExportAll(bool)\0CancelClicked(bool)\0"
 };
 
 void Menu::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -54,13 +51,11 @@ void Menu::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
         Q_ASSERT(staticMetaObject.cast(_o));
         Menu *_t = static_cast<Menu *>(_o);
         switch (_id) {
-        case 0: _t->ExportSelected((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 1: _t->ExportPathClicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 2: _t->ExportAll((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 3: _t->CancelClicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 4: _t->Button1Clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 5: _t->Button2Clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 6: _t->Button3Clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 0: _t->ExportPathClicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 1: _t->AddClipClicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 2: _t->RemoveClipClicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 3: _t->ExportAll((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 4: _t->CancelClicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -98,9 +93,9 @@ int Menu::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 7)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 7;
+        _id -= 5;
     }
     return _id;
 }
