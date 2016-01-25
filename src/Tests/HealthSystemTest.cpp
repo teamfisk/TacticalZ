@@ -3,7 +3,7 @@ using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 
 #include "HealthSystemTest.h"
-#include "Game/HealthSystem.h"
+#include "Game/Systems/HealthSystem.h"
 
 BOOST_AUTO_TEST_SUITE(HealthSystemSuite)
 
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE_END()
 GameHealthSystemTest::GameHealthSystemTest()
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
-    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
+    ResourceManager::RegisterType<EntityFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -38,24 +38,25 @@ GameHealthSystemTest::GameHealthSystemTest()
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
-     // Create a world
+    // Create a world
     m_World = new World();
-    std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
-    if (!mapToLoad.empty()) {
-        ResourceManager::Load<EntityXMLFile>(mapToLoad)->PopulateWorld(m_World);
-    }
+
+    auto file = ResourceManager::Load<EntityFile>("Schema/Entities/TeamTest.xml");
+    EntityFilePreprocessor fpp(file);
+    fpp.RegisterComponents(m_World);
+    EntityFileParser fp(file);
+    fp.MergeEntities(m_World);
 
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_EventBroker);
-    m_SystemPipeline->AddSystem<PlayerSystem>(0);
+    m_SystemPipeline = new SystemPipeline(m_World,m_EventBroker);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
 
     //The Test
-    //create entity which has transorm,player,model,health in it. i.e. is a player
+    //create entity which has transform,player,model,health in it. i.e. is a player
     EntityID playerID = m_World->CreateEntity();
     ComponentWrapper transform = m_World->AttachComponent(playerID, "Transform");
     ComponentWrapper model = m_World->AttachComponent(playerID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.obj";
+    model["Resource"] = "Models/Core/UnitSphere.mesh"; // 360NoScope UnitSphere
     ComponentWrapper player = m_World->AttachComponent(playerID, "Player");
     ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
     healthsID = playerID;
@@ -74,13 +75,13 @@ GameHealthSystemTest::GameHealthSystemTest()
     //heal some other player with 40
     Events::PlayerHealthPickup e2;
     e2.HealthAmount = 40.0f;
-    e2.PlayerHealedID = healthsID+1;
+    e2.PlayerHealedID = healthsID + 1;
     m_EventBroker->Publish(e2);
 
     EntityID playerID2 = m_World->CreateEntity();
     ComponentWrapper transform2 = m_World->AttachComponent(playerID2, "Transform");
     ComponentWrapper model2 = m_World->AttachComponent(playerID2, "Model");
-    model2["Resource"] = "Models/Core/UnitSphere.obj";
+    model2["Resource"] = "Models/Core/UnitSphere.mesh"; // 360NoScope UnitSphere
     ComponentWrapper player2 = m_World->AttachComponent(playerID2, "Player");
     ComponentWrapper health2 = m_World->AttachComponent(playerID2, "Health");
     //END TEST
@@ -102,13 +103,13 @@ void GameHealthSystemTest::Tick()
     m_LastTime = currentTime;
 
     // Iterate through systems and update world!
-    m_SystemPipeline->Update(m_World, dt);
+    m_SystemPipeline->Update(dt);
 
     m_EventBroker->Swap();
     m_EventBroker->Clear();
 
     //if health reaches 90 then we know the test has succeeded (start with 100hp, remove 50hp, add 40hp)
     double currentHealth = (double)m_World->GetComponent(healthsID, "Health")["Health"];
-    if (currentHealth==90)
+    if (currentHealth == 90)
         TestSucceeded = true;
 }

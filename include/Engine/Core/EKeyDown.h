@@ -11,6 +11,9 @@ struct KeyDown : Event
 {
 	/** GLFW key code */
 	int KeyCode;
+    bool ModCtrl;
+    bool ModAlt;
+    bool ModShift;
 };
 
 }

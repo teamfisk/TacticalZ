@@ -50,7 +50,6 @@ ComponentWrapper ComponentPool::GetByEntity(EntityID ent)
     return ComponentWrapper(m_ComponentInfo, m_EntityToComponent.at(ent));
 }
 
-
 bool ComponentPool::KnowsEntity(EntityID ent)
 {
     return m_EntityToComponent.find(ent) != m_EntityToComponent.end();
@@ -70,6 +69,11 @@ ComponentPool::iterator ComponentPool::begin() const
 ComponentPool::iterator ComponentPool::end() const
 {
     return iterator(m_ComponentInfo, m_Pool.end(), m_Pool.end());
+}
+
+size_t ComponentPool::size() const
+{
+    return m_Pool.size();
 }
 
 template <typename InterpretType /*= char*/>

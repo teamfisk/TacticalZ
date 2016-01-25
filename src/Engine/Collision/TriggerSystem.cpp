@@ -3,10 +3,10 @@
 #include "Core/AABB.h"
 #include "Rendering/Model.h"
 
-void TriggerSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void TriggerSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     //Currently only players can trigger things.
-    auto players = world->GetComponents("Player");
+    auto players = m_World->GetComponents("Player");
     if (players == nullptr) {
         return;
     }
@@ -18,7 +18,7 @@ void TriggerSystem::UpdateComponent(World* world, EntityWrapper& entity, Compone
     }
     for (auto& pc : *players) {
         EntityID pId = pc.EntityID;
-        boost::optional<AABB> playerBox = Collision::EntityAbsoluteAABB(EntityWrapper(world, pId));
+        boost::optional<AABB> playerBox = Collision::EntityAbsoluteAABB(EntityWrapper(m_World, pId));
         //The player can't trigger anything without an AABB.
         if (!playerBox) {
             continue;
@@ -34,9 +34,12 @@ void TriggerSystem::UpdateComponent(World* world, EntityWrapper& entity, Compone
             throwLeaveIfWasInTrigger(m_EntitiesCompletelyInTrigger[tId], pId, tId);
         } else {
             //Entity is at least touching the trigger.
-            AABB completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * (*playerBox).Size());
-            if (Collision::AABBVsAABB(completelyInsideBox, *playerBox) &&
-                glm::all(glm::greaterThan((*triggerBox).Size(), (*playerBox).Size()))) {
+            AABB completelyInsideBox;
+            bool playerFitsInTrigger = glm::all(glm::greaterThan((*triggerBox).Size(), (*playerBox).Size()));
+            if (playerFitsInTrigger) {
+                completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * (*playerBox).Size());
+            }
+            if (playerFitsInTrigger && Collision::AABBVsAABB(completelyInsideBox, *playerBox)) {
                 //Entity is completely inside the trigger.
                 //If it was only touching before, it is erased.
                 m_EntitiesTouchingTrigger[tId].erase(pId);

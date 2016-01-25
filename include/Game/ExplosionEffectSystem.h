@@ -4,11 +4,12 @@
 class ExplosionEffectSystem : public PureSystem
 {
 public:
-    ExplosionEffectSystem(EventBroker* eventBroker)
-        : PureSystem("ExplosionEffect")
+    ExplosionEffectSystem(World* world, EventBroker* eventBroker)
+        : System(world, eventBroker)
+        , PureSystem("ExplosionEffect")
     { }
 
-    virtual void  UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override
+    virtual void  UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override
     {
 
         if ((double)component["TimeSinceDeath"] > (double)component["ExplosionDuration"]) {

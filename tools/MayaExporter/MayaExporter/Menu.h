@@ -1,10 +1,9 @@
-#ifndef BUTTONS_H
-#define BUTTONS_H
+#ifndef Menu_Menu_h__
+#define Menu_Menu_h__
 
 #include <map>
 #include <vector>
 
-#include "MayaIncludes.h"
 // Qt
 #pragma comment(lib, "QtCore4")
 #pragma comment(lib, "QtGui4")
@@ -30,13 +29,11 @@
 #include <QtGui/qfiledialog.h>
 #include <QtGui/qlineedit.h>
 #include <QtGui/qgroupbox.h>
+#include <QtGui/qlayoutitem.h>
+#include <QtGui/qtabwidget.h>
 
-struct VertexLayout
-{
-	float pos[3];
-	float normal[3];
-	float uv[2];
-};
+#include "MayaIncludes.h"
+#include "Export.h"
 
 class Menu : public QWidget
 {
@@ -45,35 +42,36 @@ public:
 	Menu(QDialog* dialog);
 	~Menu();
 
-	void GetMeshData(MObject object);
-	void exportMaterial(MObject object);
-
 private slots:
-	void ExportSelected(bool checked);
 	void ExportPathClicked(bool);
+	void AddClipClicked(bool);
+	void RemoveClipClicked(bool);
 	void ExportAll(bool);
 	void CancelClicked(bool);
 
-	void Button1Clicked(bool);
-	void Button2Clicked(bool);
-	void Button3Clicked(bool);
-
-
 private:
 	Menu();
-	QPushButton* exportSelectedButton;
-	QPushButton* browseButton;
-	QPushButton* exportAllButton;
-	QPushButton* cancelButton;
+	std::vector<QLineEdit*> m_AnimationClipName;
+	std:: vector<QLineEdit*> m_StartFrameLines;
+	std::vector<QLineEdit*> m_EndFrameLines;
+	std::vector<QHBoxLayout*> layouts;
+	QVBoxLayout* m_ClipLayout;
 
-	QCheckBox* exportAnimationsButton;
-	QCheckBox* copyTexturesButton;
-	QCheckBox* button3;
+	QPushButton* m_BrowseButton = nullptr;
+	QPushButton* m_ExportAllButton = nullptr;
+	QPushButton* m_CancelButton = nullptr;
+	QPushButton* m_AddClipsButton = nullptr;
+	QPushButton* m_RemoveClipsButton = nullptr;
 
-	QLineEdit* exportPath;
-	QFileDialog* fileDialog;
-	QDialog* dialogPointer;
+    QCheckBox* m_ExportSelectedButton = nullptr;
+	QCheckBox* m_ExportAnimationsButton = nullptr;
+	QCheckBox* m_ExportMaterialButton = nullptr;
 
+	QLineEdit* m_ExportPath = nullptr;
+	QFileDialog* m_FileDialog = nullptr;
+	QDialog* m_DialogPointer = nullptr;
+
+    Export m_Export;
 };
 
 #endif

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>../assets/Models/DummyScene.mesh</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Health>
+          <Health>60</Health>
+        </c:Health>
+        <c:AABB/>
+        <c:Camera/>
+        <c:Listener/>
+        <c:Player/>
+        <c:Team>
+          <Team>3</Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-0.151326105" Y="13.5594187" Z="12.5957394"/>
+          <Orientation X="-0.62831825" Y="0.0872534811" Z="-7.47903606e-09"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <HomePointForTeam>3</HomePointForTeam>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitSphere.mesh</Resource>
+          <Color A="1" B="1" G="0.200000003" R="0"/>
+        </c:Model>
+        <c:Team>
+          <Team>3</Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="5.39647007" Y="2.36802292" Z="0.0546064377"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <CapturePointNumber>1</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitSphere.mesh</Resource>
+          <Color A="1" B="1" G="1" R="0"/>
+        </c:Model>
+        <c:Team/>
+        <c:Transform>
+          <Position X="3.68890452" Y="2.32191443" Z="0"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <CapturePointNumber>2</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitSphere.mesh</Resource>
+        </c:Model>
+        <c:Team/>
+        <c:Transform>
+          <Position X="1.98802853" Y="2.16289616" Z="0"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <CapturePointNumber>3</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitSphere.mesh</Resource>
+          <Color A="1" B="0" G="1" R="1"/>
+        </c:Model>
+        <c:Team/>
+        <c:Transform>
+          <Position X="0.196968079" Y="1.99913001" Z="0"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <HomePointForTeam>2</HomePointForTeam>
+          <CapturePointNumber>4</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitSphere.mesh</Resource>
+          <Color A="1" B="0" G="0.200000003" R="1"/>
+        </c:Model>
+        <c:Team>
+          <Team>2</Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-1.82539892" Y="1.96172595" Z="0"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Health/>
+        <c:AABB/>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitCube.mesh</Resource>
+          <Color A="1" B="0.482352942" G="0.490196079" R="1"/>
+        </c:Model>
+        <c:Player/>
+        <c:Team>
+          <Team>2</Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-7.44269609" Y="2.23822045" Z="-0.0577065349"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Health/>
+        <c:AABB/>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitCube.mesh</Resource>
+          <Color A="1" B="0.482352942" G="0.490196079" R="1"/>
+        </c:Model>
+        <c:Player/>
+        <c:Team>
+          <Team>2</Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-5.74354839" Y="2.23822045" Z="1.40012479"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Health/>
+        <c:AABB/>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitCube.mesh</Resource>
+          <Color A="1" B="1" G="0.196078435" R="0.196078435"/>
+        </c:Model>
+        <c:Player/>
+        <c:Team>
+          <Team>3</Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="6.96941662" Y="2.02053547" Z="1.9484092"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Health/>
+        <c:AABB/>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitCube.mesh</Resource>
+          <Color A="1" B="1" G="0.196078435" R="0.196078435"/>
+        </c:Model>
+        <c:Player/>
+        <c:Team>
+          <Team>3</Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="7.70311165" Y="2.02053547" Z="-0.0348547697"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -7,7 +7,7 @@
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
 #include "Rendering/Renderer.h"
-#include "Engine\Rendering\Texture.h"
+#include "Engine/Rendering/Texture.h"
 
 BOOST_AUTO_TEST_SUITE(resourceManagerTests)
 
@@ -19,16 +19,14 @@ BOOST_AUTO_TEST_CASE(resourceManagerTest)
 
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     BOOST_CHECK(!ResourceManager::IsResourceLoaded("ConfigFile", "Config.ini"));
-    auto m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
+
+    BOOST_CHECK_NO_THROW(ResourceManager::Load<ConfigFile>("Config.ini"));
     BOOST_CHECK(ResourceManager::IsResourceLoaded("ConfigFile", "Config.ini"));
     ResourceManager::Release("ConfigFile", "Config.ini");
     BOOST_CHECK(!ResourceManager::IsResourceLoaded("ConfigFile", "Config.ini"));
 
     //configfile without register
-    //check so output says "EE failed to load: type not registered..."
-    auto m_ScreenQuadNoRegister = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
-    BOOST_CHECK(!ResourceManager::IsResourceLoaded("Model", "Models/Core/ScreenQuad.obj"));
-
+    BOOST_CHECK_THROW(ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh"),Resource::FailedLoadingException);
     //there is no error feedback to check if you try to release the wrong resources - hence that cant be tested either
 }
 

@@ -11,55 +11,27 @@
 #include "Camera.h"
 #include "RenderJob.h"
 #include "ModelJob.h"
+#include "TextJob.h"
 #include "PointLightJob.h"
+#include "DirectionalLightJob.h"
 #include "ExplosionEffectJob.h"
-
-
-/*
-struct SpriteJob : RenderJob
-{
-	unsigned int ShaderID = 0;
-	unsigned int TextureID = 0;
-
-	glm::mat4 ModelMatrix;
-	const Texture* DiffuseTexture = nullptr;
-	const Texture* NormalTexture = nullptr;
-	const Texture* SpecularTexture = nullptr;
-	glm::vec4 Color;
-
-	void CalculateHash() override
-	{
-		Hash = TextureID;
-	}
-};
-
-struct PointLightJob : RenderJob
-{
-    glm::vec4 Position;
-	glm::vec4 Color;
-	float Radius;
-    float Intensity;
-    float Falloff;
-    float padding = 123;
-
-	void CalculateHash() override
-	{
-		Hash = 0;
-	}
-};
-*/
 
 struct RenderScene
 {
-    ::Camera* Camera;
+    ::Camera* Camera = nullptr;
     std::list<std::shared_ptr<RenderJob>> ForwardJobs;
     std::list<std::shared_ptr<RenderJob>> PointLightJobs;
+    std::list<std::shared_ptr<RenderJob>> TextJobs;
+    std::list<std::shared_ptr<RenderJob>> DirectionalLightJobs;
     Rectangle Viewport;
+    bool ClearDepth = false;
 
 	void Clear()
 	{
         ForwardJobs.clear();
         PointLightJobs.clear();
+        TextJobs.clear();
+        DirectionalLightJobs.clear();
 	}
 };
 
@@ -95,5 +67,4 @@ public:
 private:
     int m_Size = 0;
 };
-
 #endif

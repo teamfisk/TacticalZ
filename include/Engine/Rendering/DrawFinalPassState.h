@@ -6,7 +6,7 @@
 class DrawFinalPassState : public RenderState
 {
 public:
-    DrawFinalPassState();
+    DrawFinalPassState(GLuint frameBuffer);
     ~DrawFinalPassState();
 private:
 

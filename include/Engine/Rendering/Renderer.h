@@ -11,20 +11,23 @@
 #include "FrameBuffer.h"
 #include "../Core/World.h"
 #include "PickingPass.h"
-#include "DrawScenePass.h"
 #include "LightCullingPass.h"
 #include "DrawFinalPass.h"
+#include "DrawScreenQuadPass.h"
+#include "DrawBloomPass.h"
+#include "DrawColorCorrectionPass.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
 #include "../Core/Transform.h"
+#include "imgui/imgui.h"
+#include "TextPass.h"
 
 class Renderer : public IRenderer
 {
 public:
-    Renderer(EventBroker* eventBroker, World* world) 
+    Renderer(EventBroker* eventBroker) 
         : m_EventBroker(eventBroker)
-        , m_World(world)
     { }
 
     virtual void Initialize() override;
@@ -36,7 +39,7 @@ public:
 private:
     //----------------------Variables----------------------//
     EventBroker* m_EventBroker;
-    World* m_World;
+    TextPass* m_TextPass;
 
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
@@ -45,11 +48,15 @@ private:
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
-    DrawScenePass* m_DrawScenePass;
+    int m_DebugTextureToDraw = 0;
+
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
     ImGuiRenderPass* m_ImGuiRenderPass;
     DrawFinalPass* m_DrawFinalPass;
+    DrawScreenQuadPass* m_DrawScreenQuadPass;
+    DrawBloomPass* m_DrawBloomPass;
+    DrawColorCorrectionPass* m_DrawColorCorrectionPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
@@ -59,14 +66,13 @@ private:
     //TODO: Renderer: Get InputUpdate out of renderer
     void InputUpdate(double dt);
     //void PickingPass(RenderQueueCollection& rq);
-    void DrawScreenQuad(GLuint textureToDraw);
+    //void DrawScreenQuad(GLuint textureToDraw);
 
     static bool DepthSort(const std::shared_ptr<RenderJob> &i, const std::shared_ptr<RenderJob> &j) { return (i->Depth < j->Depth); }
-    void FillDepth(RenderScene& scene);
+    void SortRenderJobsByDepth(RenderScene &scene);
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
-	ShaderProgram* m_BasicForwardProgram;
-    ShaderProgram* m_DrawScreenQuadProgram;
+    ShaderProgram* m_BasicForwardProgram;
     ShaderProgram* m_ExplosionEffectProgram;
 
 };

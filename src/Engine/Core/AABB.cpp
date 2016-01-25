@@ -15,6 +15,8 @@ AABB::AABB(const glm::vec3& minPos, const glm::vec3& maxPos)
         m_MinCorner.y = glm::min(m_MaxCorner.y, m_MinCorner.y);
         m_MaxCorner.z = glm::max(m_MaxCorner.z, m_MinCorner.z);
         m_MinCorner.z = glm::min(m_MaxCorner.z, m_MinCorner.z);
+        m_Origin = 0.5f * (m_MaxCorner + m_MinCorner);
+        m_HalfSize = 0.5f * (m_MaxCorner - m_MinCorner);
     }
 }
 

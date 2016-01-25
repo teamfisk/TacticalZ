@@ -16,15 +16,15 @@
 class HealthSystem : public PureSystem
 {
 public:
-    HealthSystem(EventBroker* eventBroker);
+    HealthSystem(World* world, EventBroker* eventBroker);
 
     //updatecomponent
-    virtual void UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     //methods which will take care of specific events
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
-    bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e);
+    bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
     bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e);
 

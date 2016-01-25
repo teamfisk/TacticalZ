@@ -6,24 +6,18 @@ uniform mat4 P;
 uniform vec3 ExplosionOrigin;
 uniform float TimeSinceDeath; 
 uniform float ExplosionDuration; 
-//uniform bool Gravity;
-//uniform float GravityForce;
-//uniform float ObjectRadius;
 uniform vec4 EndColor;
 uniform bool Randomness;
 uniform float RandomNumbers[50];
 uniform float RandomnessScalar;
 uniform vec2 Velocity;
 uniform bool ColorByDistance;
-//uniform bool ReverseAnimation;
-//uniform bool Wireframe;
 uniform bool ExponentialAccelaration;
 
 in VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
-	vec4 DiffuseColor;
 	vec4 ExplosionColor;
 }Input[];
 
@@ -31,7 +25,6 @@ out VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
-	vec4 DiffuseColor;
 	vec4 ExplosionColor;
 }Output;
 
@@ -139,7 +132,6 @@ void main()
 			Output.Normal = Input[i].Normal;
 			Output.Position = Input[i].Position;
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
-			Output.DiffuseColor = Input[i].DiffuseColor;
 			
 			// convert to model space for the gravity to always be in -y
 			vec4 ExplodedPositionInModelSpace = M * vec4(ExplodedPosition, 1.0);
@@ -176,7 +168,6 @@ void main()
 			Output.Normal = Input[i].Normal;
 			Output.Position = Input[i].Position;
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
-			Output.DiffuseColor = Input[i].DiffuseColor;
 			
 			// no change in position, pass through vertex
 			gl_Position = gl_in[i].gl_Position;

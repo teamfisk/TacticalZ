@@ -100,7 +100,7 @@ void OctTree::Update(float dt, World* world, Camera* cam)
 {
     AABB aabb;
     for (ComponentWrapper& c : *world->GetComponents("Collision")) {
-        aabb.CreateFromCenter(c["BoxCenter"], c["BoxSize"]);
+        aabb.FromOriginSize(c["BoxCenter"], c["BoxSize"]);
         AddStaticObject(aabb);
     }
     const glm::vec4 redCol = glm::vec4(1, 0.2f, 0, 1);
@@ -112,13 +112,13 @@ void OctTree::Update(float dt, World* world, Camera* cam)
         ComponentWrapper transform = world->AttachComponent(m_BoxID, "Transform");
         transform["Scale"] = boxSize;
         ComponentWrapper model = world->AttachComponent(m_BoxID, "Model");
-        model["Resource"] = "Models/Core/UnitBox.obj";
+        model["Resource"] = "Models/Core/UnitBox.mesh"; // 360NoScope UnitBox
         m_UpdatedOnce = true;
     }
 
     AABB box;
     auto boxPos = cam->Position() + 1.2f*cam->Forward();
-    box.CreateFromCenter(boxPos, boxSize);
+    box.FromOriginSize(boxPos, boxSize);
     ComponentWrapper transform = world->GetComponent(m_BoxID, "Transform");
     transform["Position"] = boxPos;
     ComponentWrapper model = world->GetComponent(m_BoxID, "Model");

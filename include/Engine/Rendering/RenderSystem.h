@@ -15,41 +15,36 @@
 #include "Renderer.h"
 #include "PointLightJob.h"
 #include "../Core/Transform.h"
-#include "DebugCameraInputController.h"
+#include "../Core/EPlayerSpawned.h"
 
 class RenderSystem : public ImpureSystem
 {
 public:
-    RenderSystem(EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
+    RenderSystem(World* world, EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame);
     ~RenderSystem();
 
-    virtual void Update(World* world, double dt) override;
+    virtual void Update(double dt) override;
 
 private:
-    World* m_World = nullptr;
     const IRenderer* m_Renderer;
-
     RenderFrame* m_RenderFrame;
-    bool m_SwitchCamera = false;
     Camera* m_Camera;
-    DebugCameraInputController<RenderSystem>* m_DebugCameraInputController;
-    
-    std::list<ComponentWrapper> m_CameraComponents;
+    EntityWrapper m_CurrentCamera = EntityWrapper::Invalid;
+    EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
-    bool OnSetCamera(const Events::SetCamera &event);
-    EntityID m_CurrentCamera = EntityID_Invalid;
-
-    void switchCamera(EntityID entity);
-
-    void updateCamera(World* world, double dt);
-    void updateProjectionMatrix(ComponentWrapper& cameraComponent);
-    
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
-    void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
-
+    bool OnSetCamera(Events::SetCamera &event);
+    void fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
+    void fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
+    void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
+
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
+    void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
+
+    EventRelay<RenderSystem, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(Events::PlayerSpawned& e);
 };
 
 #endif
