@@ -25,12 +25,14 @@ class IRenderer
 {
 public:
 	GLFWwindow* Window() const { return m_Window; }
+    //Returns screensize including window border and header
 	Rectangle Resolution() const { return m_Resolution; }
 	void SetResolution(const Rectangle& resolution) { m_Resolution = resolution; }
 	bool Fullscreen() { return m_Fullscreen; }
 	void SetFullscreen(bool fullscreen) { m_Fullscreen = fullscreen; }
 	bool VSYNC() const { return m_VSYNC; }
 	void SetVSYNC(bool vsync) { m_VSYNC = vsync; }
+    //Returns screensize excluding window border and header
     Rectangle GetViewPortSize() const { return m_ViewPortWidth; }
     void SetViewPortSize(const Rectangle& viewportWidth) { m_ViewPortWidth = viewportWidth; }
 	virtual void Initialize() = 0;
