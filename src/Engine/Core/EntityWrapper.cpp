@@ -3,6 +3,11 @@
 
 const EntityWrapper EntityWrapper::Invalid = EntityWrapper(nullptr, EntityID_Invalid);
 
+const std::string EntityWrapper::Name()
+{
+    return World->GetName(ID);
+}
+
 bool EntityWrapper::HasComponent(const std::string& componentName)
 {
     if (!Valid()) {

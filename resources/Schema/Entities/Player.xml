@@ -20,7 +20,6 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="-7.12165165" Y="0" Z="6.04289007"/>
       <Orientation X="0" Y="2.24449515" Z="0"/>
     </c:Transform>
   </Components>
@@ -31,7 +30,6 @@
         <c:Camera/>
         <c:Transform>
           <Position X="0" Y="1.37700009" Z="0"/>
-          <Orientation X="0.122173041" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -40,10 +38,9 @@
             <c:Text>
               <Resource>Fonts/DroidSans.ttf,100</Resource>
               <Color A="1" B="0" G="1" R="0"/>
-              <Visible>false</Visible>
             </c:Text>
             <c:Transform>
-              <Position X="0" Y="0.247910097" Z="-0.447844714"/>
+              <Position X="0.100000001" Y="0.248000011" Z="-0.248000011"/>
               <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
               <Orientation X="0" Y="3.14199996" Z="0"/>
             </c:Transform>
@@ -144,13 +141,12 @@
       <Components>
         <c:Animation>
           <Name>Hold Pos</Name>
-          <Time>0.23794697999039638</Time>
+          <Time>0.9779997896222552</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:Model>
           <Resource>Models/AssaultAnimated.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>
-          <Visible>false</Visible>
         </c:Model>
         <c:Transform/>
       </Components>
