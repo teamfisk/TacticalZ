@@ -12,6 +12,7 @@ struct PlayerSpawned : Event
     int PlayerID;
     EntityWrapper Player;
     EntityWrapper Spawner;
+    std::string PlayerName;
 };
 
 }
