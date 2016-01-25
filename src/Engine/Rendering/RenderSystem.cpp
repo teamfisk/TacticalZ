@@ -53,7 +53,7 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
         // Don't render the local player
         if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
             if (!entity.HasComponent("HealthHUD")) { //Should work but needs to be fixed. Should only render the things "childed" to the local player camera
-                continue;
+                //continue;
             }
         }
 

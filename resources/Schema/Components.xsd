@@ -26,4 +26,5 @@
 	<xs:include schemaLocation="Components/HealthHUD.xsd"/>
 	<xs:include schemaLocation="Components/Animation.xsd"/>
 	<xs:include schemaLocation="Components/Fill.xsd"/>
+	<xs:include schemaLocation="Components/Lifetime.xsd"/>
 </xs:schema>

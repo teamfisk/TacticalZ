@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>0.25</Lifetime>
+    </c:Lifetime>
+    <c:Model>
+      <Resource>Models/CylinderBullet.mesh</Resource>
+      <Color A="1" B="39.2156868" G="7.84313726" R="0"/>
+    </c:Model>
+    <c:Transform>
+      <Scale X="0.0109999999" Y="0.0289999992" Z="100"/>
+    </c:Transform>
+  </Components>
+
+  <Children/>
+
+</Entity>
