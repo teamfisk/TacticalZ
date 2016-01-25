@@ -403,6 +403,50 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
             newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
         }
     }
+
+    //outResolutionVector = glm::vec3(INFINITY);
+    //std::stack<AABB> testBoxes;
+    //std::stack<int> resolveIndices;
+    //std::stack<glm::vec3> resolveVectors;
+    //resolveVectors.push(glm::vec3(0.f));
+    //resolveIndices.push(0);
+    //testBoxes.push(box);
+    //do {
+    //    int i = resolveIndices.top();
+    //    resolveIndices.pop();
+    //    while (i < modelIndices.size()) {
+    //        std::array<glm::vec3, 3> triVertices = {
+    //            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+    //            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+    //            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
+    //        };
+    //        glm::vec3 outVec;
+    //        bool test = AABBvsTriangle(testBoxes.top(), triVertices, outVec);
+    //        if (test) {
+    //            hit = true;
+    //            //emplace?
+    //            resolveIndices.push(i);
+    //            testBoxes.push(AABB::FromOriginSize(box.Origin() + outVec, box.Size()));
+    //            resolveVectors.top() += outVec;
+    //        }
+    //    }
+    //    testBoxes.pop();
+    //    resolveVectors.push(glm::vec3(0.f));
+    //} while (!resolveIndices.empty());
+    //if (hit) {
+    //    if (!resolveVectors.empty()) {
+    //        while (!resolveVectors.empty()) {
+    //            if (glm::length2(resolveVectors.top()) < glm::length2(outResolutionVector)) {
+    //                outResolutionVector = resolveVectors.top();
+    //            }
+    //            resolveVectors.pop();
+    //        }
+    //    } else {
+    //        //TODO: This won't happen.
+    //        ImGui::Text("Collision, but not resolved.");
+    //    }
+    //    return true;
+    //}
     return hit;
 }
 
