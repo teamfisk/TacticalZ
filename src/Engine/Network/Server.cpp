@@ -269,6 +269,7 @@ void Server::parseOnInputCommand(Packet& packet)
             Events::InputCommand e;
             e.Command = packet.ReadString();
             e.PlayerID = player; // Set correct player id
+            e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);

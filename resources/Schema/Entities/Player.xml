@@ -20,7 +20,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="-7.12165165" Y="0.0265000015" Z="6.04289007"/>
+      <Position X="-7.12165165" Y="0" Z="6.04289007"/>
       <Orientation X="0" Y="2.24449515" Z="0"/>
     </c:Transform>
   </Components>
@@ -120,20 +120,7 @@
                   <Position X="0.215000004" Y="-0.153000012" Z="-0.266000003"/>
                 </c:Transform>
               </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/CylinderBullet.mesh</Resource>
-                      <Color A="1" B="0" G="0.525490224" R="39.2156868"/>
-                    </c:Model>
-                    <c:Transform>
-                      <Scale X="0.0110000009" Y="0.029000001" Z="1"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -157,7 +144,7 @@
       <Components>
         <c:Animation>
           <Name>Hold Pos</Name>
-          <Time>0.86791076003269829</Time>
+          <Time>0.23794697999039638</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:Model>

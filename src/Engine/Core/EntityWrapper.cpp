@@ -99,6 +99,10 @@ EntityWrapper::operator bool()
 
 EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, EntityID parent)
 {
+    if (!this->World->ValidEntity(parent)) {
+        return EntityWrapper::Invalid;
+    }
+
     auto itPair = this->World->GetChildren(parent);
     if (itPair.first == itPair.second) {
         return EntityWrapper::Invalid;

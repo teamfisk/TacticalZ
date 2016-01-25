@@ -25,14 +25,13 @@ bool WeaponSystem::OnPlayerSpawned(const Events::PlayerSpawned& e)
 
 bool WeaponSystem::OnInputCommand(const Events::InputCommand& e)
 {
-    // Only shoot if the player is alive
-    if (!m_LocalPlayer.Valid()) {
-        return false;
-    }
-
     if (e.Command == "PrimaryFire" && e.Value > 0) {
         Events::Shoot eShoot;
-        eShoot.Player = m_LocalPlayer;
+        if (e.PlayerID == -1) {
+            eShoot.Player = m_LocalPlayer;
+        } else {
+            eShoot.Player = e.Player;
+        }
         m_EventBroker->Publish(eShoot);
     }
 
@@ -41,6 +40,10 @@ bool WeaponSystem::OnInputCommand(const Events::InputCommand& e)
 
 bool WeaponSystem::OnShoot(Events::Shoot& eShoot) 
 {
+    if (!eShoot.Player.Valid()) {
+        return false;
+    }
+
     // TODO: Weapon firing effects here
 
     auto rayRed = ResourceManager::Load<EntityFile>("Schema/Entities/RayRed.xml");
