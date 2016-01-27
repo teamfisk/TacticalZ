@@ -34,7 +34,6 @@ void DrawBloomPass::InitializeShaderPrograms()
 
 void DrawBloomPass::InitializeBuffers()
 {
-    printf("x:%f\ny:%f", m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height);
     GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
 
     m_GaussianFrameBuffer_horiz.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_horiz, GL_COLOR_ATTACHMENT0)));
