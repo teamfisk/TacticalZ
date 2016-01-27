@@ -20,10 +20,6 @@ AABB::AABB(const glm::vec3& minPos, const glm::vec3& maxPos)
     }
 }
 
-AABB::AABB(const glm::vec4& minPos, const glm::vec4& maxPos)
-    : AABB(glm::vec3(minPos), glm::vec3(maxPos))
-{ }
-
 AABB AABB::FromOriginSize(const glm::vec3& origin, const glm::vec3& size)
 {
     return AABB(origin - (size/2.f), origin + (size/2.f));

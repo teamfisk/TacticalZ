@@ -9,12 +9,12 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     }
     ComponentWrapper& cPhysics = entity["Physics"];
 
-    boost::optional<AABB> boundingBox = Collision::EntityAbsoluteAABB(entity);
+    boost::optional<EntityAABB> boundingBox = Collision::EntityAbsoluteAABB(entity);
     if (!boundingBox) {
         return;
     }
     ComponentWrapper& cTransform = entity["Transform"];
-    AABB& boxA = *boundingBox;
+    EntityAABB& boxA = *boundingBox;
 
     //Press 'Z' to enable/disable collision.
     if (zPress) {
@@ -22,7 +22,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     }
 
     // Collide against octree
-    std::vector<AABB> octreeResult;
+    std::vector<EntityAABB> octreeResult;
     m_Octree->ObjectsInSameRegion(*boundingBox, octreeResult);
     for (auto& boxB : octreeResult) {
         glm::vec3 resolutionVector;
