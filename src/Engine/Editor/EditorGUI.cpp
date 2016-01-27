@@ -759,7 +759,7 @@ void EditorGUI::entityDelete(EntityWrapper entity)
 
 void EditorGUI::entityChangeParent(EntityWrapper entity, EntityWrapper parent)
 {
-    if (entity == parent) {
+    if (entity == parent || parent.IsChildOf(entity)) {
         return;
     }
 
