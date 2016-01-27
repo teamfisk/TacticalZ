@@ -3,8 +3,16 @@
 
 const EntityWrapper EntityWrapper::Invalid = EntityWrapper(nullptr, EntityID_Invalid);
 
+const std::string EntityWrapper::Name()
+{
+    return World->GetName(ID);
+}
+
 bool EntityWrapper::HasComponent(const std::string& componentName)
 {
+    if (!Valid()) {
+        return false;
+    }
     return World->HasComponent(ID, componentName);
 }
 
@@ -15,6 +23,35 @@ EntityWrapper EntityWrapper::Parent()
     } else {
         return EntityWrapper(this->World, this->World->GetParent(this->ID));
     }
+}
+
+EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
+{
+    return firstChildByNameRecursive(name, this->ID);
+}
+
+EntityWrapper EntityWrapper::FirstParentWithComponent(const std::string& componentType)
+{
+    EntityWrapper entity = *this;
+    while (entity.Parent().Valid()) {
+        entity = entity.Parent();
+        if (entity.HasComponent(componentType)) {
+            return entity;
+        }
+    }
+    return EntityWrapper::Invalid;
+}
+
+bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
+{
+    EntityWrapper entity = *this;
+    while (entity.Parent().Valid()) {
+        entity = entity.Parent();
+        if (entity == potentialParent) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool EntityWrapper::Valid()
@@ -63,5 +100,31 @@ EntityWrapper::operator EntityID() const
 EntityWrapper::operator bool()
 {
     return this->Valid();
+}
+
+EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, EntityID parent)
+{
+    if (!this->World->ValidEntity(parent)) {
+        return EntityWrapper::Invalid;
+    }
+
+    auto itPair = this->World->GetChildren(parent);
+    if (itPair.first == itPair.second) {
+        return EntityWrapper::Invalid;
+    }
+
+    for (auto it = itPair.first; it != itPair.second; ++it) {
+        std::string itName = this->World->GetName(it->second);
+        if (itName == name) {
+            return EntityWrapper(this->World, it->second);
+        } else if (it->second != EntityID_Invalid) {
+            EntityWrapper result = firstChildByNameRecursive(name, it->second);
+            if (result != EntityWrapper::Invalid) {
+                return result;
+            }
+        }
+    }
+
+    return EntityWrapper::Invalid;
 }
 

@@ -18,7 +18,7 @@
           <Axis X="1" Y="0" Z="0"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/RotationWidgetX.obj</Resource>
+          <Resource>Models/RotationWidgetX.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -33,7 +33,7 @@
           <Axis X="0" Y="1" Z="0"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/RotationWidgetY.obj</Resource>
+          <Resource>Models/RotationWidgetY.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -48,7 +48,7 @@
           <Axis X="0" Y="0" Z="1"/>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/RotationWidgetZ.obj</Resource>
+          <Resource>Models/RotationWidgetZ.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>

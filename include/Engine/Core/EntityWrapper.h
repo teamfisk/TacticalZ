@@ -23,8 +23,12 @@ struct EntityWrapper
 
     static const EntityWrapper Invalid;
 
-    bool HasComponent(const std::string& componentName);
+    const std::string Name();
+    bool HasComponent(const std::string& componentType);
     EntityWrapper Parent();
+    EntityWrapper FirstChildByName(const std::string& name);
+    EntityWrapper FirstParentWithComponent(const std::string& componentType);
+    bool IsChildOf(EntityWrapper potentialParent);
     bool Valid();
 
     ComponentWrapper operator[](const char* componentName);
@@ -32,6 +36,9 @@ struct EntityWrapper
     bool operator!=(const EntityWrapper& e) const;
     explicit operator EntityID() const;
     operator bool();
+
+private:
+    EntityWrapper firstChildByNameRecursive(const std::string& name, EntityID parent);
 };
 
 namespace std

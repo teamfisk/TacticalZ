@@ -39,6 +39,7 @@ void Packet::Init(MessageType type, unsigned int & packetID)
     Packet::WritePrimitive<int>(messageType);
     Packet::WritePrimitive<int>(packetID);
     packetID++;
+    m_HeaderSize = m_Offset;
 }
 
 void Packet::WriteString(const std::string& str)

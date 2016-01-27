@@ -10,7 +10,8 @@
 
 #include "../Core/Ray.h"
 #include "../Core/AABB.h"
-#include "../Rendering/RawModel.h"
+#include "Rendering/RawModelCustom.h"
+//#include "Rendering/RawModelAssimp.h"
 #include "../Core/Transform.h"
 #include "../Core/Entity.h"
 #include "../Core/EntityWrapper.h"

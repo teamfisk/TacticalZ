@@ -56,7 +56,7 @@ GameHealthSystemTest::GameHealthSystemTest()
     EntityID playerID = m_World->CreateEntity();
     ComponentWrapper transform = m_World->AttachComponent(playerID, "Transform");
     ComponentWrapper model = m_World->AttachComponent(playerID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.obj";
+    model["Resource"] = "Models/Core/UnitSphere.mesh"; // 360NoScope UnitSphere
     ComponentWrapper player = m_World->AttachComponent(playerID, "Player");
     ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
     healthsID = playerID;
@@ -81,7 +81,7 @@ GameHealthSystemTest::GameHealthSystemTest()
     EntityID playerID2 = m_World->CreateEntity();
     ComponentWrapper transform2 = m_World->AttachComponent(playerID2, "Transform");
     ComponentWrapper model2 = m_World->AttachComponent(playerID2, "Model");
-    model2["Resource"] = "Models/Core/UnitSphere.obj";
+    model2["Resource"] = "Models/Core/UnitSphere.mesh"; // 360NoScope UnitSphere
     ComponentWrapper player2 = m_World->AttachComponent(playerID2, "Player");
     ComponentWrapper health2 = m_World->AttachComponent(playerID2, "Health");
     //END TEST

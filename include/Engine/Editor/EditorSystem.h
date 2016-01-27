@@ -1,7 +1,6 @@
 #include "../Core/System.h"
 #include "../Rendering/IRenderer.h"
 #include "../Rendering/Camera.h"
-#include "../Rendering/DebugCameraInputController.h"
 #include "../Rendering/ESetCamera.h"
 #include "../Core/World.h"
 #include "../Core/SystemPipeline.h"
@@ -10,8 +9,10 @@
 #include "../Core/EntityFileParser.h"
 #include "../Core/EntityFileWriter.h"
 #include "../Core/EMousePress.h"
+#include "../Input/EInputCommand.h"
 #include "EditorGUI.h"
 #include "EditorStats.h"
+#include "EditorCameraInputController.h"
 
 class EditorSystem : public ImpureSystem
 {
@@ -21,18 +22,24 @@ public:
 
     void Update(double dt);
 
+    void Enable();
+    void Disable();
+
 private:
     IRenderer* m_Renderer;
     RenderFrame* m_RenderFrame;
     World* m_EditorWorld;
     SystemPipeline* m_EditorWorldSystemPipeline;
-    Camera* m_EditorCamera;
-    EntityWrapper m_Camera = EntityWrapper::Invalid;
-    DebugCameraInputController<EditorSystem>* m_DebugCameraInputController;
+    //Camera* m_EditorCamera;
+    EntityWrapper m_EditorCamera = EntityWrapper::Invalid;
+    EntityWrapper m_ActualCamera = EntityWrapper::Invalid;
+    EditorCameraInputController<EditorSystem>* m_EditorCameraInputController;
     EditorGUI* m_EditorGUI;
     EditorStats* m_EditorStats;
 
     // State
+    double m_LastTime = 0.f;
+    bool m_Enabled = true;
     EditorGUI::WidgetMode m_WidgetMode = EditorGUI::WidgetMode::Translate;
     EntityWrapper m_Widget = EntityWrapper::Invalid;
     EntityWrapper m_CurrentSelection = EntityWrapper::Invalid;
@@ -56,4 +63,8 @@ private:
     bool OnMousePress(const Events::MousePress& e);
     EventRelay<EditorSystem, Events::WidgetDelta> m_EWidgetDelta;
     bool OnWidgetDelta(const Events::WidgetDelta& e);
+    EventRelay<EditorSystem, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(const Events::InputCommand& e);
+    EventRelay<EditorSystem, Events::SetCamera> m_ESetCamera;
+    bool OnSetCamera(const Events::SetCamera& e);
 };

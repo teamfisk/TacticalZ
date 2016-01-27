@@ -1,4 +1,5 @@
 #include "Editor/EditorGUI.h"
+#include "Rendering/ESetCamera.h"
 
 EditorGUI::EditorGUI(World* world, EventBroker* eventBroker) 
     : m_World(world)
@@ -302,6 +303,14 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip(fieldAnnotationIt->second.c_str());
             }
+        }
+    }
+
+    if (ci.Name == "Camera") {
+        if (ImGui::Button("Activate")) {
+            Events::SetCamera e;
+            e.CameraEntity = entity;
+            m_EventBroker->Publish(e);
         }
     }
 

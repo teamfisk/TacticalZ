@@ -2,6 +2,7 @@
 #define Events_InputCommand_h__
 
 #include "Core/EventBroker.h"
+#include "Core/EntityWrapper.h"
 
 namespace Events
 {
@@ -9,7 +10,8 @@ namespace Events
 struct InputCommand : Event
 {
 	/** Numerical ID of the player. */
-	unsigned int PlayerID;
+	int PlayerID;
+    EntityWrapper Player;
 	/** The command that was sent. */
 	std::string Command;
 	/** The value of the command. */

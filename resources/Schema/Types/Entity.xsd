@@ -32,6 +32,7 @@
 							<xs:element ref="c:DirectionalLight" minOccurs="0"/>
 							<xs:element ref="c:UniformScale" minOccurs="0"/>
 							<xs:element ref="c:EditorWidget" minOccurs="0"/>
+							<xs:element ref="c:Lifetime" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

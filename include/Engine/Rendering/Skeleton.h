@@ -4,6 +4,7 @@
 #include <sstream>
 #include "Common.h"
 #include "../GLM.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 //struct Bone
 //{
@@ -38,9 +39,9 @@ public:
 			, OffsetMatrix(offsetMatrix)
 		{ }
 
-		int ID;
 		std::string Name;
 		glm::mat4 OffsetMatrix;
+        int ID;
 
 		Bone* Parent;
 		std::vector<Bone*> Children;

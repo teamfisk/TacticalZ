@@ -20,6 +20,7 @@
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 #include "Network/EInterpolate.h"
+#include "Core/EPlayerSpawned.h"
 
 class Client : public Network
 {
@@ -39,16 +40,17 @@ private:
     char readBuf[INPUTSIZE] = { 0 };
 
     // Packet loss logic
-    unsigned int m_PacketID = 0;
-    unsigned int m_PreviousPacketID = 0;
-    unsigned int m_SendPacketID = 0;
+    PacketID m_PacketID = 0;
+    PacketID m_PreviousPacketID = 0;
+    PacketID m_SendPacketID = 0;
 
     // Game logic
     World* m_World;
     std::string m_PlayerName;
-    int m_PlayerID = -1;
+    PlayerID m_PlayerID = -1;
     EntityID m_ServerEntityID = std::numeric_limits<EntityID>::max();
     bool m_IsConnected = false;
+    EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
     // Server Client Lookup map
     // Assumes that root node for client and server is EntityID 0.
 
@@ -57,31 +59,36 @@ private:
     std::unordered_map<EntityID, EntityID> m_ClientIDToServerID;
 
     // Network logic
-    PlayerDefinition m_PlayerDefinitions[MAXCONNECTIONS];
+    PlayerDefinition m_PlayerDefinitions[8];
     SnapshotDefinitions m_NextSnapshot;
     double m_DurationOfPingTime;
     std::clock_t m_StartPingTime;
+    std::clock_t m_TimeSinceSentInputs;
+    unsigned int m_SendInputIntervalMs;
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
     void readFromServer();
-    int  receive(char* data, size_t length);
+    int  receive(char* data);
     void send(Packet& packet);
     void connect();
     void disconnect();
-    void ping();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
     void parseConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
-    void parseServerPing();
+    void parseKick();
+    void parsePlayersSpawned(Packet& packet);
+    void parseEntityDeletion(Packet& packet);
+    void parseComponentDeletion(Packet& packet);
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     bool hasServerTimedOut();
     EntityID createPlayer();
     void sendInputCommands();
+    void sendLocalPlayerTransform();
     void becomePlayer();
     // Mapping Logic
     // Returns if local EntityID exist in map
@@ -89,13 +96,16 @@ private:
     // Returns if server EntityID exist in map
     bool serverClientMapsHasEntity(EntityID serverEntityID);
     void insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
+    void deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
 
     // Events
     EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
-    EventRelay<Client, Events::PlayerDamage> m_EPlayeDamage;
+    EventRelay<Client, Events::PlayerDamage> m_EPlayerDamage;
     bool OnPlayerDamage(const Events::PlayerDamage& e);
+    EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(const Events::PlayerSpawned& e);
 };
 
 #endif

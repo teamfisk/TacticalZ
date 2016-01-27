@@ -27,7 +27,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     //    }
     //    if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
     //        (glm::vec3&)cTransform["Position"] += resolutionVector;
-    //        cPhysics["Velocity"] = glm::vec3(0, 0, 0);
+    //        ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
     //    }
     //}
 

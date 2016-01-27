@@ -24,7 +24,7 @@
           <Static>false</Static>
         </c:Collidable>
         <c:Model>
-          <Resource>Models/Core/UnitCube.obj</Resource>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="0" G="1" R="0"/>
         </c:Model>
         <c:Transform>

@@ -1,7 +1,8 @@
 #ifndef Model_h__
 #define Model_h__
 
-#include "RawModel.h"
+#include "Rendering/RawModelCustom.h"
+//#include "Rendering/RawModelAssimp.h"
 #include "../OpenGL.h"
 
 class Model : public ThreadUnsafeResource
@@ -19,12 +20,11 @@ public:
 
 	GLuint VAO;
 	GLuint ElementBuffer;
+    RawModel* m_RawModel;
 
 private:
-    RawModel* m_RawModel;
+    
 	GLuint VertexBuffer;
-	GLuint DiffuseVertexColorBuffer;
-	GLuint SpecularVertexColorBuffer;
 	GLuint NormalBuffer;
 	GLuint TangentNormalsBuffer;
 	GLuint BiTangentNormalsBuffer;

@@ -4,9 +4,11 @@ RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRender
     : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
+    , m_World(world)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &RenderSystem::OnPlayerSpawned);
 
     m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
 }
@@ -46,26 +48,59 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
             continue;
         }
 
+        EntityWrapper entity(m_World, modelComponent.EntityID);
+
+        // Don't render the local player
+        if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
+            if (!entity.HasComponent("HealthHUD") && entity.Name() != "Crosshair" && entity.Name() != "Weapon") { //Should work but needs to be fixed. Should only render the things "childed" to the local player camera
+                continue;
+            }
+        }
+
+        if ((entity.Name() == "Weapon" || entity.HasComponent("HealthHUD")) && !entity.IsChildOf(m_LocalPlayer)) {
+            continue;
+        }
+
         Model* model;
         try {
             model = ResourceManager::Load<::Model, true>(resource);
         } catch (const Resource::StillLoadingException&) {
             //continue;
-            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.obj");
+            model = ResourceManager::Load<::Model>("Models/Core/UnitRaptor.mesh");
         } catch (const std::exception&) {
             try {
-                model = ResourceManager::Load<::Model>("Models/Core/Error.obj");
+                model = ResourceManager::Load<::Model>("Models/Core/Error.mesh");
             } catch (const std::exception&) {
                 continue;
             }
         }
 
+
+        float fillPercentage = 0.f;
+        glm::vec4 fillColor = glm::vec4(0);
+
+        if(m_World->HasComponent(modelComponent.EntityID, "Fill")) {
+            auto fillComponent = m_World->GetComponent(modelComponent.EntityID, "Fill");
+            fillPercentage = (float)(double)fillComponent["Percentage"];
+            fillColor = (glm::vec4)fillComponent["Color"];
+        }
+
+        
+
         glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, m_World);
         for (auto matGroup : model->MaterialGroups()) {
-            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, m_World));
+            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, m_World, fillColor, fillPercentage));
             jobs.push_back(modelJob);
         }
     }
+}
+
+bool RenderSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
+{
+    if (e.PlayerID == -1) {
+        m_LocalPlayer = e.Player;
+    }
+    return true;
 }
 
 void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
@@ -140,8 +175,8 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(textComponent.EntityID, world);
-        std::shared_ptr<TextJob> modelJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
-        jobs.push_back(modelJob);
+        std::shared_ptr<TextJob> textJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
+        jobs.push_back(textJob);
 
     }
 }
@@ -155,12 +190,12 @@ void RenderSystem::Update(double dt)
 {
     m_EventBroker->Process<RenderSystem>();
 
-    if (m_CurrentCamera) {
-        ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
-        m_Camera->SetPosition(cameraTransform["Position"]);
-        m_Camera->SetOrientation(glm::quat((const glm::vec3&)cameraTransform["Orientation"]));
+    // Update the current camera used for rendering
+    if (m_CurrentCamera.Valid()) {
+        m_Camera->SetPosition(Transform::AbsolutePosition(m_CurrentCamera));
+        m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
     }
-    //Only supports opaque geometry atm
+
 
     RenderScene scene;
     scene.Camera = m_Camera;
