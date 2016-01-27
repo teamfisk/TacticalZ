@@ -29,41 +29,9 @@ enum _LOG_LEVEL
 
 extern _LOG_LEVEL LOG_LEVEL;
 
-const static char* _LOG_LEVEL_PREFIX[] =
-{
-	"EE: ",
-	"",
-	"WW: ",
-	"DD: "
-};
+extern const char* _LOG_LEVEL_PREFIX[];
 
-static void _LOG(_LOG_LEVEL logLevel, const char* file, const char* func, unsigned int line, const char* format, ...)
-{
-	if (logLevel > LOG_LEVEL) {
-		return;
-	}
-
-	char* message = nullptr;
-	va_list args;
-
-	va_start(args, format);
-	size_t size = vsnprintf(message, 0, format, args) + 1;
-	va_end(args);
-
-	va_start(args, format);
-	message = new char[size];
-	vsnprintf(message, size, format, args);
-	va_end(args);
-
-	if (logLevel == LOG_LEVEL_ERROR) {
-		std::cerr << file << ":" << line << " " << func << std::endl;
-		std::cerr << _LOG_LEVEL_PREFIX[logLevel] << message << std::endl;
-	} else {
-		std::cout << _LOG_LEVEL_PREFIX[logLevel] << message << std::endl;
-	}
-
-	delete[] message;
-}
+extern void _LOG(_LOG_LEVEL logLevel, const char* file, const char* func, unsigned int line, const char* format, ...);
 
 #define LOG(logLevel, format, ...) \
 	_LOG(logLevel, __BASE_FILE__, __func__, __LINE__, format, ##__VA_ARGS__)
@@ -77,7 +45,11 @@ static void _LOG(_LOG_LEVEL logLevel, const char* file, const char* func, unsign
 #define LOG_INFO(format, ...) \
 	LOG(LOG_LEVEL_INFO, format, ##__VA_ARGS__)
 
+#ifdef DEBUG
 #define LOG_DEBUG(format, ...) \
 	LOG(LOG_LEVEL_DEBUG, format, ##__VA_ARGS__)
+#else
+#define LOG_DEBUG(format, ...) 
+#endif
 
 #endif // Logging_h__

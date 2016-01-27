@@ -35,17 +35,19 @@ private:
 
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(Events::SetCamera &event);
+    EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(const Events::InputCommand& e);
+    EventRelay<RenderSystem, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(Events::PlayerSpawned& e);
+
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs);
     void fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
-    EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
-    bool OnInputCommand(const Events::InputCommand& e);
-
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
+    bool isChildOfACamera(EntityWrapper entity);
+    bool isChildOfCurrentCamera(EntityWrapper entity);
 
-    EventRelay<RenderSystem, Events::PlayerSpawned> m_EPlayerSpawned;
-    bool OnPlayerSpawned(Events::PlayerSpawned& e);
 };
 
 #endif

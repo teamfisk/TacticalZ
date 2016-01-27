@@ -12,7 +12,7 @@ EditorRenderSystem::EditorRenderSystem(World* m_World, EventBroker* eventBroker,
 
 void EditorRenderSystem::Update(double dt)
 {
-    if (m_CurrentCamera) {
+    if (m_CurrentCamera.Valid()) {
         ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
         m_EditorCamera->SetPosition(cameraTransform["Position"]);
         m_EditorCamera->SetOrientation(glm::quat((const glm::vec3&)cameraTransform["Orientation"]));

@@ -19,7 +19,7 @@
 					<xs:annotation><xs:documentation>Wether the model is transparent or not</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Visible" type="t:bool" minOccurs="0">
-					<xs:annotation><xs:documentation>Wether the model is visible or not</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>Whether the model is visible or not</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="DiffuseTexture" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Whether the model should use the Diffuse texture or not</xs:documentation></xs:annotation>

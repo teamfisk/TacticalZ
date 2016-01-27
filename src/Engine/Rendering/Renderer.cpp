@@ -58,6 +58,11 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLEW: Initialization failed");
 		exit(EXIT_FAILURE);
 	}
+
+    int res[2];
+    glfwGetWindowSize(m_Window, &res[0], &res[1]);
+    SetViewPortSize(Rectangle::Rectangle(res[0], res[1]));
+
 }
 
 void Renderer::InitializeShaders()

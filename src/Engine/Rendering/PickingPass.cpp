@@ -18,14 +18,14 @@ PickingPass::~PickingPass()
 void PickingPass::InitializeTextures()
 {
     GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
-        glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
+        glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
 }
 
 void PickingPass::InitializeFrameBuffers()
 {
     glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height);
 
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));

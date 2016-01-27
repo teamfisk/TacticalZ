@@ -40,7 +40,7 @@ private:
     int m_BlueTeamHomeCapturePoint = m_NotACapturePoint;
 
     int m_NumberOfCapturePoints = 0;
-    std::map<int, EntityID> m_CapturePointNumberToEntityIDMap;
+    std::map<int, EntityWrapper> m_CapturePointNumberToEntityMap;
 
     //std::vector<ComponentWrapper>
 
@@ -48,8 +48,8 @@ private:
     bool m_ResetTimers = false;
 
     //vectors which will keep track of enter/leave changes
-    std::vector<std::tuple<EntityID, EntityID>> m_ETriggerTouchVector;
-    std::vector<std::tuple<EntityID, EntityID>> m_ETriggerLeaveVector;
+    std::vector<std::tuple<EntityWrapper, EntityWrapper>> m_ETriggerTouchVector;
+    std::vector<std::tuple<EntityWrapper, EntityWrapper>> m_ETriggerLeaveVector;
 };
 
 #endif
