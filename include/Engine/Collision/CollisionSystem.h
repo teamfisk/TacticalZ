@@ -7,7 +7,6 @@
 #include "../Common.h"
 #include "../Core/System.h"
 #include "../Core/EventBroker.h"
-#include "../Core/EKeyUp.h"
 #include "../Core/Octree.h"
 #include "EntityAABB.h"
 
@@ -18,20 +17,13 @@ public:
         : System(world, eventBroker)
         , PureSystem("Collidable")
         , m_Octree(octree)
-        , zPress(false)
-    {
-        //TODO: Debug stuff, remove later.
-        EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &CollisionSystem::OnKeyUp);
-    }
+    { }
 
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     Octree<EntityAABB>* m_Octree;
-    bool zPress;
-
-    EventRelay<CollisionSystem, Events::KeyUp> m_EKeyUp;
-    bool OnKeyUp(const Events::KeyUp &event);
+    std::vector<EntityAABB> m_OctreeResult;
 };
 
 #endif
