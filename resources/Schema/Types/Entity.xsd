@@ -15,6 +15,7 @@
 							<xs:element ref="c:Model" minOccurs="0"/>
 							<xs:element ref="c:RaptorCopter" minOccurs="0"/>
 							<xs:element ref="c:Player" minOccurs="0"/>
+							<xs:element ref="c:ExplosionEffect" minOccurs="0"/>
 							<xs:element ref="c:Camera" minOccurs="0"/>
 							<xs:element ref="c:Text" minOccurs="0"/>
 							<xs:element ref="c:AABB" minOccurs="0"/>

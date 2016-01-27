@@ -14,6 +14,7 @@
 #include "TextJob.h"
 #include "PointLightJob.h"
 #include "DirectionalLightJob.h"
+#include "ExplosionEffectJob.h"
 
 struct RenderScene
 {

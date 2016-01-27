@@ -14,6 +14,7 @@
 #include "Core/EKeyDown.h"
 #include "Core/EntityFilePreprocessor.h"
 #include "Core/SystemPipeline.h"
+#include "ExplosionEffectSystem.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
 #include "Rendering/RenderSystem.h"

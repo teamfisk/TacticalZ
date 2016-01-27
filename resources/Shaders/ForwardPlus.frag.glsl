@@ -50,6 +50,7 @@ in VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
+	vec4 ExplosionColor;
 }Input;
 
 out vec4 sceneColor;
@@ -137,8 +138,8 @@ void main()
 		totalLighting.Specular += light_result.Specular;
 	}
 
-	//sceneColor += Input.DiffuseColor;
-	vec4 color_result = DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
+	
+	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
 	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
@@ -161,9 +162,7 @@ void main()
 	} else {
 		bloomColor = vec4(0.0, 0.0, 0.0, 1.0);
 	} */
-	
-	//sceneColor += Input.DiffuseColor * (totalLighting.Diffuse) * diffuseTexel * Color;
-	//sceneColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
+
 
 	
 

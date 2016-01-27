@@ -78,19 +78,41 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 
         float fillPercentage = 0.f;
         glm::vec4 fillColor = glm::vec4(0);
-
         if(m_World->HasComponent(modelComponent.EntityID, "Fill")) {
             auto fillComponent = m_World->GetComponent(modelComponent.EntityID, "Fill");
             fillPercentage = (float)(double)fillComponent["Percentage"];
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
-        
-
         glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, m_World);
         for (auto matGroup : model->MaterialGroups()) {
-            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, m_World, fillColor, fillPercentage));
-            jobs.push_back(modelJob);
+            if (m_World->HasComponent(modelComponent.EntityID, "ExplosionEffect")) {
+                auto explosionEffectComponent = m_World->GetComponent(modelComponent.EntityID, "ExplosionEffect");
+                std::shared_ptr<ExplosionEffectJob> explosionEffectJob = std::shared_ptr<ExplosionEffectJob>(new ExplosionEffectJob(
+                    explosionEffectComponent, 
+                    model, 
+                    m_Camera, 
+                    modelMatrix, 
+                    matGroup, 
+                    modelComponent, 
+                    m_World, 
+                    fillColor, 
+                    fillPercentage
+                ));
+                jobs.push_back(explosionEffectJob);
+            } else {
+                std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
+                    model, 
+                    m_Camera, 
+                    modelMatrix, 
+                    matGroup, 
+                    modelComponent, 
+                    m_World, 
+                    fillColor, 
+                    fillPercentage
+                ));
+                jobs.push_back(modelJob);
+            }
         }
     }
 }

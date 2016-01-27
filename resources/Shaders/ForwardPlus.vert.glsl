@@ -17,6 +17,7 @@ out VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
+	vec4 ExplosionColor;
 }Output;
 
 void main()
@@ -36,4 +37,5 @@ void main()
 	Output.Position = (boneTransform * vec4(Position, 1.0)).xyz;
 	Output.TextureCoordinate = TextureCoords;
 	Output.Normal = vec3(M * vec4(Normal, 0.0));
+	Output.ExplosionColor = vec4(0.0);
 }

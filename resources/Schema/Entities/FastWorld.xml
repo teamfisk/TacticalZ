@@ -25,10 +25,16 @@
         <Entity>
           <Components>
             <c:Animation>
-              <Name>Crouch Walk</Name>
-              <Time>701.10570384634161</Time>
-              <Speed>32</Speed>
+              <Name>Run</Name>
+              <Time>0.56277947897317659</Time>
+              <Speed>1</Speed>
             </c:Animation>
+            <c:ExplosionEffect>
+              <Velocity X="0" Y="1.10000002" Z="3.30000019"/>
+              <ExplosionOrigin X="-0.600000024" Y="1" Z="0"/>
+              <TimeSinceDeath>0.95625903442123672</TimeSinceDeath>
+              <EndColor A="0" B="0.815686285" G="1" R="0"/>
+            </c:ExplosionEffect>
             <c:Model>
               <Resource>Models/AssaultAnimated.mesh</Resource>
               <Color A="1" B="392156.875" G="1" R="1"/>

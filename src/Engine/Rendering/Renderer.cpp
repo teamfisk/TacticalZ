@@ -63,6 +63,15 @@ void Renderer::InitializeWindow()
 void Renderer::InitializeShaders()
 {
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
+    m_ExplosionEffectProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectProgram");
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ExplosionEffect.vert.glsl")));
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/ExplosionEffect.geom.glsl")));
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ExplosionEffect.frag.glsl")));
+    //m_ExplosionEffectProgram->Compile();
+    //m_ExplosionEffectProgram->Link();
+
+
+
 }
 
 void Renderer::InputUpdate(double dt)
@@ -98,6 +107,7 @@ void Renderer::Draw(RenderFrame& frame)
         m_LightCullingPass->FillLightList(*scene);
         m_LightCullingPass->CullLights(*scene);
         m_DrawFinalPass->Draw(*scene);
+        //m_DrawScenePass->Draw(*scene);
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
 

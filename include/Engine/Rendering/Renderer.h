@@ -73,6 +73,8 @@ private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 	//--------------------ShaderPrograms-------------------//
     ShaderProgram* m_BasicForwardProgram;
+    ShaderProgram* m_ExplosionEffectProgram;
+
 };
 
 #endif
