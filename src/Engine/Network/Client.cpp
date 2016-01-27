@@ -147,6 +147,7 @@ void Client::parsePlayersSpawned(Packet& packet)
     e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
     e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
     e.PlayerID = -1;
+    e.PlayerName = packet.ReadString();
     m_EventBroker->Publish(e);
 }
 
@@ -345,7 +346,7 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
 {
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
     packet.WritePrimitive(e.Damage);
-    packet.WritePrimitive(e.Player.ID);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player.ID));
     send(packet);
     return false;
 }

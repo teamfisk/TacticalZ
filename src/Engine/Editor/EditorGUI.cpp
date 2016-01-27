@@ -1,4 +1,5 @@
 #include "Editor/EditorGUI.h"
+#include "Rendering/ESetCamera.h"
 
 EditorGUI::EditorGUI(World* world, EventBroker* eventBroker) 
     : m_World(world)
@@ -233,10 +234,12 @@ void EditorGUI::drawComponents(EntityWrapper entity)
             componentTypes.push_back(pair.first.c_str());
         }
     }
+    // Sort components in alphabetical order
+    std::sort(componentTypes.begin(), componentTypes.end(), compareCharArray);
     // Draw combo box
     ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 10.f);
     int selectedItem = -1;
-    if (ImGui::Combo("", &selectedItem, componentTypes.data(), componentTypes.size())) {
+    if (ImGui::Combo("", &selectedItem, componentTypes.data(), componentTypes.size(), componentTypes.size())) {
         if (selectedItem != -1) {
             if (m_OnComponentAttach != nullptr) {
                 std::string chosenComponentType(componentTypes.at(selectedItem));
@@ -282,9 +285,8 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
 
     // Draw component fields
     ComponentWrapper& component = entity.World->GetComponent(entity.ID, ci.Name);
-    for (auto& kv : ci.Fields) {
-        const std::string& fieldName = kv.first;
-        const ComponentInfo::Field_t& field = kv.second;
+    for (auto& fieldName : ci.FieldsInOrder) {
+        const ComponentInfo::Field_t& field = ci.Fields.at(fieldName);
 
         // Draw the field widget based on its type
         bool dirty = drawComponentField(component, field);
@@ -302,6 +304,14 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip(fieldAnnotationIt->second.c_str());
             }
+        }
+    }
+
+    if (ci.Name == "Camera") {
+        if (ImGui::Button("Activate")) {
+            Events::SetCamera e;
+            e.CameraEntity = entity;
+            m_EventBroker->Publish(e);
         }
     }
 
@@ -633,6 +643,11 @@ GLuint EditorGUI::tryLoadTexture(std::string filePath)
 void EditorGUI::openModal(const std::string& modal)
 {
     m_ModalsToOpen.insert(modal);
+}
+
+bool EditorGUI::compareCharArray(const char* c1, const char* c2)
+{
+    return strcmp(c1, c2) < 0;
 }
 
 void EditorGUI::SetDirty(EntityWrapper entity)

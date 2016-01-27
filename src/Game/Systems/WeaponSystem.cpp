@@ -37,16 +37,73 @@ bool WeaponSystem::OnInputCommand(const Events::InputCommand& e)
 
     if (e.Command == "PrimaryFire" && e.Value > 0) {
         Events::Shoot eShoot;
-        eShoot.Player = m_LocalPlayer;
+        if (e.PlayerID == -1) {
+            eShoot.Player = m_LocalPlayer;
+        } else {
+            eShoot.Player = e.Player;
+        }
         m_EventBroker->Publish(eShoot);
     }
 
     return true;
 }
 
-bool WeaponSystem::OnShoot(const Events::Shoot& eShoot) {
+bool WeaponSystem::OnShoot(Events::Shoot& eShoot) 
+{
+    if (!eShoot.Player.Valid()) {
+        return false;
+    }
+
+    // TODO: Weapon firing effects here
+
+    auto rayRed = ResourceManager::Load<EntityFile>("Schema/Entities/RayRed.xml");
+    auto rayBlue = ResourceManager::Load<EntityFile>("Schema/Entities/RayBlue.xml");
+
+    EntityWrapper weapon = eShoot.Player.FirstChildByName("WeaponMuzzle");
+    if (weapon.Valid()) {
+        EntityWrapper ray;
+        if ((ComponentInfo::EnumType)eShoot.Player["Team"]["Team"] == eShoot.Player["Team"]["Team"].Enum("Red")) {
+            EntityFileParser parser(rayRed);
+            EntityID rayID = parser.MergeEntities(m_World);
+            ray = EntityWrapper(m_World, rayID);
+        } else {
+            EntityFileParser parser(rayBlue);
+            EntityID rayID = parser.MergeEntities(m_World);
+            ray = EntityWrapper(m_World, rayID);
+        }
+
+        glm::mat4 transformation = Transform::AbsoluteTransformation(weapon);
+        glm::vec3 scale;
+        glm::vec3 translation;
+        glm::quat orientation;
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        glm::decompose(transformation, scale, orientation, translation, skew, perspective);
+        
+        // Matrix to euler angles
+        glm::vec3 euler;
+        euler.y = glm::asin(-transformation[0][2]);
+        if (cos(euler.y) != 0) {
+            euler.x = atan2(transformation[1][2], transformation[2][2]);
+            euler.z = atan2(transformation[0][1], transformation[0][0]);
+        } else {
+            euler.x = atan2(-transformation[2][0], transformation[1][1]);
+            euler.z = 0;
+        }
+
+        //LOG_DEBUG("rotation: %f %f %f", euler.x, euler.y, euler.z);
+        (glm::vec3&)ray["Transform"]["Position"] = translation;
+        (glm::vec3&)ray["Transform"]["Orientation"] = euler;
+        //(glm::vec3&)ray["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(weapon);
+    }
+
+    // Only run further picking code client-side!
+    if (eShoot.Player != m_LocalPlayer) {
+        return false;
+    }
+
     // Screen center, based on current resolution!
-    //TODO: check if player has enough ammo and if weapon has a cooldown or not
+    // TODO: check if player has enough ammo and if weapon has a cooldown or not
     Rectangle screenResolution = m_Renderer->GetViewPortSize();
     glm::vec2 centerScreen = glm::vec2(screenResolution.Width / 2, screenResolution.Height / 2);
 

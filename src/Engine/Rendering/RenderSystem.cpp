@@ -4,6 +4,7 @@ RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRender
     : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
+    , m_World(world)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
@@ -30,6 +31,16 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
     return true;
 }
 
+bool RenderSystem::isChildOfACamera(EntityWrapper entity)
+{
+    return entity.FirstParentWithComponent("Camera").Valid();
+}
+
+bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
+{
+    return entity == m_CurrentCamera || entity.IsChildOf(m_CurrentCamera);
+}
+
 void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 {
     auto models = m_World->GetComponents("Model");
@@ -37,20 +48,25 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
         return;
     }
 
-    for (auto& modelComponent : *models) {
-        bool visible = modelComponent["Visible"];
+    for (auto& cModel : *models) {
+        bool visible = cModel["Visible"];
         if (!visible) {
             continue;
         }
-        std::string resource = modelComponent["Resource"];
+        std::string resource = cModel["Resource"];
         if (resource.empty()) {
             continue;
         }
 
-        EntityWrapper entity(m_World, modelComponent.EntityID);
+        EntityWrapper entity(m_World, cModel.EntityID);
 
-        // Don't render the local player
-        if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
+        // Only render children of a camera if that camera is currently active
+        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+            continue;
+        }
+
+        // Hide things parented to local player if they have the HiddenFromLocalPlayer component
+        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
             continue;
         }
 
@@ -68,10 +84,44 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
             }
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, m_World);
+
+        float fillPercentage = 0.f;
+        glm::vec4 fillColor = glm::vec4(0);
+        if(m_World->HasComponent(cModel.EntityID, "Fill")) {
+            auto fillComponent = m_World->GetComponent(cModel.EntityID, "Fill");
+            fillPercentage = (float)(double)fillComponent["Percentage"];
+            fillColor = (glm::vec4)fillComponent["Color"];
+        }
+
+        glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
         for (auto matGroup : model->MaterialGroups()) {
-            std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(model, m_Camera, modelMatrix, matGroup, modelComponent, m_World));
-            jobs.push_back(modelJob);
+            if (m_World->HasComponent(cModel.EntityID, "ExplosionEffect")) {
+                auto explosionEffectComponent = m_World->GetComponent(cModel.EntityID, "ExplosionEffect");
+                std::shared_ptr<ExplosionEffectJob> explosionEffectJob = std::shared_ptr<ExplosionEffectJob>(new ExplosionEffectJob(
+                    explosionEffectComponent, 
+                    model, 
+                    m_Camera, 
+                    modelMatrix, 
+                    matGroup, 
+                    cModel, 
+                    m_World, 
+                    fillColor, 
+                    fillPercentage
+                ));
+                jobs.push_back(explosionEffectJob);
+            } else {
+                std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
+                    model, 
+                    m_Camera, 
+                    modelMatrix, 
+                    matGroup, 
+                    cModel, 
+                    m_World, 
+                    fillColor, 
+                    fillPercentage
+                ));
+                jobs.push_back(modelJob);
+            }
         }
     }
 }
@@ -156,8 +206,8 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(textComponent.EntityID, world);
-        std::shared_ptr<TextJob> modelJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
-        jobs.push_back(modelJob);
+        std::shared_ptr<TextJob> textJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
+        jobs.push_back(textJob);
 
     }
 }
@@ -177,7 +227,6 @@ void RenderSystem::Update(double dt)
         m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
     }
 
-    //Only supports opaque geometry atm
 
     RenderScene scene;
     scene.Camera = m_Camera;

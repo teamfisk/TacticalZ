@@ -9,7 +9,6 @@ public:
     AABB() = default;
     //No checks are made. Values in minPos must be less than values in maxPos, i.e. min.x < max.x, etc.
     AABB(const glm::vec3& minPos, const glm::vec3& maxPos);
-    AABB(const glm::vec4& minPos, const glm::vec4& maxPos);
     //No checks are made. Size must consist of non-negative numbers.
     static AABB FromOriginSize(const glm::vec3& origin, const glm::vec3& size);
     virtual ~AABB();

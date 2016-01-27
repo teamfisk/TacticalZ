@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Collision/CollidableOctreeSystem.h"
+#include "Collision/EntityAABB.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
 #include "Systems/RaptorCopterSystem.h"
@@ -12,6 +13,8 @@
 #include "Game/Systems/WeaponSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
+#include "Game/Systems/PlayerHUD.h"
+#include "Game/Systems/LifetimeSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -41,7 +44,7 @@ Game::Game(int argc, char* argv[])
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-        ));
+    ));
     m_Renderer->Initialize();
     //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
     m_RenderFrame = new RenderFrame();
@@ -71,31 +74,35 @@ Game::Game(int argc, char* argv[])
 
 
     // Create Octrees
-    m_OctreeCollision = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
-    m_OctreeFrustrumCulling = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeFrustrumCulling = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
 
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
-    //m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
+
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
     ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);

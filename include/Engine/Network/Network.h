@@ -12,7 +12,7 @@
 #include <fstream>
 #include <iostream>
 
-#define INPUTSIZE 4097
+#define INPUTSIZE 32000
 typedef unsigned int PlayerID;
 typedef unsigned int PacketID;
 

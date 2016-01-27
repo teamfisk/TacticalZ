@@ -6,8 +6,11 @@ uniform mat4 P;
 uniform vec4 Color;
 uniform vec4 DiffuseColor;
 uniform vec2 ScreenDimensions;
+uniform vec4 FillColor;
+uniform float FillPercentage;
 layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D GlowMap;
+
 
 #define TILE_SIZE 16
 
@@ -47,6 +50,7 @@ in VertexData{
 	vec3 Position;
 	vec3 Normal;
 	vec2 TextureCoordinate;
+	vec4 ExplosionColor;
 }Input;
 
 out vec4 sceneColor;
@@ -134,12 +138,23 @@ void main()
 		totalLighting.Specular += light_result.Specular;
 	}
 
-	//sceneColor += Input.DiffuseColor;
-	vec4 color_result = DiffuseColor * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
+	
+	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
+	
+
+	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
+
+	if(pos <= FillPercentage) {
+		color_result += FillColor;
+	}
 	//bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 	//These if statements should be removed if they are slow.
 	color_result += glowTexel;
+
+
+	
+
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
 	/*
 	if(color_result.x > 1 || color_result.y > 1 || color_result.z > 1) {
@@ -147,11 +162,10 @@ void main()
 	} else {
 		bloomColor = vec4(0.0, 0.0, 0.0, 1.0);
 	} */
+
+
 	
-	//sceneColor += Input.DiffuseColor * (totalLighting.Diffuse) * diffuseTexel * Color;
-	//sceneColor += Input.DiffuseColor + vec4(0.0, LightGrids.Data[currentTile].Amount/3, 0, 1);
-	//sceneColor = diffuseTexel * Input.DiffuseColor * Color;
-	//sceneColor += vec4(currentTile/3600.f, 0, 0, 1);
+
 
 	//Tiled Debug Code
 	/*

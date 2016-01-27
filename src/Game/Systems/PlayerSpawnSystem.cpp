@@ -102,10 +102,10 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     }
 
     // TODO: Set the player name to whatever
-    //EntityWrapper playerName = e.Player.FirstChildByName("PlayerName");
-    //if (playerName.Valid()) {
-    //    playerName["Text"]["Content"] = ???;
-    //}
+    EntityWrapper playerName = e.Player.FirstChildByName("PlayerName");
+    if (playerName.Valid()) {
+        playerName["Text"]["Content"] = e.PlayerName;
+    }
 
     return true;
 }

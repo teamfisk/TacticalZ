@@ -12,7 +12,7 @@ EditorRenderSystem::EditorRenderSystem(World* m_World, EventBroker* eventBroker,
 
 void EditorRenderSystem::Update(double dt)
 {
-    if (m_CurrentCamera) {
+    if (m_CurrentCamera.Valid()) {
         ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
         m_EditorCamera->SetPosition(cameraTransform["Position"]);
         m_EditorCamera->SetOrientation(glm::quat((const glm::vec3&)cameraTransform["Orientation"]));
@@ -48,7 +48,7 @@ void EditorRenderSystem::Update(double dt)
             EntityWrapper entity(m_World, cModel.EntityID);
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
-                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World);
+                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f);
                 scene.ForwardJobs.push_back(modelJob);
             }
         }
