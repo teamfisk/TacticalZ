@@ -22,8 +22,6 @@ void DrawColorCorrectionPass::InitializeShaderPrograms()
 
 void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture)
 {
-    ImGui::DragFloat("Exposure", &m_Exposure, 0.01f, 0.f, 10.f, "%.2f", 1.f);
-    ImGui::DragFloat("Gamma", &m_Gamma, 0.01f, 0.f, 50.f, "%.2f", 1.f);
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLERROR("DrawScreenQuadPass::Draw: Pre");
 

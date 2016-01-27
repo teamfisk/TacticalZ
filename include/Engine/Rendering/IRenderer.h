@@ -40,9 +40,6 @@ public:
 	virtual void Draw(RenderFrame& rq) = 0;
     virtual PickData Pick(glm::vec2 screenCord) = 0;
 
-
-    World* m_World; //Temp world, untill viktor merge.
-
 protected:
 	Rectangle m_Resolution = Rectangle::Rectangle(1280, 720);
     Rectangle m_ViewPortWidth = Rectangle::Rectangle(1280, 720);
