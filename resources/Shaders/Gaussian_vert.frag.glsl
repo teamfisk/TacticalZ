@@ -1,4 +1,5 @@
 #version 430
+#extension GL_EXT_gpu_shader4 : enable
 
 layout (binding = 0) uniform sampler2D Texture;
 

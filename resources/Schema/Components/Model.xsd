@@ -15,8 +15,23 @@
 				<xs:element name="Color" type="t:Color" minOccurs="0">
 					<xs:annotation><xs:documentation>Color tint</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Transparent" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Wether the model is transparent or not</xs:documentation></xs:annotation>
+				</xs:element>
 				<xs:element name="Visible" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Whether the model is visible or not</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="DiffuseTexture" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Whether the model should use the Diffuse texture or not</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="NormalMap" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Whether the model should use the Normalmap or not</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="SpecularMap" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Whether the model should use the Specularmap or not</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="GlowMap" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Whether the model should use the Glowmap or not</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>
