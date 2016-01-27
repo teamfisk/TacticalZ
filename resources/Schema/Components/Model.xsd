@@ -16,7 +16,7 @@
 					<xs:annotation><xs:documentation>Color tint</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Visible" type="t:bool" minOccurs="0">
-					<xs:annotation><xs:documentation>Wether the model is visible or not</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>Whether the model is visible or not</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>
