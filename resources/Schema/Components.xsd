@@ -24,4 +24,5 @@
 	<xs:include schemaLocation="Components/UniformScale.xsd"/>
 	<xs:include schemaLocation="Components/EditorWidget.xsd"/>
 	<xs:include schemaLocation="Components/Animation.xsd"/>
+	<xs:include schemaLocation="Components/BoneAttachment.xsd"/>
 </xs:schema>

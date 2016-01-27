@@ -94,11 +94,16 @@ void DrawFinalPass::Draw(RenderScene& scene)
             glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
             }*/
 
-            //TODO: Fixa så att modelsJobs kan spela upp olika animationer och så att den kan få in en tid istället för 1.0f - Hälsningar Johan och Andreas :)
-            if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-               
+            if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {           
                 if (modelJob->Animation != nullptr) {
-                    std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones( *modelJob->Animation, modelJob->AnimationTime);
+                    std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
+//                     std::vector<glm::mat4> frameBones2 = modelJob->Skeleton->GetFrameBones(*modelJob->Skeleton->GetAnimation("Walk"), modelJob->AnimationTime);
+// 
+// 
+//                     for (int i = 0; i < frameBones.size(); i++) {
+//                         frameBones[i] = frameBones[i] * glm::mat4(glm::quat(glm::vec3(0.f, 0.f, 0.f)));//* frameBones2[i];
+//                     }
+
                     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
             }

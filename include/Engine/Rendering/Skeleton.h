@@ -82,17 +82,19 @@ public:
 
 	int GetBoneID(std::string name);
 
-	const Animation* GetAnimation(std::string name);
-	std::vector<glm::mat4> GetFrameBones(const Animation& animation, double time, bool noRootMotion = false);
-	void AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
-	void PrintSkeleton();
+    const Animation* GetAnimation(std::string name);
+    std::vector<glm::mat4> GetFrameBones(const Animation& animation, double time, bool noRootMotion = false);
+    void AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+    void PrintSkeleton();
 	void PrintSkeleton(const Bone* parent, int depthCount);
 	std::map<std::string, Animation> Animations;
+
+    glm::mat4 GetBoneTransform(const Bone* bone, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, glm::mat4 parentMatrix);
+    int GetKeyframe(const Animation& animation, double time);
 
 private:
 	std::map<std::string, Bone*> m_BonesByName;
 
-	int GetKeyframe(const Animation& animation, double time);
 };
 
 #endif

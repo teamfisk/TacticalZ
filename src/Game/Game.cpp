@@ -10,7 +10,8 @@
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/WeaponSystem.h"
-#include "../Engine/Rendering/AnimationSystem.h"
+#include "Rendering/AnimationSystem.h"
+#include "Rendering/BoneAttachmentSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -90,6 +91,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
     ++updateOrderLevel;

@@ -41,7 +41,5 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
         }
     }
 
-    
-
 }
 

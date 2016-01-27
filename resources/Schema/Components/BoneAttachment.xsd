@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="BoneAttachment">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Name" type="t:string" minOccurs="0"/>
+				<xs:element name="PositionOffset" type="t:Vector" minOccurs="0"/>
+				<xs:element name="InheritPosition" type="t:bool" minOccurs="0"/>
+				<xs:element name="OrientationOffset" type="t:Vector" minOccurs="0"/>
+				<xs:element name="InheritOrientation" type="t:bool" minOccurs="0"/>
+				<xs:element name="ScaleOffset" type="t:Vector" minOccurs="0"/>
+				<xs:element name="InheritScale" type="t:bool" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
