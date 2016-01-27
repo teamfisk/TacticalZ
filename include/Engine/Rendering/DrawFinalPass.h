@@ -30,10 +30,13 @@ public:
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
     void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
-    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& job);
+    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& job, RenderScene& scene);
 
-    void BindExplosionUniforms();
-    void BindExplosionTextures();
+    void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
+    void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
+
+    void BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job);
+    void BindModelTextures(std::shared_ptr<ModelJob>& job);
 
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;

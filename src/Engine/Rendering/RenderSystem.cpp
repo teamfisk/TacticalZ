@@ -98,6 +98,10 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     fillColor, 
                     fillPercentage
                 ));
+                if(explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                    modelComponent["Transparent"] = true;
+                }
+
                 if (modelComponent["Transparent"]) {
                     transparentJobs.push_back(explosionEffectJob);
                 } else {
@@ -114,6 +118,9 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     fillColor, 
                     fillPercentage
                 ));
+                if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                    modelComponent["Transparent"] = true;
+                }
                 if (modelComponent["Transparent"]) {
                     transparentJobs.push_back(modelJob);
                 } else {
