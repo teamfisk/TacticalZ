@@ -15,7 +15,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
     
 
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
-    const Skeleton::Animation* animation = skeleton->GetAnimation(animationComponent["Name"]);
+    const Skeleton::Animation* animation = skeleton->GetAnimation(animationComponent["AnimationName"]);
 
     if(animation != nullptr) {
         double animationSpeed = (double)animationComponent["Speed"];
@@ -29,7 +29,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
                 (double&)animationComponent["Speed"] = 0.0;
                 Events::AnimationComplete e;
                 e.Entity = entity;
-                e.Name = (std::string)animationComponent["Name"];
+                e.Name = (std::string)animationComponent["AnimationName"];
                 m_EventBroker->Publish(e);
             } else {
                 if (glm::abs(nextTime) > animation->Duration) {

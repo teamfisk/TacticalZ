@@ -6,7 +6,7 @@
 	<xs:element name="Animation">
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="Name" type="t:string" minOccurs="0"/>
+				<xs:element name="AnimationName" type="t:string" minOccurs="0"/>
 				<xs:element name="Time" type="t:double" minOccurs="0"/>
 				<xs:element name="Speed" type="t:double" minOccurs="0"/>
 				<xs:element name="Loop" type="t:bool" minOccurs="0"/>

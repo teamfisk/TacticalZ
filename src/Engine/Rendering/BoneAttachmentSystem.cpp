@@ -20,13 +20,13 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
 
 
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
-    const Skeleton::Animation* animation = skeleton->GetAnimation(parent["Animation"]["Name"]);
+    const Skeleton::Animation* animation = skeleton->GetAnimation(parent["Animation"]["AnimationName"]);
 
     if (!animation) {
         return;
     }
 
-    int id = skeleton->GetBoneID(entity["BoneAttachment"]["Name"]);
+    int id = skeleton->GetBoneID(entity["BoneAttachment"]["BoneName"]);
 
     if(id == -1) {
         return;
