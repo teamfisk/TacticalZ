@@ -6,6 +6,7 @@ EditorGUI::EditorGUI(World* world, EventBroker* eventBroker)
     , m_EventBroker(eventBroker)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &EditorGUI::OnKeyDown);
+    EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorGUI::OnFileDropped);
 }
 
 void EditorGUI::Draw()
@@ -168,10 +169,7 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
             ImGui::Text(formatEntityName(entity).c_str());
             ImGui::End();
         }
-    }/* else if (m_CurrentlyDragging == entity) {
-        LOG_DEBUG("Stopped dragging %i", entity.ID);
-        m_CurrentlyDragging = EntityWrapper::Invalid;
-    }*/
+    }
     // Entity context menu
     std::string contextMenuUniqueID = std::string("EntityContextMenu") + std::to_string(entity.ID);
     if (hovered && ImGui::IsMouseClicked(1)) {
@@ -436,18 +434,31 @@ bool EditorGUI::drawComponentField_bool(ComponentWrapper &c, const ComponentInfo
 
 bool EditorGUI::drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
+    bool result = false;
+
     auto& val = c.Field<std::string>(field.Name);
+
     char tempString[1024]; // Let's just hope this is an sufficiently large buffer for strings :)
     tempString[1023] = '\0'; // Null terminator just in case the string is larger than the buffer
     // Copy the string into the buffer, taking the null terminator into account
     memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString) - 1));
     if (ImGui::InputText("", tempString, sizeof(tempString))) {
         val = std::string(tempString);
-        return true;
-    } else {
-        return false;
+        result = true;
     }
-    // TODO: Handle drag and drop of files
+
+    // Handle file drag and drop
+    if (ImGui::IsItemHovered() && !m_DroppedFile.empty()) {
+        // Unset potential input focus or our newly set value will be overwritten!
+        if (ImGui::IsItemActive()) {
+            ImGui::SetActiveID(0, nullptr);
+        }
+        // Set the actual dropped value
+        val = m_DroppedFile;
+        m_DroppedFile = "";
+    }
+    
+    return result;
 }
 
 void EditorGUI::drawModals()
@@ -571,6 +582,17 @@ bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
         }
     }
 
+    return true;
+}
+
+bool EditorGUI::OnFileDropped(const Events::FileDropped& e)
+{
+    // Make a best effort to make the path relative to the working directory of the executable
+    m_DroppedFile = boost::filesystem::path(e.Path).lexically_relative(boost::filesystem::current_path()).string();
+    // Compensate for Windows retardedness
+    std::replace(m_DroppedFile.begin(), m_DroppedFile.end(), '\\', '/');
+    // Special case for when people drop from the asset folder instead of from the symlink to the asset folders in bin
+    boost::algorithm::replace_first(m_DroppedFile, "../assets/", "");
     return true;
 }
 

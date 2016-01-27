@@ -7,7 +7,7 @@
 #include <nativefiledialog/nfd.h>
 #include <boost/filesystem.hpp>
 #include <boost/any.hpp>
-#include <boost/sort/spreadsort/string_sort.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include "../Common.h"
 #include "../GLM.h"
 #include <glm/gtx/common.hpp>
@@ -19,6 +19,7 @@
 #include "../Core/ResourceManager.h"
 #include "../Core/EPause.h"
 #include "../Core/EKeyDown.h"
+#include "../Core/EFileDropped.h"
 #include "../Rendering/Texture.h"
 
 class EditorGUI
@@ -96,6 +97,7 @@ private:
     WidgetMode m_CurrentWidgetMode = WidgetMode::Translate;
     std::set<std::string> m_ModalsToOpen;
     std::map<std::string, boost::any> m_ModalData;
+    std::string m_DroppedFile = "";
 
     // Callbacks
     OnEntitySelectedCallback_t m_OnEntitySelected = nullptr;
@@ -112,6 +114,8 @@ private:
     // Events
     EventRelay<EditorGUI, Events::KeyDown> m_EKeyDown;
     bool OnKeyDown(const Events::KeyDown& e);
+    EventRelay<EditorGUI, Events::FileDropped> m_EFileDropped;
+    bool OnFileDropped(const Events::FileDropped& e);
 
     // Utility functions
     boost::filesystem::path fileOpenDialog();
