@@ -1,4 +1,6 @@
 #include "Core/World.h"
+#include "Core/EEntityDeleted.h"
+#include "Core/EComponentDeleted.h"
 
 World::~World()
 {
@@ -21,37 +23,7 @@ EntityID World::CreateEntity(EntityID parent /*= 0*/)
 
 void World::DeleteEntity(EntityID entity)
 {
-    // Delete components
-    for (auto& pair : m_ComponentPools) {
-        auto& pool = pair.second;
-        if (pool->KnowsEntity(entity)) {
-            auto& c = pool->GetByEntity(entity);
-            pool->Delete(c);
-        }
-    }
-
-    // Loop through children
-    std::vector<EntityID> childrenToDelete;
-    auto children = m_EntityChildren.equal_range(entity);
-    for (auto it = children.first; it != children.second; ++it) {
-        childrenToDelete.push_back(it->second);
-    }
-    for (auto& child : childrenToDelete) {
-        DeleteEntity(child);
-    }
-
-    EntityID parent = m_EntityParents.at(entity);
-    m_EntityParents.erase(entity);
-    auto parentChildren = m_EntityChildren.equal_range(parent);
-    for (auto it = parentChildren.first; it != parentChildren.second; ++it) {
-        if (it->second == entity) {
-            m_EntityChildren.erase(it);
-            break;
-        }
-    }
-
-    // Erase potential name
-    m_EntityNames.erase(entity);
+    deleteEntityRecursive(entity, false);
 }
 
 bool World::ValidEntity(EntityID entity) const
@@ -96,7 +68,15 @@ void World::DeleteComponent(EntityID entity, const std::string& componentType)
 {
     ComponentPool* pool = m_ComponentPools.at(componentType);
     ComponentWrapper c = pool->GetByEntity(entity);
-    return pool->Delete(c);
+    pool->Delete(c);
+
+    if (m_EventBroker != nullptr) {
+        Events::ComponentDeleted e;
+        e.Entity = entity;
+        e.ComponentType = componentType;
+        e.Cascaded = false;
+        m_EventBroker->Publish(e);
+    }
 }
 
 const ComponentPool* World::GetComponents(const std::string& componentType)
@@ -153,5 +133,59 @@ EntityID World::generateEntityID()
 {
     // TODO: Make EntityID generation smarter
     return m_CurrentEntityID++;
+}
+
+void World::deleteEntityRecursive(EntityID entity, bool cascaded /*= false*/)
+{
+    // Don't attempt to delete entities that don't exist anyway
+    if (!ValidEntity(entity)) {
+        return;
+    }
+
+    if (m_EventBroker != nullptr) {
+        Events::EntityDeleted e;
+        e.DeletedEntity = entity;
+        e.Cascaded = cascaded;
+        m_EventBroker->Publish(e);
+    }
+
+    // Delete components
+    for (auto& pair : m_ComponentPools) {
+        auto& pool = pair.second;
+        if (pool->KnowsEntity(entity)) {
+            auto& c = pool->GetByEntity(entity);
+            pool->Delete(c);
+            if (m_EventBroker != nullptr) {
+                Events::ComponentDeleted e;
+                e.Entity = entity;
+                e.ComponentType = pair.first;
+                e.Cascaded = true;
+                m_EventBroker->Publish(e);
+            }
+        }
+    }
+
+    // Loop through children
+    std::vector<EntityID> childrenToDelete;
+    auto children = m_EntityChildren.equal_range(entity);
+    for (auto it = children.first; it != children.second; ++it) {
+        childrenToDelete.push_back(it->second);
+    }
+    for (auto& child : childrenToDelete) {
+        deleteEntityRecursive(child, true);
+    }
+
+    EntityID parent = m_EntityParents.at(entity);
+    m_EntityParents.erase(entity);
+    auto parentChildren = m_EntityChildren.equal_range(parent);
+    for (auto it = parentChildren.first; it != parentChildren.second; ++it) {
+        if (it->second == entity) {
+            m_EntityChildren.erase(it);
+            break;
+        }
+    }
+
+    // Erase potential name
+    m_EntityNames.erase(entity);
 }
 

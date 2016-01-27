@@ -10,6 +10,9 @@
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/WeaponSystem.h"
+#include "Game/Systems/PlayerHUD.h"
+#include "Game/Systems/LifetimeSystem.h"
+#include "../Engine/Rendering/AnimationSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -57,7 +60,7 @@ Game::Game(int argc, char* argv[])
     m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
-    m_World = new World();
+    m_World = new World(m_EventBroker);
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
@@ -83,9 +86,13 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
+
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);

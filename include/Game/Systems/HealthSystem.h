@@ -24,7 +24,7 @@ public:
 private:
     //methods which will take care of specific events
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
-    bool HealthSystem::OnPlayerDamaged(const Events::PlayerDamage& e);
+    bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
     bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e);
 

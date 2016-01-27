@@ -1,8 +1,6 @@
 #ifndef PickingPass_h__
 #define PickingPass_h__
 
-
-
 #include "IRenderer.h"
 #include "PickingPassState.h"
 #include "FrameBuffer.h"
@@ -10,8 +8,7 @@
 #include "Util/UnorderedMapiVec2.h"
 #include "../Core/EventBroker.h"
 #include "../Core/World.h"
-
-
+#include "Rendering/Skeleton.h"
 
 class PickingPass
 {

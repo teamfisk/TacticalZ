@@ -13,10 +13,11 @@
 #include "Camera.h"
 #include "../Core/World.h"
 #include "../Core/Transform.h"
+#include "Skeleton.h"
 
 struct ModelJob : RenderJob
 {
-    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialGroup matGroup, ComponentWrapper modelComponent, World* world)
+    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialGroup matGroup, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage)
         : RenderJob()
     {
         Model = model;
@@ -37,6 +38,17 @@ struct ModelJob : RenderJob
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
         Depth = worldpos.z;
         World = world;
+
+
+        FillColor = fillColor;
+        FillPercentage = fillPercentage;
+        Skeleton = Model->m_RawModel->m_Skeleton;
+
+        if (world->HasComponent(Entity, "Animation") && Skeleton != nullptr) {
+            auto animationComponent = world->GetComponent(Entity, "Animation");
+            Animation = model->m_RawModel->m_Skeleton->GetAnimation(animationComponent["Name"]);
+            AnimationTime = (double)animationComponent["Time"];
+        }
     };
 
     unsigned int TextureID;
@@ -51,12 +63,20 @@ struct ModelJob : RenderJob
     float Shininess = 0.f;
     glm::vec4 Color;
     const ::Model* Model = nullptr;
+    ::Skeleton* Skeleton = nullptr;
+    const ::Skeleton::Animation* Animation = nullptr;
+
+    float AnimationTime = 0.f;
+
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;
     glm::vec4 IncandescenceColor;
     unsigned int StartIndex = 0;
     unsigned int EndIndex = 0;
     World* World;
+
+    glm::vec4 FillColor = glm::vec4(0);
+    float FillPercentage = 0.0;
 
     void CalculateHash() override
     {

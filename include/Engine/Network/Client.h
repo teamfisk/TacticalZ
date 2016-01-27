@@ -50,6 +50,7 @@ private:
     PlayerID m_PlayerID = -1;
     EntityID m_ServerEntityID = std::numeric_limits<EntityID>::max();
     bool m_IsConnected = false;
+    EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
     // Server Client Lookup map
     // Assumes that root node for client and server is EntityID 0.
 
@@ -79,12 +80,15 @@ private:
     void parsePing();
     void parseKick();
     void parsePlayersSpawned(Packet& packet);
+    void parseEntityDeletion(Packet& packet);
+    void parseComponentDeletion(Packet& packet);
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     bool hasServerTimedOut();
     EntityID createPlayer();
     void sendInputCommands();
+    void sendLocalPlayerTransform();
     void becomePlayer();
     // Mapping Logic
     // Returns if local EntityID exist in map
@@ -92,13 +96,16 @@ private:
     // Returns if server EntityID exist in map
     bool serverClientMapsHasEntity(EntityID serverEntityID);
     void insertIntoServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
+    void deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
 
     // Events
     EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
-    EventRelay<Client, Events::PlayerDamage> m_EPlayeDamage;
+    EventRelay<Client, Events::PlayerDamage> m_EPlayerDamage;
     bool OnPlayerDamage(const Events::PlayerDamage& e);
+    EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(const Events::PlayerSpawned& e);
 };
 
 #endif

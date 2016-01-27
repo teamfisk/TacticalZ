@@ -12,6 +12,11 @@ InterpolationSystem::InterpolationSystem(World* world, EventBroker* eventBroker)
 
 void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt)
 {
+    // Don't interpolate entities that might already have been removed
+    if (!entity.Valid()) {
+        return;
+    }
+
     if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
         m_NextTransform[transform.EntityID].interpolationTime += dt;
         Transform sTransform = m_NextTransform[transform.EntityID];
@@ -31,11 +36,10 @@ void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
             // Position
             glm::vec3 nextPosition = sTransform.Position;
             glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
-            // HACK: Hardcoded tolerance value for player position desync = 1
-            if (isLocalPlayer && glm::length(nextPosition - currentPosition) < 1.f) {
-                return;
+            // HACK: Don't force position for players 
+            if (!isLocalPlayer) {
+                (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
             }
-            (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
             // Orientation
             // Don't force orientation for players
             if (!isLocalPlayer) {

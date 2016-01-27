@@ -75,6 +75,10 @@ void DrawFinalPass::Draw(RenderScene& scene)
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
             glUniform4fv(glGetUniformLocation(shaderHandle, "DiffuseColor"), 1, glm::value_ptr(modelJob->DiffuseColor));
 
+            glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(modelJob->FillColor));
+            glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), modelJob->FillPercentage);
+
+
             glActiveTexture(GL_TEXTURE0);
             if(modelJob->DiffuseTexture != nullptr) {
                 glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
@@ -96,12 +100,9 @@ void DrawFinalPass::Draw(RenderScene& scene)
 
             //TODO: Fixa så att modelsJobs kan spela upp olika animationer och så att den kan få in en tid istället för 1.0f - Hälsningar Johan och Andreas :)
             if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-                auto animation = modelJob->Model->m_RawModel->m_Skeleton->GetAnimation("running");
-                if (animation != nullptr) {
-                    std::vector<glm::mat4> frameBones = modelJob->Model->m_RawModel->m_Skeleton->GetFrameBones(
-                        *animation,
-                        0.0f
-                        );
+               
+                if (modelJob->Animation != nullptr) {
+                    std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones( *modelJob->Animation, modelJob->AnimationTime);
                     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
             }
