@@ -35,15 +35,12 @@ bool RenderSystem::isChildOfACamera(EntityWrapper entity)
 {
     return entity.FirstParentWithComponent("Camera").Valid();
 }
-void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
-
-place me somewhere
-
 bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
 {
     return entity == m_CurrentCamera || entity.IsChildOf(m_CurrentCamera);
 }
 
+void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
 {
     auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
@@ -110,10 +107,10 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
                     fillPercentage
                 ));
                 if(explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
-                    modelComponent["Transparent"] = true;
+                    cModel["Transparent"] = true;
                 }
 
-                if (modelComponent["Transparent"]) {
+                if (cModel["Transparent"]) {
                     transparentJobs.push_back(explosionEffectJob);
                 } else {
                     opaqueJobs.push_back(explosionEffectJob);
@@ -130,9 +127,9 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
                     fillPercentage
                 ));
                 if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
-                    modelComponent["Transparent"] = true;
+                    cModel["Transparent"] = true;
                 }
-                if (modelComponent["Transparent"]) {
+                if (cModel["Transparent"]) {
                     transparentJobs.push_back(modelJob);
                 } else {
                     opaqueJobs.push_back(modelJob);
