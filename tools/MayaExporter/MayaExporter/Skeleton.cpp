@@ -60,7 +60,7 @@
 //
 //	return m_AllSkeletons;
 //}
-std::string attr[9] = { "scaleX", "scaleY", "scaleZ", "translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ" };
+static std::string attr[9] = { "scaleX", "scaleY", "scaleZ", "translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ" };
 
 Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int endFrame)
 {
@@ -80,6 +80,9 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 		m_Hierarchy.push_back(jointIt.item());
 
 		MFnDependencyNode depNode(jointIt.item());
+        MGlobal::displayInfo("-------- INFO ---------");
+        MGlobal::displayInfo("Joint name: " + depNode.name());
+        //Loop toght the attr Array to find keyframes;
 		for (int i = 0; i < 9; i++)
 		{
 			MStatus tmp;
@@ -94,21 +97,38 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 
 					MFnAnimCurve jointAnim(connected);
 
+                    //MGlobal::displayInfo(MString() + "curve                     : " + jointAnim.name());
+                    //MGlobal::displayInfo(MString() + "curve keys                : " + jointAnim.numKeys());
+                    //MGlobal::displayInfo(MString() + "curve keyframes           : " + jointAnim.numKeyframes());
+                    //MGlobal::displayInfo(MString() + "startFrame                : " + startFrame);
+                    //MGlobal::displayInfo(MString() + "endFrame                  : " + endFrame);
+
 					unsigned int startKeyFrameIndex = jointAnim.findClosest(MTime(startFrame, MTime::kNTSCField), &tmp);
 
 					if (tmp == MStatus::kFailure)
 						MGlobal::displayInfo(MString() + "Fail :c");
 
-					if (startFrame * oneDivSixty <= jointAnim.time(startKeyFrameIndex).value() && jointAnim.time(startKeyFrameIndex).value() <= endFrame * oneDivSixty) {
+                    //MGlobal::displayInfo(MString() + "Start key index           : " + startKeyFrameIndex);
+                    //MGlobal::displayInfo(MString() + "Start key time            : " + jointAnim.time(startKeyFrameIndex).value());
+
+
+					if (startFrame <= jointAnim.time(startKeyFrameIndex).value() && jointAnim.time(startKeyFrameIndex).value() <= endFrame ) {
 						animatedJoints.push_back(jointIt.item());
 						i = 9;
 						break;
-					}
+					}                         
 
-					unsigned int endKeyFrameIndex = jointAnim.findClosest(MTime(endFrame, MTime::kNTSCField));
-					MGlobal::displayInfo(MString() + startKeyFrameIndex + " " + endKeyFrameIndex);
+					unsigned int endKeyFrameIndex = jointAnim.findClosest(MTime(endFrame, MTime::kNTSCField), &tmp);
+                    if (tmp == MStatus::kFailure)
+                        MGlobal::displayInfo(MString() + "Fail!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-					if (startFrame * oneDivSixty <= jointAnim.time(endKeyFrameIndex).value() && jointAnim.time(endKeyFrameIndex).value() <= endFrame * oneDivSixty || endKeyFrameIndex - startKeyFrameIndex > 0) {
+
+                    //MGlobal::displayInfo(MString() + "End key index             : " + endKeyFrameIndex);
+                    //MGlobal::displayInfo(MString() + "end key time              : " + jointAnim.time(endKeyFrameIndex).value());
+
+					/*MGlobal::displayInfo(MString() + "start keyfram index: " + startKeyFrameIndex + ". End keyfram index: " + endKeyFrameIndex + ".");*/
+
+					if (startFrame  <= jointAnim.time(endKeyFrameIndex).value() && jointAnim.time(endKeyFrameIndex).value() <= endFrame || endKeyFrameIndex - startKeyFrameIndex > 0) {
 						animatedJoints.push_back(jointIt.item());
 						i = 9;
 						break;
@@ -122,16 +142,19 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 					MFnMatrixData MartixFn(DataHandle.data());
 					MMatrix BindPoseMatrix = MartixFn.matrix();
 
-					if (!BindPoseMatrix.isEquivalent(MayaJoint.transformationMatrix()))
+					if (!BindPoseMatrix.isEquivalent(MayaJoint.transformationMatrix(), 0.0000001f))
 					{
 						MGlobal::displayError(MString() + animationName.c_str() + " is using " + MayaJoint.name() + " that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
 					}
 				}
-			}
-		}
+			}//end of connections.length() loop
 
+		} // end of int i loop
 		jointIt.next();
-	}
+	} // enf of while (!jointIt.isDone())
+
+
+
 
 	int currentFrame = startFrame;
 	while (currentFrame != endFrame + 1) { // ANDREAS
@@ -251,18 +274,15 @@ std::vector<BindPoseSkeletonNode> Skeleton::GetBindPoses()
 
 
         MVector tmp = MayaJoint.transformation().getTranslation(MSpace::kObject);
-        MGlobal::displayError(MString() + "translation befor: " + tmp[0] + " " + tmp[1] + " " + tmp[2]);
         //Matrix[3][0] *= -1;
         //Matrix[3][2] *= -1;
         //Matrix[3][1] *= -1;
 
         double test[3];
         MayaJoint.transformation().getScale(test, MSpace::kObject);
-        MGlobal::displayError(MString() + "scale: " + test[0] + " " + test[1] + " " + test[2]);
 
         MTransformationMatrix::RotationOrder order = MTransformationMatrix::RotationOrder::kXYZ;
         MayaJoint.transformation().getRotation(test, order);
-        MGlobal::displayError(MString() + "rotation: " + test[0] + " " + test[1] + " " + test[2]);
        
         //----- test
 

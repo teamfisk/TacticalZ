@@ -87,10 +87,6 @@ std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
             }
             weightMap[geomIter.index()] = weightInfo;
 
-
-            for (unsigned int k = 0; k!=nrOfWeights; k++) {
-                MGlobal::displayInfo(MString() + "influence: " + weightInfo.BoneIndices[k] + " weight: " + weightInfo.BoneWeights[k]);
-            }
             geomIter.next();
         }
         it.next();
@@ -112,7 +108,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         MFnDependencyNode thisNode(node);
         MPlugArray connections;
         thisNode.findPlug("inMesh").connectedTo(connections, true, true);
-        MGlobal::displayInfo(MString() + "inMesh");
         bool hasSkin = false;
         MPlug weightList, weights;
         MObject weightListObject;
@@ -138,7 +133,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         }
 
         for (int pathID = 0; pathID < dagPaths.length(); pathID++) {
-            MGlobal::displayInfo(dagPaths[pathID].fullPathName());
             MDagPath thisMeshPath(dagPaths[pathID]);
 
             MMatrix transformMatrix = thisMeshPath.inclusiveMatrix(&status);
@@ -173,8 +167,7 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                 break;
             }
             map<string, vector<int>> materialFaceIDs;
-            MGlobal::displayInfo(MString() + "shaderIndexList: " + shaderIndexList.length());
-            MGlobal::displayInfo(MString() + "shaderList: " + shaderList.length());
+
             MPlugArray plugArray;
             for (int i = 0; i < shaderIndexList.length(); i++) {
                 MFnDependencyNode shader(shaderList[shaderIndexList[i]]);
