@@ -130,7 +130,7 @@ void Client::parsePing()
     LOG_INFO("%i: response time with ctime(ms): %f", m_PacketID, m_DurationOfPingTime);
     m_StartPingTime = std::clock();
 
-    Packet packet(MessageType::Ping, m_SendPacketID);
+    Packet packet(MessageType::Ping, m_SendPacketID, m_PacketID, ackBitField);
     packet.WriteString("Ping recieved");
     send(packet);
 }
@@ -294,7 +294,7 @@ void Client::send(Packet& packet)
 
 void Client::connect()
 {
-    Packet packet(MessageType::Connect, m_SendPacketID);
+    Packet packet(MessageType::Connect, m_SendPacketID, m_PacketID, ackBitField);
     packet.WriteString(m_PlayerName);
     m_StartPingTime = std::clock();
     send(packet);
@@ -304,7 +304,7 @@ void Client::disconnect()
 {
     m_PreviousPacketID = 0;
     m_PacketID = 0;
-    Packet packet(MessageType::Disconnect, m_SendPacketID);
+    Packet packet(MessageType::Disconnect, m_SendPacketID, m_PacketID, ackBitField);
     send(packet);
 }
 
@@ -344,7 +344,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 
 bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
 {
-    Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
+    Packet packet(MessageType::OnPlayerDamage, m_SendPacketID, m_PacketID, ackBitField);
     packet.WritePrimitive(e.Damage);
     packet.WritePrimitive(e.Player.ID);
     send(packet);
@@ -368,7 +368,7 @@ void Client::sendLocalPlayerTransform()
     ComponentWrapper cTransform = m_LocalPlayer["Transform"];
     glm::vec3& position = cTransform["Position"];
     glm::vec3& orientation = cTransform["Orientation"];
-    Packet packet(MessageType::PlayerTransform, m_SendPacketID);
+    Packet packet(MessageType::PlayerTransform, m_SendPacketID, m_PacketID, ackBitField);
     packet.WritePrimitive(position.x);
     packet.WritePrimitive(position.y);
     packet.WritePrimitive(position.z);
@@ -413,7 +413,7 @@ EntityID Client::createPlayer()
 void Client::sendInputCommands()
 {
     if (m_InputCommandBuffer.size() > 0) {
-        Packet packet(MessageType::OnInputCommand, m_SendPacketID);
+        Packet packet(MessageType::OnInputCommand, m_SendPacketID, m_PacketID, ackBitField);
         for (int i = 0; i < m_InputCommandBuffer.size(); i++) {
             packet.WriteString(m_InputCommandBuffer[i].Command);
             packet.WritePrimitive(m_InputCommandBuffer[i].Value);
@@ -425,7 +425,7 @@ void Client::sendInputCommands()
 
 void Client::becomePlayer()
 {
-    Packet packet = Packet(MessageType::BecomePlayer, m_SendPacketID);
+    Packet packet(MessageType::BecomePlayer, m_SendPacketID, m_PacketID, ackBitField);
     send(packet);
 }
 

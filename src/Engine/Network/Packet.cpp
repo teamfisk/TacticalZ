@@ -1,9 +1,9 @@
 #include "Network/Packet.h"
 
-Packet::Packet(MessageType type, unsigned int& packetID)
+Packet::Packet(MessageType type, unsigned int& packetID, unsigned int lastReceivedPacket, unsigned int ackBitField)
 {
     m_Data = new char[m_MaxPacketSize];
-    Init(type, packetID);
+    Init(type, packetID, lastReceivedPacket, ackBitField);
 }
 
 // Create message
@@ -21,7 +21,9 @@ Packet::Packet(MessageType type)
 {
     m_Data = new char[m_MaxPacketSize];
     unsigned int dummy = 0;
-    Init(type, dummy);
+    // Dummy allocates memory for later insertion of
+    // correct values
+    Init(type, dummy, dummy, dummy);
 }
 
 Packet::~Packet()
@@ -29,15 +31,17 @@ Packet::~Packet()
     delete[] m_Data;
 }
 
-void Packet::Init(MessageType type, unsigned int & packetID)
+void Packet::Init(MessageType type, unsigned int & packetID, unsigned int lastReceivedPacket, unsigned int ackBitField)
 {
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
     // Add message type
     int messageType = static_cast<int>(type);
-    Packet::WritePrimitive<int>(messageType);
-    Packet::WritePrimitive<int>(packetID);
+    WritePrimitive<int>(messageType);
+    WritePrimitive<unsigned int>(packetID);
+    WritePrimitive<unsigned int>(lastReceivedPacket);
+    WritePrimitive<unsigned int>(ackBitField);
     packetID++;
     m_HeaderSize = m_Offset;
 }
@@ -87,16 +91,31 @@ char * Packet::ReadData(int SizeOfData)
     return (m_Data + oldReturnDataOffset);
 }
 
-void Packet::ChangePacketID(unsigned int & packetID)
+//void Packet::ChangePacketID(unsigned int & packetID)
+//{
+//    packetID = packetID + 1;
+//    // Overwrite old PacketID
+//    memcpy(m_Data + sizeof(int), &packetID, sizeof(int));
+//}
+
+void Packet::ChangeHeaderInfo(unsigned int& packetID, unsigned int lastReceivedPacket, unsigned int ackBitField)
 {
     packetID = packetID + 1;
+    // Start at sizeOf(int) cause of MessageType
+    int offset = sizeof(int);
     // Overwrite old PacketID
-    memcpy(m_Data + sizeof(int), &packetID, sizeof(int));
+    memcpy(m_Data + sizeof(unsigned int), &packetID, offset);
+    offset += sizeof(unsigned int);
+    // Overwrite old LastReceivedPacket
+    memcpy(m_Data + sizeof(unsigned int), &lastReceivedPacket, offset);
+    offset += sizeof(unsigned int);
+    // Overwrite old ackBitField
+    memcpy(m_Data + sizeof(unsigned int), &ackBitField, offset);
+    offset += sizeof(unsigned int);
 }
 
 void Packet::resizeData()
 {
-
     // Allocate memory to store our data in
     char* holdData = new char[m_MaxPacketSize];
     // Copy our data to the newly allocated memory

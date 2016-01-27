@@ -11,12 +11,12 @@ class Packet
 public:
     // arg1: Type of message (Connect, Disconnect...)
     // arg2: PacketID for identifying packet loss.
-    Packet(MessageType type, unsigned int& packetID);
+    Packet(MessageType type, unsigned int& packetID, unsigned int lastReceivedPacket, unsigned int ackBitField);
     // Used to create packet from already existing data buffer.
     Packet(char* data, const int sizeOfPacket);
     Packet(MessageType type);
     ~Packet();
-    void Init(MessageType type, unsigned int& packetID);
+    void Init(MessageType type, unsigned int& packetID, unsigned int lastReceivedPacket, unsigned int ackBitField);
 
     // Add primitive types like int, float, char...
     template<typename T>
@@ -50,7 +50,9 @@ public:
     // Pops the first element as if it was a string.
     std::string ReadString();
     char* ReadData(int SizeOfData);
-    void ChangePacketID(unsigned int& packetID);
+    // No purpose any more 
+    //void ChangePacketID(unsigned int& packetID);
+    void ChangeHeaderInfo(unsigned int& packetID, unsigned int lastReceivedPacket, unsigned int ackBitField);
     int Size() { return m_Offset; };
     char* Data() { return m_Data; };
     unsigned int DataReadSize() { return m_ReturnDataOffset; }

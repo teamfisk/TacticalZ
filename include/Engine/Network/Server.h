@@ -37,7 +37,7 @@ private:
     char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
     // time for previouse message
-    std::clock_t previousePingMessage = std::clock();
+    std::clock_t previousPingMessage = std::clock();
     std::clock_t previousSnapshotMessage = std::clock();
     std::clock_t timOutTimer = std::clock();
     // How often we send messages (milliseconds)
@@ -58,25 +58,26 @@ private:
     PacketID m_PreviousPacketID = 0;
 
     // Private member functions
-    int  receive(char* data);
-    void readFromClients();
-    void send(PlayerID player, Packet& packet);
-    void send(Packet& packet);
-    void broadcast(Packet& packet);
-    void sendSnapshot();
     void addChildrenToPacket(Packet& packet, EntityID entityID);
-    void sendPing();
+    void broadcast(Packet& packet);
     void checkForTimeOuts();
     void disconnect(PlayerID playerID);
+    void identifyPacketLoss();
+    void kick(PlayerID player);
+    int  receive(char* data);
+    void readFromClients();
+    void send(PlayerID playerID, Packet& packet);
+    void send(Packet& packet);
+    void sendSnapshot();
+    void sendPing();
+    void parseClientPing(PlayerID playerID);
+    void parseConnect(Packet& packet, PlayerID playerID);
+    void parseDisconnect();
     void parseMessageType(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseOnPlayerDamage(Packet& packet);
-    void parseConnect(Packet& packet);
-    void parseDisconnect();
-    void parseClientPing();
     void parsePing();
-    void identifyPacketLoss();
-    void kick(PlayerID player);
+
     PlayerID GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;

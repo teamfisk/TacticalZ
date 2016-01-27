@@ -43,6 +43,7 @@ private:
     PacketID m_PacketID = 0;
     PacketID m_PreviousPacketID = 0;
     PacketID m_SendPacketID = 0;
+    AckBitPattern ackBitField = 0;
 
     // Game logic
     World* m_World;

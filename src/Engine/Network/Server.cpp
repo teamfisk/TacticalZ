@@ -32,6 +32,16 @@ void Server::Update()
     m_EventBroker->Process<Server>();
     if (isReadingData) {
         Network::Update();
+        // Test bit patterns
+        //std::bitset<32> bitPattern;
+        //bitPattern[0].flip();
+        //bitPattern[15].flip();
+        //bitPattern[31].flip();
+        //std::cout << "bitPattern: " << bitPattern << '\n';
+        //unsigned int bitPatternInt = static_cast<unsigned int>(bitPattern.to_ulong());
+        //std::cout << "Int pattern: " << bitPatternInt << '\n';
+        //std::bitset<32> bitPatternRev(bitPatternInt);
+        //std::cout << "bitPatternReverted: " << bitPatternRev << '\n';
     }
 
 }
@@ -55,9 +65,9 @@ void Server::readFromClients()
     }
 
     // Send pings each 
-    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+    if (pingIntervalMs < (1000 * (currentTime - previousPingMessage) / (double)CLOCKS_PER_SEC)) {
         sendPing();
-        previousePingMessage = currentTime;
+        previousPingMessage = currentTime;
     }
 
     // Time out logic
@@ -69,15 +79,19 @@ void Server::readFromClients()
 
 void Server::parseMessageType(Packet& packet)
 {
-    int messageType = packet.ReadPrimitive<int>(); // Read what type off message was sent from server
+    PlayerID playerID = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
 
+    int messageType = packet.ReadPrimitive<int>(); // Read what type off message was sent from server
     // Read packet ID 
-    m_PreviousPacketID = m_PacketID;    // Set previous packet id
-    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+    if (playerID != -1) {
+        // TODO: Bit pattern stuff!"#!"#
+        m_ConnectedPlayers[playerID].LastPacketReceivedID = packet.ReadPrimitive<PacketID>();
+    }
+
     //identifyPacketLoss();
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
-        parseConnect(packet);
+        parseConnect(packet, playerID);
         break;
     case MessageType::Ping:
         parsePing();
@@ -118,12 +132,12 @@ int Server::receive(char * data)
     return length;
 }
 
-void Server::send(PlayerID player, Packet& packet)
+void Server::send(PlayerID playerID, Packet& packet)
 {
     try {
         int bytesSent = m_Socket.send_to(
             boost::asio::buffer(packet.Data(), packet.Size()),
-            m_ConnectedPlayers[player].Endpoint,
+            m_ConnectedPlayers[playerID].Endpoint,
             0);
         // Network Debug data
         if (isReadingData) {
@@ -133,7 +147,7 @@ void Server::send(PlayerID player, Packet& packet)
         }
     } catch (const boost::system::system_error& e) {
         // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
-        m_ConnectedPlayers[player].Endpoint = boost::asio::ip::udp::endpoint();
+        m_ConnectedPlayers[playerID].Endpoint = boost::asio::ip::udp::endpoint();
     }
 }
 
@@ -155,7 +169,11 @@ void Server::send(Packet & packet)
 void Server::broadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
-        packet.ChangePacketID(kv.second.PacketID);
+        packet.ChangeHeaderInfo(
+            kv.second.PacketID,
+            kv.second.LastPacketReceivedID, 
+            kv.second.AckBitField
+            );
         send(kv.first, packet);
     }
 }
@@ -285,19 +303,12 @@ void Server::parseOnPlayerDamage(Packet & packet)
     //LOG_DEBUG("Server::parseOnPlayerDamage: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
 }
 
-void Server::parseConnect(Packet& packet)
+void Server::parseConnect(Packet& packet, PlayerID playerID)
 {
     LOG_INFO("Parsing connections");
     // Check if player is already connected
-    if (GetPlayerIDFromEndpoint(m_ReceiverEndpoint) != -1) {
+    if (playerID != -1) {
         return;
-    }
-    for (auto& kv : m_ConnectedPlayers) {
-        if (kv.second.Endpoint.address() == m_ReceiverEndpoint.address() &&
-            kv.second.Endpoint.port() == m_ReceiverEndpoint.port()) {
-            // Already connected 
-            return;
-        }
     }
     // Create a new player
     PlayerDefinition pd;
@@ -306,11 +317,11 @@ void Server::parseConnect(Packet& packet)
     pd.Name = packet.ReadString();
     pd.PacketID = 0;
     pd.StopTime = std::clock();
+    Packet connnectPacket(MessageType::Connect, pd.PacketID, pd.LastPacketReceivedID, pd.AckBitField);
     m_ConnectedPlayers[m_NextPlayerID++] = pd;
     LOG_INFO("Spectator \"%s\" connected on IP: %s", pd.Name.c_str(), pd.Endpoint.address().to_string().c_str());
 
     // Send a message to the player that connected
-    Packet connnectPacket(MessageType::Connect, pd.PacketID);
     send(connnectPacket);
 
     // Send notification that a player has connected
@@ -331,15 +342,18 @@ void Server::parseDisconnect()
     }
 }
 
-void Server::parseClientPing()
+void Server::parseClientPing(PlayerID player)
 {
-    LOG_INFO("%i: Parsing ping", m_PacketID);
-    PlayerID player = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
     if (player == -1) {
         return;
     }
     // Return ping
-    Packet packet(MessageType::Ping, m_ConnectedPlayers[player].PacketID);
+    Packet packet(
+        MessageType::Ping, 
+        m_ConnectedPlayers[player].PacketID, 
+        m_ConnectedPlayers[player].LastPacketReceivedID, 
+        m_ConnectedPlayers[player].AckBitField
+        );
     packet.WriteString("Ping received");
     send(packet);
 }

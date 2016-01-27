@@ -11,10 +11,12 @@
 #include "Core/ConfigFile.h"
 #include <fstream>
 #include <iostream>
+#include <bitset>
 
 #define INPUTSIZE 4097
 typedef unsigned int PlayerID;
 typedef unsigned int PacketID;
+typedef unsigned int AckBitPattern;
 
 class Network
 {
