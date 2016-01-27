@@ -70,7 +70,7 @@ void SoundSystem::deleteInactiveEmitters()
                 // Sound has been stopped / finished playing. 
                 alDeleteBuffers(1, &it->second->ALsource);
                 alDeleteSources(1, &it->second->ALsource);
-                m_World->DeleteEntity(it->first);
+                delete it->second;
                 it = m_Sources.erase(it);
             }
         } else {
