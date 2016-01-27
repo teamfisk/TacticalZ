@@ -15,6 +15,9 @@
 				<xs:element name="Color" type="t:Color" minOccurs="0">
 					<xs:annotation><xs:documentation>Color tint</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Transparent" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Wether the model is transparent or not</xs:documentation></xs:annotation>
+				</xs:element>
 				<xs:element name="Visible" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Wether the model is visible or not</xs:documentation></xs:annotation>
 				</xs:element>
