@@ -41,11 +41,6 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
             continue;
         }
 
-        auto absPosition = Transform::AbsolutePosition(m_World, cModel.EntityID);
-        auto absOrientation = Transform::AbsoluteOrientation(m_World, cModel.EntityID);
-        auto absScale = Transform::AbsoluteScale(m_World, cModel.EntityID);
-        glm::mat4 modelMatrix = glm::translate(absPosition) * glm::toMat4(absOrientation) * glm::scale(absScale);
-
         RawModel* model;
         try {
             model = ResourceManager::Load<RawModel, true>(cModel["Resource"]);
@@ -53,8 +48,13 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
             continue;
         }
 
+        auto absPosition = Transform::AbsolutePosition(m_World, cModel.EntityID);
+        auto absOrientation = Transform::AbsoluteOrientation(m_World, cModel.EntityID);
+        auto absScale = Transform::AbsoluteScale(m_World, cModel.EntityID);
+        glm::mat4 modelMatrix = glm::translate(absPosition) * glm::toMat4(absOrientation) * glm::scale(absScale);
+
         glm::vec3 resolutionVector;
-        if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, resolutionVector)) {
+        if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, (glm::vec3&)cPhysics["Velocity"], resolutionVector)) {
             (glm::vec3&)cTransform["Position"] += resolutionVector;
             cPhysics["Velocity"] = glm::vec3(0, 0, 0);
         }

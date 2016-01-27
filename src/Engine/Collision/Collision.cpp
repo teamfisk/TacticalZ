@@ -327,11 +327,14 @@ constexpr std::array<std::pair<int, int>, 3> dimensionPairs({ std::pair<int, int
 
 bool AABBvsTriangle(const AABB& box, 
     const std::array<glm::vec3, 3>& triPos,
+    const glm::vec3& boxVelocity,
     glm::vec3& outVector)
 {
     //Check so we don't have a zero area triangle when calculating the normal.
+    //Also, don't check a triangle facing away from the player.
+    //Less checks, and we should be able to walk out from models if we are trapped inside.
     glm::vec3 triNormal = glm::cross(triPos[1] - triPos[0], triPos[2] - triPos[0]);
-    if (!vectorHasLength(triNormal)) {
+    if (!vectorHasLength(triNormal) || glm::dot(triNormal, boxVelocity) > 0) {
         return false;
     }
 
@@ -385,10 +388,18 @@ bool AABBvsTriangle(const AABB& box,
     return true;
 }
 
-bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& modelVertices, const std::vector<unsigned int>& modelIndices, const glm::mat4& modelMatrix, glm::vec3& outResolutionVector)
+bool AABBvsTriangles(const AABB& box, 
+    const std::vector<RawModel::Vertex>& modelVertices, 
+    const std::vector<unsigned int>& modelIndices, 
+    const glm::mat4& modelMatrix,
+    const glm::vec3& boxVelocity,
+    glm::vec3& outResolutionVector,
+    int startIndex,
+    int recursiveDepth)
 {
-    AABB newBox = box;
     bool hit = false;
+
+    AABB newBox = box;
     outResolutionVector = glm::vec3(0.f);
     for (int i = 0; i < modelIndices.size(); ) {
         std::array<glm::vec3, 3> triVertices = {
@@ -397,12 +408,37 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
             Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
         };
         glm::vec3 outVec;
-        if (AABBvsTriangle(newBox, triVertices, outVec)) {
+        if (AABBvsTriangle(newBox, triVertices, boxVelocity, outVec)) {
             hit = true;
             outResolutionVector += outVec;
             newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
         }
     }
+
+    //outResolutionVector = glm::vec3(INFINITY);
+    //if (recursiveDepth > 2) {
+    //    return true;
+    //}
+    //for (int i = startIndex; i < modelIndices.size(); ) {
+    //    std::array<glm::vec3, 3> triVertices = {
+    //        Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+    //        Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+    //        Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
+    //    };
+    //    glm::vec3 outVec;
+    //    if (AABBvsTriangle(box, triVertices, boxVelocity, outVec) && glm::length2(outVec) < glm::length2(outResolutionVector)) {
+    //        hit = true;
+    //        glm::vec3 potentialResolution = outVec;
+    //        const AABB& resolvedBox = AABB::FromOriginSize(box.Origin() + potentialResolution, box.Size());
+    //        if (AABBvsTriangles(resolvedBox, modelVertices, modelIndices, modelMatrix, boxVelocity, outVec, i, recursiveDepth+1)) {
+    //            potentialResolution += outVec;
+    //            if (glm::length2(potentialResolution) > glm::length2(outResolutionVector)) {
+    //                continue;
+    //            }
+    //        }
+    //        outResolutionVector = potentialResolution;
+    //    }
+    //}
 
     //outResolutionVector = glm::vec3(INFINITY);
     //std::stack<AABB> testBoxes;
@@ -448,6 +484,24 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
     //    return true;
     //}
     return hit;
+}
+bool AABBvsTriangles(const AABB& box,
+    const std::vector<RawModel::Vertex>& modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix,
+    const glm::vec3& boxVelocity,
+    glm::vec3& outResolutionVector)
+{
+    return AABBvsTriangles(
+        box, 
+        modelVertices,
+        modelIndices,
+        modelMatrix,
+        boxVelocity,
+        outResolutionVector,
+        0,
+        0
+        );
 }
 
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)

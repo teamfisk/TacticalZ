@@ -6,9 +6,7 @@
     <c:Model>
       <Resource>../assets\Models/MapVersion1.obj</Resource>
     </c:Model>
-    <c:Transform>
-      <Position X="0" Y="0" Z="-0.313012958"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
@@ -24,7 +22,7 @@
         </c:Physics>
         <c:Player/>
         <c:Transform>
-          <Position X="-2.88221216" Y="7.13004351" Z="54.4666595"/>
+          <Position X="-1.48400009" Y="3.68200016" Z="24.7580013"/>
         </c:Transform>
       </Components>
       <Children/>
