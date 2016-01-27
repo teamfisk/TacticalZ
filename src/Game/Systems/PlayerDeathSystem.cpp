@@ -112,5 +112,72 @@ bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
     //    playerName["Text"]["Content"] = e.PlayerName;
     //}
 
+    //m_World->DeleteEntity(e.Player.ID);
+
+    //koppla till en kamera modell för att explodera den
+
+    auto cameras = m_World->GetComponents("Camera");
+
+    for (auto& someCamera : *cameras) {
+        EntityWrapper entity = EntityWrapper(m_World, someCamera.EntityID);
+        auto cameraID = entity.ID;
+        auto modelID = entity.FirstChildByName("HUD");
+        auto weapID = entity.FirstChildByName("Weapon").ID;
+
+        //    auto modelID = m_World->GetComponent(e.PlayerID, "Camera");
+        ComponentWrapper& explosionEffect = m_World->AttachComponent(weapID, "ExplosionEffect");
+        ComponentWrapper& lifeTime = m_World->AttachComponent(weapID, "Lifetime");
+        (glm::vec3)explosionEffect["ExplosionOrigin"] = glm::vec3(0, 0, 0);
+        //explosionEffect["ExplosionOrigin"] = e.Player["Transform"]["Position"];
+        (double)explosionEffect["TimeSinceDeath"] = 0.0;
+        (double)explosionEffect["ExplosionDuration"] = 2.0;
+        explosionEffect["EndColor"] = glm::vec4(0, 0, 0, 1);
+        (bool)explosionEffect["Randomness"] = false;
+        (double)explosionEffect["RandomnessScalar"] = 1.0;
+        (glm::vec2)explosionEffect["Velocity"] = glm::vec2(1, 1);
+        (bool)explosionEffect["ColorByDistance"] = false;
+        (bool)explosionEffect["ExponentialAccelaration"] = false;
+        lifeTime["Lifetime"] = 2.0;
+    }
+
+   
+    auto t = e.Player.FirstChildByName("PlayerModel");
+    auto playerEntityModel = t["Model"];
+    auto playerEntityAnimation = t["Animation"];
+    auto playerEntityTransform = t["Transform"];
+    //auto playerEntityModel = e.Player["PlayerModel"];
+//    ComponentWrapper& playerEntityModel = e.Player.FirstChildByName("PlayerModel");
+
+    auto newEntity = m_World->CreateEntity();
+    ComponentWrapper& newEntityModel = m_World->AttachComponent(newEntity, "Model");
+    ComponentWrapper& newAnimationModel = m_World->AttachComponent(newEntity, "Animation");
+    ComponentWrapper& newTransformModel = m_World->AttachComponent(newEntity, "Transform");
+
+    //ComponentWrapper& playerEntityModel = m_World->GetComponent(e.PlayerID, "PlayerModel");
+    playerEntityModel.Copy(newEntityModel);
+    playerEntityAnimation.Copy(newAnimationModel);
+    playerEntityTransform.Copy(newTransformModel);
+    newAnimationModel["Speed"] = (double)0.0;
+    auto t2 = e.Player["Transform"]["Position"];
+    newTransformModel["Position"] = (glm::vec3)e.Player["Transform"]["Position"];
+    newTransformModel["Scale"] = glm::vec3(5, 5, 5);
+    //auto tr = m_World->GetComponent(newEntityModel.EntityID, "Transform");
+    //tr["Position"] = glm::vec3(0, 50, 0);
+
+    ComponentWrapper& explosionEffect = m_World->AttachComponent(newEntityModel.EntityID, "ExplosionEffect");
+    ComponentWrapper& lifeTime = m_World->AttachComponent(newEntityModel.EntityID, "Lifetime");
+    (glm::vec3)explosionEffect["ExplosionOrigin"] = (glm::vec3)e.Player["Transform"]["Position"];
+    //explosionEffect["ExplosionOrigin"] = e.Player["Transform"]["Position"];
+    (double)explosionEffect["TimeSinceDeath"] = 0.0;
+    (double)explosionEffect["ExplosionDuration"] = 8.0;
+    explosionEffect["EndColor"] = glm::vec4(0, 0, 0, 1);
+    (bool)explosionEffect["Randomness"] = false;
+    (double)explosionEffect["RandomnessScalar"] = 1.0;
+    (glm::vec2)explosionEffect["Velocity"] = glm::vec2(1, 1);
+    (bool)explosionEffect["ColorByDistance"] = false;
+    (bool)explosionEffect["ExponentialAccelaration"] = false;
+    lifeTime["Lifetime"] = 8.0;
+
     return true;
 }
+//on deathanim done -> del entity
