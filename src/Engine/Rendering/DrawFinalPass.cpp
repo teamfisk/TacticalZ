@@ -11,8 +11,9 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
 
 void DrawFinalPass::InitializeTextures()
 {
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
     m_BlackTexture = ResourceManager::Load<Texture>("Textures/Core/Black.png");
+    m_NeutralNormalTexture = ResourceManager::Load<Texture>("Textures/Core/NeutralNormalMap.png");
 }
 
 void DrawFinalPass::InitializeFrameBuffers()
@@ -230,7 +231,15 @@ void DrawFinalPass::BindModelTextures(std::shared_ptr<ModelJob>& job)
     } else {
         glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
     }
+
     glActiveTexture(GL_TEXTURE1);
+    if (job->NormalTexture != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->NormalTexture->m_Texture); 
+    } else {
+        glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
+    }
+
+    glActiveTexture(GL_TEXTURE2);
     if (job->IncandescenceTexture != nullptr) {
         glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture->m_Texture);
     } else {

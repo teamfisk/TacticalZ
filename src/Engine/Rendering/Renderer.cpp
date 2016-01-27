@@ -143,7 +143,7 @@ PickData Renderer::Pick(glm::vec2 screenCoord)
 void Renderer::InitializeTextures()
 {
     m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
 }
 
 
