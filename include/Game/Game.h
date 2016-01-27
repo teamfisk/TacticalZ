@@ -14,6 +14,7 @@
 #include "Core/EKeyDown.h"
 #include "Core/EntityFilePreprocessor.h"
 #include "Core/SystemPipeline.h"
+#include "ExplosionEffectSystem.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
 #include "Rendering/RenderSystem.h"
@@ -21,6 +22,7 @@
 #include "Core/Octree.h"
 #include "Rendering/Font.h"
 #include "Systems/InterpolationSystem.h"
+#include "Collision/EntityAABB.h"
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"
@@ -48,8 +50,8 @@ private:
     InputProxy* m_InputProxy;
 	GUI::Frame* m_FrameStack;
     World* m_World;
-    Octree<AABB>* m_OctreeCollision;
-    Octree<AABB>* m_OctreeFrustrumCulling;
+    Octree<EntityAABB>* m_OctreeCollision;
+    Octree<EntityAABB>* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
     RenderFrame* m_RenderFrame;
     // Network variables

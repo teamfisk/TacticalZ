@@ -22,10 +22,26 @@ struct ModelJob : RenderJob
     {
         Model = model;
         TextureID = (matGroup.Texture) ? matGroup.Texture->ResourceID : 0;
-        DiffuseTexture = matGroup.Texture.get();
-        NormalTexture = matGroup.NormalMap.get();
-        SpecularTexture = matGroup.SpecularMap.get();
-        IncandescenceTexture = matGroup.IncandescenceMap.get();
+        if (modelComponent["DiffuseTexture"]) {
+            DiffuseTexture = matGroup.Texture.get();
+        } else {
+            DiffuseTexture = nullptr;
+        }
+        if (modelComponent["NormalMap"]) {
+            NormalTexture = matGroup.NormalMap.get();
+        } else {
+            NormalTexture = nullptr;
+        }
+        if (modelComponent["SpecularMap"]) {
+            SpecularTexture = matGroup.SpecularMap.get();
+        } else {
+            SpecularTexture = nullptr;
+        }
+        if (modelComponent["GlowMap"]) {
+            IncandescenceTexture = matGroup.IncandescenceMap.get();
+        } else {
+            IncandescenceTexture = nullptr;
+        }
         DiffuseColor = matGroup.DiffuseColor;
         SpecularColor = matGroup.SpecularColor;
         IncandescenceColor = matGroup.IncandescenceColor;
@@ -38,7 +54,6 @@ struct ModelJob : RenderJob
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
         Depth = worldpos.z;
         World = world;
-
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;

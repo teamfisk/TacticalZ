@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="HiddenForLocalPlayer">
+		<xs:annotation>
+			<xs:documentation>Used to make the entity invisible if it's parented to the current local player entity (for first person player model and such)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

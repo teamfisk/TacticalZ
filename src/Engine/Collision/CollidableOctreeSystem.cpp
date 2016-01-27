@@ -8,7 +8,7 @@ void CollidableOctreeSystem::Update(double dt)
 void CollidableOctreeSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     if (entity.HasComponent("AABB")) {
-        boost::optional<AABB> absoluteAABB = Collision::EntityAbsoluteAABB(entity);
+        boost::optional<EntityAABB> absoluteAABB = Collision::EntityAbsoluteAABB(entity);
         if (absoluteAABB) {
             m_Octree->AddDynamicObject(*absoluteAABB);
         }
