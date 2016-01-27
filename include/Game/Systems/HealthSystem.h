@@ -26,7 +26,7 @@ private:
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
-    bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e);
+    bool HealthSystem::OnPlayerHealthPickup(Events::PlayerHealthPickup& e);
 
     //vector which will keep track of health changes
     std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;

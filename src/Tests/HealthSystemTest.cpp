@@ -69,8 +69,8 @@ GameHealthSystemTest::GameHealthSystemTest()
     m_EventBroker->Publish(e3);
     //damage player with 50
     Events::PlayerDamage e;
-    e.DamageAmount = 50.0f;
-    e.PlayerDamagedID = healthsID;
+    e.Damage = 50.0f;
+//    e.PlayerDamagedID = healthsID;
     m_EventBroker->Publish(e);
     //heal some other player with 40
     Events::PlayerHealthPickup e2;
