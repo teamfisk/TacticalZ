@@ -14,6 +14,7 @@ void DrawFinalPass::InitializeTextures()
     m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
     m_BlackTexture = ResourceManager::Load<Texture>("Textures/Core/Black.png");
     m_NeutralNormalTexture = ResourceManager::Load<Texture>("Textures/Core/NeutralNormalMap.png");
+    m_GreyTexture = ResourceManager::Load<Texture>("Textures/Core/Grey.png");
 }
 
 void DrawFinalPass::InitializeFrameBuffers()
@@ -240,6 +241,13 @@ void DrawFinalPass::BindModelTextures(std::shared_ptr<ModelJob>& job)
     }
 
     glActiveTexture(GL_TEXTURE2);
+    if (job->SpecularTexture != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->SpecularTexture->m_Texture);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
+    }
+
+    glActiveTexture(GL_TEXTURE3);
     if (job->IncandescenceTexture != nullptr) {
         glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture->m_Texture);
     } else {

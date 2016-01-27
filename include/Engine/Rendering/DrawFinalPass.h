@@ -41,6 +41,7 @@ private:
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;
     Texture* m_NeutralNormalTexture;
+    Texture* m_GreyTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
     GLuint m_BloomTexture;

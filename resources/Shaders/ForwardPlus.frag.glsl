@@ -10,7 +10,8 @@ uniform vec4 FillColor;
 uniform float FillPercentage;
 layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
-layout (binding = 2) uniform sampler2D GlowMapTexture;
+layout (binding = 2) uniform sampler2D SpecularMapTexture;
+layout (binding = 3) uniform sampler2D GlowMapTexture;
 
 
 #define TILE_SIZE 16
@@ -116,6 +117,7 @@ void main()
 {
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate);
+	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, NormalMapTexture);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
@@ -149,7 +151,7 @@ void main()
 	}
 
 	
-	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
+	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
