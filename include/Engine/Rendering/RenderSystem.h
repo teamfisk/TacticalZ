@@ -41,7 +41,7 @@ private:
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
 
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
 
     EventRelay<RenderSystem, Events::PlayerSpawned> m_EPlayerSpawned;

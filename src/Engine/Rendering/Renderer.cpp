@@ -150,7 +150,7 @@ void Renderer::InitializeTextures()
 void Renderer::SortRenderJobsByDepth(RenderScene &scene)
 {
     //Sort all forward jobs so transparency is good.
-    scene.ForwardJobs.sort(Renderer::DepthSort);
+    scene.TransparentObjects.sort(Renderer::DepthSort);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)

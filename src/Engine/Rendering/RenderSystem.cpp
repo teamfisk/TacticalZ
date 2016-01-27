@@ -31,7 +31,7 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
     return true;
 }
 
-void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
+void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
 {
     auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
@@ -75,7 +75,6 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
             }
         }
 
-
         float fillPercentage = 0.f;
         glm::vec4 fillColor = glm::vec4(0);
         if(m_World->HasComponent(modelComponent.EntityID, "Fill")) {
@@ -99,7 +98,15 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
                     fillColor, 
                     fillPercentage
                 ));
-                jobs.push_back(explosionEffectJob);
+                if(explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                    modelComponent["Transparent"] = true;
+                }
+
+                if (modelComponent["Transparent"]) {
+                    transparentJobs.push_back(explosionEffectJob);
+                } else {
+                    opaqueJobs.push_back(explosionEffectJob);
+                }
             } else {
                 std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
                     model, 
@@ -111,7 +118,14 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
                     fillColor, 
                     fillPercentage
                 ));
-                jobs.push_back(modelJob);
+                if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                    modelComponent["Transparent"] = true;
+                }
+                if (modelComponent["Transparent"]) {
+                    transparentJobs.push_back(modelJob);
+                } else {
+                    opaqueJobs.push_back(modelJob);
+                }
             }
         }
     }
@@ -222,7 +236,7 @@ void RenderSystem::Update(double dt)
     RenderScene scene;
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
-    fillModels(scene.ForwardJobs);
+    fillModels(scene.OpaqueObjects, scene.TransparentObjects);
     fillPointLights(scene.PointLightJobs, m_World);
     fillDirectionalLights(scene.DirectionalLightJobs, m_World);
     fillText(scene.TextJobs, m_World);

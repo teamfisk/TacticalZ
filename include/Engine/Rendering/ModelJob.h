@@ -39,7 +39,6 @@ struct ModelJob : RenderJob
         Depth = worldpos.z;
         World = world;
 
-
         FillColor = fillColor;
         FillPercentage = fillPercentage;
         Skeleton = Model->m_RawModel->m_Skeleton;
