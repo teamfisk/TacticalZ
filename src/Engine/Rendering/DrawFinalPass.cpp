@@ -132,6 +132,10 @@ void DrawFinalPass::Draw(RenderScene& scene)
                 glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
                 glUniform4fv(glGetUniformLocation(shaderHandle, "DiffuseColor"), 1, glm::value_ptr(modelJob->DiffuseColor));
 
+            glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(modelJob->FillColor));
+            glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), modelJob->FillPercentage);
+
+
                 if (modelJob->DiffuseTexture != nullptr) {
                     glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);

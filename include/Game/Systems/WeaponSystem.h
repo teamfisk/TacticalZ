@@ -11,6 +11,8 @@
 #include "Core/EShoot.h"
 #include "Core/EPlayerSpawned.h"
 #include "Input/EInputCommand.h"
+#include "Core/EntityFile.h"
+#include "Core/EntityFileParser.h"
 
 #include <tuple>
 #include <vector>
@@ -33,7 +35,7 @@ private:
     EventRelay<WeaponSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool WeaponSystem::OnPlayerSpawned(const Events::PlayerSpawned& e);
     EventRelay<WeaponSystem, Events::Shoot> m_EShoot;
-    bool WeaponSystem::OnShoot(const Events::Shoot& e);
+    bool WeaponSystem::OnShoot(Events::Shoot& e);
     EventRelay<WeaponSystem, Events::InputCommand> m_EInputCommand;
     bool WeaponSystem::OnInputCommand(const Events::InputCommand& e);
 };

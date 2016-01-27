@@ -269,6 +269,7 @@ void Server::parseOnInputCommand(Packet& packet)
             Events::InputCommand e;
             e.Command = packet.ReadString();
             e.PlayerID = player; // Set correct player id
+            e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -405,6 +406,8 @@ bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
     Packet packet = Packet(MessageType::OnPlayerSpawned);
     packet.WritePrimitive<EntityID>(e.Player.ID);
     packet.WritePrimitive<EntityID>(e.Spawner.ID);
+    // We don't send PlayerID here because it will always be set to -1
+    packet.WriteString(m_ConnectedPlayers[e.PlayerID].Name);
     send(e.PlayerID, packet);
     return false;
 }

@@ -8,8 +8,10 @@
 namespace Transform
 {
 
+glm::mat4 AbsoluteTransformation(EntityWrapper entity);
 glm::vec3 AbsolutePosition(EntityWrapper entity);
 glm::vec3 AbsolutePosition(World* world, EntityID entity);
+glm::vec3 AbsoluteOrientationEuler(EntityWrapper entity);
 glm::quat AbsoluteOrientation(EntityWrapper entity);
 glm::quat AbsoluteOrientation(World* world, EntityID entity);
 glm::vec3 AbsoluteScale(EntityWrapper entity);

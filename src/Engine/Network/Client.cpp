@@ -147,6 +147,7 @@ void Client::parsePlayersSpawned(Packet& packet)
     e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
     e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
     e.PlayerID = -1;
+    e.PlayerName = packet.ReadString();
     m_EventBroker->Publish(e);
 }
 

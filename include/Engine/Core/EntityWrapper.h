@@ -23,6 +23,7 @@ struct EntityWrapper
 
     static const EntityWrapper Invalid;
 
+    const std::string Name();
     bool HasComponent(const std::string& componentType);
     EntityWrapper Parent();
     EntityWrapper FirstChildByName(const std::string& name);
@@ -35,6 +36,9 @@ struct EntityWrapper
     bool operator!=(const EntityWrapper& e) const;
     explicit operator EntityID() const;
     operator bool();
+
+private:
+    EntityWrapper firstChildByNameRecursive(const std::string& name, EntityID parent);
 };
 
 namespace std

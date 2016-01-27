@@ -50,7 +50,8 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 
     // Set its position and orientation to that of the SpawnPoint
     spawnedEntity["Transform"]["Position"] = Transform::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
-    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint.World, spawnPoint.ID));
+    // TODO: Quaternions, bitch
+    //spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint.World, spawnPoint.ID));
 
     return spawnedEntity;
 }
