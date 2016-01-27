@@ -20,7 +20,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Orientation X="0" Y="2.24449515" Z="0"/>
+      <Position X="8.60201447e-23" Y="0" Z="3.9201616e-23"/>
     </c:Transform>
   </Components>
 
@@ -141,9 +141,10 @@
       <Components>
         <c:Animation>
           <Name>Hold Pos</Name>
-          <Time>0.9779997896222552</Time>
+          <Time>0.73515426169631848</Time>
           <Speed>1</Speed>
         </c:Animation>
+        <c:HiddenForLocalPlayer/>
         <c:Model>
           <Resource>Models/AssaultAnimated.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>

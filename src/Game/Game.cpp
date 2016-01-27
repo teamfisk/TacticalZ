@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Collision/CollidableOctreeSystem.h"
+#include "Collision/EntityAABB.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
 #include "Systems/RaptorCopterSystem.h"
@@ -42,7 +43,7 @@ Game::Game(int argc, char* argv[])
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-        ));
+    ));
     m_Renderer->Initialize();
     //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
     m_RenderFrame = new RenderFrame();
@@ -72,8 +73,8 @@ Game::Game(int argc, char* argv[])
 
 
     // Create Octrees
-    m_OctreeCollision = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
-    m_OctreeFrustrumCulling = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeFrustrumCulling = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
 

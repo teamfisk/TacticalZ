@@ -31,6 +31,16 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
     return true;
 }
 
+bool RenderSystem::isChildOfACamera(EntityWrapper entity)
+{
+    return entity.FirstParentWithComponent("Camera").Valid();
+}
+
+bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
+{
+    return entity == m_CurrentCamera || entity.IsChildOf(m_CurrentCamera);
+}
+
 void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 {
     auto models = m_World->GetComponents("Model");
@@ -38,26 +48,25 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
         return;
     }
 
-    for (auto& modelComponent : *models) {
-        bool visible = modelComponent["Visible"];
+    for (auto& cModel : *models) {
+        bool visible = cModel["Visible"];
         if (!visible) {
             continue;
         }
-        std::string resource = modelComponent["Resource"];
+        std::string resource = cModel["Resource"];
         if (resource.empty()) {
             continue;
         }
 
-        EntityWrapper entity(m_World, modelComponent.EntityID);
+        EntityWrapper entity(m_World, cModel.EntityID);
 
-        // Don't render the local player
-        if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
-            if (!entity.HasComponent("HealthHUD") && entity.Name() != "Crosshair" && entity.Name() != "Weapon") { //Should work but needs to be fixed. Should only render the things "childed" to the local player camera
-                continue;
-            }
+        // Only render children of a camera if that camera is currently active
+        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+            continue;
         }
 
-        if ((entity.Name() == "Weapon" || entity.HasComponent("HealthHUD")) && !entity.IsChildOf(m_LocalPlayer)) {
+        // Hide things parented to local player if they have the HiddenFromLocalPlayer component
+        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
             continue;
         }
 
@@ -78,23 +87,23 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
 
         float fillPercentage = 0.f;
         glm::vec4 fillColor = glm::vec4(0);
-        if(m_World->HasComponent(modelComponent.EntityID, "Fill")) {
-            auto fillComponent = m_World->GetComponent(modelComponent.EntityID, "Fill");
+        if(m_World->HasComponent(cModel.EntityID, "Fill")) {
+            auto fillComponent = m_World->GetComponent(cModel.EntityID, "Fill");
             fillPercentage = (float)(double)fillComponent["Percentage"];
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(modelComponent.EntityID, m_World);
+        glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
         for (auto matGroup : model->MaterialGroups()) {
-            if (m_World->HasComponent(modelComponent.EntityID, "ExplosionEffect")) {
-                auto explosionEffectComponent = m_World->GetComponent(modelComponent.EntityID, "ExplosionEffect");
+            if (m_World->HasComponent(cModel.EntityID, "ExplosionEffect")) {
+                auto explosionEffectComponent = m_World->GetComponent(cModel.EntityID, "ExplosionEffect");
                 std::shared_ptr<ExplosionEffectJob> explosionEffectJob = std::shared_ptr<ExplosionEffectJob>(new ExplosionEffectJob(
                     explosionEffectComponent, 
                     model, 
                     m_Camera, 
                     modelMatrix, 
                     matGroup, 
-                    modelComponent, 
+                    cModel, 
                     m_World, 
                     fillColor, 
                     fillPercentage
@@ -106,7 +115,7 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
                     m_Camera, 
                     modelMatrix, 
                     matGroup, 
-                    modelComponent, 
+                    cModel, 
                     m_World, 
                     fillColor, 
                     fillPercentage

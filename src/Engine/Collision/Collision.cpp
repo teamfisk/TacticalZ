@@ -283,7 +283,7 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
     return true;
 }
 
-boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity)
+boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
 {
     if (!entity.HasComponent("AABB")) {
         return boost::none;
@@ -294,7 +294,11 @@ boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity)
     glm::vec3 absScale = Transform::AbsoluteScale(entity.World, entity.ID);
     glm::vec3 origin = absPosition + (glm::vec3)cAABB["Origin"];
     glm::vec3 size = (glm::vec3)cAABB["Size"] * absScale;
-    return AABB::FromOriginSize(origin, size);
+
+    EntityAABB aabb = EntityAABB::FromOriginSize(origin, size);
+    aabb.Entity = entity;
+
+    return aabb;
 }
 
 }
