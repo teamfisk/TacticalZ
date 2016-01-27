@@ -7,6 +7,7 @@
 #include <nativefiledialog/nfd.h>
 #include <boost/filesystem.hpp>
 #include <boost/any.hpp>
+#include <boost/sort/spreadsort/string_sort.hpp>
 #include "../Common.h"
 #include "../GLM.h"
 #include <glm/gtx/common.hpp>
@@ -118,6 +119,7 @@ private:
     const std::string formatEntityName(EntityWrapper entity);
     GLuint tryLoadTexture(std::string filePath);
     void openModal(const std::string& modal);
+    static bool compareCharArray(const char* c1, const char* c2);
 
     // Entity file handling methods
     void entityImport(World* world);

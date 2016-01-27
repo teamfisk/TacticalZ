@@ -234,10 +234,12 @@ void EditorGUI::drawComponents(EntityWrapper entity)
             componentTypes.push_back(pair.first.c_str());
         }
     }
+    // Sort components in alphabetical order
+    std::sort(componentTypes.begin(), componentTypes.end(), compareCharArray);
     // Draw combo box
     ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 10.f);
     int selectedItem = -1;
-    if (ImGui::Combo("", &selectedItem, componentTypes.data(), componentTypes.size())) {
+    if (ImGui::Combo("", &selectedItem, componentTypes.data(), componentTypes.size(), componentTypes.size())) {
         if (selectedItem != -1) {
             if (m_OnComponentAttach != nullptr) {
                 std::string chosenComponentType(componentTypes.at(selectedItem));
@@ -642,6 +644,11 @@ GLuint EditorGUI::tryLoadTexture(std::string filePath)
 void EditorGUI::openModal(const std::string& modal)
 {
     m_ModalsToOpen.insert(modal);
+}
+
+bool EditorGUI::compareCharArray(const char* c1, const char* c2)
+{
+    return strcmp(c1, c2) < 0;
 }
 
 void EditorGUI::SetDirty(EntityWrapper entity)
