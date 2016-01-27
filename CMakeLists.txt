@@ -34,6 +34,12 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
 endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 
+# DEBUG definition
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
+	$<$<CONFIG:Debug>:DEBUG>
+	$<$<CONFIG:RelWithDebInfo>:DEBUG>
+)
+
 include(cotire)
 add_subdirectory(src/Engine)
 add_subdirectory(src/Game)
