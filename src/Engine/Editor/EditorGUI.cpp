@@ -285,9 +285,8 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
 
     // Draw component fields
     ComponentWrapper& component = entity.World->GetComponent(entity.ID, ci.Name);
-    for (auto& kv : ci.Fields) {
-        const std::string& fieldName = kv.first;
-        const ComponentInfo::Field_t& field = kv.second;
+    for (auto& fieldName : ci.FieldsInOrder) {
+        const ComponentInfo::Field_t& field = ci.Fields.at(fieldName);
 
         // Draw the field widget based on its type
         bool dirty = drawComponentField(component, field);
