@@ -7,6 +7,7 @@
 #include "ShaderProgram.h"
 //#include "Util/UnorderedMapVec2.h"
 #include "Texture.h"
+#include "imgui/imgui.h"
 
 class DrawColorCorrectionPass
 {
@@ -23,7 +24,8 @@ private:
     ShaderProgram* m_ColorCorrectionProgram;
 
     Model* m_ScreenQuad;
-    GLfloat m_Exposure;
+    GLfloat m_Exposure = 1;
+    GLfloat m_Gamma = 2.2;
 };
 
 #endif 

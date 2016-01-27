@@ -160,7 +160,7 @@ void main()
 		color_result += FillColor;
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
-	color_result += glowTexel;
+	color_result += glowTexel*3;
 
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
 
