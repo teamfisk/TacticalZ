@@ -24,7 +24,7 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
         ePlayerDeath.PlayerID = e.Player.ID;
         ePlayerDeath.Player = e.Player;
         m_EventBroker->Publish(ePlayerDeath);
-        //m_World->DeleteEntity(e.Player.ID);
+        //Note: we will delete the entity in PlayerDeathSystem
     }
 
     return true;
