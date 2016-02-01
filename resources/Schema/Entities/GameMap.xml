@@ -8,6 +8,9 @@
   <Children>
     <Entity name="Scenemesh">
       <Components>
+        <c:AABB>
+          <Size X="150" Y="64" Z="180"/>
+        </c:AABB>
         <c:Collidable/>
         <c:Model>
           <Resource>Models\MapVersion1.mesh</Resource>
