@@ -20,6 +20,10 @@
 #include "Sound/EStopSound.h"
 #include "Sound/ESetBGMGain.h"
 #include "Sound/ESetSFXGain.h"
+#include "Core/EShoot.h"
+#include "Core/EPlayerSpawned.h"
+#include "Input/EInputCommand.h"
+#include "Core/ECaptured.h"
 
 enum class SoundType {
     SFX,
@@ -55,17 +59,23 @@ private:
 
     // Logic 
     void initOpenAL();
-    void updateEmitters(double dt);
-    void updateListener(double dt);
-    void deleteInactiveEmitters();
     void addNewEmitters(double dt);
-    Source* createSource(std::string filePath);
-    void playSound(Source* source);
-    void stopSound(Source* source);
+    void updateEmitters(double dt);
+    void deleteInactiveEmitters();
     void stopEmitters();
+    void updateListener(double dt);
+    Source* createSource(std::string filePath);
     ALenum getSourceState(ALuint source);
     void setGain(Source* source, float gain);
     void setSoundProperties(ALuint source, ComponentWrapper* soundComponent);
+
+    // Specific logic
+    void playSound(Source* source);
+    void stopSound(Source* source);
+    void playerDamaged();
+    void playerShot();
+    void playerJumps();
+    void playerStep(double dt);
 
     // OpenAL system variables
     ALCdevice* m_ALCdevice = nullptr;
@@ -75,9 +85,14 @@ private:
     World* m_World = nullptr;
     EventBroker* m_EventBroker = nullptr;
     std::unordered_map<EntityID, Source*> m_Sources;
-    float m_BGMVolumeChannel = 1.0f;
+    float m_BGMVolumeChannel = 1.f;
     float m_SFXVolumeChannel = 1.f;
     bool m_EditorEnabled = false;
+    const double m_PlayerFootstepInterval = 0.5;
+    double m_TimeSinceLastFootstep = 0;
+    // TEMP
+    EntityID m_LocalPlayer = EntityID_Invalid;
+    bool m_LeftFoot = false;
 
     // Events
     EventRelay<SoundSystem, Events::PlaySoundOnEntity> m_EPlaySoundOnEntity;
@@ -96,6 +111,16 @@ private:
     bool OnSetBGMGain(const Events::SetBGMGain &e); // Not tested
     EventRelay<SoundSystem, Events::SetSFXGain> m_ESetSFXGain; 
     bool OnSetSFXGain(const Events::SetSFXGain &e); // Not tested
+
+    EventRelay<SoundSystem, Events::Shoot> m_EShoot;
+    bool OnShoot(const Events::Shoot &e);
+    EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(const Events::PlayerSpawned &e);
+    EventRelay<SoundSystem, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(const Events::InputCommand &e);
+    EventRelay<SoundSystem, Events::Captured> m_ECaptured;
+    bool OnCaptured(const Events::Captured &e);
+
 };
 
 #endif

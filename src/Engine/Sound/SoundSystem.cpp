@@ -20,6 +20,10 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventBroker, bool editorMode
     EVENT_SUBSCRIBE_MEMBER(m_EContinueSound, &SoundSystem::OnContinueSound);
     EVENT_SUBSCRIBE_MEMBER(m_ESetBGMGain, &SoundSystem::OnSetBGMGain);
     EVENT_SUBSCRIBE_MEMBER(m_ESetSFXGain, &SoundSystem::OnSetSFXGain);
+    EVENT_SUBSCRIBE_MEMBER(m_EShoot, &SoundSystem::OnShoot);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &SoundSystem::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
 }
 
 SoundSystem::~SoundSystem()
@@ -48,19 +52,20 @@ void SoundSystem::stopEmitters()
 }
 
 void SoundSystem::Update(double dt)
-{ 
+{
     m_EventBroker->Process<SoundSystem>();
+    playerStep(dt);
     addNewEmitters(dt); // can be optimized with "EEntityCreated"
     deleteInactiveEmitters(); // can be optimized with "EEntityDeleted"
-    updateEmitters( dt);
-    updateListener( dt);
+    updateEmitters(dt);
+    updateListener(dt);
 }
 
 void SoundSystem::deleteInactiveEmitters()
 {
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end();) {
-        if (m_World->ValidEntity(it->first) 
+        if (m_World->ValidEntity(it->first)
             && m_World->HasComponent(it->first, "SoundEmitter")) {
             if (getSourceState(it->second->ALsource) != AL_STOPPED) {
                 // Nothing to see here, move along
@@ -70,6 +75,7 @@ void SoundSystem::deleteInactiveEmitters()
                 // Sound has been stopped / finished playing. 
                 alDeleteBuffers(1, &it->second->ALsource);
                 alDeleteSources(1, &it->second->ALsource);
+                m_World->DeleteEntity(it->first);
                 delete it->second;
                 it = m_Sources.erase(it);
             }
@@ -174,6 +180,58 @@ void SoundSystem::stopSound(Source* source)
     alSourceStop(source->ALsource);
 }
 
+void SoundSystem::playerDamaged()
+{
+
+}
+
+void SoundSystem::playerShot()
+{ }
+
+void SoundSystem::playerJumps()
+{
+    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer, "Physics")["Velocity"];
+    if (vel.y > 1) {
+        Source* source = createSource("Audio/jump/jump1.wav");
+        auto emitterID = m_World->CreateEntity(m_LocalPlayer);
+        m_World->AttachComponent(emitterID, "Transform");
+        m_World->AttachComponent(emitterID, "SoundEmitter");
+        source->Type = SoundType::SFX;
+        m_Sources[emitterID] = source;
+        playSound(source);
+    }
+}
+
+void SoundSystem::playerStep(double dt)
+{
+    if (m_LocalPlayer == EntityID_Invalid) {
+        return;
+    }
+    m_TimeSinceLastFootstep += dt;
+    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer, "Physics")["Velocity"];
+    float playerSpeed = glm::length(vel);
+    bool isAirborne = vel.y != 0;
+    if (playerSpeed > 1 && !isAirborne) {
+        // Player is walking
+        if (m_TimeSinceLastFootstep > m_PlayerFootstepInterval) {
+            // Create footstep sound
+            EntityID child = m_World->CreateEntity(m_LocalPlayer);
+            m_World->AttachComponent(child, "Transform");
+            m_World->AttachComponent(child, "SoundEmitter");
+            Events::PlaySoundOnEntity e;
+            e.EmitterID = child;
+            if (m_LeftFoot) {
+                e.FilePath = "Audio/footstep/footstep2.wav";
+            } else {
+                e.FilePath = "Audio/footstep/footstep3.wav";
+            }
+            m_LeftFoot = !m_LeftFoot;
+            m_EventBroker->Publish(e);
+            m_TimeSinceLastFootstep = 0;
+        }
+    }
+}
+
 bool SoundSystem::OnPlaySoundOnEntity(const Events::PlaySoundOnEntity & e)
 {
     Source* source = createSource(e.FilePath);
@@ -249,6 +307,69 @@ bool SoundSystem::OnSetSFXGain(const Events::SetSFXGain & e)
 {
     m_SFXVolumeChannel = e.Gain;
     return true;
+}
+
+bool SoundSystem::OnShoot(const Events::Shoot & e)
+{
+    Source* source = createSource("Audio/laser/laser1.wav");
+    auto emitterID = m_World->CreateEntity(e.Player.ID);
+    m_World->AttachComponent(emitterID, "Transform");
+    auto emitter = m_World->AttachComponent(emitterID, "SoundEmitter");
+    source->Type = SoundType::SFX;
+    m_Sources[emitterID] = source;
+    playSound(source);
+    return true;
+}
+
+bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned & e)
+{
+    if (e.PlayerID == -1) { // Local player
+        m_World->AttachComponent(e.Player.ID, "Listener");
+        m_LocalPlayer = e.Player.ID;
+        EntityID child = m_World->CreateEntity(e.Player.ID);
+        m_World->AttachComponent(child, "SoundEmitter"); // Temp
+        m_World->AttachComponent(child, "Transform"); // Temp
+        Events::PlaySoundOnEntity event;
+        event.EmitterID = child;
+        event.FilePath = "Audio/announcer/go.wav";
+        m_EventBroker->Publish(event);
+    }
+    return true;
+}
+
+bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
+{
+    if (e.Player.ID == EntityID_Invalid) {
+        //return false;
+    }
+    if (e.Command == "Jump" && e.Value > 0) {
+        if (e.PlayerID == -1) { // local player
+            //bool airBorne = ((glm::vec3)m_World->GetComponent(e.Player.ID, "Physics")["Velocity"]).y != 0;
+            //if (!airBorne) {
+                playerJumps();
+            //}
+            return true;
+        }
+    }
+    return false;
+}
+
+bool SoundSystem::OnCaptured(const Events::Captured & e)
+{
+    int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "CapturePoint")["HomePointForTeam"];
+    int team = (int)m_World->GetComponent(m_LocalPlayer, "Team")["Team"];
+    Events::PlaySoundOnEntity ev;
+    if (team == homeTeam) {
+        ev.FilePath = "Audio/announcer/objective_achieved.wav";
+    } else {
+        ev.FilePath = "Audio/announcer/objective_failed.wav";
+    }
+    EntityID child = m_World->CreateEntity(m_LocalPlayer);
+    m_World->AttachComponent(child, "Transform");
+    m_World->AttachComponent(child, "SoundEmitter");
+    ev.EmitterID = child;
+    m_EventBroker->Publish(ev);
+    return false;
 }
 
 void SoundSystem::setListenerOri(glm::vec3 ori)
