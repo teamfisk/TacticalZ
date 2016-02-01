@@ -336,6 +336,11 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
     return true;
 }
 
+constexpr float SlopeConstant(float degrees)
+{
+    return (1.0 - degrees / 90.f);
+}
+
 //An array containing 3 int pairs { 0, 2 }, { 0, 1 }, { 1, 2 }
 constexpr std::array<std::pair<int, int>, 3> dimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
 
@@ -355,9 +360,11 @@ bool AABBvsTriangle(const AABB& box,
 
     enum BoxTriResolveCase
     {
-        Vertex,
-        Line,
-        Corner
+        ResolveDimX,
+        ResolveDimY,
+        ResolveDimZ,
+        Line,       //Box edge colliding with triangle line.
+        Corner      //Box corner colliding with the triangle face.
     } resolveCase;
 
     const glm::vec3& origin = box.Origin();
@@ -389,7 +396,9 @@ bool AABBvsTriangle(const AABB& box,
             outVector[dim.first] = resolutionVector.x;
             outVector[dim.second] = resolutionVector.y;
             minimumTranslation = resolutionDist;
-            resolveCase = pushedFromTriangleLine ? Line : Vertex;
+            //If we pushed away from triangle line (edge), or if we 
+            //move the player along one coordinate axis (pick the dimension that isn't zero).
+            resolveCase = pushedFromTriangleLine ? Line : static_cast<BoxTriResolveCase>((abs(outVector[dim.first]) < 0.0001f) ? dim.second : dim.first);
         }
     }
 
@@ -411,22 +420,15 @@ bool AABBvsTriangle(const AABB& box,
         resolveCase = Corner;
     }
 
-    bool groundCollision = triNormal.y > 0.5f;
-
     glm::vec3 projNorm;
     switch (resolveCase) {
-    case Vertex:
+    case ResolveDimX:
+    case ResolveDimY:
+    case ResolveDimZ:
     {
-        int maxD = 0;
-        float maxResolution = 0.f;
-        for (int d = 0; d < 3; ++d) {
-            float resolve = glm::abs(outVector[d]);
-            if (resolve > maxResolution) {
-                maxResolution = resolve;
-                maxD = d;
-            }
-        }
-        boxVelocity[maxD] = 0.f;
+        //If we get here, the resolution is along one coordinate axis.
+        //set velocity to 0 in that dimension.
+        boxVelocity[resolveCase] = 0.f;
         return true;
     }
     case Line:
@@ -442,12 +444,17 @@ bool AABBvsTriangle(const AABB& box,
     //Project the velocity onto the normal of the hit line/face.
     //w = v - <v,n>*n, |n|==1.
     boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
-    if (groundCollision) {
+    //If the collision was not on steep wall or similarly (e.g. walking on the ground), do special treatment.
+    //Magic value that makes condition correspond to: 
+    //if the angle between horizon and the collision surface is less than 45 degrees. 
+    if (projNorm.y > SlopeConstant(45.0f)) {
+        //Make sure the player keeps moving in their desired direction, just slower.
         float len = glm::length2(boxVelocity);
         if (len > 0.0001f) {
             boxVelocity = glm::sqrt(len) * wantDirection;
         }
 
+        //Ensure that the player always is moved upwards, instead of sliding down.
         len = glm::length(outVector);
         float ang = glm::half_pi<float>() - glm::acos(outVector.y / len);
         if (len > 0.0000001f && ang > 0.0000001f) {
