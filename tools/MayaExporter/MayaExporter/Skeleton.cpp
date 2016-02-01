@@ -74,67 +74,130 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
     returnData.nameLength = animationName.size() + 1;
 	returnData.Duration = (endFrame - startFrame) * oneDivSixty;
 
+	std::map<std::string, std::array<std::array<double, 4>, 4>> joinCheckMap;
+	std::map<std::string, bool> exportJoint;
+
 	MItDag jointIt(MItDag::TraversalType::kDepthFirst, MFn::kJoint);
-	while (!jointIt.isDone())
+	for (unsigned int i = startFrame; i <= endFrame; i++)
 	{
-		m_Hierarchy.push_back(jointIt.item());
-
-		MFnDependencyNode depNode(jointIt.item());
-		for (int i = 0; i < 9; i++)
+		MAnimControl::setCurrentTime(MTime(i, MTime::kNTSCField));
+		while (!jointIt.isDone())
 		{
-			MStatus tmp;
-			MPlug plug = depNode.findPlug(attr[i].c_str(), &tmp);
+			m_Hierarchy.push_back(jointIt.item());
 
-			MPlugArray connections;
-			plug.connectedTo(connections, true, false, 0);
-			for (int j = 0; j != connections.length(); j++) {
-				MObject connected = connections[j].node();
+			MFnTransform MayaJoint(jointIt.item());
+			MMatrix transformationMatrix = MayaJoint.transformationMatrix();
 
-				if (connected.hasFn(MFn::kAnimCurve)) {
+			if (i == startFrame)
+			{
+				double doubleMat[4][4];
+				transformationMatrix.get(doubleMat);
 
-					MFnAnimCurve jointAnim(connected);
+				joinCheckMap[MayaJoint.name().asChar()][0][0] = doubleMat[0][0];
+				joinCheckMap[MayaJoint.name().asChar()][0][1] = doubleMat[0][1];
+				joinCheckMap[MayaJoint.name().asChar()][0][2] = doubleMat[0][2];
+				joinCheckMap[MayaJoint.name().asChar()][0][3] = doubleMat[0][3];
+				joinCheckMap[MayaJoint.name().asChar()][1][0] = doubleMat[1][0];
+				joinCheckMap[MayaJoint.name().asChar()][1][1] = doubleMat[1][1];
+				joinCheckMap[MayaJoint.name().asChar()][1][2] = doubleMat[1][2];
+				joinCheckMap[MayaJoint.name().asChar()][1][3] = doubleMat[1][3];
+				joinCheckMap[MayaJoint.name().asChar()][2][0] = doubleMat[2][0];
+				joinCheckMap[MayaJoint.name().asChar()][2][1] = doubleMat[2][1];
+				joinCheckMap[MayaJoint.name().asChar()][2][2] = doubleMat[2][2];
+				joinCheckMap[MayaJoint.name().asChar()][2][3] = doubleMat[2][3];
+				joinCheckMap[MayaJoint.name().asChar()][3][0] = doubleMat[3][0];
+				joinCheckMap[MayaJoint.name().asChar()][3][1] = doubleMat[3][1];
+				joinCheckMap[MayaJoint.name().asChar()][3][2] = doubleMat[3][2];
+				joinCheckMap[MayaJoint.name().asChar()][3][3] = doubleMat[3][3];
 
-					unsigned int startKeyFrameIndex = jointAnim.findClosest(MTime(startFrame, MTime::kNTSCField), &tmp);
+				exportJoint[MayaJoint.name().asChar()] = false;
+			}
+			else if(!exportJoint[MayaJoint.name().asChar()])//!exportJoint[MayaJoint.name().asChar()])
+			{
+				double doubleMat[4][4];
 
-					if (tmp == MStatus::kFailure)
-						MGlobal::displayInfo(MString() + "Fail :c");
+				doubleMat[0][0] = joinCheckMap[MayaJoint.name().asChar()][0][0];
+				doubleMat[0][1] = joinCheckMap[MayaJoint.name().asChar()][0][1];
+				doubleMat[0][2] = joinCheckMap[MayaJoint.name().asChar()][0][2];
+				doubleMat[0][3] = joinCheckMap[MayaJoint.name().asChar()][0][3];
+				doubleMat[1][0] = joinCheckMap[MayaJoint.name().asChar()][1][0];
+				doubleMat[1][1] = joinCheckMap[MayaJoint.name().asChar()][1][1];
+				doubleMat[1][2] = joinCheckMap[MayaJoint.name().asChar()][1][2];
+				doubleMat[1][3] = joinCheckMap[MayaJoint.name().asChar()][1][3];
+				doubleMat[2][0] = joinCheckMap[MayaJoint.name().asChar()][2][0];
+				doubleMat[2][1] = joinCheckMap[MayaJoint.name().asChar()][2][1];
+				doubleMat[2][2] = joinCheckMap[MayaJoint.name().asChar()][2][2];
+				doubleMat[2][3] = joinCheckMap[MayaJoint.name().asChar()][2][3];
+				doubleMat[3][0] = joinCheckMap[MayaJoint.name().asChar()][3][0];
+				doubleMat[3][1] = joinCheckMap[MayaJoint.name().asChar()][3][1];
+				doubleMat[3][2] = joinCheckMap[MayaJoint.name().asChar()][3][2];
+				doubleMat[3][3] = joinCheckMap[MayaJoint.name().asChar()][3][3];
 
-					if (startFrame * oneDivSixty <= jointAnim.time(startKeyFrameIndex).value() && jointAnim.time(startKeyFrameIndex).value() <= endFrame * oneDivSixty) {
-						animatedJoints.push_back(jointIt.item());
-						i = 9;
-						break;
-					}
-
-					unsigned int endKeyFrameIndex = jointAnim.findClosest(MTime(endFrame, MTime::kNTSCField));
-					MGlobal::displayInfo(MString() + startKeyFrameIndex + " " + endKeyFrameIndex);
-
-					if (startFrame * oneDivSixty <= jointAnim.time(endKeyFrameIndex).value() && jointAnim.time(endKeyFrameIndex).value() <= endFrame * oneDivSixty || endKeyFrameIndex - startKeyFrameIndex > 0) {
-						animatedJoints.push_back(jointIt.item());
-						i = 9;
-						break;
-					}
-
-					MFnTransform MayaJoint(jointIt.item());
-
-					MPlug BindPose = MayaJoint.findPlug("bindPose");
-					MDataHandle DataHandle;
-					BindPose.getValue(DataHandle);
-					MFnMatrixData MartixFn(DataHandle.data());
-					MMatrix BindPoseMatrix = MartixFn.matrix();
-
-					if (!BindPoseMatrix.isEquivalent(MayaJoint.transformationMatrix()))
-					{
-						MGlobal::displayError(MString() + animationName.c_str() + " is using " + MayaJoint.name() + " that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
-					}
+				MMatrix tmp(doubleMat);
+				if (!tmp.isEquivalent(transformationMatrix)) {
+					MGlobal::displayInfo(MString() + MayaJoint.name() + " is exported");
+					exportJoint[MayaJoint.name().asChar()] = true;
+					animatedJoints.push_back(MayaJoint.object());
 				}
 			}
-		}
 
-		jointIt.next();
+				/*for (int i = 0; i < 9; i++)
+				{
+					MStatus tmp;
+					MPlug plug = depNode.findPlug(attr[i].c_str(), &tmp);
+
+					MPlugArray connections;
+					plug.connectedTo(connections, true, false, 0);
+					for (int j = 0; j != connections.length(); j++) {
+						MObject connected = connections[j].node();
+
+						if (connected.hasFn(MFn::kAnimCurve)) {
+
+							MFnAnimCurve jointAnim(connected);
+
+							unsigned int startKeyFrameIndex = jointAnim.findClosest(MTime(startFrame, MTime::kNTSCField), &tmp);
+
+							if (tmp == MStatus::kFailure)
+								MGlobal::displayInfo(MString() + "Fail :c");
+
+							if (startFrame * oneDivSixty <= jointAnim.time(startKeyFrameIndex).value() && jointAnim.time(startKeyFrameIndex).value() <= endFrame * oneDivSixty) {
+								animatedJoints.push_back(jointIt.item());
+								i = 9;
+								break;
+							}
+
+							unsigned int endKeyFrameIndex = jointAnim.findClosest(MTime(endFrame, MTime::kNTSCField));
+							MGlobal::displayInfo(MString() + startKeyFrameIndex + " " + endKeyFrameIndex);
+
+							if (startFrame * oneDivSixty <= jointAnim.time(endKeyFrameIndex).value() && jointAnim.time(endKeyFrameIndex).value() <= endFrame * oneDivSixty || endKeyFrameIndex - startKeyFrameIndex > 0) {
+								animatedJoints.push_back(jointIt.item());
+								i = 9;
+								break;
+							}
+
+							MFnTransform MayaJoint(jointIt.item());
+
+							MPlug BindPose = MayaJoint.findPlug("bindPose");
+							MDataHandle DataHandle;
+							BindPose.getValue(DataHandle);
+							MFnMatrixData MartixFn(DataHandle.data());
+							MMatrix BindPoseMatrix = MartixFn.matrix();
+
+							if (!BindPoseMatrix.isEquivalent(MayaJoint.transformationMatrix()))
+							{
+								MGlobal::displayError(MString() + animationName.c_str() + " is using " + MayaJoint.name() + " that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
+							}
+						}
+					}
+				}*/
+
+				jointIt.next();
+		}
+		jointIt.reset();
 	}
 
 	int currentFrame = startFrame;
-	while (currentFrame != endFrame + 1) { // ANDREAS
+	while (currentFrame <= endFrame) { // ANDREAS
 		Animation::Keyframe thisKeyFrame;
 		thisKeyFrame.Index = currentFrame - startFrame;
 		thisKeyFrame.Time = thisKeyFrame.Index * oneDivSixty;
@@ -219,7 +282,7 @@ std::vector<BindPoseSkeletonNode> Skeleton::GetBindPoses()
 		MFnTransform MayaJoint(jointIt.currentItem());
 		BindPoseSkeletonNode::BindPoseJoint NewJoint;
 
-		if (MFnDependencyNode(MayaJoint.parent(0)).name() == "world") {
+		if (MFnDependencyNode(MayaJoint.parent(0)).object().apiType() != MFn::kJoint) {
 			if (SkeletonStorage.Joints.size() != 0) {
 				m_AllSkeletons.push_back(SkeletonStorage);
 

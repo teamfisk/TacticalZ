@@ -109,6 +109,8 @@ bool Export::Materials(std::string pathName)
 
 bool Export::Animations(std::string pathName, std::vector<AnimationInfo> animInfo)
 { 
+	allAnimations.clear();
+	allBindPoses.clear();
     if (MAnimControl::currentTime().unit() != MTime::kNTSCField) {
 
         MGlobal::displayError(MString() + "Please change to 60 FPS under Preferences/Settings!");
