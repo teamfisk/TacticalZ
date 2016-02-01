@@ -84,15 +84,6 @@
       </Components>
       <Children/>
     </Entity>
-    <Entity name="Light">
-      <Components>
-        <c:PointLight/>
-        <c:Transform>
-          <Position X="0.400000006" Y="0.400000006" Z="0.400000006"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
   </Children>
 
 </Entity>

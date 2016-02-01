@@ -30,7 +30,7 @@ void EditorRenderSystem::Update(double dt)
         //scene.AmbientColor = (glm::vec4)(*cSceneLight->begin())["AmbientColor"];
         m_RenderFrame->Gamma = 2.2;
         m_RenderFrame->Exposure = 1.0;
-        scene.AmbientColor = glm::vec4(0.6, 0.5, 0.5, 1.0);
+        scene.AmbientColor = glm::vec4(0.8, 0.8, 0.8, 1.0);
     }
 
     auto models = m_World->GetComponents("Model");
