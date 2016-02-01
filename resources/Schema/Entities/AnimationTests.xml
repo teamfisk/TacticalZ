@@ -12,7 +12,8 @@
           <Resource>Models/Core/UnitPlane.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="-1.79600012" Y="-2.11031318" Z="-5.20000029"/>
+          <Position X="0" Y="-1.245" Z="0"/>
+          <Scale X="10" Y="10" Z="10"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -34,7 +35,7 @@
       <Components>
         <c:Animation>
           <AnimationName>Run</AnimationName>
-          <Time>0.60863376686742265</Time>
+          <Time>0.88759450484008484</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:Model>
@@ -82,9 +83,9 @@
               <Color A="1" B="1" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.0864263624" Y="0.210641265" Z="-0.0983783901"/>
-              <Scale X="0.199999988" Y="0.200000033" Z="0.200000003"/>
-              <Orientation X="-2.90010285" Y="0.0159484055" Z="-3.1345098"/>
+              <Position X="-0.0863928348" Y="0.0355217457" Z="-0.153234094"/>
+              <Scale X="0.199999988" Y="0.199999988" Z="0.200000003"/>
+              <Orientation X="3.14144039" Y="0.0170426127" Z="-3.13839984"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -95,7 +96,7 @@
       <Components>
         <c:Animation>
           <AnimationName>Walk</AnimationName>
-          <Time>0.66325497978402836</Time>
+          <Time>0.94221571775669055</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:Model>
@@ -111,18 +112,26 @@
       <Components>
         <c:Animation>
           <AnimationName>Crouch Walk</AnimationName>
-          <Time>0.6245290972212274</Time>
+          <Time>0.90348983519388959</Time>
           <Speed>1</Speed>
         </c:Animation>
-        <c:BoneAttachment>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-        </c:BoneAttachment>
         <c:Model>
           <Resource>Models/AssaultAnimated.mesh</Resource>
           <Color A="1" B="1" G="1" R="19.6078434"/>
         </c:Model>
         <c:Transform>
           <Position X="0.0539491512" Y="-1.24511254" Z="0.0892278999"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-0.967451036" Y="-0.749000013" Z="-1"/>
         </c:Transform>
       </Components>
       <Children/>

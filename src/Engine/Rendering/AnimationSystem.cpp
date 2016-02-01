@@ -15,6 +15,12 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
     
 
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+
+    if(skeleton == nullptr) {
+        return;
+    }
+
+
     const Skeleton::Animation* animation = skeleton->GetAnimation(animationComponent["AnimationName"]);
 
     if(animation != nullptr) {

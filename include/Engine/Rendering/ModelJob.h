@@ -42,6 +42,7 @@ struct ModelJob : RenderJob
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;
+
         Skeleton = Model->m_RawModel->m_Skeleton;
 
         if (world->HasComponent(Entity, "Animation") && Skeleton != nullptr) {

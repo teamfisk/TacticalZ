@@ -89,11 +89,8 @@ void PickingPass::Draw(RenderScene& scene)
             glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
             if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-
-                if (modelJob->Animation != nullptr) {
                     std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animation, modelJob->AnimationTime);
                     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-                }
             }
 
             glBindVertexArray(modelJob->Model->VAO);

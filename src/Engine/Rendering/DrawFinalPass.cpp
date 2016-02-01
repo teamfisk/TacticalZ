@@ -156,7 +156,6 @@ void DrawFinalPass::Draw(RenderScene& scene)
                 if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
                     std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animation, modelJob->AnimationTime);
                     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
                 }
 
                 glBindVertexArray(modelJob->Model->VAO);
