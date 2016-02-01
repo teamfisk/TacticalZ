@@ -4,13 +4,13 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
 	<xs:element name="Player">
+		<xs:annotation>
+			<xs:documentation>The player charachter</xs:documentation>
+		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="Velocity" type="t:Vector" minOccurs="0"/>
-				<xs:element name="Forward" type="t:bool" minOccurs="0"/>
-				<xs:element name="Left" type="t:bool" minOccurs="0"/>
-				<xs:element name="Back" type="t:bool" minOccurs="0"/>
-				<xs:element name="Right" type="t:bool" minOccurs="0"/>
+				<xs:element name="MovementSpeed" type="t:float" minOccurs="0"/>
+				<xs:element name="CrouchSpeed" type="t:float" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

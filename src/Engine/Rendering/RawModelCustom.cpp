@@ -4,11 +4,13 @@
 
 RawModelCustom::RawModelCustom(std::string fileName)
 {
+    if(fileName.substr(fileName.find_last_of(".")).compare(".mesh") != 0) {
+        throw Resource::FailedLoadingException("Unknown model file format. Please use \".mesh\" files.");
+    }
     fileName = fileName.erase(fileName.find_last_of("."), fileName.find_last_of(".") - fileName.size());
     ReadMeshFile(fileName);
     ReadMaterialFile(fileName);
     ReadAnimationFile(fileName);
-    int k = 0;
 }
 
 void RawModelCustom::ReadMeshFile(std::string filePath)
@@ -138,11 +140,11 @@ void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, un
     newMaterial.ReflectionFactor = *(float*)(fileData + offset);
     offset += sizeof(float);
 
-    memcpy(newMaterial.DiffuseColor, fileData + offset, sizeof(float) * 3);
+    memcpy(&newMaterial.DiffuseColor[0], fileData + offset, sizeof(float) * 3);
     offset += sizeof(float) * 3;
-    memcpy(newMaterial.SpecularColor, fileData + offset, sizeof(float) * 3);
+    memcpy(&newMaterial.SpecularColor[0], fileData + offset, sizeof(float) * 3);
     offset += sizeof(float) * 3;
-    memcpy(newMaterial.IncandescenceColor, fileData + offset, sizeof(float) * 3);
+    memcpy(&newMaterial.IncandescenceColor[0], fileData + offset, sizeof(float) * 3);
     offset += sizeof(float) * 3;
 
     newMaterial.StartIndex = *(unsigned int*)(fileData + offset);

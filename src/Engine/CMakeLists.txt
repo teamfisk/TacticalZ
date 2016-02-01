@@ -8,6 +8,7 @@ find_package(assimp REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(PNG REQUIRED)
 find_package(Xerces REQUIRED)
+find_package(Freetype REQUIRED)
 # Because FindOpenAL is retarded
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${CMAKE_SOURCE_DIR}/deps/include/OpenAL")
 find_package(OpenAL REQUIRED)
@@ -25,6 +26,7 @@ include_directories(
     ${assimp_INCLUDE_DIRS}
     ${PNG_INCLUDE_DIRS}
     ${Xerces_INCLUDE_DIRS}
+    ${FREETYPE_INCLUDE_DIRS}
     ${OPENAL_INCLUDE_DIR}
     ${X11_INCLUDE_DIRS}
 )
@@ -126,6 +128,7 @@ set(LIBRARIES
     ${assimp_LIBRARIES}
     ${PNG_LIBRARIES}
     ${Xerces_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${X11_LIBRARIES}
 )

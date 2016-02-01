@@ -9,7 +9,10 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="Velocity" type="t:Vector" minOccurs="0"/>
+				<xs:element name="Velocity" type="t:Vector" minOccurs="0">
+					<xs:annotation><xs:documentation>m/s^2</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Gravity" type="t:bool" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

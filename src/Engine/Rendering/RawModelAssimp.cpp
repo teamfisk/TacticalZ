@@ -273,7 +273,6 @@ RawModelAssimp::RawModelAssimp(std::string fileName)
 
 		m_Skeleton->Animations[animationName] = skelAnim;
 	}
-    int k = 0;
 }
 
 RawModelAssimp::~RawModelAssimp()

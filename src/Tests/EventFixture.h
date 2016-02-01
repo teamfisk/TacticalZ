@@ -2,7 +2,7 @@
 #define EVENTFIXTURE_H
 
 #include <boost/test/unit_test.hpp>
-#include "Core\EventBroker.h"
+#include "Core/EventBroker.h"
 
 template <typename EventType>
 struct EventFixture

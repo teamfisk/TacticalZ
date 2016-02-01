@@ -19,18 +19,18 @@ public:
 	float ReflectionFactor;
     float SpecularExponent;
 
-    float DiffuseColor[3]{ 1.0f };
+    float DiffuseColor[3]{ 1.0f, 1.0f, 1.0f };
     unsigned int ColorMapFileLength = 0;
 	std::string ColorMapFile;
 
-    float SpecularColor[3]{ 1.0f };
+    float SpecularColor[3]{ 1.0f, 1.0f, 1.0f };
     unsigned int SpecularMapFileLength = 0;
 	std::string SpecularMapFile;
 
     unsigned int NormalMapFileLength = 0;
 	std::string NormalMapFile;
 
-    float IncandescenceColor[3]{ 1.0f };
+    float IncandescenceColor[3]{ 1.0f, 1.0f, 1.0f };
     unsigned int IncandescenceMapFileLength = 0;
 	std::string IncandescenceMapFile;
 

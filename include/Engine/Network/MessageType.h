@@ -5,13 +5,20 @@
 // Used to determine what type of message was sent.
 enum class MessageType
 {
-	Connect,
-	Disconnect,
-	ClientPing,
-	ServerPing,
-	Message,
-	Snapshot,
-	Event,
+    Connect,
+    Disconnect,
+    Ping,
+    Message,
+    Snapshot,
+    OnInputCommand,
+    OnPlayerDamage,
+    PlayerConnected,
+    BecomePlayer,
+    Kick,
+    OnPlayerSpawned,
+    EntityDeleted,
+    ComponentDeleted,
+    PlayerTransform
 };
 
 #endif

@@ -2,7 +2,7 @@
 #include "Collision/CollisionSystem.h"
 #include "Core/AABB.h"
 
-void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, ComponentWrapper& component, double dt)
+void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
     if (!entity.HasComponent("Physics")) {
         return;
@@ -23,7 +23,7 @@ void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, Compo
 
     // Collide against octree
     std::vector<AABB> octreeResult;
-    m_Octree->BoxesInSameRegion(*boundingBox, octreeResult);
+    m_Octree->ObjectsInSameRegion(*boundingBox, octreeResult);
     for (auto& boxB : octreeResult) {
         glm::vec3 resolutionVector;
         if (Collision::IsSameBoxProbably(boxA, boxB)) {
@@ -31,7 +31,7 @@ void CollisionSystem::UpdateComponent(World* world, EntityWrapper& entity, Compo
         }
         if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
             (glm::vec3&)cTransform["Position"] += resolutionVector;
-            cPhysics["Velocity"] = glm::vec3(0, 0, 0);
+            ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
         }
     }
 

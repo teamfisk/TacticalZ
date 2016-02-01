@@ -9,21 +9,15 @@ void Renderer::Initialize()
 	glfwSwapInterval(m_VSYNC);
 	InitializeShaders();
     InitializeTextures();
+    m_TextPass = new TextPass();
+    m_TextPass->Initialize();
+
 
    /* m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");*/
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
-
-
-    // Create default camera
-    m_DefaultCamera = new ::Camera((float)m_Resolution.Width / m_Resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
-    m_DefaultCamera->SetPosition(glm::vec3(0, 0, 10));
-    if (m_Camera == nullptr) {
-        m_Camera = m_DefaultCamera;
-    }
-
 }
 
 void Renderer::InitializeWindow()
@@ -69,12 +63,6 @@ void Renderer::InitializeWindow()
 void Renderer::InitializeShaders()
 {
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
-
-    m_DrawScreenQuadProgram = ResourceManager::Load<ShaderProgram>("#DrawScreenQuadProgram");
-    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
-    m_DrawScreenQuadProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/DrawScreenQuad.frag.glsl")));
-    m_DrawScreenQuadProgram->Compile();
-    m_DrawScreenQuadProgram->Link();
 }
 
 void Renderer::InputUpdate(double dt)
@@ -86,28 +74,51 @@ void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
     InputUpdate(dt);
+    m_TextPass->Update();
     m_ImGuiRenderPass->Update(dt);
 }
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    glClearColor(255.f / 255, 163.f / 255, 176.f / 255, 0.f);
-    
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking");
+    //clear buffer 0
+    glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
 
+    //Clear other buffers
     m_PickingPass->ClearPicking();
+    m_DrawFinalPass->ClearBuffer();
+    m_DrawBloomPass->ClearBuffer();
+
     for (auto scene : frame.RenderScenes){
-        m_Camera = scene->Camera; // remove renderer camera when Editor uses the render scene cameras.
+        
         SortRenderJobsByDepth(*scene);
         m_PickingPass->Draw(*scene);
         m_LightCullingPass->GenerateNewFrustum(*scene);
         m_LightCullingPass->FillLightList(*scene);
         m_LightCullingPass->CullLights(*scene);
         m_DrawFinalPass->Draw(*scene);
-        //m_DrawScenePass->Draw(rq);
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
+
+        m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
+
+    }
+    m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
+    if(m_DebugTextureToDraw == 0) {
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture());
+    }
+    if (m_DebugTextureToDraw == 1) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
+    }
+    if (m_DebugTextureToDraw == 2) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTexture());
+    }
+    if (m_DebugTextureToDraw == 3) {
+        m_DrawScreenQuadPass->Draw(m_DrawBloomPass->GaussianTexture());
+    }
+    if (m_DebugTextureToDraw == 4) {
+        m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
 
     m_ImGuiRenderPass->Draw();
@@ -117,27 +128,6 @@ void Renderer::Draw(RenderFrame& frame)
 PickData Renderer::Pick(glm::vec2 screenCoord)
 {
     return m_PickingPass->Pick(screenCoord);
-}
-
-void Renderer::DrawScreenQuad(GLuint textureToDraw)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-
-    m_DrawScreenQuadProgram->Bind();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureToDraw);
-
-    glBindVertexArray(m_ScreenQuad->VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
-    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].EndIndex - m_ScreenQuad->MaterialGroups()[0].StartIndex +1
-        , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].StartIndex);
 }
 
 void Renderer::InitializeTextures()
@@ -167,8 +157,10 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
 
 void Renderer::InitializeRenderPasses()
 {
-    m_DrawScenePass = new DrawScenePass(this);
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
+    m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
+    m_DrawBloomPass = new DrawBloomPass(this);
+    m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
 }

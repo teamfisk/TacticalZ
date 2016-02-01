@@ -1,6 +1,7 @@
 #include "Systems/SpawnerSystem.h"
 
-SpawnerSystem::SpawnerSystem(EventBroker* eventBroker) : System(eventBroker)
+SpawnerSystem::SpawnerSystem(World* world, EventBroker* eventBroker) 
+    : System(world, eventBroker)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnSpawnerSpawn, &SpawnerSystem::OnSpawnerSpawn);
 }
@@ -49,7 +50,8 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 
     // Set its position and orientation to that of the SpawnPoint
     spawnedEntity["Transform"]["Position"] = Transform::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
-    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint.World, spawnPoint.ID));
+    // TODO: Quaternions, bitch
+    //spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint.World, spawnPoint.ID));
 
     return spawnedEntity;
 }

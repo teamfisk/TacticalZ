@@ -17,22 +17,29 @@ Packet::Packet(char* data, const int sizeOfPacket)
     m_Offset = sizeOfPacket;
 }
 
+Packet::Packet(MessageType type)
+{
+    m_Data = new char[m_MaxPacketSize];
+    unsigned int dummy = 0;
+    Init(type, dummy);
+}
+
 Packet::~Packet()
 {
     delete[] m_Data;
 }
 
 void Packet::Init(MessageType type, unsigned int & packetID)
-{ 
+{
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
     // Add message type
     int messageType = static_cast<int>(type);
     Packet::WritePrimitive<int>(messageType);
-    packetID = packetID % 1000; // Packet id modulos
     Packet::WritePrimitive<int>(packetID);
     packetID++;
+    m_HeaderSize = m_Offset;
 }
 
 void Packet::WriteString(const std::string& str)
@@ -40,7 +47,7 @@ void Packet::WriteString(const std::string& str)
     // Message, add one extra byte for null terminator
     int sizeOfString = str.size() + 1;
     if (m_Offset + sizeOfString > m_MaxPacketSize) {
-        LOG_WARNING("Package::WriteString(): Data size in packet exceeded maximum package size. New size is %i bytes\n", m_MaxPacketSize*2);
+        //LOG_WARNING("Package::WriteString(): Data size in packet exceeded maximum package size. New size is %i bytes\n", m_MaxPacketSize*2);
         resizeData();
     }
     memcpy(m_Data + m_Offset, str.data(), sizeOfString * sizeof(char));
@@ -50,7 +57,7 @@ void Packet::WriteString(const std::string& str)
 void Packet::WriteData(char * data, int sizeOfData)
 {
     if (m_Offset + sizeOfData > m_MaxPacketSize) {
-        LOG_WARNING("Packet::WriteData(): Data size in packet exceeded maximum packet size. New size is %i bytes\n", m_MaxPacketSize*2);
+        //LOG_WARNING("Packet::WriteData(): Data size in packet exceeded maximum packet size. New size is %i bytes\n", m_MaxPacketSize*2);
         resizeData();
     }
     memcpy(m_Data + m_Offset, data, sizeOfData);
@@ -61,7 +68,7 @@ std::string Packet::ReadString()
 {
     std::string returnValue(m_Data + m_ReturnDataOffset);
     if (m_Offset < m_ReturnDataOffset + returnValue.size()) {
-        LOG_WARNING("packet ReadString(): Oh no! You are trying to remove things outside my memory kingdom");
+        //LOG_WARNING("packet ReadString(): Oh no! You are trying to remove things outside my memory kingdom");
         return "PopFrontString Failed";
     }
     // +1 for null terminator.
@@ -72,7 +79,7 @@ std::string Packet::ReadString()
 char * Packet::ReadData(int SizeOfData)
 {
     if (m_Offset < m_ReturnDataOffset + SizeOfData) {
-        LOG_WARNING("packet ReadData(): Oh no! You are trying to remove things outside my memory kingdom");
+        //LOG_WARNING("packet ReadData(): Oh no! You are trying to remove things outside my memory kingdom");
         return nullptr;
     }
     unsigned int oldReturnDataOffset = m_ReturnDataOffset;
@@ -80,14 +87,21 @@ char * Packet::ReadData(int SizeOfData)
     return (m_Data + oldReturnDataOffset);
 }
 
+void Packet::ChangePacketID(unsigned int & packetID)
+{
+    packetID = packetID + 1;
+    // Overwrite old PacketID
+    memcpy(m_Data + sizeof(int), &packetID, sizeof(int));
+}
+
 void Packet::resizeData()
-{ 
+{
 
     // Allocate memory to store our data in
     char* holdData = new char[m_MaxPacketSize];
     // Copy our data to the newly allocated memory
     memcpy(holdData, m_Data, m_Offset);
-   // Increase max packet size
+    // Increase max packet size
     m_MaxPacketSize = m_MaxPacketSize * 2;
     // Delete our data
     delete m_Data;

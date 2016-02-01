@@ -8,6 +8,11 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Core/EntityFileWriter.h"
+#include "Game/Systems/CapturePointSystem.h"
+#include "Game/Systems/WeaponSystem.h"
+#include "Game/Systems/PlayerHUD.h"
+#include "Game/Systems/LifetimeSystem.h"
+#include "../Engine/Rendering/AnimationSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -18,6 +23,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<Font>("FontFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
@@ -26,7 +32,6 @@ Game::Game(int argc, char* argv[])
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
-
 
     // Create the renderer
     m_Renderer = new Renderer(m_EventBroker);
@@ -55,7 +60,7 @@ Game::Game(int argc, char* argv[])
     m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
-    m_World = new World();
+    m_World = new World(m_EventBroker);
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
@@ -67,28 +72,36 @@ Game::Game(int argc, char* argv[])
 
 
     // Create Octrees
-    m_OctreeCollision = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
-    m_OctreeFrustrumCulling = new Octree(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeCollision = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeFrustrumCulling = new Octree<AABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
 
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
+
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
     ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     // Invoke network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
@@ -140,13 +153,14 @@ void Game::Tick()
         m_ClientOrServer->Update();
     }
     // Iterate through systems and update world!
-    m_SystemPipeline->Update(m_World, dt);
+    m_EventBroker->Process<SystemPipeline>();
+    m_SystemPipeline->Update(dt);
     debugTick(dt);
     m_Renderer->Update(dt);
-    m_EventBroker->Process<Client>();
     m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
+    m_RenderFrame->Clear();
     GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();

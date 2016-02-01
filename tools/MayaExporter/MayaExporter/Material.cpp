@@ -85,9 +85,6 @@ bool Material::findColorTexture(MaterialNode& material_node, MFnDependencyNode& 
 			material_node.ColorMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 
             material_node.ColorMapFileLength = material_node.ColorMapFile.length() + 1;
-			// Test
-            MGlobal::displayInfo(MString() + "getAbsolutePathToResources: " + workspace);
-			MGlobal::displayInfo(MString() + "Texture file: " + FullPath.c_str());
 			return true;
 		}
 	}
@@ -209,6 +206,7 @@ std::vector<MaterialNode>* Material::DoIt(Mesh mesh)
                 meshHasMaterial = true;
                 MaterialStorage.IndexStart = totalIndices;
                 MaterialStorage.IndexEnd = totalIndices + aMeshMaterial.second.size() - 1;
+                MGlobal::displayInfo("Oh noes, breaking in material");
                 break;
             }
             totalIndices += aMeshMaterial.second.size();

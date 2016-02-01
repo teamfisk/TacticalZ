@@ -8,15 +8,12 @@
 #include "Core/InputManager.h"
 #include "GUI/Frame.h"
 #include "Core/World.h"
-#include "Rendering/RenderQueueFactory.h"
 #include "Input/InputProxy.h"
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
-#include "Core/EntityXMLFile.h"
+#include "Core/EntityFile.h"
 #include "Core/SystemPipeline.h"
-#include "RaptorCopterSystem.h"
-#include "PlayerSystem.h"
 #include "Editor/EditorSystem.h"
 
 class GameHealthSystemTest
