@@ -121,7 +121,11 @@ void SoundSystem::updateEmitters(double dt)
         setSourcePos(it->second->ALsource, nextPos);
         setSourceVel(it->second->ALsource, velocity);
         float gain;
-        (bool)(it->second->Type) ? gain = m_SFXVolumeChannel : gain = m_BGMVolumeChannel;
+        if (it->second->Type == SoundType::SFX) {
+            gain = m_SFXVolumeChannel;
+        } else if (it->second->Type == SoundType::BGM) {
+            gain = m_BGMVolumeChannel;
+        }
 
         auto emitter = m_World->GetComponent(it->first, "SoundEmitter");
         setSoundProperties(it->second->ALsource, &emitter);
