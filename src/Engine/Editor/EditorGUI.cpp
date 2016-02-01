@@ -9,6 +9,8 @@ EditorGUI::EditorGUI(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorGUI::OnFileDropped);
     EVENT_SUBSCRIBE_MEMBER(m_EPause, &EditorGUI::OnPause);
     EVENT_SUBSCRIBE_MEMBER(m_EResume, &EditorGUI::OnResume);
+    EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &EditorGUI::OnLockMouse);
+    EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &EditorGUI::OnUnlockMouse);
 }
 
 void EditorGUI::Draw()
@@ -40,26 +42,49 @@ void EditorGUI::drawTools()
         return;
     }
 
+    // Widget modes
     createWidgetToolButton(WidgetMode::Translate);
     if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Translate");
+        ImGui::SetTooltip("Translate (W)");
     }
     ImGui::SameLine();
     createWidgetToolButton(WidgetMode::Rotate);
     if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Rotate");
+        ImGui::SetTooltip("Rotate (E)");
     }
     ImGui::SameLine();
     createWidgetToolButton(WidgetMode::Scale);
     if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Scale");
+        ImGui::SetTooltip("Scale (R)");
     }
+
+    ImGui::SameLine();
+    ImGui::ItemSize(ImVec2(5, 0));
+
+    // Widget space
+    ImGui::SameLine();
+    GLuint spaceTexture = 0;
+    if (m_CurrentWidgetSpace == WidgetSpace::Global) {
+        spaceTexture = tryLoadTexture("Textures/Icons/Global.png");
+    } else if (m_CurrentWidgetSpace == WidgetSpace::Local) {
+        spaceTexture = tryLoadTexture("Textures/Icons/Local.png");
+    }
+    if (ImGui::ImageButton((void*)spaceTexture, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1))) {
+        toggleWidgetSpace();
+    }
+    if (ImGui::IsItemHovered()) {
+        if (m_CurrentWidgetSpace == WidgetSpace::Global) {
+            ImGui::SetTooltip("Widget space: Global (X)");
+        } else if (m_CurrentWidgetSpace == WidgetSpace::Local) {
+            ImGui::SetTooltip("Widget space: Local (X)");
+        }
+    }
+
     ImGui::SameLine();
     ImGui::ItemSize(ImVec2(5, 0));
 
     // Play button
     ImGui::SameLine();
-    static bool paused = false;
     if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Play.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Resume e;
         e.World = m_World;
@@ -549,10 +574,7 @@ void EditorGUI::createWidgetToolButton(WidgetMode mode)
             (m_CurrentWidgetMode == mode) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
         )
     ) {
-        if (m_OnWidgetMode != nullptr) {
-            m_OnWidgetMode(mode);
-        }
-        m_CurrentWidgetMode = mode;
+        setWidgetMode(mode);
     }
 }
 
@@ -579,6 +601,22 @@ bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
     if (e.KeyCode == GLFW_KEY_DELETE) {
         if (m_CurrentSelection.Valid()) {
             entityDelete(m_CurrentSelection);
+        }
+    }
+
+    if (!m_MouseLocked) {
+        if (e.KeyCode == GLFW_KEY_W) {
+            setWidgetMode(WidgetMode::Translate);
+        }
+        if (e.KeyCode == GLFW_KEY_E) {
+            setWidgetMode(WidgetMode::Rotate);
+        }
+        if (e.KeyCode == GLFW_KEY_R) {
+            setWidgetMode(WidgetMode::Scale);
+        }
+
+        if (e.KeyCode == GLFW_KEY_X) {
+            toggleWidgetSpace();
         }
     }
 
@@ -609,6 +647,18 @@ bool EditorGUI::OnResume(const Events::Resume& e)
     if (e.World == m_World) {
         m_Paused = false;
     }
+    return true;
+}
+
+bool EditorGUI::OnLockMouse(const Events::LockMouse& e)
+{
+    m_MouseLocked = true;
+    return true;
+}
+
+bool EditorGUI::OnUnlockMouse(const Events::UnlockMouse& e)
+{
+    m_MouseLocked = false;
     return true;
 }
 
@@ -681,6 +731,27 @@ GLuint EditorGUI::tryLoadTexture(std::string filePath)
 void EditorGUI::openModal(const std::string& modal)
 {
     m_ModalsToOpen.insert(modal);
+}
+
+void EditorGUI::setWidgetMode(WidgetMode mode)
+{
+    if (m_OnWidgetMode != nullptr) {
+        m_OnWidgetMode(mode);
+    }
+    m_CurrentWidgetMode = mode;
+}
+
+void EditorGUI::toggleWidgetSpace()
+{
+    if (m_CurrentWidgetSpace == WidgetSpace::Global) {
+        m_CurrentWidgetSpace = WidgetSpace::Local;
+    } else if (m_CurrentWidgetSpace == WidgetSpace::Local) {
+        m_CurrentWidgetSpace = WidgetSpace::Global;
+    }
+
+    if (m_OnWidgetSpace != nullptr) {
+        m_OnWidgetSpace(m_CurrentWidgetSpace);
+    }
 }
 
 bool EditorGUI::compareCharArray(const char* c1, const char* c2)
