@@ -25,6 +25,16 @@ bool WeaponSystem::OnPlayerSpawned(const Events::PlayerSpawned& e)
 
 bool WeaponSystem::OnInputCommand(const Events::InputCommand& e)
 {
+    // Only shoot client-side!
+    if (e.PlayerID != -1) {
+        return false;
+    }
+
+    // Only shoot if the player is alive
+    if (!m_LocalPlayer.Valid()) {
+        return false;
+    }
+
     if (e.Command == "PrimaryFire" && e.Value > 0) {
         Events::Shoot eShoot;
         if (e.PlayerID == -1) {
@@ -94,7 +104,7 @@ bool WeaponSystem::OnShoot(Events::Shoot& eShoot)
 
     // Screen center, based on current resolution!
     // TODO: check if player has enough ammo and if weapon has a cooldown or not
-    Rectangle screenResolution = m_Renderer->Resolution();
+    Rectangle screenResolution = m_Renderer->GetViewPortSize();
     glm::vec2 centerScreen = glm::vec2(screenResolution.Width / 2, screenResolution.Height / 2);
 
     // TODO: check if player has enough ammo and if weapon has a cooldown or not

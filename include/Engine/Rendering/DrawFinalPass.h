@@ -30,9 +30,18 @@ public:
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
     void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
+    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& job, RenderScene& scene);
+
+    void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
+    void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
+
+    void BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job);
+    void BindModelTextures(std::shared_ptr<ModelJob>& job);
 
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;
+    Texture* m_NeutralNormalTexture;
+    Texture* m_GreyTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
     GLuint m_BloomTexture;
@@ -43,6 +52,7 @@ private:
     const LightCullingPass* m_LightCullingPass;
 
     ShaderProgram* m_ForwardPlusProgram;
+    ShaderProgram* m_ExplosionEffectProgram;
 };
 
 #endif 

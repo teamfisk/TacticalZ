@@ -14,11 +14,13 @@
 #include "TextJob.h"
 #include "PointLightJob.h"
 #include "DirectionalLightJob.h"
+#include "ExplosionEffectJob.h"
 
 struct RenderScene
 {
     ::Camera* Camera = nullptr;
-    std::list<std::shared_ptr<RenderJob>> ForwardJobs;
+    std::list<std::shared_ptr<RenderJob>> OpaqueObjects;
+    std::list<std::shared_ptr<RenderJob>> TransparentObjects;
     std::list<std::shared_ptr<RenderJob>> PointLightJobs;
     std::list<std::shared_ptr<RenderJob>> TextJobs;
     std::list<std::shared_ptr<RenderJob>> DirectionalLightJobs;
@@ -27,7 +29,8 @@ struct RenderScene
 
 	void Clear()
 	{
-        ForwardJobs.clear();
+        OpaqueObjects.clear();
+        TransparentObjects.clear();
         PointLightJobs.clear();
         TextJobs.clear();
         DirectionalLightJobs.clear();

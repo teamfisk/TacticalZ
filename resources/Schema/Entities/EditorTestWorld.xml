@@ -6,7 +6,7 @@
   </Components>
 
   <Children>
-    <Entity>
+    <Entity name="Ground">
       <Components>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
@@ -20,67 +20,49 @@
     </Entity>
     <Entity>
       <Components>
-        <c:Model>
-          <Resource>An error</Resource>
-        </c:Model>
-        <c:Transform>
-          <Position X="1" Y="1" Z="0"/>
-          <Orientation X="0" Y="0.785390019" Z="0"/>
-        </c:Transform>
-      </Components>
-      <Children>
-        <Entity>
-          <Components>
-            <c:Model>
-              <Resource>An error</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="2" Y="0" Z="0"/>
-              <Orientation X="0" Y="0.785390019" Z="0"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
-    </Entity>
-    <Entity>
-      <Components>
         <c:Camera/>
         <c:Listener/>
         <c:Transform>
-          <Position X="1.36896265" Y="4.4259491" Z="10.6640663"/>
+          <Position X="1.36896265" Y="4.10503054" Z="10.6640663"/>
           <Orientation X="-0.0349078141" Y="0.157154545" Z="-2.60252193e-07"/>
         </c:Transform>
       </Components>
       <Children/>
     </Entity>
-    <Entity>
+    <Entity name="DirectionalLight">
       <Components>
-        <c:DirectionalLight/>
+        <c:DirectionalLight>
+          <Intensity>0.80000001192092896</Intensity>
+        </c:DirectionalLight>
         <c:Model>
           <Resource>Models/DirectionalLightWidget.mesh</Resource>
         </c:Model>
+        <c:RaptorCopter>
+          <Speed>1.0499999523162842</Speed>
+          <Axis X="0" Y="1" Z="0"/>
+        </c:RaptorCopter>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.32000017" Y="4.6340003" Z="0"/>
+          <Orientation X="4.16300011" Y="1422.89319" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
     </Entity>
-    <Entity>
+    <Entity name="AssaultTPose">
       <Components>
         <c:Model>
           <Resource>Models/Assault.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="-2.00568962" Y="0.527161121" Z="0"/>
+          <Position X="-1.68900967" Y="0.527161121" Z="-1.59648728"/>
+          <Orientation X="0" Y="1.64900005" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
-        <Entity>
+        <Entity name="SecondaryWeapon">
           <Components>
             <c:Model>
-              <Resource>Models/SecondaryWeapon.fbx</Resource>
+              <Resource>Models/SecondaryWeapon.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="-0.546139359" Y="0.853016734" Z="0.177482292"/>
@@ -91,16 +73,218 @@
         </Entity>
       </Children>
     </Entity>
-    <Entity>
+    <Entity name="AnimationGroupOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="1.11190474" Y="0.490183681" Z="0"/>
+          <Orientation X="0" Y="1.02100003" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="RunAnim">
+          <Components>
+            <c:Animation>
+              <Name>Run</Name>
+              <Time>0.62051775215976157</Time>
+              <Speed>1</Speed>
+            </c:Animation>
+            <c:Model>
+              <Resource>models/AssaultAnimated.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.786919653" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Walkanim">
+          <Components>
+            <c:Animation>
+              <Name>Walk</Name>
+              <Time>0.28779680073140668</Time>
+              <Speed>1</Speed>
+            </c:Animation>
+            <c:Model>
+              <Resource>models/AssaultAnimated.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="UnitSphere">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                  <Color A="0.294117659" B="19.6078434" G="1.17647064" R="0.0392156877"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0.754540265" Z="0"/>
+                  <Scale X="0.800000012" Y="1.9000001" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Log">
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitSphere.mesh</Resource>
+          <Resource>Models/Log.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="3.70000029" Z="0"/>
+          <Position X="-4" Y="0.698000014" Z="-1"/>
+          <Orientation X="0" Y="2.74900007" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
+    </Entity>
+    <Entity name="SpheresOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="6.80000019" Y="4.9000001" Z="-5.9000001"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="NormalSphere">
+          <Components>
+            <c:Model>
+              <Resource>Models/NormalMapSphere.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="1.82700014" Y="0" Z="-0.166000009"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="SpecularSphere">
+          <Components>
+            <c:Model>
+              <Resource>Models/SpecularMapSphere.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-1.06487739" Y="0" Z="1.52336037"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Rotationpoint">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>1</Speed>
+                  <Axis X="0.699999988" Y="1" Z="0.300000012"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="404.200684" Y="577.428955" Z="173.228897"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="PointLight">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Core/UnitSphere.mesh</Resource>
+                      <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                    </c:Model>
+                    <c:PointLight>
+                      <Radius>3</Radius>
+                      <Intensity>1.1399998664855957</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.600000024" Y="0.5" Z="0"/>
+                      <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="GlowMap">
+          <Components>
+            <c:Model>
+              <Resource>Models/IncandescenceMapSphere.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-1.10000002" Y="0" Z="-1.80000007"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="CombinedSpheres">
+          <Components>
+            <c:Model>
+              <Resource>models/NormSpecIncdMapSphere.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="RotationPoint">
+          <Components>
+            <c:RaptorCopter>
+              <Speed>1</Speed>
+              <Axis X="1" Y="1" Z="1"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Orientation X="53.9495354" Y="53.9495354" Z="53.9495354"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="PointLight">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                  <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                </c:Model>
+                <c:PointLight>
+                  <Radius>3</Radius>
+                  <Intensity>1.1399998664855957</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="-1.70000005" Y="0" Z="0"/>
+                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="PointLight">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                  <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                </c:Model>
+                <c:PointLight>
+                  <Radius>5.0100002288818359</Radius>
+                  <Intensity>0.69999998807907104</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0.900000036" Y="1.10000002" Z="0"/>
+                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="PointLight">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                  <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                </c:Model>
+                <c:PointLight>
+                  <Radius>4</Radius>
+                  <Intensity>0.80000001192092896</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0.400000006" Y="-1" Z="-1.50000012"/>
+                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
     </Entity>
   </Children>
 
