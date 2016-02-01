@@ -122,6 +122,7 @@ void SoundSystem::updateEmitters(double dt)
         setSourceVel(it->second->ALsource, velocity);
         float gain;
         (bool)(it->second->Type) ? gain = m_SFXVolumeChannel : gain = m_BGMVolumeChannel;
+
         auto emitter = m_World->GetComponent(it->first, "SoundEmitter");
         setSoundProperties(it->second->ALsource, &emitter);
 
@@ -369,6 +370,48 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     m_World->AttachComponent(child, "SoundEmitter");
     ev.EmitterID = child;
     m_EventBroker->Publish(ev);
+    return false;
+}
+
+bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
+{
+    if (e.Player.ID == m_LocalPlayer) {
+        Events::PlaySoundOnEntity ev;
+        EntityID child = m_World->CreateEntity(m_LocalPlayer);
+        m_World->AttachComponent(child, "Transform");
+        m_World->AttachComponent(child, "SoundEmitter");
+        ev.EmitterID = child;
+        ev.FilePath = "Audio/hurt/hurt3.wav"; // random between a bunch
+        m_EventBroker->Publish(ev);
+    }
+    return false;
+}
+
+bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
+{
+    if (e.PlayerID == m_LocalPlayer) {
+        Events::PlaySoundOnEntity ev;
+        EntityID child = m_World->CreateEntity(m_LocalPlayer);
+        m_World->AttachComponent(child, "Transform");
+        m_World->AttachComponent(child, "SoundEmitter");
+        ev.EmitterID = child;
+        ev.FilePath = "Audio/die/die2.wav"; // random between a bunch
+        m_EventBroker->Publish(ev);
+    }
+    return false;
+}
+
+bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
+{
+    if (e.PlayerHealedID == m_LocalPlayer) {
+        Events::PlaySoundOnEntity ev;
+        EntityID child = m_World->CreateEntity(m_LocalPlayer);
+        m_World->AttachComponent(child, "Transform");
+        m_World->AttachComponent(child, "SoundEmitter");
+        ev.EmitterID = child;
+        ev.FilePath = "Audio/pickup/pickup2.wav";
+        m_EventBroker->Publish(ev);
+    }
     return false;
 }
 

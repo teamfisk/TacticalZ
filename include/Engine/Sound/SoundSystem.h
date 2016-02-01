@@ -24,6 +24,9 @@
 #include "Core/EPlayerSpawned.h"
 #include "Input/EInputCommand.h"
 #include "Core/ECaptured.h"
+#include "Core/EPlayerDamage.h"
+#include "Core/EPlayerDeath.h"
+#include "Core/EPlayerHealthPickup.h"
 
 enum class SoundType {
     SFX,
@@ -120,6 +123,14 @@ private:
     bool OnInputCommand(const Events::InputCommand &e);
     EventRelay<SoundSystem, Events::Captured> m_ECaptured;
     bool OnCaptured(const Events::Captured &e);
+    EventRelay<SoundSystem, Events::PlayerDamage> m_EPlayerDamage;
+    bool OnPlayerDamage(const Events::PlayerDamage &e);
+    EventRelay<SoundSystem, Events::PlayerDeath> m_EPlayerDeath;
+    bool OnPlayerDeath(const Events::PlayerDeath &e);
+    EventRelay<SoundSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
+    bool OnPlayerHealthPickup(const Events::PlayerHealthPickup &e);
+
+
 
 };
 
