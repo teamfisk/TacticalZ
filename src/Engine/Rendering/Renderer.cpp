@@ -147,14 +147,14 @@ PickData Renderer::Pick(glm::vec2 screenCoord)
 void Renderer::InitializeTextures()
 {
     m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
 }
 
 
 void Renderer::SortRenderJobsByDepth(RenderScene &scene)
 {
     //Sort all forward jobs so transparency is good.
-    scene.ForwardJobs.sort(Renderer::DepthSort);
+    scene.TransparentObjects.sort(Renderer::DepthSort);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
