@@ -49,7 +49,7 @@ void EditorRenderSystem::Update(double dt)
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
                 std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f);
-                if(cModel["Transparent"]) {
+                if (cModel["Transparent"]) {
                     scene.TransparentObjects.push_back(modelJob);
                 } else {
                     scene.OpaqueObjects.push_back(modelJob);

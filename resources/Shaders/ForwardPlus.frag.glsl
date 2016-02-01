@@ -14,7 +14,6 @@ layout (binding = 1) uniform sampler2D NormalMapTexture;
 layout (binding = 2) uniform sampler2D SpecularMapTexture;
 layout (binding = 3) uniform sampler2D GlowMapTexture;
 
-
 #define TILE_SIZE 16
 
 struct LightSource {
@@ -149,8 +148,9 @@ void main()
 		totalLighting.Specular += light_result.Specular;
 	}
 
-	
-	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
+	vec4 color_result = Color * diffuseTexel * DiffuseColor * Input.ExplosionColor;
+	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
+	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;

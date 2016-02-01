@@ -27,7 +27,7 @@ void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture, GLf
 
     DrawScreenQuadPassState state = DrawScreenQuadPassState();
     m_ColorCorrectionProgram->Bind();
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT);
     glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Exposure"), exposure);
     glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Gamma"), gamma);
 

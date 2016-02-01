@@ -17,6 +17,8 @@ uniform bool ExponentialAccelaration;
 in VertexData{
 	vec3 Position;
 	vec3 Normal;
+	vec3 Tangent;
+	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 }Input[];
@@ -24,6 +26,8 @@ in VertexData{
 out VertexData{
 	vec3 Position;
 	vec3 Normal;
+	vec3 Tangent;
+	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 }Output;
@@ -132,6 +136,8 @@ void main()
 			Output.Normal = Input[i].Normal;
 			Output.Position = Input[i].Position;
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
+			Output.Tangent = Input[i].Tangent;
+			Output.BiTangent = Input[i].BiTangent;
 			
 			// convert to model space for the gravity to always be in -y
 			vec4 ExplodedPositionInModelSpace = M * vec4(ExplodedPosition, 1.0);
@@ -154,7 +160,7 @@ void main()
 		// if explosion color should be affected by distance instead of time...
 		if (ColorByDistance == true)
 		{
-			Output.ExplosionColor = vec4(0.0);
+			Output.ExplosionColor = vec4(1.0);
 		}
 		else
 		{
@@ -168,7 +174,9 @@ void main()
 			Output.Normal = Input[i].Normal;
 			Output.Position = Input[i].Position;
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
-			
+			Output.Tangent = Input[i].Tangent;
+			Output.BiTangent = Input[i].BiTangent;
+
 			// no change in position, pass through vertex
 			gl_Position = gl_in[i].gl_Position;
 			EmitVertex();
