@@ -412,7 +412,6 @@ bool AABBvsTriangle(const AABB& box,
     }
 
     bool groundCollision = triNormal.y > 0.5f;
-    //ImGui::Text(groundCollision ? "Ground" : "Slope");
 
     glm::vec3 projNorm;
     switch (resolveCase) {
@@ -446,14 +445,12 @@ bool AABBvsTriangle(const AABB& box,
     if (groundCollision) {
         float len = glm::length2(boxVelocity);
         if (len > 0.0001f) {
-            len = glm::sqrt(len);
-            boxVelocity = len * glm::normalize(wantDirection);
+            boxVelocity = glm::sqrt(len) * wantDirection;
         }
 
         len = glm::length(outVector);
         float ang = glm::half_pi<float>() - glm::acos(outVector.y / len);
         if (len > 0.0000001f && ang > 0.0000001f) {
-            //ImGui::Text("ang=%f, len=%f, acos=%f, outY=%f", ang, len, glm::acos(outVector.y / len), outVector.y);
             outVector.x = 0;
             outVector.y = len / glm::sin(ang);
             outVector.z = 0;
@@ -475,7 +472,9 @@ bool AABBvsTriangles(const AABB& box,
     outResolutionVector = glm::vec3(0.f);
     glm::vec3 wantDirection(boxVelocity);
     wantDirection.y = 0;
-    wantDirection = glm::normalize(wantDirection);
+    if (vectorHasLength(wantDirection)) {
+        wantDirection = glm::normalize(wantDirection);
+    }
     for (int i = 0; i < modelIndices.size(); ) {
         std::array<glm::vec3, 3> triVertices = {
             Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
