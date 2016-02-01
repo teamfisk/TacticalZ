@@ -7,6 +7,7 @@ uniform vec4 Color;
 uniform vec4 DiffuseColor;
 uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
+uniform vec4 AmbientColor;
 uniform float FillPercentage;
 layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
@@ -59,8 +60,6 @@ in VertexData{
 
 out vec4 sceneColor;
 out vec4 bloomColor;
-
-vec4 scene_ambient = vec4(0.3,0.3,0.3,1);
 
 struct LightResult {
 	vec4 Diffuse;
@@ -128,7 +127,7 @@ void main()
 	tilePos.y = int(gl_FragCoord.y/TILE_SIZE);
 
 	LightResult totalLighting;
-	totalLighting.Diffuse = scene_ambient;
+	totalLighting.Diffuse = AmbientColor;
 	int currentTile = int(floor(gl_FragCoord.x/TILE_SIZE) + (floor(gl_FragCoord.y/TILE_SIZE) * int(ScreenDimensions.x/TILE_SIZE)));
 
 	int start = int(LightGrids.Data[currentTile].Start);

@@ -17,15 +17,13 @@ public:
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
 
-    void Draw(GLuint sceneTexture, GLuint bloomTexture);
+    void Draw(GLuint sceneTexture, GLuint bloomTexture, GLfloat gamma, GLfloat exposure);
 private:
     const IRenderer* m_Renderer;
 
     ShaderProgram* m_ColorCorrectionProgram;
 
     Model* m_ScreenQuad;
-    GLfloat m_Exposure = 1;
-    GLfloat m_Gamma = 2.2;
 };
 
 #endif 

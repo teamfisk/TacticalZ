@@ -141,18 +141,22 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             glBindVertexArray(explosionEffectJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
             glDrawElements(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(explosionEffectJob->StartIndex*sizeof(unsigned int)));
+            GLERROR("DrawFinalPass::Model: 1");
 
         } else {
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
             if (modelJob) {
                 //bind forward program
                 m_ForwardPlusProgram->Bind();
+                GLERROR("DrawFinalPass::Model: 2");
 
                 //bind uniforms
                 BindModelUniforms(forwardHandle, modelJob, scene);
+                GLERROR("DrawFinalPass::Model: 3");
 
                 //bind textures
                 BindModelTextures(modelJob);
+                GLERROR("DrawFinalPass::Model: 4");
 
                 if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
 
@@ -161,6 +165,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                         glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                     }
                 }
+                GLERROR("DrawFinalPass::Model: 5");
 
                 //draw
                 glBindVertexArray(modelJob->Model->VAO);
@@ -175,6 +180,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
 {
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, GL_FALSE, glm::value_ptr(scene.AmbientColor));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
     glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
@@ -196,8 +202,10 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 
 void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene)
 {
+    glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+
     glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
 
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(job->Matrix));
@@ -205,6 +213,7 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
     glUniform4fv(glGetUniformLocation(shaderHandle, "DiffuseColor"), 1, glm::value_ptr(job->DiffuseColor));
     glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(job->FillColor));
     glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), job->FillPercentage);
+
 }
 
 

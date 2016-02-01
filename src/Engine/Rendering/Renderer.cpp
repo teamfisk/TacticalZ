@@ -120,8 +120,8 @@ void Renderer::Draw(RenderFrame& frame)
 
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
-    if(m_DebugTextureToDraw == 0) {
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture());
+    if (m_DebugTextureToDraw == 0) {
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
     }
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());

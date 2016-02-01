@@ -18,7 +18,7 @@
       </Components>
       <Children/>
     </Entity>
-    <Entity>
+    <Entity name="Listener">
       <Components>
         <c:Camera/>
         <c:Listener/>
@@ -43,7 +43,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.16300011" Y="1885.31665" Z="0"/>
+          <Orientation X="4.16300011" Y="1939.05518" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -85,7 +85,7 @@
           <Components>
             <c:Animation>
               <Name>Run</Name>
-              <Time>0.33637802883706303</Time>
+              <Time>0.20192568323882343</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -101,7 +101,7 @@
           <Components>
             <c:Animation>
               <Name>Walk</Name>
-              <Time>0.0036570774087083535</Time>
+              <Time>0.86920473181046898</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -163,7 +163,7 @@
               <Axis X="1" Y="1" Z="1"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="494.357269" Y="494.357269" Z="494.357269"/>
+              <Orientation X="545.536804" Y="545.536804" Z="545.536804"/>
             </c:Transform>
           </Components>
           <Children>
@@ -227,7 +227,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="290.653473" Z="0"/>
+              <Orientation X="0" Y="341.83255" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -259,7 +259,7 @@
                       <Axis X="0.699999988" Y="1" Z="0.300000012"/>
                     </c:RaptorCopter>
                     <c:Transform>
-                      <Orientation X="712.485046" Y="1017.83423" Z="305.350739"/>
+                      <Orientation X="748.309875" Y="1069.01184" Z="320.704285"/>
                     </c:Transform>
                   </Components>
                   <Children>
@@ -298,6 +298,13 @@
           </Children>
         </Entity>
       </Children>
+    </Entity>
+    <Entity name="SceneColors">
+      <Components>
+        <c:SceneLight/>
+        <c:Transform/>
+      </Components>
+      <Children/>
     </Entity>
   </Children>
 

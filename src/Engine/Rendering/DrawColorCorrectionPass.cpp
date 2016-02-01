@@ -20,7 +20,7 @@ void DrawColorCorrectionPass::InitializeShaderPrograms()
     m_ColorCorrectionProgram->Link();
 }
 
-void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture)
+void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture, GLfloat gamma, GLfloat exposure)
 {
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLERROR("DrawScreenQuadPass::Draw: Pre");
@@ -28,8 +28,8 @@ void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture)
     DrawScreenQuadPassState state = DrawScreenQuadPassState();
     m_ColorCorrectionProgram->Bind();
     glClear(GL_COLOR_BUFFER_BIT);
-    glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Exposure"), m_Exposure);
-    glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Gamma"), m_Gamma);
+    glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Exposure"), exposure);
+    glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Gamma"), gamma);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sceneTexture);

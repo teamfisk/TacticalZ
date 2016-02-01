@@ -240,20 +240,17 @@ void RenderSystem::Update(double dt)
         m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
     }
 
-
     RenderScene scene;
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
 
-    //auto cSceneLight = m_Renderer->m_World->GetComponents("SceneLight");
-    //if (cSceneLight != nullptr) {
-    //    m_Gamma = (double)(*cSceneLight->begin())["Gamma"];
-    //    m_Exposure = (double)(*cSceneLight->begin())["Exposure"];
-    //}
+    auto cSceneLight = m_World->GetComponents("SceneLight");
+    if (cSceneLight != nullptr) {
+        m_RenderFrame->Gamma = (double)(*cSceneLight->begin())["Gamma"];
+        m_RenderFrame->Exposure = (double)(*cSceneLight->begin())["Exposure"];
+        scene.AmbientColor = (glm::vec4)(*cSceneLight->begin())["AmbientColor"];
+    }
 
-    //scene.ambient
-    //scene.gamma
-    //scene.exponent
     fillModels(scene.OpaqueObjects, scene.TransparentObjects);
     fillPointLights(scene.PointLightJobs, m_World);
     fillDirectionalLights(scene.DirectionalLightJobs, m_World);
