@@ -12,8 +12,7 @@
           <Resource>Models/Core/UnitPlane.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="-1.79600012" Y="0.200000003" Z="-5.20000029"/>
-          <Scale X="10" Y="10" Z="10"/>
+          <Position X="-1.79600012" Y="-2.11031318" Z="-5.20000029"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -34,16 +33,15 @@
     <Entity>
       <Components>
         <c:Animation>
-          <AnimationName>Walk</AnimationName>
-          <Time>0.56225092855229164</Time>
-          <Speed>0.5</Speed>
+          <AnimationName>Run</AnimationName>
+          <Time>0.60863376686742265</Time>
+          <Speed>1</Speed>
         </c:Animation>
         <c:Model>
           <Resource>Models/AssaultAnimated.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="0" Z="0.219988048"/>
-          <Orientation X="0" Y="1.95300007" Z="0"/>
+          <Position X="0.200000003" Y="-1.245" Z="-2.08000016"/>
         </c:Transform>
       </Components>
       <Children>
@@ -84,33 +82,50 @@
               <Color A="1" B="1" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.106393129" Y="0.164001703" Z="0.26629591"/>
-              <Scale X="0.199999988" Y="0.200000003" Z="0.200000003"/>
-              <Orientation X="-1.91579378" Y="0.00274402252" Z="-3.12450099"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="Test">
-          <Components>
-            <c:BoneAttachment>
-              <BoneName>R_Foot</BoneName>
-              <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-              <InheritScale>true</InheritScale>
-            </c:BoneAttachment>
-            <c:Model>
-              <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="1" R="19.6078434"/>
-            </c:Model>
-            <c:Transform>
-              <Position X="0.0958700925" Y="0.0355969071" Z="-0.102683716"/>
-              <Scale X="0.199999988" Y="0.200000033" Z="0.200000033"/>
-              <Orientation X="0.00436601695" Y="0.262745619" Z="-3.10364795"/>
+              <Position X="-0.0864263624" Y="0.210641265" Z="-0.0983783901"/>
+              <Scale X="0.199999988" Y="0.200000033" Z="0.200000003"/>
+              <Orientation X="-2.90010285" Y="0.0159484055" Z="-3.1345098"/>
             </c:Transform>
           </Components>
           <Children/>
         </Entity>
       </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Animation>
+          <AnimationName>Walk</AnimationName>
+          <Time>0.66325497978402836</Time>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:Model>
+          <Resource>Models/AssaultAnimated.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="-1.245" Z="-1.05166435"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Test">
+      <Components>
+        <c:Animation>
+          <AnimationName>Crouch Walk</AnimationName>
+          <Time>0.6245290972212274</Time>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:BoneAttachment>
+          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+        </c:BoneAttachment>
+        <c:Model>
+          <Resource>Models/AssaultAnimated.mesh</Resource>
+          <Color A="1" B="1" G="1" R="19.6078434"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="0.0539491512" Y="-1.24511254" Z="0.0892278999"/>
+        </c:Transform>
+      </Components>
+      <Children/>
     </Entity>
   </Children>
 

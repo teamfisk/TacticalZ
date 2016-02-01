@@ -88,11 +88,8 @@ void DrawFinalPass::Draw(RenderScene& scene)
             GLERROR("DrawFinalPass::ExplosionEffect: 2");
 
             if (explosionEffectJob->Model->m_RawModel->m_Skeleton != nullptr) {
-
-                if (explosionEffectJob->Animation != nullptr) {
-                    std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(*explosionEffectJob->Animation, explosionEffectJob->AnimationTime);
-                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-                }
+                std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animation, explosionEffectJob->AnimationTime);
+                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
             }
 
             //TODO: Renderer: bättre textur felhantering samt fler texturer stöd
@@ -157,10 +154,9 @@ void DrawFinalPass::Draw(RenderScene& scene)
                 }*/
 
                 if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-                    if (modelJob->Animation != nullptr) {
-                        std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
-                        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-                    }
+                    std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animation, modelJob->AnimationTime);
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
                 }
 
                 glBindVertexArray(modelJob->Model->VAO);
