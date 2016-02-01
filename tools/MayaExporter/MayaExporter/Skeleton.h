@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <map>
 #include <algorithm>
 #include "MayaIncludes.h"
 #include "OutputData.h"
