@@ -98,6 +98,7 @@ private:
     std::set<std::string> m_ModalsToOpen;
     std::map<std::string, boost::any> m_ModalData;
     std::string m_DroppedFile = "";
+    bool m_Paused = false;
 
     // Callbacks
     OnEntitySelectedCallback_t m_OnEntitySelected = nullptr;
@@ -116,6 +117,10 @@ private:
     bool OnKeyDown(const Events::KeyDown& e);
     EventRelay<EditorGUI, Events::FileDropped> m_EFileDropped;
     bool OnFileDropped(const Events::FileDropped& e);
+    EventRelay<EditorGUI, Events::Pause> m_EPause;
+    bool OnPause(const Events::Pause& e);
+    EventRelay<EditorGUI, Events::Resume> m_EResume;
+    bool OnResume(const Events::Resume& e);
 
     // Utility functions
     boost::filesystem::path fileOpenDialog();

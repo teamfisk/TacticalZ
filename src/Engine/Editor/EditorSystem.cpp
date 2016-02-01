@@ -93,6 +93,11 @@ void EditorSystem::Enable()
         (glm::vec3&)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
     }
 
+    // Pause the world we're editing
+    Events::Pause ePause;
+    ePause.World = m_World;
+    m_EventBroker->Publish(ePause);
+
     m_Enabled = true;
 }
 

@@ -7,6 +7,8 @@ EditorGUI::EditorGUI(World* world, EventBroker* eventBroker)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &EditorGUI::OnKeyDown);
     EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorGUI::OnFileDropped);
+    EVENT_SUBSCRIBE_MEMBER(m_EPause, &EditorGUI::OnPause);
+    EVENT_SUBSCRIBE_MEMBER(m_EResume, &EditorGUI::OnResume);
 }
 
 void EditorGUI::Draw()
@@ -58,19 +60,17 @@ void EditorGUI::drawTools()
     // Play button
     ImGui::SameLine();
     static bool paused = false;
-    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Play.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Play.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Resume e;
         e.World = m_World;
         m_EventBroker->Publish(e);
-        paused = false;
     }
     // Pause button
     ImGui::SameLine();
-    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Pause.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Pause.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Pause e;
         e.World = m_World;
         m_EventBroker->Publish(e);
-        paused = true;
     }
 
     ImGui::End();
@@ -593,6 +593,22 @@ bool EditorGUI::OnFileDropped(const Events::FileDropped& e)
     std::replace(m_DroppedFile.begin(), m_DroppedFile.end(), '\\', '/');
     // Special case for when people drop from the asset folder instead of from the symlink to the asset folders in bin
     boost::algorithm::replace_first(m_DroppedFile, "../assets/", "");
+    return true;
+}
+
+bool EditorGUI::OnPause(const Events::Pause& e)
+{
+    if (e.World == m_World) {
+        m_Paused = true;
+    }
+    return true;
+}
+
+bool EditorGUI::OnResume(const Events::Resume& e)
+{
+    if (e.World == m_World) {
+        m_Paused = false;
+    }
     return true;
 }
 
