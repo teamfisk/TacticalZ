@@ -59,10 +59,9 @@ void Renderer::InitializeWindow()
 		exit(EXIT_FAILURE);
 	}
 
-    int res[2];
-    glfwGetWindowSize(m_Window, &res[0], &res[1]);
-    SetViewPortSize(Rectangle::Rectangle(res[0], res[1]));
-
+    int windowSize[2];
+    glfwGetWindowSize(m_Window, &windowSize[0], &windowSize[1]);
+    m_ViewportSize = Rectangle(windowSize[0], windowSize[1]);
 }
 
 void Renderer::InitializeShaders()

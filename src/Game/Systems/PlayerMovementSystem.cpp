@@ -80,14 +80,14 @@ void PlayerMovementSystem::Update(double dt)
                 velocity.y += 4.f;
             }
 
-            //if (player.HasComponent("AABB")) {
-            //    glm::vec3& size = player["AABB"]["Size"];
-            //    if (controller->Crouching()) {
-            //        size = glm::vec3(1.f, 1.f, 1.f);
-            //    } else {
-            //        size = glm::vec3(1.f, 1.6f, 1.f);
-            //    }
-            //}
+            if (player.HasComponent("AABB")) {
+                glm::vec3& size = player["AABB"]["Size"];
+                if (controller->Crouching()) {
+                    size = glm::vec3(1.f, 1.f, 1.f);
+                } else {
+                    size = glm::vec3(1.f, 1.6f, 1.f);
+                }
+            }
 
             // Animations
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
