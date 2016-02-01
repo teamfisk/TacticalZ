@@ -82,11 +82,17 @@ void EditorSystem::Update(double dt)
 void EditorSystem::Enable()
 {
     m_EditorCameraInputController->Enable();
+
     m_EventBroker->Publish(Events::UnlockMouse());
-    Events::SetCamera e;
-    e.CameraEntity = m_EditorCamera;
-    m_EventBroker->Publish(e);
-    (glm::vec3&)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
+
+    // Enable editor camera
+    Events::SetCamera eSetCamera;
+    eSetCamera.CameraEntity = m_EditorCamera;
+    m_EventBroker->Publish(eSetCamera);
+    if (m_ActualCamera.Valid()) {
+        (glm::vec3&)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
+    }
+
     m_Enabled = true;
 }
 
