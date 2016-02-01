@@ -32,7 +32,7 @@ void EditorWidgetSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper
 
     auto camera = m_PickData.Camera;
     glm::vec3 axis = (glm::vec3)cEditorWidget["Axis"];
-    glm::vec2 axisScreen = camera->WorldToScreen(moveEntityPos + axis, m_Renderer->GetViewPortSize()) - camera->WorldToScreen(moveEntityPos, m_Renderer->GetViewPortSize());
+    glm::vec2 axisScreen = camera->WorldToScreen(moveEntityPos + axis, m_Renderer->GetViewportSize()) - camera->WorldToScreen(moveEntityPos, m_Renderer->GetViewportSize());
     ImGui::Text("axisScreen: (%f, %f)", axisScreen.x, axisScreen.y);
     float dot = glm::dot(m_MouseDelta, glm::normalize(axisScreen)) / glm::length(axisScreen);
     glm::vec3 worldMovement = dot * axis;
