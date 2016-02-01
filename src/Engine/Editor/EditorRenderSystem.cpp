@@ -26,8 +26,6 @@ void EditorRenderSystem::Update(double dt)
     auto cSceneLight = m_World->GetComponents("SceneLight");
     if (cSceneLight != nullptr) {
         //these are hardcoded since they want special light treatment and a component just for widgets is stupid.
-        m_RenderFrame->Gamma = 2.2;
-        m_RenderFrame->Exposure = 1.0;
         scene.AmbientColor = glm::vec4(0.8, 0.8, 0.8, 1.0);
     }
 

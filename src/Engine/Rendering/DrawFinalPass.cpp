@@ -134,7 +134,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                 continue;
             }
 
-            //glDisable(GL_CULL_FACE);
+            glDisable(GL_CULL_FACE);
 
             //Bind uniforms
             BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
@@ -162,7 +162,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             glBindVertexArray(explosionEffectJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
             glDrawElements(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(explosionEffectJob->StartIndex*sizeof(unsigned int)));
-            //glEnable(GL_CULL_FACE);
+            glEnable(GL_CULL_FACE);
             if(GLERROR("explosion effect end")) {
                 continue;
             }
