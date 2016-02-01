@@ -126,7 +126,7 @@ void main()
 	tilePos.y = int(gl_FragCoord.y/TILE_SIZE);
 
 	LightResult totalLighting;
-	totalLighting.Diffuse = AmbientColor;
+	totalLighting.Diffuse = vec4(AmbientColor.rgb, 1.0);
 	int currentTile = int(floor(gl_FragCoord.x/TILE_SIZE) + (floor(gl_FragCoord.y/TILE_SIZE) * int(ScreenDimensions.x/TILE_SIZE)));
 
 	int start = int(LightGrids.Data[currentTile].Start);
