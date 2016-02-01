@@ -16,6 +16,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 elseif(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
 #set(BUILD_SHARED_LIBS FALSE)
