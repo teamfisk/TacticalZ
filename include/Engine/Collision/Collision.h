@@ -66,7 +66,7 @@ bool AABBvsTriangles(const AABB& box,
     const std::vector<RawModel::Vertex>& modelVertices,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix,
-    const glm::vec3& boxVelocity,
+    glm::vec3& boxVelocity,
     glm::vec3& outResolutionVector);
 
 //Return true if the boxes are intersecting.

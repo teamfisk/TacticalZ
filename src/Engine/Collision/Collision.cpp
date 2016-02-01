@@ -253,8 +253,10 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
     const glm::vec2& boxMax,
     const std::array<glm::vec2, 3>& triPos,
     glm::vec2& resolutionDirection,
-    float& resolutionDistance)
+    float& resolutionDistance,
+    bool& pushedFromTriNormal)
 {
+    pushedFromTriNormal = false;
     resolutionDistance = INFINITY;
     //Project along box normals (coordinate axes, since it's axis-aligned).
     for (int ax = 0; ax < 2; ++ax) {
@@ -264,14 +266,20 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
             minTri = std::min(t[ax], minTri);
             maxTri = std::max(t[ax], maxTri);
         }
-        if (minTri > boxMax[ax] || maxTri < boxMin[ax]) {
+        if (boxMax[ax] <= minTri || maxTri <= boxMin[ax]) {
             return false;
         }
-        float push = std::min(maxTri - boxMin[ax], boxMax[ax] - minTri);
-        if (push < resolutionDistance) {
-            resolutionDistance = push;
+
+        //Here: maxBox > minTri && minBox < maxTri
+        //Left is negative.
+        float leftRes = minTri - boxMax[ax];
+        float rightRes = maxTri - boxMin[ax];
+        float push = rightRes < -leftRes ? rightRes : leftRes;
+        float absPush = abs(push);
+        if (absPush < resolutionDistance) {
+            resolutionDistance = absPush;
             resolutionDirection[1 - ax] = 0.f;
-            resolutionDirection[ax] = resolutionDistance;
+            resolutionDirection[ax] = push;
         }
     }
     //Project along triangle normals.
@@ -292,7 +300,7 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
             continue;
         }
         //Rotate edge to a normal.
-        normal = glm::vec2(-normal.y, normal.x);
+        normal = glm::normalize(glm::vec2(-normal.y, normal.x));
         //Project triangle onto the normal.
         float minTri = INFINITY;
         float maxTri = -INFINITY;
@@ -309,14 +317,20 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
             minBox = std::min(dot, minBox);
             maxBox = std::max(dot, maxBox);
         }
-        if (maxBox < minTri || minBox > maxTri) {
+        if (maxBox <= minTri || maxTri <= minBox) {
             return false;
         }
+
         //Here: maxBox > minTri && minBox < maxTri
-        float push = std::min(maxTri - minBox, maxBox - minTri);
-        if (push < resolutionDistance) {
-            resolutionDistance = push;
-            resolutionDirection = resolutionDistance * glm::normalize(normal);
+        //Left is negative.
+        float leftRes = minTri - maxBox;
+        float rightRes = maxTri - minBox;
+        float push = rightRes < -leftRes ? rightRes : leftRes;
+        float absPush = abs(push);
+        if (absPush < resolutionDistance) {
+            resolutionDistance = absPush;
+            resolutionDirection = push * normal;
+            pushedFromTriNormal = true;
         }
     }
     return true;
@@ -326,17 +340,25 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
 constexpr std::array<std::pair<int, int>, 3> dimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
 
 bool AABBvsTriangle(const AABB& box, 
-    const std::array<glm::vec3, 3>& triPos,
-    const glm::vec3& boxVelocity,
+    const std::array<glm::vec3, 3>& triPos, 
+    const glm::vec3& wantDirection,
+    glm::vec3& boxVelocity,
     glm::vec3& outVector)
 {
     //Check so we don't have a zero area triangle when calculating the normal.
     //Also, don't check a triangle facing away from the player.
     //Less checks, and we should be able to walk out from models if we are trapped inside.
     glm::vec3 triNormal = glm::cross(triPos[1] - triPos[0], triPos[2] - triPos[0]);
-    if (!vectorHasLength(triNormal) || glm::dot(triNormal, boxVelocity) > 0) {
+    if (!vectorHasLength(triNormal) || (glm::dot(triNormal, boxVelocity) > 0) && vectorHasLength(boxVelocity)) {
         return false;
     }
+
+    enum BoxTriResolveCase
+    {
+        Vertex,
+        Line,
+        Corner
+    } resolveCase;
 
     const glm::vec3& origin = box.Origin();
     const glm::vec3& half = box.HalfSize();
@@ -358,14 +380,16 @@ bool AABBvsTriangle(const AABB& box,
         glm::vec2 boxMax(max[dim.first], max[dim.second]);
         glm::vec2 resolutionVector;
         float resolutionDist;
+        bool pushedFromTriangleLine;
         //if projections don't overlap, return false.
-        if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector, resolutionDist)) {
+        if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector, resolutionDist, pushedFromTriangleLine)) {
             return false;
         } else if (resolutionDist < minimumTranslation) {
             outVector = glm::vec3(0.f);
             outVector[dim.first] = resolutionVector.x;
             outVector[dim.second] = resolutionVector.y;
             minimumTranslation = resolutionDist;
+            resolveCase = pushedFromTriangleLine ? Line : Vertex;
         }
     }
 
@@ -384,6 +408,56 @@ bool AABBvsTriangle(const AABB& box,
     glm::vec3 cornerResolution = (1+t) * diagonal;
     if (glm::length(cornerResolution) < minimumTranslation) {
         outVector = cornerResolution;
+        resolveCase = Corner;
+    }
+
+    bool groundCollision = triNormal.y > 0.5f;
+    //ImGui::Text(groundCollision ? "Ground" : "Slope");
+
+    glm::vec3 projNorm;
+    switch (resolveCase) {
+    case Vertex:
+    {
+        int maxD = 0;
+        float maxResolution = 0.f;
+        for (int d = 0; d < 3; ++d) {
+            float resolve = glm::abs(outVector[d]);
+            if (resolve > maxResolution) {
+                maxResolution = resolve;
+                maxD = d;
+            }
+        }
+        boxVelocity[maxD] = 0.f;
+        return true;
+    }
+    case Line:
+        projNorm = glm::normalize(outVector);
+        break;
+    case Corner:
+        projNorm = triNormal;
+        break;
+    default:
+        break;
+    }
+
+    //Project the velocity onto the normal of the hit line/face.
+    //w = v - <v,n>*n, |n|==1.
+    boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
+    if (groundCollision) {
+        float len = glm::length2(boxVelocity);
+        if (len > 0.0001f) {
+            len = glm::sqrt(len);
+            boxVelocity = len * glm::normalize(wantDirection);
+        }
+
+        len = glm::length(outVector);
+        float ang = glm::half_pi<float>() - glm::acos(outVector.y / len);
+        if (len > 0.0000001f && ang > 0.0000001f) {
+            //ImGui::Text("ang=%f, len=%f, acos=%f, outY=%f", ang, len, glm::acos(outVector.y / len), outVector.y);
+            outVector.x = 0;
+            outVector.y = len / glm::sin(ang);
+            outVector.z = 0;
+        }
     }
     return true;
 }
@@ -392,15 +466,16 @@ bool AABBvsTriangles(const AABB& box,
     const std::vector<RawModel::Vertex>& modelVertices, 
     const std::vector<unsigned int>& modelIndices, 
     const glm::mat4& modelMatrix,
-    const glm::vec3& boxVelocity,
-    glm::vec3& outResolutionVector,
-    int startIndex,
-    int recursiveDepth)
+    glm::vec3& boxVelocity,
+    glm::vec3& outResolutionVector)
 {
     bool hit = false;
 
     AABB newBox = box;
     outResolutionVector = glm::vec3(0.f);
+    glm::vec3 wantDirection(boxVelocity);
+    wantDirection.y = 0;
+    wantDirection = glm::normalize(wantDirection);
     for (int i = 0; i < modelIndices.size(); ) {
         std::array<glm::vec3, 3> triVertices = {
             Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
@@ -408,100 +483,14 @@ bool AABBvsTriangles(const AABB& box,
             Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
         };
         glm::vec3 outVec;
-        if (AABBvsTriangle(newBox, triVertices, boxVelocity, outVec)) {
+        if (AABBvsTriangle(newBox, triVertices, wantDirection, boxVelocity, outVec)) {
             hit = true;
             outResolutionVector += outVec;
             newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
         }
     }
 
-    //outResolutionVector = glm::vec3(INFINITY);
-    //if (recursiveDepth > 2) {
-    //    return true;
-    //}
-    //for (int i = startIndex; i < modelIndices.size(); ) {
-    //    std::array<glm::vec3, 3> triVertices = {
-    //        Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
-    //        Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
-    //        Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
-    //    };
-    //    glm::vec3 outVec;
-    //    if (AABBvsTriangle(box, triVertices, boxVelocity, outVec) && glm::length2(outVec) < glm::length2(outResolutionVector)) {
-    //        hit = true;
-    //        glm::vec3 potentialResolution = outVec;
-    //        const AABB& resolvedBox = AABB::FromOriginSize(box.Origin() + potentialResolution, box.Size());
-    //        if (AABBvsTriangles(resolvedBox, modelVertices, modelIndices, modelMatrix, boxVelocity, outVec, i, recursiveDepth+1)) {
-    //            potentialResolution += outVec;
-    //            if (glm::length2(potentialResolution) > glm::length2(outResolutionVector)) {
-    //                continue;
-    //            }
-    //        }
-    //        outResolutionVector = potentialResolution;
-    //    }
-    //}
-
-    //outResolutionVector = glm::vec3(INFINITY);
-    //std::stack<AABB> testBoxes;
-    //std::stack<int> resolveIndices;
-    //std::stack<glm::vec3> resolveVectors;
-    //resolveVectors.push(glm::vec3(0.f));
-    //resolveIndices.push(0);
-    //testBoxes.push(box);
-    //do {
-    //    int i = resolveIndices.top();
-    //    resolveIndices.pop();
-    //    while (i < modelIndices.size()) {
-    //        std::array<glm::vec3, 3> triVertices = {
-    //            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
-    //            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
-    //            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
-    //        };
-    //        glm::vec3 outVec;
-    //        bool test = AABBvsTriangle(testBoxes.top(), triVertices, outVec);
-    //        if (test) {
-    //            hit = true;
-    //            //emplace?
-    //            resolveIndices.push(i);
-    //            testBoxes.push(AABB::FromOriginSize(box.Origin() + outVec, box.Size()));
-    //            resolveVectors.top() += outVec;
-    //        }
-    //    }
-    //    testBoxes.pop();
-    //    resolveVectors.push(glm::vec3(0.f));
-    //} while (!resolveIndices.empty());
-    //if (hit) {
-    //    if (!resolveVectors.empty()) {
-    //        while (!resolveVectors.empty()) {
-    //            if (glm::length2(resolveVectors.top()) < glm::length2(outResolutionVector)) {
-    //                outResolutionVector = resolveVectors.top();
-    //            }
-    //            resolveVectors.pop();
-    //        }
-    //    } else {
-    //        //TODO: This won't happen.
-    //        ImGui::Text("Collision, but not resolved.");
-    //    }
-    //    return true;
-    //}
     return hit;
-}
-bool AABBvsTriangles(const AABB& box,
-    const std::vector<RawModel::Vertex>& modelVertices,
-    const std::vector<unsigned int>& modelIndices,
-    const glm::mat4& modelMatrix,
-    const glm::vec3& boxVelocity,
-    glm::vec3& outResolutionVector)
-{
-    return AABBvsTriangles(
-        box, 
-        modelVertices,
-        modelIndices,
-        modelMatrix,
-        boxVelocity,
-        outResolutionVector,
-        0,
-        0
-        );
 }
 
 bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)

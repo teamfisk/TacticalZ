@@ -4,7 +4,7 @@
   <Components>
     <c:Collidable/>
     <c:Model>
-      <Resource>../assets\Models/MapVersion1.obj</Resource>
+      <Resource>../assets/Models/MapVersion1.mesh</Resource>
     </c:Model>
     <c:Transform/>
   </Components>
@@ -15,7 +15,7 @@
         <c:AABB/>
         <c:Collidable/>
         <c:Model>
-          <Resource>../assets/Models/Core/UnitCube.obj</Resource>
+          <Resource>../assets/Models/Core/UnitCube.mesh</Resource>
         </c:Model>
         <c:Physics>
           <Gravity>false</Gravity>
