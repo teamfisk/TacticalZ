@@ -2,7 +2,9 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Transform/>
+    <c:Transform>
+      <Position X="0" Y="-1" Z="0"/>
+    </c:Transform>
   </Components>
 
   <Children>
@@ -43,7 +45,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.16300011" Y="3137.18433" Z="0"/>
+          <Orientation X="4.16300011" Y="7875.41211" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -54,14 +56,13 @@
           <ColorByDistance>true</ColorByDistance>
           <Velocity X="0" Y="0" Z="0.300000012"/>
           <ExplosionOrigin X="0" Y="1.30000007" Z="0"/>
-          <TimeSinceDeath>0.9332666733480437</TimeSinceDeath>
+          <TimeSinceDeath>5.0498686575577523</TimeSinceDeath>
           <ExplosionDuration>5</ExplosionDuration>
           <EndColor A="1" B="1" G="0" R="0"/>
           <RandomnessScalar>3</RandomnessScalar>
         </c:ExplosionEffect>
         <c:Model>
           <Resource>Models/Assault.mesh</Resource>
-          <Transparent>true</Transparent>
         </c:Model>
         <c:Transform>
           <Position X="-1.68900967" Y="0.527161121" Z="-1.59648728"/>
@@ -72,11 +73,12 @@
         <Entity name="SecondaryWeapon">
           <Components>
             <c:Model>
-              <Resource>Models/AssaultWeapon.mesh</Resource>
+              <Resource>Models/AssaultWeaponRed.mesh</Resource>
               <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
-              <Position X="-0.519181371" Y="0.803532183" Z="0.128527239"/>
+              <Position X="-0.560000002" Y="0.754308224" Z="0.181485131"/>
+              <Orientation X="0.989000022" Y="0" Z="6.10900021"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -109,7 +111,7 @@
           <Components>
             <c:Animation>
               <Name>Run</Name>
-              <Time>0.48512596304830424</Time>
+              <Time>0.17818245776980568</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -125,7 +127,7 @@
           <Components>
             <c:Animation>
               <Name>Walk</Name>
-              <Time>0.65240541714881228</Time>
+              <Time>0.34546191187031372</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -187,7 +189,7 @@
               <Axis X="1" Y="1" Z="1"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="1747.31226" Y="1747.31226" Z="1747.31226"/>
+              <Orientation X="6484.80273" Y="6484.80273" Z="6484.80273"/>
             </c:Transform>
           </Components>
           <Children>
@@ -251,7 +253,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="1543.6106" Z="0"/>
+              <Orientation X="0" Y="6281.02246" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -283,7 +285,7 @@
                       <Axis X="0.699999988" Y="1" Z="0.300000012"/>
                     </c:RaptorCopter>
                     <c:Transform>
-                      <Orientation X="1589.52576" Y="2270.7627" Z="681.260559"/>
+                      <Orientation X="4905.44824" Y="7008.50781" Z="2103.03223"/>
                     </c:Transform>
                   </Components>
                   <Children>
