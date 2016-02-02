@@ -225,8 +225,10 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
             entityChangeParent(m_CurrentlyDragging, entity);
             m_CurrentlyDragging = EntityWrapper::Invalid;
         }
+        ImGui::PopID();
         return true;
     } else {
+        ImGui::PopID();
         return false;
     }
 }
