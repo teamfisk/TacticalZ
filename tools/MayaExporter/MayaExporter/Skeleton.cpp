@@ -216,7 +216,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 
 
     int currentFrame = startFrame;
-    while (currentFrame <= endFrame) { // ANDREAS
+    while (currentFrame < endFrame) { // ANDREAS
         Animation::Keyframe thisKeyFrame;
         thisKeyFrame.Index = currentFrame - startFrame;
         thisKeyFrame.Time = thisKeyFrame.Index * oneDivSixty;
@@ -280,13 +280,32 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             joinCheckMap[thisJoint.name().asChar()][3][2] = doubleMat[3][2];
             joinCheckMap[thisJoint.name().asChar()][3][3] = doubleMat[3][3];
 
-            MTransformationMatrix Matrix = thisJoint.transformation();
-            MPlug BindPose = thisJoint.findPlug("bindPose");
+            MPlug thisJointBindPose = thisJoint.findPlug("bindPose");
             MDataHandle DataHandle;
-            BindPose.getValue(DataHandle);
+            thisJointBindPose.getValue(DataHandle);
             MFnMatrixData MartixFn(DataHandle.data());
-            MMatrix BindPoseMatrix = MartixFn.matrix();
-            Matrix = Matrix.asMatrix();
+            MMatrix thisJointBindPoseMatrix = MartixFn.matrix();
+
+            MFnTransform Parent(thisJoint.parent(0), &status);
+            if (status == MS::kSuccess && thisJoint.parent(0).apiType() == MFn::kJoint) {
+                MTransformationMatrix Matrix = Parent.transformation();
+                MPlug parentBindPose = Parent.findPlug("bindPose");
+                MDataHandle DataHandle;
+                parentBindPose.getValue(DataHandle);
+                MFnMatrixData MartixFn(DataHandle.data());
+                MMatrix parentBindPoseMatrix = MartixFn.matrix();
+
+                thisJointBindPoseMatrix = thisJointBindPoseMatrix * parentBindPoseMatrix.inverse();
+            }
+
+            MTransformationMatrix TransformationMatrix = thisJoint.transformation();
+
+            if (thisJointBindPoseMatrix.isEquivalent(TransformationMatrix.asMatrix())) {
+                jointID++;
+                jointIt.next();
+                MGlobal::displayError(MString() + thisJoint.name() + " is in bindPose");
+                continue;
+            }
 
             MObject jointOrientObj = thisJoint.attribute("jointOrient");
             MFnNumericAttribute jointOrient(jointOrientObj);
@@ -302,7 +321,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             MQuaternion jo = joEuler.asQuaternion();
 
             double tmp[4];
-            Matrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
+            TransformationMatrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
             MQuaternion rotation(tmp);
 
             rotation = rotation * jo;
@@ -315,11 +334,11 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             joint.Rotation[1] = tmp[1];
             joint.Rotation[2] = tmp[2];
             joint.Rotation[3] = tmp[3];
-            Matrix.getTranslation(MSpace::kTransform).get(tmp);
+            TransformationMatrix.getTranslation(MSpace::kTransform).get(tmp);
             joint.Position[0] = tmp[0];
             joint.Position[1] = tmp[1];
             joint.Position[2] = tmp[2];
-            Matrix.getScale(tmp, MSpace::kTransform);
+            TransformationMatrix.getScale(tmp, MSpace::kTransform);
             joint.Scale[0] = tmp[0];
             joint.Scale[1] = tmp[1];
             joint.Scale[2] = tmp[2];
