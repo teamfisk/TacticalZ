@@ -41,6 +41,7 @@ private:
     double m_LastTime = 0.f;
     bool m_Enabled = true;
     EditorGUI::WidgetMode m_WidgetMode = EditorGUI::WidgetMode::Translate;
+    EditorGUI::WidgetSpace m_WidgetSpace = EditorGUI::WidgetSpace::Global;
     EntityWrapper m_Widget = EntityWrapper::Invalid;
     EntityWrapper m_CurrentSelection = EntityWrapper::Invalid;
 
@@ -57,6 +58,7 @@ private:
     void OnEntityChangeName(EntityWrapper entity, const std::string& name);
     void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
+    void OnWidgetSpace(EditorGUI::WidgetSpace widgetSpace);
 
     // Events
     EventRelay<EditorSystem, Events::MousePress> m_EMousePress;

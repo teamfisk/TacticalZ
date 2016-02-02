@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:AABB/>
+    <c:CapturePoint/>
+    <c:Model>
+      <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitSphere.mesh</Resource>
+    </c:Model>
+    <c:Team/>
+    <c:Transform/>
+    <c:Trigger/>
+  </Components>
+
+  <Children/>
+
+</Entity>
