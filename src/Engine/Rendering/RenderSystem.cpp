@@ -245,7 +245,7 @@ void RenderSystem::Update(double dt)
     scene.Viewport = Rectangle(1280, 720);
 
     auto cSceneLight = m_World->GetComponents("SceneLight");
-    if (cSceneLight != nullptr) {
+    if (cSceneLight != nullptr && cSceneLight->begin() != cSceneLight->end()) {
         m_RenderFrame->Gamma = (double)(*cSceneLight->begin())["Gamma"];
         m_RenderFrame->Exposure = (double)(*cSceneLight->begin())["Exposure"];
         scene.AmbientColor = (glm::vec4)(*cSceneLight->begin())["AmbientColor"];
