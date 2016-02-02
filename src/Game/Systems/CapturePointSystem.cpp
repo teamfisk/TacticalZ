@@ -64,7 +64,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     std::map<std::string, int> nextPossibleCapturePoint;
     nextPossibleCapturePoint["Red"] = -1;
     nextPossibleCapturePoint["Blue"] = -1;
-    for (size_t i = 0; i < m_NumberOfCapturePoints; i++)
+    for (int i = 0; i < m_NumberOfCapturePoints; i++)
     {
         if (m_CapturePointNumberToEntityMap[i].HasComponent("Team")) {
             continue;
@@ -93,7 +93,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
 
     //reset timers and reset the bool that triggers this
     if (m_ResetTimers) {
-        for (size_t i = 0; i < m_NumberOfCapturePoints; i++)
+        for (int i = 0; i < m_NumberOfCapturePoints; i++)
         {
             ComponentWrapper& capturePoint = m_CapturePointNumberToEntityMap[i]["CapturePoint"];
             if ((int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Red"] &&

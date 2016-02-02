@@ -134,8 +134,8 @@ bool ImGuiRenderPass::OnMouseRelease(const Events::MouseRelease& e)
 bool ImGuiRenderPass::OnMouseMove(const Events::MouseMove& e)
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.MousePos.x = e.X;
-    io.MousePos.y = e.Y;
+    io.MousePos.x = static_cast<float>(e.X);
+    io.MousePos.y = static_cast<float>(e.Y);
     return true;
 }
 
@@ -271,7 +271,7 @@ bool ImGuiRenderPass::createFontsTexture()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     // Store our identifier
-    io.Fonts->TexID = (void*)g_FontTexture;
+    io.Fonts->TexID = reinterpret_cast<void*>(g_FontTexture);
 
     // Restore state
     glBindTexture(GL_TEXTURE_2D, last_texture);
@@ -291,7 +291,7 @@ void ImGuiRenderPass::newFrame()
     io.DisplaySize = ImVec2((float)w, (float)h);
     io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
 
-    io.DeltaTime = g_DeltaTime;
+    io.DeltaTime = static_cast<float>(g_DeltaTime);
 
     io.KeyCtrl = glfwGetKey(g_Window, GLFW_KEY_LEFT_CONTROL) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_CONTROL);
     io.KeyShift = glfwGetKey(g_Window, GLFW_KEY_LEFT_SHIFT) || glfwGetKey(g_Window, GLFW_KEY_RIGHT_SHIFT);

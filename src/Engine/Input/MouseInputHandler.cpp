@@ -98,7 +98,7 @@ bool MouseInputHandler::OnMouseMove(const Events::MouseMove& e)
             Events::InputCommand ic;
             ic.PlayerID = -1;
             std::tie(ic.Command, ic.Value) = it->second;
-            ic.Value *= e.DeltaX;
+            ic.Value *= static_cast<float>(e.DeltaX);
             m_InputProxy->Publish(ic);
         }
     }
@@ -109,7 +109,7 @@ bool MouseInputHandler::OnMouseMove(const Events::MouseMove& e)
             Events::InputCommand ic;
             ic.PlayerID = -1;
             std::tie(ic.Command, ic.Value) = it->second;
-            ic.Value *= e.DeltaY;
+            ic.Value *= static_cast<float>(e.DeltaY);
             m_InputProxy->Publish(ic);
         }
     }

@@ -75,21 +75,21 @@ private:
    
 
     void ReadMeshFile(std::string filePath);
-    void ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
-    void ReadMesh(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
-    void ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
-    void ReadIndices(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
+    void ReadMeshFileHeader(std::size_t& offset, char* fileData);
+    void ReadMesh(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+    void ReadVertices(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+    void ReadIndices(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
 
     void ReadMaterialFile(std::string filePath);
-    void ReadMaterials(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
-    void ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+    void ReadMaterials(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+    void ReadMaterialSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
 
     void ReadAnimationFile(std::string filePath);
-    void ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
-    void ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
-    void ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips);
-    void ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex);
-    void ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfJoints, Skeleton::Animation& animation);
+    void ReadAnimationBindPoses(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+    void ReadAnimationJoint(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+    void ReadAnimationClips(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int numberOfClips);
+    void ReadAnimationClipSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int clipIndex);
+    void ReadAnimationKeyFrame(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int numberOfJoints, Skeleton::Animation& animation);
     
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
