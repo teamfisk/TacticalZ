@@ -25,7 +25,9 @@
         <Entity>
           <Components>
             <c:Animation>
-              <Name>Walk</Name>
+              <AnimationName>Crouch Walk</AnimationName>
+              <Time>0.64462505387501778</Time>
+              <Speed>8</Speed>
             </c:Animation>
             <c:Model>
               <Resource>Models/AssaultAnimated.mesh</Resource>

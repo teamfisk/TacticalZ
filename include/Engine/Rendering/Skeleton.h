@@ -41,6 +41,7 @@ public:
 
 		std::string Name;
 		glm::mat4 OffsetMatrix;
+        glm::mat4 ModificationMatrix =  glm::mat4(1);
         int ID;
 
 		Bone* Parent;

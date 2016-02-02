@@ -61,14 +61,14 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& jobs)
         EntityWrapper entity(m_World, cModel.EntityID);
 
         // Only render children of a camera if that camera is currently active
-        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-            continue;
-        }
+//         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+//             continue;
+//         } DO NOT COMMIT THIS  DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
-            continue;
-        }
+//         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+//             continue;
+//         }  DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS
 
         Model* model;
         try {

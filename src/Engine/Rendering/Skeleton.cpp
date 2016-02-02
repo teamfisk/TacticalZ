@@ -95,12 +95,13 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyf
 			positionInterp.z = 0;
 		}
 
+        
 
-		boneMatrix = parentMatrix * (glm::translate(positionInterp) * glm::toMat4(rotationInterp) * glm::scale(scaleInterp));
-		boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
+        boneMatrix =  parentMatrix * bone->ModificationMatrix * (glm::translate(positionInterp) * glm::toMat4(rotationInterp) * glm::scale(scaleInterp));
+        boneMatrices[bone->ID] = boneMatrix *bone->OffsetMatrix;
 	} else {
         if (bone->Parent) {
-            boneMatrix = parentMatrix; // * glm::inverse(bone->OffsetMatrix);
+            boneMatrix = parentMatrix;// *glm::inverse(bone->OffsetMatrix);
         }
 		boneMatrices[bone->ID] = boneMatrix; // * bone->OffsetMatrix;
 	}
@@ -125,7 +126,7 @@ glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation::Keyframe
         glm::vec3 scaleInterp = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
 
 
-        boneMatrix = (glm::translate(positionInterp) * glm::toMat4(rotationInterp) * glm::scale(scaleInterp)) * parentMatrix;
+        boneMatrix = (glm::translate(positionInterp) * glm::toMat4(rotationInterp) * glm::scale(scaleInterp)) * bone->ModificationMatrix * parentMatrix;
     } else {
         if (bone->Parent) {
             boneMatrix = parentMatrix;

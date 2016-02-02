@@ -97,18 +97,18 @@ void PlayerMovementSystem::Update(double dt)
                 float movementLength = glm::length(groundVelocity);
                 if (glm::length(controller->Movement()) > 0.f) {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch Walk";
+                        cAnimation["AnimationName"] = "Crouch Walk";
                         (double&)cAnimation["Speed"] = 1.f * -glm::sign(controller->Movement().z);
                     } else {
-                        cAnimation["Name"] = "Run";
+                        cAnimation["AnimationName"] = "Run";
                         (double&)cAnimation["Speed"] = 2.f * -glm::sign(controller->Movement().z);
                     }
                 } else {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch";
+                        cAnimation["AnimationName"] = "Crouch";
                         (double&)cAnimation["Speed"] = 1.f;
                     } else {
-                        cAnimation["Name"] = "Hold Pos";
+                        cAnimation["AnimationName"] = "Hold Pos";
                         (double&)cAnimation["Speed"] = 1.f;
                     }
                 }

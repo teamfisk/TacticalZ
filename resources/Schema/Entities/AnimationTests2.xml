@@ -34,8 +34,8 @@
     <Entity>
       <Components>
         <c:Animation>
-          <AnimationName>Crouch</AnimationName>
-          <Time>1.2451274133223826</Time>
+          <AnimationName>Run</AnimationName>
+          <Time>0.94215130460312757</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:Model>
@@ -54,12 +54,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.0718467757" Y="0.479806602" Z="0.0548748523"/>
+              <Position X="0.0670756698" Y="0.7053985" Z="0.0367298797"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-0.431370437" Y="0.850169301" Z="-2.42601299"/>
+              <Orientation X="-0.539481044" Y="-0.0316002518" Z="-2.95271134"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -72,12 +72,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.39332974" Y="0.324809998" Z="-0.0288445484"/>
+              <Position X="0.148491099" Y="0.406787694" Z="-0.159706444"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="1.18491673" Y="1.0242362" Z="-2.26206946"/>
+              <Orientation X="1.192891" Y="0.187030882" Z="-2.87608051"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -90,12 +90,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.305837631" Y="0.0361253619" Z="0.179315761"/>
+              <Position X="0.147671953" Y="0.288556606" Z="0.187201411"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="3.10044129e-07" Y="1.09664524" Z="-3.13675666"/>
+              <Orientation X="1.19914544" Y="0.0853852332" Z="-3.1367836"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -111,9 +111,9 @@
               <Color A="1" B="1" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.186916605" Y="0.0361250937" Z="-0.136036098"/>
+              <Position X="-0.0861762166" Y="0.035969615" Z="-0.0733369738"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="3.14159131" Y="-7.15255737e-07" Z="3.14159274"/>
+              <Orientation X="-3.14159179" Y="1.56462193e-05" Z="-3.1415894"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -129,9 +129,9 @@
               <Color A="1" B="1" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.124794818" Y="0.343560517" Z="-0.32563746"/>
+              <Position X="-0.0949281976" Y="0.38283509" Z="-0.191370964"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-2.66533947" Y="-0.187336028" Z="2.93550467"/>
+              <Orientation X="-2.88567233" Y="-0.208285078" Z="-3.09033155"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -147,9 +147,9 @@
               <Color A="1" B="1" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.0666294992" Y="0.471828938" Z="0.0128124626"/>
+              <Position X="-0.0714211613" Y="0.697834671" Z="-0.00534122996"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="1.98675263" Y="0.0233680122" Z="2.87409353"/>
+              <Orientation X="2.61832142" Y="-0.111381792" Z="-3.05362916"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -162,12 +162,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.00469498895" Y="0.512485623" Z="0.0200203825"/>
+              <Position X="-9.4325589e-18" Y="0.738307238" Z="0.00194504182"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-3.03470659" Y="0.36588186" Z="-3.0760417"/>
+              <Orientation X="-3.03686881" Y="0.365960717" Z="-3.07918954"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -180,12 +180,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.00108358753" Y="0.645309925" Z="0.00671719108"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-2.23578" Y="1.12130237" Z="-2.36199307"/>
+              <Position X="-0.00329666352" Y="0.871166348" Z="-0.0110896118"/>
+              <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
+              <Orientation X="-2.58382678" Y="1.22235525" Z="-2.69361424"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -198,12 +198,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.0091821691" Y="0.768297315" Z="-0.0377721936"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-1.92300212" Y="1.0594666" Z="-2.269871"/>
+              <Position X="0.00619302923" Y="0.999758601" Z="-0.0344300792"/>
+              <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
+              <Orientation X="-2.29503679" Y="1.19778895" Z="-2.59355855"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -216,17 +216,17 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.0091821691" Y="0.768297315" Z="-0.0377721936"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-1.92300212" Y="1.0594666" Z="-2.269871"/>
+              <Position X="0.00619302923" Y="0.999758601" Z="-0.0344300792"/>
+              <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
+              <Orientation X="-2.29503679" Y="1.19778895" Z="-2.59355855"/>
             </c:Transform>
           </Components>
           <Children/>
         </Entity>
-        <Entity name="R_Leg_Top">
+        <Entity name="Neck">
           <Components>
             <c:BoneAttachment>
               <BoneName>Neck</BoneName>
@@ -234,12 +234,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="19.6078434"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.0257265922" Y="0.835334301" Z="-0.0725377947"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-2.67842054" Y="0.0451255701" Z="2.97098374"/>
+              <Position X="0.0217485577" Y="1.07277262" Z="-0.0545123592"/>
+              <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
+              <Orientation X="-2.72223639" Y="0.035971649" Z="3.00587177"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -252,12 +252,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.0091821691" Y="0.768297315" Z="-0.0377721936"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-1.92300212" Y="1.0594666" Z="-2.269871"/>
+              <Position X="0.00619302923" Y="0.999758601" Z="-0.0344300792"/>
+              <Scale X="0.100000001" Y="0.0500000007" Z="0.100000001"/>
+              <Orientation X="-2.29503679" Y="1.19778895" Z="-2.59355855"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -270,12 +270,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.080665715" Y="0.757790864" Z="0.0217154976"/>
+              <Position X="0.0779105872" Y="0.97813803" Z="0.0216788556"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-0.990312934" Y="0.329345405" Z="-0.0508526377"/>
+              <Orientation X="-0.504944384" Y="0.385777682" Z="-0.0470155627"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -288,12 +288,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.160035357" Y="0.843445063" Z="0.00654693879"/>
+              <Position X="-0.145016268" Y="1.09721363" Z="0.0620321929"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-1.90130699" Y="-0.773362398" Z="1.06810308"/>
+              <Orientation X="-2.07472539" Y="-1.02085268" Z="1.20787954"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -306,12 +306,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.238011926" Y="0.711740375" Z="-0.115170464"/>
+              <Position X="-0.194418803" Y="0.990253985" Z="-0.0940467715"/>
               <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-0.845395327" Y="0.765393734" Z="-0.237622365"/>
+              <Orientation X="-0.332483619" Y="0.762842059" Z="0.00552804675"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -324,48 +324,12 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
+              <Color A="1" B="19.6078434" G="19.6078434" R="19.6078434"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.0430049673" Y="0.916874766" Z="-0.143034652"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-2.96715546" Y="0.0551578514" Z="2.99139857"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="L_Hand">
-          <Components>
-            <c:BoneAttachment>
-              <BoneName>L_Hand</BoneName>
-              <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-            </c:BoneAttachment>
-            <c:Model>
-              <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
-            </c:Model>
-            <c:Transform>
-              <Position X="0.0662894994" Y="0.739402592" Z="-0.459511727"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="-3.1153264" Y="-0.248137668" Z="-0.829112232"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="L_Elbow">
-          <Components>
-            <c:BoneAttachment>
-              <BoneName>L_Elbow</BoneName>
-              <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-            </c:BoneAttachment>
-            <c:Model>
-              <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="1" B="1" G="19.6078434" R="1"/>
-            </c:Model>
-            <c:Transform>
-              <Position X="-0.0279197786" Y="0.648010612" Z="-0.314551264"/>
-              <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
-              <Orientation X="0.325028092" Y="1.40154743" Z="1.88795435"/>
+              <Position X="0.035807699" Y="1.15795505" Z="-0.12132182"/>
+              <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+              <Orientation X="-2.96464038" Y="0.0267533381" Z="2.98014784"/>
             </c:Transform>
           </Components>
           <Children/>
