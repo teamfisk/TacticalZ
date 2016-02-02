@@ -55,6 +55,7 @@ in VertexData{
 	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
+	float ExplosionPercentageElapsed;
 }Input;
 
 out vec4 sceneColor;
@@ -148,7 +149,7 @@ void main()
 		totalLighting.Specular += light_result.Specular;
 	}
 
-	vec4 color_result = Color * diffuseTexel * DiffuseColor * Input.ExplosionColor;
+	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	

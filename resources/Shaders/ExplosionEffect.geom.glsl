@@ -21,6 +21,7 @@ in VertexData{
 	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
+	float ExplosionPercentageElapsed;
 }Input[];
 
 out VertexData{
@@ -30,6 +31,7 @@ out VertexData{
 	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
+	float ExplosionPercentageElapsed;
 }Output;
 
 layout(triangles) in;
@@ -118,12 +120,17 @@ void main()
 		{
 			// calculate the max distance (s) the triangle will move
 			float s = (randomVelocity.x * ExplosionDuration) + (0.5 * a * pow(ExplosionDuration, 2));
+			float te = (length(triangleCenter2ExplosionRadius) / s);
 			
-			Output.ExplosionColor = EndColor * (length(triangleCenter2ExplosionRadius) / s);
+			Output.ExplosionColor = EndColor;
+			Output.ExplosionPercentageElapsed = te;
+
 		}
 		else
 		{
-			Output.ExplosionColor = EndColor * timePercetage;
+			Output.ExplosionColor = EndColor;
+			Output.ExplosionPercentageElapsed = timePercetage;
+
 		}
 		
 		// for every vertex on the triangle...
@@ -160,11 +167,14 @@ void main()
 		// if explosion color should be affected by distance instead of time...
 		if (ColorByDistance == true)
 		{
-			Output.ExplosionColor = vec4(1.0);
+			Output.ExplosionColor = EndColor;
+			Output.ExplosionPercentageElapsed = 0.0;
 		}
 		else
 		{
-			Output.ExplosionColor = EndColor * timePercetage;
+			Output.ExplosionColor = EndColor;
+			Output.ExplosionPercentageElapsed = timePercetage;
+
 		}
 		
 		// for every vertex on the triangle...

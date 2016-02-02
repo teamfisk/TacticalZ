@@ -43,15 +43,25 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.16300011" Y="2654.78613" Z="0"/>
+          <Orientation X="4.16300011" Y="3137.18433" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
     </Entity>
     <Entity name="AssaultTPose">
       <Components>
+        <c:ExplosionEffect>
+          <ColorByDistance>true</ColorByDistance>
+          <Velocity X="0" Y="0" Z="0.300000012"/>
+          <ExplosionOrigin X="0" Y="1.30000007" Z="0"/>
+          <TimeSinceDeath>0.9332666733480437</TimeSinceDeath>
+          <ExplosionDuration>5</ExplosionDuration>
+          <EndColor A="1" B="1" G="0" R="0"/>
+          <RandomnessScalar>3</RandomnessScalar>
+        </c:ExplosionEffect>
         <c:Model>
           <Resource>Models/Assault.mesh</Resource>
+          <Transparent>true</Transparent>
         </c:Model>
         <c:Transform>
           <Position X="-1.68900967" Y="0.527161121" Z="-1.59648728"/>
@@ -62,23 +72,17 @@
         <Entity name="SecondaryWeapon">
           <Components>
             <c:Model>
-              <Resource>Models/DefenderGunBlue.mesh</Resource>
+              <Resource>Models/AssaultWeapon.mesh</Resource>
+              <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
               <Position X="-0.519181371" Y="0.803532183" Z="0.128527239"/>
-              <Orientation X="0.989000022" Y="0" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
         </Entity>
         <Entity name="SecondaryWeaponRed">
           <Components>
-            <c:ExplosionEffect>
-              <ColorByDistance>true</ColorByDistance>
-              <Velocity X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-              <TimeSinceDeath>0.33345697685444975</TimeSinceDeath>
-              <EndColor A="1" B="1" G="0.627451003" R="0.686274529"/>
-            </c:ExplosionEffect>
             <c:Model>
               <Resource>Models/DefenderGunRed.mesh</Resource>
               <Transparent>true</Transparent>
@@ -105,7 +109,7 @@
           <Components>
             <c:Animation>
               <Name>Run</Name>
-              <Time>0.051746205796625588</Time>
+              <Time>0.48512596304830424</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -121,7 +125,7 @@
           <Components>
             <c:Animation>
               <Name>Walk</Name>
-              <Time>0.21902565989713363</Time>
+              <Time>0.65240541714881228</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -183,7 +187,7 @@
               <Axis X="1" Y="1" Z="1"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="1264.88269" Y="1264.88269" Z="1264.88269"/>
+              <Orientation X="1747.31226" Y="1747.31226" Z="1747.31226"/>
             </c:Transform>
           </Components>
           <Children>
@@ -247,7 +251,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="1061.18103" Z="0"/>
+              <Orientation X="0" Y="1543.6106" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -279,7 +283,7 @@
                       <Axis X="0.699999988" Y="1" Z="0.300000012"/>
                     </c:RaptorCopter>
                     <c:Transform>
-                      <Orientation X="1251.85034" Y="1788.34839" Z="536.510132"/>
+                      <Orientation X="1589.52576" Y="2270.7627" Z="681.260559"/>
                     </c:Transform>
                   </Components>
                   <Children>
@@ -322,7 +326,7 @@
     <Entity name="SceneColors">
       <Components>
         <c:SceneLight>
-          <Gamma>2</Gamma>
+          <Gamma>1.3999999761581421</Gamma>
         </c:SceneLight>
         <c:Transform/>
       </Components>
