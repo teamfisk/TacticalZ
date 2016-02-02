@@ -87,10 +87,6 @@ std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
             }
             weightMap[geomIter.index()] = weightInfo;
 
-
-            for (unsigned int k = 0; k!=nrOfWeights; k++) {
-                MGlobal::displayInfo(MString() + "influence: " + weightInfo.BoneIndices[k] + " weight: " + weightInfo.BoneWeights[k]);
-            }
             geomIter.next();
         }
         it.next();
@@ -112,8 +108,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         MFnDependencyNode thisNode(node);
         MPlugArray connections;
         thisNode.findPlug("inMesh").connectedTo(connections, true, true);
-        MGlobal::displayInfo(MString() + "inMesh");
-        bool hasSkin = false;
         MPlug weightList, weights;
         MObject weightListObject;
         for (unsigned int i = 0; i < connections.length(); i++) {
@@ -122,7 +116,7 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                 weightList = skinCluster.findPlug("weightList", &status);
                 weightListObject = weightList.attribute();
                 weights = skinCluster.findPlug("weights");
-                hasSkin = true;
+				newMesh.hasSkin = true;
                 break;
             }
         }
@@ -138,7 +132,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         }
 
         for (int pathID = 0; pathID < dagPaths.length(); pathID++) {
-            MGlobal::displayInfo(dagPaths[pathID].fullPathName());
             MDagPath thisMeshPath(dagPaths[pathID]);
 
             MMatrix transformMatrix = thisMeshPath.inclusiveMatrix(&status);
@@ -173,8 +166,7 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                 break;
             }
             map<string, vector<int>> materialFaceIDs;
-            MGlobal::displayInfo(MString() + "shaderIndexList: " + shaderIndexList.length());
-            MGlobal::displayInfo(MString() + "shaderList: " + shaderList.length());
+
             MPlugArray plugArray;
             for (int i = 0; i < shaderIndexList.length(); i++) {
                 MFnDependencyNode shader(shaderList[shaderIndexList[i]]);
@@ -308,7 +300,8 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         thisVertex.Uv[1] = UV[1];
 
                         
-                        if (hasSkin) {
+                        if (newMesh.hasSkin) {
+							thisVertex.useWeights = true;
                             float totalWeight = 0.0f;
                             unsigned int totalBones = 0;
                             MIntArray jointIDs /* ??? */;
@@ -326,7 +319,9 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                             for (unsigned int i = 0; i < 4; i++) {
                                 thisVertex.BoneWeights[i] = thisVertex.BoneWeights[i] / totalWeight;
                             }
-                        }
+						} else {
+							thisVertex.useWeights = false;
+						}
 
                         //float totalWeight = thisVertex.BoneWeights[0] + thisVertex.BoneWeights[1] + thisVertex.BoneWeights[2] + thisVertex.BoneWeights[3];
                         //if (totalWeight > 0.0001f) {

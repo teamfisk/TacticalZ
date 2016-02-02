@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <map>
 #include <algorithm>
 #include "MayaIncludes.h"
 #include "OutputData.h"
@@ -21,6 +22,7 @@ public:
 
 		int Index = 0;
 		float Time = 0;
+        int NumberOfJoints;
 		std::vector<JointProperty> JointProperties;
 	};
 
@@ -28,7 +30,6 @@ public:
     int nameLength = 0;
 	float Duration = 0;
     int NumKeyFrames = 0;
-    int NumberOfJoints = 0;
 	std::vector<Keyframe> Keyframes;
 
 	virtual void WriteBinary(std::ostream& out)
@@ -37,11 +38,11 @@ public:
 		out.write(Name.c_str(), Name.size() + 1);
 		out.write((char*)&Duration, sizeof(float));
         out.write((char*)&NumKeyFrames, sizeof(int));
-        out.write((char*)&NumberOfJoints, sizeof(int));
         //Här under loopas alla key frames igenom
 		for (auto aKeyframe : Keyframes) {
 			out.write((char*)&aKeyframe.Index, sizeof(int));
 			out.write((char*)&aKeyframe.Time, sizeof(float));
+            out.write((char*)&aKeyframe.NumberOfJoints, sizeof(int));
 			for (auto aJoint : aKeyframe.JointProperties) {
 				out.write((char*)&aJoint.ID, sizeof(int));
 				out.write((char*)aJoint.Position, sizeof(float) * 3);
@@ -55,11 +56,11 @@ public:
 	{
 		out << "Animation Name: " << Name << endl;
 		out << "Duration: " << Duration << endl;
-        out << "Number of KeyFrames: " << NumKeyFrames << endl;
-        out << "Number of Joints: " << NumberOfJoints << endl;
+        out << "Number of KeyFrames: " << NumKeyFrames << endl;   
 		for (auto aKeyframe : Keyframes) {
 			out << "Frame: " << aKeyframe.Index << endl;
 			out << "Time: " << aKeyframe.Time << endl;
+            out << "Number of Joints: " << aKeyframe.NumberOfJoints << endl;
 			for (auto aJoint : aKeyframe.JointProperties) {
 				out << "Joint ID: " << aJoint.ID << endl;
 				out << aJoint.Position[0] << " " << aJoint.Position[1] << " " << aJoint.Position[2] << endl;

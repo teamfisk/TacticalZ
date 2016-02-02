@@ -40,10 +40,10 @@ private:
     EventRelay<RenderSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
 
+    void fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs);
     void fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& jobs);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
     bool isChildOfACamera(EntityWrapper entity);
     bool isChildOfCurrentCamera(EntityWrapper entity);

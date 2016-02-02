@@ -89,7 +89,7 @@ private:
     void ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
     void ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips);
     void ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex);
-    void ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfJoints, Skeleton::Animation& animation);
+    void ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, Skeleton::Animation& animation);
     
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
