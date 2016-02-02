@@ -341,22 +341,16 @@ void RawModelCustom::ReadAnimationClipSingle(unsigned int &offset, char* fileDat
     unsigned int nrOfKeyframes = *(unsigned int*)(fileData + offset);
     offset += sizeof(unsigned int);
 
-    if (offset + sizeof(unsigned int) > fileByteSize) {
-        throw Resource::FailedLoadingException("Reading AnimationClip NrOfJoints failed");
-    }
-    unsigned int nrOfJoints = *(unsigned int*)(fileData + offset);
-    offset += sizeof(unsigned int);
-
     newAnimation.Keyframes.reserve(nrOfKeyframes);
     for (unsigned int i = 0; i < nrOfKeyframes; i++) { 
-        ReadAnimationKeyFrame(offset, fileData, fileByteSize, nrOfJoints, newAnimation);
+        ReadAnimationKeyFrame(offset, fileData, fileByteSize, newAnimation);
     }
     m_Skeleton->Animations[newAnimation.Name] = newAnimation;
 #else
 #endif
 }
 
-void RawModelCustom::ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int nrOfJoints, Skeleton::Animation& animation)
+void RawModelCustom::ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, Skeleton::Animation& animation)
 {
     Skeleton::Animation::Keyframe newKeyFrame;
 
@@ -371,6 +365,12 @@ void RawModelCustom::ReadAnimationKeyFrame(unsigned int &offset, char* fileData,
     }
     newKeyFrame.Time = *(float*)(fileData + offset);
     offset += sizeof(float);
+
+    if (offset + sizeof(unsigned int) > fileByteSize) {
+        throw Resource::FailedLoadingException("Reading AnimationKeyFrame NrOfJoints failed");
+    }
+    unsigned int nrOfJoints = *(unsigned int*)(fileData + offset);
+    offset += sizeof(unsigned int);
 
     if (offset + sizeof(Skeleton::Animation::Keyframe::BoneProperty) * nrOfJoints> fileByteSize) {
         throw Resource::FailedLoadingException("Reading AnimationKeyFrame joints failed");

@@ -4,11 +4,12 @@
 #include "../Core/System.h"
 #include "../Core/Octree.h"
 #include "Collision.h"
+#include "EntityAABB.h"
 
 class CollidableOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    CollidableOctreeSystem(World* world, EventBroker* eventBroker, Octree<AABB>* octree)
+    CollidableOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree)
         : System(world, eventBroker)
         , PureSystem("Collidable")
         , m_Octree(octree)
@@ -18,7 +19,7 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
-    Octree<AABB>* m_Octree;
+    Octree<EntityAABB>* m_Octree;
 };
 
 #endif

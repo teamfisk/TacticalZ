@@ -35,7 +35,6 @@ struct EntityWrapper
     bool operator==(const EntityWrapper& e) const;
     bool operator!=(const EntityWrapper& e) const;
     explicit operator EntityID() const;
-    operator bool();
 
 private:
     EntityWrapper firstChildByNameRecursive(const std::string& name, EntityID parent);

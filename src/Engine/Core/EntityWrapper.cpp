@@ -97,11 +97,6 @@ EntityWrapper::operator EntityID() const
     return this->ID;
 }
 
-EntityWrapper::operator bool()
-{
-    return this->Valid();
-}
-
 EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, EntityID parent)
 {
     if (!this->World->ValidEntity(parent)) {

@@ -9,29 +9,27 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     }
     ComponentWrapper& cPhysics = entity["Physics"];
 
-    boost::optional<AABB> boundingBox = Collision::EntityAbsoluteAABB(entity);
+    boost::optional<EntityAABB> boundingBox = Collision::EntityAbsoluteAABB(entity);
     if (!boundingBox) {
         return;
     }
     ComponentWrapper& cTransform = entity["Transform"];
-    AABB& boxA = *boundingBox;
+    EntityAABB& boxA = *boundingBox;
 
-    //Press 'Z' to enable/disable collision.
-    if (zPress) {
-        return;
-    }
-
-    // Collide against octree
-    std::vector<AABB> octreeResult;
-    m_Octree->ObjectsInSameRegion(*boundingBox, octreeResult);
-    for (auto& boxB : octreeResult) {
+    // Collide against octree items
+    m_OctreeResult.clear();
+    m_Octree->ObjectsInSameRegion(*boundingBox, m_OctreeResult);
+    for (auto& boxB : m_OctreeResult) {
         glm::vec3 resolutionVector;
-        if (Collision::IsSameBoxProbably(boxA, boxB)) {
+        if (boxA.Entity == boxB.Entity) {
             continue;
         }
+
         if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
             (glm::vec3&)cTransform["Position"] += resolutionVector;
-            ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
+            if (resolutionVector.y > 0) {
+                ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
+            }
         }
     }
 
@@ -56,12 +54,4 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     //        (glm::vec3&)cTransform["Position"] += resolutionVector;
     //    }
     //}
-}
-
-bool CollisionSystem::OnKeyUp(const Events::KeyUp & event)
-{
-    if (event.KeyCode == GLFW_KEY_Z) {
-        zPress = !zPress;
-    }
-    return false;
 }
