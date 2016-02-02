@@ -25,6 +25,7 @@ public:
     bool StencilMask(GLuint mask);
     bool DepthMask(GLboolean flag);
 	bool DepthFunc(GLenum func);
+    bool PolygonMode(GLenum face, GLenum mode);
 	bool AlphaFunc(GLenum func, GLclampf thresholder);
 
 private:

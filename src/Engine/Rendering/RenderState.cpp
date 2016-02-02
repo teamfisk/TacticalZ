@@ -155,6 +155,20 @@ bool RenderState::AlphaFunc(GLenum func, GLclampf thresholder)
 	return !GLERROR("AlphaFunc");
 }
 
+bool RenderState::PolygonMode(GLenum face, GLenum mode)
+{
+    GLint originalMode[2];
+    glGetIntegerv(GL_POLYGON_MODE, &originalMode[0]);
+    if (face == GL_FRONT || face == GL_FRONT_AND_BACK) {
+        m_ResetFunctions.push_back(std::bind(glPolygonMode, GL_FRONT, originalMode[0]));
+    }
+    if (face == GL_BACK || face == GL_FRONT_AND_BACK) {
+        m_ResetFunctions.push_back(std::bind(glPolygonMode, GL_BACK, originalMode[1]));
+    }
+    glPolygonMode(face, mode);
+    return !GLERROR("RenderState::PolygonMode");
+}
+
 RenderState::~RenderState()
 {
     for (auto& f : boost::adaptors::reverse(m_ResetFunctions)) {

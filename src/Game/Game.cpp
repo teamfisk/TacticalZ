@@ -4,6 +4,7 @@
 #include "Collision/EntityAABB.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
+#include "Editor/EditorRenderSystem.h"
 #include "Systems/RaptorCopterSystem.h"
 #include "Systems/HealthSystem.h"
 #include "Systems/PlayerMovementSystem.h"
@@ -164,6 +165,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<EditorRenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame, m_OctreeFrustrumCulling);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);

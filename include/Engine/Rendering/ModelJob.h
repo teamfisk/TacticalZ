@@ -164,7 +164,7 @@ struct ModelJob : RenderJob
 	std::vector<const ::RawModel::TextureProperties*> SpecularTexture;
 	std::vector<const ::RawModel::TextureProperties*> IncandescenceTexture;
     float Shininess = 0.f;
-    glm::vec4 Color;
+    glm::vec4 Color = glm::vec4(1.f, 1.f, 1.f, 1.f);
     const ::Model* Model = nullptr;
     ::Skeleton* Skeleton = nullptr;
     std::vector<::Skeleton::AnimationData> Animations;
@@ -182,6 +182,7 @@ struct ModelJob : RenderJob
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;
 	bool IsShielded;
+    bool Wireframe = false;
     void CalculateHash() override
     {
         Hash = ShaderID << 20 + ModelID << 10 + TextureID;
