@@ -1,5 +1,5 @@
-#ifndef EditorRenderSystem_h__
-#define EditorRenderSystem_h__
+#ifndef EditorWidgetRenderSystem_h__
+#define EditorWidgetRenderSystem_h__
 
 #include "../Core/System.h"
 #include "../Rendering/IRenderer.h"
@@ -7,10 +7,10 @@
 #include "../Rendering/Camera.h"
 #include "../Rendering/ESetCamera.h"
 
-class EditorRenderSystem : public ImpureSystem
+class EditorWidgetRenderSystem : public ImpureSystem
 {
 public:
-    EditorRenderSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame);
+    EditorWidgetRenderSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame);
 
     virtual void Update(double dt) override;
 
@@ -20,7 +20,7 @@ private:
     Camera* m_EditorCamera;
     EntityWrapper m_CurrentCamera = EntityWrapper::Invalid;
 
-    EventRelay<EditorRenderSystem, Events::SetCamera> m_ESetCamera;
+    EventRelay<EditorWidgetRenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(Events::SetCamera& e);
 };
 

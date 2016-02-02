@@ -1,16 +1,16 @@
-#include "Editor/EditorRenderSystem.h"
+#include "Editor/EditorWidgetRenderSystem.h"
 
-EditorRenderSystem::EditorRenderSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
+EditorWidgetRenderSystem::EditorWidgetRenderSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
     : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {
-    EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &EditorRenderSystem::OnSetCamera);
+    EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &EditorWidgetRenderSystem::OnSetCamera);
     auto resolution = Rectangle::Rectangle(1280, 720);
     m_EditorCamera = new Camera((float)resolution.Width / resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
 }
 
-void EditorRenderSystem::Update(double dt)
+void EditorWidgetRenderSystem::Update(double dt)
 {
     if (m_CurrentCamera.Valid()) {
         ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
@@ -82,7 +82,7 @@ void EditorRenderSystem::Update(double dt)
     m_RenderFrame->Add(scene);
 }
 
-bool EditorRenderSystem::OnSetCamera(Events::SetCamera& e)
+bool EditorWidgetRenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
