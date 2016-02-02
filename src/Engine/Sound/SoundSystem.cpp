@@ -365,7 +365,7 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
 
 bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
-    int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "CapturePoint")["HomePointForTeam"];
+    int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
     int team = (int)m_World->GetComponent(m_LocalPlayer, "Team")["Team"];
     Events::PlaySoundOnEntity ev;
     if (team == homeTeam) {
