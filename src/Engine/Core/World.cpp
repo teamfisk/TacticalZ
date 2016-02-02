@@ -54,8 +54,12 @@ ComponentWrapper World::AttachComponent(EntityID entity, const std::string& comp
 
 bool World::HasComponent(EntityID entity, const std::string& componentType) const
 {
-    ComponentPool* pool = m_ComponentPools.at(componentType);
-    return pool->KnowsEntity(entity);
+    auto it = m_ComponentPools.find(componentType);
+    if (it == m_ComponentPools.end()) {
+        return false;
+    } else {
+        return it->second->KnowsEntity(entity);
+    }
 }
 
 ComponentWrapper World::GetComponent(EntityID entity, const std::string& componentType)
@@ -92,6 +96,13 @@ EntityID World::GetParent(EntityID entity)
 
 void World::SetParent(EntityID entity, EntityID parent)
 {
+    // Don't allow an entity to be a child to itself!
+    if (entity == parent) {
+        // HACK: We purposely don't check the whole hierarchy of children here, since it would be way too slow.
+        // This might result in infinite loops if an entity somehow ends up as a child.
+        return;
+    }
+
     EntityID lastParent = m_EntityParents.at(entity);
     auto parentChildren = m_EntityChildren.equal_range(lastParent);
     for (auto it = parentChildren.first; it != parentChildren.second; it++) {

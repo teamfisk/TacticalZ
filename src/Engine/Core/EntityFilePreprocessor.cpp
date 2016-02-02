@@ -65,6 +65,7 @@ void EntityFilePreprocessor::parseComponentInfo()
 
         // Name
         compInfo.Name = XS::ToString(element->getName());
+        bool brk = compInfo.Name == "HiddenForLocalPlayer";
         // Known allocation
         compInfo.Meta->Allocation = m_ComponentCounts[compInfo.Name];
         // Annotation
@@ -90,7 +91,7 @@ void EntityFilePreprocessor::parseComponentInfo()
         // <xs:all>
         auto modelGroupParticle = complexTypeDefinition->getParticle();
         if (modelGroupParticle == nullptr || modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
-            //LOG_ERROR("Failed to parse component definition for \"%s\": Model group particle was null or wasn't TERM_MODELGROUP!", compInfo.Name.c_str());
+            LOG_ERROR("Failed to parse component definition for \"%s\": Model group particle was null or wasn't TERM_MODELGROUP!", compInfo.Name.c_str());
             continue;
         }
         auto modelGroup = modelGroupParticle->getModelGroupTerm();
@@ -113,7 +114,7 @@ void EntityFilePreprocessor::parseComponentInfo()
             std::string baseType = XS::ToString(elementDeclaration->getTypeDefinition()->getBaseType()->getName());
 
             std::string effectiveType = type;
-            size_t stride = EntityFile::GetTypeStride(type);
+            unsigned int stride = EntityFile::GetTypeStride(type);
             if (stride == 0) {
                 stride = EntityFile::GetTypeStride(baseType);
                 if (stride == 0) {

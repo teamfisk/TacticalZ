@@ -20,7 +20,7 @@ void EntityFile::Parse(const EntityFileHandler* handler) const
 {
     using namespace xercesc;
 
-    EntityFileSAXHandler saxHandler(handler, nullptr);
+    EntityFileSAXHandler saxHandler(handler, m_SAX2XMLReader);
     setReaderFeatures(m_SAX2XMLReader);
     m_SAX2XMLReader->setContentHandler(&saxHandler);
     m_SAX2XMLReader->setErrorHandler(&saxHandler);
@@ -37,11 +37,12 @@ void EntityFile::setReaderFeatures(xercesc::SAX2XMLReader* reader)
     reader->setFeature(XMLUni::fgSAX2CoreNameSpaces, true);
     reader->setFeature(XMLUni::fgXercesSchema, true);
     reader->setFeature(XMLUni::fgXercesSchemaFullChecking, true);
+    reader->setFeature(XMLUni::fgXercesCalculateSrcOfs, true);
 }
 
-std::size_t EntityFile::GetTypeStride(std::string typeName)
+unsigned int EntityFile::GetTypeStride(std::string typeName)
 {
-    std::map<std::string, size_t> typeStrides{
+    std::map<std::string, unsigned int> typeStrides{
         { "bool", sizeof(bool) },
         { "int", sizeof(int) },
         { "float", sizeof(float) },
@@ -111,8 +112,9 @@ void EntityFile::WriteValueData(char* outData, const ComponentInfo::Field_t& fie
     } catch (const boost::bad_lexical_cast&) { }
 }
 
-EntityFileSAXHandler::EntityFileSAXHandler(const EntityFileHandler* handler, xercesc::SAX2XMLReader* reader) : m_Handler(handler)
-, m_Reader(reader)
+EntityFileSAXHandler::EntityFileSAXHandler(const EntityFileHandler* handler, xercesc::SAX2XMLReader* reader) 
+    : m_Handler(handler)
+    , m_Reader(reader)
 {
     // 0 is imaginary base parent
     m_EntityStack.push(0);
@@ -188,21 +190,29 @@ void EntityFileSAXHandler::characters(const XMLCh* const chars, const XMLSize_t 
 
 void EntityFileSAXHandler::fatalError(const xercesc::SAXParseException& e)
 {
-    XS::ToString s(e.getMessage());
-    LOG_ERROR("SAXParseException: %s", ((std::string)s).c_str());
-    //throw e;
+    std::string message = XS::ToString(e.getMessage());
+    std::string systemId = XS::ToString(e.getSystemId());
+    XMLFileLoc line = e.getLineNumber();
+    XMLFileLoc column = e.getColumnNumber();
+    LOG_ERROR("SAXParseException\n\tLocation: %s:%i:%i\n\tFatal Error: %s", systemId.c_str(), line, column, message.c_str());
 }
 
 void EntityFileSAXHandler::error(const xercesc::SAXParseException& e)
 {
-    XS::ToString s(e.getMessage());
-    LOG_ERROR("SAXParseException: %s", ((std::string)s).c_str());
+    std::string message = XS::ToString(e.getMessage());
+    std::string systemId = XS::ToString(e.getSystemId());
+    XMLFileLoc line = e.getLineNumber();
+    XMLFileLoc column = e.getColumnNumber();
+    LOG_ERROR("SAXParseException\n\tLocation: %s:%i:%i\n\tError: %s", systemId.c_str(), line, column, message.c_str());
 }
 
 void EntityFileSAXHandler::warning(const xercesc::SAXParseException& e)
 {
-    XS::ToString s(e.getMessage());
-    LOG_ERROR("SAXParseException: %s", ((std::string)s).c_str());
+    std::string message = XS::ToString(e.getMessage());
+    std::string systemId = XS::ToString(e.getSystemId());
+    XMLFileLoc line = e.getLineNumber();
+    XMLFileLoc column = e.getColumnNumber();
+    LOG_ERROR("SAXParseException\n\tLocation: %s:%i:%i\n\tWarning: %s", systemId.c_str(), line, column, message.c_str());
 }
 
 void EntityFileSAXHandler::onStartEntity(const xercesc::Attributes& attrs)

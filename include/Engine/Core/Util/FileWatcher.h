@@ -42,7 +42,7 @@ enum class FileWatcher::FileEventFlags
 };
 
 inline FileWatcher::FileEventFlags operator|(FileWatcher::FileEventFlags a, FileWatcher::FileEventFlags b) { return static_cast<FileWatcher::FileEventFlags>(static_cast<int>(a) | static_cast<int>(b)); }
-inline bool operator&(FileWatcher::FileEventFlags a, FileWatcher::FileEventFlags b) { return static_cast<int>(a)& static_cast<int>(b); }
+inline bool operator&(FileWatcher::FileEventFlags a, FileWatcher::FileEventFlags b) { return (static_cast<int>(a) & static_cast<int>(b)) != 0; }
 
 class FileWatcher::Worker
 {
@@ -54,7 +54,7 @@ public:
 private:
 	struct FileInfo
 	{
-		int Size;
+		std::size_t Size;
 		std::time_t Timestamp;
 	};
 

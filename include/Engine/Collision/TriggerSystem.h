@@ -8,13 +8,14 @@
 #include "../Core/EventBroker.h"
 #include "../Core/Octree.h"
 #include "ETrigger.h"
+#include "EntityAABB.h"
 
 class AABB;
 
 class TriggerSystem : public PureSystem
 {
 public:
-    TriggerSystem(World* world, EventBroker* eventBroker, Octree<AABB>* octree)
+    TriggerSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree)
         : System(world, eventBroker)
         , PureSystem("Trigger")
         , m_Octree(octree)
@@ -27,9 +28,10 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
-    Octree<AABB>* m_Octree;
-    std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesTouchingTrigger;
-    std::unordered_map<EntityID, std::unordered_set<EntityID>> m_EntitiesCompletelyInTrigger;
+    Octree<EntityAABB>* m_Octree;
+    std::vector<EntityAABB> m_OctreeOut;
+    std::unordered_map<EntityWrapper, std::unordered_set<EntityWrapper>> m_EntitiesTouchingTrigger;
+    std::unordered_map<EntityWrapper, std::unordered_set<EntityWrapper>> m_EntitiesCompletelyInTrigger;
 
     //TODO: Only exists for debug purposes, remove later.
     EventRelay<TriggerSystem, Events::TriggerEnter> m_EEnter;
@@ -40,13 +42,13 @@ private:
     bool OnLeave(const Events::TriggerLeave &event);
 
     //True if leave event was thrown.
-    bool throwLeaveIfWasInTrigger(std::unordered_set<EntityID>& triggerSet, EntityID pId, EntityID tId);
+    bool throwLeaveIfWasInTrigger(std::unordered_set<EntityWrapper>& triggerSet, EntityWrapper colliderENtity, EntityWrapper triggerEntity);
     template<typename Event>
-    void publish(EntityID pId, EntityID tId)
+    void publish(EntityWrapper collider, EntityWrapper trigger)
     {
         Event e;
-        e.Trigger = tId;
-        e.Entity = pId;
+        e.Trigger = trigger;
+        e.Entity = collider;
         m_EventBroker->Publish(e);
     }
 };

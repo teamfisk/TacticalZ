@@ -9,7 +9,9 @@ uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform float FillPercentage;
 layout (binding = 0) uniform sampler2D DiffuseTexture;
-layout (binding = 1) uniform sampler2D GlowMap;
+layout (binding = 1) uniform sampler2D NormalMapTexture;
+layout (binding = 2) uniform sampler2D SpecularMapTexture;
+layout (binding = 3) uniform sampler2D GlowMapTexture;
 
 
 #define TILE_SIZE 16
@@ -49,6 +51,8 @@ layout (std430, binding = 4) buffer LightIndexBuffer
 in VertexData{
 	vec3 Position;
 	vec3 Normal;
+	vec3 Tangent;
+	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 }Input;
@@ -102,13 +106,21 @@ LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensi
 	return result;
 }
 
+vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textureCoordinate, sampler2D normalMap)
+{
+	mat3 TBN = mat3(tangent, bitangent, normal);
+	vec3 NormalMap = texture(normalMap, textureCoordinate).xyz * 2.0 - vec3(1.0);
+	return vec4(TBN * normalize(NormalMap), 0.0);
+}
 
 void main()
 {
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate);
-	vec4 glowTexel = texture2D(GlowMap, Input.TextureCoordinate);
+	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate);
+	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
-	vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
+	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, NormalMapTexture);
+	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position); 
 
 	vec2 tilePos;
@@ -139,7 +151,7 @@ void main()
 	}
 
 	
-	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + totalLighting.Specular) * diffuseTexel * Color;
+	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
@@ -147,25 +159,10 @@ void main()
 	if(pos <= FillPercentage) {
 		color_result += FillColor;
 	}
-	//bloomColor = vec4(0.3, 0.8, 0.6, 1.0);
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
-	//These if statements should be removed if they are slow.
 	color_result += glowTexel;
 
-
-	
-
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
-	/*
-	if(color_result.x > 1 || color_result.y > 1 || color_result.z > 1) {
-		bloomColor = vec4(color_result.xyz, 1.0);
-	} else {
-		bloomColor = vec4(0.0, 0.0, 0.0, 1.0);
-	} */
-
-
-	
-
 
 	//Tiled Debug Code
 	/*
