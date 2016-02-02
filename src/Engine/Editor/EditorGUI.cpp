@@ -157,7 +157,7 @@ void EditorGUI::drawEntitiesRecursive(World* world, EntityID parent)
     auto entityChildren = world->GetEntityChildren();
     auto range = entityChildren.equal_range(parent);
     for (auto it = range.first; it != range.second; it++) {
-        if (EditorGUI::drawEntityNode(EntityWrapper(world, it->second))) {
+        if (drawEntityNode(EntityWrapper(world, it->second))) {
             drawEntitiesRecursive(world, it->second);
             ImGui::TreePop();
         }
@@ -217,6 +217,7 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
         ImGui::EndPopup();
     }
 
+    ImGui::PushID(("EntityNode" + std::to_string(entity.ID)).c_str());
     ImGui::SetNextTreeNodeOpened(true, ImGuiSetCond_Once);
     if (ImGui::TreeNode(formatEntityName(entity).c_str())) {
         // Handle drop events for reparenting
@@ -224,8 +225,10 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
             entityChangeParent(m_CurrentlyDragging, entity);
             m_CurrentlyDragging = EntityWrapper::Invalid;
         }
+        ImGui::PopID();
         return true;
     } else {
+        ImGui::PopID();
         return false;
     }
 }
