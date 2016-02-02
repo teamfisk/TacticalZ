@@ -40,7 +40,14 @@ void RawModelCustom::ReadMeshFile(std::string filePath)
 void RawModelCustom::ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
-    m_Vertices.resize(*(unsigned int*)(fileData + offset));
+	isSkined = *(unsigned int*)(fileData + offset);
+	offset += sizeof(bool);
+	if (isSkined) {
+		m_SkinedVertices.resize(*(unsigned int*)(fileData + offset));
+	}
+	else {
+		m_Vertices.resize(*(unsigned int*)(fileData + offset));
+	}
     offset += sizeof(unsigned int);
     m_Indices.resize(*(unsigned int*)(fileData + offset));
     offset += sizeof(unsigned int);
@@ -57,12 +64,19 @@ void RawModelCustom::ReadMesh(unsigned int& offset, char* fileData, unsigned int
 void RawModelCustom::ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
-    if (offset +  m_Vertices.size() * sizeof(Vertex) > fileByteSize) {
-        throw Resource::FailedLoadingException("Reading vertices failed");
-    }
-
-    memcpy(&m_Vertices[0], fileData + offset, m_Vertices.size() * sizeof(Vertex));
-    offset += m_Vertices.size() * sizeof(Vertex);
+	if (isSkined) {
+		if (offset + m_SkinedVertices.size() * sizeof(SkinedVertex) > fileByteSize) {
+			throw Resource::FailedLoadingException("Reading skined vertices failed");
+		}
+		memcpy(&m_SkinedVertices[0], fileData + offset, m_Vertices.size() * sizeof(SkinedVertex));
+		offset += m_SkinedVertices.size() * sizeof(SkinedVertex);
+	} else {
+		if (offset + m_Vertices.size() * sizeof(Vertex) > fileByteSize) {
+			throw Resource::FailedLoadingException("Reading vertices failed");
+		}
+		memcpy(&m_Vertices[0], fileData + offset, m_Vertices.size() * sizeof(Vertex));
+		offset += m_Vertices.size() * sizeof(Vertex);
+	}
 #else
 #endif
 }
