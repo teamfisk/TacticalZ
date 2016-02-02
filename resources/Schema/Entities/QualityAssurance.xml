@@ -40,7 +40,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="6826.94531" Z="0"/>
+              <Orientation X="0" Y="7246.41113" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -105,7 +105,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.16300011" Y="14844.2129" Z="0"/>
+          <Orientation X="4.16300011" Y="15263.3721" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -122,7 +122,7 @@
           <Components>
             <c:Animation>
               <Name>Run</Name>
-              <Time>0.70027951332552352</Time>
+              <Time>0.46573581743625159</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -138,7 +138,7 @@
           <Components>
             <c:Animation>
               <Name>Walk</Name>
-              <Time>0.86755896742603245</Time>
+              <Time>0.63301527153676052</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -188,7 +188,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1749.85217" Z="0"/>
+                  <Orientation X="0" Y="1959.99243" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -196,7 +196,7 @@
                   <Components>
                     <c:Animation>
                       <Name>Run</Name>
-                      <Time>0.43908963041676596</Time>
+                      <Time>0.20454593452749403</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Model>
@@ -237,7 +237,7 @@
               <Axis X="1" Y="1" Z="1"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="13458.8584" Y="13458.8584" Z="13458.8584"/>
+              <Orientation X="13878.0176" Y="13878.0176" Z="13878.0176"/>
             </c:Transform>
           </Components>
           <Children>
@@ -301,7 +301,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="13255.8916" Z="0"/>
+              <Orientation X="0" Y="13675.0508" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -333,7 +333,7 @@
                       <Axis X="0.699999988" Y="1" Z="0.300000012"/>
                     </c:RaptorCopter>
                     <c:Transform>
-                      <Orientation X="9809.55469" Y="13980.3506" Z="4191.5957"/>
+                      <Orientation X="10105.4023" Y="14399.5098" Z="4315.40723"/>
                     </c:Transform>
                   </Components>
                   <Children>
@@ -683,7 +683,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="46.7168274" Z="0"/>
+                  <Orientation X="0" Y="257.097443" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -730,7 +730,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="46.7168274" Z="0"/>
+                  <Orientation X="0" Y="257.097443" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -790,7 +790,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="46.7168274" Z="0"/>
+                  <Orientation X="0" Y="257.097443" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -837,7 +837,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="46.7168274" Z="0"/>
+                  <Orientation X="0" Y="257.097443" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -883,7 +883,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="46.7168274" Z="0"/>
+                  <Orientation X="0" Y="257.097443" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -930,7 +930,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="46.7168274" Z="0"/>
+                  <Orientation X="0" Y="257.097443" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -977,7 +977,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="46.7168274" Z="0"/>
+                  <Orientation X="0" Y="257.097443" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1304,7 +1304,7 @@
               <Resource>Models/Core/UnitCube.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="6.80000019" Y="4.60000038" Z="23.9000015"/>
+              <Position X="6.80000019" Y="4.60000038" Z="23.7000008"/>
               <Scale X="51.4000015" Y="12.500001" Z="1"/>
             </c:Transform>
           </Components>
@@ -1332,7 +1332,7 @@
               <Resource>Models/Core/UnitCube.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="-18.4000015" Y="4.5999999" Z="0"/>
+              <Position X="-17.8151627" Y="4.5999999" Z="0.000119187171"/>
               <Scale X="1" Y="12.5" Z="47.5000038"/>
             </c:Transform>
           </Components>
@@ -1374,7 +1374,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="580.356079" Z="0"/>
+                  <Orientation X="0" Y="790.789185" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1383,7 +1383,7 @@
                     <c:ExplosionEffect>
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                      <TimeSinceDeath>2.6005657651057277</TimeSinceDeath>
+                      <TimeSinceDeath>0.016748705294958199</TimeSinceDeath>
                       <ExplosionDuration>3.7999999523162842</ExplosionDuration>
                       <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
                       <Randomness>true</Randomness>
@@ -1430,7 +1430,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="580.356079" Z="0"/>
+                  <Orientation X="0" Y="790.789185" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1439,7 +1439,7 @@
                     <c:ExplosionEffect>
                       <Velocity X="0.5" Y="1" Z="0"/>
                       <ExplosionOrigin X="0" Y="0.900000036" Z="0"/>
-                      <TimeSinceDeath>1.1504741652238408</TimeSinceDeath>
+                      <TimeSinceDeath>0.96672645330102114</TimeSinceDeath>
                     </c:ExplosionEffect>
                     <c:Model>
                       <Resource>Models/Assault.mesh</Resource>
@@ -1482,7 +1482,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="580.356079" Z="0"/>
+                  <Orientation X="0" Y="790.789185" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1490,14 +1490,14 @@
                   <Components>
                     <c:Animation>
                       <Name>Walk</Name>
-                      <Time>0.64857562577674344</Time>
+                      <Time>0.41403192988747151</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:ExplosionEffect>
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.300000012" Y="2" Z="0"/>
                       <ExplosionOrigin X="0" Y="1.30000007" Z="-0.200000003"/>
-                      <TimeSinceDeath>0.43378409460495959</TimeSinceDeath>
+                      <TimeSinceDeath>0.51665750859842774</TimeSinceDeath>
                       <EndColor A="0" B="0.333333343" G="0.933333337" R="3.92156863"/>
                       <Randomness>true</Randomness>
                     </c:ExplosionEffect>
