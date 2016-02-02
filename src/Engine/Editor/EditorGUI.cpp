@@ -69,7 +69,7 @@ void EditorGUI::drawTools()
     } else if (m_CurrentWidgetSpace == WidgetSpace::Local) {
         spaceTexture = tryLoadTexture("Textures/Icons/Local.png");
     }
-    if (ImGui::ImageButton((void*)spaceTexture, ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton(reinterpret_cast<void*>(spaceTexture), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1))) {
         toggleWidgetSpace();
     }
     if (ImGui::IsItemHovered()) {
@@ -85,14 +85,14 @@ void EditorGUI::drawTools()
 
     // Play button
     ImGui::SameLine();
-    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Play.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton(reinterpret_cast<void*>(tryLoadTexture("Textures/Icons/Play.png")), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Resume e;
         e.World = m_World;
         m_EventBroker->Publish(e);
     }
     // Pause button
     ImGui::SameLine();
-    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Pause.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton(reinterpret_cast<void*>(tryLoadTexture("Textures/Icons/Pause.png")), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Pause e;
         e.World = m_World;
         m_EventBroker->Publish(e);
@@ -262,7 +262,7 @@ void EditorGUI::drawComponents(EntityWrapper entity)
     // Draw combo box
     ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 10.f);
     int selectedItem = -1;
-    if (ImGui::Combo("", &selectedItem, componentTypes.data(), componentTypes.size(), componentTypes.size())) {
+    if (ImGui::Combo("", &selectedItem, componentTypes.data(), static_cast<int>(componentTypes.size()), static_cast<int>(componentTypes.size()))) {
         if (selectedItem != -1) {
             if (m_OnComponentAttach != nullptr) {
                 std::string chosenComponentType(componentTypes.at(selectedItem));
@@ -565,7 +565,7 @@ void EditorGUI::createWidgetToolButton(WidgetMode mode)
         break;
     }
     if (ImGui::ImageButton(
-            (void*)texture, 
+            reinterpret_cast<void*>(texture),
             ImVec2(24, 24), 
             ImVec2(0, 1), 
             ImVec2(1, 0), 
