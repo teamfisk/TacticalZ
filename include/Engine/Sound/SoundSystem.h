@@ -2,6 +2,7 @@
 #define SoundSystem_h__
 
 #include <unordered_map>
+#include <random>
 
 #include "glm/common.hpp"
 #include "glm/gtx/rotate_vector.hpp" // Calculate Up vector
@@ -27,6 +28,7 @@
 #include "Core/EPlayerDamage.h"
 #include "Core/EPlayerDeath.h"
 #include "Core/EPlayerHealthPickup.h"
+#include "Core/EComponentAttached.h"
 
 enum class SoundType {
     SFX,
@@ -70,7 +72,7 @@ private:
     Source* createSource(std::string filePath);
     ALenum getSourceState(ALuint source);
     void setGain(Source* source, float gain);
-    void setSoundProperties(ALuint source, ComponentWrapper* soundComponent);
+    void setSoundProperties(Source* source, ComponentWrapper* soundComponent);
 
     // Specific logic
     void playSound(Source* source);
@@ -91,11 +93,12 @@ private:
     float m_BGMVolumeChannel = 1.f;
     float m_SFXVolumeChannel = 1.f;
     bool m_EditorEnabled = false;
-    const double m_PlayerFootstepInterval = 0.5;
+    const double m_PlayerFootstepInterval = 1.0;
     double m_TimeSinceLastFootstep = 0;
     // TEMP
     EntityID m_LocalPlayer = EntityID_Invalid;
     bool m_LeftFoot = false;
+    std::default_random_engine generator;
 
     // Events
     EventRelay<SoundSystem, Events::PlaySoundOnEntity> m_EPlaySoundOnEntity;
@@ -129,6 +132,8 @@ private:
     bool OnPlayerDeath(const Events::PlayerDeath &e);
     EventRelay<SoundSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
     bool OnPlayerHealthPickup(const Events::PlayerHealthPickup &e);
+    EventRelay<SoundSystem, Events::ComponentAttached> m_EComponentAttached;
+    bool OnComponentAttached(const Events::ComponentAttached &e);
 
 
 

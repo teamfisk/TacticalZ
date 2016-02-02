@@ -154,12 +154,13 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
+    m_SoundSystem->Update(dt);
+
     // Iterate through systems and update world!
     m_EventBroker->Process<SystemPipeline>();
     m_SystemPipeline->Update(dt);
     debugTick(dt);
     m_Renderer->Update(dt);
-    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
     m_RenderFrame->Clear();
