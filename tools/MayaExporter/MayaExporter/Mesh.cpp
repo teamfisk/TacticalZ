@@ -108,7 +108,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         MFnDependencyNode thisNode(node);
         MPlugArray connections;
         thisNode.findPlug("inMesh").connectedTo(connections, true, true);
-        bool hasSkin = false;
         MPlug weightList, weights;
         MObject weightListObject;
         for (unsigned int i = 0; i < connections.length(); i++) {
@@ -117,7 +116,7 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                 weightList = skinCluster.findPlug("weightList", &status);
                 weightListObject = weightList.attribute();
                 weights = skinCluster.findPlug("weights");
-                hasSkin = true;
+				newMesh.hasSkin = true;
                 break;
             }
         }
@@ -301,7 +300,8 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         thisVertex.Uv[1] = UV[1];
 
                         
-                        if (hasSkin) {
+                        if (newMesh.hasSkin) {
+							thisVertex.useWeights = true;
                             float totalWeight = 0.0f;
                             unsigned int totalBones = 0;
                             MIntArray jointIDs /* ??? */;
@@ -319,7 +319,9 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                             for (unsigned int i = 0; i < 4; i++) {
                                 thisVertex.BoneWeights[i] = thisVertex.BoneWeights[i] / totalWeight;
                             }
-                        }
+						} else {
+							thisVertex.useWeights = false;
+						}
 
                         //float totalWeight = thisVertex.BoneWeights[0] + thisVertex.BoneWeights[1] + thisVertex.BoneWeights[2] + thisVertex.BoneWeights[3];
                         //if (totalWeight > 0.0001f) {

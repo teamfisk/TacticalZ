@@ -186,29 +186,29 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 
 					/*MGlobal::displayInfo(MString() + "start keyfram index: " + startKeyFrameIndex + ". End keyfram index: " + endKeyFrameIndex + ".");*/
 
-					if (startFrame  <= jointAnim.time(endKeyFrameIndex).value() && jointAnim.time(endKeyFrameIndex).value() <= endFrame || endKeyFrameIndex - startKeyFrameIndex > 0) {
-								animatedJoints.push_back(jointIt.item());
-								i = 9;
-								break;
-							}
+				//			if (startFrame  <= jointAnim.time(endKeyFrameIndex).value() && jointAnim.time(endKeyFrameIndex).value() <= endFrame || endKeyFrameIndex - startKeyFrameIndex > 0) {
+				//						animatedJoints.push_back(jointIt.item());
+				//						i = 9;
+				//						break;
+				//					}
 
-							MFnTransform MayaJoint(jointIt.item());
+				//					MFnTransform MayaJoint(jointIt.item());
 
-							MPlug BindPose = MayaJoint.findPlug("bindPose");
-							MDataHandle DataHandle;
-							BindPose.getValue(DataHandle);
-							MFnMatrixData MartixFn(DataHandle.data());
-							MMatrix BindPoseMatrix = MartixFn.matrix();
+				//					MPlug BindPose = MayaJoint.findPlug("bindPose");
+				//					MDataHandle DataHandle;
+				//					BindPose.getValue(DataHandle);
+				//					MFnMatrixData MartixFn(DataHandle.data());
+				//					MMatrix BindPoseMatrix = MartixFn.matrix();
 
-							if (!BindPoseMatrix.isEquivalent(MayaJoint.transformationMatrix()))
-							{
-								MGlobal::displayError(MString() + animationName.c_str() + " is using " + MayaJoint.name() + " that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
-							}
-						}
-					}
-				}*/
+				//					if (!BindPoseMatrix.isEquivalent(MayaJoint.transformationMatrix()))
+				//					{
+				//						MGlobal::displayError(MString() + animationName.c_str() + " is using " + MayaJoint.name() + " that is not in bind pose nor is it key framed in the animation, the exported animation will NOT correspond to the animation in Maya");
+				//					}
+				//				}
+				//			}
+				//		}
 
-		} // end of int i loop
+				//} // end of int i loop
 				jointIt.next();
 		}
 		jointIt.reset();

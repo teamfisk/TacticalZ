@@ -11,6 +11,7 @@
 class VertexLayout : public OutputData
 {
 public:
+	bool useWeights = true;
     float Pos[3]{ 0 };
 	float Normal[3]{ 0 };
 	float Tangent[3]{ 0 };
@@ -26,8 +27,10 @@ public:
         out.write((char*)&Tangent, sizeof(float) * 3);
         out.write((char*)&BiNormal, sizeof(float) * 3);
         out.write((char*)&Uv, sizeof(float) * 2);
-        out.write((char*)&BoneIndices, sizeof(float) * 4);
-        out.write((char*)&BoneWeights, sizeof(float) * 4);
+		if (useWeights) {
+			out.write((char*)&BoneIndices, sizeof(float) * 4);
+			out.write((char*)&BoneWeights, sizeof(float) * 4);
+		}
     }
 
     virtual void WriteASCII(std::ostream& out) const
@@ -37,8 +40,10 @@ public:
         out <<  Tangent[0] << " " << Tangent[1]  << " " << Tangent[2] << endl;
         out <<  BiNormal[0] << " " << BiNormal[1]  << " " << BiNormal[2] << endl;
         out <<  Uv[0] << " " << Uv[1]  << endl;
-        out <<  BoneIndices[0] << " " << BoneIndices[1]  << " " << BoneIndices[2] << " " << BoneIndices[3] << endl;
-        out <<  BoneWeights[0] << " " << BoneWeights[1]  << " " << BoneWeights[2] << " " << BoneWeights[3] << endl;
+		if (useWeights) {
+			out << BoneIndices[0] << " " << BoneIndices[1] << " " << BoneIndices[2] << " " << BoneIndices[3] << endl;
+			out << BoneWeights[0] << " " << BoneWeights[1] << " " << BoneWeights[2] << " " << BoneWeights[3] << endl;
+		}
 
     }
     bool operator==(const VertexLayout& right)
@@ -57,6 +62,7 @@ public:
 
 class Mesh : public OutputData {
 public:
+	bool hasSkin = false;
     unsigned int NumVertices;
     unsigned int NumIndices;
     std::vector<VertexLayout> Vertices;
@@ -64,6 +70,7 @@ public:
 
     virtual void WriteBinary(std::ostream& out)
     {
+		out.write((char*)&hasSkin, sizeof(bool));
         out.write((char*)&NumVertices, sizeof(int));
         out.write((char*)&NumIndices, sizeof(int));
         for (auto aVertex : Vertices) {
@@ -79,6 +86,11 @@ public:
     virtual void WriteASCII(std::ostream& out) const
     {
         out << "New Mesh _ not in binary" << endl;
+		out << "hasSkin: ";
+		if(hasSkin)
+			out << "true" << endl;
+		else
+			out << "false" << endl;
         out << "Number of vertices: " << NumVertices << endl;
         out << "number of indices: " << NumIndices << endl;
         int vertexNumber = 0;
