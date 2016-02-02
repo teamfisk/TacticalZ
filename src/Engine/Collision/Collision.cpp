@@ -429,19 +429,14 @@ bool AABBvsTriangle(const AABB& box,
     {
         //If we get here, the resolution is along one coordinate axis.
         //set velocity to 0 in that dimension.
-        //projNorm = glm::vec3(0.f);
-        //projNorm[resolveCase] = 1;
-        //ImGui::Text(("Axis " + std::string(projNorm.y > SlopeConstant(45.0f) ? "Ground" : "Slope") + "collision proj=(%f,%f,%f)").c_str(), projNorm.x, projNorm.y, projNorm.z);
         boxVelocity[resolveCase] = 0.f;
         return true;
     }
     case Line:
         projNorm = glm::normalize(outVector);
-        //ImGui::Text(("Line " + std::string(projNorm.y > SlopeConstant(45.0f) ? "Ground" : "Slope") + "collision proj=(%f,%f,%f)").c_str(), projNorm.x, projNorm.y, projNorm.z);
         break;
     case Corner:
         projNorm = triNormal;
-        //ImGui::Text(("Corner " + std::string(projNorm.y > SlopeConstant(45.0f) ? "Ground" : "Slope") + "collision proj=(%f,%f,%f)").c_str(), projNorm.x, projNorm.y, projNorm.z);
         break;
     default:
         break;
@@ -466,19 +461,6 @@ bool AABBvsTriangle(const AABB& box,
         //Project the velocity onto the normal of the hit line/face.
         //w = v - <v,n>*n, |n|==1.
         boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
-
-        //Ensure that the player will be pushed in the xz-plane.
-        //glm::vec3 moveDir(outVector);
-        //moveDir.y = 0;
-        //if (vectorHasLength(moveDir)) {
-        //    moveDir = glm::normalize(moveDir);
-        //    float len = glm::length(outVector);
-        //    float dotMoveOut = moveDir.x * outVector.x + moveDir.z * outVector.z;
-        //    float ang = glm::half_pi<float>() - glm::acos(dotMoveOut / len);
-        //    if (len > 0.0000001f && ang > 0.0000001f) {
-        //        outVector = (len / glm::sin(ang)) * moveDir;
-        //    }
-        //}
     }
     return true;
 }
