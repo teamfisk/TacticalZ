@@ -16,8 +16,9 @@ public:
 	~Model();
     const std::vector<RawModel::MaterialGroup>& MaterialGroups() const { return m_RawModel->MaterialGroups; }
     const glm::mat4& Matrix() const { return m_RawModel->m_Matrix; }
-    const std::vector<RawModel::Vertex>& Vertices() const { return m_RawModel->m_Vertices; }
-
+    const RawModel::Vertex* Vertices() const { return m_RawModel->Vertices(); }
+	unsigned int NumberOfVertices() const { return m_RawModel->NumVertices(); }
+	bool isSkined() const { return m_RawModel->isSkined; }
 	GLuint VAO;
 	GLuint ElementBuffer;
     RawModel* m_RawModel;

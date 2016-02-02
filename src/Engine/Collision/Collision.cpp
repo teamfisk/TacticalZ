@@ -269,7 +269,8 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
 
     glm::vec3 mini = glm::vec3(INFINITY, INFINITY, INFINITY);
     glm::vec3 maxi = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
-    for (const auto& v : modelRes->Vertices()) {
+	for (unsigned int i = 0; i < modelRes->NumberOfVertices(); i++) {
+		const auto& v = modelRes->Vertices()[i];
         const auto& wPos = modelMatrix * glm::vec4(v.Position.x, v.Position.y, v.Position.z, 1);
         maxi.x = std::max(wPos.x, maxi.x);
         maxi.y = std::max(wPos.y, maxi.y);
