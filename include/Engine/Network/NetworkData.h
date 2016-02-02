@@ -3,16 +3,16 @@
 #include <vector>
 
 struct NetworkData {
-    unsigned int TotalTime = 0;
-    unsigned int TotalDataReceived = 0;
-    unsigned int TotalDataSent = 0;
-    unsigned int AmountOfMessagesReceived = 0;
+    double TotalTime = 0;
+    size_t TotalDataReceived = 0;
+    size_t TotalDataSent = 0;
+    size_t AmountOfMessagesReceived = 0;
     unsigned int AmountOfMessagesSent = 0;
     // Interval based
-    unsigned int DataReceivedThisInterval = 0;
-    unsigned int DataSentThisInterval = 0;
+    size_t DataReceivedThisInterval = 0;
+    size_t DataSentThisInterval = 0;
     // pair: first=reveived, second=send 
-    std::vector<std::pair<unsigned int, unsigned int>> BandwidthBytes;
+    std::vector<std::pair<size_t, size_t>> BandwidthBytes;
 };
 
 #endif
