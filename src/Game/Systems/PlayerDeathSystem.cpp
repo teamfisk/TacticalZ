@@ -3,7 +3,38 @@
 PlayerDeathSystem::PlayerDeathSystem(World* m_World, EventBroker* eventBroker)
     : System(m_World, eventBroker)
 {
+    EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerDeathSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerDeathSystem::OnPlayerDeath);
+}
+
+bool PlayerDeathSystem::OnInputCommand(const Events::InputCommand& e)
+{
+    //testing: Jump > playerdamage
+    if (e.Command != "Jump") {
+        return false;
+
+    }
+
+    // 0 = released
+    if (e.Value != 0) {
+        return false;
+
+    }
+
+    auto players = m_World->GetComponents("Player");
+
+    for (auto& cPlayer : *players) {
+        EntityWrapper player(m_World, cPlayer.EntityID);
+        Events::PlayerDamage e;
+        e.Player = player;
+        e.Damage = 50;
+        m_EventBroker->Publish(e);
+
+    }
+
+
+
+    return true;
 }
 
 void PlayerDeathSystem::Update(double dt)
@@ -12,60 +43,35 @@ void PlayerDeathSystem::Update(double dt)
 
 bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
-    //current components for player that we need
-    auto playerModelEWrapper = e.Player.FirstChildByName("PlayerModel");
-    auto playerEntityModel = playerModelEWrapper["Model"];
-    auto playerEntityAnimation = playerModelEWrapper["Animation"];
-    auto playerEntityTransform = playerModelEWrapper["Transform"];
+    //LOAD THE XML
+    auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
 
-    //create new entity with those components
-    //graphics bug: model must have an animationcomponent to be able to display it
-    auto newEntity = m_World->CreateEntity();
-    ComponentWrapper& newEntityModel = m_World->AttachComponent(newEntity, "Model");
-    ComponentWrapper& newAnimationModel = m_World->AttachComponent(newEntity, "Animation");
-    ComponentWrapper& newTransformModel = m_World->AttachComponent(newEntity, "Transform");
-    playerEntityModel.Copy(newEntityModel);
-    playerEntityAnimation.Copy(newAnimationModel);
-    playerEntityTransform.Copy(newTransformModel);
+    EntityFileParser parser(deathEffect);
+    EntityID deathEffectID = parser.MergeEntities(m_World);
+    EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
+    
+    //current components for player that we need
+    auto playerModelEW = e.Player.FirstChildByName("PlayerModel");
+    auto playerEntityModel = playerModelEW["Model"];
+    auto playerEntityTransform = playerModelEW["Transform"];
+
+    //copy the data from player to new playermodel
+    playerEntityModel.Copy(deathEffectEW["Model"]);
+    playerEntityTransform.Copy(deathEffectEW["Transform"]);
 
     //change the animation speed and make sure the explosioneffect spawns at the players position
-    newAnimationModel["Speed"] = (double)0.0;
-    newEntityModel["Color"] = glm::vec4(1, 0, 0, 1);
-    newTransformModel["Position"] = (glm::vec3)e.Player["Transform"]["Position"];
-    newTransformModel["Scale"] = glm::vec3(1, 1, 1);
-
-    //add the explosion with a lifetime
-    ComponentWrapper& explosionEffect = m_World->AttachComponent(newEntity, "ExplosionEffect");
-    ComponentWrapper& lifeTime = m_World->AttachComponent(newEntity, "Lifetime");
-    (glm::vec3)explosionEffect["ExplosionOrigin"] = (glm::vec3)e.Player["Transform"]["Position"];
-    (double)explosionEffect["TimeSinceDeath"] = 0.0;
-    (double)explosionEffect["ExplosionDuration"] = 8.0;
-    (glm::vec4)explosionEffect["EndColor"] = glm::vec4(0, 0, 0, 1);
-    (bool)explosionEffect["Randomness"] = false;
-    (double)explosionEffect["RandomnessScalar"] = 1.0;
-    (glm::vec2)explosionEffect["Velocity"] = glm::vec2(0.1f, 0.1f);
-    (bool)explosionEffect["ColorByDistance"] = false;
-    (bool)explosionEffect["ExponentialAccelaration"] = false;
-    lifeTime["Lifetime"] = (double)8.0;
-
-    //create a camera (with lifetime) slightly above the player and look down at the player
-    auto cameraEntity = m_World->CreateEntity();
-    ComponentWrapper& thirdPersonCameraLifeTime = m_World->AttachComponent(cameraEntity, "Lifetime");
-    ComponentWrapper& thirdPersonCamera = m_World->AttachComponent(cameraEntity, "Camera");
-    ComponentWrapper& thirdPersonCameraTransform = m_World->AttachComponent(cameraEntity, "Transform");
-    auto pos = (glm::vec3)e.Player["Transform"]["Position"];
-    pos.y += 10.0f;
-    thirdPersonCameraTransform["Position"] = (glm::vec3)pos;
     //http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
-    thirdPersonCameraTransform["Orientation"] = glm::vec3(-0.7f, 1.46f, 0.8f);
-    thirdPersonCamera["FOV"] = 120.0;
-    thirdPersonCamera["NearClip"] = 0.1;
-    thirdPersonCamera["FarClip"] = 10000.0;
-    thirdPersonCameraLifeTime["Lifetime"] = (double)1.0;
+    auto playerPosition = (glm::vec3)e.Player["Transform"]["Position"];
+    deathEffectEW["Transform"]["Position"] = playerPosition;
+    deathEffectEW["ExplosionEffect"]["ExplosionOrigin"] = playerPosition;
 
-    //set 3rd person camera
+    //camera (with lifetime) slightly above the player and looking down at the player
+    //camera will be positioned just above the player
+    glm::vec3 cameraPosition = glm::vec3(0, 10, 0);
+    auto cam = deathEffectEW.FirstChildByName("Camera");
+    cam["Transform"]["Position"] = cameraPosition;
     Events::SetCamera eSetCamera;
-    eSetCamera.CameraEntity = EntityWrapper(m_World, cameraEntity);
+    eSetCamera.CameraEntity = cam;
     m_EventBroker->Publish(eSetCamera);
 
     //on deathanim done -> del entity

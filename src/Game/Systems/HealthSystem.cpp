@@ -21,7 +21,6 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
     
     if (health <= 0.0) {
         Events::PlayerDeath ePlayerDeath;
-        ePlayerDeath.PlayerID = e.Player.ID;
         ePlayerDeath.Player = e.Player;
         m_EventBroker->Publish(ePlayerDeath);
         //Note: we will delete the entity in PlayerDeathSystem

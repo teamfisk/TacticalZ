@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Explosion" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Animation>
+      <Name>Hold Pos</Name>
+      <Time>0</Time>
+      <Speed>0</Speed>
+    </c:Animation>
+    <c:Lifetime>
+      <Lifetime>8</Lifetime>
+    </c:Lifetime>
+    <c:ExplosionEffect>
+      <TimeSinceDeath>0</TimeSinceDeath>
+      <ExplosionDuration>8</ExplosionDuration>
+      <ExplosionOrigin X="-60.9153252" Y="0.767338753" Z="-76.4729843"/>
+    </c:ExplosionEffect>
+    <c:Model>
+      <Resource>Models/AssaultAnimated.mesh</Resource>
+      <Color A="1" B="0" G="0" R="1"/>
+      <Transparent>true</Transparent>
+    </c:Model>
+    <c:Transform>
+      <Position X="-60.9153252" Y="0.767338753" Z="-76.4729843"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Camera">
+      <Components>
+        <c:Lifetime>
+          <Lifetime>1</Lifetime>
+        </c:Lifetime>
+        <c:Camera>
+          <FOV>120</FOV>
+          <NearClip>0.1</NearClip>
+          <FarClip>10000</FarClip>
+        </c:Camera>
+        <c:Transform>
+          <Position X="-60.9153252" Y="0.767338753" Z="-76.4729843"/>
+          <Orientation X="-0.7" Y="1.46" Z="0.8"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>
