@@ -6,7 +6,7 @@
 
 	<xs:element name="CapturePoint">
 		<xs:annotation>
-			<xs:documentation>A Capture Point. Add a Team Component to specify who currently owns it</xs:documentation>
+			<xs:documentation>A Capture Point. Make sure to update the HomePoint,CapturePointNumber,Team for each</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
