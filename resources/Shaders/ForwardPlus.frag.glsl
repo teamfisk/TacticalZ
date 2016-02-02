@@ -119,6 +119,7 @@ void main()
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, NormalMapTexture);
+	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position); 
 

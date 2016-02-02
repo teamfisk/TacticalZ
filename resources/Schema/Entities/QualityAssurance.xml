@@ -20,12 +20,14 @@
       </Components>
       <Children/>
     </Entity>
-    <Entity name="Listener">
+    <Entity name="SoundTestOrigin">
       <Components>
-        <c:Camera/>
+        <c:Camera>
+          <FOV>90</FOV>
+        </c:Camera>
         <c:Listener/>
         <c:Transform>
-          <Position X="6.86900043" Y="1.30500007" Z="16.8640003"/>
+          <Position X="6.86900043" Y="1.30500007" Z="28.6792946"/>
           <Orientation X="-0.0349078141" Y="0.157154545" Z="-2.60252193e-07"/>
         </c:Transform>
       </Components>
@@ -37,7 +39,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="5432.63721" Z="0"/>
+              <Orientation X="0" Y="5481.87109" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -96,7 +98,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.16300011" Y="13450.792" Z="0"/>
+          <Orientation X="4.16300011" Y="13499.9707" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -113,7 +115,7 @@
           <Components>
             <c:Animation>
               <Name>Run</Name>
-              <Time>0.037659292080723716</Time>
+              <Time>0.40429036323679846</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -129,7 +131,7 @@
           <Components>
             <c:Animation>
               <Name>Walk</Name>
-              <Time>0.20493874618123264</Time>
+              <Time>0.57156981733730738</Time>
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
@@ -179,7 +181,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1051.30505" Z="0"/>
+                  <Orientation X="0" Y="1075.96741" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -187,7 +189,7 @@
                   <Components>
                     <c:Animation>
                       <Name>Run</Name>
-                      <Time>0.77646940917196616</Time>
+                      <Time>0.1431004803280409</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Model>
@@ -208,7 +210,7 @@
     <Entity name="SpheresOrigin">
       <Components>
         <c:Transform>
-          <Position X="6.80000019" Y="4.9000001" Z="-5.9000001"/>
+          <Position X="8.68610287" Y="2.44893074" Z="-22.087244"/>
         </c:Transform>
       </Components>
       <Children>
@@ -228,7 +230,7 @@
               <Axis X="1" Y="1" Z="1"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="12065.4375" Y="12065.4375" Z="12065.4375"/>
+              <Orientation X="12114.6162" Y="12114.6162" Z="12114.6162"/>
             </c:Transform>
           </Components>
           <Children>
@@ -292,7 +294,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="11862.4707" Z="0"/>
+              <Orientation X="0" Y="11911.6494" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -324,7 +326,7 @@
                       <Axis X="0.699999988" Y="1" Z="0.300000012"/>
                     </c:RaptorCopter>
                     <c:Transform>
-                      <Orientation X="8826.16895" Y="12586.9297" Z="3775.76514"/>
+                      <Orientation X="8860.87793" Y="12636.1084" Z="3790.48999"/>
                     </c:Transform>
                   </Components>
                   <Children>
@@ -673,7 +675,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1370.96594" Z="0"/>
+                  <Orientation X="0" Y="1395.6283" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -720,7 +722,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1352.92419" Z="0"/>
+                  <Orientation X="0" Y="1377.58655" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -780,7 +782,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1290.16565" Z="0"/>
+                  <Orientation X="0" Y="1314.828" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -827,7 +829,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1218.74438" Z="0"/>
+                  <Orientation X="0" Y="1243.40674" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -873,7 +875,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1169.32043" Z="0"/>
+                  <Orientation X="0" Y="1193.98279" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -920,7 +922,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1143.34485" Z="0"/>
+                  <Orientation X="0" Y="1168.0072" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -967,7 +969,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1110.25281" Z="0"/>
+                  <Orientation X="0" Y="1134.91516" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -991,7 +993,7 @@
     <Entity name="CapturePointTestOrigin">
       <Components>
         <c:Transform>
-          <Position X="19.7931061" Y="0" Z="-0.429342508"/>
+          <Position X="17.6998138" Y="0" Z="-0.429342508"/>
         </c:Transform>
       </Components>
       <Children>
@@ -1015,7 +1017,7 @@
               <Color A="1" B="0" G="0" R="1"/>
             </c:Model>
             <c:Transform>
-              <Position X="0" Y="0" Z="-7"/>
+              <Position X="0" Y="0" Z="-14"/>
             </c:Transform>
           </Components>
           <Children>
@@ -1102,7 +1104,7 @@
               <Color A="1" B="1" G="0" R="0"/>
             </c:Model>
             <c:Transform>
-              <Position X="0" Y="0" Z="7"/>
+              <Position X="0" Y="0" Z="14"/>
             </c:Transform>
           </Components>
           <Children>
