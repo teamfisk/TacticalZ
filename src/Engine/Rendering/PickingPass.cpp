@@ -77,7 +77,7 @@ void PickingPass::Draw(RenderScene& scene)
                     m_ColorCounter[0] = 0;
                     m_ColorCounter[1] += 1;
                 } else {
-                        m_ColorCounter[0] += 1;
+                    m_ColorCounter[0] += 1;
                 }
             }
 
