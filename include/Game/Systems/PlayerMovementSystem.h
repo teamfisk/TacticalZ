@@ -21,19 +21,4 @@ private:
     EventRelay<PlayerMovementSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
 
-    double m_AssaultDashDoubleTapDeltaTime = 0.0f;
-    double m_AssaultDashCoolDownTimer = 0.0f;
-    double m_AssaultDashCoolDownMaxTimer = 3.0f;
-    ImGuiKey m_AssaultDashDoubleTapLastKey = ImGuiKey_Escape;
-    const float m_AssaultDashDoubleTapSensitivityTimer = 0.25f;
-    enum class AssaultDashDirection {
-        Left,
-        Right,
-        None
-    };
-    AssaultDashDirection m_AssaultDashTapDirection = AssaultDashDirection::None;
-    bool m_AssaultDashDoubleTapped = false;
-    bool m_PlayerIsDashing = false;
-
-    void assaultDashCheck(glm::vec3 controllerMovement, double dt, bool isJumping);
 };

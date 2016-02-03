@@ -25,6 +25,10 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override;
     virtual void Reset();
 
+    void AssaultDashCheck(double dt, bool isJumping);
+    virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
+    virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
+
 protected:
     const int m_PlayerID;
     bool m_MouseLocked = false;
@@ -33,6 +37,23 @@ protected:
     bool m_Jumping = false;
     bool m_DoubleJumping = false;
     bool m_Crouching = false;
+    //assault dash enum
+    enum class AssaultDashDirection {
+        Left,
+        Right,
+        Forward,
+        Backward,
+        None
+    };
+    //assault dash membervariables
+    double m_AssaultDashDoubleTapDeltaTime = 0.0f;
+    double m_AssaultDashCoolDownTimer = 0.0f;
+    double m_AssaultDashCoolDownMaxTimer = 3.0f;
+    AssaultDashDirection m_AssaultDashDoubleTapLastKey = AssaultDashDirection::None;
+    const float m_AssaultDashDoubleTapSensitivityTimer = 0.25f;
+    AssaultDashDirection m_AssaultDashTapDirection = AssaultDashDirection::None;
+    bool m_AssaultDashDoubleTapped = false;
+    bool m_PlayerIsDashing = false;
 
     EventRelay<EventContext, Events::LockMouse> m_ELockMouse;
     bool OnLockMouse(const Events::LockMouse& e);
@@ -127,6 +148,47 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 {
     m_MouseLocked = true;
     return true;
+}
+
+template <typename EventContext>
+void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping) {
+    auto controllerMovement = Movement();
+    m_AssaultDashDoubleTapDeltaTime += dt;
+    m_AssaultDashCoolDownTimer -= dt;
+    //cooldown = m_AssaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)
+    if (m_AssaultDashCoolDownTimer > (m_AssaultDashCoolDownMaxTimer - 0.25f)) {
+        m_PlayerIsDashing = true;
+    } else {
+        m_PlayerIsDashing = false;
+    }
+    //reset the DoubleTapped state in case we recently doubleTapped
+    if (m_AssaultDashDoubleTapped) {
+        m_AssaultDashDoubleTapped = false;
+    }
+    //Assault Dash logic: tap left or right twice within 0.5sec to activate the doubletap-dash
+    if (controllerMovement.x > 0 && controllerMovement.y == 0.f && controllerMovement.z == 0.f) {
+        if (m_AssaultDashDoubleTapLastKey != AssaultDashDirection::Right && m_AssaultDashDoubleTapDeltaTime < m_AssaultDashDoubleTapSensitivityTimer
+            && m_AssaultDashTapDirection == AssaultDashDirection::Right && m_AssaultDashCoolDownTimer <= 0.0f && !isJumping) {
+            m_AssaultDashDoubleTapped = true;
+            m_AssaultDashDoubleTapDeltaTime = 0.f;
+            m_AssaultDashCoolDownTimer = m_AssaultDashCoolDownMaxTimer;
+        }
+        m_AssaultDashDoubleTapLastKey = AssaultDashDirection::Right;
+        m_AssaultDashDoubleTapDeltaTime = 0.f;
+        m_AssaultDashTapDirection = AssaultDashDirection::Right;
+    } else if (controllerMovement.x < 0 && controllerMovement.y == 0.f && controllerMovement.z == 0.f) {
+        if (m_AssaultDashDoubleTapLastKey != AssaultDashDirection::Left && m_AssaultDashDoubleTapDeltaTime < m_AssaultDashDoubleTapSensitivityTimer
+            && m_AssaultDashTapDirection == AssaultDashDirection::Left && m_AssaultDashCoolDownTimer <= 0.0f && !isJumping) {
+            m_AssaultDashDoubleTapped = true;
+            m_AssaultDashDoubleTapDeltaTime = 0.f;
+            m_AssaultDashCoolDownTimer = m_AssaultDashCoolDownMaxTimer;
+        }
+        m_AssaultDashDoubleTapLastKey = AssaultDashDirection::Left;
+        m_AssaultDashDoubleTapDeltaTime = 0.f;
+        m_AssaultDashTapDirection = AssaultDashDirection::Left;
+    } else {
+        m_AssaultDashDoubleTapLastKey = AssaultDashDirection::None;
+    }
 }
 
 #endif
