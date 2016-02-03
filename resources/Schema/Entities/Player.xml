@@ -109,7 +109,7 @@
                   <Randomness>true</Randomness>
                 </c:ExplosionEffect>
                 <c:Model>
-                  <Resource>Models/AssaultWeaponRed.mesh</Resource>
+                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="0.180000007" Y="-0.183000013" Z="0"/>
@@ -153,7 +153,7 @@
         </c:Animation>
         <c:HiddenForLocalPlayer/>
         <c:Model>
-          <Resource>Models/AssaultAnimated.mesh</Resource>
+          <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>
         </c:Model>
         <c:Transform/>
