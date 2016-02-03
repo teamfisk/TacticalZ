@@ -9,6 +9,8 @@
 #include "OpenAL/al.h"
 #include "OpenAL/alc.h"
 
+#include "imgui/imgui.h"
+
 #include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Core/Transform.h" // Absolute transform
@@ -29,6 +31,7 @@
 #include "Core/EPlayerDeath.h"
 #include "Core/EPlayerHealthPickup.h"
 #include "Core/EComponentAttached.h"
+#include "Collision/ETrigger.h"
 
 enum class SoundType {
     SFX,
@@ -90,8 +93,11 @@ private:
     World* m_World = nullptr;
     EventBroker* m_EventBroker = nullptr;
     std::unordered_map<EntityID, Source*> m_Sources;
-    float m_BGMVolumeChannel = 1.f;
-    float m_SFXVolumeChannel = 1.f;
+
+
+
+    float m_BGMVolumeChannel = 1.0f;
+    float m_SFXVolumeChannel = 1.0f;
     bool m_EditorEnabled = false;
     const double m_PlayerFootstepInterval = 1.0;
     double m_TimeSinceLastFootstep = 0;
@@ -117,7 +123,6 @@ private:
     bool OnSetBGMGain(const Events::SetBGMGain &e); // Not tested
     EventRelay<SoundSystem, Events::SetSFXGain> m_ESetSFXGain; 
     bool OnSetSFXGain(const Events::SetSFXGain &e); // Not tested
-
     EventRelay<SoundSystem, Events::Shoot> m_EShoot;
     bool OnShoot(const Events::Shoot &e);
     EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
@@ -134,6 +139,8 @@ private:
     bool OnPlayerHealthPickup(const Events::PlayerHealthPickup &e);
     EventRelay<SoundSystem, Events::ComponentAttached> m_EComponentAttached;
     bool OnComponentAttached(const Events::ComponentAttached &e);
+    EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
+    bool OnTriggerTouch(const Events::TriggerTouch &e);
 
 
 

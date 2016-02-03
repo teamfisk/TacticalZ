@@ -25,6 +25,7 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventBroker, bool editorMode
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &SoundSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
+    EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
 }
 
 SoundSystem::~SoundSystem()
@@ -60,6 +61,10 @@ void SoundSystem::Update(double dt)
     deleteInactiveEmitters(); // can be optimized with "EEntityDeleted"
     updateEmitters(dt);
     updateListener(dt);
+
+    // Editor debug info
+    ImGui::SliderFloat("BGM", &m_BGMVolumeChannel, 0.0f, 1.0f, "%.3f", 1.0f);
+    ImGui::SliderFloat("SFX", &m_SFXVolumeChannel, 0.0f, 1.0f, "%.3f", 1.0f);
 }
 
 void SoundSystem::deleteInactiveEmitters()
@@ -287,11 +292,12 @@ bool SoundSystem::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
-        (bool&)emitter["Loop"] = true;
+        (bool&)emitter["Loop"] = false;
         (std::string&)emitter["FilePath"] = e.FilePath;
         m_World->AttachComponent(emitterChild, "Transform");
         Source* source = createSource(e.FilePath);
         source->Type = SoundType::BGM;
+        setSoundProperties(source, &emitter);
         m_Sources[emitterChild] = source;
         playSound(source);
     }
@@ -334,6 +340,12 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned & e)
         event.EmitterID = child;
         event.FilePath = "Audio/announcer/go.wav";
         m_EventBroker->Publish(event);
+        // TEMP: starts bgm
+        {
+            Events::PlayBackgroundMusic ev;
+            ev.FilePath = "Audio/bgm/ambient.wav";
+            m_EventBroker->Publish(ev);
+        }
     }
     return true;
 }
@@ -384,15 +396,15 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
 bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 {
     //if (e.Player.ID == m_LocalPlayer) {
-        Events::PlaySoundOnEntity ev;
-        EntityID child = m_World->CreateEntity(m_LocalPlayer);
-        m_World->AttachComponent(child, "Transform");
-        m_World->AttachComponent(child, "SoundEmitter");
-        ev.EmitterID = child;
-        std::uniform_int_distribution<int> dist(1, 12);
-        int rand = dist(generator);
-        ev.FilePath = "Audio/hurt/hurt" + std::to_string(rand) + ".wav";
-        m_EventBroker->Publish(ev);
+    Events::PlaySoundOnEntity ev;
+    EntityID child = m_World->CreateEntity(m_LocalPlayer);
+    m_World->AttachComponent(child, "Transform");
+    m_World->AttachComponent(child, "SoundEmitter");
+    ev.EmitterID = child;
+    std::uniform_int_distribution<int> dist(1, 12);
+    int rand = dist(generator);
+    ev.FilePath = "Audio/hurt/hurt" + std::to_string(rand) + ".wav";
+    m_EventBroker->Publish(ev);
     //}
     return false;
 }
@@ -429,6 +441,16 @@ bool SoundSystem::OnComponentAttached(const Events::ComponentAttached & e)
 {
     if (e.Component.Info.Name == "SoundEmitter") {
 
+    }
+    return false;
+}
+
+bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
+{
+    if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
+        Events::PlayBackgroundMusic ev;
+        ev.FilePath = "Audio/bgm/drumstest.wav";
+        m_EventBroker->Publish(ev);
     }
     return false;
 }
