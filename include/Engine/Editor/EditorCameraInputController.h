@@ -55,12 +55,11 @@ public:
             }
         }
 
-        //this is just temp here, the sprint ability. it will have a component check later
-        if (e.Command == "SpecialAbility") {
+        if (e.Command == "Sprint") {
             if (e.Value > 0) {
-                //m_SpeedMultiplier *= 2.f;
+                m_SpeedMultiplier *= 2.f;
             } else {
-                //m_SpeedMultiplier /= 2.f;
+                m_SpeedMultiplier /= 2.f;
             }
         }
 

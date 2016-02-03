@@ -38,24 +38,15 @@ protected:
     bool m_Jumping = false;
     bool m_DoubleJumping = false;
     bool m_Crouching = false;
-    //assault dash enum
-    enum class AssaultDashDirection {
-        Left,
-        Right,
-        Forward,
-        Backward,
-        None
-    };
     //assault dash membervariables
-    double m_AssaultDashDoubleTapDeltaTime = 0.0f;
-    double m_AssaultDashCoolDownTimer = 0.0f;
-    double m_AssaultDashCoolDownMaxTimer = 2.0f;
-    AssaultDashDirection m_AssaultDashDoubleTapLastKey = AssaultDashDirection::None;
+    double m_AssaultDashDoubleTapDeltaTime = 0.0;
+    double m_AssaultDashCoolDownTimer = 0.0;
+    double m_AssaultDashCoolDownMaxTimer = 2.0;
     const float m_AssaultDashDoubleTapSensitivityTimer = 0.25f;
     std::string m_AssaultDashTapDirection = "";
     bool m_AssaultDashDoubleTapped = false;
     bool m_PlayerIsDashing = false;
-    bool m_ShiftDashing = true;
+    bool m_ShiftDashing = false;
     bool m_ValidDoubleTap = false;
 
     //specialabilitys
