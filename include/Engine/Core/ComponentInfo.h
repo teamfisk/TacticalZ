@@ -11,6 +11,7 @@ struct ComponentInfo
 	{
 		std::string Annotation;
 		unsigned int Allocation = 0;
+        bool NetworkReplicated = false;
         std::map<std::string, std::string> FieldAnnotations;
         std::map<std::string, std::map<std::string, EnumType>> FieldEnumDefinitions;
 	};

@@ -4,9 +4,6 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
 	<xs:element name="Transform">
-		<xs:annotation>
-			<xs:documentation>It's a transform thingy!</xs:documentation>
-		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="Position" type="t:Vector" minOccurs="0">
@@ -15,6 +12,7 @@
 				<xs:element name="Orientation" type="t:Vector" minOccurs="0"/>
 				<xs:element name="Scale" type="t:Vector" minOccurs="0"/>
 			</xs:all>
+			<xs:attribute name="replicated" type="xs:boolean" fixed="true"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

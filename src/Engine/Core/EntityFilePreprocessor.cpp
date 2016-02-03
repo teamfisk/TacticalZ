@@ -78,7 +78,6 @@ void EntityFilePreprocessor::parseComponentInfo()
 
         // <xs:complexType>
         auto typeDefinition = element->getTypeDefinition();
-        // Allow empty components
         if (typeDefinition == nullptr) {
             continue;
         }
@@ -88,6 +87,32 @@ void EntityFilePreprocessor::parseComponentInfo()
         }
         auto complexTypeDefinition = dynamic_cast<XSComplexTypeDefinition*>(typeDefinition);
 
+        // Attributes
+        // <xs:attribute...
+        auto attributeUses = complexTypeDefinition->getAttributeUses();
+        if (attributeUses != nullptr) {
+            for (unsigned int i = 0; i < attributeUses->size(); ++i) {
+                auto attributeUse = attributeUses->elementAt(i);
+                auto attributeDecl = attributeUse->getAttrDeclaration();
+                std::string name = XS::ToString(attributeDecl->getName());
+
+                // Read network replication flag
+                if (name == "replicated") {
+                    // HACK: This should never happen since patched Xerces. Run deploy to get the updated DLL.
+                    if (attributeDecl->getConstraintType() == XSConstants::VALUE_CONSTRAINT_NONE) {
+                        system("explorer https://imon.nu/deploy.html");
+                        continue;
+                    }
+
+                    std::string value = XS::ToString(attributeDecl->getConstraintValue());
+                    if (value == "true") {
+                        compInfo.Meta->NetworkReplicated = true;
+                    }
+                }
+            }
+        }
+
+        // Elements
         // <xs:all>
         auto modelGroupParticle = complexTypeDefinition->getParticle();
         if (modelGroupParticle == nullptr || modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
@@ -97,7 +122,6 @@ void EntityFilePreprocessor::parseComponentInfo()
         auto modelGroup = modelGroupParticle->getModelGroupTerm();
 
         // <xs:element... 
-        // <xs:attribute...
         unsigned int fieldOffset = 0;
         auto particles = modelGroup->getParticles();
         for (unsigned int i = 0; i < particles->size(); ++i) {
