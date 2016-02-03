@@ -12,7 +12,7 @@ EditorRenderSystem::EditorRenderSystem(World* m_World, EventBroker* eventBroker,
 
 void EditorRenderSystem::Update(double dt)
 {
-    if (m_CurrentCamera) {
+    if (m_CurrentCamera.Valid()) {
         ComponentWrapper cameraTransform = m_CurrentCamera["Transform"];
         m_EditorCamera->SetPosition(cameraTransform["Position"]);
         m_EditorCamera->SetOrientation(glm::quat((const glm::vec3&)cameraTransform["Orientation"]));
@@ -48,8 +48,12 @@ void EditorRenderSystem::Update(double dt)
             EntityWrapper entity(m_World, cModel.EntityID);
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
-                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World);
-                scene.ForwardJobs.push_back(modelJob);
+                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f);
+                if(cModel["Transparent"]) {
+                    scene.TransparentObjects.push_back(modelJob);
+                } else {
+                    scene.OpaqueObjects.push_back(modelJob);
+                }
             }
         }
     }
@@ -76,9 +80,9 @@ bool EditorRenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
-    m_EditorCamera->SetFOV((double)cCamera["FOV"]);
-    m_EditorCamera->SetNearClip((double)cCamera["NearClip"]);
-    m_EditorCamera->SetFarClip((double)cCamera["FarClip"]);
+    m_EditorCamera->SetFOV(static_cast<float>((double)cCamera["FOV"]));
+    m_EditorCamera->SetNearClip(static_cast<float>((double)cCamera["NearClip"]));
+    m_EditorCamera->SetFarClip(static_cast<float>((double)cCamera["FarClip"]));
     m_EditorCamera->SetPosition(cTransform["Position"]);
     m_EditorCamera->SetOrientation(glm::quat((const glm::vec3&)cTransform["Orientation"]));
     m_CurrentCamera = e.CameraEntity;

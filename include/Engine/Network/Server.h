@@ -34,6 +34,7 @@ private:
 
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
+    // HACK: Fix INPUTSIZE
     char readBuffer[INPUTSIZE] = { 0 };
     int bytesRead = 0;
     // time for previouse message

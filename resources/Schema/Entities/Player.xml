@@ -2,13 +2,15 @@
 <Entity name="Player" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:Health/>
     <c:AABB>
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
     <c:Collidable/>
-    <c:Model/>
-    <c:Physics/>
+    <c:Physics>
+      <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
+    </c:Physics>
     <c:Player>
       <MovementSpeed>5</MovementSpeed>
     </c:Player>
@@ -18,8 +20,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="-0.246963501" Y="0.0265000071" Z="3.01600003"/>
-      <Orientation X="0" Y="2.14675093" Z="0"/>
+      <Position X="8.60201447e-23" Y="0" Z="3.9201616e-23"/>
     </c:Transform>
   </Components>
 
@@ -37,10 +38,9 @@
             <c:Text>
               <Resource>Fonts/DroidSans.ttf,100</Resource>
               <Color A="1" B="0" G="1" R="0"/>
-              <Visible>false</Visible>
             </c:Text>
             <c:Transform>
-              <Position X="0" Y="0.247910097" Z="-0.447844714"/>
+              <Position X="0.100000001" Y="0.248000011" Z="-0.248000011"/>
               <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
               <Orientation X="0" Y="3.14199996" Z="0"/>
             </c:Transform>
@@ -51,6 +51,7 @@
           <Components>
             <c:Model>
               <Resource>Models/Camera.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0.0331346765" Z="-0.0792061687"/>
@@ -58,6 +59,67 @@
             </c:Transform>
           </Components>
           <Children/>
+        </Entity>
+        <Entity name="HUD">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-0.5"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="HealthBar">
+              <Components>
+                <c:Fill>
+                  <Percentage>1</Percentage>
+                  <Color A="0" B="1" G="0" R="0"/>
+                </c:Fill>
+                <c:HealthHUD/>
+                <c:Model>
+                  <Resource>Models/Core/UnitHexagon.mesh</Resource>
+                  <Color A="1" B="0.70588237" G="0.70588237" R="0.70588237"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-0.383000016" Y="-0.185000002" Z="0"/>
+                  <Scale X="0.150000006" Y="0.150000006" Z="0.150000006"/>
+                  <Orientation X="0" Y="0.594000041" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Crosshair">
+              <Components>
+                <c:Model>
+                  <Resource>Models/CrosshairQuad.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.200000003"/>
+                  <Scale X="0.00600000005" Y="1" Z="0.00600000005"/>
+                  <Orientation X="1.57000005" Y="0" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Weapon">
+              <Components>
+                <c:Model>
+                  <Resource>Models/AssaultWeapon.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0.180000007" Y="-0.183000013" Z="0"/>
+                  <Orientation X="0" Y="4.64700031" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="WeaponMuzzle">
+              <Components>
+                <c:Transform>
+                  <Position X="0.215000004" Y="-0.153000012" Z="-0.266000003"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>
@@ -77,13 +139,17 @@
     </Entity>
     <Entity name="PlayerModel">
       <Components>
+        <c:Animation>
+          <Name>Hold Pos</Name>
+          <Time>0.73515426169631848</Time>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:HiddenForLocalPlayer/>
         <c:Model>
-          <Resource>Models/AssaultHeadless.mesh</Resource>
+          <Resource>Models/AssaultAnimated.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>
         </c:Model>
-        <c:Transform>
-          <Orientation X="0" Y="3.14159274" Z="0"/>
-        </c:Transform>
+        <c:Transform/>
       </Components>
       <Children/>
     </Entity>

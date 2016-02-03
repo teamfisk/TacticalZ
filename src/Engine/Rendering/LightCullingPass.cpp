@@ -25,8 +25,8 @@ void LightCullingPass::GenerateNewFrustum(RenderScene& scene)
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glUniformMatrix4fv(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "P"), 1, false, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
-    glDispatchCompute((int)(m_Renderer->Resolution().Width/(TILE_SIZE*TILE_SIZE) + 1), (int)(m_Renderer->Resolution().Height/(TILE_SIZE*TILE_SIZE) + 1), 1);
+    glUniform2f(glGetUniformLocation(m_CalculateFrustumProgram->GetHandle(), "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glDispatchCompute((int)(m_Renderer->GetViewportSize().Width/(TILE_SIZE*TILE_SIZE) + 1), (int)(m_Renderer->GetViewportSize().Height/(TILE_SIZE*TILE_SIZE) + 1), 1);
 
     GLERROR("CalculateFrustum Error: End");
 }
@@ -40,7 +40,7 @@ void LightCullingPass::OnResolutionChange()
 
 void LightCullingPass::SetSSBOSizes()
 {
-    m_NumberOfTiles = (int)(m_Renderer->Resolution().Width/TILE_SIZE) * (int)(m_Renderer->Resolution().Height/TILE_SIZE);
+    m_NumberOfTiles = (int)(m_Renderer->GetViewportSize().Width/TILE_SIZE) * (int)(m_Renderer->GetViewportSize().Height/TILE_SIZE);
 
     m_Frustums = new Frustum[m_NumberOfTiles];
     m_LightGrid = new LightGrid[m_NumberOfTiles];
@@ -67,14 +67,14 @@ void LightCullingPass::CullLights(RenderScene& scene)
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     m_LightCullProgram->Bind();
-    glUniform2f(glGetUniformLocation(m_LightCullProgram->GetHandle(), "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+    glUniform2f(glGetUniformLocation(m_LightCullProgram->GetHandle(), "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glUniformMatrix4fv(glGetUniformLocation(m_LightCullProgram->GetHandle(), "V"), 1, false, glm::value_ptr(scene.Camera->ViewMatrix()));
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_FrustumSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightGridSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_LightOffsetSSBO);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightIndexSSBO);
-    glDispatchCompute(glm::ceil(m_Renderer->Resolution().Width / TILE_SIZE), glm::ceil(m_Renderer->Resolution().Height / TILE_SIZE), 1);
+    glDispatchCompute(glm::ceil(m_Renderer->GetViewportSize().Width/ TILE_SIZE), glm::ceil(m_Renderer->GetViewportSize().Height / TILE_SIZE), 1);
 
     GLERROR("CullLights Error: End");
 }

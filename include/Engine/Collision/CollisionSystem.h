@@ -7,30 +7,23 @@
 #include "../Common.h"
 #include "../Core/System.h"
 #include "../Core/EventBroker.h"
-#include "../Core/EKeyUp.h"
 #include "../Core/Octree.h"
+#include "EntityAABB.h"
 
 class CollisionSystem : public PureSystem
 {
 public:
-    CollisionSystem(World* world, EventBroker* eventBroker, Octree<AABB>* octree)
+    CollisionSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree)
         : System(world, eventBroker)
         , PureSystem("Collidable")
         , m_Octree(octree)
-        , zPress(false)
-    {
-        //TODO: Debug stuff, remove later.
-        EVENT_SUBSCRIBE_MEMBER(m_EKeyUp, &CollisionSystem::OnKeyUp);
-    }
+    { }
 
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
-    Octree<AABB>* m_Octree;
-    bool zPress;
-
-    EventRelay<CollisionSystem, Events::KeyUp> m_EKeyUp;
-    bool OnKeyUp(const Events::KeyUp &event);
+    Octree<EntityAABB>* m_Octree;
+    std::vector<EntityAABB> m_OctreeResult;
 };
 
 #endif

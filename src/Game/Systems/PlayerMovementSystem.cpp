@@ -36,15 +36,18 @@ void PlayerMovementSystem::Update(double dt)
         glm::vec3& ori = cTransform["Orientation"];
         ori.y += controller->Rotation().y;
 
+        float playerMovementSpeed = player["Player"]["MovementSpeed"];
+        float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
+
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
 
             glm::vec3 wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             float wishSpeed;
             if (controller->Crouching()) {
-                wishSpeed = player["Player"]["CrouchSpeed"];
+                wishSpeed = playerCrouchSpeed;
             } else {
-                wishSpeed = player["Player"]["MovementSpeed"];
+                wishSpeed = playerMovementSpeed;
             }
             glm::vec3& velocity = cPhysics["Velocity"];
             ImGui::Text("velocity: (%f, %f, %f)", velocity.x, velocity.y, velocity.z);
@@ -73,20 +76,51 @@ void PlayerMovementSystem::Update(double dt)
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
 
-            if (controller->Jumping() && !controller->Crouching() && velocity.y == 0.f) {
+            if (controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
+                if (velocity.y == 0.f) {
+                    controller->SetDoubleJumping(false);
+                }
+                else {
+                    controller->SetDoubleJumping(true);
+                }
                 velocity.y += 4.f;
             }
 
-            //if (player.HasComponent("AABB")) {
-            //    glm::vec3& size = player["AABB"]["Size"];
-            //    if (controller->Crouching()) {
-            //        size = glm::vec3(1.f, 1.f, 1.f);
-            //    } else {
-            //        size = glm::vec3(1.f, 1.6f, 1.f);
-            //    }
-            //}
+            if (player.HasComponent("AABB")) {
+                glm::vec3& size = player["AABB"]["Size"];
+                if (controller->Crouching()) {
+                    size = glm::vec3(1.f, 1.f, 1.f);
+                } else {
+                    size = glm::vec3(1.f, 1.6f, 1.f);
+                }
+            }
+
+            // Animations
+            EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+            if (playerModel.Valid()) {
+                ComponentWrapper cAnimation = playerModel["Animation"];
+
+                float movementLength = glm::length(groundVelocity);
+                if (glm::length(controller->Movement()) > 0.f) {
+                    if (controller->Crouching()) {
+                        cAnimation["Name"] = "Crouch Walk";
+                        (double&)cAnimation["Speed"] = 1.f * -glm::sign(controller->Movement().z);
+                    } else {
+                        cAnimation["Name"] = "Run";
+                        (double&)cAnimation["Speed"] = 2.f * -glm::sign(controller->Movement().z);
+                    }
+                } else {
+                    if (controller->Crouching()) {
+                        cAnimation["Name"] = "Crouch";
+                        (double&)cAnimation["Speed"] = 1.f;
+                    } else {
+                        cAnimation["Name"] = "Hold Pos";
+                        (double&)cAnimation["Speed"] = 1.f;
+                    }
+                }
+            }
         }
-        
+
         controller->Reset();
     }
 }

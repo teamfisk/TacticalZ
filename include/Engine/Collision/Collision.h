@@ -15,6 +15,7 @@
 #include "../Core/Transform.h"
 #include "../Core/Entity.h"
 #include "../Core/EntityWrapper.h"
+#include "EntityAABB.h"
 
 class World;
 struct ComponentWrapper;
@@ -58,10 +59,9 @@ bool AABBVsAABB(const AABB& a, const AABB& b);
 //Return true if the boxes are intersecting.
 //Also outputs the minimum translation that box [a] would need in order to resolve collision.
 bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation);
-bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon = 0.0001f);
 
 // Calculates an absolute AABB from an entity AABB component
-boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity);
+boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity);
 
 }
 

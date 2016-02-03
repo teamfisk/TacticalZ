@@ -18,14 +18,14 @@ PickingPass::~PickingPass()
 void PickingPass::InitializeTextures()
 {
     GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
-        glm::vec2(m_Renderer->Resolution().Width, m_Renderer->Resolution().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
+        glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
 }
 
 void PickingPass::InitializeFrameBuffers()
 {
     glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
@@ -48,7 +48,7 @@ void PickingPass::Draw(RenderScene& scene)
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
     
     //TODO: Render: Add code for more jobs than modeljobs.
-    GLuint ShaderHandle = m_PickingProgram->GetHandle();
+    GLuint shaderHandle = m_PickingProgram->GetHandle();
     m_PickingProgram->Bind();
 
     if (scene.ClearDepth) {
@@ -56,7 +56,7 @@ void PickingPass::Draw(RenderScene& scene)
     }
     m_Camera = scene.Camera;
 
-    for (auto &job : scene.ForwardJobs) {
+    for (auto &job : scene.OpaqueObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
@@ -75,22 +75,76 @@ void PickingPass::Draw(RenderScene& scene)
                 m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
                 if (m_ColorCounter[0] > 255) {
                     m_ColorCounter[0] = 0;
-                        m_ColorCounter[1]++;
+                        m_ColorCounter[1] += 5;
                 } else {
-                        m_ColorCounter[0]++;
+                        m_ColorCounter[0] += 50;
                 }
             }
 
             m_PickingColorsToEntity[glm::ivec2(pickColor[0], pickColor[1])] = pickInfo;
 
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(ShaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniform2fv(glGetUniformLocation(ShaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+            glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+            if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
+
+                if (modelJob->Animation != nullptr) {
+                    std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                }
+            }
 
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-            glDrawElementsBaseVertex(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, nullptr, modelJob->StartIndex);
+            glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+        }
+    }
+
+    for (auto &job : scene.TransparentObjects) {
+        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+
+        if (modelJob) {
+            int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
+
+            PickingInfo pickInfo;
+            pickInfo.Entity = modelJob->Entity;
+            pickInfo.World = modelJob->World;
+            pickInfo.Camera = scene.Camera;
+
+            auto color = m_EntityColors.find(std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera));
+            if (color != m_EntityColors.end()) {
+                pickColor[0] = color->second[0];
+                pickColor[1] = color->second[1];
+            } else {
+                m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
+                if (m_ColorCounter[0] > 255) {
+                    m_ColorCounter[0] = 0;
+                    m_ColorCounter[1] += 5;
+                } else {
+                    m_ColorCounter[0] += 50;
+                }
+            }
+
+            m_PickingColorsToEntity[glm::ivec2(pickColor[0], pickColor[1])] = pickInfo;
+
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+            glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+            if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
+
+                if (modelJob->Animation != nullptr) {
+                    std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                }
+            }
+
+            glBindVertexArray(modelJob->Model->VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+            glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
         }
     }
     

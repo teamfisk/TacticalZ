@@ -1,10 +1,16 @@
 #include "Editor/EditorGUI.h"
+#include "Rendering/ESetCamera.h"
 
 EditorGUI::EditorGUI(World* world, EventBroker* eventBroker) 
     : m_World(world)
     , m_EventBroker(eventBroker)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EKeyDown, &EditorGUI::OnKeyDown);
+    EVENT_SUBSCRIBE_MEMBER(m_EFileDropped, &EditorGUI::OnFileDropped);
+    EVENT_SUBSCRIBE_MEMBER(m_EPause, &EditorGUI::OnPause);
+    EVENT_SUBSCRIBE_MEMBER(m_EResume, &EditorGUI::OnResume);
+    EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &EditorGUI::OnLockMouse);
+    EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &EditorGUI::OnUnlockMouse);
 }
 
 void EditorGUI::Draw()
@@ -36,39 +42,60 @@ void EditorGUI::drawTools()
         return;
     }
 
+    // Widget modes
     createWidgetToolButton(WidgetMode::Translate);
     if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Translate");
+        ImGui::SetTooltip("Translate (W)");
     }
     ImGui::SameLine();
     createWidgetToolButton(WidgetMode::Rotate);
     if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Rotate");
+        ImGui::SetTooltip("Rotate (E)");
     }
     ImGui::SameLine();
     createWidgetToolButton(WidgetMode::Scale);
     if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Scale");
+        ImGui::SetTooltip("Scale (R)");
     }
+
+    ImGui::SameLine();
+    ImGui::ItemSize(ImVec2(5, 0));
+
+    // Widget space
+    ImGui::SameLine();
+    GLuint spaceTexture = 0;
+    if (m_CurrentWidgetSpace == WidgetSpace::Global) {
+        spaceTexture = tryLoadTexture("Textures/Icons/Global.png");
+    } else if (m_CurrentWidgetSpace == WidgetSpace::Local) {
+        spaceTexture = tryLoadTexture("Textures/Icons/Local.png");
+    }
+    if (ImGui::ImageButton(reinterpret_cast<void*>(spaceTexture), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1))) {
+        toggleWidgetSpace();
+    }
+    if (ImGui::IsItemHovered()) {
+        if (m_CurrentWidgetSpace == WidgetSpace::Global) {
+            ImGui::SetTooltip("Widget space: Global (X)");
+        } else if (m_CurrentWidgetSpace == WidgetSpace::Local) {
+            ImGui::SetTooltip("Widget space: Local (X)");
+        }
+    }
+
     ImGui::SameLine();
     ImGui::ItemSize(ImVec2(5, 0));
 
     // Play button
     ImGui::SameLine();
-    static bool paused = false;
-    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Play.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton(reinterpret_cast<void*>(tryLoadTexture("Textures/Icons/Play.png")), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (!m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Resume e;
         e.World = m_World;
         m_EventBroker->Publish(e);
-        paused = false;
     }
     // Pause button
     ImGui::SameLine();
-    if (ImGui::ImageButton((void*)tryLoadTexture("Textures/Icons/Pause.png"), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
+    if (ImGui::ImageButton(reinterpret_cast<void*>(tryLoadTexture("Textures/Icons/Pause.png")), ImVec2(24, 24), ImVec2(0, 1), ImVec2(1, 0), -1, ImVec4(0, 0, 0, 0), (m_Paused) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1))) {
         Events::Pause e;
         e.World = m_World;
         m_EventBroker->Publish(e);
-        paused = true;
     }
 
     ImGui::End();
@@ -167,10 +194,7 @@ bool EditorGUI::drawEntityNode(EntityWrapper entity)
             ImGui::Text(formatEntityName(entity).c_str());
             ImGui::End();
         }
-    }/* else if (m_CurrentlyDragging == entity) {
-        LOG_DEBUG("Stopped dragging %i", entity.ID);
-        m_CurrentlyDragging = EntityWrapper::Invalid;
-    }*/
+    }
     // Entity context menu
     std::string contextMenuUniqueID = std::string("EntityContextMenu") + std::to_string(entity.ID);
     if (hovered && ImGui::IsMouseClicked(1)) {
@@ -233,10 +257,12 @@ void EditorGUI::drawComponents(EntityWrapper entity)
             componentTypes.push_back(pair.first.c_str());
         }
     }
+    // Sort components in alphabetical order
+    std::sort(componentTypes.begin(), componentTypes.end(), compareCharArray);
     // Draw combo box
     ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - 10.f);
     int selectedItem = -1;
-    if (ImGui::Combo("", &selectedItem, componentTypes.data(), componentTypes.size())) {
+    if (ImGui::Combo("", &selectedItem, componentTypes.data(), static_cast<int>(componentTypes.size()), static_cast<int>(componentTypes.size()))) {
         if (selectedItem != -1) {
             if (m_OnComponentAttach != nullptr) {
                 std::string chosenComponentType(componentTypes.at(selectedItem));
@@ -282,9 +308,8 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
 
     // Draw component fields
     ComponentWrapper& component = entity.World->GetComponent(entity.ID, ci.Name);
-    for (auto& kv : ci.Fields) {
-        const std::string& fieldName = kv.first;
-        const ComponentInfo::Field_t& field = kv.second;
+    for (auto& fieldName : ci.FieldsInOrder) {
+        const ComponentInfo::Field_t& field = ci.Fields.at(fieldName);
 
         // Draw the field widget based on its type
         bool dirty = drawComponentField(component, field);
@@ -302,6 +327,14 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip(fieldAnnotationIt->second.c_str());
             }
+        }
+    }
+
+    if (ci.Name == "Camera") {
+        if (ImGui::Button("Activate")) {
+            Events::SetCamera e;
+            e.CameraEntity = entity;
+            m_EventBroker->Publish(e);
         }
     }
 
@@ -426,18 +459,31 @@ bool EditorGUI::drawComponentField_bool(ComponentWrapper &c, const ComponentInfo
 
 bool EditorGUI::drawComponentField_string(ComponentWrapper &c, const ComponentInfo::Field_t &field)
 {
+    bool result = false;
+
     auto& val = c.Field<std::string>(field.Name);
+
     char tempString[1024]; // Let's just hope this is an sufficiently large buffer for strings :)
     tempString[1023] = '\0'; // Null terminator just in case the string is larger than the buffer
     // Copy the string into the buffer, taking the null terminator into account
     memcpy(tempString, val.c_str(), std::min(val.length() + 1, sizeof(tempString) - 1));
     if (ImGui::InputText("", tempString, sizeof(tempString))) {
         val = std::string(tempString);
-        return true;
-    } else {
-        return false;
+        result = true;
     }
-    // TODO: Handle drag and drop of files
+
+    // Handle file drag and drop
+    if (ImGui::IsItemHovered() && !m_DroppedFile.empty()) {
+        // Unset potential input focus or our newly set value will be overwritten!
+        if (ImGui::IsItemActive()) {
+            ImGui::SetActiveID(0, nullptr);
+        }
+        // Set the actual dropped value
+        val = m_DroppedFile;
+        m_DroppedFile = "";
+    }
+    
+    return result;
 }
 
 void EditorGUI::drawModals()
@@ -519,7 +565,7 @@ void EditorGUI::createWidgetToolButton(WidgetMode mode)
         break;
     }
     if (ImGui::ImageButton(
-            (void*)texture, 
+            reinterpret_cast<void*>(texture),
             ImVec2(24, 24), 
             ImVec2(0, 1), 
             ImVec2(1, 0), 
@@ -528,10 +574,7 @@ void EditorGUI::createWidgetToolButton(WidgetMode mode)
             (m_CurrentWidgetMode == mode) ? ImVec4(0, 1, 0, 1) : ImVec4(1, 1, 1, 1)
         )
     ) {
-        if (m_OnWidgetMode != nullptr) {
-            m_OnWidgetMode(mode);
-        }
-        m_CurrentWidgetMode = mode;
+        setWidgetMode(mode);
     }
 }
 
@@ -561,6 +604,61 @@ bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
         }
     }
 
+    if (!m_MouseLocked) {
+        if (e.KeyCode == GLFW_KEY_W) {
+            setWidgetMode(WidgetMode::Translate);
+        }
+        if (e.KeyCode == GLFW_KEY_E) {
+            setWidgetMode(WidgetMode::Rotate);
+        }
+        if (e.KeyCode == GLFW_KEY_R) {
+            setWidgetMode(WidgetMode::Scale);
+        }
+
+        if (e.KeyCode == GLFW_KEY_X) {
+            toggleWidgetSpace();
+        }
+    }
+
+    return true;
+}
+
+bool EditorGUI::OnFileDropped(const Events::FileDropped& e)
+{
+    // Make a best effort to make the path relative to the working directory of the executable
+    m_DroppedFile = boost::filesystem::path(e.Path).lexically_relative(boost::filesystem::current_path()).string();
+    // Compensate for Windows retardedness
+    std::replace(m_DroppedFile.begin(), m_DroppedFile.end(), '\\', '/');
+    // Special case for when people drop from the asset folder instead of from the symlink to the asset folders in bin
+    boost::algorithm::replace_first(m_DroppedFile, "../assets/", "");
+    return true;
+}
+
+bool EditorGUI::OnPause(const Events::Pause& e)
+{
+    if (e.World == m_World) {
+        m_Paused = true;
+    }
+    return true;
+}
+
+bool EditorGUI::OnResume(const Events::Resume& e)
+{
+    if (e.World == m_World) {
+        m_Paused = false;
+    }
+    return true;
+}
+
+bool EditorGUI::OnLockMouse(const Events::LockMouse& e)
+{
+    m_MouseLocked = true;
+    return true;
+}
+
+bool EditorGUI::OnUnlockMouse(const Events::UnlockMouse& e)
+{
+    m_MouseLocked = false;
     return true;
 }
 
@@ -633,6 +731,32 @@ GLuint EditorGUI::tryLoadTexture(std::string filePath)
 void EditorGUI::openModal(const std::string& modal)
 {
     m_ModalsToOpen.insert(modal);
+}
+
+void EditorGUI::setWidgetMode(WidgetMode mode)
+{
+    if (m_OnWidgetMode != nullptr) {
+        m_OnWidgetMode(mode);
+    }
+    m_CurrentWidgetMode = mode;
+}
+
+void EditorGUI::toggleWidgetSpace()
+{
+    if (m_CurrentWidgetSpace == WidgetSpace::Global) {
+        m_CurrentWidgetSpace = WidgetSpace::Local;
+    } else if (m_CurrentWidgetSpace == WidgetSpace::Local) {
+        m_CurrentWidgetSpace = WidgetSpace::Global;
+    }
+
+    if (m_OnWidgetSpace != nullptr) {
+        m_OnWidgetSpace(m_CurrentWidgetSpace);
+    }
+}
+
+bool EditorGUI::compareCharArray(const char* c1, const char* c2)
+{
+    return strcmp(c1, c2) < 0;
 }
 
 void EditorGUI::SetDirty(EntityWrapper entity)
@@ -722,7 +846,7 @@ void EditorGUI::entityDelete(EntityWrapper entity)
 
 void EditorGUI::entityChangeParent(EntityWrapper entity, EntityWrapper parent)
 {
-    if (entity == parent) {
+    if (entity == parent || parent.IsChildOf(entity)) {
         return;
     }
 

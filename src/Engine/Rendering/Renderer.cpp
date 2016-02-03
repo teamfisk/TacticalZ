@@ -58,11 +58,24 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLEW: Initialization failed");
 		exit(EXIT_FAILURE);
 	}
+
+    int windowSize[2];
+    glfwGetWindowSize(m_Window, &windowSize[0], &windowSize[1]);
+    m_ViewportSize = Rectangle(windowSize[0], windowSize[1]);
 }
 
 void Renderer::InitializeShaders()
 {
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
+    m_ExplosionEffectProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectProgram");
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ExplosionEffect.vert.glsl")));
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/ExplosionEffect.geom.glsl")));
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ExplosionEffect.frag.glsl")));
+    //m_ExplosionEffectProgram->Compile();
+    //m_ExplosionEffectProgram->Link();
+
+
+
 }
 
 void Renderer::InputUpdate(double dt)
@@ -98,6 +111,7 @@ void Renderer::Draw(RenderFrame& frame)
         m_LightCullingPass->FillLightList(*scene);
         m_LightCullingPass->CullLights(*scene);
         m_DrawFinalPass->Draw(*scene);
+        //m_DrawScenePass->Draw(*scene);
 
         GLERROR("Renderer::Draw m_DrawScenePass->Draw");
 
@@ -133,14 +147,14 @@ PickData Renderer::Pick(glm::vec2 screenCoord)
 void Renderer::InitializeTextures()
 {
     m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/Blank.png");
+    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
 }
 
 
 void Renderer::SortRenderJobsByDepth(RenderScene &scene)
 {
     //Sort all forward jobs so transparency is good.
-    scene.ForwardJobs.sort(Renderer::DepthSort);
+    scene.TransparentObjects.sort(Renderer::DepthSort);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)

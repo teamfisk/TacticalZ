@@ -346,7 +346,7 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
 {
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
     packet.WritePrimitive(e.Damage);
-    packet.WritePrimitive(e.Player.ID);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player.ID));
     send(packet);
     return false;
 }

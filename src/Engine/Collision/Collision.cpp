@@ -239,20 +239,6 @@ bool AABBvsTriangles(const AABB& box, const std::vector<RawModel::Vertex>& model
     return hit;
 }
 
-bool IsSameBoxProbably(const AABB& first, const AABB& second, const float epsilon)
-{
-    const glm::vec3& ma1 = first.MaxCorner();
-    const glm::vec3& ma2 = second.MaxCorner();
-    const glm::vec3& mi1 = first.MinCorner();
-    const glm::vec3& mi2 = second.MinCorner();
-    return (std::abs(ma1.x - ma2.x) < epsilon) &&
-        (std::abs(mi1.x - mi2.x) < epsilon) &&
-        (std::abs(ma1.z - ma2.z) < epsilon) &&
-        (std::abs(mi1.z - mi2.z) < epsilon) &&
-        (std::abs(ma1.y - ma2.y) < epsilon) &&
-        (std::abs(mi1.y - mi2.y) < epsilon);
-}
-
 bool attachAABBComponentFromModel(World* world, EntityID id)
 {
     if (!world->HasComponent(id, "Model")) {
@@ -283,7 +269,7 @@ bool attachAABBComponentFromModel(World* world, EntityID id)
     return true;
 }
 
-boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity)
+boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
 {
     if (!entity.HasComponent("AABB")) {
         return boost::none;
@@ -294,7 +280,11 @@ boost::optional<AABB> EntityAbsoluteAABB(EntityWrapper& entity)
     glm::vec3 absScale = Transform::AbsoluteScale(entity.World, entity.ID);
     glm::vec3 origin = absPosition + (glm::vec3)cAABB["Origin"];
     glm::vec3 size = (glm::vec3)cAABB["Size"] * absScale;
-    return AABB::FromOriginSize(origin, size);
+
+    EntityAABB aabb = EntityAABB::FromOriginSize(origin, size);
+    aabb.Entity = entity;
+
+    return aabb;
 }
 
 }

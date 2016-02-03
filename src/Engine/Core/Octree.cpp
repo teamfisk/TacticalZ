@@ -105,8 +105,7 @@ bool Child::BoxCollides(const AABB& boxToTest, AABB& outBoxIntersected) const
         for (int i : m_DynamicObjIndices) {
             if (!m_DynamicObjectsRef[i].Checked) {
                 const AABB& objBox = *m_DynamicObjectsRef[i].Box;
-                if (!Collision::IsSameBoxProbably(boxToTest, objBox) &&
-                    Collision::AABBVsAABB(boxToTest, objBox)) {
+                if (Collision::AABBVsAABB(boxToTest, objBox)) {
                     outBoxIntersected = objBox;
                     return true;
                 }

@@ -31,6 +31,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
+    m_EditorGUI->SetWidgetSpaceCallback(std::bind(&EditorSystem::OnWidgetSpace, this, std::placeholders::_1));
 
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorSystem::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EWidgetDelta, &EditorSystem::OnWidgetDelta);
@@ -65,7 +66,12 @@ void EditorSystem::Update(double dt)
         m_EditorStats->Draw(actualDelta);
 
         if (m_CurrentSelection.Valid() && m_Widget.Valid()) {
-            (glm::vec3&)m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
+            (glm::vec3&)m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection);
+            if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
+                (glm::vec3&)m_Widget["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(m_CurrentSelection);
+            } else {
+                (glm::vec3&)m_Widget["Transform"]["Orientation"] = glm::vec3(0, 0, 0);
+            }
         }
 
         m_EditorWorldSystemPipeline->Update(actualDelta);
@@ -82,11 +88,22 @@ void EditorSystem::Update(double dt)
 void EditorSystem::Enable()
 {
     m_EditorCameraInputController->Enable();
+
     m_EventBroker->Publish(Events::UnlockMouse());
-    Events::SetCamera e;
-    e.CameraEntity = m_EditorCamera;
-    m_EventBroker->Publish(e);
-    (glm::vec3&)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
+
+    // Enable editor camera
+    Events::SetCamera eSetCamera;
+    eSetCamera.CameraEntity = m_EditorCamera;
+    m_EventBroker->Publish(eSetCamera);
+    if (m_ActualCamera.Valid()) {
+        (glm::vec3&)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
+    }
+
+    // Pause the world we're editing
+    Events::Pause ePause;
+    ePause.World = m_World;
+    m_EventBroker->Publish(ePause);
+
     m_Enabled = true;
 }
 
@@ -154,6 +171,11 @@ void EditorSystem::OnComponentDelete(EntityWrapper entity, const std::string& co
     }
 }
 
+void EditorSystem::OnWidgetSpace(EditorGUI::WidgetSpace widgetSpace)
+{
+    m_WidgetSpace = widgetSpace;
+}
+
 bool EditorSystem::OnMousePress(const Events::MousePress& e)
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -170,12 +192,18 @@ bool EditorSystem::OnMousePress(const Events::MousePress& e)
 bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
 {
     if (m_CurrentSelection.Valid()) {
-        glm::quat parentOrientation;
-        EntityWrapper parent = m_CurrentSelection.Parent();
-        if (parent.Valid()) {
-            parentOrientation = glm::inverse(Transform::AbsoluteOrientation(parent.World, parent.ID));
+        if (m_WidgetSpace == EditorGUI::WidgetSpace::Global) {
+            glm::quat parentOrientation;
+            EntityWrapper parent = m_CurrentSelection.Parent();
+            if (parent.Valid()) {
+                parentOrientation = glm::inverse(Transform::AbsoluteOrientation(parent));
+            }
+            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation;
+        } else if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
+            glm::quat selectionOri = glm::quat((glm::vec3)m_CurrentSelection["Transform"]["Orientation"]);
+            glm::vec3 localTranslation = selectionOri * e.Translation;
+            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += localTranslation;
         }
-        (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation;
         m_EditorGUI->SetDirty(m_CurrentSelection);
     }
     return true;
@@ -203,7 +231,7 @@ bool EditorSystem::OnSetCamera(const Events::SetCamera& e)
         m_ActualCamera = e.CameraEntity;
         Events::SetCamera e2;
         e2.CameraEntity = m_EditorCamera;
-        m_EventBroker->Publish(e2);
+        //m_EventBroker->Publish(e2);
     }
     return true;
 }
