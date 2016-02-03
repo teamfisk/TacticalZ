@@ -25,7 +25,7 @@
 #include <boost/thread.hpp>
 #include "Network/Network.h"
 #include "Network/Server.h"
-#include "Network/Client.h"
+#include "Network/HybridClient.h"
 
 // Sound
 #include "Sound/SoundSystem.h"

@@ -271,7 +271,7 @@ void Server::parseOnInputCommand(Packet& packet)
             e.PlayerID = player; // Set correct player id
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
-            //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+            LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         }
     }
 }

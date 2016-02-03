@@ -29,7 +29,7 @@ public:
     ~Client();
     void Start(World* world, EventBroker* eventBroker) override;
     void Update() override;
-private:
+protected:
     // Assio UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
