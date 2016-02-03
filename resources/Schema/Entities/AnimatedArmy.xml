@@ -42,7 +42,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>models/animTest.mesh</Resource>
+          <Resource>Models/Test/AnimTest.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="0" Y="1.31816244" Z="1.1888907"/>
@@ -53,7 +53,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>models/animTest.mesh</Resource>
+          <Resource>Models/Test/AnimTest.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="0.708824873" Y="1.30000007" Z="0"/>
@@ -64,7 +64,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>models/animTest.mesh</Resource>
+          <Resource>Models/Test/AnimTest.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="1.36948848" Y="1.20000005" Z="0"/>

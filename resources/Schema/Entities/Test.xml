@@ -36,7 +36,7 @@
 							<ExponentialAccelaration>0</ExponentialAccelaration>
 						</c:ExplosionEffect>
 				<c:Model>
-					<Resource>Models/Camera.mesh</Resource>
+					<Resource>Models/Widgets/Camera.mesh</Resource>
 				</c:Model>
 			</Components>
 		</Entity>

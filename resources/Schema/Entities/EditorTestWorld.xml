@@ -37,7 +37,7 @@
           <Intensity>0.80000001192092896</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.mesh</Resource>
+          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
         </c:Model>
         <c:RaptorCopter>
           <Speed>1</Speed>
@@ -62,7 +62,7 @@
           <RandomnessScalar>3</RandomnessScalar>
         </c:ExplosionEffect>
         <c:Model>
-          <Resource>Models/Assault.mesh</Resource>
+          <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-1.68900967" Y="0.527161121" Z="-1.59648728"/>

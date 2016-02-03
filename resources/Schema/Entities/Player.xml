@@ -50,7 +50,7 @@
         <Entity name="CameraModel">
           <Components>
             <c:Model>
-              <Resource>Models/Camera.mesh</Resource>
+              <Resource>Models/Widgets/Camera.mesh</Resource>
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
@@ -134,7 +134,7 @@
       <Components>
         <c:Camera/>
         <c:Model>
-          <Resource>Models/Camera.mesh</Resource>
+          <Resource>Models/Widgets/Camera.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>

@@ -97,7 +97,7 @@
           <Intensity>0.80000001192092896</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.mesh</Resource>
+          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
         </c:Model>
         <c:RaptorCopter>
           <Speed>1</Speed>
@@ -422,7 +422,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -435,7 +435,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -448,7 +448,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -461,7 +461,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -493,7 +493,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -506,7 +506,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -519,7 +519,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -532,7 +532,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -608,7 +608,7 @@
         <Entity name="Assault">
           <Components>
             <c:Model>
-              <Resource>Models/Assault.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
               <Color A="0.572549045" B="1" G="1" R="0"/>
               <Transparent>true</Transparent>
             </c:Model>
@@ -1442,7 +1442,7 @@
                       <TimeSinceDeath>1.1999860997035228</TimeSinceDeath>
                     </c:ExplosionEffect>
                     <c:Model>
-                      <Resource>Models/Assault.mesh</Resource>
+                      <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                       <Transparent>true</Transparent>
                     </c:Model>
                     <c:Transform>
