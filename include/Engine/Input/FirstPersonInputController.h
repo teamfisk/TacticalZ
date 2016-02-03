@@ -15,7 +15,11 @@ public:
     virtual const glm::vec3 Rotation() const { return m_Rotation; }
     virtual bool Jumping() const { return m_Jumping; }
     virtual bool Crouching() const { return m_Crouching; }
-    
+    virtual bool DoubleJumping() const { return m_DoubleJumping; }
+    virtual void SetDoubleJumping(bool isDoubleJumping) {
+        m_DoubleJumping = isDoubleJumping;
+    }
+
     void LockMouse();
     void UnlockMouse();
     virtual bool OnCommand(const Events::InputCommand& e) override;
@@ -27,8 +31,9 @@ protected:
     glm::vec3 m_Rotation;
     glm::vec3 m_Movement;
     bool m_Jumping = false;
+    bool m_DoubleJumping = false;
     bool m_Crouching = false;
-    
+
     EventRelay<EventContext, Events::LockMouse> m_ELockMouse;
     bool OnLockMouse(const Events::LockMouse& e);
     EventRelay<EventContext, Events::UnlockMouse> m_EUnlockMouse;
@@ -36,7 +41,7 @@ protected:
 };
 
 template <typename EventContext>
-FirstPersonInputController<EventContext>::FirstPersonInputController(EventBroker* eventBroker, int playerID) 
+FirstPersonInputController<EventContext>::FirstPersonInputController(EventBroker* eventBroker, int playerID)
     : InputController(eventBroker)
     , m_PlayerID(playerID)
 {
@@ -113,14 +118,14 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
 template <typename EventContext>
 bool FirstPersonInputController<EventContext>::OnUnlockMouse(const Events::UnlockMouse& e)
 {
-    m_MouseLocked = false; 
+    m_MouseLocked = false;
     return true;
 }
 
 template <typename EventContext>
 bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMouse& e)
 {
-    m_MouseLocked = true; 
+    m_MouseLocked = true;
     return true;
 }
 

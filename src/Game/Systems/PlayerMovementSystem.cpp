@@ -76,7 +76,13 @@ void PlayerMovementSystem::Update(double dt)
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
 
-            if (controller->Jumping() && !controller->Crouching() && velocity.y == 0.f) {
+            if (controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
+                if (velocity.y == 0.f) {
+                    controller->SetDoubleJumping(false);
+                }
+                else {
+                    controller->SetDoubleJumping(true);
+                }
                 velocity.y += 4.f;
             }
 

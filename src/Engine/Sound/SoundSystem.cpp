@@ -405,7 +405,7 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     // breathe
     std::vector<ALuint> buffers;
     buffers.push_back(source->SoundResource->Buffer());
-    int ammountOfbreaths = (e.Damage / 10) + 2; // TEMP: Idk something stupid like this shit
+    int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
     for (int i = 0; i < ammountOfbreaths; i++) {
         buffers.push_back(ResourceManager::Load<Sound>("Audio/exhausted/breath.wav")->Buffer());
     }
