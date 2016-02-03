@@ -92,7 +92,9 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
+        //Loop through all materialgroups of a model
         for (auto matGroup : model->MaterialGroups()) {
+            //If the model has an explosioneffect component, we will add an explosioneffectjob
             if (m_World->HasComponent(cModel.EntityID, "ExplosionEffect")) {
                 auto explosionEffectComponent = m_World->GetComponent(cModel.EntityID, "ExplosionEffect");
                 std::shared_ptr<ExplosionEffectJob> explosionEffectJob = std::shared_ptr<ExplosionEffectJob>(new ExplosionEffectJob(
@@ -106,15 +108,30 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillColor, 
                     fillPercentage
                 ));
+                if (m_World->HasComponent(cModel.EntityID, "Shield")){
+                    Jobs.ShieldObjects.push_back(explosionEffectJob);
+                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
+                    || m_World->HasComponent(cModel.EntityID, "Player")) {
 
-                if(explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
-                    cModel["Transparent"] = true;
-                }
+                    if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
 
-                if (cModel["Transparent"]) {
-                    Jobs.TransparentObjects.push_back(explosionEffectJob);
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
+                    } else {
+                        Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
+                    }
                 } else {
-                    Jobs.OpaqueObjects.push_back(explosionEffectJob);
+                    if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentObjects.push_back(explosionEffectJob);
+                    } else {
+                        Jobs.OpaqueObjects.push_back(explosionEffectJob);
+                    }
                 }
             } else {
                 std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
@@ -127,13 +144,30 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillColor, 
                     fillPercentage
                 ));
-                if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
-                    cModel["Transparent"] = true;
-                }
-                if (cModel["Transparent"]) {
-                    Jobs.TransparentObjects.push_back(modelJob);
+                if (m_World->HasComponent(cModel.EntityID, "Shield")) {
+                    Jobs.ShieldObjects.push_back(modelJob);
+                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
+                    || m_World->HasComponent(cModel.EntityID, "Player")) {
+
+                    if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentShieldedObjects.push_back(modelJob);
+                    } else {
+                        Jobs.OpaqueShieldedObjects.push_back(modelJob);
+                    }
                 } else {
-                    Jobs.OpaqueObjects.push_back(modelJob);
+                    if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentObjects.push_back(modelJob);
+                    } else {
+                        Jobs.OpaqueObjects.push_back(modelJob);
+                    }
                 }
             }
         }
