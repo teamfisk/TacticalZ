@@ -220,7 +220,7 @@ void SoundSystem::playerStep(double dt)
     bool isAirborne = vel.y != 0;
     if (playerSpeed > 1 && !isAirborne) {
         // Player is walking
-        if (m_TimeSinceLastFootstep * playerSpeed > m_PlayerFootstepInterval) {
+        if (m_TimeSinceLastFootstep * std::min<float>(playerSpeed, 2) > m_PlayerFootstepInterval) {
             // Create footstep sound
             EntityID child = m_World->CreateEntity(m_LocalPlayer);
             m_World->AttachComponent(child, "Transform");
