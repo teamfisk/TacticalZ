@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform>
+      <Position X="0.340887427" Y="0" Z="0"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <HomePointForTeam>
+            <Red/>
+          </HomePointForTeam>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitSphere.mesh</Resource>
+          <Color A="1" B="0" G="0.200000003" R="1"/>
+        </c:Model>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="6.60000038" Y="0" Z="0"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <CapturePointNumber>1</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitSphere.mesh</Resource>
+          <Color A="1" B="1" G="1" R="0"/>
+        </c:Model>
+        <c:Team/>
+        <c:Transform>
+          <Position X="4.46673203" Y="0" Z="3.50259304"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <CapturePointNumber>2</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitSphere.mesh</Resource>
+          <Color A="1" B="1" G="0.200000003" R="0"/>
+        </c:Model>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="3.00000024" Y="0" Z="0.113596022"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <CapturePointNumber>3</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitSphere.mesh</Resource>
+          <Color A="1" B="1" G="0.200000003" R="0"/>
+        </c:Model>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="1.75382805" Y="0" Z="0.0895374417"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:CapturePoint>
+          <HomePointForTeam>
+            <Blue/>
+          </HomePointForTeam>
+          <CapturePointNumber>4</CapturePointNumber>
+        </c:CapturePoint>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitSphere.mesh</Resource>
+          <Color A="1" B="1" G="0.200000003" R="0"/>
+        </c:Model>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="0.56674248" Y="0" Z="0"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Health/>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Player/>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="4.29100037" Y="-0.08556436" Z="1.29717529"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Health/>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\Core\UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Player/>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="5.43557501" Y="0.888866663" Z="1.55849135"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>C:\Users\123456\Workspace\TacticalZ\assets\Models\DummyScene.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-0.600000024" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -23,7 +23,7 @@ public:
         m_SpeedMultiplier = m_Config->Get<float>("Editor.CameraSpeed", 3.f);
     }
     
-    virtual const glm::vec3 Movement() const override { return m_Movement * m_SpeedMultiplier; }
+    virtual const glm::vec3 Movement() const override { return m_Movement * static_cast<float>(m_SpeedMultiplier); }
 
     void Enable() { m_Enabled = true; }
     void Disable() { m_Enabled = false; }
@@ -69,7 +69,7 @@ public:
 protected:
     ConfigFile* m_Config;
     bool m_Enabled = false;
-    float m_SpeedMultiplier = 1.f;
+    double m_SpeedMultiplier = 1.f;
 
     EventRelay<EventContext, Events::MousePress> m_EMousePress;
     bool OnMousePress(const Events::MousePress& e)
@@ -105,7 +105,7 @@ protected:
             return false;
         }
 
-        m_SpeedMultiplier += e.DeltaY * (0.1f * m_SpeedMultiplier);
+        m_SpeedMultiplier += e.DeltaY * (0.1 * m_SpeedMultiplier);
         m_Config->Set("Editor.CameraSpeed", m_SpeedMultiplier);
         m_Config->SaveToDisk();
         return true;

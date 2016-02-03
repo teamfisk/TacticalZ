@@ -71,12 +71,12 @@ PNG::PNG(std::string path)
 		png_read_update_info(png_ptr, info_ptr);
 	}
 	
-	unsigned int row_bytes = png_get_rowbytes(png_ptr, info_ptr);
+	std::size_t row_bytes = png_get_rowbytes(png_ptr, info_ptr);
 	this->Data = new unsigned char[height * row_bytes];
 	png_bytep* row_pointers = new png_bytep[height];
 
 	// Point each row to the continuous data array
-	for (int i = 0; i < height; ++i) {
+	for (unsigned int i = 0; i < height; ++i) {
 		// Invert Y for OpenGL
 		row_pointers[height - 1 - i] = this->Data + i * row_bytes;
 	}

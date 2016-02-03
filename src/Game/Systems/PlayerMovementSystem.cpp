@@ -81,7 +81,13 @@ void PlayerMovementSystem::Update(double dt)
             }
 
             //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
-            if (!m_PlayerIsDashing && controller->Jumping() && !controller->Crouching() && velocity.y == 0.f) {
+            if (!m_PlayerIsDashing && controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
+                if (velocity.y == 0.f) {
+                    controller->SetDoubleJumping(false);
+                }
+                else {
+                    controller->SetDoubleJumping(true);
+                }
                 velocity.y += 4.f;
             }
 

@@ -21,7 +21,7 @@ GLuint Shader::CompileShader(GLenum shaderType, std::string fileName)
 		return 0;
 
 	const GLchar* shaderFiles = shaderFile.c_str();
-	const GLint length = shaderFile.length();
+	const GLint length = static_cast<GLint>(shaderFile.length());
 	glShaderSource(shader, 1, &shaderFiles, &length);
 	if (GLERROR("glShaderSource"))
 		return 0;
