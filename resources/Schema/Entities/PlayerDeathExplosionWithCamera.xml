@@ -8,12 +8,13 @@
       <Speed>0</Speed>
     </c:Animation>
     <c:Lifetime>
-      <Lifetime>8</Lifetime>
+      <Lifetime>4</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
       <TimeSinceDeath>0</TimeSinceDeath>
-      <ExplosionDuration>8</ExplosionDuration>
+      <ExplosionDuration>4</ExplosionDuration>
       <ExplosionOrigin X="-60.9153252" Y="0.767338753" Z="-76.4729843"/>
+      <Velocity X="0.5" Y="0.5" Z="0"/>
     </c:ExplosionEffect>
     <c:Model>
       <Resource>Models/AssaultAnimated.mesh</Resource>

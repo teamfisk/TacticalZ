@@ -43,38 +43,39 @@ void PlayerDeathSystem::Update(double dt)
 
 bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
-    //LOAD THE XML
+    //load the explosioneffect XML
     auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
 
     EntityFileParser parser(deathEffect);
     EntityID deathEffectID = parser.MergeEntities(m_World);
     EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
-    
-    //current components for player that we need
-    auto playerModelEW = e.Player.FirstChildByName("PlayerModel");
-    auto playerEntityModel = playerModelEW["Model"];
-    auto playerEntityTransform = playerModelEW["Transform"];
 
-    //copy the data from player to new playermodel
+    //components that we need from player
+    auto playerCamera = e.Player.FirstChildByName("Camera");
+    auto playerEntityModel = e.Player.FirstChildByName("PlayerModel")["Model"];
+    auto playerEntityAnimation = e.Player.FirstChildByName("PlayerModel")["Animation"];
+
+    //copy the data from player to explisioneffectmodel
     playerEntityModel.Copy(deathEffectEW["Model"]);
-    playerEntityTransform.Copy(deathEffectEW["Transform"]);
+    playerEntityAnimation.Copy(deathEffectEW["Animation"]);
+    //freeze the animation
+    deathEffectEW["Animation"]["Speed"] = 0.0;
 
-    //change the animation speed and make sure the explosioneffect spawns at the players position
-    //http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
-    auto playerPosition = (glm::vec3)e.Player["Transform"]["Position"];
-    deathEffectEW["Transform"]["Position"] = playerPosition;
-    deathEffectEW["ExplosionEffect"]["ExplosionOrigin"] = playerPosition;
+    //copy the models position,orientation
+    deathEffectEW["Transform"]["Position"] = (glm::vec3)e.Player["Transform"]["Position"];
+    deathEffectEW["Transform"]["Orientation"] = (glm::vec3)e.Player["Transform"]["Orientation"];
+    //effect,camera is relative to playersPosition
+    deathEffectEW["ExplosionEffect"]["ExplosionOrigin"] = glm::vec3(0, 0, 0);
 
-    //camera (with lifetime) slightly above the player and looking down at the player
-    //camera will be positioned just above the player
-    glm::vec3 cameraPosition = glm::vec3(0, 10, 0);
+    //camera (with lifetime) behind the player
     auto cam = deathEffectEW.FirstChildByName("Camera");
-    cam["Transform"]["Position"] = cameraPosition;
+    cam["Transform"]["Position"] = glm::vec3(0, 2.5f, 1.8f);
+    cam["Transform"]["Orientation"] = glm::vec3(5.655f, 0, 0);
     Events::SetCamera eSetCamera;
     eSetCamera.CameraEntity = cam;
     m_EventBroker->Publish(eSetCamera);
 
-    //on deathanim done -> del entity
+    //done -> del entity
     m_World->DeleteEntity(e.Player.ID);
     return true;
 }
