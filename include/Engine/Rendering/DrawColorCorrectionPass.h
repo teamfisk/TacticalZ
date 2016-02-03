@@ -7,7 +7,6 @@
 #include "ShaderProgram.h"
 //#include "Util/UnorderedMapVec2.h"
 #include "Texture.h"
-#include "imgui/imgui.h"
 
 class DrawColorCorrectionPass
 {
@@ -17,13 +16,14 @@ public:
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
 
-    void Draw(GLuint sceneTexture, GLuint bloomTexture, GLfloat gamma, GLfloat exposure);
+    void Draw(GLuint sceneTexture, GLuint bloomTexture);
 private:
     const IRenderer* m_Renderer;
 
     ShaderProgram* m_ColorCorrectionProgram;
 
     Model* m_ScreenQuad;
+    GLfloat m_Exposure;
 };
 
 #endif 

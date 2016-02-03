@@ -17,21 +17,15 @@ uniform bool ExponentialAccelaration;
 in VertexData{
 	vec3 Position;
 	vec3 Normal;
-	vec3 Tangent;
-	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
-	float ExplosionPercentageElapsed;
 }Input[];
 
 out VertexData{
 	vec3 Position;
 	vec3 Normal;
-	vec3 Tangent;
-	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
-	float ExplosionPercentageElapsed;
 }Output;
 
 layout(triangles) in;
@@ -120,17 +114,12 @@ void main()
 		{
 			// calculate the max distance (s) the triangle will move
 			float s = (randomVelocity.x * ExplosionDuration) + (0.5 * a * pow(ExplosionDuration, 2));
-			float te = (length(triangleCenter2ExplosionRadius) / s);
 			
-			Output.ExplosionColor = EndColor;
-			Output.ExplosionPercentageElapsed = te;
-
+			Output.ExplosionColor = EndColor * (length(triangleCenter2ExplosionRadius) / s);
 		}
 		else
 		{
-			Output.ExplosionColor = EndColor;
-			Output.ExplosionPercentageElapsed = timePercetage;
-
+			Output.ExplosionColor = EndColor * timePercetage;
 		}
 		
 		// for every vertex on the triangle...
@@ -143,8 +132,6 @@ void main()
 			Output.Normal = Input[i].Normal;
 			Output.Position = Input[i].Position;
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
-			Output.Tangent = Input[i].Tangent;
-			Output.BiTangent = Input[i].BiTangent;
 			
 			// convert to model space for the gravity to always be in -y
 			vec4 ExplodedPositionInModelSpace = M * vec4(ExplodedPosition, 1.0);
@@ -167,14 +154,11 @@ void main()
 		// if explosion color should be affected by distance instead of time...
 		if (ColorByDistance == true)
 		{
-			Output.ExplosionColor = EndColor;
-			Output.ExplosionPercentageElapsed = 0.0;
+			Output.ExplosionColor = vec4(0.0);
 		}
 		else
 		{
-			Output.ExplosionColor = EndColor;
-			Output.ExplosionPercentageElapsed = timePercetage;
-
+			Output.ExplosionColor = EndColor * timePercetage;
 		}
 		
 		// for every vertex on the triangle...
@@ -184,9 +168,7 @@ void main()
 			Output.Normal = Input[i].Normal;
 			Output.Position = Input[i].Position;
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
-			Output.Tangent = Input[i].Tangent;
-			Output.BiTangent = Input[i].BiTangent;
-
+			
 			// no change in position, pass through vertex
 			gl_Position = gl_in[i].gl_Position;
 			EmitVertex();
