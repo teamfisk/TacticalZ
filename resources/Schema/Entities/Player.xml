@@ -6,6 +6,7 @@
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
+    <c:Dash/>
     <c:Collidable/>
     <c:Health/>
     <c:Physics>

@@ -43,8 +43,14 @@ void PlayerMovementSystem::Update(double dt)
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check - 
             //TODO: check if playerclass is assault!
-            controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f);
+            if (player.HasComponent("Dash")) {
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f);
+            }
             glm::vec3 wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
+            //this makes sure you can only dash in the 4 directions: forw,backw,left,right
+            if (controller->AssaultDashDoubleTapped() && controller->Movement().z != 0 && controller->Movement().x != 0) {
+                wishDirection = glm::vec3(controller->Movement().x, 0, 0)* glm::inverse(glm::quat(ori));
+            }
             float wishSpeed;
             if (controller->Crouching()) {
                 wishSpeed = playerCrouchSpeed;
@@ -74,7 +80,7 @@ void PlayerMovementSystem::Update(double dt)
                 ImGui::InputFloat("surfaceFriction", &surfaceFriction);
                 float accelerationSpeed = actualAccel * (float)dt * wishSpeed * surfaceFriction;
                 //if doubleTapped do Assault Dash - but only boost maximum 50.0f
-                float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 20.0f : 1.0f;
+                float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
                 accelerationSpeed = glm::min(doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed), 50.0f);
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
@@ -84,8 +90,7 @@ void PlayerMovementSystem::Update(double dt)
             if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
                 if (velocity.y == 0.f) {
                     controller->SetDoubleJumping(false);
-                }
-                else {
+                } else {
                     controller->SetDoubleJumping(true);
                 }
                 velocity.y += 4.f;
