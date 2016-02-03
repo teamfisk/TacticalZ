@@ -26,6 +26,9 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventBroker, bool editorMode
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &SoundSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
+    EVENT_SUBSCRIBE_MEMBER(m_EPause, &SoundSystem::OnPause);
+    EVENT_SUBSCRIBE_MEMBER(m_EResume, &SoundSystem::OnResume);
+    EVENT_SUBSCRIBE_MEMBER(m_EComponentAttached, &SoundSystem::OnComponentAttached);
 }
 
 SoundSystem::~SoundSystem()
@@ -57,7 +60,6 @@ void SoundSystem::Update(double dt)
 {
     m_EventBroker->Process<SoundSystem>();
     playerStep(dt);
-    addNewEmitters(dt); // can be optimized with "EEntityCreated"
     deleteInactiveEmitters(); // can be optimized with "EEntityDeleted"
     updateEmitters(dt);
     updateListener(dt);
@@ -87,28 +89,11 @@ void SoundSystem::deleteInactiveEmitters()
             }
         } else {
             // Entity / Component has been removed
-            stopSound((*it).second);
+            stopSound(it->second);
             alDeleteBuffers(1, &it->second->ALsource);
             alDeleteSources(1, &it->second->ALsource);
             delete it->second;
             it = m_Sources.erase(it);
-        }
-    }
-}
-
-void SoundSystem::addNewEmitters(double dt)
-{
-    auto emitterComponents = m_World->GetComponents("SoundEmitter");
-    if (emitterComponents == nullptr) {
-        return;
-    }
-    for (auto it = emitterComponents->begin(); it != emitterComponents->end(); it++) {
-        EntityID emitter = (*it).EntityID;
-        std::unordered_map<EntityID, Source*>::iterator source;
-        source = m_Sources.find(emitter);
-        if (source == m_Sources.end()) { // Did not exist, add it
-            Source* source = createSource((std::string)(*it)["FilePath"]);
-            m_Sources[emitter] = source;
         }
     }
 }
@@ -118,6 +103,9 @@ void SoundSystem::updateEmitters(double dt)
     std::unordered_map<EntityID, Source*>::iterator it;
     for (it = m_Sources.begin(); it != m_Sources.end(); it++) {
         // Get previous pos
+        if (!m_World->ValidEntity(it->first)) {
+            return;
+        }
         glm::vec3 previousPos;
         alGetSource3f(it->second->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
         // Get next pos
@@ -180,6 +168,15 @@ void SoundSystem::playSound(Source* source)
     alSourcePlay(source->ALsource);
 }
 
+void SoundSystem::playQueue(QueuedBuffers qb)
+{
+    for (int i = 0; i < qb.second.size(); i++) {
+        alSourceQueueBuffers(qb.first, 1, &qb.second[i]);
+    }
+    alSourcePlay(qb.first);
+}
+
+
 void SoundSystem::stopSound(Source* source)
 {
     alSourceStop(source->ALsource);
@@ -210,9 +207,13 @@ void SoundSystem::playerJumps()
 
 void SoundSystem::playerStep(double dt)
 {
+    if (!m_World->ValidEntity(m_LocalPlayer)) {
+        return;
+    }
     if (m_LocalPlayer == EntityID_Invalid) {
         return;
     }
+
     m_TimeSinceLastFootstep += dt;
     glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer, "Physics")["Velocity"];
     float playerSpeed = glm::length(vel);
@@ -260,8 +261,6 @@ bool SoundSystem::OnPlaySoundOnPosition(const Events::PlaySoundOnPosition & e)
     (float&)(double)emitter["MaxDistance"] = e.MaxDistance;
     (float&)(double)emitter["RollOffFactor"] = e.RollOffFactor;
     (float&)(double)emitter["ReferenceDistance"] = e.ReferenceDistance;
-    auto model = m_World->AttachComponent(emitterID, "Model");
-    (std::string&)model["Resource"] = "Models/Core/UnitCube.mesh"; // 360NoScope UnitCube
     source->Type = SoundType::SFX;
     m_Sources[emitterID] = source;
     playSound(source);
@@ -352,24 +351,20 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned & e)
 
 bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
 {
-    if (e.Player.ID == EntityID_Invalid) {
-        //return false;
-    }
     if (e.Command == "Jump" && e.Value > 0) {
         if (e.PlayerID == -1) { // local player
-            //bool airBorne = ((glm::vec3)m_World->GetComponent(e.Player.ID, "Physics")["Velocity"]).y != 0;
-            //if (!airBorne) {
             playerJumps();
-            //}
             return true;
         }
     }
+    // TEMP: testing purpose (obviously)
     if (e.Command == "TakeDamage" && e.Value > 0) {
         if (e.PlayerID == -1) { //Local Player
             Events::PlayerDamage ePlayerDamage;
             ePlayerDamage.Damage = 1;
             ePlayerDamage.Player = EntityWrapper(m_World, e.Player.ID);
             m_EventBroker->Publish(ePlayerDamage);
+            return true;
         }
     }
     return false;
@@ -383,7 +378,7 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     if (team == homeTeam) {
         ev.FilePath = "Audio/announcer/objective_achieved.wav";
     } else {
-        ev.FilePath = "Audio/announcer/objective_failed.wav";
+        ev.FilePath = "Audio/announcer/objective_failed.wav"; // have not been tested
     }
     EntityID child = m_World->CreateEntity(m_LocalPlayer);
     m_World->AttachComponent(child, "Transform");
@@ -395,17 +390,27 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
 
 bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 {
-    //if (e.Player.ID == m_LocalPlayer) {
-    Events::PlaySoundOnEntity ev;
+    // Should check for only local players here...
     EntityID child = m_World->CreateEntity(m_LocalPlayer);
     m_World->AttachComponent(child, "Transform");
     m_World->AttachComponent(child, "SoundEmitter");
-    ev.EmitterID = child;
+
     std::uniform_int_distribution<int> dist(1, 12);
     int rand = dist(generator);
-    ev.FilePath = "Audio/hurt/hurt" + std::to_string(rand) + ".wav";
-    m_EventBroker->Publish(ev);
-    //}
+    Source* source = createSource("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
+    source->Type = SoundType::SFX;
+    m_Sources[child] = source;
+    //playSound(source);
+
+    // breathe
+    std::vector<ALuint> buffers;
+    buffers.push_back(source->SoundResource->Buffer());
+    int ammountOfbreaths = (e.Damage / 10) + 2; // TEMP: Idk something stupid like this shit
+    for (int i = 0; i < ammountOfbreaths; i++) {
+        buffers.push_back(ResourceManager::Load<Sound>("Audio/exhausted/breath.wav")->Buffer());
+    }
+    playQueue(QueuedBuffers(std::make_pair(source->ALsource, buffers)));
+
     return false;
 }
 
@@ -417,7 +422,7 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
         m_World->AttachComponent(child, "Transform");
         m_World->AttachComponent(child, "SoundEmitter");
         ev.EmitterID = child;
-        ev.FilePath = "Audio/die/die2.wav"; // random between a bunch
+        ev.FilePath = "Audio/die/die2.wav"; // should random between a bunch
         m_EventBroker->Publish(ev);
     }
     return false;
@@ -440,6 +445,16 @@ bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 bool SoundSystem::OnComponentAttached(const Events::ComponentAttached & e)
 {
     if (e.Component.Info.Name == "SoundEmitter") {
+        auto component = m_World->GetComponent(e.Entity.ID, "SoundEmitter");
+        Source* source = createSource(component["FilePath"]);
+        m_Sources[e.Entity.ID] = source;
+    }
+    return false;
+}
+
+bool SoundSystem::OnComponentDeleted(const Events::ComponentDeleted & e)
+{
+    if (e.ComponentType == "SoundEmitter") {
 
     }
     return false;
@@ -451,6 +466,22 @@ bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
         Events::PlayBackgroundMusic ev;
         ev.FilePath = "Audio/bgm/drumstest.wav";
         m_EventBroker->Publish(ev);
+    }
+    return false;
+}
+
+bool SoundSystem::OnPause(const Events::Pause & e)
+{
+    for (auto it = m_Sources.begin(); it != m_Sources.end(); it++) {
+        alSourcePause(it->second->ALsource);
+    }
+    return false;
+}
+
+bool SoundSystem::OnResume(const Events::Resume &e)
+{
+    for (auto it = m_Sources.begin(); it != m_Sources.end(); it++) {
+        alSourcePlay(it->second->ALsource);
     }
     return false;
 }

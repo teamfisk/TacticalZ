@@ -31,7 +31,13 @@
 #include "Core/EPlayerDeath.h"
 #include "Core/EPlayerHealthPickup.h"
 #include "Core/EComponentAttached.h"
+#include "Core/EComponentDeleted.h"
+#include "Core/EEntityDeleted.h"
 #include "Collision/ETrigger.h"
+#include "Core/EPause.h"
+
+
+typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
 
 enum class SoundType {
     SFX,
@@ -67,7 +73,6 @@ private:
 
     // Logic 
     void initOpenAL();
-    void addNewEmitters(double dt);
     void updateEmitters(double dt);
     void deleteInactiveEmitters();
     void stopEmitters();
@@ -79,6 +84,8 @@ private:
 
     // Specific logic
     void playSound(Source* source);
+    // Need to be the same format (sample rate etc)
+    void playQueue(QueuedBuffers qb);
     void stopSound(Source* source);
     void playerDamaged();
     void playerShot();
@@ -93,8 +100,6 @@ private:
     World* m_World = nullptr;
     EventBroker* m_EventBroker = nullptr;
     std::unordered_map<EntityID, Source*> m_Sources;
-
-
 
     float m_BGMVolumeChannel = 1.0f;
     float m_SFXVolumeChannel = 1.0f;
@@ -139,8 +144,14 @@ private:
     bool OnPlayerHealthPickup(const Events::PlayerHealthPickup &e);
     EventRelay<SoundSystem, Events::ComponentAttached> m_EComponentAttached;
     bool OnComponentAttached(const Events::ComponentAttached &e);
+    EventRelay<SoundSystem, Events::ComponentDeleted> m_EComponentDeleted;
+    bool OnComponentDeleted(const Events::ComponentDeleted &e);
     EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(const Events::TriggerTouch &e);
+    EventRelay<SoundSystem, Events::Pause> m_EPause;
+    bool OnPause(const Events::Pause &e);
+    EventRelay<SoundSystem, Events::Resume> m_EResume;
+    bool OnResume(const Events::Resume &e);
 
 
 
