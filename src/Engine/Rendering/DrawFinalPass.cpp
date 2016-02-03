@@ -66,9 +66,9 @@ void DrawFinalPass::Draw(RenderScene& scene)
         glClear(GL_DEPTH_BUFFER_BIT);
     }
 
-    DrawModelRenderQueues(scene.OpaqueObjects, scene);
+    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
-    DrawModelRenderQueues(scene.TransparentObjects, scene);
+    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
 
     delete state;

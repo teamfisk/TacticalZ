@@ -56,7 +56,7 @@ void PickingPass::Draw(RenderScene& scene)
     }
     m_Camera = scene.Camera;
 
-    for (auto &job : scene.OpaqueObjects) {
+    for (auto &job : scene.Jobs.OpaqueObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
@@ -102,7 +102,7 @@ void PickingPass::Draw(RenderScene& scene)
         }
     }
 
-    for (auto &job : scene.TransparentObjects) {
+    for (auto &job : scene.Jobs.TransparentObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {

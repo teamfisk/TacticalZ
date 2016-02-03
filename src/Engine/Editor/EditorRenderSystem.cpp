@@ -56,9 +56,9 @@ void EditorRenderSystem::Update(double dt)
             for (auto matGroup : model->MaterialGroups()) {
                 std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f);
                 if (cModel["Transparent"]) {
-                    scene.TransparentObjects.push_back(modelJob);
+                    scene.Jobs.TransparentObjects.push_back(modelJob);
                 } else {
-                    scene.OpaqueObjects.push_back(modelJob);
+                    scene.Jobs.OpaqueObjects.push_back(modelJob);
                 }
             }
         }
@@ -75,7 +75,7 @@ void EditorRenderSystem::Update(double dt)
             EntityWrapper entity(m_World, cPointLight.EntityID);
             ComponentWrapper& cTransform = entity["Transform"];
             std::shared_ptr<PointLightJob> pointLightJob = std::make_shared<PointLightJob>(cTransform, cPointLight, entity.World);
-            scene.PointLightJobs.push_back(pointLightJob);
+            scene.Jobs.PointLight.push_back(pointLightJob);
         }
     }
 

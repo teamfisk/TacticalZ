@@ -40,7 +40,7 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
     return entity == m_CurrentCamera || entity.IsChildOf(m_CurrentCamera);
 }
 
-void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
+void RenderSystem::fillModels(RenderScene::Queues &Jobs)
 {
     auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
@@ -106,14 +106,15 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     fillColor, 
                     fillPercentage
                 ));
+
                 if(explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
                     cModel["Transparent"] = true;
                 }
 
                 if (cModel["Transparent"]) {
-                    transparentJobs.push_back(explosionEffectJob);
+                    Jobs.TransparentObjects.push_back(explosionEffectJob);
                 } else {
-                    opaqueJobs.push_back(explosionEffectJob);
+                    Jobs.OpaqueObjects.push_back(explosionEffectJob);
                 }
             } else {
                 std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
@@ -130,9 +131,9 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     cModel["Transparent"] = true;
                 }
                 if (cModel["Transparent"]) {
-                    transparentJobs.push_back(modelJob);
+                    Jobs.TransparentObjects.push_back(modelJob);
                 } else {
-                    opaqueJobs.push_back(modelJob);
+                    Jobs.OpaqueObjects.push_back(modelJob);
                 }
             }
         }
@@ -251,10 +252,10 @@ void RenderSystem::Update(double dt)
         scene.AmbientColor = (glm::vec4)(*cSceneLight->begin())["AmbientColor"];
     }
 
-    fillModels(scene.OpaqueObjects, scene.TransparentObjects);
-    fillPointLights(scene.PointLightJobs, m_World);
-    fillDirectionalLights(scene.DirectionalLightJobs, m_World);
-    fillText(scene.TextJobs, m_World);
+    fillModels(scene.Jobs);
+    fillPointLights(scene.Jobs.PointLight, m_World);
+    fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
+    fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);
    
 }
