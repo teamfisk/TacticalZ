@@ -2,6 +2,6 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
-	<xs:element name="ShieldComponent">
+	<xs:element name="Shield">
 	</xs:element>
 </xs:schema>

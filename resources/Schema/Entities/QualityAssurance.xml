@@ -1568,7 +1568,7 @@
             <c:Model>
               <Resource>Models/Core/UnitHexagon.mesh</Resource>
             </c:Model>
-            <c:ShieldComponent/>
+            <c:Shield/>
             <c:Transform>
               <Position X="0" Y="1.47765553" Z="0"/>
               <Orientation X="0" Y="2.15300012" Z="0"/>
