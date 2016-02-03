@@ -85,6 +85,20 @@ bool RenderState::BlendFunc(GLenum sfactor, GLenum dfactor)
     return !GLERROR("RenderState::BlendFunc");
 }
 
+
+bool RenderState::StencilFunc(GLenum sfail, GLenum dpfail, GLenum dppass)
+{
+    GLint originalSFail;
+    glGetIntegerv(GL_STENCIL_FAIL, &originalSFail);
+    GLint originalDPFail;
+    glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &originalDPFail);
+    GLint originalDPPass;
+    glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &originalDPPass);
+    m_ResetFunctions.push_back(std::bind(glStencilOp, originalSFail, originalDPFail, originalDPPass));
+    glStencilOp(sfail, dpfail, dppass);
+    return !GLERROR("StencilFunc");
+}
+
 bool RenderState::DepthMask(GLboolean flag)
 {
     GLboolean original;

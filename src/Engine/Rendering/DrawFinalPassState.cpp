@@ -1,6 +1,7 @@
 #include "Rendering/DrawFinalPassState.h"
 
 
+
 DrawFinalPassState::DrawFinalPassState(GLuint frameBuffer)
 {
     BindFramebuffer(frameBuffer);
@@ -15,3 +16,18 @@ DrawFinalPassState::~DrawFinalPassState()
 {
 
 }
+
+DrawStencilState::DrawStencilState(GLuint frameBuffer)
+{
+    BindFramebuffer(frameBuffer);
+    Enable(GL_STENCIL_TEST);
+    StencilFunc(GL_KEEP, GL_KEEP, GL_REPLACE);
+    Enable(GL_DEPTH_TEST);
+    ClearColor(glm::vec4(0.f));
+}
+
+DrawStencilState::~DrawStencilState()
+{
+
+}
+

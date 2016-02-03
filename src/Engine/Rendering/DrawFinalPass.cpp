@@ -55,6 +55,14 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ExplosionEffectProgram->BindFragDataLocation(1, "bloomColor");
     m_ExplosionEffectProgram->Link();
     GLERROR("Creating explosion program");
+
+    m_ShieldToStencilProgram = ResourceManager::Load<ShaderProgram>("#ShieldToStencilProgram");
+    m_ShieldToStencilProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ShieldStencil.vert.glsl")));
+    m_ShieldToStencilProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ShieldStencil.frag.glsl")));
+    m_ShieldToStencilProgram->Compile();
+    m_ShieldToStencilProgram->Link();
+    GLERROR("Creating Shield program");
+
 }
 
 void DrawFinalPass::Draw(RenderScene& scene)
@@ -65,14 +73,30 @@ void DrawFinalPass::Draw(RenderScene& scene)
     if (scene.ClearDepth) {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
+    //might need to clear stencil here
 
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
-
     delete state;
+
+    DrawStencilState* stencilState = new DrawStencilState(m_FinalPassFrameBuffer.GetHandle());
+    glClear(GL_STENCIL_BUFFER_BIT);
+    //Draw shields to stencil pass
+    DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
+    GLERROR("StencilPass");
+
+    //Draw Opaque shielded objects
+    DrawShieldedModelRenderQueue(scene.Jobs.OpaqueShieldedObjects, scene);
+    GLERROR("Shielded Opaque object");
+
+    //Draw Transparen Shielded objects
+    //DrawShieldedModelRenderQueue(scene.Jobs.TransparentShieldedObjects, scene);
+    GLERROR("Shielded Transparent objects");
+
     GLERROR("END");
+    delete stencilState;
 }
 
 
@@ -110,7 +134,7 @@ void DrawFinalPass::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm:
     GLERROR("MipMap Texture initialization failed");
 }
 
-void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& job, RenderScene& scene)
+void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
 {
     GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
     GLERROR("forwardHandle");
@@ -121,7 +145,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());
 
-    for(auto &job : job)
+    for(auto &job : jobs)
     {
         auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
         if(explosionEffectJob) {
@@ -199,6 +223,120 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
         }
     }
 
+}
+
+
+void DrawFinalPass::DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
+{
+    m_ShieldToStencilProgram->Bind();
+    GLuint shaderHandle = m_ShieldToStencilProgram->GetHandle();
+
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+
+    for (auto &job : jobs) {
+        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+        if (modelJob) {
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+
+
+            glBindVertexArray(modelJob->Model->VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+            glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex*sizeof(unsigned int)));
+            if (GLERROR("models end")) {
+                continue;
+            }
+        }
+    }
+}
+
+void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
+{
+    GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
+    GLERROR("forwardHandle");
+    GLuint explosionHandle = m_ExplosionEffectProgram->GetHandle();
+    GLERROR("explosionHandle");
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightCullingPass->LightSSBO());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());
+
+    for (auto &job : jobs) {
+        auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
+        if (explosionEffectJob) {
+            //Bind program
+            if (GLERROR("Prebind")) {
+                continue;
+            }
+            m_ExplosionEffectProgram->Bind();
+            if (GLERROR("BindProgram")) {
+                continue;
+            }
+
+            glDisable(GL_CULL_FACE);
+
+            //Bind uniforms
+            BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
+            if (GLERROR("BindExplosionUniforms")) {
+                continue;
+            }
+
+            if (explosionEffectJob->Model->m_RawModel->m_Skeleton != nullptr) {
+
+                if (explosionEffectJob->Animation != nullptr) {
+                    std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(*explosionEffectJob->Animation, explosionEffectJob->AnimationTime);
+                    glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                }
+            }
+            if (GLERROR("Animation")) {
+                continue;
+            }
+
+            //bind textures
+            BindExplosionTextures(explosionEffectJob);
+            if (GLERROR("BindExplosionTextures")) {
+                continue;
+            }
+            //draw
+            glBindVertexArray(explosionEffectJob->Model->VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
+            glDrawElements(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(explosionEffectJob->StartIndex*sizeof(unsigned int)));
+            glEnable(GL_CULL_FACE);
+            if (GLERROR("explosion effect end")) {
+                continue;
+            }
+
+        } else {
+            auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+            if (modelJob) {
+                //bind forward program
+                m_ForwardPlusProgram->Bind();
+                glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+
+                //bind uniforms
+                BindModelUniforms(forwardHandle, modelJob, scene);
+
+                //bind textures
+                BindModelTextures(modelJob);
+
+                if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
+
+                    if (modelJob->Animation != nullptr) {
+                        std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
+                        glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                    }
+                }
+
+                //draw
+                glBindVertexArray(modelJob->Model->VAO);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+                glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex*sizeof(unsigned int)));
+                if (GLERROR("models end")) {
+                    continue;
+                }
+            }
+        }
+    }
 }
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
