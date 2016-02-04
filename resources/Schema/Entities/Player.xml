@@ -2,7 +2,6 @@
 <Entity name="Player" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Health/>
     <c:AABB>
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
@@ -11,6 +10,7 @@
       <CoolDownMaxTimer>2.0</CoolDownMaxTimer>
     </c:DashAbility>
     <c:Collidable/>
+    <c:Health/>
     <c:Physics>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
     </c:Physics>
@@ -23,7 +23,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="8.60201447e-23" Y="0" Z="3.9201616e-23"/>
+      <Position X="9.56501799e-22" Y="-0.471999973" Z="4.35902473e-22"/>
     </c:Transform>
   </Components>
 
@@ -104,12 +104,19 @@
             </Entity>
             <Entity name="Weapon">
               <Components>
+                <c:ExplosionEffect>
+                  <ColorByDistance>true</ColorByDistance>
+                  <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
+                  <ExplosionDuration>3.7999999523162842</ExplosionDuration>
+                  <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
+                  <Randomness>true</Randomness>
+                </c:ExplosionEffect>
                 <c:Model>
-                  <Resource>Models/AssaultWeapon.mesh</Resource>
+                  <Resource>Models/AssaultWeaponRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="0.180000007" Y="-0.183000013" Z="0"/>
-                  <Orientation X="0" Y="4.64700031" Z="0"/>
+                  <Orientation X="0" Y="3.08300018" Z="0"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -144,7 +151,7 @@
       <Components>
         <c:Animation>
           <Name>Hold Pos</Name>
-          <Time>0.73515426169631848</Time>
+          <Time>0.73506627647571587</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:HiddenForLocalPlayer/>

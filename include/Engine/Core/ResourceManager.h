@@ -200,13 +200,16 @@ static T* ResourceManager::Load(const std::string& resourceName, Resource* paren
     }
 
     //If resource has already been cached and completely loaded.
-    it = m_ResourceCache.find(cacheKey);
-    if (it != m_ResourceCache.end()) {
-        if (it->second != nullptr) {
-            return static_cast<T*>(it->second);
-        } else {
-            //Don't return null on failure, exception instead.
-            throw Resource::FailedLoadingException();
+    {
+        boost::lock_guard<decltype(m_Mutex)> guard(m_Mutex);
+        it = m_ResourceCache.find(cacheKey);
+        if (it != m_ResourceCache.end()) {
+            if (it->second != nullptr) {
+                return static_cast<T*>(it->second);
+            } else {
+                //Don't return null on failure, exception instead.
+                throw Resource::FailedLoadingException();
+            }
         }
     }
 
