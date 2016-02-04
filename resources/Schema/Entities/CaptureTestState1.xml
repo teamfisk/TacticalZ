@@ -9,7 +9,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/DummyScene.mesh</Resource>
+          <Resource>Models/Test/DummyScene.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>

@@ -20,7 +20,7 @@
         <Entity name="Model">
           <Components>
             <c:Model>
-              <Resource>Models/Assault.obj</Resource>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
               <Color A="1" B="3.92156863" G="3.92156863" R="3.92156863"/>
             </c:Model>
             <c:Transform>

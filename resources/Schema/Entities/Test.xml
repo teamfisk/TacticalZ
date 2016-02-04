@@ -6,7 +6,7 @@
 			<Orientation X="0" Y="0" Z="0"/>
 		</c:Transform>
 		<c:Model>
-			<Resource>Models/DummyScene.mesh</Resource>
+			<Resource>Models/Test/DummyScene.mesh</Resource>
 		</c:Model>
 	</Components>
 	<Children>

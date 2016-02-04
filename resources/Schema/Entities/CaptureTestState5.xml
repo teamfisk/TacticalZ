@@ -160,7 +160,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>Models/DummyScene.mesh</Resource>
+          <Resource>Models/Test/DummyScene.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-0.600000024" Y="0" Z="0"/>

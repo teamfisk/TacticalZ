@@ -797,7 +797,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/SecondaryWeapon.mesh</Resource>
+                      <Resource>Models/Weapons/SecondaryWeapon.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -844,7 +844,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/AssualtSoft.mesh</Resource>
+                      <Resource>Models/Test/AssaultTPoseSoftEdge.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -984,7 +984,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/Assualt.mesh</Resource>
+                      <Resource>Models/Test/AssaultTPoseHardEdge.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -1021,7 +1021,7 @@
         <Entity name="RedTeamHomeCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-30"/>
@@ -1073,7 +1073,7 @@
         <Entity name="RedMiddleCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-15"/>
@@ -1118,7 +1118,7 @@
         <Entity name="MiddleCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -1161,7 +1161,7 @@
         <Entity name="BlueMiddleCaapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="15"/>
@@ -1207,7 +1207,7 @@
         <Entity name="BlueTeamHomeCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="30"/>
