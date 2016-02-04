@@ -11,7 +11,6 @@
 #include "Core/EntityFileParser.h"
 
 #include "Core/EPlayerDeath.h"
-#include "Core/EPlayerDamage.h"
 
 class PlayerDeathSystem : public ImpureSystem
 {
@@ -23,9 +22,5 @@ public:
 private:
     EventRelay<PlayerDeathSystem, Events::PlayerDeath> m_OnPlayerDeath;
     bool OnPlayerDeath(Events::PlayerDeath& e);
-
-    EventRelay<PlayerDeathSystem, Events::InputCommand> m_OnInputCommand;
-    bool OnInputCommand(const Events::InputCommand& e);
-
 };
 #endif

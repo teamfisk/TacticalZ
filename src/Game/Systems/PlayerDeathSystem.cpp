@@ -3,38 +3,7 @@
 PlayerDeathSystem::PlayerDeathSystem(World* m_World, EventBroker* eventBroker)
     : System(m_World, eventBroker)
 {
-    EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerDeathSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerDeathSystem::OnPlayerDeath);
-}
-
-bool PlayerDeathSystem::OnInputCommand(const Events::InputCommand& e)
-{
-    //testing: Jump > playerdamage
-    if (e.Command != "Jump") {
-        return false;
-
-    }
-
-    // 0 = released
-    if (e.Value != 0) {
-        return false;
-
-    }
-
-    auto players = m_World->GetComponents("Player");
-
-    for (auto& cPlayer : *players) {
-        EntityWrapper player(m_World, cPlayer.EntityID);
-        Events::PlayerDamage e;
-        e.Player = player;
-        e.Damage = 50;
-        m_EventBroker->Publish(e);
-
-    }
-
-
-
-    return true;
 }
 
 void PlayerDeathSystem::Update(double dt)
