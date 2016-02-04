@@ -73,22 +73,23 @@ void DrawFinalPass::Draw(RenderScene& scene)
     if (scene.ClearDepth) {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
-    //might need to clear stencil here
+    //TODO: Do we need check for this or will it be per scene always?
+    glClear(GL_STENCIL_BUFFER_BIT);
 
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
-    delete state;
 
-    DrawStencilState* stencilState = new DrawStencilState(m_FinalPassFrameBuffer.GetHandle());
-    glClear(GL_STENCIL_BUFFER_BIT);
+    //DrawStencilState* stencilState = new DrawStencilState(m_FinalPassFrameBuffer.GetHandle());
     //Draw shields to stencil pass
+    state->StencilFunc(GL_ALWAYS, 1, 0xFF);
+    state->StencilMask(0xFF);
     DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
     GLERROR("StencilPass");
 
     //Draw Opaque shielded objects
-    DrawShieldedModelRenderQueue(scene.Jobs.OpaqueShieldedObjects, scene);
+    //DrawShieldedModelRenderQueue(scene.Jobs.OpaqueShieldedObjects, scene);
     GLERROR("Shielded Opaque object");
 
     //Draw Transparen Shielded objects
@@ -96,7 +97,8 @@ void DrawFinalPass::Draw(RenderScene& scene)
     GLERROR("Shielded Transparent objects");
 
     GLERROR("END");
-    delete stencilState;
+    delete state;
+    //delete stencilState;
 }
 
 

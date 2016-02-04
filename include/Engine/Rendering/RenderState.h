@@ -19,7 +19,9 @@ public:
     bool BindFramebuffer(GLint framebuffer);
     bool BlendEquation(GLenum mode);
     bool BlendFunc(GLenum sfactor, GLenum dfactor);
-    bool StencilFunc(GLenum sfail, GLenum dpfail, GLenum dppass);
+    bool StencilOp(GLenum sfail, GLenum dpfail, GLenum dppass);
+    bool StencilFunc(GLenum func, GLint ref, GLuint mask);
+    bool StencilMask(GLuint mask);
     bool DepthMask(GLboolean flag);
 
 private:
