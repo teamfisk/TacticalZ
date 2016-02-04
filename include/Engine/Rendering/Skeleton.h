@@ -55,19 +55,23 @@ public:
 			struct BoneProperty
 			{
 				int ID;
-				glm::vec3 Position;
-				glm::quat Rotation;
+                glm::vec3 Position;
+                glm::quat Rotation;
 				glm::vec3 Scale = glm::vec3(1);
 			};
 
 			int Index = 0;
 			double Time = 0.0;
 			std::map<int, Keyframe::BoneProperty> BoneProperties;
+            //Keyframe::BoneProperty boneProperty;
 		};
 
 		std::string Name;
 		double Duration;
+       // unsigned int KeyFrameAmount;
 		std::vector<Keyframe> Keyframes;
+        //std::map<int, std::list<Keyframe>> BoneKeyFrames;
+        
 	};
 
 	Skeleton() { }
@@ -86,6 +90,10 @@ public:
     const Animation* GetAnimation(std::string name);
     std::vector<glm::mat4> GetFrameBones(const Animation* animation, double time, bool noRootMotion = false);
     void AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+
+    void  AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+    void AccumulateBoneTransforms2(bool noRootMotion, const Animation* animation, int keyframeIndex, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+
     void PrintSkeleton();
 	void PrintSkeleton(const Bone* parent, int depthCount);
 	std::map<std::string, Animation> Animations;

@@ -51,6 +51,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
     
 
     
+/*
 
     ImGui::SliderFloat("Angle", &angle, -180.f, 180.f);
     
@@ -86,6 +87,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
     }
     
 
+*/
 
 /*
 
@@ -117,7 +119,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
         if (it != skeleton->Bones.end()) {
             it->second->ModificationMatrix = glm::mat4(glm::quat(glm::vec3(glm::radians(angle/2.f), 0.f, 0.f)));
         }
-    }*/
+    }*
 
     if (entity.HasComponent("Player")) {
         EntityWrapper cameraEntity = entity.FirstChildByName("Camera");
@@ -127,5 +129,6 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
             
         }
     }
+    */
 }
 

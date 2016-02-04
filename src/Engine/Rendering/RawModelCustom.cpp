@@ -332,6 +332,7 @@ void RawModelCustom::ReadAnimationClipSingle(unsigned int &offset, char* fileDat
         ReadAnimationKeyFrame(offset, fileData, fileByteSize, newAnimation);
     }
     m_Skeleton->Animations[newAnimation.Name] = newAnimation;
+    //m_Skeleton->Animations[newAnimation.Name].KeyFrameAmount = nrOfKeyframes;
 #else
 #endif
 }
@@ -363,12 +364,18 @@ void RawModelCustom::ReadAnimationKeyFrame(unsigned int &offset, char* fileData,
     }
 
     Skeleton::Animation::Keyframe::BoneProperty newBone;
+
     for (unsigned int i = 0; i < nrOfJoints; i++) {
         memcpy(&newBone, (fileData + offset), sizeof(Skeleton::Animation::Keyframe::BoneProperty));
         offset += sizeof(Skeleton::Animation::Keyframe::BoneProperty);
         newKeyFrame.BoneProperties[newBone.ID] = newBone;
     }
     animation.Keyframes.push_back(newKeyFrame);
+   // memcpy(&newBone, (fileData + offset), sizeof(Skeleton::Animation::Keyframe::BoneProperty));
+    //newKeyFrame.boneProperty = newBone;
+
+   // animation.BoneKeyFrames[newBone.ID].push_back(newKeyFrame);
+
 }
 
 RawModelCustom::~RawModelCustom()

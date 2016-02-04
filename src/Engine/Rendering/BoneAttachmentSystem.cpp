@@ -2,6 +2,7 @@
 
 void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& BoneAttachmentComponent, double dt)
 {
+/*
 
     if(!entity.HasComponent("Transform")) {
         return;
@@ -67,5 +68,5 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     }
     if ((bool)entity["BoneAttachment"]["InheritScale"]) {
         (glm::vec3&)entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];
-    }
+    }*/
 }
