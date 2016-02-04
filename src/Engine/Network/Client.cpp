@@ -1,9 +1,6 @@
 #include "Network/Client.h"
 
-using namespace boost::asio::ip;
-
-
-Client::Client(ConfigFile* config) : m_Socket(m_IOService)
+Client::Client(ConfigFile* config)
 {
     Network::initialize();
 
@@ -12,13 +9,11 @@ Client::Client(ConfigFile* config) : m_Socket(m_IOService)
     // Init timer
     m_TimeSinceSentInputs = std::clock();
     // Default is local host
-    std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
-    int port = config->Get<int>("Networking.Port", 27666);
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
+    address = config->Get<std::string>("Networking.Address", "127.0.0.1");
+    port = config->Get<int>("Networking.Port", 27666);
     // Set up network stream
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
     m_SendInputIntervalMs = config->Get<int>("Networking.SendInputIntervalMs", 33);
-
 }
 
 Client::~Client()
@@ -33,8 +28,6 @@ void Client::Start(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
-
-    m_Socket.connect(m_ReceiverEndpoint);
     LOG_INFO("I am client. BIP BOP");
 }
 
@@ -52,17 +45,6 @@ void Client::Update()
         sendLocalPlayerTransform();
     }
     Network::Update();
-}
-
-void Client::readFromServer()
-{
-    while (m_Socket.available()) {
-        bytesRead = receive(readBuf);
-        if (bytesRead > 0) {
-            Packet packet(readBuf, bytesRead);
-            parseMessageType(packet);
-        }
-    }
 }
 
 void Client::parseMessageType(Packet& packet)
@@ -258,40 +240,6 @@ void Client::parseSnapshot(Packet& packet)
     }
 }
 
-int Client::receive(char* data)
-{
-    boost::system::error_code error;
-
-    int bytesReceived = m_Socket.receive_from(boost
-        ::asio::buffer((void*)data, INPUTSIZE),
-        m_ReceiverEndpoint,
-        0, error);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataReceived += bytesReceived;
-        m_NetworkData.DataReceivedThisInterval += bytesReceived;
-        m_NetworkData.AmountOfMessagesReceived++;
-    }
-    if (error) {
-        //LOG_ERROR("receive: %s", error.message().c_str());
-    }
-    return bytesReceived;
-}
-
-void Client::send(Packet& packet)
-{
-    m_Socket.send_to(boost::asio::buffer(
-        packet.Data(),
-        packet.Size()),
-        m_ReceiverEndpoint, 0);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataSent += packet.Size();
-        m_NetworkData.DataSentThisInterval += packet.Size();
-        m_NetworkData.AmountOfMessagesSent++;
-    }
-}
-
 void Client::connect()
 {
     Packet packet(MessageType::Connect, m_SendPacketID);
@@ -457,7 +405,6 @@ void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID client
 {
     m_ServerIDToClientID.insert(std::make_pair(serverEntityID, clientEntityID));
     m_ClientIDToServerID.insert(std::make_pair(clientEntityID, serverEntityID));
-
 }
 
 void Client::deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)

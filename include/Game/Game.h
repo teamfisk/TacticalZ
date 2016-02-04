@@ -26,8 +26,10 @@
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"
-#include "Network/Server.h"
+#include "Network/HybridServer.h"
 #include "Network/HybridClient.h"
+#include "Network/TCPClient.h"
+#include "Network/TCPServer.h"
 
 // Sound
 #include "Sound/SoundSystem.h"

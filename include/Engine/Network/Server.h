@@ -5,7 +5,6 @@
 #include <ctime>
 
 #include <glm/common.hpp>
-#include <boost/asio/ip/udp.hpp>
 
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
@@ -18,7 +17,6 @@
 #include "Core/EPlayerSpawned.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
-
 class Server : public Network
 {
 public:
@@ -26,12 +24,9 @@ public:
     ~Server();
     void Start(World* m_world, EventBroker *eventBroker) override;
     void Update() override;
-private:
-    // UDP logic
-    boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
-    boost::asio::io_service m_IOService;
-    boost::asio::ip::udp::socket m_Socket;
-
+protected:
+    template<class T>
+    T m_ReceiverEndpoint;
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
     // HACK: Fix INPUTSIZE
@@ -41,12 +36,12 @@ private:
     std::clock_t previousePingMessage = std::clock();
     std::clock_t previousSnapshotMessage = std::clock();
     std::clock_t timOutTimer = std::clock();
+
     // How often we send messages (milliseconds)
     int pingIntervalMs;
     int snapshotInterval;
     int checkTimeOutInterval = 100;
     int m_NextPlayerID = 0;
-
     //Timers
     std::clock_t m_StartPingTime;
 
@@ -59,10 +54,7 @@ private:
     PacketID m_PreviousPacketID = 0;
 
     // Private member functions
-    int  receive(char* data);
-    void readFromClients();
-    void send(PlayerID player, Packet& packet);
-    void send(Packet& packet);
+    //int  receive(char* data);
     void broadcast(Packet& packet);
     void sendSnapshot();
     void addChildrenToPacket(Packet& packet, EntityID entityID);
@@ -70,15 +62,18 @@ private:
     void checkForTimeOuts();
     void disconnect(PlayerID playerID);
     void parseMessageType(Packet& packet);
-    void parseOnInputCommand(Packet& packet);
     void parseOnPlayerDamage(Packet& packet);
-    void parseConnect(Packet& packet);
-    void parseDisconnect();
-    void parseClientPing();
-    void parsePing();
     void identifyPacketLoss();
     void kick(PlayerID player);
-    PlayerID GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint);
+    // Pure virtual functions
+    virtual void parseOnInputCommand(Packet& packet) = 0;
+    virtual void readFromClients() = 0;
+    virtual void send(Packet& packet, PlayerDefinition & playerDefinition) = 0;
+    virtual void send(Packet& packet) = 0;
+    virtual void parseConnect(Packet& packet) = 0;
+    virtual void parseDisconnect() = 0;
+    virtual void parseClientPing() = 0;
+    virtual void parsePing() = 0;
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
@@ -88,7 +83,7 @@ private:
     bool OnEntityDeleted(const Events::EntityDeleted& e);
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
-    void parsePlayerTransform(Packet& packet);
+    virtual void parsePlayerTransform(Packet& packet) = 0;
 };
 
 #endif

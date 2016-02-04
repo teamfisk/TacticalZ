@@ -30,11 +30,9 @@ public:
     void Start(World* world, EventBroker* eventBroker) override;
     void Update() override;
 protected:
-    // Assio UDP logic
-    boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
-    boost::asio::io_service m_IOService;
-    boost::asio::ip::udp::socket m_Socket;
-
+    // Save for children
+    std::string address;
+    int port = 0;
     // Sending message to server logic
     int bytesRead = -1;
     char readBuf[INPUTSIZE] = { 0 };
@@ -68,9 +66,8 @@ protected:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    void readFromServer();
-    int  receive(char* data);
-    void send(Packet& packet);
+    virtual void send(Packet& packet) = 0;
+    virtual void readFromServer() = 0;
     void connect();
     void disconnect();
     void parseMessageType(Packet& packet);

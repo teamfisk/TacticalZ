@@ -2,6 +2,7 @@
 #define PlayerDefinition_h__
 #include <string>
 #include "../Core/Entity.h"
+#include <boost/asio.hpp>
 
 struct PlayerDefinition {
     ::EntityID EntityID = EntityID_Invalid;
@@ -9,6 +10,8 @@ struct PlayerDefinition {
     boost::asio::ip::udp::endpoint Endpoint;
     unsigned int PacketID;
     std::clock_t StopTime;
+    // use for tcp connections
+    boost::shared_ptr<boost::asio::ip::tcp::socket> TCPSocket;
 };
 
 #endif
