@@ -126,9 +126,9 @@ private:
     EventRelay<SoundSystem, Events::ContinueSound> m_EContinueSound;
     bool OnContinueSound(const Events::ContinueSound &e);
     EventRelay<SoundSystem, Events::SetBGMGain> m_ESetBGMGain; 
-    bool OnSetBGMGain(const Events::SetBGMGain &e); // Not tested
+    bool OnSetBGMGain(const Events::SetBGMGain &e);
     EventRelay<SoundSystem, Events::SetSFXGain> m_ESetSFXGain; 
-    bool OnSetSFXGain(const Events::SetSFXGain &e); // Not tested
+    bool OnSetSFXGain(const Events::SetSFXGain &e);
     EventRelay<SoundSystem, Events::Shoot> m_EShoot;
     bool OnShoot(const Events::Shoot &e);
     EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
