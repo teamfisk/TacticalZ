@@ -2,6 +2,7 @@
 #define RenderState_h__
 
 #include <functional>
+#include <boost/range/adaptor/reversed.hpp>
 #include "../Common.h"
 #include "../OpenGL.h"
 #include "../GLM.h"

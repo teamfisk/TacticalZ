@@ -137,7 +137,7 @@ bool RenderState::DepthMask(GLboolean flag)
 
 RenderState::~RenderState()
 {
-    for (auto& f : m_ResetFunctions) {
+    for (auto& f : boost::adaptors::reverse(m_ResetFunctions)) {
         f();
     }
 }

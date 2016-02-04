@@ -21,17 +21,18 @@ void DrawFinalPass::InitializeFrameBuffers()
 {
     glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 
     GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
 
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
+    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
     m_FinalPassFrameBuffer.Generate();
+    GLERROR("FBO generation");
 
 }
 
@@ -74,8 +75,10 @@ void DrawFinalPass::Draw(RenderScene& scene)
         glClear(GL_DEPTH_BUFFER_BIT);
     }
     //TODO: Do we need check for this or will it be per scene always?
+    glClearStencil(0x00);
     glClear(GL_STENCIL_BUFFER_BIT);
 
+    state->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
@@ -89,11 +92,13 @@ void DrawFinalPass::Draw(RenderScene& scene)
     GLERROR("StencilPass");
 
     //Draw Opaque shielded objects
-    //DrawShieldedModelRenderQueue(scene.Jobs.OpaqueShieldedObjects, scene);
+    state->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    DrawShieldedModelRenderQueue(scene.Jobs.OpaqueShieldedObjects, scene);
     GLERROR("Shielded Opaque object");
 
     //Draw Transparen Shielded objects
-    //DrawShieldedModelRenderQueue(scene.Jobs.TransparentShieldedObjects, scene);
+    DrawShieldedModelRenderQueue(scene.Jobs.TransparentShieldedObjects, scene);
     GLERROR("Shielded Transparent objects");
 
     GLERROR("END");

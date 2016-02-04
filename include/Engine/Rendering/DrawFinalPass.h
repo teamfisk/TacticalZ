@@ -50,6 +50,7 @@ private:
     GLuint m_BloomTexture;
     GLuint m_SceneTexture;
     GLuint m_DepthBuffer;
+    GLuint m_StencilBuffer;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;

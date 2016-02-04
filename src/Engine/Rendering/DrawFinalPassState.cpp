@@ -12,7 +12,7 @@ DrawFinalPassState::DrawFinalPassState(GLuint frameBuffer)
     Enable(GL_STENCIL_TEST);
     StencilFunc(GL_NOTEQUAL, 1, 0xFF);
     StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    StencilMask(0x00);
+    StencilMask(0xFF);
     ClearColor(glm::vec4(0.f, 0.f, 0.f, 0.f));
 }
 

@@ -57,17 +57,17 @@ void FrameBuffer::Generate()
             break;
         }
         
-
-        if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT) {
+        if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT || (*it)->m_Attachment != GL_STENCIL_ATTACHMENT || (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
             attachments.push_back((*it)->m_Attachment);
         }
     }
-        
+
     GLenum* bufferTextures = &attachments[0];
     glDrawBuffers(attachments.size(), bufferTextures);
 
     if (GLenum frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        LOG_ERROR("FrameBuffer incomplete: 0x%x\n", frameBufferStatus);
+        GLERROR("Framebuffer incomplete");
+        //LOG_ERROR("FrameBuffer incomplete: 0x%x\n", frameBufferStatus);
         exit(EXIT_FAILURE);
     }
 }
