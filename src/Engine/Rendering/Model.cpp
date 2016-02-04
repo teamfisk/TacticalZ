@@ -24,7 +24,12 @@ Model::Model(std::string fileName)
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, m_RawModel->m_Vertices.size() * sizeof(RawModel::Vertex), &m_RawModel->m_Vertices[0], GL_STATIC_DRAW);
+
+	if (m_RawModel->isSkined) {
+		glBufferData(GL_ARRAY_BUFFER, m_RawModel->NumVertices() * sizeof(RawModel::SkinedVertex), m_RawModel->Vertices(), GL_STATIC_DRAW);
+	} else {
+		glBufferData(GL_ARRAY_BUFFER, m_RawModel->NumVertices() * sizeof(RawModel::Vertex), m_RawModel->Vertices(), GL_STATIC_DRAW);
+	}
 
     glGenBuffers(1, &ElementBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
@@ -35,7 +40,13 @@ Model::Model(std::string fileName)
     GLERROR("GLEW: BufferFail4");
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	std::vector<int> structSizes = { 3, 3, 3, 3, 2, 4, 4 };
+	std::vector<int> structSizes;
+	if (m_RawModel->isSkined) {
+		structSizes = { 3, 3, 3, 3, 2, 4, 4 };
+	} else {
+		structSizes = { 3, 3, 3, 3, 2 };
+	}
+
     int stride = 0;
     for (int size : structSizes) {
         stride += size;
@@ -49,8 +60,10 @@ Model::Model(std::string fileName)
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
-        glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
-        glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
+		if (m_RawModel->isSkined) {
+			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
+			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
+		}
     }
     GLERROR("GLEW: BufferFail5");
 
@@ -59,8 +72,10 @@ Model::Model(std::string fileName)
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
-    glEnableVertexAttribArray(5);
-    glEnableVertexAttribArray(6);
+	if (m_RawModel->isSkined) {
+		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
+	}
     GLERROR("GLEW: BufferFail5");
 
     //CreateBuffers();

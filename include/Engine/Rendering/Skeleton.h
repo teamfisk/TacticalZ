@@ -54,24 +54,22 @@ public:
 		{
 			struct BoneProperty
 			{
-				int ID;
                 glm::vec3 Position;
                 glm::quat Rotation;
 				glm::vec3 Scale = glm::vec3(1);
 			};
 
-			int Index = 0;
-			double Time = 0.0;
-			std::map<int, Keyframe::BoneProperty> BoneProperties;
+            int Index = 0;
+            double Time = 0.0;
+            BoneProperty BoneProperties;
             //Keyframe::BoneProperty boneProperty;
 		};
-
-		std::string Name;
-		double Duration;
-       // unsigned int KeyFrameAmount;
-		std::vector<Keyframe> Keyframes;
-        //std::map<int, std::list<Keyframe>> BoneKeyFrames;
-        
+        std::string Name;
+        double Duration;
+        std::map<int, std::vector<Keyframe>> JointAnimations;
+		
+		
+		 
 	};
 
 	Skeleton() { }

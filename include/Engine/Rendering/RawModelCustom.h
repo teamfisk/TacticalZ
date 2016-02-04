@@ -33,17 +33,20 @@ protected:
 public:
     ~RawModelCustom();
     
-    struct Vertex
-    {
-        glm::vec3 Position;
-        glm::vec3 Normal;
-        glm::vec3 Tangent;
-        glm::vec3 BiNormal;
-        glm::vec2 TextureCoords;
+	struct Vertex
+	{
+		glm::vec3 Position;
+		glm::vec3 Normal;
+		glm::vec3 Tangent;
+		glm::vec3 BiNormal;
+		glm::vec2 TextureCoords;
+	};
+
+    struct SkinedVertex : public Vertex {
         glm::vec4 BoneIndices;
         glm::vec4 BoneWeights;
     };
-
+	
     struct MaterialGroup
     {
         float SpecularExponent;
@@ -64,15 +67,33 @@ public:
         std::shared_ptr<::Texture> IncandescenceMap;
     };
 
-    std::vector<MaterialGroup> MaterialGroups;
+	const Vertex*	Vertices() const {
+		if (isSkined) { 
+			return m_SkinedVertices.data(); 
+		} else {
+			return m_Vertices.data();
+		}
+	};
 
-    std::vector<Vertex> m_Vertices;
+	unsigned int	NumVertices() const {
+		if (isSkined) {
+			return m_SkinedVertices.size();
+		} else {
+			return m_Vertices.size();
+		}
+	};
+
+    std::vector<MaterialGroup> MaterialGroups;
+	bool isSkined;
+
     std::vector<unsigned int> m_Indices;
     Skeleton* m_Skeleton = nullptr;
     glm::mat4 m_Matrix;
 
 private:
    
+	std::vector<Vertex> m_Vertices;
+	std::vector<SkinedVertex> m_SkinedVertices;
 
     void ReadMeshFile(std::string filePath);
     void ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize);
@@ -89,7 +110,7 @@ private:
     void ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
     void ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips);
     void ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex);
-    void ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, Skeleton::Animation& animation);
+    void ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, std::vector<Skeleton::Animation::Keyframe>& animation);
     
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
