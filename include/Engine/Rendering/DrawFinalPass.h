@@ -22,9 +22,13 @@ public:
 
     //Return the texture that is used in later stages to apply the bloom effect
     GLuint BloomTexture() const { return m_BloomTexture; }
+    GLuint BloomTextureLowRes() const { return m_BloomTextureLowRes; }
     //Return the texture with diffuse and lighting of the scene.
     GLuint SceneTexture() const { return m_SceneTexture; }
+    GLuint SceneTextureLowRes() const { return m_SceneTextureLowRes; }
+    //Return the framebuffer used in the scene rendering stage.
     FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
+    FrameBuffer* FinalPassFrameBufferLowRes() { return &m_FinalPassFrameBufferLowRes; }
 
 
 private:
@@ -47,10 +51,12 @@ private:
     Texture* m_GreyTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
+    FrameBuffer m_FinalPassFrameBufferLowRes;
     GLuint m_BloomTexture;
     GLuint m_SceneTexture;
+    GLuint m_BloomTextureLowRes;
+    GLuint m_SceneTextureLowRes;
     GLuint m_DepthBuffer;
-    GLuint m_StencilBuffer;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;

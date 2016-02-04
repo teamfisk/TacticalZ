@@ -93,7 +93,7 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -129,9 +129,15 @@ void Renderer::Draw(RenderFrame& frame)
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTexture());
     }
     if (m_DebugTextureToDraw == 3) {
-        m_DrawScreenQuadPass->Draw(m_DrawBloomPass->GaussianTexture());
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTextureLowRes());
     }
     if (m_DebugTextureToDraw == 4) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTextureLowRes());
+    }
+    if (m_DebugTextureToDraw == 5) {
+        m_DrawScreenQuadPass->Draw(m_DrawBloomPass->GaussianTexture());
+    }
+    if (m_DebugTextureToDraw == 6) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
 

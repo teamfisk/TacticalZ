@@ -22,18 +22,33 @@ void DrawFinalPass::InitializeFrameBuffers()
     glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    GLERROR("RenderBuffer generation");
 
     GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
+    //GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
 
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+    //m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
     m_FinalPassFrameBuffer.Generate();
     GLERROR("FBO generation");
 
+    GenerateTexture(&m_SceneTextureLowRes, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/16, m_Renderer->GetViewportSize().Height/16), GL_RGB16F, GL_RGB, GL_FLOAT);
+    //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    GenerateTexture(&m_BloomTextureLowRes, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/16, m_Renderer->GetViewportSize().Height/16), GL_RGB16F, GL_RGB, GL_FLOAT);
+    //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
+    //GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
+
+    m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+    //m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
+    m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTextureLowRes, GL_COLOR_ATTACHMENT0)));
+    m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTextureLowRes, GL_COLOR_ATTACHMENT1)));
+    m_FinalPassFrameBufferLowRes.Generate();
+    GLERROR("FBO2 generation");
 }
 
 void DrawFinalPass::InitializeShaderPrograms()
@@ -93,7 +108,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
 
     //Draw Opaque shielded objects
     state->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    glStencilMask(0x00);
+    state->StencilMask(0x00);
     DrawShieldedModelRenderQueue(scene.Jobs.OpaqueShieldedObjects, scene);
     GLERROR("Shielded Opaque object");
 
@@ -103,7 +118,26 @@ void DrawFinalPass::Draw(RenderScene& scene)
 
     GLERROR("END");
     delete state;
-    //delete stencilState;
+
+
+    DrawFinalPassState* stateLowRes = new DrawFinalPassState(m_FinalPassFrameBufferLowRes.GetHandle());
+    //Draw the lowres texture that will be shown behind the shield.
+    if (scene.ClearDepth) {
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
+    //TODO: Do we need check for this or will it be per scene always?
+    //glClearStencil(0x00);
+    //glClear(GL_STENCIL_BUFFER_BIT);
+
+    //state->StencilMask(0x00);
+    //state->StencilFunc(GL_ALWAYS, 1, 0xFF);
+    state->Disable(GL_STENCIL_TEST);
+    state->Disable(GL_DEPTH_TEST);
+    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
+    GLERROR("OpaqueObjects");
+    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
+    GLERROR("TransparentObjects");
+    delete stateLowRes;
 }
 
 
@@ -113,6 +147,11 @@ void DrawFinalPass::ClearBuffer()
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_FinalPassFrameBuffer.Unbind();
+
+    m_FinalPassFrameBufferLowRes.Bind();
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_FinalPassFrameBufferLowRes.Unbind();
 }
 
 void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
