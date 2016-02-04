@@ -90,7 +90,6 @@ public:
     void AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
 
     void  AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
-    void AccumulateBoneTransforms2(bool noRootMotion, const Animation* animation, int keyframeIndex, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
 
     void PrintSkeleton();
 	void PrintSkeleton(const Bone* parent, int depthCount);

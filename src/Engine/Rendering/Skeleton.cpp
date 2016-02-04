@@ -41,7 +41,8 @@ const Skeleton::Animation* Skeleton::GetAnimation(std::string name)
 
 std::vector<glm::mat4> Skeleton::GetFrameBones(const Animation* animation, double time, bool noRootMotion /*= false*/)
 {
-    if(animation == nullptr) {
+    if(true){
+   // if(animation == nullptr) {
         std::vector<glm::mat4> finalMatrices;
         for(auto& b : Bones) {
             finalMatrices.push_back(glm::mat4(1));//b.second->OffsetMatrix);
@@ -60,14 +61,13 @@ std::vector<glm::mat4> Skeleton::GetFrameBones(const Animation* animation, doubl
 
 	int currentKeyframeIndex = GetKeyframe(*animation, time);
 
-	const Animation::Keyframe& currentFrame = animation->Keyframes[currentKeyframeIndex];
-	const Animation::Keyframe&	nextFrame = animation->Keyframes[(currentKeyframeIndex + 1) % animation->Keyframes.size()];
-	float alpha = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
+// 	const Animation::Keyframe& currentFrame = animation->Keyframes[currentKeyframeIndex];
+// 	const Animation::Keyframe&	nextFrame = animation->Keyframes[(currentKeyframeIndex + 1) % animation->Keyframes.size()];
+// 	float alpha = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
 
 	//auto animationFrame = Animations[""].Keyframes[frame];
 	std::map<int, glm::mat4> frameBones;
-    //AccumulateBoneTransforms(noRootMotion, animation, time, frameBones, RootBone, glm::mat4(1));
-    AccumulateBoneTransforms2(noRootMotion, animation, currentKeyframeIndex, time, frameBones, RootBone, glm::mat4(1));
+    AccumulateBoneTransforms(noRootMotion, animation, time, frameBones, RootBone, glm::mat4(1));
     //AccumulateBoneTransforms(noRootMotion, currentFrame, nextFrame, alpha, frameBones, RootBone, glm::mat4(1));
 
 	std::vector<glm::mat4> finalMatrices;
@@ -81,7 +81,7 @@ std::vector<glm::mat4> Skeleton::GetFrameBones(const Animation* animation, doubl
 
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe &currentFrame, const Animation::Keyframe &nextFrame, float progress, std::map<int, glm::mat4> &boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
 {
-    glm::mat4 boneMatrix;
+   /* glm::mat4 boneMatrix;
 
 
 
@@ -120,56 +120,9 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyf
 		std::string name = child->Name;
 		AccumulateBoneTransforms(noRootMotion, currentFrame, nextFrame, progress, boneMatrices, child, boneMatrix);
 	}
+*/
 
 }
-
-
-void Skeleton::AccumulateBoneTransforms2(bool noRootMotion, const Animation* animation, int keyframeIndex, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
-{
-    glm::mat4 boneMatrix = glm::mat4(1);
-
-    Animation::Keyframe currentFrame;
-    Animation::Keyframe nextFrame;
-
-    int currentFrameIndex = keyframeIndex;
-
-    while (true) {
-        std::map<int, Animation::Keyframe::BoneProperty> boneProperties = animation->Keyframes[currentFrameIndex].BoneProperties;
-        if (boneProperties.find(bone->ID) != boneProperties.end()) {
-            currentFrame = animation->Keyframes[keyframeIndex];
-            break;
-        } else {
-            
-            if(currentFrameIndex > 0) {
-                currentFrameIndex--;
-            } else {
-                break;
-            }
-        }
-    }
-    
-
-
-    if ( != animation->BoneKeyFrames.end()) { // find the bone keyframes that surrounds the current frame
-        std::list<Animation::Keyframe> boneKeyFrames = animation->BoneKeyFrames.at(bone->ID);
-        for (auto frame : boneKeyFrames) {
-            if (frame.Time <= time) {
-                currentFrame = &frame;
-            } else if (frame.Time > time) {
-                nextFrame = &frame;
-            }
-        }
-
-        //if(currentFrame == nullptr) cant happen
-
-        if (nextFrame == nullptr) {
-            std::list<Animation::Keyframe> boneKeyFrames = animation->BoneKeyFrames.at(bone->ID);
-            nextFrame = &boneKeyFrames.front();
-        }
-
-}
-
-
 
 
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
@@ -242,7 +195,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
 
 glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, glm::mat4 parentMatrix)
 {
-    glm::mat4 boneMatrix;
+   /* glm::mat4 boneMatrix;
 
     if (currentFrame.BoneProperties.find(bone->ID) != currentFrame.BoneProperties.end() || nextFrame.BoneProperties.find(bone->ID) != nextFrame.BoneProperties.end()) {
         Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties.at(bone->ID);
@@ -264,8 +217,8 @@ glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation::Keyframe
         return  GetBoneTransform(bone->Parent, currentFrame, nextFrame, progress, boneMatrix);
     } else {
         return boneMatrix;
-    }
-
+    }*/
+    return parentMatrix;
 }
 
 int Skeleton::GetBoneID(std::string name)
@@ -301,6 +254,7 @@ void Skeleton::PrintSkeleton(const Bone* bone, int depthCount)
 
 int Skeleton::GetKeyframe(const Animation& animation, double time)
 {
+/*
 	if (time < 0) {
 		time = 0;
 	}
@@ -313,6 +267,7 @@ int Skeleton::GetKeyframe(const Animation& animation, double time)
 			return (keyframe - 1) % animation.Keyframes.size();
 		}
 	}
+*/
 
 	return 0;
 }
