@@ -26,7 +26,7 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override;
     virtual void Reset();
 
-    void AssaultDashCheck(double dt, bool isJumping);
+    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer);
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
 
@@ -38,10 +38,11 @@ protected:
     bool m_Jumping = false;
     bool m_DoubleJumping = false;
     bool m_Crouching = false;
-    //assault dash membervariables
+    //assault dash membervariables - needed to calculate the doubletap- and dashlogic
     double m_AssaultDashDoubleTapDeltaTime = 0.0;
     double m_AssaultDashCoolDownTimer = 0.0;
-    double m_AssaultDashCoolDownMaxTimer = 2.0;
+    //i will let m_AssaultDashDoubleTapSensitivityTimer stay hardcoded, its not really a gamevariable (more an inputvariable), 
+    //and its very unlikely that someone wants to change that value
     const float m_AssaultDashDoubleTapSensitivityTimer = 0.25f;
     std::string m_AssaultDashTapDirection = "";
     bool m_AssaultDashDoubleTapped = false;
@@ -178,11 +179,11 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 }
 
 template <typename EventContext>
-void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping) {
+void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer) {
     m_AssaultDashDoubleTapDeltaTime += dt;
     m_AssaultDashCoolDownTimer -= dt;
-    //cooldown = m_AssaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)
-    if (m_AssaultDashCoolDownTimer > (m_AssaultDashCoolDownMaxTimer - 0.25f)) {
+    //cooldown = assaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)
+    if (m_AssaultDashCoolDownTimer > (assaultDashCoolDownMaxTimer - 0.25f)) {
         m_PlayerIsDashing = true;
     } else {
         m_PlayerIsDashing = false;
@@ -192,7 +193,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     if (m_ShiftDashing && m_AssaultDashCoolDownTimer <= 0.0f && !isJumping) {
         //player is dashing with shift
         //the wanted-direction is set in playermovement already so we dont need to check what direction we want to dash in!
-        m_AssaultDashCoolDownTimer = m_AssaultDashCoolDownMaxTimer;
+        m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
         m_AssaultDashDoubleTapped = true;
         m_AssaultDashDoubleTapDeltaTime = 0.f;
         //moving to the side has priority
@@ -223,7 +224,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     //ok, we have a valid tap, lets do it
     m_AssaultDashDoubleTapped = true;
     m_AssaultDashDoubleTapDeltaTime = 0.f;
-    m_AssaultDashCoolDownTimer = m_AssaultDashCoolDownMaxTimer;
+    m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
 }
 
 #endif
