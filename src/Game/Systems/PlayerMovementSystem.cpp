@@ -82,6 +82,8 @@ void PlayerMovementSystem::Update(double dt)
                 }
                 else {
                     controller->SetDoubleJumping(true);
+                    Events::DoubleJump e;
+                    m_EventBroker->Publish(e);
                 }
                 velocity.y += 4.f;
             }

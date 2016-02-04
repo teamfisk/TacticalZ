@@ -29,6 +29,7 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventBroker, bool editorMode
     EVENT_SUBSCRIBE_MEMBER(m_EPause, &SoundSystem::OnPause);
     EVENT_SUBSCRIBE_MEMBER(m_EResume, &SoundSystem::OnResume);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentAttached, &SoundSystem::OnComponentAttached);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
 }
 
 SoundSystem::~SoundSystem()
@@ -400,7 +401,6 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     Source* source = createSource("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
     source->Type = SoundType::SFX;
     m_Sources[child] = source;
-    //playSound(source);
 
     // breathe
     std::vector<ALuint> buffers;
@@ -483,6 +483,18 @@ bool SoundSystem::OnResume(const Events::Resume &e)
     for (auto it = m_Sources.begin(); it != m_Sources.end(); it++) {
         alSourcePlay(it->second->ALsource);
     }
+    return false;
+}
+
+bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
+{
+    Events::PlaySoundOnEntity ev;
+    EntityID child = m_World->CreateEntity(m_LocalPlayer);
+    m_World->AttachComponent(child, "Transform");
+    m_World->AttachComponent(child, "SoundEmitter");
+    ev.EmitterID = child;
+    ev.FilePath = "Audio/jump/jump2.wav";
+    m_EventBroker->Publish(ev);
     return false;
 }
 

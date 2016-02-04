@@ -4,6 +4,7 @@
 #include "Core/EPlayerSpawned.h"
 #include "Input/FirstPersonInputController.h"
 #include <imgui/imgui.h>
+#include "Events/EDoubleJump.h"
 
 class PlayerMovementSystem : public ImpureSystem, PureSystem
 {

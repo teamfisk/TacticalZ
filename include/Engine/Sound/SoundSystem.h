@@ -35,6 +35,7 @@
 #include "Core/EEntityDeleted.h"
 #include "Collision/ETrigger.h"
 #include "Core/EPause.h"
+#include "Game/Events/EDoubleJump.h"
 
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
@@ -152,6 +153,8 @@ private:
     bool OnPause(const Events::Pause &e);
     EventRelay<SoundSystem, Events::Resume> m_EResume;
     bool OnResume(const Events::Resume &e);
+    EventRelay<SoundSystem, Events::DoubleJump> m_EDoubleJump;
+    bool OnDoubleJump(const Events::DoubleJump &e);
 
 
 
