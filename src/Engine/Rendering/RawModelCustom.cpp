@@ -69,7 +69,7 @@ void RawModelCustom::ReadVertices(unsigned int& offset, char* fileData, unsigned
 		if (offset + m_SkinedVertices.size() * sizeof(SkinedVertex) > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading skined vertices failed");
 		}
-		memcpy(&m_SkinedVertices[0], fileData + offset, m_Vertices.size() * sizeof(SkinedVertex));
+		memcpy(&m_SkinedVertices[0], fileData + offset, m_SkinedVertices.size() * sizeof(SkinedVertex));
 		offset += m_SkinedVertices.size() * sizeof(SkinedVertex);
 	} else {
 		if (offset + m_Vertices.size() * sizeof(Vertex) > fileByteSize) {
