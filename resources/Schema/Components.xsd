@@ -29,4 +29,5 @@
 	<xs:include schemaLocation="Components/Fill.xsd"/>
 	<xs:include schemaLocation="Components/Lifetime.xsd"/>
 	<xs:include schemaLocation="Components/HiddenForLocalPlayer.xsd"/>
+	<xs:include schemaLocation="Components/PickupSpawn.xsd"/>
 </xs:schema>
