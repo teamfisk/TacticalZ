@@ -214,26 +214,28 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
         jointIt.reset();
     }*/
 
+    MItDag jointIt(MItDag::TraversalType::kDepthFirst, MFn::kJoint);
+    unsigned int jointID = 0;
 
-    int currentFrame = startFrame;
-    while (currentFrame < endFrame) { // ANDREAS
-        Animation::Keyframe thisKeyFrame;
-        thisKeyFrame.Index = currentFrame - startFrame;
-        thisKeyFrame.Time = thisKeyFrame.Index * oneDivSixty;
+    while (!jointIt.isDone()) {
+        int currentFrame = startFrame;
+        Animation::JointAnimation thisJointAnimation;
+        bool haxBool = false;
+        while (currentFrame < endFrame) {
+            Animation::JointAnimation::KeyFrame thisKeyFrame;
+            //thisKeyFrame.Index = currentFrame - startFrame;
+            //thisKeyFrame.Time = thisKeyFrame.Index * oneDivSixty;
 
-        MAnimControl::setCurrentTime(MTime(currentFrame, MTime::kNTSCField));
-        MTime time = MAnimControl::currentTime();
+            MAnimControl::setCurrentTime(MTime(currentFrame, MTime::kNTSCField));
+            MTime time = MAnimControl::currentTime();
 
-        MItDag jointIt(MItDag::TraversalType::kDepthFirst, MFn::kJoint);
-        unsigned int jointID = 0;
-        while (!jointIt.isDone()) {
             MFnTransform thisJoint(jointIt.currentItem());
             MMatrix transformationMatrix = thisJoint.transformationMatrix();
-           
+
             double doubleMat[4][4];
 
-            if (currentFrame != startFrame){
-                Animation::Keyframe::JointProperty joint;
+            if (currentFrame != startFrame) {
+                //Animation::JointAnimation joint;
 
                 doubleMat[0][0] = joinCheckMap[thisJoint.name().asChar()][0][0];
                 doubleMat[0][1] = joinCheckMap[thisJoint.name().asChar()][0][1];
@@ -255,9 +257,53 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
                 MMatrix LastJointMatrix(doubleMat);
                 //Is same as last KeyFrame
                 if (LastJointMatrix.isEquivalent(transformationMatrix)) {
-                    jointID++;
-                    jointIt.next();
+                    //jointID++;
+                    //jointIt.next();
+                    currentFrame++;
+                    haxBool = false;
                     continue;
+                } else if(!haxBool){
+                    haxBool = true;
+                    MTransformationMatrix TransformationMatrix = LastJointMatrix;
+                    MObject jointOrientObj = thisJoint.attribute("jointOrient");
+                    MFnNumericAttribute jointOrient(jointOrientObj);
+                    double jointOrientDouble[3];
+                    jointOrient.getDefault(jointOrientDouble[0], jointOrientDouble[1], jointOrientDouble[2]);
+                    //MGlobal::displayError(MString() + "Joint Matrix: ");
+                    //MGlobal::displayError(MString() + Matrix.asMatrix()[0][0] + " " + Matrix.asMatrix()[0][1] + " " + Matrix.asMatrix()[0][2] + " " + Matrix.asMatrix()[0][3]);
+                    //MGlobal::displayError(MString() + Matrix.asMatrix()[1][0] + " " + Matrix.asMatrix()[1][1] + " " + Matrix.asMatrix()[1][2] + " " + Matrix.asMatrix()[1][3]);
+                    //MGlobal::displayError(MString() + Matrix.asMatrix()[2][0] + " " + Matrix.asMatrix()[2][1] + " " + Matrix.asMatrix()[2][2] + " " + Matrix.asMatrix()[2][3]);
+                    //MGlobal::displayError(MString() + Matrix.asMatrix()[3][0] + " " + Matrix.asMatrix()[3][1] + " " + Matrix.asMatrix()[3][2] + " " + Matrix.asMatrix()[3][3]);
+
+                    MEulerRotation joEuler(jointOrientDouble[0], jointOrientDouble[1], jointOrientDouble[2]);
+                    MQuaternion jo = joEuler.asQuaternion();
+
+                    double tmp[4];
+                    TransformationMatrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
+                    MQuaternion rotation(tmp);
+
+                    rotation = rotation * jo;
+                    rotation.get(tmp);
+
+                    //Animation::JointAnimation::KeyFrame keyframe;
+                    Animation::JointAnimation::KeyFrame previousKeyFrame;
+                    previousKeyFrame.Index = currentFrame - startFrame - 1;
+                    previousKeyFrame.Time = previousKeyFrame.Index * oneDivSixty;
+
+                    previousKeyFrame.Rotation[0] = tmp[0];
+                    previousKeyFrame.Rotation[1] = tmp[1];
+                    previousKeyFrame.Rotation[2] = tmp[2];
+                    previousKeyFrame.Rotation[3] = tmp[3];
+                    TransformationMatrix.getTranslation(MSpace::kTransform).get(tmp);
+                    previousKeyFrame.Position[0] = tmp[0];
+                    previousKeyFrame.Position[1] = tmp[1];
+                    previousKeyFrame.Position[2] = tmp[2];
+                    TransformationMatrix.getScale(tmp, MSpace::kTransform);
+                    previousKeyFrame.Scale[0] = tmp[0];
+                    previousKeyFrame.Scale[1] = tmp[1];
+                    previousKeyFrame.Scale[2] = tmp[2];
+
+                    thisJointAnimation.m_KeyFrames.push_back(previousKeyFrame);
                 }
             }
 
@@ -280,31 +326,35 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             joinCheckMap[thisJoint.name().asChar()][3][2] = doubleMat[3][2];
             joinCheckMap[thisJoint.name().asChar()][3][3] = doubleMat[3][3];
 
-            MPlug thisJointBindPose = thisJoint.findPlug("bindPose");
-            MDataHandle DataHandle;
-            thisJointBindPose.getValue(DataHandle);
-            MFnMatrixData MartixFn(DataHandle.data());
-            MMatrix thisJointBindPoseMatrix = MartixFn.matrix();
-
-            MFnTransform Parent(thisJoint.parent(0), &status);
-            if (status == MS::kSuccess && thisJoint.parent(0).apiType() == MFn::kJoint) {
-                MTransformationMatrix Matrix = Parent.transformation();
-                MPlug parentBindPose = Parent.findPlug("bindPose");
-                MDataHandle DataHandle;
-                parentBindPose.getValue(DataHandle);
-                MFnMatrixData MartixFn(DataHandle.data());
-                MMatrix parentBindPoseMatrix = MartixFn.matrix();
-
-                thisJointBindPoseMatrix = thisJointBindPoseMatrix * parentBindPoseMatrix.inverse();
-            }
-
             MTransformationMatrix TransformationMatrix = thisJoint.transformation();
 
-            if (thisJointBindPoseMatrix.isEquivalent(TransformationMatrix.asMatrix())) {
-                jointID++;
-                jointIt.next();
-                MGlobal::displayError(MString() + thisJoint.name() + " is in bindPose");
-                continue;
+            if (currentFrame == startFrame) {
+                MPlug thisJointBindPose = thisJoint.findPlug("bindPose");
+                MDataHandle DataHandle;
+                thisJointBindPose.getValue(DataHandle);
+                MFnMatrixData MartixFn(DataHandle.data());
+                MMatrix thisJointBindPoseMatrix = MartixFn.matrix();
+
+                MFnTransform Parent(thisJoint.parent(0), &status);
+                if (status == MS::kSuccess && thisJoint.parent(0).apiType() == MFn::kJoint) {
+                    MTransformationMatrix Matrix = Parent.transformation();
+                    MPlug parentBindPose = Parent.findPlug("bindPose");
+                    MDataHandle DataHandle;
+                    parentBindPose.getValue(DataHandle);
+                    MFnMatrixData MartixFn(DataHandle.data());
+                    MMatrix parentBindPoseMatrix = MartixFn.matrix();
+
+                    thisJointBindPoseMatrix = thisJointBindPoseMatrix * parentBindPoseMatrix.inverse();
+                }
+
+                if (thisJointBindPoseMatrix.isEquivalent(TransformationMatrix.asMatrix())) {
+                    //jointID++;
+                    //jointIt.next();
+                    currentFrame++;
+                    MGlobal::displayError(MString() + thisJoint.name() + " is in bindPose");
+                    continue;
+                }
+                haxBool = true;
             }
 
             MObject jointOrientObj = thisJoint.attribute("jointOrient");
@@ -327,34 +377,35 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             rotation = rotation * jo;
             rotation.get(tmp);
 
-            Animation::Keyframe::JointProperty joint;
-            joint.ID = jointID;
+            //Animation::JointAnimation::KeyFrame keyframe;
+            thisKeyFrame.Index = currentFrame - startFrame;
+            thisKeyFrame.Time = thisKeyFrame.Index * oneDivSixty;
 
-            joint.Rotation[0] = tmp[0];
-            joint.Rotation[1] = tmp[1];
-            joint.Rotation[2] = tmp[2];
-            joint.Rotation[3] = tmp[3];
+            thisKeyFrame.Rotation[0] = tmp[0];
+            thisKeyFrame.Rotation[1] = tmp[1];
+            thisKeyFrame.Rotation[2] = tmp[2];
+            thisKeyFrame.Rotation[3] = tmp[3];
             TransformationMatrix.getTranslation(MSpace::kTransform).get(tmp);
-            joint.Position[0] = tmp[0];
-            joint.Position[1] = tmp[1];
-            joint.Position[2] = tmp[2];
+            thisKeyFrame.Position[0] = tmp[0];
+            thisKeyFrame.Position[1] = tmp[1];
+            thisKeyFrame.Position[2] = tmp[2];
             TransformationMatrix.getScale(tmp, MSpace::kTransform);
-            joint.Scale[0] = tmp[0];
-            joint.Scale[1] = tmp[1];
-            joint.Scale[2] = tmp[2];
+            thisKeyFrame.Scale[0] = tmp[0];
+            thisKeyFrame.Scale[1] = tmp[1];
+            thisKeyFrame.Scale[2] = tmp[2];
 
-            thisKeyFrame.JointProperties.push_back(joint);
-           
-            jointID++;
-            jointIt.next();
+            thisJointAnimation.m_KeyFrames.push_back(thisKeyFrame);
+
+            currentFrame++;
         }
-        thisKeyFrame.NumberOfJoints = thisKeyFrame.JointProperties.size();
-        returnData.Keyframes.push_back(thisKeyFrame);
-        currentFrame++;
+        //thisKeyFrame.NumberOfJoints = thisKeyFrame.JointProperties.size();
+        thisJointAnimation.numberOFKeyFrames = thisJointAnimation.m_KeyFrames.size();
+        returnData.JointsFrameMap[jointID] = (thisJointAnimation);
+
+        jointID++;
+        jointIt.next();
     }
-
-    returnData.NumKeyFrames = returnData.Keyframes.size();
-
+    returnData.NumOfJointFrames = returnData.JointsFrameMap.size();
     return returnData;
 }
 
