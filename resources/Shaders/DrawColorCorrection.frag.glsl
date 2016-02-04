@@ -3,7 +3,6 @@
 layout (binding = 0) uniform sampler2D SceneTexture;
 layout (binding = 1) uniform sampler2D BloomTexture;
 uniform float Exposure;
-uniform float Gamma;
 
 in VertexData{
 	vec2 TextureCoordinate;
@@ -13,6 +12,7 @@ out vec4 fragmentColor;
 
 void main()
 {
+	const float gamma = 2.2;
 	vec4 hdrColor = texture(SceneTexture, Input.TextureCoordinate);
 	vec4 bloomColor = texture(BloomTexture, Input.TextureCoordinate);
 	hdrColor += bloomColor;
@@ -21,7 +21,7 @@ void main()
 	vec3 result = vec3(1.0) - exp(-hdrColor.rgb * Exposure);
 
 	//gamme correction
-	result = pow(result, vec3(1.0 / Gamma));
+	result = pow(result, vec3(1.0 / gamma));
 
 	fragmentColor = vec4(result, 1.0);
 	//fragmentColor = hdrColor;

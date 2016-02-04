@@ -31,7 +31,6 @@
 							<xs:element ref="c:PlayerSpawn" minOccurs="0"/>
 							<xs:element ref="c:Team" minOccurs="0"/>
 							<xs:element ref="c:DirectionalLight" minOccurs="0"/>
-							<xs:element ref="c:SceneLight" minOccurs="0"/>
 							<xs:element ref="c:UniformScale" minOccurs="0"/>
 							<xs:element ref="c:EditorWidget" minOccurs="0"/>
 							<xs:element ref="c:Lifetime" minOccurs="0"/>

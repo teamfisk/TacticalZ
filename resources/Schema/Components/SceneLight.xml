@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<SceneLight xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SceneLight.xsd">
-	<AmbientColor R="0.2" G="0.2" B="0.2" A="1"/>
-	<Visible>true</Visible>
-	<Gamma>2.2</Gamma>
-	<Exposure>1</Exposure>
-</SceneLight>

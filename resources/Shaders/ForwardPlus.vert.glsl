@@ -20,7 +20,6 @@ out VertexData{
 	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
-	float ExplosionPercentageElapsed;
 }Output;
 
 void main()
@@ -42,6 +41,5 @@ void main()
 	Output.Normal = vec3(M * vec4(Normal, 0.0));
 	Output.Tangent = vec3(M * vec4(Tangent, 0.0));
  	Output.BiTangent = vec3(M * vec4(BiTangent, 0.0));
-	Output.ExplosionColor = vec4(1.0);
-	Output.ExplosionPercentageElapsed = 0.0;
+	Output.ExplosionColor = vec4(0.0);
 }

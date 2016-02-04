@@ -9,7 +9,7 @@ inline bool _GLERROR(const char* info, const char* file, const char* func, unsig
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
-		_LOG(LOG_LEVEL_ERROR, file, func, line, "GL Error: %s\nError code: %i, %s\n", info, error, gluErrorString(error));
+		_LOG(LOG_LEVEL_ERROR, file, func, line, "GL Error: %s, %i, %s", info, error, gluErrorString(error));
 		return true;
 	}
 
