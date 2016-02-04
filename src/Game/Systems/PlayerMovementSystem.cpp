@@ -1,6 +1,6 @@
 #include "Systems/PlayerMovementSystem.h"
 
-PlayerMovementSystem::PlayerMovementSystem(World* world, EventBroker* eventBroker) 
+PlayerMovementSystem::PlayerMovementSystem(World* world, EventBroker* eventBroker)
     : System(world, eventBroker)
     , PureSystem("Player")
 {
@@ -72,6 +72,10 @@ void PlayerMovementSystem::Update(double dt)
                 ImGui::InputFloat("surfaceFriction", &surfaceFriction);
                 float accelerationSpeed = actualAccel * (float)dt * wishSpeed * surfaceFriction;
                 accelerationSpeed = glm::min(accelerationSpeed, addSpeed);
+                //if player has Boost from an Assault class, accelerate the player faster
+                if (player.HasComponent("BoostAssault")) {
+                    accelerationSpeed *= (double) player["BoostAssault"]["StrengthOfEffect"];
+                }
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
@@ -79,8 +83,7 @@ void PlayerMovementSystem::Update(double dt)
             if (controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
                 if (velocity.y == 0.f) {
                     controller->SetDoubleJumping(false);
-                }
-                else {
+                } else {
                     controller->SetDoubleJumping(true);
                 }
                 velocity.y += 4.f;

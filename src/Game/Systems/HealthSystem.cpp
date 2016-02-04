@@ -49,6 +49,9 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
     ComponentWrapper cHealth = e.Player["Health"];
     double& health = cHealth["Health"];
+    if (e.Player.HasComponent("BoostDefender")) {
+        e.Damage -= (double)e.Player["BoostDefender"]["StrengthOfEffect"];
+    }
     health -= e.Damage;
     
     if (health <= 0.0) {
