@@ -40,9 +40,9 @@ void RawModelCustom::ReadMeshFile(std::string filePath)
 void RawModelCustom::ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
-	isSkined = *(unsigned int*)(fileData + offset);
+	hasSkin = *(bool*)(fileData + offset);
 	offset += sizeof(bool);
-	if (isSkined) {
+	if (hasSkin) {
 		m_SkinedVertices.resize(*(unsigned int*)(fileData + offset));
 	}
 	else {
@@ -64,7 +64,7 @@ void RawModelCustom::ReadMesh(unsigned int& offset, char* fileData, unsigned int
 void RawModelCustom::ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
-	if (isSkined) {
+	if (hasSkin) {
 		if (offset + m_SkinedVertices.size() * sizeof(SkinedVertex) > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading skined vertices failed");
 		}

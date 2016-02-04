@@ -82,9 +82,16 @@ bool Material::findColorTexture(MaterialNode& material_node, MFnDependencyNode& 
                 workspace);
             FullPath = FullPath.substr(workspace.length());
             FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
-			material_node.ColorMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 
-            material_node.ColorMapFileLength = material_node.ColorMapFile.length() + 1;
+			MaterialNode::Texture newTexture;
+
+			newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+			newTexture.FileNameLength = newTexture.FileName.length() + 1;
+
+			newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
+			newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+
+			material_node.ColorMaps.push_back(newTexture);
 			return true;
 		}
 	}
@@ -117,8 +124,16 @@ bool Material::findNormalTexture(MaterialNode& material_node, MFnDependencyNode&
                         workspace);
                     FullPath = FullPath.substr(workspace.length());
                     FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
-                    material_node.NormalMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
-                    material_node.NormalMapFileLength = material_node.NormalMapFile.length() + 1;
+
+					MaterialNode::Texture newTexture;
+
+					newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+					newTexture.FileNameLength = newTexture.FileName.length() + 1;
+
+					newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
+					newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+
+					material_node.NormalMaps.push_back(newTexture);
 					return true;
 				}
 			}
@@ -147,8 +162,16 @@ bool Material::findSpecularTexture(MaterialNode& material_node, MFnDependencyNod
                 workspace);
             FullPath = FullPath.substr(workspace.length());
             FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
-            material_node.SpecularMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
-            material_node.SpecularMapFileLength = material_node.SpecularMapFile.length() + 1;
+
+			MaterialNode::Texture newTexture;
+
+			newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+			newTexture.FileNameLength = newTexture.FileName.length() + 1;
+
+			newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
+			newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+
+			material_node.SpecularMaps.push_back(newTexture);
 			return true;
 		}
 	}
@@ -165,7 +188,7 @@ bool Material::findIncandescenceTexture(MaterialNode& material_node, MFnDependen
 	for (int i = 0; i < AllConnections.length(); i++) {
 		if (AllConnections[i].node().hasFn(MFn::kFileTexture)) {
 			MFnDependencyNode TextureNode(AllConnections[i].node());
-
+			
 			std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
 			m_TexturePaths.push_back(FullPath);
 
@@ -174,11 +197,26 @@ bool Material::findIncandescenceTexture(MaterialNode& material_node, MFnDependen
                 workspace);
             FullPath = FullPath.substr(workspace.length());
             FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
-            material_node.IncandescenceMapFile = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
-            material_node.IncandescenceMapFileLength = material_node.IncandescenceMapFile.length() + 1;
+
+			MaterialNode::Texture newTexture;
+
+			newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+			newTexture.FileNameLength = newTexture.FileName.length() + 1;
+
+			newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
+			newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+
+			material_node.IncandescenceMaps.push_back(newTexture);
 			return true;
+
+		} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
+			return findSplatTextures(material_node.IncandescenceMaps, MFnDependencyNode(AllConnections[i].node()));
 		}
 	}
+	return false;
+}
+
+bool Material::findSplatTextures(std::vector<MaterialNode::Texture>& textureVector, MFnDependencyNode& node) {
 	return false;
 }
 

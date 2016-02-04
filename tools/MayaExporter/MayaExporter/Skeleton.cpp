@@ -228,8 +228,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
         unsigned int jointID = 0;
         while (!jointIt.isDone()) {
             MFnTransform thisJoint(jointIt.currentItem());
-            MMatrix transformationMatrix = thisJoint.transformationMatrix();
-           
+			MTransformationMatrix TransformationMatrix = thisJoint.transformationMatrix();
             double doubleMat[4][4];
 
             if (currentFrame != startFrame){
@@ -263,6 +262,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 
             transformationMatrix.get(doubleMat);
 
+			//Save transformationMatrix to joinCheckMap
             joinCheckMap[thisJoint.name().asChar()][0][0] = doubleMat[0][0];
             joinCheckMap[thisJoint.name().asChar()][0][1] = doubleMat[0][1];
             joinCheckMap[thisJoint.name().asChar()][0][2] = doubleMat[0][2];
@@ -280,32 +280,32 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             joinCheckMap[thisJoint.name().asChar()][3][2] = doubleMat[3][2];
             joinCheckMap[thisJoint.name().asChar()][3][3] = doubleMat[3][3];
 
-            MPlug thisJointBindPose = thisJoint.findPlug("bindPose");
-            MDataHandle DataHandle;
-            thisJointBindPose.getValue(DataHandle);
-            MFnMatrixData MartixFn(DataHandle.data());
-            MMatrix thisJointBindPoseMatrix = MartixFn.matrix();
+			if (currentFrame == startFrame) {
+				MPlug thisJointBindPose = thisJoint.findPlug("bindPose");
+				MDataHandle DataHandle;
+				thisJointBindPose.getValue(DataHandle);
+				MFnMatrixData MartixFn(DataHandle.data());
+				MMatrix thisJointBindPoseMatrix = MartixFn.matrix();
 
-            MFnTransform Parent(thisJoint.parent(0), &status);
-            if (status == MS::kSuccess && thisJoint.parent(0).apiType() == MFn::kJoint) {
-                MTransformationMatrix Matrix = Parent.transformation();
-                MPlug parentBindPose = Parent.findPlug("bindPose");
-                MDataHandle DataHandle;
-                parentBindPose.getValue(DataHandle);
-                MFnMatrixData MartixFn(DataHandle.data());
-                MMatrix parentBindPoseMatrix = MartixFn.matrix();
+				MFnTransform Parent(thisJoint.parent(0), &status);
+				if (status == MS::kSuccess && thisJoint.parent(0).apiType() == MFn::kJoint) {
+					MTransformationMatrix Matrix = Parent.transformation();
+					MPlug parentBindPose = Parent.findPlug("bindPose");
+					MDataHandle DataHandle;
+					parentBindPose.getValue(DataHandle);
+					MFnMatrixData MartixFn(DataHandle.data());
+					MMatrix parentBindPoseMatrix = MartixFn.matrix();
 
-                thisJointBindPoseMatrix = thisJointBindPoseMatrix * parentBindPoseMatrix.inverse();
-            }
+					thisJointBindPoseMatrix = thisJointBindPoseMatrix * parentBindPoseMatrix.inverse();
+				}
 
-            MTransformationMatrix TransformationMatrix = thisJoint.transformation();
-
-            if (thisJointBindPoseMatrix.isEquivalent(TransformationMatrix.asMatrix())) {
-                jointID++;
-                jointIt.next();
-                MGlobal::displayError(MString() + thisJoint.name() + " is in bindPose");
-                continue;
-            }
+				if (thisJointBindPoseMatrix.isEquivalent(TransformationMatrix.asMatrix())) {
+					jointID++;
+					jointIt.next();
+					MGlobal::displayError(MString() + thisJoint.name() + " is in bindPose");
+					continue;
+				}
+			}
 
             MObject jointOrientObj = thisJoint.attribute("jointOrient");
             MFnNumericAttribute jointOrient(jointOrientObj);

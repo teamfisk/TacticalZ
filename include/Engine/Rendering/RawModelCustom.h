@@ -68,30 +68,41 @@ public:
     };
 
 	const Vertex*	Vertices() const {
-		if (isSkined) { 
+		if (hasSkin) { 
 			return m_SkinedVertices.data(); 
 		} else {
 			return m_Vertices.data();
 		}
 	};
 
+	unsigned int	VertexSize() const {
+		if (hasSkin) {
+			return sizeof(SkinedVertex);
+		}
+		else {
+			return sizeof(Vertex);
+		}
+	};
+
 	unsigned int	NumVertices() const {
-		if (isSkined) {
+		if (hasSkin) {
 			return m_SkinedVertices.size();
 		} else {
 			return m_Vertices.size();
 		}
 	};
 
+	bool isSkined() const { return hasSkin; };
+
     std::vector<MaterialGroup> MaterialGroups;
-	bool isSkined;
+
 
     std::vector<unsigned int> m_Indices;
     Skeleton* m_Skeleton = nullptr;
     glm::mat4 m_Matrix;
 
 private:
-   
+   	bool hasSkin;
 	std::vector<Vertex> m_Vertices;
 	std::vector<SkinedVertex> m_SkinedVertices;
 

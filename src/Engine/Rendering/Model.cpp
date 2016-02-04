@@ -25,11 +25,7 @@ Model::Model(std::string fileName)
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
 
-	if (m_RawModel->isSkined) {
-		glBufferData(GL_ARRAY_BUFFER, m_RawModel->NumVertices() * sizeof(RawModel::SkinedVertex), m_RawModel->Vertices(), GL_STATIC_DRAW);
-	} else {
-		glBufferData(GL_ARRAY_BUFFER, m_RawModel->NumVertices() * sizeof(RawModel::Vertex), m_RawModel->Vertices(), GL_STATIC_DRAW);
-	}
+	glBufferData(GL_ARRAY_BUFFER, m_RawModel->NumVertices() * m_RawModel->VertexSize(), m_RawModel->Vertices(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &ElementBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
@@ -41,7 +37,7 @@ Model::Model(std::string fileName)
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	std::vector<int> structSizes;
-	if (m_RawModel->isSkined) {
+	if (m_RawModel->isSkined()) {
 		structSizes = { 3, 3, 3, 3, 2, 4, 4 };
 	} else {
 		structSizes = { 3, 3, 3, 3, 2 };
@@ -60,7 +56,7 @@ Model::Model(std::string fileName)
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
-		if (m_RawModel->isSkined) {
+		if (m_RawModel->isSkined()) {
 			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
 			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
 		}
@@ -72,7 +68,7 @@ Model::Model(std::string fileName)
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
-	if (m_RawModel->isSkined) {
+	if (m_RawModel->isSkined()) {
 		glEnableVertexAttribArray(5);
 		glEnableVertexAttribArray(6);
 	}
