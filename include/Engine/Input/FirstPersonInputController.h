@@ -45,6 +45,7 @@ protected:
     //and its very unlikely that someone wants to change that value
     const float m_AssaultDashDoubleTapSensitivityTimer = 0.25f;
     std::string m_AssaultDashTapDirection = "";
+    std::string m_CurrentDirectionVector = "";
     bool m_AssaultDashDoubleTapped = false;
     bool m_PlayerIsDashing = false;
     bool m_ShiftDashing = false;
@@ -125,17 +126,21 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
     }
 
     if (e.Command == "Forward" || e.Command == "Right") {
+        if (e.Value != 0) {
+            m_CurrentDirectionVector = e.Command == "Right" ? (e.Value > 0 ? "Right" : "Left") : (e.Value > 0 ? "Forward" : "Backward");
+        }
         //if value = 0 then you have just released this key
-        if (e.Value > 0 || e.Value < 0) {
+        if (e.Value != 0) {
             m_MovementKeyDown = true;
             //if you pressed the same key within m_AssaultDashDoubleTapSensitivityTimer then you have doubletapped it
-            if (m_AssaultDashDoubleTapDeltaTime < m_AssaultDashDoubleTapSensitivityTimer && m_AssaultDashTapDirection == e.Command) {
+            if (m_AssaultDashDoubleTapDeltaTime < m_AssaultDashDoubleTapSensitivityTimer && m_AssaultDashTapDirection == m_CurrentDirectionVector) {
                 m_ValidDoubleTap = true;
             }
         } else {
+            //== 0
             m_MovementKeyDown = false;
             //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
-            m_AssaultDashTapDirection = e.Command;
+            m_AssaultDashTapDirection = m_CurrentDirectionVector;
             m_AssaultDashDoubleTapDeltaTime = 0.f;
         }
     }

@@ -3,7 +3,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
-	<xs:element name="Dash">
+	<xs:element name="DashAbility">
 		<xs:annotation>
 			<xs:documentation>A dash component for one of the classes</xs:documentation>
 		</xs:annotation>
