@@ -46,8 +46,14 @@ public:
         glm::vec4 BoneIndices;
         glm::vec4 BoneWeights;
     };
+
+	struct TextureProperties {
+		std::string TexturePath;
+		glm::vec2 UVRepeat;
+		std::shared_ptr<::Texture> Texture;	
+	};
 	
-    struct MaterialGroup
+    struct MaterialBasic
     {
         float SpecularExponent;
         float ReflectionFactor;
@@ -57,15 +63,31 @@ public:
         unsigned int StartIndex;
         unsigned int EndIndex;
         //float Transparency;
-        std::string TexturePath;
-        std::shared_ptr<::Texture> Texture;
-        std::string NormalMapPath;
-        std::shared_ptr<::Texture> NormalMap;
-        std::string SpecularMapPath;
-        std::shared_ptr<::Texture> SpecularMap;
-        std::string IncandescenceMapPath;
-        std::shared_ptr<::Texture> IncandescenceMap;
     };
+
+	struct MaterialSplatMapping : public MaterialBasic
+	{
+		TextureProperties SplatMap;
+		std::vector<TextureProperties> ColorMaps;
+		std::vector<TextureProperties> NormalMaps;
+		std::vector<TextureProperties> SpecularMaps;
+		std::vector<TextureProperties> IncandescenceMaps;
+	};
+
+	struct MaterialSingleTextures : public MaterialBasic
+	{
+		TextureProperties ColorMaps;
+		TextureProperties NormalMaps;
+		TextureProperties SpecularMaps;
+		TextureProperties IncandescenceMaps;
+	};
+
+	enum class MaterialType { Basic = 1, SplatMapping, SingleTextures };
+
+	struct MaterialProperties {
+		MaterialType type;
+		MaterialBasic* material;
+	};
 
 	const Vertex*	Vertices() const {
 		if (hasSkin) { 
@@ -94,8 +116,7 @@ public:
 
 	bool isSkined() const { return hasSkin; };
 
-    std::vector<MaterialGroup> MaterialGroups;
-
+	std::vector<MaterialProperties> m_Materials;
 
     std::vector<unsigned int> m_Indices;
     Skeleton* m_Skeleton = nullptr;
@@ -115,6 +136,10 @@ private:
     void ReadMaterialFile(std::string filePath);
     void ReadMaterials(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
     void ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+	void ReadMaterialBasic(MaterialBasic* Material, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+	void ReadMaterialSingleTexture(MaterialSingleTextures* Material, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+	void ReadMaterialSplatMapping(MaterialSplatMapping* Material, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+	void ReadMaterialTextureProperties(TextureProperties& texture, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
 
     void ReadAnimationFile(std::string filePath);
     void ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsigned int& fileByteSize);

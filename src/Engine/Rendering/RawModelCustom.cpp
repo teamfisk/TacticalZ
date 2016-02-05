@@ -122,7 +122,7 @@ void RawModelCustom::ReadMaterials(unsigned int& offset, char* fileData, unsigne
 { 
 #ifdef BOOST_LITTLE_ENDIAN
     unsigned int* numMaterials = (unsigned int*)(fileData);
-    MaterialGroups.reserve(*numMaterials);
+	m_Materials.reserve(*numMaterials);
     offset += sizeof(unsigned int);
 
     for (int i = 0; i < *numMaterials; i++) {
@@ -134,83 +134,148 @@ void RawModelCustom::ReadMaterials(unsigned int& offset, char* fileData, unsigne
 
 void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
 { 
-    MaterialGroup newMaterial;
-
+	MaterialProperties newMaterialProperty;
 #ifdef BOOST_LITTLE_ENDIAN
 
-    if (offset + sizeof(unsigned int) * 4 > fileByteSize) {
-        throw Resource::FailedLoadingException("Reading Material texture names length failed");
-    }
+	if (offset + sizeof(MaterialType) > fileByteSize) {
+		throw Resource::FailedLoadingException("Reading Material Type failed");
+	}
+	MaterialType type = *(MaterialType*)(fileData + offset);
+	offset += sizeof(MaterialType);
 
-    unsigned int* nameLengths = (unsigned int*)(fileData + offset); 
-    offset += sizeof(unsigned int) * 4;
+	switch (type) {
+	case MaterialType::Basic:
+		newMaterialProperty.material = new MaterialBasic();
+		ReadMaterialBasic(newMaterialProperty.material, offset, fileData, fileByteSize);
+		break;
+	case MaterialType::SplatMapping:
+		newMaterialProperty.material = new MaterialSplatMapping();
+		ReadMaterialSplatMapping(static_cast<MaterialSplatMapping*>(newMaterialProperty.material), offset, fileData, fileByteSize);
+		break;
+	case MaterialType::SingleTextures:
+		newMaterialProperty.material = new MaterialSingleTextures();
+		ReadMaterialSingleTexture(static_cast<MaterialSingleTextures*>(newMaterialProperty.material), offset, fileData, fileByteSize);
+		break;
+	default:
+		throw Resource::FailedLoadingException("Material contains an unknown MaterialType");
+	};
 
-    if (offset + sizeof(float) * 11 + sizeof(unsigned int) * 2 > fileByteSize) {
-        throw Resource::FailedLoadingException("Reading Material specular, reflection, color and start and end index  values failed");
-    }
-
-    newMaterial.SpecularExponent = *(float*)(fileData + offset);
-    offset += sizeof(float);
-    newMaterial.ReflectionFactor = *(float*)(fileData + offset);
-    offset += sizeof(float);
-
-    memcpy(&newMaterial.DiffuseColor[0], fileData + offset, sizeof(float) * 3);
-    offset += sizeof(float) * 3;
-    memcpy(&newMaterial.SpecularColor[0], fileData + offset, sizeof(float) * 3);
-    offset += sizeof(float) * 3;
-    memcpy(&newMaterial.IncandescenceColor[0], fileData + offset, sizeof(float) * 3);
-    offset += sizeof(float) * 3;
-
-    newMaterial.StartIndex = *(unsigned int*)(fileData + offset);
-    offset += sizeof(unsigned int);
-    newMaterial.EndIndex = *(unsigned int*)(fileData + offset);
-    offset += sizeof(unsigned int);
-
-    if (nameLengths[0] > 0) {
-        if (offset + nameLengths[0] > fileByteSize) {
-            throw Resource::FailedLoadingException("Reading Material texture path failed");
-        }
-
-        newMaterial.TexturePath = "Textures/";
-        newMaterial.TexturePath += (fileData + offset);
-        newMaterial.TexturePath += ".png";
-        offset += nameLengths[0];
-    }
-
-    if (nameLengths[1] > 0) {
-        if (offset + nameLengths[1] > fileByteSize) {
-            throw Resource::FailedLoadingException("Reading Material NormalMap path failed");
-        }
-        newMaterial.NormalMapPath = "Textures/";
-        newMaterial.NormalMapPath += (fileData + offset);
-        newMaterial.NormalMapPath += ".png";
-        offset += nameLengths[1];
-    }
-
-    if (nameLengths[2] > 0) {
-        if (offset + nameLengths[2] > fileByteSize) {
-            throw Resource::FailedLoadingException("Reading Material SpecularMap path failed");
-        }
-        newMaterial.SpecularMapPath = "Textures/";
-        newMaterial.SpecularMapPath += (fileData + offset);
-        newMaterial.SpecularMapPath += ".png";
-        offset += nameLengths[2];
-    }
-
-    if (nameLengths[3] > 0) {
-        if (offset + nameLengths[3] > fileByteSize) {
-            throw Resource::FailedLoadingException("Reading Material IncandescenceMap path failed");
-        }
-        newMaterial.IncandescenceMapPath = "Textures/";
-        newMaterial.IncandescenceMapPath += (fileData + offset);
-        newMaterial.IncandescenceMapPath += ".png";
-        offset += nameLengths[3];
-    }
+	newMaterialProperty.type = type;
 
 #else
 #endif
 
-    MaterialGroups.push_back(newMaterial);
+    m_Materials.push_back(newMaterialProperty);
+}
+
+void RawModelCustom::ReadMaterialBasic(RawModelCustom::MaterialBasic* newMaterial, unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+{
+	if (offset + sizeof(unsigned int) * 4 > fileByteSize) {
+		throw Resource::FailedLoadingException("Reading Material texture names length failed");
+	}
+
+	unsigned int* nameLengths = (unsigned int*)(fileData + offset);
+	offset += sizeof(unsigned int) * 4;
+
+	if (offset + sizeof(float) * 11 + sizeof(unsigned int) * 2 > fileByteSize) {
+		throw Resource::FailedLoadingException("Reading Material specular, reflection, color and start and end index  values failed");
+	}
+
+	newMaterial->SpecularExponent = *(float*)(fileData + offset);
+	offset += sizeof(float);
+	newMaterial->ReflectionFactor = *(float*)(fileData + offset);
+	offset += sizeof(float);
+
+	memcpy(&newMaterial->DiffuseColor[0], fileData + offset, sizeof(float) * 3);
+	offset += sizeof(float) * 3;
+	memcpy(&newMaterial->SpecularColor[0], fileData + offset, sizeof(float) * 3);
+	offset += sizeof(float) * 3;
+	memcpy(&newMaterial->IncandescenceColor[0], fileData + offset, sizeof(float) * 3);
+	offset += sizeof(float) * 3;
+
+	newMaterial->StartIndex = *(unsigned int*)(fileData + offset);
+	offset += sizeof(unsigned int);
+	newMaterial->EndIndex = *(unsigned int*)(fileData + offset);
+	offset += sizeof(unsigned int);
+}
+
+void RawModelCustom::ReadMaterialSingleTexture(RawModelCustom::MaterialSingleTextures* newMaterial, unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+{
+	unsigned char numberOfMaps[4];
+	if (offset + sizeof(unsigned char) * 4 > fileByteSize) {
+		throw Resource::FailedLoadingException("Reading Material NumOfMaps failed");
+	}
+
+	if (numberOfMaps[0] > 0)
+	{
+		ReadMaterialTextureProperties(newMaterial->ColorMaps, offset, fileData, fileByteSize);
+	}
+
+	if (numberOfMaps[1] > 0)
+	{
+		ReadMaterialTextureProperties(newMaterial->SpecularMaps, offset, fileData, fileByteSize);
+	}
+
+	if (numberOfMaps[2] > 0)
+	{
+		ReadMaterialTextureProperties(newMaterial->NormalMaps, offset, fileData, fileByteSize);
+	}
+
+	if (numberOfMaps[3] > 0)
+	{
+		ReadMaterialTextureProperties(newMaterial->IncandescenceMaps, offset, fileData, fileByteSize);
+	}
+}
+
+void RawModelCustom::ReadMaterialSplatMapping(RawModelCustom::MaterialSplatMapping* newMaterial, unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+{
+	ReadMaterialTextureProperties(newMaterial->SplatMap, offset, fileData, fileByteSize);
+	unsigned char numberOfMaps[4];
+	if (offset + sizeof(unsigned char) * 4 > fileByteSize) {
+		throw Resource::FailedLoadingException("Reading Material NumOfMaps failed");
+	}
+
+	newMaterial->ColorMaps.resize(numberOfMaps[0]);
+	for (unsigned char i = 0; i < numberOfMaps[0]; i++)
+	{	
+		ReadMaterialTextureProperties(newMaterial->ColorMaps[i], offset, fileData, fileByteSize);
+	}
+
+	newMaterial->SpecularMaps.resize(numberOfMaps[1]);
+	for (unsigned char i = 0; i < numberOfMaps[1]; i++)
+	{
+		ReadMaterialTextureProperties(newMaterial->SpecularMaps[i], offset, fileData, fileByteSize);
+	}
+
+	newMaterial->NormalMaps.resize(numberOfMaps[2]);
+	for (unsigned char i = 0; i < numberOfMaps[2]; i++)
+	{
+		ReadMaterialTextureProperties(newMaterial->NormalMaps[i], offset, fileData, fileByteSize);
+	}
+
+	newMaterial->IncandescenceMaps.resize(numberOfMaps[3]);
+	for (unsigned char i = 0; i < numberOfMaps[3]; i++)
+	{
+		ReadMaterialTextureProperties(newMaterial->IncandescenceMaps[i], offset, fileData, fileByteSize);
+	}
+}
+
+void RawModelCustom::ReadMaterialTextureProperties(RawModelCustom::TextureProperties& texture, unsigned int &offset, char* fileData, unsigned int& fileByteSize) {
+	unsigned int nameLength = *(unsigned int*)(fileData + offset);
+	if (nameLength > 0) {
+		if (offset + nameLength > fileByteSize) {
+			throw Resource::FailedLoadingException("Reading Material texture path failed");
+		}
+		texture.TexturePath = "Textures/";
+		texture.TexturePath += (fileData + offset);
+		texture.TexturePath += ".png";
+		offset += nameLength;
+		if (offset + sizeof(glm::vec2) > fileByteSize) {
+			throw Resource::FailedLoadingException("Reading Material texture UVTiling failed");
+		}
+		memcpy(&texture.UVRepeat[0], fileData + offset, sizeof(glm::vec2));
+		offset += sizeof(glm::vec2);
+	}
 }
 
 void RawModelCustom::ReadAnimationFile(std::string filePath)
