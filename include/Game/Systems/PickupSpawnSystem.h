@@ -2,16 +2,12 @@
 #define PickupSpawnSystem_h__
 
 #include "Core/System.h"
-#include "Input/EInputCommand.h"
-#include "Systems/SpawnerSystem.h"
-#include "Events/ESpawnerSpawn.h"
-#include "Core/EPlayerSpawned.h"
-#include "Rendering/ESetCamera.h"
-#include "Core/ConfigFile.h"
+#include "Core/Transform.h"
+#include "Core/ResourceManager.h"
+#include "Core/EntityFileParser.h"
 #include "Core/EPickupSpawned.h"
 #include "Core/EPlayerHealthPickup.h";
 #include "Engine/Collision/ETrigger.h"
-
 #include "Common.h"
 #include <tuple>
 
@@ -26,8 +22,6 @@ private:
     EventRelay<PickupSpawnSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(Events::TriggerTouch& e);
 
-    std::vector<std::tuple<glm::vec3,double>> m_ETriggerTouchVector;
-
-
+    std::vector<std::tuple<glm::vec3,double,double,double>> m_ETriggerTouchVector;
 };
 #endif

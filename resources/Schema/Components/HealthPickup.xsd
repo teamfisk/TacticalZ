@@ -12,6 +12,9 @@
 				<xs:element name="RespawnTimer" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>The respawn timer for a health pickup</xs:documentation></xs:annotation>
 				</xs:element>			
+				<xs:element name="HealthGain" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>How much health the player will get when he picks the healthPickup up</xs:documentation></xs:annotation>
+				</xs:element>			
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
