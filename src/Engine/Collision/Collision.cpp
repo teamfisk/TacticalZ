@@ -459,7 +459,7 @@ bool AABBvsTriangle(const AABB& box,
         return false;
     }
     glm::vec3 cornerResolution = (1+t) * diagonal;
-    //Overwrite the smallest resolution if this is smaller.
+    //Overwrite the smallest resolution if cornerResolution is smaller.
     float lenSq = glm::length2(cornerResolution);
     if (lenSq < resolveShortest.DistanceSq) {
         resolveShortest.Vector = cornerResolution;
@@ -477,26 +477,6 @@ bool AABBvsTriangle(const AABB& box,
     Resolution& bestResolve = takeUp ? resolveUpwards : resolveShortest;
     outResolution = bestResolve.Vector;
 
-    //TODO: Debug stuff.
-    std::string dbg;
-    switch (bestResolve.Case) {
-    case ResolveDimY:
-    case ResolveDimX:
-    case ResolveDimZ:
-        dbg = "Axis";
-        break;
-    case Line:
-        dbg = "Line";
-        break;
-    case Corner:
-        dbg = "Corner";
-        break;
-    default:
-        break;
-    }
-    std::string outs = (takeUp ? "Resolve upwards " : "Resolve normal ") + dbg;
-    //TODO: End debug stuff.
-
     glm::vec3 projNorm;
     switch (bestResolve.Case) {
     case ResolveDimY:
@@ -505,14 +485,9 @@ bool AABBvsTriangle(const AABB& box,
             isOnGround = true;
     case ResolveDimX:
     case ResolveDimZ:
-    {
         //If we get here, the resolution is along one coordinate axis.
         //set velocity to 0 in y if it is along y-axis.
-        outs += isOnGround ? " ground" : " air";
-        ImGui::Text(outs.c_str());
-        LOG_INFO(outs.c_str());
         return true;
-    }
     case Line:
         projNorm = glm::normalize(outResolution);
         break;
@@ -523,11 +498,9 @@ bool AABBvsTriangle(const AABB& box,
         break;
     }
 
-    isOnGround = false;
     //If the collision was not on steep wall or similarly (e.g. walking on the ground), force resolution in y only.
     if (FaceIsGround(projNorm.y)) {
         //Ensure that the player always is moved upwards, instead of sliding down.
-        //Also zero the vertical velocity.
         float len = glm::length(outResolution);
         float ang = glm::half_pi<float>() - glm::acos(outResolution.y / len);
         if (len > 0.0000001f && ang > 0.0000001f) {
@@ -535,52 +508,21 @@ bool AABBvsTriangle(const AABB& box,
             outResolution.y = len / glm::sin(ang);
             outResolution.z = 0;
         }
+        //Also zero the vertical velocity, if it is positive, else project it onto the normal.
         //Project the velocity onto the normal of the hit line/face.
         //w = v - <v,n>*n, |n|==1.
-        glm::vec3 projVel = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
-        if (abs(originalBoxVelocity.x) < 0.001f && abs(originalBoxVelocity.z) < 0.001f) {
-            boxVelocity.y = 0.f;
-        } else {
-            boxVelocity.y = std::min(projVel.y, 0.f);
-        }
-
+        boxVelocity.y = std::min(boxVelocity.y - glm::dot(boxVelocity, projNorm) * projNorm.y, 0.f);
         isOnGround = true;
-    } else if (projNorm.y > 0) {
+    } else {
         //Enter here if the triangle is a steep slope, and it is not facing downwards.
-        //Ensure that the player will be pushed in the xz-plane.
-        //glm::vec3 moveDir(outResolution);
-        //moveDir.y = 0;
-        //if (vectorHasLength(moveDir)) {
-        //    moveDir = glm::normalize(moveDir);
-        //    float len = glm::length(outResolution);
-        //    float dotMoveOut = moveDir.x * outResolution.x + moveDir.z * outResolution.z;
-        //    float ang = glm::half_pi<float>() - glm::acos(dotMoveOut / len);
-        //    if (len > 0.0000001f && ang > 0.0000001f) {
-        //        outResolution = (len / glm::sin(ang)) * moveDir;
-        //    }
-        //}
         //Project the velocity onto the normal of the hit line/face.
         //w = v - <v,n>*n, |n|==1.
-        //TODO: What do we want..
-#if 0   //Walk up steep walls.
-        glm::vec3 projVel = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
-        boxVelocity.y = std::min(projVel.y, 0.f);
-        isOnGround = true;
-#elif 1 //"ice cream"-effect, air resistance + projected velocity.
+        //"ice cream"-effect, air resistance + projected velocity.
         if (!isOnGround) {
             boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
         }
         isOnGround = false;
-#elif 0 //"ice cream"-effect, ground friction (full control) + projected velocity.
-        if (!isOnGround) {
-            boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
-        }
-        isOnGround = true;
-#endif
     }
-    outs += isOnGround ? " ground" : " air";
-    ImGui::Text(outs.c_str());
-    LOG_INFO(outs.c_str());
     return true;
 }
 
