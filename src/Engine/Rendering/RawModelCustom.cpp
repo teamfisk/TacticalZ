@@ -22,46 +22,46 @@ void RawModelCustom::ReadMeshFile(std::string filePath)
     if (!in.is_open()) {
         throw Resource::FailedLoadingException("Open mesh file failed");
     }
-    unsigned int fileByteSize = in.tellg();
+    unsigned int fileByteSize = static_cast<unsigned int>(in.tellg());
     in.seekg(0, std::ios_base::beg);
 
     fileData = new char[fileByteSize];
     in.read(fileData, fileByteSize);
     in.close();
 
-    unsigned int offset = 0;
+    std::size_t offset = 0;
     if (fileByteSize > 0) {
-        ReadMeshFileHeader(offset, fileData, fileByteSize);
+        ReadMeshFileHeader(offset, fileData);
         ReadMesh(offset, fileData, fileByteSize);
     }
     delete fileData;
 }
 
-void RawModelCustom::ReadMeshFileHeader(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMeshFileHeader(std::size_t& offset, char* fileData)
 {
 #ifdef BOOST_LITTLE_ENDIAN
 	hasSkin = true;//*(bool*)(fileData + offset);
 	//offset += sizeof(bool);
 	if (hasSkin) {
-		m_SkinedVertices.resize(*(unsigned int*)(fileData + offset));
+		m_SkinedVertices.resize(static_cast<std::size_t>(*(unsigned int*)(fileData + offset)));
 	}
 	else {
-		m_Vertices.resize(*(unsigned int*)(fileData + offset));
+		m_Vertices.resize(static_cast<std::size_t>(*(unsigned int*)(fileData + offset)));
 	}
     offset += sizeof(unsigned int);
-    m_Indices.resize(*(unsigned int*)(fileData + offset));
+    m_Indices.resize(static_cast<std::size_t>(*(unsigned int*)(fileData + offset)));
     offset += sizeof(unsigned int);
 #else
 #endif
 }
 
-void RawModelCustom::ReadMesh(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMesh(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 {
     ReadVertices(offset, fileData, fileByteSize);
     ReadIndices(offset, fileData, fileByteSize);
 }
 
-void RawModelCustom::ReadVertices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadVertices(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
 	if (hasSkin) {
@@ -81,7 +81,7 @@ void RawModelCustom::ReadVertices(unsigned int& offset, char* fileData, unsigned
 #endif
 }
 
-void RawModelCustom::ReadIndices(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadIndices(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     if (offset + m_Indices.size() * sizeof(unsigned int) > fileByteSize) {
@@ -104,35 +104,36 @@ void RawModelCustom::ReadMaterialFile(std::string filePath)
     if (!in.is_open()) {
         throw Resource::FailedLoadingException("Open material file failed");
     }
-    unsigned int fileByteSize = in.tellg();
+
+    unsigned int fileByteSize = static_cast<unsigned int>(in.tellg());
     in.seekg(0, std::ios_base::beg);
 
     fileData = new char[fileByteSize];
     in.read(fileData, fileByteSize);
     in.close();
 
-    unsigned int offset = 0;
+    std::size_t offset = 0;
     if (fileByteSize > 0) {
         ReadMaterials(offset, fileData, fileByteSize);
     }
     delete fileData;
 }
 
-void RawModelCustom::ReadMaterials(unsigned int& offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMaterials(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 { 
 #ifdef BOOST_LITTLE_ENDIAN
     unsigned int* numMaterials = (unsigned int*)(fileData);
 	m_Materials.reserve(*numMaterials);
     offset += sizeof(unsigned int);
 
-    for (int i = 0; i < *numMaterials; i++) {
+    for (unsigned int i = 0; i < *numMaterials; i++) {
         ReadMaterialSingle(offset, fileData, fileByteSize);
     }
 #else
 #endif
 }
 
-void RawModelCustom::ReadMaterialSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMaterialSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 { 
 	MaterialProperties newMaterialProperty;
 #ifdef BOOST_LITTLE_ENDIAN
@@ -289,14 +290,14 @@ void RawModelCustom::ReadAnimationFile(std::string filePath)
         return;
     }
 
-    unsigned int fileByteSize = in.tellg();
+    unsigned int fileByteSize = static_cast<unsigned int>(in.tellg());
     in.seekg(0, std::ios_base::beg);
 
     fileData = new char[fileByteSize];
     in.read(fileData, fileByteSize);
     in.close();
 
-    unsigned int offset = 0;
+    std::size_t offset = 0;
     if (fileByteSize > 0) {
         m_Skeleton = new Skeleton();
 
@@ -314,7 +315,7 @@ void RawModelCustom::ReadAnimationFile(std::string filePath)
     delete fileData;
 }
 
-void RawModelCustom::ReadAnimationBindPoses(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadAnimationBindPoses(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     unsigned int* numBones = (unsigned int*)(fileData + offset);
@@ -327,7 +328,7 @@ void RawModelCustom::ReadAnimationBindPoses(unsigned int &offset, char* fileData
 #endif
 }
 
-void RawModelCustom::ReadAnimationJoint(unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadAnimationJoint(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     if (offset + sizeof(unsigned int) > fileByteSize) {
@@ -369,14 +370,14 @@ void RawModelCustom::ReadAnimationJoint(unsigned int &offset, char* fileData, un
 #endif
 }
 
-void RawModelCustom::ReadAnimationClips(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int numberOfClips)
+void RawModelCustom::ReadAnimationClips(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int numberOfClips)
 {
     for (unsigned int i = 0; i < numberOfClips; i++) {
         ReadAnimationClipSingle(offset, fileData, fileByteSize, i);
     }
 }
 
-void RawModelCustom::ReadAnimationClipSingle(unsigned int &offset, char* fileData, unsigned int& fileByteSize, unsigned int clipIndex)
+void RawModelCustom::ReadAnimationClipSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int clipIndex)
 {
 #ifdef BOOST_LITTLE_ENDIAN
     Skeleton::Animation newAnimation;
@@ -431,7 +432,7 @@ void RawModelCustom::ReadAnimationClipSingle(unsigned int &offset, char* fileDat
 #endif
 }
 
-void RawModelCustom::ReadAnimationKeyFrame(unsigned int &offset, char* fileData, unsigned int& fileByteSize, std::vector<Skeleton::Animation::Keyframe>& animation)
+void RawModelCustom::ReadAnimationKeyFrame(std::size_t& &offset, char* fileData, const unsigned int& fileByteSize, std::vector<Skeleton::Animation::Keyframe>& animation)
 {
     Skeleton::Animation::Keyframe newKeyFrame;
 

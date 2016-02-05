@@ -4,7 +4,7 @@ Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::a
 {
     Network::initialize();
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
-    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05);
+    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
     pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
 
 }
@@ -43,7 +43,7 @@ void Server::readFromClients()
             bytesRead = receive(readBuffer);
             Packet packet(readBuffer, bytesRead);
             parseMessageType(packet);
-        } catch (const std::exception& err) {
+        } catch (const std::exception&) {
             //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
         }
     }
@@ -103,9 +103,9 @@ void Server::parseMessageType(Packet& packet)
     }
 }
 
-int Server::receive(char * data)
+size_t Server::receive(char * data)
 {
-    unsigned int length = m_Socket.receive_from(
+    size_t length = m_Socket.receive_from(
         boost::asio::buffer((void*)data
             , INPUTSIZE)
         , m_ReceiverEndpoint, 0);
@@ -121,7 +121,7 @@ int Server::receive(char * data)
 void Server::send(PlayerID player, Packet& packet)
 {
     try {
-        int bytesSent = m_Socket.send_to(
+        size_t bytesSent = m_Socket.send_to(
             boost::asio::buffer(packet.Data(), packet.Size()),
             m_ConnectedPlayers[player].Endpoint,
             0);
@@ -131,7 +131,7 @@ void Server::send(PlayerID player, Packet& packet)
             m_NetworkData.DataSentThisInterval += packet.Size();
             m_NetworkData.AmountOfMessagesSent++;
         }
-    } catch (const boost::system::system_error& e) {
+    } catch (const boost::system::system_error&) {
         // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
         m_ConnectedPlayers[player].Endpoint = boost::asio::ip::udp::endpoint();
     }
@@ -231,12 +231,12 @@ void Server::sendPing()
 
 void Server::checkForTimeOuts()
 {
-    int startPing = 1000 * m_StartPingTime
+    double startPing = 1000 * m_StartPingTime
         / static_cast<double>(CLOCKS_PER_SEC);
 
     for (int i = 0; i < m_ConnectedPlayers.size(); i++) {
         if (m_ConnectedPlayers[i].Endpoint.address() != boost::asio::ip::address()) {
-            int stopPing = 1000 * m_ConnectedPlayers[i].StopTime /
+            double stopPing = 1000 * m_ConnectedPlayers[i].StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
             if (startPing > stopPing + m_TimeoutMs) {
                 LOG_INFO("User %i timed out!", i);

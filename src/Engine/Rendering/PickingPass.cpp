@@ -18,14 +18,14 @@ PickingPass::~PickingPass()
 void PickingPass::InitializeTextures()
 {
     GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
-        glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
+        glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
 }
 
 void PickingPass::InitializeFrameBuffers()
 {
     glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
@@ -75,9 +75,9 @@ void PickingPass::Draw(RenderScene& scene)
                 m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
                 if (m_ColorCounter[0] > 255) {
                     m_ColorCounter[0] = 0;
-                        m_ColorCounter[1] += 5;
+                    m_ColorCounter[1] += 1;
                 } else {
-                        m_ColorCounter[0] += 50;
+                    m_ColorCounter[0] += 1;
                 }
             }
 
@@ -121,9 +121,9 @@ void PickingPass::Draw(RenderScene& scene)
                 m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
                 if (m_ColorCounter[0] > 255) {
                     m_ColorCounter[0] = 0;
-                    m_ColorCounter[1] += 5;
+                    m_ColorCounter[1] += 1;
                 } else {
-                    m_ColorCounter[0] += 50;
+                    m_ColorCounter[0] += 1;
                 }
             }
 

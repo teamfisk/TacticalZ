@@ -40,9 +40,9 @@ void EntityFile::setReaderFeatures(xercesc::SAX2XMLReader* reader)
     reader->setFeature(XMLUni::fgXercesCalculateSrcOfs, true);
 }
 
-std::size_t EntityFile::GetTypeStride(std::string typeName)
+unsigned int EntityFile::GetTypeStride(std::string typeName)
 {
-    std::map<std::string, size_t> typeStrides{
+    std::map<std::string, unsigned int> typeStrides{
         { "bool", sizeof(bool) },
         { "int", sizeof(int) },
         { "float", sizeof(float) },

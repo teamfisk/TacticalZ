@@ -96,6 +96,13 @@ EntityID World::GetParent(EntityID entity)
 
 void World::SetParent(EntityID entity, EntityID parent)
 {
+    // Don't allow an entity to be a child to itself!
+    if (entity == parent) {
+        // HACK: We purposely don't check the whole hierarchy of children here, since it would be way too slow.
+        // This might result in infinite loops if an entity somehow ends up as a child.
+        return;
+    }
+
     EntityID lastParent = m_EntityParents.at(entity);
     auto parentChildren = m_EntityChildren.equal_range(lastParent);
     for (auto it = parentChildren.first; it != parentChildren.second; it++) {

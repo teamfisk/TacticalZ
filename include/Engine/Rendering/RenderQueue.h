@@ -26,6 +26,7 @@ struct RenderScene
     std::list<std::shared_ptr<RenderJob>> DirectionalLightJobs;
     Rectangle Viewport;
     bool ClearDepth = false;
+    glm::vec4 AmbientColor;
 
 	void Clear()
 	{
@@ -40,6 +41,9 @@ struct RenderScene
 struct RenderFrame
 {
 public:
+    //TODO: Getters
+    GLfloat Gamma = 2.2f;
+    GLfloat Exposure = 1.f;
 
     void Add(RenderScene &scene)
     {

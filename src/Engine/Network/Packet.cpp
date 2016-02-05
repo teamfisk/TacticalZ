@@ -7,7 +7,7 @@ Packet::Packet(MessageType type, unsigned int& packetID)
 }
 
 // Create message
-Packet::Packet(char* data, const int sizeOfPacket)
+Packet::Packet(char* data, const size_t sizeOfPacket)
 {
     // Resize message
     m_MaxPacketSize = sizeOfPacket;
@@ -45,7 +45,7 @@ void Packet::Init(MessageType type, unsigned int & packetID)
 void Packet::WriteString(const std::string& str)
 {
     // Message, add one extra byte for null terminator
-    int sizeOfString = str.size() + 1;
+    size_t sizeOfString = str.size() + 1;
     if (m_Offset + sizeOfString > m_MaxPacketSize) {
         //LOG_WARNING("Package::WriteString(): Data size in packet exceeded maximum package size. New size is %i bytes\n", m_MaxPacketSize*2);
         resizeData();
@@ -82,7 +82,7 @@ char * Packet::ReadData(int SizeOfData)
         //LOG_WARNING("packet ReadData(): Oh no! You are trying to remove things outside my memory kingdom");
         return nullptr;
     }
-    unsigned int oldReturnDataOffset = m_ReturnDataOffset;
+    size_t oldReturnDataOffset = m_ReturnDataOffset;
     m_ReturnDataOffset += SizeOfData;
     return (m_Data + oldReturnDataOffset);
 }

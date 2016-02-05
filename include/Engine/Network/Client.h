@@ -36,7 +36,7 @@ private:
     boost::asio::ip::udp::socket m_Socket;
 
     // Sending message to server logic
-    int bytesRead = -1;
+    size_t bytesRead = 0;
     char readBuf[INPUTSIZE] = { 0 };
 
     // Packet loss logic
@@ -69,7 +69,7 @@ private:
 
     // Private member functions
     void readFromServer();
-    int  receive(char* data);
+    size_t  receive(char* data);
     void send(Packet& packet);
     void connect();
     void disconnect();
