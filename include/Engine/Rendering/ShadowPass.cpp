@@ -62,10 +62,10 @@ void ShadowPass::ClearBuffer()
 void ShadowPass::Draw(RenderScene & scene)
 {
     ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
-
-    GLuint shaderHandle = m_ShadowProgram->GetHandle();
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
+
+    GLuint shaderHandle = m_ShadowProgram->GetHandle();
     m_ShadowProgram->Bind();
 
     //if (scene.ClearDepth) {
