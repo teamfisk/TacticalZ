@@ -92,7 +92,6 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -115,16 +114,12 @@ Game::Game(int argc, char* argv[])
         networkFunction();
     }
 
-    // Invoke sound system
-    //m_SoundManager = new SoundManager(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
-
     m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
     delete m_SystemPipeline;
-    //delete m_SoundManager;
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
     delete m_OctreeTrigger;
