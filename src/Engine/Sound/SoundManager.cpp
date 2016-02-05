@@ -23,7 +23,6 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker, bool editorMo
     EVENT_SUBSCRIBE_MEMBER(m_EShoot, &SoundManager::OnShoot);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundManager::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundManager::OnPlayerDamage);
-    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &SoundManager::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundManager::OnCaptured);
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundManager::OnTriggerTouch);
     EVENT_SUBSCRIBE_MEMBER(m_EPause, &SoundManager::OnPause);
@@ -182,16 +181,7 @@ void SoundManager::stopSound(Source* source)
     alSourceStop(source->ALsource);
 }
 
-void SoundManager::playerJumps()
-{
-    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
-    if (vel.y == 0) {
-        Source* source = createSource("Audio/jump/jump1.wav");
-        source->Type = SoundType::SFX;
-        m_Sources[createChildEmitter(m_LocalPlayer)] = source;
-        playSound(source);
-    }
-}
+
 
 void SoundManager::playerStep(double dt)
 {
@@ -303,26 +293,6 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned & e)
     return true;
 }
 
-bool SoundManager::OnInputCommand(const Events::InputCommand & e)
-{
-    if (e.Command == "Jump" && e.Value > 0) {
-        if (e.PlayerID == -1) { // local player
-            playerJumps();
-            return true;
-        }
-    }
-    // TEMP: testing purpose (obviously)
-    if (e.Command == "TakeDamage" && e.Value > 0) {
-        if (e.PlayerID == -1) { //Local Player
-            Events::PlayerDamage ePlayerDamage;
-            ePlayerDamage.Damage = 1;
-            ePlayerDamage.Player = EntityWrapper(m_World, e.Player.ID);
-            m_EventBroker->Publish(ePlayerDamage);
-            return true;
-        }
-    }
-    return false;
-}
 
 bool SoundManager::OnCaptured(const Events::Captured & e)
 {

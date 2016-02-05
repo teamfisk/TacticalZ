@@ -4,6 +4,7 @@
 #include "../Engine/Core/System.h"
 #include "../Engine/Sound/SoundManager.h"
 #include "../Engine/Core/EPlayerSpawned.h"
+#include "../Engine/Input/EInputCommand.h"
 
 
 class SoundSystem : public PureSystem, ImpureSystem, SoundManager
@@ -19,14 +20,19 @@ private:
     World* m_World = nullptr;
     EventBroker* m_EventBroker = nullptr;
 
+    void playerJumps();
+
+
     // TODO: WIP Update this
-    double m_DistanceMoved = 0.0;
-    const float m_PlayerStepLength = 1.0;
+    float m_DistanceMoved = 0.0f;
+    const float m_PlayerStepLength = 2.0f;
     glm::vec3 m_LastPosition = glm::vec3();
     bool m_LeftFoot = false;
 
     EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned &e);
+    EventRelay<SoundSystem, Events::InputCommand> m_InputCommand;
+    bool OnInputCommand(const Events::InputCommand &e);
 };
 
 #endif

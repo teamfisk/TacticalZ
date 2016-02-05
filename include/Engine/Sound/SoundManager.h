@@ -133,8 +133,6 @@ private:
     bool OnShoot(const Events::Shoot &e);
     EventRelay<SoundManager, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned &e);
-    EventRelay<SoundManager, Events::InputCommand> m_EInputCommand;
-    bool OnInputCommand(const Events::InputCommand &e);
     EventRelay<SoundManager, Events::Captured> m_ECaptured;
     bool OnCaptured(const Events::Captured &e);
     EventRelay<SoundManager, Events::PlayerDamage> m_EPlayerDamage;
