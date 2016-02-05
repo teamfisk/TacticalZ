@@ -5,7 +5,8 @@ DrawColorCorrectionPass::DrawColorCorrectionPass(IRenderer* renderer)
     m_Renderer = renderer;
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh");
-    m_Exposure = 0.4; //TODO: Renderer: Fixa så att denna går att ändra på genom komponent eller setting.
+
+    //m_Exposure = 0.4; //TODO: Renderer: Fixa så att denna går att ändra på genom komponent eller setting.
 
     InitializeShaderPrograms();
 }
@@ -19,7 +20,7 @@ void DrawColorCorrectionPass::InitializeShaderPrograms()
     m_ColorCorrectionProgram->Link();
 }
 
-void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture)
+void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture, GLfloat gamma, GLfloat exposure)
 {
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLERROR("DrawScreenQuadPass::Draw: Pre");
@@ -27,7 +28,8 @@ void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture)
     DrawScreenQuadPassState state = DrawScreenQuadPassState();
     m_ColorCorrectionProgram->Bind();
     glClear(GL_COLOR_BUFFER_BIT);
-    glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Exposure"), m_Exposure);
+    glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Exposure"), exposure);
+    glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Gamma"), gamma);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sceneTexture);
