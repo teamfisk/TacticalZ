@@ -35,7 +35,7 @@ protected:
     int port = 0;
     // Sending message to server logic
     int bytesRead = -1;
-    char readBuf[INPUTSIZE] = { 0 };
+    char readBuffer[BUFFERSIZE] = { 0 };
 
     // Packet loss logic
     PacketID m_PacketID = 0;
@@ -68,7 +68,7 @@ protected:
     // Private member functions
     virtual void send(Packet& packet) = 0;
     virtual void readFromServer() = 0;
-    void connect();
+    virtual void connect() = 0;
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);

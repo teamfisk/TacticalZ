@@ -25,12 +25,13 @@ public:
     void Start(World* m_world, EventBroker *eventBroker) override;
     void Update() override;
 protected:
-    template<class T>
-    T m_ReceiverEndpoint;
+    // dont forget to set these in the childrens receive logic
+    boost::asio::ip::address m_Address;
+    unsigned short m_Port;
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
     // HACK: Fix INPUTSIZE
-    char readBuffer[INPUTSIZE] = { 0 };
+    char readBuffer[BUFFERSIZE] = { 0 };
     int bytesRead = 0;
     // time for previouse message
     std::clock_t previousePingMessage = std::clock();
@@ -65,15 +66,17 @@ protected:
     void parseOnPlayerDamage(Packet& packet);
     void identifyPacketLoss();
     void kick(PlayerID player);
+    PlayerID GetPlayerIDFromEndpoint();
+    void parsePlayerTransform(Packet& packet);
+    void parseOnInputCommand(Packet& packet);
+    void parseClientPing();
+    void parsePing();
+    void parseDisconnect();
     // Pure virtual functions
-    virtual void parseOnInputCommand(Packet& packet) = 0;
     virtual void readFromClients() = 0;
     virtual void send(Packet& packet, PlayerDefinition & playerDefinition) = 0;
     virtual void send(Packet& packet) = 0;
     virtual void parseConnect(Packet& packet) = 0;
-    virtual void parseDisconnect() = 0;
-    virtual void parseClientPing() = 0;
-    virtual void parsePing() = 0;
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
@@ -83,7 +86,6 @@ protected:
     bool OnEntityDeleted(const Events::EntityDeleted& e);
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
-    virtual void parsePlayerTransform(Packet& packet) = 0;
 };
 
 #endif

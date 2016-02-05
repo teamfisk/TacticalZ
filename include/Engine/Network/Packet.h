@@ -49,6 +49,8 @@ public:
     void WriteData(char* data, int sizeOfData);
     // Pops the first element as if it was a string.
     std::string ReadString();
+    // Update size of packet variable in header
+    void UpdateSize();
     char* ReadData(int SizeOfData);
     void ChangePacketID(unsigned int& packetID);
     int Size() { return m_Offset; };

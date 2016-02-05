@@ -181,11 +181,13 @@ void Game::networkFunction()
     bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
     if (!isServer) {
         m_IsClientOrServer = true;
-        m_ClientOrServer = new TCPClient(m_Config);
+        //m_ClientOrServer = new TCPClient(m_Config);
+        m_ClientOrServer = new HybridClient(m_Config);
     }
     if (isServer) {
         m_IsClientOrServer = true;
-        m_ClientOrServer = new TCPServer();
+        //m_ClientOrServer = new TCPServer();
+        m_ClientOrServer = new HybridServer();
     }
     m_ClientOrServer->Start(m_World, m_EventBroker);
 

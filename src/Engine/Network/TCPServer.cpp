@@ -11,11 +11,6 @@ TCPServer::~TCPServer()
 
 }
 
-void TCPServer::Start(World* world, EventBroker* eventBroker)
-{
-    Server::Start(world, eventBroker);
-}
-
 void TCPServer::readFromClients()
 {
     acceptNewConnections();
@@ -24,6 +19,11 @@ void TCPServer::readFromClients()
             try {
                 bytesRead = receive(readBuffer, *kv.second.TCPSocket);
                 lastReceivedSocket = kv.second.TCPSocket;
+                // Get logic for mother class
+                boost::asio::ip::tcp::endpoint remoteEndpoint = kv.second.TCPSocket->remote_endpoint();
+                m_Address = remoteEndpoint.address();
+                m_Port = remoteEndpoint.port();
+                // Recreate packets
                 Packet packet(readBuffer, bytesRead);
                 parseMessageType(packet);
             } catch (const std::exception& err) {
@@ -63,41 +63,48 @@ void TCPServer::acceptNewConnections()
 
 void TCPServer::handle_accept(boost::shared_ptr<tcp::socket> socket, const boost::system::error_code& error)
 {
-    if (!error) {
+    if (!error && GetPlayerIDFromEndpoint() == -1) {
         // Add tcp socket to connections
+        boost::asio::ip::tcp::no_delay option(true);
+        socket->set_option(option);
         PlayerDefinition pd;
         pd.StopTime = std::clock();
         pd.TCPSocket = socket;
+        pd.Address = socket.get()->remote_endpoint().address();
+        pd.Port = socket.get()->remote_endpoint().port();
         m_ConnectedPlayers[m_NextPlayerID++] = pd;
     }
 }
-void TCPServer::parseClientPing()
-{
 
-}
-void TCPServer::parsePing()
-{
-
-}
-void TCPServer::parseDisconnect()
-{
-
-}
 void TCPServer::parseConnect(Packet & packet)
 {
+    LOG_INFO("Parsing connections");
+    // Check if player is already connected
+    PlayerID playerID = GetPlayerIDFromEndpoint();
+    if(playerID = -1){
+        return;
+    }
 
-}
-void TCPServer::parseOnInputCommand(Packet & packet)
-{
+    // Create a new player
+    m_ConnectedPlayers.at(playerID).EntityID = 0; // Overlook this
+    m_ConnectedPlayers.at(playerID).Name = packet.ReadString();
+    m_ConnectedPlayers.at(playerID).PacketID = 0;
+    m_ConnectedPlayers.at(playerID).StopTime = std::clock();
+    LOG_INFO("Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
 
-}
-void TCPServer::parsePlayerTransform(Packet & packet)
-{
+    // Send a message to the player that connected
+    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
+    send(connnectPacket);
 
+    // Send notification that a player has connected
+    Packet notificationPacket(MessageType::PlayerConnected);
+    broadcast(notificationPacket);
 }
+
 void TCPServer::send(Packet & packet, PlayerDefinition & playerDefinition)
 {
     try {
+        packet.UpdateSize();
         int bytesSent = playerDefinition.TCPSocket->send(
             boost::asio::buffer(packet.Data(), packet.Size()),
             0);
@@ -115,6 +122,7 @@ void TCPServer::send(Packet & packet, PlayerDefinition & playerDefinition)
 
 void TCPServer::send(Packet & packet)
 {
+    packet.UpdateSize();
     lastReceivedSocket->send(
         boost::asio::buffer(
             packet.Data(),
@@ -128,21 +136,28 @@ void TCPServer::send(Packet & packet)
 }
 
 //boost::shared_ptr<boost::asio::ip::tcp::socket> socket
-int TCPServer::receive(char * data,boost::asio::ip::tcp::socket& socket)
+int TCPServer::receive(char * data, boost::asio::ip::tcp::socket& socket)
 {
-    unsigned int length = socket.read_some(
-        boost::asio::buffer((void*)data, INPUTSIZE));
+    boost::system::error_code error;
+    // Read size of packet
+    int bytesReceived = socket.read_some(boost
+        ::asio::buffer((void*)data, sizeof(int)),
+        error);
+    int sizeOfPacket = 0;
+    memcpy(&sizeOfPacket, data, sizeof(int));
+
+    // Read the rest of the message
+    bytesReceived += socket.read_some(boost
+        ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
+        error);
     // Network Debug data
     if (isReadingData) {
-        m_NetworkData.TotalDataReceived += length;
-        m_NetworkData.DataReceivedThisInterval += length;
+        m_NetworkData.TotalDataReceived += bytesReceived;
+        m_NetworkData.DataReceivedThisInterval += bytesReceived;
         m_NetworkData.AmountOfMessagesReceived++;
     }
-    return length;
-
-}
-
-PlayerID TCPServer::GetPlayerIDFromEndpoint(boost::asio::ip::udp::endpoint endpoint)
-{
-    return PlayerID();
+    if (error) {
+        //LOG_ERROR("receive: %s", error.message().c_str());
+    }
+    return bytesReceived;
 }

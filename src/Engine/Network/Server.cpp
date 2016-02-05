@@ -35,6 +35,10 @@ void Server::Update()
 
 void Server::parseMessageType(Packet& packet)
 {
+    // Pop packetSize which is used by TCP Client to
+    // create a packet of the correct size
+    packet.ReadPrimitive<int>();
+
     int messageType = packet.ReadPrimitive<int>(); // Read what type off message was sent from server
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
@@ -150,14 +154,27 @@ void Server::checkForTimeOuts()
     int startPing = 1000 * m_StartPingTime
         / static_cast<double>(CLOCKS_PER_SEC);
 
-    for (int i = 0; i < m_ConnectedPlayers.size(); i++) {
-        if (m_ConnectedPlayers[i].Endpoint.address() != boost::asio::ip::address()) {
-            int stopPing = 1000 * m_ConnectedPlayers[i].StopTime /
+    for (auto& kv : m_ConnectedPlayers) {
+        if (kv.second.Address != boost::asio::ip::address()) {
+            int stopPing = 1000 * kv.second.StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
             if (startPing > stopPing + m_TimeoutMs) {
-                LOG_INFO("User %i timed out!", i);
-                disconnect(i);
+                LOG_INFO("User %i timed out!", kv.second.Name);
+                disconnect(kv.first);
             }
+        }
+    }
+}
+
+void Server::parseDisconnect()
+{
+    LOG_INFO("%i: Parsing disconnect", m_PacketID);
+
+    for (auto& kv : m_ConnectedPlayers) {
+        if (kv.second.Address == m_Address &&
+            kv.second.Port == m_Port) {
+            disconnect(kv.first);
+            break;
         }
     }
 }
@@ -168,7 +185,7 @@ void Server::disconnect(PlayerID playerID)
     LOG_INFO("User %s disconnected/timed out", m_ConnectedPlayers[playerID].Name.c_str());
     // Remove enteties and stuff (When we can remove entity, remove it and tell clients to remove the copy they have)
     Events::PlayerDisconnected e;
-    e.Entity = m_ConnectedPlayers[playerID].EntityID;
+    e.Entity = m_ConnectedPlayers.at(playerID).EntityID;
     e.PlayerID = playerID;
     m_EventBroker->Publish(e);
 
@@ -249,4 +266,78 @@ bool Server::OnComponentDeleted(const Events::ComponentDeleted & e)
         broadcast(packet);
     }
     return false;
+}
+
+
+void Server::parseClientPing()
+{
+    LOG_INFO("%i: Parsing ping", m_PacketID);
+    PlayerID player = GetPlayerIDFromEndpoint();
+    if (player == -1) {
+        return;
+    }
+    // Return ping
+    Packet packet(MessageType::Ping, m_ConnectedPlayers[player].PacketID);
+    packet.WriteString("Ping received");
+    send(packet);
+}
+
+void Server::parsePing()
+{
+    for (auto& kv : m_ConnectedPlayers) {
+        if (kv.second.Address == m_Address &&
+            kv.second.Port == m_Port) {
+            kv.second.StopTime = std::clock();
+            break;
+        }
+    }
+}
+
+void Server::parseOnInputCommand(Packet& packet)
+{
+    PlayerID player = -1;
+    // Check which player it was who sent the message
+    player = GetPlayerIDFromEndpoint();
+    if (player != -1) {
+        while (packet.DataReadSize() < packet.Size()) {
+            Events::InputCommand e;
+            e.Command = packet.ReadString();
+            e.PlayerID = player; // Set correct player id
+            e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
+            e.Value = packet.ReadPrimitive<float>();
+            m_EventBroker->Publish(e);
+            LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+        }
+    }
+}
+
+void Server::parsePlayerTransform(Packet& packet)
+{
+    glm::vec3 position;
+    glm::vec3 orientation;
+    position.x = packet.ReadPrimitive<float>();
+    position.y = packet.ReadPrimitive<float>();
+    position.z = packet.ReadPrimitive<float>();
+    orientation.x = packet.ReadPrimitive<float>();
+    orientation.y = packet.ReadPrimitive<float>();
+    orientation.z = packet.ReadPrimitive<float>();
+
+    PlayerID playerID = GetPlayerIDFromEndpoint();
+    EntityWrapper player(m_World, m_ConnectedPlayers.at(playerID).EntityID);
+
+    if (player.Valid()) {
+        player["Transform"]["Position"] = position;
+        player["Transform"]["Orientation"] = orientation;
+    }
+}
+
+PlayerID Server::GetPlayerIDFromEndpoint()
+{
+    for (auto& kv : m_ConnectedPlayers) {
+        if (kv.second.Address == m_Address &&
+            kv.second.Port == m_Port) {
+            return kv.first;
+        }
+    }
+    return -1;
 }

@@ -21,9 +21,9 @@ void HybridClient::Start(World* world, EventBroker* eventBroker)
 void HybridClient::readFromServer()
 {
     while (m_Socket.available()) {
-        bytesRead = receive(readBuf);
+        bytesRead = receive(readBuffer);
         if (bytesRead > 0) {
-            Packet packet(readBuf, bytesRead);
+            Packet packet(readBuffer, bytesRead);
             parseMessageType(packet);
         }
     }
@@ -34,7 +34,7 @@ int HybridClient::receive(char* data)
     boost::system::error_code error;
 
     int bytesReceived = m_Socket.receive_from(boost
-        ::asio::buffer((void*)data, INPUTSIZE),
+        ::asio::buffer((void*)data, BUFFERSIZE),
         m_ReceiverEndpoint,
         0, error);
     // Network Debug data
@@ -61,4 +61,12 @@ void HybridClient::send(Packet& packet)
         m_NetworkData.DataSentThisInterval += packet.Size();
         m_NetworkData.AmountOfMessagesSent++;
     }
+}
+
+void HybridClient::connect()
+{
+    Packet packet(MessageType::Connect, m_SendPacketID);
+    packet.WriteString(m_PlayerName);
+    m_StartPingTime = std::clock();
+    send(packet);
 }

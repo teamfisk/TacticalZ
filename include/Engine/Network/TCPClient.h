@@ -15,6 +15,7 @@ private:
     boost::asio::io_service m_IOService;
     boost::shared_ptr<boost::asio::ip::tcp::socket> m_Socket;
 
+    void connect();
     void readFromServer();
     int receive(char * data);
     void send(Packet & packet);

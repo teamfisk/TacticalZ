@@ -49,6 +49,9 @@ void Client::Update()
 
 void Client::parseMessageType(Packet& packet)
 {
+    // Pop packetSize which is used by TCP Client to
+    // create a packet of the correct size
+    packet.ReadPrimitive<int>();
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
         return;
@@ -240,16 +243,9 @@ void Client::parseSnapshot(Packet& packet)
     }
 }
 
-void Client::connect()
-{
-    Packet packet(MessageType::Connect, m_SendPacketID);
-    packet.WriteString(m_PlayerName);
-    m_StartPingTime = std::clock();
-    send(packet);
-}
-
 void Client::disconnect()
 {
+    m_IsConnected = false;
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
@@ -283,7 +279,9 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
             m_SaveDataTimer = std::clock();
         }
     } else {
-        m_InputCommandBuffer.push_back(e);
+        if (m_IsConnected) { 
+            m_InputCommandBuffer.push_back(e);
+        }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     }

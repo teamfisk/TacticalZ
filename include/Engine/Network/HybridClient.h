@@ -16,6 +16,7 @@ private:
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::socket m_Socket;
 
+    void connect();
     void readFromServer();
     int receive(char * data);
     void send(Packet & packet);

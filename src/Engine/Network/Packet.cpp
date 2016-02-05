@@ -34,6 +34,8 @@ void Packet::Init(MessageType type, unsigned int & packetID)
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
+    // allocate memory for size of packet(only used in tcp)
+    Packet::WritePrimitive<int>(0);
     // Add message type
     int messageType = static_cast<int>(type);
     Packet::WritePrimitive<int>(messageType);
@@ -76,6 +78,11 @@ std::string Packet::ReadString()
     return returnValue;
 }
 
+void Packet::UpdateSize()
+{ 
+    memcpy(m_Data, &m_Offset, sizeof(int));
+}
+
 char * Packet::ReadData(int SizeOfData)
 {
     if (m_Offset < m_ReturnDataOffset + SizeOfData) {
@@ -91,7 +98,7 @@ void Packet::ChangePacketID(unsigned int & packetID)
 {
     packetID = packetID + 1;
     // Overwrite old PacketID
-    memcpy(m_Data + sizeof(int), &packetID, sizeof(int));
+    memcpy(m_Data + 2*sizeof(int), &packetID, sizeof(int));
 }
 
 void Packet::resizeData()
