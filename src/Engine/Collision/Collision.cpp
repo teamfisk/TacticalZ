@@ -521,7 +521,6 @@ bool AABBvsTriangle(const AABB& box,
         if (!isOnGround) {
             boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
         }
-        isOnGround = false;
     }
     return true;
 }
