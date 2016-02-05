@@ -31,8 +31,6 @@
 #include "Core/EPlayerDeath.h"
 #include "Core/EPlayerHealthPickup.h"
 #include "Core/EComponentAttached.h"
-#include "Core/EComponentDeleted.h"
-#include "Core/EEntityDeleted.h"
 #include "Collision/ETrigger.h"
 #include "Core/EPause.h"
 #include "Game/Events/EDoubleJump.h"
@@ -107,7 +105,6 @@ private:
     bool m_EditorEnabled = false;
     const double m_PlayerFootstepInterval = 1.0;
     double m_TimeSinceLastFootstep = 0;
-    // TEMP
     EntityID m_LocalPlayer = EntityID_Invalid;
     bool m_LeftFoot = false;
     std::default_random_engine generator;
@@ -145,8 +142,6 @@ private:
     bool OnPlayerHealthPickup(const Events::PlayerHealthPickup &e);
     EventRelay<SoundSystem, Events::ComponentAttached> m_EComponentAttached;
     bool OnComponentAttached(const Events::ComponentAttached &e);
-    EventRelay<SoundSystem, Events::ComponentDeleted> m_EComponentDeleted;
-    bool OnComponentDeleted(const Events::ComponentDeleted &e);
     EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(const Events::TriggerTouch &e);
     EventRelay<SoundSystem, Events::Pause> m_EPause;

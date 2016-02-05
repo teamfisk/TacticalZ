@@ -177,7 +177,6 @@ void SoundSystem::playQueue(QueuedBuffers qb)
     alSourcePlay(qb.first);
 }
 
-
 void SoundSystem::stopSound(Source* source)
 {
     alSourceStop(source->ALsource);
@@ -402,7 +401,7 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     source->Type = SoundType::SFX;
     m_Sources[child] = source;
 
-    // breathe
+    // Breathe
     std::vector<ALuint> buffers;
     buffers.push_back(source->SoundResource->Buffer());
     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
@@ -448,14 +447,6 @@ bool SoundSystem::OnComponentAttached(const Events::ComponentAttached & e)
         auto component = m_World->GetComponent(e.Entity.ID, "SoundEmitter");
         Source* source = createSource(component["FilePath"]);
         m_Sources[e.Entity.ID] = source;
-    }
-    return false;
-}
-
-bool SoundSystem::OnComponentDeleted(const Events::ComponentDeleted & e)
-{
-    if (e.ComponentType == "SoundEmitter") {
-
     }
     return false;
 }
