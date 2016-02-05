@@ -69,12 +69,11 @@ protected:
     void stopSound(Source* source);
     void playerJumps();
     void playerStep(double dt);
-    EntityID createChildEmitter();
+    EntityID createChildEmitter(EntityWrapper localPlayer);
 
     // Logic
     World* m_World = nullptr;
     EventBroker* m_EventBroker = nullptr;
-    std::unordered_map<EntityID, Source*> m_Sources;
 
 private:
     // Help functions for working with OpenaAL
@@ -98,7 +97,8 @@ private:
     void setGain(Source* source, float gain);
     void setSoundProperties(Source* source, ComponentWrapper* soundComponent);
 
-   
+    std::unordered_map<EntityID, Source*> m_Sources;
+
 
     // OpenAL system variables
     ALCdevice* m_ALCdevice = nullptr;
@@ -109,7 +109,7 @@ private:
     float m_BGMVolumeChannel = 1.0f;
     float m_SFXVolumeChannel = 1.0f;
     bool m_EditorEnabled = false;
-    EntityID m_LocalPlayer = EntityID_Invalid;
+    EntityWrapper m_LocalPlayer = EntityWrapper();
     std::default_random_engine generator;
 
     // Events

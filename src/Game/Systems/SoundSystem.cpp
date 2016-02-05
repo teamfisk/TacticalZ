@@ -18,39 +18,32 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 
 void SoundSystem::Update(double dt)
 {
-    SoundManager::Update(dt);
     playerStep(dt);
+    SoundManager::Update(dt);
 }
 
 void SoundSystem::playerStep(double dt)
 {
-    if (!m_LocalPlayer.Valid()) {
-        return;
-    }
-    if (m_LocalPlayer.ID == EntityID_Invalid) {
-        return;
-    }
-
-    m_TimeSinceLastFootstep += dt;
-    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
-    float playerSpeed = glm::length(vel);
-    bool isAirborne = vel.y != 0;
-    if (playerSpeed > 1 && !isAirborne) {
-        // Player is walking
-        if (m_TimeSinceLastFootstep * std::min<float>(playerSpeed, 2) > m_PlayerFootstepInterval) {
-            // Create footstep sound
-            Events::PlaySoundOnEntity e;
-            e.EmitterID = createChildEmitter();
-            if (m_LeftFoot) {
-                e.FilePath = "Audio/footstep/footstep2.wav";
-            } else {
-                e.FilePath = "Audio/footstep/footstep3.wav";
-            }
-            m_LeftFoot = !m_LeftFoot;
-            m_EventBroker->Publish(e);
-            m_TimeSinceLastFootstep = 0;
-        }
-    }
+    //if (!m_LocalPlayer.Valid()) {
+    //    return;
+    //}
+    //glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
+    //glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
+    //glm::vec3 difference = pos - m_LastPosition;
+    //m_DistanceMoved += glm::length(difference);
+    //bool isAirborne = vel.y != 0;
+    //if (m_DistanceMoved > m_PlayerStepLength && !isAirborne) {
+    //    // Player is walking
+    //    if (m_TimeSinceLastFootstep * std::min<float>(playerSpeed, 2) > m_PlayerFootstepInterval) {
+    //        // Create footstep sound
+    //        Events::PlaySoundOnEntity e;
+    //        e.EmitterID = createChildEmitter(m_LocalPlayer);
+    //        e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
+    //        m_LeftFoot = !m_LeftFoot;
+    //        m_EventBroker->Publish(e);
+    //        m_TimeSinceLastFootstep = 0;
+    //    }
+    //}
 }
 
 bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
@@ -59,7 +52,7 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
         m_World->AttachComponent(e.Player.ID, "Listener");
         m_LocalPlayer = e.Player;
         Events::PlaySoundOnEntity event;
-        event.EmitterID = createChildEmitter();
+        event.EmitterID = createChildEmitter(m_LocalPlayer);
         event.FilePath = "Audio/announcer/go.wav";
         m_EventBroker->Publish(event);
         // TEMP: starts bgm

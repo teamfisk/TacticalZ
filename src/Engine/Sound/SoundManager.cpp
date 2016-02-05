@@ -184,14 +184,13 @@ void SoundManager::stopSound(Source* source)
 
 void SoundManager::playerJumps()
 {
-    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer, "Physics")["Velocity"];
+    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
     if (vel.y == 0) {
         Source* source = createSource("Audio/jump/jump1.wav");
         source->Type = SoundType::SFX;
-        m_Sources[createChildEmitter()] = source;
+        m_Sources[createChildEmitter(m_LocalPlayer)] = source;
         playSound(source);
     }
-
 }
 
 void SoundManager::playerStep(double dt)
@@ -199,9 +198,9 @@ void SoundManager::playerStep(double dt)
    
 }
 
-EntityID SoundManager::createChildEmitter()
+EntityID SoundManager::createChildEmitter(EntityWrapper localPlayer)
 { 
-    EntityID child = m_World->CreateEntity(m_LocalPlayer);
+    EntityID child = m_World->CreateEntity(localPlayer.ID);
     m_World->AttachComponent(child, "Transform");
     m_World->AttachComponent(child, "SoundEmitter");
     return child;
@@ -290,7 +289,7 @@ bool SoundManager::OnShoot(const Events::Shoot & e)
     //m_World->AttachComponent(emitterID, "Transform");
     //auto emitter = m_World->AttachComponent(emitterID, "SoundEmitter");
     source->Type = SoundType::SFX;
-    m_Sources[createChildEmitter()] = source;
+    m_Sources[createChildEmitter(m_LocalPlayer)] = source;
     playSound(source);
     return true;
 }
@@ -299,7 +298,7 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned & e)
 {
     if (e.PlayerID == -1) { // Local player
         m_World->AttachComponent(e.Player.ID, "Listener");
-        m_LocalPlayer = e.Player.ID;
+        m_LocalPlayer.ID = e.Player.ID;
     }
     return true;
 }
@@ -328,14 +327,14 @@ bool SoundManager::OnInputCommand(const Events::InputCommand & e)
 bool SoundManager::OnCaptured(const Events::Captured & e)
 {
     int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
-    int team = (int)m_World->GetComponent(m_LocalPlayer, "Team")["Team"];
+    int team = (int)m_World->GetComponent(m_LocalPlayer.ID, "Team")["Team"];
     Events::PlaySoundOnEntity ev;
     if (team == homeTeam) {
         ev.FilePath = "Audio/announcer/objective_achieved.wav";
     } else {
         ev.FilePath = "Audio/announcer/objective_failed.wav"; // have not been tested
     }
-    ev.EmitterID = createChildEmitter();
+    ev.EmitterID = createChildEmitter(m_LocalPlayer);
     m_EventBroker->Publish(ev);
     return false;
 }
@@ -348,7 +347,7 @@ bool SoundManager::OnPlayerDamage(const Events::PlayerDamage & e)
     int rand = dist(generator);
     Source* source = createSource("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
     source->Type = SoundType::SFX;
-    m_Sources[createChildEmitter()] = source;
+    m_Sources[createChildEmitter(m_LocalPlayer)] = source;
 
     // Breathe
     std::vector<ALuint> buffers;
@@ -364,9 +363,9 @@ bool SoundManager::OnPlayerDamage(const Events::PlayerDamage & e)
 
 bool SoundManager::OnPlayerDeath(const Events::PlayerDeath & e)
 {
-    if (e.PlayerID == m_LocalPlayer) {
+    if (e.PlayerID == m_LocalPlayer.ID) {
         Events::PlaySoundOnEntity ev;
-        ev.EmitterID = createChildEmitter();
+        ev.EmitterID = createChildEmitter(m_LocalPlayer);
         ev.FilePath = "Audio/die/die2.wav"; // should random between a bunch
         m_EventBroker->Publish(ev);
     }
@@ -375,9 +374,9 @@ bool SoundManager::OnPlayerDeath(const Events::PlayerDeath & e)
 
 bool SoundManager::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
-    if (e.PlayerHealedID == m_LocalPlayer) {
+    if (e.PlayerHealedID == m_LocalPlayer.ID) {
         Events::PlaySoundOnEntity ev;
-        ev.EmitterID = createChildEmitter();
+        ev.EmitterID = createChildEmitter(m_LocalPlayer);
         ev.FilePath = "Audio/pickup/pickup2.wav";
         m_EventBroker->Publish(ev);
     }
@@ -423,7 +422,7 @@ bool SoundManager::OnResume(const Events::Resume &e)
 bool SoundManager::OnDoubleJump(const Events::DoubleJump & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter();
+    ev.EmitterID = createChildEmitter(m_LocalPlayer);
     ev.FilePath = "Audio/jump/jump2.wav";
     m_EventBroker->Publish(ev);
     return false;
@@ -432,7 +431,7 @@ bool SoundManager::OnDoubleJump(const Events::DoubleJump & e)
 bool SoundManager::OnDashAbility(const Events::DashAbility &e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter();
+    ev.EmitterID = createChildEmitter(m_LocalPlayer);
     ev.FilePath = "Audio/jump/dash1.wav";
     m_EventBroker->Publish(ev);
     return false;

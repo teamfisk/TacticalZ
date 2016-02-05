@@ -20,8 +20,9 @@ private:
     EventBroker* m_EventBroker = nullptr;
 
     // TODO: WIP Update this
-    double m_TimeSinceLastFootstep = 0.0;
-    const double  m_PlayerFootstepInterval = 1.0;
+    double m_DistanceMoved = 0.0;
+    const float m_PlayerStepLength = 1.0;
+    glm::vec3 m_LastPosition = glm::vec3();
     bool m_LeftFoot = false;
 
     EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
