@@ -7,6 +7,7 @@
 #include "../Core/EventBroker.h"
 #include "../Core/World.h"
 #include "ShadowPassState.h"
+#include "imgui/imgui.h"
 
 //#include "ShadowPassState.h" // not created yet
 
@@ -44,6 +45,14 @@ private:
     ShaderProgram* m_ShadowProgram;
 
     GLuint m_DepthFBO;
+
+    GLfloat m_NearPlane = -40.f;
+    GLfloat m_FarPlane = 80.f;
+    //GLfloat m_Left = -10.f;
+    //GLfloat m_Right = 10.f;
+    //GLfloat m_Bottom = -10.f;
+    //GLfloat m_Top = 10.f;
+    GLfloat m_LRBT[4] = { -40.f, 100.f, -50.f, 50.f };
 
 };
 
