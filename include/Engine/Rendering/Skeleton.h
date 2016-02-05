@@ -62,7 +62,6 @@ public:
             int Index = 0;
             double Time = 0.0;
             BoneProperty BoneProperties;
-            //Keyframe::BoneProperty boneProperty;
 		};
         std::string Name;
         double Duration;
@@ -87,8 +86,6 @@ public:
 
     const Animation* GetAnimation(std::string name);
     std::vector<glm::mat4> GetFrameBones(const Animation* animation, double time, bool noRootMotion = false);
-    void AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
-
     void  AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
 
     void PrintSkeleton();
