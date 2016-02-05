@@ -1,5 +1,5 @@
-#ifndef SoundSystem_h__
-#define SoundSystem_h__
+#ifndef SoundManager_h__
+#define SoundManager_h__
 
 #include <unordered_map>
 #include <random>
@@ -34,6 +34,7 @@
 #include "Collision/ETrigger.h"
 #include "Core/EPause.h"
 #include "Game/Events/EDoubleJump.h"
+#include "Game/Events/EDashAbility.h"
 
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
@@ -51,14 +52,30 @@ struct Source
     SoundType Type;
 };
 
-class SoundSystem
+class SoundManager
 {
 public:
-    SoundSystem() { }
-    SoundSystem(World* world, EventBroker* eventBroker, bool editorMode);
-    ~SoundSystem();
+    SoundManager() { }
+    SoundManager(World* world, EventBroker* eventBroker, bool editorMode);
+    ~SoundManager();
     // Update emitters / listener
     void Update(double dt); 
+
+protected:
+    // Specific logic
+    void playSound(Source* source);
+    // Need to be the same format (sample rate etc)
+    void playQueue(QueuedBuffers qb);
+    void stopSound(Source* source);
+    void playerJumps();
+    void playerStep(double dt);
+    EntityID createChildEmitter();
+
+    // Logic
+    World* m_World = nullptr;
+    EventBroker* m_EventBroker = nullptr;
+    std::unordered_map<EntityID, Source*> m_Sources;
+
 private:
     // Help functions for working with OpenaAL
     void setListenerPos(glm::vec3 pos) { alListener3f(AL_POSITION, pos.x, pos.y, pos.z); };
@@ -81,75 +98,63 @@ private:
     void setGain(Source* source, float gain);
     void setSoundProperties(Source* source, ComponentWrapper* soundComponent);
 
-    // Specific logic
-    void playSound(Source* source);
-    // Need to be the same format (sample rate etc)
-    void playQueue(QueuedBuffers qb);
-    void stopSound(Source* source);
-    void playerDamaged();
-    void playerShot();
-    void playerJumps();
-    void playerStep(double dt);
+   
 
     // OpenAL system variables
     ALCdevice* m_ALCdevice = nullptr;
     ALCcontext* m_ALCcontext = nullptr;
 
-    // Logic
-    World* m_World = nullptr;
-    EventBroker* m_EventBroker = nullptr;
-    std::unordered_map<EntityID, Source*> m_Sources;
+
 
     float m_BGMVolumeChannel = 1.0f;
     float m_SFXVolumeChannel = 1.0f;
     bool m_EditorEnabled = false;
-    const double m_PlayerFootstepInterval = 1.0;
-    double m_TimeSinceLastFootstep = 0;
     EntityID m_LocalPlayer = EntityID_Invalid;
-    bool m_LeftFoot = false;
     std::default_random_engine generator;
 
     // Events
-    EventRelay<SoundSystem, Events::PlaySoundOnEntity> m_EPlaySoundOnEntity;
+    EventRelay<SoundManager, Events::PlaySoundOnEntity> m_EPlaySoundOnEntity;
     bool OnPlaySoundOnEntity(const Events::PlaySoundOnEntity &e);
-    EventRelay<SoundSystem, Events::PlaySoundOnPosition> m_EPlaySoundOnPosition;
+    EventRelay<SoundManager, Events::PlaySoundOnPosition> m_EPlaySoundOnPosition;
     bool OnPlaySoundOnPosition(const Events::PlaySoundOnPosition &e);
-    EventRelay<SoundSystem, Events::PlayBackgroundMusic> m_EPlayBackgroundMusic;
+    EventRelay<SoundManager, Events::PlayBackgroundMusic> m_EPlayBackgroundMusic;
     bool OnPlayBackgroundMusic(const Events::PlayBackgroundMusic &e);
-    EventRelay<SoundSystem, Events::PauseSound> m_EPauseSound;
+    EventRelay<SoundManager, Events::PauseSound> m_EPauseSound;
     bool OnPauseSound(const Events::PauseSound &e);
-    EventRelay<SoundSystem, Events::StopSound> m_EStopSound;
+    EventRelay<SoundManager, Events::StopSound> m_EStopSound;
     bool OnStopSound(const Events::StopSound &e);
-    EventRelay<SoundSystem, Events::ContinueSound> m_EContinueSound;
+    EventRelay<SoundManager, Events::ContinueSound> m_EContinueSound;
     bool OnContinueSound(const Events::ContinueSound &e);
-    EventRelay<SoundSystem, Events::SetBGMGain> m_ESetBGMGain; 
+    EventRelay<SoundManager, Events::SetBGMGain> m_ESetBGMGain; 
     bool OnSetBGMGain(const Events::SetBGMGain &e);
-    EventRelay<SoundSystem, Events::SetSFXGain> m_ESetSFXGain; 
+    EventRelay<SoundManager, Events::SetSFXGain> m_ESetSFXGain; 
     bool OnSetSFXGain(const Events::SetSFXGain &e);
-    EventRelay<SoundSystem, Events::Shoot> m_EShoot;
+    EventRelay<SoundManager, Events::Shoot> m_EShoot;
     bool OnShoot(const Events::Shoot &e);
-    EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
+    EventRelay<SoundManager, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned &e);
-    EventRelay<SoundSystem, Events::InputCommand> m_EInputCommand;
+    EventRelay<SoundManager, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand &e);
-    EventRelay<SoundSystem, Events::Captured> m_ECaptured;
+    EventRelay<SoundManager, Events::Captured> m_ECaptured;
     bool OnCaptured(const Events::Captured &e);
-    EventRelay<SoundSystem, Events::PlayerDamage> m_EPlayerDamage;
+    EventRelay<SoundManager, Events::PlayerDamage> m_EPlayerDamage;
     bool OnPlayerDamage(const Events::PlayerDamage &e);
-    EventRelay<SoundSystem, Events::PlayerDeath> m_EPlayerDeath;
+    EventRelay<SoundManager, Events::PlayerDeath> m_EPlayerDeath;
     bool OnPlayerDeath(const Events::PlayerDeath &e);
-    EventRelay<SoundSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
+    EventRelay<SoundManager, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
     bool OnPlayerHealthPickup(const Events::PlayerHealthPickup &e);
-    EventRelay<SoundSystem, Events::ComponentAttached> m_EComponentAttached;
+    EventRelay<SoundManager, Events::ComponentAttached> m_EComponentAttached;
     bool OnComponentAttached(const Events::ComponentAttached &e);
-    EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
+    EventRelay<SoundManager, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(const Events::TriggerTouch &e);
-    EventRelay<SoundSystem, Events::Pause> m_EPause;
+    EventRelay<SoundManager, Events::Pause> m_EPause;
     bool OnPause(const Events::Pause &e);
-    EventRelay<SoundSystem, Events::Resume> m_EResume;
+    EventRelay<SoundManager, Events::Resume> m_EResume;
     bool OnResume(const Events::Resume &e);
-    EventRelay<SoundSystem, Events::DoubleJump> m_EDoubleJump;
+    EventRelay<SoundManager, Events::DoubleJump> m_EDoubleJump;
     bool OnDoubleJump(const Events::DoubleJump &e);
+    EventRelay<SoundManager, Events::DashAbility> m_EDashAbility;
+    bool OnDashAbility(const Events::DashAbility &e);
 
 
 

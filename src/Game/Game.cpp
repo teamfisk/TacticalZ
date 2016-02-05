@@ -81,6 +81,7 @@ Game::Game(int argc, char* argv[])
 
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
+    m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
@@ -91,6 +92,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -114,7 +116,7 @@ Game::Game(int argc, char* argv[])
     }
 
     // Invoke sound system
-    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
+    //m_SoundManager = new SoundManager(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
 
     m_LastTime = glfwGetTime();
 }
@@ -122,7 +124,7 @@ Game::Game(int argc, char* argv[])
 Game::~Game()
 {
     delete m_SystemPipeline;
-    delete m_SoundSystem;
+    //delete m_SoundManager;
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
     delete m_OctreeTrigger;
@@ -157,7 +159,7 @@ void Game::Tick()
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
-    m_SoundSystem->Update(dt);
+    //m_SoundManager->Update(dt);
 
     // Iterate through systems and update world!
     m_EventBroker->Process<SystemPipeline>();
