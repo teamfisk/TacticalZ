@@ -51,6 +51,7 @@ private:
 	GUI::Frame* m_FrameStack;
     World* m_World;
     Octree<EntityAABB>* m_OctreeCollision;
+    Octree<EntityAABB>* m_OctreeTrigger;
     Octree<EntityAABB>* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
     RenderFrame* m_RenderFrame;

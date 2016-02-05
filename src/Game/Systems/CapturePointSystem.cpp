@@ -66,7 +66,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     nextPossibleCapturePoint["Blue"] = -1;
     for (int i = 0; i < m_NumberOfCapturePoints; i++)
     {
-        if (m_CapturePointNumberToEntityMap[i].HasComponent("Team")) {
+        if (!m_CapturePointNumberToEntityMap[i].HasComponent("Team")) {
             continue;
         }
         ComponentWrapper& capturePointOwnedBy = m_CapturePointNumberToEntityMap[i]["Team"];
@@ -119,6 +119,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         if (std::get<1>(triggerTouched) == capturePointEntity) {
             //some player has touched this - lets figure out: what team, health
             EntityWrapper player = std::get<0>(triggerTouched);
+            //check if its really a player that has triggered the touch
             if (!player.HasComponent("Player")) {
                 //if a non-player has entered the capturePoint, just erase that event and continue
                 m_ETriggerTouchVector.erase(m_ETriggerTouchVector.begin() + i - 1);

@@ -23,7 +23,7 @@ class InterpolationSystem : public PureSystem
         glm::vec3 Position;
         glm::vec3 Scale;
         glm::quat Orientation;
-        double interpolationTime;
+        float interpolationTime;
     };
 public:
     InterpolationSystem(World* world, EventBroker* eventBroker);

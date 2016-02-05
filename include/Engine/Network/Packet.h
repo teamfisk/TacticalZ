@@ -13,7 +13,7 @@ public:
     // arg2: PacketID for identifying packet loss.
     Packet(MessageType type, unsigned int& packetID);
     // Used to create packet from already existing data buffer.
-    Packet(char* data, const int sizeOfPacket);
+    Packet(char* data, const size_t sizeOfPacket);
     Packet(MessageType type);
     ~Packet();
     void Init(MessageType type, unsigned int& packetID);
@@ -51,18 +51,18 @@ public:
     std::string ReadString();
     char* ReadData(int SizeOfData);
     void ChangePacketID(unsigned int& packetID);
-    int Size() { return m_Offset; };
+    size_t Size() { return m_Offset; };
     char* Data() { return m_Data; };
-    unsigned int DataReadSize() { return m_ReturnDataOffset; }
-    unsigned int MaxSize() { return m_MaxPacketSize; }
-    unsigned int HeaderSize() { return m_HeaderSize; }
+    size_t DataReadSize() { return m_ReturnDataOffset; }
+    size_t MaxSize() { return m_MaxPacketSize; }
+    size_t HeaderSize() { return m_HeaderSize; }
 
 private:
     char* m_Data;
-    unsigned int m_ReturnDataOffset = 0;
-    int m_Offset = 0;
-    unsigned int m_MaxPacketSize = 512;
-    unsigned int m_HeaderSize = 0;
+    size_t m_ReturnDataOffset = 0;
+    size_t m_Offset = 0;
+    size_t m_MaxPacketSize = 512;
+    size_t m_HeaderSize = 0;
     void resizeData();
 };
 

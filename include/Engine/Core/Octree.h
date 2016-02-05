@@ -149,7 +149,7 @@ template<typename T>
 template<typename Box>
 void Octree<T>::ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects)
 {
-    //static_assert(std::is_base_of<AABB, Box>::value, "template argument type Box in Octree<T>::ObjectsInSameRegion must be a subclass of AABB.");
+    static_assert(std::is_base_of<AABB, Box>::value, "template argument type Box in Octree<T>::ObjectsInSameRegion must be a subclass of AABB.");
     falsifyObjectChecks();
     m_Root->ObjectsInSameRegion(box, outObjects);
 }

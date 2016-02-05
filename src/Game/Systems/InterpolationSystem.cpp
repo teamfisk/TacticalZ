@@ -5,7 +5,7 @@ InterpolationSystem::InterpolationSystem(World* world, EventBroker* eventBroker)
     , PureSystem("Transform")
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
-    m_SnapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05);
+    m_SnapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05f);
     EVENT_SUBSCRIBE_MEMBER(m_EInterpolate, &InterpolationSystem::OnInterpolate);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &InterpolationSystem::OnPlayerSpawned);
 }
@@ -18,9 +18,9 @@ void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
     }
 
     if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
-        m_NextTransform[transform.EntityID].interpolationTime += dt;
+        m_NextTransform[transform.EntityID].interpolationTime += static_cast<float>(dt);
         Transform sTransform = m_NextTransform[transform.EntityID];
-        double time = sTransform.interpolationTime;
+        float time = sTransform.interpolationTime;
         if (time > m_SnapshotInterval) {
             if (m_LastReceivedTransform.find(transform.EntityID) != m_LastReceivedTransform.end()) {
                 m_NextTransform[transform.EntityID] = m_LastReceivedTransform[transform.EntityID];
