@@ -45,6 +45,7 @@ private:
     void fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
+    void fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     bool isChildOfACamera(EntityWrapper entity);
     bool isChildOfCurrentCamera(EntityWrapper entity);
 

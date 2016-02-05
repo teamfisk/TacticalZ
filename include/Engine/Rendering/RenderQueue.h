@@ -15,6 +15,7 @@
 #include "PointLightJob.h"
 #include "DirectionalLightJob.h"
 #include "ExplosionEffectJob.h"
+#include "SpriteJob.h"
 
 struct RenderScene
 {
@@ -24,6 +25,8 @@ struct RenderScene
     std::list<std::shared_ptr<RenderJob>> PointLightJobs;
     std::list<std::shared_ptr<RenderJob>> TextJobs;
     std::list<std::shared_ptr<RenderJob>> DirectionalLightJobs;
+    std::list<std::shared_ptr<RenderJob>> SpriteJobs;
+
     Rectangle Viewport;
     bool ClearDepth = false;
     glm::vec4 AmbientColor;
@@ -35,6 +38,7 @@ struct RenderScene
         PointLightJobs.clear();
         TextJobs.clear();
         DirectionalLightJobs.clear();
+        SpriteJobs.clear();
 	}
 };
 

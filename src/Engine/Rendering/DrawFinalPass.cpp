@@ -55,6 +55,15 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ExplosionEffectProgram->BindFragDataLocation(1, "bloomColor");
     m_ExplosionEffectProgram->Link();
     GLERROR("Creating explosion program");
+
+    m_SpriteProgram = ResourceManager::Load<ShaderProgram>("#m_SpriteProgram");
+    m_SpriteProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Sprite.vert.glsl")));
+    m_SpriteProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Sprite.frag.glsl")));
+    m_SpriteProgram->Compile();
+    m_SpriteProgram->BindFragDataLocation(0, "sceneColor");
+    m_SpriteProgram->BindFragDataLocation(1, "bloomColor");
+    m_SpriteProgram->Link();
+    GLERROR("Creating sprite program");
 }
 
 void DrawFinalPass::Draw(RenderScene& scene)
@@ -70,6 +79,8 @@ void DrawFinalPass::Draw(RenderScene& scene)
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.TransparentObjects, scene);
     GLERROR("TransparentObjects");
+    DrawSprites(scene.SpriteJobs, scene);
+    GLERROR("SpriteJobs");
 
     delete state;
     GLERROR("END");
@@ -201,6 +212,50 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 
 }
 
+
+void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene)
+{
+    m_SpriteProgram->Bind();
+
+    GLuint shaderHandle = m_SpriteProgram->GetHandle();
+
+    for(auto& job : jobs) {
+        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
+
+        if(spriteJob) {
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+            glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(spriteJob->Color));
+            glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(spriteJob->FillColor));
+            glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), spriteJob->FillPercentage);
+
+            glActiveTexture(GL_TEXTURE0);
+            if (spriteJob->DiffuseTexture != nullptr) {
+                glBindTexture(GL_TEXTURE_2D, spriteJob->DiffuseTexture->m_Texture);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+            }
+
+            glActiveTexture(GL_TEXTURE1);
+            if (spriteJob->IncandescenceTexture != nullptr) {
+                glBindTexture(GL_TEXTURE_2D, spriteJob->IncandescenceTexture->m_Texture);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+            }
+
+
+            glBindVertexArray(spriteJob->Model->VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
+            glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
+        }
+    }
+
+    
+
+   // m_SpriteProgram->Unbind();
+}
+
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
 {
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(job->Matrix));
@@ -244,7 +299,6 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 
     GLERROR("END");
 }
-
 
 void DrawFinalPass::BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job)
 {
