@@ -93,7 +93,7 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking\0Shadow");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -102,11 +102,13 @@ void Renderer::Draw(RenderFrame& frame)
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
+    m_ShadowPass->ClearBuffer();
 
     for (auto scene : frame.RenderScenes){
         
         SortRenderJobsByDepth(*scene);
         m_PickingPass->Draw(*scene);
+        m_ShadowPass->Draw(*scene);
         m_LightCullingPass->GenerateNewFrustum(*scene);
         m_LightCullingPass->FillLightList(*scene);
         m_LightCullingPass->CullLights(*scene);
@@ -133,6 +135,10 @@ void Renderer::Draw(RenderFrame& frame)
     }
     if (m_DebugTextureToDraw == 4) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
+    } 
+    if (m_DebugTextureToDraw == 5) {
+        m_DrawScreenQuadPass->Draw(m_ShadowPass->DepthMap());
+       // m_DrawScreenQuadPass->Draw();
     }
 
     m_ImGuiRenderPass->Draw();
@@ -177,4 +183,5 @@ void Renderer::InitializeRenderPasses()
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
+    m_ShadowPass = new ShadowPass(this);
 }

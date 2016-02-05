@@ -58,7 +58,7 @@ void FrameBuffer::Generate()
         }
         
 
-        if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT) {
+        if ((*it)->m_ResourceType == GL_TEXTURE_2D) {
             attachments.push_back((*it)->m_Attachment);
         }
     }

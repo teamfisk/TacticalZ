@@ -22,6 +22,7 @@
 #include "../Core/Transform.h"
 #include "imgui/imgui.h"
 #include "TextPass.h"
+#include "ShadowPass.h"
 
 class Renderer : public IRenderer
 {
@@ -57,6 +58,7 @@ private:
     DrawScreenQuadPass* m_DrawScreenQuadPass;
     DrawBloomPass* m_DrawBloomPass;
     DrawColorCorrectionPass* m_DrawColorCorrectionPass;
+    ShadowPass* m_ShadowPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
