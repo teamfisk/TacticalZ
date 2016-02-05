@@ -13,6 +13,10 @@
 					<xs:annotation><xs:documentation>m/s^2</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Gravity" type="t:bool" minOccurs="0"/>
+				<xs:element name="IsOnGround" type="t:bool" minOccurs="0"/>
+				<xs:element name="VerticalStepHeight" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The largest height of a "stair-step" that can be walked over</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

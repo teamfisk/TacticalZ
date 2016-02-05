@@ -238,7 +238,7 @@ inline glm::vec3 signNonZero(const glm::vec3& x)
 {
     glm::vec3 r;
     for (int i = 0; i < 3; ++i) {
-        r[i] = signNonZero(x[i]);
+        r[i] = (float)signNonZero(x[i]);
     }
     return r;
 }
@@ -253,11 +253,11 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
     const glm::vec2& boxMax,
     const std::array<glm::vec2, 3>& triPos,
     glm::vec2& resolutionDirection,
-    float& resolutionDistance,
+    float& resolutionDistanceSq,
     bool& pushedFromTriNormal)
 {
     pushedFromTriNormal = false;
-    resolutionDistance = INFINITY;
+    resolutionDistanceSq = INFINITY;
     //Project along box normals (coordinate axes, since it's axis-aligned).
     for (int ax = 0; ax < 2; ++ax) {
         float minTri = INFINITY;
@@ -275,9 +275,11 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
         float leftRes = minTri - boxMax[ax];
         float rightRes = maxTri - boxMin[ax];
         float push = rightRes < -leftRes ? rightRes : leftRes;
-        float absPush = abs(push);
-        if (absPush < resolutionDistance) {
-            resolutionDistance = absPush;
+        float absPushSq = abs(push);
+        absPushSq *= absPushSq;
+
+        if (absPushSq < resolutionDistanceSq) {
+            resolutionDistanceSq = absPushSq;
             resolutionDirection[1 - ax] = 0.f;
             resolutionDirection[ax] = push;
         }
@@ -326,9 +328,11 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
         float leftRes = minTri - maxBox;
         float rightRes = maxTri - minBox;
         float push = rightRes < -leftRes ? rightRes : leftRes;
-        float absPush = abs(push);
-        if (absPush < resolutionDistance) {
-            resolutionDistance = absPush;
+        float absPushSq = abs(push);
+        absPushSq *= absPushSq;
+        
+        if (absPushSq < resolutionDistanceSq) {
+            resolutionDistanceSq = absPushSq;
             resolutionDirection = push * normal;
             pushedFromTriNormal = true;
         }
@@ -338,26 +342,35 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
 
 constexpr float SlopeConstant(float degrees)
 {
-    return (1.0 - degrees / 90.f);
+    return (1.0f - degrees / 90.f);
+}
+
+//Returns true if the angle between horizon and the collision surface is less than 45 degrees. 
+constexpr bool FaceIsGround(float faceNormalY)
+{
+    //TODO: Perhaps the 45 degrees could be saved in a component or in the config..
+    return faceNormalY > SlopeConstant(45.0f);
 }
 
 //An array containing 3 int pairs { 0, 2 }, { 0, 1 }, { 1, 2 }
 constexpr std::array<std::pair<int, int>, 3> dimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
 
-//TODO: Prefer to move in y - if the resolution is small enough, value in physics comp.
-//TODO: Walking down slopes correctly.
 bool AABBvsTriangle(const AABB& box, 
     const std::array<glm::vec3, 3>& triPos, 
+    const glm::vec3& originalBoxVelocity,
+    float verticalStepHeight,
+    bool& isOnGround,
     glm::vec3& boxVelocity,
-    glm::vec3& outVector)
+    glm::vec3& outResolution)
 {
     //Check so we don't have a zero area triangle when calculating the normal.
     //Also, don't check a triangle facing away from the player.
     //Less checks, and we should be able to walk out from models if we are trapped inside.
     glm::vec3 triNormal = glm::cross(triPos[1] - triPos[0], triPos[2] - triPos[0]);
-    if (!vectorHasLength(triNormal) || (glm::dot(triNormal, boxVelocity) > 0)) {
+    if (!vectorHasLength(triNormal) || (glm::dot(triNormal, originalBoxVelocity) > 0)) {
         return false;
     }
+    triNormal = glm::normalize(triNormal);
 
     enum BoxTriResolveCase
     {
@@ -366,13 +379,29 @@ bool AABBvsTriangle(const AABB& box,
         ResolveDimZ,
         Line,       //Box edge colliding with triangle line.
         Corner      //Box corner colliding with the triangle face.
-    } resolveCase;
+    };
+    struct Resolution
+    {
+        Resolution()
+            : DistanceSq(INFINITY)
+            , Vector(0.f)
+        {}
+        BoxTriResolveCase Case;
+        float DistanceSq;
+        glm::vec3 Vector;
+    };
+    //The smallest resolution that solves the collision.
+    Resolution resolveShortest;
+    //The smallest resolution that solves the collision, that resolves upwards.
+    Resolution resolveUpwards;
+    //If player stands on the ground and collides with a ground triangle, 
+    //we might step up onto it if the step is small enough.
+    bool canStairStepUp = isOnGround && FaceIsGround(triNormal.y);
 
     const glm::vec3& origin = box.Origin();
     const glm::vec3& half = box.HalfSize();
     const glm::vec3& min = box.MinCorner();
     const glm::vec3& max = box.MaxCorner();
-    float minimumTranslation = INFINITY;
 
     //For each projection in xy-, xz-, and yx-planes.
     for (std::pair<int, int> dim : dimensionPairs) {
@@ -392,21 +421,35 @@ bool AABBvsTriangle(const AABB& box,
         //if projections don't overlap, return false.
         if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector, resolutionDist, pushedFromTriangleLine)) {
             return false;
-        } else if (resolutionDist < minimumTranslation) {
-            outVector = glm::vec3(0.f);
-            outVector[dim.first] = resolutionVector.x;
-            outVector[dim.second] = resolutionVector.y;
-            minimumTranslation = resolutionDist;
-            //If we pushed away from triangle line (edge), or if we 
-            //move the player along one coordinate axis (pick the dimension that isn't zero).
-            resolveCase = pushedFromTriangleLine ? Line : static_cast<BoxTriResolveCase>((abs(outVector[dim.first]) < 0.0001f) ? dim.second : dim.first);
+        } else {
+            //Overwrite the smallest resolution if this is smaller.
+            if (resolutionDist < resolveShortest.DistanceSq) {
+                resolveShortest.Vector = glm::vec3(0.f);
+                resolveShortest.Vector[dim.first] = resolutionVector.x;
+                resolveShortest.Vector[dim.second] = resolutionVector.y;
+                resolveShortest.DistanceSq = resolutionDist;
+                //If we pushed away from triangle line (edge), or if we 
+                //move the player along one coordinate axis (pick the dimension that isn't zero).
+                resolveShortest.Case = pushedFromTriangleLine ? Line : static_cast<BoxTriResolveCase>((abs(resolveShortest.Vector[dim.first]) < 0.0001f) ? dim.second : dim.first);
+            }
+            //Overwrite the smallest upward resolution if this is smaller, and resolves upwards.
+            constexpr int yAxis = 1;
+            bool resIsUpwardsIn3D = dim.first == yAxis && resolutionVector.x > 0 || dim.second == yAxis && resolutionVector.y > 0;
+            if (canStairStepUp && resIsUpwardsIn3D && resolutionDist < resolveUpwards.DistanceSq) {
+                resolveUpwards.Vector = glm::vec3(0.f);
+                resolveUpwards.Vector[dim.first] = resolutionVector.x;
+                resolveUpwards.Vector[dim.second] = resolutionVector.y;
+                resolveUpwards.DistanceSq = resolutionDist;
+                //If we pushed away from triangle line (edge), or if we 
+                //move the player along one coordinate axis (pick the dimension that isn't zero).
+                resolveUpwards.Case = pushedFromTriangleLine ? Line : static_cast<BoxTriResolveCase>((abs(resolveUpwards.Vector[dim.first]) < 0.0001f) ? dim.second : dim.first);
+            }
         }
     }
 
     //If the triangle does intersect any of the cube diagonals, it will 
     //intersect the cube diagonal that comes
     //closest to being perpendicular to the plane of the triangle.
-    triNormal = glm::normalize(triNormal);
     glm::vec3 diagonal = signNonZero(triNormal) * half;
     //The triangle plane contains all points P in dot(triNormal, P) == dot(triNormal, v0)
     //The diagonal line contains all points P in P = origin + diagonal * t.
@@ -416,24 +459,62 @@ bool AABBvsTriangle(const AABB& box,
         return false;
     }
     glm::vec3 cornerResolution = (1+t) * diagonal;
-    if (glm::length(cornerResolution) < minimumTranslation) {
-        outVector = cornerResolution;
-        resolveCase = Corner;
+    //Overwrite the smallest resolution if this is smaller.
+    float lenSq = glm::length2(cornerResolution);
+    if (lenSq < resolveShortest.DistanceSq) {
+        resolveShortest.Vector = cornerResolution;
+        resolveShortest.Case = Corner;
+    }
+    if (canStairStepUp && cornerResolution.y > 0 && lenSq < resolveUpwards.DistanceSq) {
+        resolveUpwards.Vector = cornerResolution;
+        resolveUpwards.Case = Corner;
+        resolveUpwards.DistanceSq = lenSq;
     }
 
-    glm::vec3 projNorm;
-    switch (resolveCase) {
-    case ResolveDimX:
+    //Force the resolution upwards if it is smaller than the threshold verticalStepHeight.
+    //Else take the shortest resolution.
+    bool takeUp = resolveUpwards.Vector.y > 0 && resolveUpwards.Vector.y < verticalStepHeight;
+    Resolution& bestResolve = takeUp ? resolveUpwards : resolveShortest;
+    outResolution = bestResolve.Vector;
+
+    //TODO: Debug stuff.
+    std::string dbg;
+    switch (bestResolve.Case) {
     case ResolveDimY:
+    case ResolveDimX:
+    case ResolveDimZ:
+        dbg = "Axis";
+        break;
+    case Line:
+        dbg = "Line";
+        break;
+    case Corner:
+        dbg = "Corner";
+        break;
+    default:
+        break;
+    }
+    std::string outs = (takeUp ? "Resolve upwards " : "Resolve normal ") + dbg;
+    //TODO: End debug stuff.
+
+    glm::vec3 projNorm;
+    switch (bestResolve.Case) {
+    case ResolveDimY:
+        boxVelocity.y = 0.f;
+        if (outResolution.y > 0)
+            isOnGround = true;
+    case ResolveDimX:
     case ResolveDimZ:
     {
         //If we get here, the resolution is along one coordinate axis.
-        //set velocity to 0 in that dimension.
-        boxVelocity[resolveCase] = 0.f;
+        //set velocity to 0 in y if it is along y-axis.
+        outs += isOnGround ? " ground" : " air";
+        ImGui::Text(outs.c_str());
+        LOG_INFO(outs.c_str());
         return true;
     }
     case Line:
-        projNorm = glm::normalize(outVector);
+        projNorm = glm::normalize(outResolution);
         break;
     case Corner:
         projNorm = triNormal;
@@ -442,26 +523,64 @@ bool AABBvsTriangle(const AABB& box,
         break;
     }
 
-    //If the collision was not on steep wall or similarly (e.g. walking on the ground), do special treatment.
-    //Magic value that makes condition correspond to: 
-    //if the angle between horizon and the collision surface is less than 45 degrees. 
-    if (projNorm.y > SlopeConstant(45.0f)) {
+    isOnGround = false;
+    //If the collision was not on steep wall or similarly (e.g. walking on the ground), force resolution in y only.
+    if (FaceIsGround(projNorm.y)) {
         //Ensure that the player always is moved upwards, instead of sliding down.
         //Also zero the vertical velocity.
-        float len = glm::length(outVector);
-        float ang = glm::half_pi<float>() - glm::acos(outVector.y / len);
+        float len = glm::length(outResolution);
+        float ang = glm::half_pi<float>() - glm::acos(outResolution.y / len);
         if (len > 0.0000001f && ang > 0.0000001f) {
-            outVector.x = 0;
-            outVector.y = len / glm::sin(ang);
-            outVector.z = 0;
-            boxVelocity.y = 0.f;
+            outResolution.x = 0;
+            outResolution.y = len / glm::sin(ang);
+            outResolution.z = 0;
         }
-    } else if (projNorm.y > 0) {
-        //Enter here if the triangle is a steep slope, and it is not facing downwards.
         //Project the velocity onto the normal of the hit line/face.
         //w = v - <v,n>*n, |n|==1.
-        boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
+        glm::vec3 projVel = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
+        if (abs(originalBoxVelocity.x) < 0.001f && abs(originalBoxVelocity.z) < 0.001f) {
+            boxVelocity.y = 0.f;
+        } else {
+            boxVelocity.y = std::min(projVel.y, 0.f);
+        }
+
+        isOnGround = true;
+    } else if (projNorm.y > 0) {
+        //Enter here if the triangle is a steep slope, and it is not facing downwards.
+        //Ensure that the player will be pushed in the xz-plane.
+        //glm::vec3 moveDir(outResolution);
+        //moveDir.y = 0;
+        //if (vectorHasLength(moveDir)) {
+        //    moveDir = glm::normalize(moveDir);
+        //    float len = glm::length(outResolution);
+        //    float dotMoveOut = moveDir.x * outResolution.x + moveDir.z * outResolution.z;
+        //    float ang = glm::half_pi<float>() - glm::acos(dotMoveOut / len);
+        //    if (len > 0.0000001f && ang > 0.0000001f) {
+        //        outResolution = (len / glm::sin(ang)) * moveDir;
+        //    }
+        //}
+        //Project the velocity onto the normal of the hit line/face.
+        //w = v - <v,n>*n, |n|==1.
+        //TODO: What do we want..
+#if 0   //Walk up steep walls.
+        glm::vec3 projVel = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
+        boxVelocity.y = std::min(projVel.y, 0.f);
+        isOnGround = true;
+#elif 1 //"ice cream"-effect, air resistance + projected velocity.
+        if (!isOnGround) {
+            boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
+        }
+        isOnGround = false;
+#elif 0 //"ice cream"-effect, ground friction (full control) + projected velocity.
+        if (!isOnGround) {
+            boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
+        }
+        isOnGround = true;
+#endif
     }
+    outs += isOnGround ? " ground" : " air";
+    ImGui::Text(outs.c_str());
+    LOG_INFO(outs.c_str());
     return true;
 }
 
@@ -470,12 +589,16 @@ bool AABBvsTriangles(const AABB& box,
     const std::vector<unsigned int>& modelIndices, 
     const glm::mat4& modelMatrix,
     glm::vec3& boxVelocity,
+    float verticalStepHeight,
+    bool& isOnGround,
     glm::vec3& outResolutionVector)
 {
     bool hit = false;
 
+    bool everHitTheGround = false;
     AABB newBox = box;
     outResolutionVector = glm::vec3(0.f);
+    glm::vec3 originalBoxVelocity(boxVelocity);
     for (int i = 0; i < modelIndices.size(); ) {
         std::array<glm::vec3, 3> triVertices = {
             Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
@@ -483,13 +606,20 @@ bool AABBvsTriangles(const AABB& box,
             Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
         };
         glm::vec3 outVec;
-        if (AABBvsTriangle(newBox, triVertices, boxVelocity, outVec)) {
+        bool collideWithGround = isOnGround;
+        if (AABBvsTriangle(newBox, triVertices, originalBoxVelocity, verticalStepHeight, collideWithGround, boxVelocity, outVec)) {
             hit = true;
             outResolutionVector += outVec;
             newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
+            if (collideWithGround) {
+                everHitTheGround = isOnGround = true;
+            }
         }
     }
 
+    if (!everHitTheGround) {
+        isOnGround = false;
+    }
     return hit;
 }
 

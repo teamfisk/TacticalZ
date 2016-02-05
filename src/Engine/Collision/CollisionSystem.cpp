@@ -37,15 +37,33 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
 
             glm::mat4 modelMatrix = Transform::ModelMatrix(boxB.Entity);
 
-            glm::vec3 newVelocity = (glm::vec3)cPhysics["Velocity"];
-            if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, newVelocity, resolutionVector)) {
-                (glm::vec3&)cTransform["Position"] += resolutionVector;
-                cPhysics["Velocity"] = newVelocity;
-            }
+            glm::vec3 inOutVelocity = (glm::vec3)cPhysics["Velocity"];
+            bool isOnGround = (bool)cPhysics["IsOnGround"];
+            //glm::vec3 gravity = glm::vec3(0, 9.82f * dt, 0);
+            //TODO: glm::abs(inOutVelocity - gravity) doesn't work, because of velocity projection on ground normal.
+            //if (!isOnGround || glm::any(glm::greaterThan(glm::abs(inOutVelocity - gravity), glm::vec3(0.0001f)))) {
+                float verticalStepHeight = (float)(double)cPhysics["VerticalStepHeight"];
+                if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
+                    glm::vec3 pos = (glm::vec3)cTransform["Position"] + resolutionVector;
+                    //Hack: Force the position to be at discrete values after collision, removes jittering.
+                    //constexpr float discreteValue = 1.0e2f;
+                    //pos = glm::vec3(glm::ivec3(discreteValue * pos)) / discreteValue;
+                    //pos = glm::round(discreteValue * pos) / discreteValue;
+                    (glm::vec3&)cTransform["Position"] = pos;
+                    cPhysics["Velocity"] = inOutVelocity;
+                    (bool)cPhysics["IsOnGround"] = isOnGround;
+                } else {
+                    (bool)cPhysics["IsOnGround"] = false;
+                }
+            //} else {
+            //    (glm::vec3&)cTransform["Position"] -= gravity;
+            //    cPhysics["Velocity"] = glm::vec3(0.f);
+            //}
         } else if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
             //Enter here if boxB has no Model.
             (glm::vec3&)cTransform["Position"] += resolutionVector;
-            if (resolutionVector.y > 0) {
+            (bool)cPhysics["IsOnGround"] = resolutionVector.y > 0;
+            if ((bool)cPhysics["IsOnGround"]){
                 ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
             }
         }
