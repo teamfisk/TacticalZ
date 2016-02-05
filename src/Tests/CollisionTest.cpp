@@ -29,7 +29,7 @@ void RayTest(std::string fileName) {
     Ray ray(glm::vec3(-50, 0, 0), glm::vec3(1, 0, 0));
     //using a 
     
-    here, else we have to init the renderingsystem
+    //here, else we have to init the renderingsystem
     ResourceManager::RegisterType<RawModel>("RawModel");
     auto unitBox = ResourceManager::Load<RawModel>(fileName);
     BOOST_REQUIRE(unitBox != nullptr);
