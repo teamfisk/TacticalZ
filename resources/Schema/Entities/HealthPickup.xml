@@ -3,12 +3,13 @@
 
   <Components>
     <c:AABB/>
-    <c:CapturePoint/>
+    <c:HealthPickup/>
     <c:Model>
       <Resource>Models/Core/UnitSphere.mesh</Resource>
     </c:Model>
-    <c:Team/>
-    <c:Transform/>
+    <c:Transform>
+      <Position X="60" Y="1" Z="80"/>
+    </c:Transform>
     <c:Trigger/>
   </Components>
 
