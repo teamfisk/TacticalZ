@@ -9,7 +9,6 @@ namespace Events
 
 struct PickupSpawned : Event
 {
-    EntityID PickupID;
     EntityWrapper Pickup;
 };
 
