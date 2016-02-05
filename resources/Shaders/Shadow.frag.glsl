@@ -12,7 +12,7 @@ layout(location = 0 ) out float ShadowMap;
 void main()
 {
 	//ShadowMap = vec4(vec3(gl_FragCoord.z), 1.0);
-	ShadowMap = (glgl_FragCoord.x, glgl_FragCoord.y, glgl_FragCoord.z);
+	ShadowMap = (gl_FragCoord.z);
 }
 
 

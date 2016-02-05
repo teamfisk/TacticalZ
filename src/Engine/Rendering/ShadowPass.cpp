@@ -1,4 +1,4 @@
-#include "ShadowPass.h"
+#include "Rendering/ShadowPass.h"
 
 ShadowPass::ShadowPass(IRenderer * renderer)
 {
@@ -26,15 +26,15 @@ void ShadowPass::InitializeFrameBuffers()
     glGenTextures(1, &m_DepthMap);
     glBindTexture(GL_TEXTURE_2D, m_DepthMap);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 1024, 1024, 0, GL_RGB, GL_FLOAT, 0);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 1024, 1024, 0, GL_RGB, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
-    //m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap, GL_COLOR_ATTACHMENT0)));
+    //m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
+    m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap, GL_COLOR_ATTACHMENT0)));
     m_DepthBuffer.Generate();
 
     GLERROR("depthMap failed");
@@ -75,16 +75,19 @@ void ShadowPass::Draw(RenderScene & scene)
         
         if(directionalLightJob) {
   
-            GLfloat near_plane = 1.0f, far_plane = 200.5f;
+            GLfloat near_plane = 1.0f, far_plane = 75.5f;
             glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
             // broken?
-            //glm::mat4 lightView = glm::lookAt(-glm::normalize(glm::vec3(directionalLightJob->Direction)), glm::vec3(0,0,0), glm::vec3(0,1,0));
-            glm::mat4 lightView = glm::lookAt(glm::vec3(50.f, 50.f, 50.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+            glm::mat4 lightView = glm::lookAt(-glm::normalize(glm::vec3(directionalLightJob->Direction)) * (float)50.0 , glm::vec3(0,0,0), glm::vec3(0,1,0));
+            //glm::mat4 lightView = glm::lookAt(glm::vec3(10.f, 10.f, 50.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
             //glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(lightProjection));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(lightView));
+
+          /*  glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));*/
 
             GLERROR("ShadowLight ERROR");
 
