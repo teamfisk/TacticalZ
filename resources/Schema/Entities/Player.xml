@@ -6,6 +6,9 @@
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
+    <c:DashAbility>
+      <CoolDownMaxTimer>2.0</CoolDownMaxTimer>
+    </c:DashAbility>
     <c:Collidable/>
     <c:Health/>
     <c:Physics>
