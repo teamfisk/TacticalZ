@@ -20,6 +20,7 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 void SoundSystem::Update(double dt)
 {
     playerStep(dt);
+    // Update listener and emitters.
     SoundManager::Update(dt);
 }
 
@@ -28,11 +29,13 @@ void SoundSystem::playerStep(double dt)
     if (!m_LocalPlayer.Valid()) {
         return;
     }
+    // Position of the local player, used see how far a player has moved.
     glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
+    // Velocity of the local player, used to see if a player is airborne.
     glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
-    glm::vec3 difference = pos - m_LastPosition;
+    m_DistanceMoved += glm::length(pos - m_LastPosition);
+    // Set the last position for next iteration
     m_LastPosition = pos;
-    m_DistanceMoved += glm::length(difference);
     bool isAirborne = vel.y != 0;
     if (m_DistanceMoved > m_PlayerStepLength && !isAirborne) {
         // Player moved a step's distance
@@ -56,11 +59,11 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
         event.FilePath = "Audio/announcer/go.wav";
         m_EventBroker->Publish(event);
         // TEMP: starts bgm
-//         {
-//             Events::PlayBackgroundMusic ev;
-//             ev.FilePath = "Audio/bgm/ambient.wav";
-//             m_EventBroker->Publish(ev);
-//         }
+        {
+            Events::PlayBackgroundMusic ev;
+            ev.FilePath = "Audio/bgm/ambient.wav";
+            m_EventBroker->Publish(ev);
+        }
     }
     return true;
 }
@@ -76,7 +79,7 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
     if (e.Command == "Forward" || e.Command == "Right") {
         if (e.Value == 0) {
             // Key released
-            // Reset the distance moved
+            // Reset the distance moved (player walk logic)
             m_DistanceMoved = 0.f;
         }
     }
