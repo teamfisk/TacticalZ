@@ -2,7 +2,7 @@
 
 void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& BoneAttachmentComponent, double dt)
 {
-/*
+
 
     if(!entity.HasComponent("Transform")) {
         return;
@@ -33,13 +33,8 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
-    int currentKeyframeIndex = skeleton->GetKeyframe(*animation, parent["Animation"]["Time"]);
 
-    const Skeleton::Animation::Keyframe& currentFrame = animation->Keyframes[currentKeyframeIndex];
-    const Skeleton::Animation::Keyframe& nextFrame = animation->Keyframes[(currentKeyframeIndex + 1) % animation->Keyframes.size()];
-    float alpha = ((double)parent["Animation"]["Time"] - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
-
-    glm::mat4 boneTransform = skeleton->GetBoneTransform(skeleton->Bones[id], currentFrame, nextFrame, alpha, glm::mat4(1));
+    glm::mat4 boneTransform = skeleton->GetBoneTransform(skeleton->Bones[id], animation, (double)parent["Animation"]["Time"], glm::mat4(1));
 
 
 
@@ -68,5 +63,5 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     }
     if ((bool)entity["BoneAttachment"]["InheritScale"]) {
         (glm::vec3&)entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];
-    }*/
+    }
 }

@@ -19,6 +19,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
     if(skeleton == nullptr) {
         return;
     }
+/*
 
     ImGui::SliderFloat("Angle", &angle, -100.f, 100.f);
     {
@@ -28,6 +29,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
             it->second->ModificationMatrix = glm::mat4(glm::quat(glm::vec3(glm::radians(angle), 0.f, 0.f)));
         }
     }
+*/
 
 
     const Skeleton::Animation* animation = skeleton->GetAnimation(animationComponent["AnimationName"]);

@@ -92,7 +92,7 @@ public:
 	void PrintSkeleton(const Bone* parent, int depthCount);
 	std::map<std::string, Animation> Animations;
 
-    glm::mat4 GetBoneTransform(const Bone* bone, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, glm::mat4 parentMatrix);
+    glm::mat4 GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 parentMatrix);
     int GetKeyframe(const Animation& animation, double time);
 
 private:
