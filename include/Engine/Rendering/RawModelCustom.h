@@ -76,10 +76,10 @@ public:
 
 	struct MaterialSingleTextures : public MaterialBasic
 	{
-		TextureProperties ColorMaps;
-		TextureProperties NormalMaps;
-		TextureProperties SpecularMaps;
-		TextureProperties IncandescenceMaps;
+		TextureProperties ColorMap;
+		TextureProperties NormalMap;
+		TextureProperties SpecularMap;
+		TextureProperties IncandescenceMap;
 	};
 
 	enum class MaterialType { Basic = 1, SplatMapping, SingleTextures };
@@ -136,10 +136,10 @@ private:
     void ReadMaterialFile(std::string filePath);
     void ReadMaterials(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
     void ReadMaterialSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
-	void ReadMaterialBasic(MaterialBasic* Material, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
-	void ReadMaterialSingleTexture(MaterialSingleTextures* Material, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
-	void ReadMaterialSplatMapping(MaterialSplatMapping* Material, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
-	void ReadMaterialTextureProperties(TextureProperties& texture, unsigned int &offset, char* fileData, unsigned int& fileByteSize);
+	void ReadMaterialBasic(MaterialBasic* Material, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+	void ReadMaterialSingleTexture(MaterialSingleTextures* Material, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+	void ReadMaterialSplatMapping(MaterialSplatMapping* Material, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+	void ReadMaterialTextureProperties(TextureProperties& texture, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
 
     void ReadAnimationFile(std::string filePath);
     void ReadAnimationBindPoses(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);

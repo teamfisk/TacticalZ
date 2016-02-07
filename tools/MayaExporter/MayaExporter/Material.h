@@ -17,6 +17,8 @@
 //#define NormalMapSplat  1 << 2
 //#define IncandescenceMapSplat 1 << 3
 
+
+
 class MaterialNode : public OutputData
 {
 public:
@@ -41,6 +43,10 @@ public:
 		}
 	};
 
+	enum class MaterialType { Basic = 1, SplatMapping, SingleTextures };
+
+	MaterialType type = MaterialType::Basic;
+
 	std::string Name;
 
 	float ReflectionFactor;
@@ -53,11 +59,11 @@ public:
 	unsigned int IndexStart;
 	unsigned int IndexEnd;
 
-	char NumColormaps = 0;
-	char NumSpecularMap = 0;
-	char NumNormalMap = 0;
-	char NumIncandescenceMap = 0;
-
+	unsigned char NumColorMaps = 0;
+	unsigned char NumSpecularMaps = 0;
+	unsigned char NumNormalMaps = 0;
+	unsigned char NumIncandescenceMaps = 0;
+	Texture SplatMap;
 	std::vector<Texture> ColorMaps;
 	std::vector<Texture> SpecularMaps;	
 	std::vector<Texture> NormalMaps;
@@ -65,6 +71,8 @@ public:
 
     virtual void WriteBinary(std::ostream& out)
     {
+		
+		out.write((char*)&type, sizeof(MaterialType));
         out.write((char*)&SpecularExponent, sizeof(float));
         out.write((char*)&ReflectionFactor, sizeof(float));
 
@@ -74,30 +82,52 @@ public:
 
         out.write((char*)&IndexStart, sizeof(unsigned int));
         out.write((char*)&IndexEnd, sizeof(unsigned int));
+		if (type != MaterialType::Basic) {
+			if (type == MaterialType::SplatMapping) {
+				SplatMap.WriteBinary(out);
+			}
+			out.write((char*)&NumColorMaps, sizeof(unsigned char));
+			out.write((char*)&NumSpecularMaps, sizeof(unsigned char));
+			out.write((char*)&NumNormalMaps, sizeof(unsigned char));
+			out.write((char*)&NumIncandescenceMaps, sizeof(unsigned char));
+		}
 
-		out.write((char*)&NumColormaps, sizeof(char));
-		out.write((char*)&NumSpecularMap, sizeof(char));
-		out.write((char*)&NumNormalMap, sizeof(char));
-		out.write((char*)&NumIncandescenceMap, sizeof(char));
-
-		for(auto aTexture : ColorMaps) {
-			aTexture.WriteBinary(out);
-		}
-		for (auto aTexture : SpecularMaps) {
-			aTexture.WriteBinary(out);
-		}
-		for (auto aTexture : NormalMaps) {
-			aTexture.WriteBinary(out);
-		}
-		for (auto aTexture : IncandescenceMaps) {
-			aTexture.WriteBinary(out);
+		if (type != MaterialType::Basic) {
+			for (auto aTexture : ColorMaps) {
+				aTexture.WriteBinary(out);
+			}
+			for (auto aTexture : SpecularMaps) {
+				aTexture.WriteBinary(out);
+			}
+			for (auto aTexture : NormalMaps) {
+				aTexture.WriteBinary(out);
+			}
+			for (auto aTexture : IncandescenceMaps) {
+				aTexture.WriteBinary(out);
+			}
 		}
     }
 
     virtual void WriteASCII(std::ostream& out) const
     {
         out << "New Material _ not in binary" << endl;
-        out << "number of indices: " << Name << " _ not in binary" << endl;
+
+		out << "MaterialType(enum): ";
+		switch (type) {
+		case MaterialType::Basic:
+			out << "Basic";
+			break;
+		case MaterialType::SplatMapping:
+			out << "SplatMapping";
+			break;
+		case MaterialType::SingleTextures:
+			out << "SingleTextures";
+			break;
+		};
+
+		out << endl;
+
+        out << "Material Name: " << Name << " _ not in binary" << endl;
 
         out << "SpecularExponent: " << SpecularExponent << endl;
         out << "ReflectionFactor: " << ReflectionFactor << endl;
@@ -107,37 +137,38 @@ public:
         out << "IndexStart: " << IndexStart << endl;
         out << "IndexEnd: " << IndexEnd << endl;
 
-        if (NumColormaps > 0)
-            out << "NumColormaps: " << NumColormaps << endl;
+		switch (type) {
+		case MaterialType::SplatMapping:
+			out << "SplatMap _ not in binary " << endl;
+			SplatMap.WriteASCII(out);
+			//Intended fall trought
+		case MaterialType::SingleTextures:
+			out << "NumColormaps (is unsigned char in Binary): " << ((unsigned int)NumColorMaps) << endl;
+			out << "NumSpecularMap (is unsigned char in Binary): " << ((unsigned int)NumSpecularMaps) << endl;
+			out << "NumNormalMap (is unsigned char in Binary): " << ((unsigned int)NumNormalMaps) << endl;
+			out << "NumIncandescenceMap (is unsigned char in Binary): " << ((unsigned int)NumIncandescenceMaps )<< endl;
 
-        if (NumSpecularMap > 0)
-            out << "NumSpecularMap: " << NumSpecularMap << endl;
-        
-        if (NumNormalMap > 0)
-            out << "NumNormalMap: " << NumNormalMap << endl;
-     
-        if (NumIncandescenceMap > 0)
-            out << "NumIncandescenceMap: " << NumIncandescenceMap << endl;
+			out << "ColorMaps _ not in binary " << endl;
+			for (auto aTexture : ColorMaps) {
+				aTexture.WriteASCII(out);
+			}
 
-		out << "ColorMaps _ not in binary " << endl;
-		for (auto aTexture : ColorMaps) {
-			aTexture.WriteASCII(out);
-		}
+			out << "SpecularMaps _ not in binary " << endl;
+			for (auto aTexture : SpecularMaps) {
+				aTexture.WriteASCII(out);
+			}
 
-		out << "SpecularMaps _ not in binary " << endl;
-		for (auto aTexture : SpecularMaps) {
-			aTexture.WriteASCII(out);
-		}
+			out << "NormalMaps _ not in binary " << endl;
+			for (auto aTexture : NormalMaps) {
+				aTexture.WriteASCII(out);
+			}
 
-		out << "NormalMaps _ not in binary " << endl;
-		for (auto aTexture : NormalMaps) {
-			aTexture.WriteASCII(out);
-		}
-
-		out << "IncandescenceMaps _ not in binary " << endl;
-		for (auto aTexture : IncandescenceMaps) {
-			aTexture.WriteASCII(out);
-		}
+			out << "IncandescenceMaps _ not in binary " << endl;
+			for (auto aTexture : IncandescenceMaps) {
+				aTexture.WriteASCII(out);
+			}
+			break;
+		};
     }
 };
 
@@ -158,7 +189,7 @@ private:
 	bool findNormalTexture(MaterialNode& material_node, MFnDependencyNode& node);
 	bool findSpecularTexture(MaterialNode& material_node, MFnDependencyNode& node);
 	bool findIncandescenceTexture(MaterialNode& material_node, MFnDependencyNode& node);
-	bool findSplatTextures(std::vector<MaterialNode::Texture>& textureVector, MFnDependencyNode& node);
+	bool findSplatTextures(MaterialNode& material_node, std::vector<MaterialNode::Texture>& textureVector, MFnDependencyNode& node);
 	void grabLambertProperties(MaterialNode& material_node, MFnDependencyNode& node);
 	void grabBlinnProperties(MaterialNode& material_node, MFnDependencyNode& node);
 	void grabPhongProperties(MaterialNode& material_node, MFnDependencyNode& node);

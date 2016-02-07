@@ -113,6 +113,7 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                 if (cModel["Transparent"]) {
                     transparentJobs.push_back(explosionEffectJob);
                 } else {
+					explosionEffectJob->CalculateHash();
                     opaqueJobs.push_back(explosionEffectJob);
                 }
             } else {
@@ -132,6 +133,7 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                 if (cModel["Transparent"]) {
                     transparentJobs.push_back(modelJob);
                 } else {
+					modelJob->CalculateHash();
                     opaqueJobs.push_back(modelJob);
                 }
             }
@@ -196,7 +198,7 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
     if (texts == nullptr) {
         return;
     }
-
+	
     for (auto& textComponent : *texts) {
         bool visible = textComponent["Visible"];
         if (!visible) {
@@ -252,6 +254,7 @@ void RenderSystem::Update(double dt)
     }
 
     fillModels(scene.OpaqueObjects, scene.TransparentObjects);
+	scene.OpaqueObjects.sort();
     fillPointLights(scene.PointLightJobs, m_World);
     fillDirectionalLights(scene.DirectionalLightJobs, m_World);
     fillText(scene.TextJobs, m_World);

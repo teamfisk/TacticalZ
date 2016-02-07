@@ -55,6 +55,15 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ExplosionEffectProgram->BindFragDataLocation(1, "bloomColor");
     m_ExplosionEffectProgram->Link();
     GLERROR("Creating explosion program");
+
+	m_ForwardPlusSplatMapProgram = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram");
+	m_ForwardPlusSplatMapProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
+	m_ForwardPlusSplatMapProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMap.frag.glsl")));
+	m_ForwardPlusSplatMapProgram->Compile();
+	m_ForwardPlusSplatMapProgram->BindFragDataLocation(0, "sceneColor");
+	m_ForwardPlusSplatMapProgram->BindFragDataLocation(1, "bloomColor");
+	m_ForwardPlusSplatMapProgram->Link();
+	GLERROR("Creating SplatMap program");
 }
 
 void DrawFinalPass::Draw(RenderScene& scene)
@@ -114,8 +123,9 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 {
     GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
     GLERROR("forwardHandle");
-    GLuint explosionHandle = m_ExplosionEffectProgram->GetHandle();
+	GLuint explosionHandle = m_ExplosionEffectProgram->GetHandle();
     GLERROR("explosionHandle");
+	GLuint forwardSplatHandle = m_ForwardPlusSplatMapProgram->GetHandle();
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightCullingPass->LightSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
@@ -171,14 +181,32 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
             if (modelJob) {
                 //bind forward program
-                m_ForwardPlusProgram->Bind();
-                glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+				//TODO: JOHAN/TOBIAS: Bind shader based on ModelJob->ShaderID;
+				switch (modelJob->Type) {
+					case RawModel::MaterialType::Basic:
+					case RawModel::MaterialType::SingleTextures:
+					{
+						m_ForwardPlusProgram->Bind();
+						GLERROR("Bind Forward program");
+						//bind uniforms
+						BindModelUniforms(forwardHandle, modelJob, scene);
+						break;
+					}
+					case RawModel::MaterialType::SplatMapping:
+					{
+						m_ForwardPlusSplatMapProgram->Bind();
+						GLERROR("Bind SplatMap program");
+						//bind uniforms
+						BindModelUniforms(forwardSplatHandle, modelJob, scene);
+						break;
+					}
+				}
 
-                //bind uniforms
-                BindModelUniforms(forwardHandle, modelJob, scene);
+				//bind textures
+				BindModelTextures(modelJob);
+				GLERROR("asdasd");
 
-                //bind textures
-                BindModelTextures(modelJob);
+
 
                 if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
 
@@ -230,48 +258,65 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 
 void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene)
 {
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(job->Matrix));
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+	GLERROR("Bind 1 uniform");
+	GLint Location_M = glGetUniformLocation(shaderHandle, "M");
+	glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
+	GLERROR("Bind 2 uniform");
+	GLint Location_V = glGetUniformLocation(shaderHandle, "V");
+	glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+	GLERROR("Bind 3 uniform");
+	GLint Location_P = glGetUniformLocation(shaderHandle, "P");
+	glUniformMatrix4fv(Location_P, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+	GLERROR("Bind 4 uniform");
 
-    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+	GLint Location_ScreenDimensions = glGetUniformLocation(shaderHandle, "ScreenDimensions");
+	glUniform2f(Location_ScreenDimensions, m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+	GLERROR("Bind 5 uniform");
 
-    glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(job->Color));
-    glUniform4fv(glGetUniformLocation(shaderHandle, "DiffuseColor"), 1, glm::value_ptr(job->DiffuseColor));
-    glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(job->FillColor));
-    glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), job->FillPercentage);
-    glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+	GLint Location_FillPercentage = glGetUniformLocation(shaderHandle, "FillPercentage");
+	glUniform1f(Location_FillPercentage, job->FillPercentage);
+	GLERROR("Bind 6 uniform");
+	GLint Location_DiffuseColor = glGetUniformLocation(shaderHandle, "DiffuseColor");
+	glUniform4fv(Location_DiffuseColor, 1, glm::value_ptr(job->DiffuseColor));
+	GLERROR("Bind 7 uniform");
+	GLint Location_FillColor = glGetUniformLocation(shaderHandle, "FillColor");
+	glUniform4fv(Location_FillColor, 1, glm::value_ptr(job->FillColor));
+	GLERROR("Bind 8 uniform");
+	GLint Location_Color = glGetUniformLocation(shaderHandle, "Color");
+	glUniform4fv(Location_Color, 1, glm::value_ptr(job->Color));
+	GLERROR("Bind 9 uniform");
+	GLint Location_AmbientColor = glGetUniformLocation(shaderHandle, "AmbientColor");
+	glUniform4fv(Location_AmbientColor, 1, glm::value_ptr(scene.AmbientColor));
 
-    GLERROR("END");
+	GLERROR("END");
 }
-
 
 void DrawFinalPass::BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job)
 {
     glActiveTexture(GL_TEXTURE0);
-    if (job->DiffuseTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture->m_Texture);
+    if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0] != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
     }
 
     glActiveTexture(GL_TEXTURE1);
-    if (job->NormalTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->NormalTexture->m_Texture);
+    if (job->NormalTexture.size() > 0 && job->NormalTexture[0] != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
     }
 
     glActiveTexture(GL_TEXTURE2);
-    if (job->SpecularTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->SpecularTexture->m_Texture);
+    if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0] != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
     }
 
     glActiveTexture(GL_TEXTURE3);
-    if (job->IncandescenceTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture->m_Texture);
+    if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0] != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
     }
@@ -279,32 +324,95 @@ void DrawFinalPass::BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& j
 
 void DrawFinalPass::BindModelTextures(std::shared_ptr<ModelJob>& job)
 {
-    glActiveTexture(GL_TEXTURE0);
-    if (job->DiffuseTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture->m_Texture);
-    } else {
-        glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-    }
+	switch (job->Type) {
+		case RawModel::MaterialType::SingleTextures:
+		case RawModel::MaterialType::Basic:
+		{
+			glActiveTexture(GL_TEXTURE0);
+			if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0] != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->m_Texture);
+			}
+			else {
+				glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+			}
 
-    glActiveTexture(GL_TEXTURE1);
-    if (job->NormalTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->NormalTexture->m_Texture); 
-    } else {
-        glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
-    }
+			glActiveTexture(GL_TEXTURE1);
+			if (job->NormalTexture.size() > 0 && job->NormalTexture[0] != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->m_Texture);
+			}
+			else {
+				glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
+			}
 
-    glActiveTexture(GL_TEXTURE2);
-    if (job->SpecularTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->SpecularTexture->m_Texture);
-    } else {
-        glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
-    }
+			glActiveTexture(GL_TEXTURE2);
+			if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0] != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->m_Texture);
+			}
+			else {
+				glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
+			}
 
-    glActiveTexture(GL_TEXTURE3);
-    if (job->IncandescenceTexture != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture->m_Texture);
-    } else {
-        glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
-    }
+			glActiveTexture(GL_TEXTURE3);
+			if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0] != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->m_Texture);
+			}
+			else {
+				glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+			}
+			break;
+		}
+		case RawModel::MaterialType::SplatMapping:
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, job->SplatMap->m_Texture);
+
+			int texturePosition = GL_TEXTURE1;
+			//Bind 5 diffuse textures
+			for (unsigned int i = 0; i < 5; i++) {
+				glActiveTexture(texturePosition);
+				if (job->DiffuseTexture.size() > i && job->DiffuseTexture[i] != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[i]->m_Texture);
+				}
+				else {
+					glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+				}
+				texturePosition++;
+			}
+			//Bind 5 Normal textures
+			for (unsigned int i = 0; i < 5; i++) {
+				glActiveTexture(texturePosition);
+				if (job->NormalTexture.size() > i && job->NormalTexture[i] != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->NormalTexture[i]->m_Texture);
+				}
+				else {
+					glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
+				}
+				texturePosition++;
+			}
+			//Bind 5 Specular textures
+			for (unsigned int i = 0; i < 5; i++) {
+				glActiveTexture(texturePosition);
+				if (job->SpecularTexture.size() > i && job->SpecularTexture[i] != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[i]->m_Texture);
+				}
+				else {
+					glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
+				}
+				texturePosition++;
+			}
+			//Bind 5 Incandescence textures
+			for (unsigned int i = 0; i < 5; i++) {
+				glActiveTexture(texturePosition);
+				if (job->IncandescenceTexture.size() > i && job->IncandescenceTexture[i] != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[i]->m_Texture);
+				}
+				else {
+					glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+				}
+				texturePosition++;
+			}
+			break;
+		}
+	}
 }
 

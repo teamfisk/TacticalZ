@@ -48,16 +48,16 @@ std::vector<glm::mat4> Skeleton::GetFrameBones(const Animation& animation, doubl
 	while (time > animation.Duration) {
 		time -= animation.Duration;
 	}
-
+	//JOHAN TODO: Ask Viktor about stuff
 	//int currentKeyframeIndex = GetKeyframe(animation, time);
 
 	//const Animation::Keyframe& currentFrame = animation.Keyframes[currentKeyframeIndex];
 	//const Animation::Keyframe&	nextFrame = animation.Keyframes[(currentKeyframeIndex + 1) % animation.Keyframes.size()];
-	double alpha = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
+	//double alpha = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
 
 	////auto animationFrame = Animations[""].Keyframes[frame];
 	std::map<int, glm::mat4> frameBones;
-	AccumulateBoneTransforms(noRootMotion, currentFrame, nextFrame, static_cast<float>(alpha), frameBones, RootBone, glm::mat4(1));
+	//AccumulateBoneTransforms(noRootMotion, currentFrame, nextFrame, static_cast<float>(alpha), frameBones, RootBone, glm::mat4(1));
 
 	std::vector<glm::mat4> finalMatrices;
 	for (auto &kv : frameBones) {

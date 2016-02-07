@@ -47,7 +47,6 @@ private:
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
     bool isChildOfACamera(EntityWrapper entity);
     bool isChildOfCurrentCamera(EntityWrapper entity);
-
 };
 
 #endif

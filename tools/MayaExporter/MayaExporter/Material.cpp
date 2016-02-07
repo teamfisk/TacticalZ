@@ -88,14 +88,30 @@ bool Material::findColorTexture(MaterialNode& material_node, MFnDependencyNode& 
 			newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 			newTexture.FileNameLength = newTexture.FileName.length() + 1;
 
-			newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
-			newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+			MPlug uvRepeatFile = TextureNode.findPlug("repeatUV");
+
+			uvRepeatFile.connectedTo(AllConnections, true, false);
+
+			for (int i = 0; i < AllConnections.length(); i++) {
+				if (AllConnections[i].node().hasFn(MFn::kPlace2dTexture)) {
+					MFnDependencyNode place2DTexture(AllConnections[i].node());
+					MPlug uvRepeat = place2DTexture.findPlug("repeatUV");
+
+					newTexture.UVTiling[0] = uvRepeat.child(0).asFloat();
+					newTexture.UVTiling[1] = uvRepeat.child(1).asFloat();
+				}
+			}
 
 			material_node.ColorMaps.push_back(newTexture);
+			if(material_node.type == MaterialNode::MaterialType::Basic)
+				material_node.type = MaterialNode::MaterialType::SingleTextures;
 			return true;
+
+		} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
+			MGlobal::displayInfo(MString() + "find splat map");
+			return findSplatTextures(material_node, material_node.ColorMaps, MFnDependencyNode(AllConnections[i].node()));
 		}
 	}
-
 	return false;
 }
 
@@ -130,11 +146,25 @@ bool Material::findNormalTexture(MaterialNode& material_node, MFnDependencyNode&
 					newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 					newTexture.FileNameLength = newTexture.FileName.length() + 1;
 
-					newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
-					newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+					MPlug uvRepeatFile = TextureNode.findPlug("repeatUV");
+
+					uvRepeatFile.connectedTo(AllConnections, true, false);
+
+					for (int i = 0; i < AllConnections.length(); i++) {
+						if (AllConnections[i].node().hasFn(MFn::kPlace2dTexture)) {
+							MFnDependencyNode place2DTexture(AllConnections[i].node());
+							MPlug uvRepeat = place2DTexture.findPlug("repeatUV");
+
+							newTexture.UVTiling[0] = uvRepeat.child(0).asFloat();
+							newTexture.UVTiling[1] = uvRepeat.child(1).asFloat();
+						}
+					}
 
 					material_node.NormalMaps.push_back(newTexture);
 					return true;
+				} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
+					MGlobal::displayInfo(MString() + "find splat map");
+					return findSplatTextures(material_node, material_node.NormalMaps, MFnDependencyNode(AllConnections[i].node()));
 				}
 			}
 		}
@@ -168,11 +198,28 @@ bool Material::findSpecularTexture(MaterialNode& material_node, MFnDependencyNod
 			newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 			newTexture.FileNameLength = newTexture.FileName.length() + 1;
 
-			newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
-			newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+			MPlug uvRepeatFile = TextureNode.findPlug("repeatUV");
+
+			uvRepeatFile.connectedTo(AllConnections, true, false);
+
+			for (int i = 0; i < AllConnections.length(); i++) {
+				if (AllConnections[i].node().hasFn(MFn::kPlace2dTexture)) {
+					//C:\Users\kamisama\Desktop\TacticalZ\assets\test
+					MFnDependencyNode place2DTexture(AllConnections[i].node());
+					MPlug uvRepeat = place2DTexture.findPlug("repeatUV");
+
+					newTexture.UVTiling[0] = uvRepeat.child(0).asFloat();
+					newTexture.UVTiling[1] = uvRepeat.child(1).asFloat();
+				}
+			}
 
 			material_node.SpecularMaps.push_back(newTexture);
+			if (material_node.type == MaterialNode::MaterialType::Basic)
+				material_node.type = MaterialNode::MaterialType::SingleTextures;
 			return true;
+		} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
+			MGlobal::displayInfo(MString() + "find splat map");
+			return findSplatTextures(material_node, material_node.SpecularMaps, MFnDependencyNode(AllConnections[i].node()));
 		}
 	}
 	return false;
@@ -203,21 +250,133 @@ bool Material::findIncandescenceTexture(MaterialNode& material_node, MFnDependen
 			newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
 			newTexture.FileNameLength = newTexture.FileName.length() + 1;
 
-			newTexture.UVTiling[0] = TextureNode.findPlug("RepeatU").asFloat();
-			newTexture.UVTiling[1] = TextureNode.findPlug("RepeatV").asFloat();
+			MPlug uvRepeatFile = TextureNode.findPlug("repeatUV");
+
+			uvRepeatFile.connectedTo(AllConnections, true, false);
+
+			for (int i = 0; i < AllConnections.length(); i++) {
+				if (AllConnections[i].node().hasFn(MFn::kPlace2dTexture)) {
+					MFnDependencyNode place2DTexture(AllConnections[i].node());
+					MPlug uvRepeat = place2DTexture.findPlug("repeatUV");
+
+					newTexture.UVTiling[0] = uvRepeat.child(0).asFloat();
+					newTexture.UVTiling[1] = uvRepeat.child(1).asFloat();
+				}
+			}
 
 			material_node.IncandescenceMaps.push_back(newTexture);
+			if (material_node.type == MaterialNode::MaterialType::Basic)
+				material_node.type = MaterialNode::MaterialType::SingleTextures;
 			return true;
 
 		} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
-			return findSplatTextures(material_node.IncandescenceMaps, MFnDependencyNode(AllConnections[i].node()));
+			MGlobal::displayInfo(MString() + "find splat map");
+			return findSplatTextures(material_node, material_node.IncandescenceMaps, MFnDependencyNode(AllConnections[i].node()));
 		}
 	}
 	return false;
 }
 
-bool Material::findSplatTextures(std::vector<MaterialNode::Texture>& textureVector, MFnDependencyNode& node) {
-	return false;
+//C:\Users\kamisama\Desktop\TacticalZ\assets\test
+
+bool Material::findSplatTextures(MaterialNode& material_node, std::vector<MaterialNode::Texture>& textureVector, MFnDependencyNode& node) {
+	//Get all Inputs in LayeredTexture
+	MPlug inputs = node.findPlug("inputs");
+	MGlobal::displayInfo(MString() + "inputs.numElements(): " + inputs.numElements());
+
+	MPlugArray AllConnections;
+	MStatus test;
+	//Try to find splat texture if using custom splatmap build up.
+	inputs[0].child(1).connectedTo(AllConnections, true, false);
+	for (int i = 0; i < AllConnections.length(); i++) {
+		if (AllConnections[i].node().hasFn(MFn::kMultiplyDivide)) {
+			MGlobal::displayInfo(MString() + "found kMultiplyDivide");
+			MFnDependencyNode multiplyDivide(AllConnections[i].node());
+			multiplyDivide.findPlug("input1", &test).child(0).connectedTo(AllConnections, true, false);;
+			for (int i = 0; i < AllConnections.length(); i++) {
+				if (AllConnections[i].node().hasFn(MFn::kFileTexture)) {
+					MFnDependencyNode TextureNode(AllConnections[i].node());
+
+					std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
+					m_TexturePaths.push_back(FullPath);
+
+					MString workspace;
+					MStatus status = MGlobal::executeCommand(MString("workspace -q -rd;"),
+						workspace);
+					FullPath = FullPath.substr(workspace.length());
+					FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
+
+					MaterialNode::Texture newTexture;
+
+					newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+					newTexture.FileNameLength = newTexture.FileName.length() + 1;
+
+					MPlug uvRepeatFile = TextureNode.findPlug("repeatUV");
+
+					uvRepeatFile.connectedTo(AllConnections, true, false);
+
+					for (int i = 0; i < AllConnections.length(); i++) {
+						if (AllConnections[i].node().hasFn(MFn::kPlace2dTexture)) {
+							MFnDependencyNode place2DTexture(AllConnections[i].node());
+							MPlug uvRepeat = place2DTexture.findPlug("repeatUV");
+
+							newTexture.UVTiling[0] = uvRepeat.child(0).asFloat();
+							newTexture.UVTiling[1] = uvRepeat.child(1).asFloat();
+						}
+					}
+					material_node.SplatMap = newTexture;
+					material_node.type = MaterialNode::MaterialType::SplatMapping;
+				}
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i < inputs.numElements(); i++) {
+		//Get connections to color in input[i]
+		inputs[i].child(0).connectedTo(AllConnections, true, false);
+
+		for (int i = 0; i < AllConnections.length(); i++) {
+			if (AllConnections[i].node().hasFn(MFn::kFileTexture)) {
+				MFnDependencyNode TextureNode(AllConnections[i].node());
+
+				std::string FullPath = TextureNode.findPlug("ftn").asString().asChar();
+				m_TexturePaths.push_back(FullPath);
+
+				MString workspace;
+				MStatus status = MGlobal::executeCommand(MString("workspace -q -rd;"),
+					workspace);
+				FullPath = FullPath.substr(workspace.length());
+				FullPath = FullPath.substr(FullPath.find_first_of("/") + 1);
+
+				MaterialNode::Texture newTexture;
+
+				newTexture.FileName = FullPath.erase(FullPath.find_last_of("."), FullPath.find_last_of(".") - FullPath.size());
+				newTexture.FileNameLength = newTexture.FileName.length() + 1;
+
+				MPlug uvRepeatFile = TextureNode.findPlug("repeatUV");
+
+				uvRepeatFile.connectedTo(AllConnections, true, false);
+
+				for (int i = 0; i < AllConnections.length(); i++) {
+					if (AllConnections[i].node().hasFn(MFn::kPlace2dTexture)) {
+						MFnDependencyNode place2DTexture(AllConnections[i].node());
+						MPlug uvRepeat = place2DTexture.findPlug("repeatUV");
+
+						newTexture.UVTiling[0] = uvRepeat.child(0).asFloat();
+						newTexture.UVTiling[1] = uvRepeat.child(1).asFloat();
+					}
+				}
+				textureVector.push_back(newTexture);
+				break;
+			}
+		} 
+		if (AllConnections.length() == 0) {
+			MaterialNode::Texture newTexture;
+			newTexture.FileNameLength = 0;
+			textureVector.push_back(newTexture);
+		}
+	}
+	return true;
 }
 
 // Returns the absolute path for all textures. Use for copying texture files.
@@ -244,8 +403,6 @@ std::vector<MaterialNode>* Material::DoIt(Mesh mesh)
                 meshHasMaterial = true;
                 MaterialStorage.IndexStart = totalIndices;
                 MaterialStorage.IndexEnd = totalIndices + aMeshMaterial.second.size() - 1;
-                MGlobal::displayInfo("Oh noes, breaking in material");
-                break;
             }
             totalIndices += aMeshMaterial.second.size();
         }
@@ -262,7 +419,10 @@ std::vector<MaterialNode>* Material::DoIt(Mesh mesh)
                 MaterialStorage.ReflectionFactor = 0.0f;
                 MaterialStorage.SpecularExponent = 0.0f;      
             }
-
+			MaterialStorage.NumColorMaps = MaterialStorage.ColorMaps.size();
+			MaterialStorage.NumNormalMaps = MaterialStorage.NormalMaps.size();
+			MaterialStorage.NumSpecularMaps = MaterialStorage.SpecularMaps.size();
+			MaterialStorage.NumIncandescenceMaps = MaterialStorage.IncandescenceMaps.size();
             m_AllMaterials.push_back(MaterialStorage);
         }
 		matIt.next();

@@ -53,6 +53,7 @@ private:
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;
+	ShaderProgram* m_ForwardPlusSplatMapProgram;
 };
 
 #endif 

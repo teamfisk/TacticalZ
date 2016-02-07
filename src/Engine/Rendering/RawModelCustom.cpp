@@ -34,7 +34,7 @@ void RawModelCustom::ReadMeshFile(std::string filePath)
         ReadMeshFileHeader(offset, fileData);
         ReadMesh(offset, fileData, fileByteSize);
     }
-    delete fileData;
+    delete[] fileData;
 }
 
 void RawModelCustom::ReadMeshFileHeader(std::size_t& offset, char* fileData)
@@ -116,7 +116,7 @@ void RawModelCustom::ReadMaterialFile(std::string filePath)
     if (fileByteSize > 0) {
         ReadMaterials(offset, fileData, fileByteSize);
     }
-    delete fileData;
+    delete[] fileData;
 }
 
 void RawModelCustom::ReadMaterials(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
@@ -169,15 +169,8 @@ void RawModelCustom::ReadMaterialSingle(std::size_t& offset, char* fileData, con
     m_Materials.push_back(newMaterialProperty);
 }
 
-void RawModelCustom::ReadMaterialBasic(RawModelCustom::MaterialBasic* newMaterial, unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMaterialBasic(RawModelCustom::MaterialBasic* newMaterial, std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 {
-	if (offset + sizeof(unsigned int) * 4 > fileByteSize) {
-		throw Resource::FailedLoadingException("Reading Material texture names length failed");
-	}
-
-	unsigned int* nameLengths = (unsigned int*)(fileData + offset);
-	offset += sizeof(unsigned int) * 4;
-
 	if (offset + sizeof(float) * 11 + sizeof(unsigned int) * 2 > fileByteSize) {
 		throw Resource::FailedLoadingException("Reading Material specular, reflection, color and start and end index  values failed");
 	}
@@ -200,41 +193,48 @@ void RawModelCustom::ReadMaterialBasic(RawModelCustom::MaterialBasic* newMateria
 	offset += sizeof(unsigned int);
 }
 
-void RawModelCustom::ReadMaterialSingleTexture(RawModelCustom::MaterialSingleTextures* newMaterial, unsigned int &offset, char* fileData, unsigned int& fileByteSize)
-{
-	unsigned char numberOfMaps[4];
+void RawModelCustom::ReadMaterialSingleTexture(RawModelCustom::MaterialSingleTextures* newMaterial, std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
+{	
+	ReadMaterialBasic(newMaterial, offset, fileData, fileByteSize);
 	if (offset + sizeof(unsigned char) * 4 > fileByteSize) {
 		throw Resource::FailedLoadingException("Reading Material NumOfMaps failed");
 	}
+	unsigned char numberOfMaps[4];
+	memcpy(numberOfMaps, fileData + offset, sizeof(unsigned char) * 4);
+	offset += sizeof(unsigned char) * 4;
 
 	if (numberOfMaps[0] > 0)
 	{
-		ReadMaterialTextureProperties(newMaterial->ColorMaps, offset, fileData, fileByteSize);
+		ReadMaterialTextureProperties(newMaterial->ColorMap, offset, fileData, fileByteSize);
 	}
 
 	if (numberOfMaps[1] > 0)
 	{
-		ReadMaterialTextureProperties(newMaterial->SpecularMaps, offset, fileData, fileByteSize);
+		ReadMaterialTextureProperties(newMaterial->SpecularMap, offset, fileData, fileByteSize);
 	}
 
 	if (numberOfMaps[2] > 0)
 	{
-		ReadMaterialTextureProperties(newMaterial->NormalMaps, offset, fileData, fileByteSize);
+		ReadMaterialTextureProperties(newMaterial->NormalMap, offset, fileData, fileByteSize);
 	}
 
 	if (numberOfMaps[3] > 0)
 	{
-		ReadMaterialTextureProperties(newMaterial->IncandescenceMaps, offset, fileData, fileByteSize);
+		ReadMaterialTextureProperties(newMaterial->IncandescenceMap, offset, fileData, fileByteSize);
 	}
 }
 
-void RawModelCustom::ReadMaterialSplatMapping(RawModelCustom::MaterialSplatMapping* newMaterial, unsigned int &offset, char* fileData, unsigned int& fileByteSize)
+void RawModelCustom::ReadMaterialSplatMapping(RawModelCustom::MaterialSplatMapping* newMaterial, std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
 {
+	ReadMaterialBasic(newMaterial, offset, fileData, fileByteSize);
 	ReadMaterialTextureProperties(newMaterial->SplatMap, offset, fileData, fileByteSize);
-	unsigned char numberOfMaps[4];
 	if (offset + sizeof(unsigned char) * 4 > fileByteSize) {
 		throw Resource::FailedLoadingException("Reading Material NumOfMaps failed");
 	}
+
+	unsigned char numberOfMaps[4];
+	memcpy(numberOfMaps, fileData + offset, sizeof(unsigned char) * 4);
+	offset += sizeof(unsigned char) * 4;
 
 	newMaterial->ColorMaps.resize(numberOfMaps[0]);
 	for (unsigned char i = 0; i < numberOfMaps[0]; i++)
@@ -261,8 +261,10 @@ void RawModelCustom::ReadMaterialSplatMapping(RawModelCustom::MaterialSplatMappi
 	}
 }
 
-void RawModelCustom::ReadMaterialTextureProperties(RawModelCustom::TextureProperties& texture, unsigned int &offset, char* fileData, unsigned int& fileByteSize) {
+void RawModelCustom::ReadMaterialTextureProperties(RawModelCustom::TextureProperties& texture, std::size_t& offset, char* fileData, const unsigned int& fileByteSize) {
 	unsigned int nameLength = *(unsigned int*)(fileData + offset);
+	offset += sizeof(unsigned int);
+
 	if (nameLength > 0) {
 		if (offset + nameLength > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading Material texture path failed");
@@ -312,7 +314,7 @@ void RawModelCustom::ReadAnimationFile(std::string filePath)
         ReadAnimationBindPoses(offset, fileData, fileByteSize);
         ReadAnimationClips(offset, fileData, fileByteSize, numAnimations);
     }
-    delete fileData;
+    delete[] fileData;
 }
 
 void RawModelCustom::ReadAnimationBindPoses(std::size_t& offset, char* fileData, const unsigned int& fileByteSize)
@@ -432,7 +434,7 @@ void RawModelCustom::ReadAnimationClipSingle(std::size_t& offset, char* fileData
 #endif
 }
 
-void RawModelCustom::ReadAnimationKeyFrame(std::size_t& &offset, char* fileData, const unsigned int& fileByteSize, std::vector<Skeleton::Animation::Keyframe>& animation)
+void RawModelCustom::ReadAnimationKeyFrame(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, std::vector<Skeleton::Animation::Keyframe>& animation)
 {
     Skeleton::Animation::Keyframe newKeyFrame;
 
@@ -475,6 +477,9 @@ RawModelCustom::~RawModelCustom()
     if (m_Skeleton != nullptr) {
         delete m_Skeleton;
     }
+	for (auto material : m_Materials) {
+		delete material.material;
+	}
 }
 
 #endif

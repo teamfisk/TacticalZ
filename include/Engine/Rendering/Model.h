@@ -14,7 +14,7 @@ private:
 
 public:
 	~Model();
-    const std::vector<RawModel::MaterialGroup>& MaterialGroups() const { return m_RawModel->MaterialGroups; }
+    const std::vector<RawModel::MaterialProperties>& MaterialGroups() const { return m_RawModel->m_Materials; }
     const glm::mat4& Matrix() const { return m_RawModel->m_Matrix; }
     const RawModel::Vertex* Vertices() const { return m_RawModel->Vertices(); }
 	unsigned int NumberOfVertices() const { return m_RawModel->NumVertices(); }

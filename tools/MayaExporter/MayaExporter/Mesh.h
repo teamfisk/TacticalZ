@@ -62,7 +62,7 @@ public:
 
 class Mesh : public OutputData {
 public:
-	bool hasSkin = false;
+	bool hasSkin = true; //Should be false by default... Have it true now since pipeline only support skinned vertecies
     unsigned int NumVertices;
     unsigned int NumIndices;
     std::vector<VertexLayout> Vertices;
