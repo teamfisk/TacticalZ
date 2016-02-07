@@ -36,7 +36,7 @@ private:
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
 
     void BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job);
-    void BindModelTextures(std::shared_ptr<ModelJob>& job);
+    void BindModelTextures(GLuint shaderHandle, std::shared_ptr<ModelJob>& job);
 
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;

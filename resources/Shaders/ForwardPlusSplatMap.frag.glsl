@@ -9,6 +9,28 @@ uniform vec4 DiffuseColor;
 uniform vec4 FillColor;
 uniform vec4 Color;
 uniform vec4 AmbientColor;
+
+//Get bineded at the same time as the textures
+uniform vec2 DiffuseUVRepeat1;
+uniform vec2 DiffuseUVRepeat2;
+uniform vec2 DiffuseUVRepeat3;
+uniform vec2 DiffuseUVRepeat4;
+uniform vec2 DiffuseUVRepeat5;
+uniform vec2 NormalUVRepeat1;
+uniform vec2 NormalUVRepeat2;
+uniform vec2 NormalUVRepeat3;
+uniform vec2 NormalUVRepeat4;
+uniform vec2 NormalUVRepeat5;
+uniform vec2 SpecularUVRepeat1;
+uniform vec2 SpecularUVRepeat2;
+uniform vec2 SpecularUVRepeat3;
+uniform vec2 SpecularUVRepeat4;
+uniform vec2 SpecularUVRepeat5;
+uniform vec2 GlowUVRepeat1;
+uniform vec2 GlowUVRepeat2;
+uniform vec2 GlowUVRepeat3;
+uniform vec2 GlowUVRepeat4;
+uniform vec2 GlowUVRepeat5;
 layout (binding = 0) uniform sampler2D SplatMapTexture;
 layout (binding = 1) uniform sampler2D DiffuseTexture1;
 layout (binding = 2) uniform sampler2D DiffuseTexture2;
@@ -131,12 +153,13 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 
 #define TEXTURE_TILE 5.0
 
-vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, sampler2D A, sampler2D D, vec2 tileValues){
-	vec4 R_Channel = texture2D(R, Input.TextureCoordinate * tileValues);
-	vec4 G_Channel = texture2D(G, Input.TextureCoordinate * tileValues);
-	vec4 B_Channel = texture2D(B, Input.TextureCoordinate * tileValues);
-	vec4 A_Channel = texture2D(A, Input.TextureCoordinate * tileValues);
-	vec4 D_Channel = texture2D(D, Input.TextureCoordinate * tileValues);
+vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, sampler2D A, sampler2D D,
+	 				  vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues,  vec2 A_TileValues,  vec2 D_TileValues){
+	vec4 R_Channel = texture2D(R, Input.TextureCoordinate * R_TileValues);
+	vec4 G_Channel = texture2D(G, Input.TextureCoordinate * G_TileValues);
+	vec4 B_Channel = texture2D(B, Input.TextureCoordinate * B_TileValues);
+	vec4 A_Channel = texture2D(A, Input.TextureCoordinate * A_TileValues);
+	vec4 D_Channel = texture2D(D, Input.TextureCoordinate * D_TileValues);
 
 	float total = blendValue.r + blendValue.g + blendValue.b + blendValue.a;
 	if(total > 1.0f){
@@ -154,18 +177,23 @@ vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, sa
 		 + D_percent    * D_Channel;
 }
 
-vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, sampler2D A, sampler2D D, vec2 tileValues){
+vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, sampler2D A, sampler2D D,
+					   vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues,  vec2 A_TileValues,  vec2 D_TileValues){
 	mat3 TBN = mat3(Input.Tangent, Input.BiTangent, Input.Normal);
-	vec3 R_Channel = texture(R, Input.TextureCoordinate * tileValues).xyz * 2.0 - vec3(1.0);
-	vec3 G_Channel = texture(G, Input.TextureCoordinate * tileValues).xyz * 2.0 - vec3(1.0);
-	vec3 B_Channel = texture(B, Input.TextureCoordinate * tileValues).xyz * 2.0 - vec3(1.0);
-	vec3 A_Channel = texture(A, Input.TextureCoordinate * tileValues).xyz * 2.0 - vec3(1.0);
-	vec3 D_Channel = texture(D, Input.TextureCoordinate * tileValues).xyz * 2.0 - vec3(1.0);
+	vec3 R_Channel = texture(R, Input.TextureCoordinate * R_TileValues).xyz * 2.0 - vec3(1.0);
+	vec3 G_Channel = texture(G, Input.TextureCoordinate * G_TileValues).xyz * 2.0 - vec3(1.0);
+	vec3 B_Channel = texture(B, Input.TextureCoordinate * B_TileValues).xyz * 2.0 - vec3(1.0);
+	vec3 A_Channel = texture(A, Input.TextureCoordinate * A_TileValues).xyz * 2.0 - vec3(1.0);
+	vec3 D_Channel = texture(D, Input.TextureCoordinate * D_TileValues).xyz * 2.0 - vec3(1.0);
 
-	if(blendValue.length() > 1.0f){
-		blendValue = normalize(blendValue);
+	float total = blendValue.r + blendValue.g + blendValue.b + blendValue.a;
+	if(total > 1.0f){
+		blendValue.r / total;
+		blendValue.g / total;
+		blendValue.b / total;
+		blendValue.a / total;
 	}
-	float D_percent = 1.0f - blendValue.r - blendValue.g - blendValue.b - blendValue.a;
+	float D_percent = clamp( 1.0f - total, 0.0f, 1.0f);
 
 	vec3 Normal_result = blendValue.r * R_Channel
 					   + blendValue.g * G_Channel 
@@ -180,12 +208,16 @@ void main()
 {
 	vec4 splatTexel = texture2D(SplatMapTexture, Input.TextureCoordinate);
 
-	vec4 diffuseTexel = CalcBlendedTexel(splatTexel, DiffuseTexture1, DiffuseTexture2, DiffuseTexture3, DiffuseTexture4, DiffuseTexture5, vec2(TEXTURE_TILE, TEXTURE_TILE));
-	vec4 glowTexel = CalcBlendedTexel(splatTexel, GlowMapTexture1, GlowMapTexture2, GlowMapTexture3, GlowMapTexture4, GlowMapTexture5, vec2(TEXTURE_TILE, TEXTURE_TILE));
-	vec4 specularTexel = CalcBlendedTexel(splatTexel, SpecularMapTexture1, SpecularMapTexture2, SpecularMapTexture3, SpecularMapTexture4, SpecularMapTexture5, vec2(TEXTURE_TILE, TEXTURE_TILE));
+	vec4 diffuseTexel = CalcBlendedTexel(splatTexel, DiffuseTexture1, DiffuseTexture2, DiffuseTexture3, DiffuseTexture4, DiffuseTexture5,
+	 									 DiffuseUVRepeat1, DiffuseUVRepeat2, DiffuseUVRepeat3, DiffuseUVRepeat4, DiffuseUVRepeat5);
+	vec4 glowTexel = CalcBlendedTexel(splatTexel, GlowMapTexture1, GlowMapTexture2, GlowMapTexture3, GlowMapTexture4, GlowMapTexture5,
+	 									 GlowUVRepeat1, GlowUVRepeat2, GlowUVRepeat3, GlowUVRepeat4, GlowUVRepeat5);
+	vec4 specularTexel = CalcBlendedTexel(splatTexel, SpecularMapTexture1, SpecularMapTexture2, SpecularMapTexture3, SpecularMapTexture4, SpecularMapTexture5,
+										 SpecularUVRepeat1, SpecularUVRepeat2, SpecularUVRepeat3, SpecularUVRepeat4, SpecularUVRepeat5);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
 	//vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, SplatMapTexture);
-	vec4 normal = V * CalcBlendedNormal(splatTexel, NormalMapTexture1, NormalMapTexture2, NormalMapTexture3, NormalMapTexture4, NormalMapTexture5, vec2(TEXTURE_TILE, TEXTURE_TILE));
+	vec4 normal = V * CalcBlendedNormal(splatTexel, NormalMapTexture1, NormalMapTexture2, NormalMapTexture3, NormalMapTexture4, NormalMapTexture5,
+		   								NormalUVRepeat1, NormalUVRepeat2, NormalUVRepeat3, NormalUVRepeat4, NormalUVRepeat5);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position); 

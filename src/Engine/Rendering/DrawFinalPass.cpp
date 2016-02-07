@@ -190,6 +190,10 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						GLERROR("Bind Forward program");
 						//bind uniforms
 						BindModelUniforms(forwardHandle, modelJob, scene);
+						//bind textures
+						BindModelTextures(forwardHandle, modelJob);
+						GLERROR("asdasd");
+
 						break;
 					}
 					case RawModel::MaterialType::SplatMapping:
@@ -198,15 +202,13 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						GLERROR("Bind SplatMap program");
 						//bind uniforms
 						BindModelUniforms(forwardSplatHandle, modelJob, scene);
+						//bind textures
+						BindModelTextures(forwardSplatHandle, modelJob);
+						GLERROR("asdasd");
+
 						break;
 					}
 				}
-
-				//bind textures
-				BindModelTextures(modelJob);
-				GLERROR("asdasd");
-
-
 
                 if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
 
@@ -294,120 +296,140 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 void DrawFinalPass::BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job)
 {
     glActiveTexture(GL_TEXTURE0);
-    if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0] != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
+    if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0]->Texture != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->Texture->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
     }
 
     glActiveTexture(GL_TEXTURE1);
-    if (job->NormalTexture.size() > 0 && job->NormalTexture[0] != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
+    if (job->NormalTexture.size() > 0 && job->NormalTexture[0]->Texture != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->Texture->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
     }
 
     glActiveTexture(GL_TEXTURE2);
-    if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0] != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
+    if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0]->Texture != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->Texture->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
     }
 
     glActiveTexture(GL_TEXTURE3);
-    if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0] != nullptr) {
-        glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->m_Texture); //JOHAN TODO: support multiple diffuse Textures
+    if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0]->Texture != nullptr) {
+        glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->Texture->m_Texture); //JOHAN TODO: support multiple diffuse Textures
     } else {
         glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
     }
 }
 
-void DrawFinalPass::BindModelTextures(std::shared_ptr<ModelJob>& job)
+void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<ModelJob>& job)
 {
 	switch (job->Type) {
 		case RawModel::MaterialType::SingleTextures:
 		case RawModel::MaterialType::Basic:
 		{
 			glActiveTexture(GL_TEXTURE0);
-			if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0] != nullptr) {
-				glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->m_Texture);
+			if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0]->Texture != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->Texture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(job->DiffuseTexture[0]->UVRepeat));
 			}
 			else {
 				glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
 
 			glActiveTexture(GL_TEXTURE1);
-			if (job->NormalTexture.size() > 0 && job->NormalTexture[0] != nullptr) {
-				glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->m_Texture);
+			if (job->NormalTexture.size() > 0 && job->NormalTexture[0]->Texture != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->Texture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(job->NormalTexture[0]->UVRepeat));
 			}
 			else {
 				glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
 
 			glActiveTexture(GL_TEXTURE2);
-			if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0] != nullptr) {
-				glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->m_Texture);
+			if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0]->Texture != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->Texture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "SpecularUVRepeat"), 1, glm::value_ptr(job->SpecularTexture[0]->UVRepeat));
 			}
 			else {
 				glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "SpecularUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
 
 			glActiveTexture(GL_TEXTURE3);
-			if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0] != nullptr) {
-				glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->m_Texture);
+			if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0]->Texture != nullptr) {
+				glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->Texture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "GlowUVRepeat"), 1, glm::value_ptr(job->IncandescenceTexture[0]->UVRepeat));
 			}
 			else {
 				glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+				glUniform2fv(glGetUniformLocation(shaderHandle, "GlowUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
 			break;
 		}
 		case RawModel::MaterialType::SplatMapping:
 		{
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, job->SplatMap->m_Texture);
+			glBindTexture(GL_TEXTURE_2D, job->SplatMap->Texture->m_Texture);
 
 			int texturePosition = GL_TEXTURE1;
+		
 			//Bind 5 diffuse textures
+			std::string UniformName = "DiffuseUVRepeat";
 			for (unsigned int i = 0; i < 5; i++) {
 				glActiveTexture(texturePosition);
-				if (job->DiffuseTexture.size() > i && job->DiffuseTexture[i] != nullptr) {
-					glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[i]->m_Texture);
-				}
-				else {
+				if (job->DiffuseTexture.size() > i && job->DiffuseTexture[i]->Texture != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[i]->Texture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(job->DiffuseTexture[i]->UVRepeat));
+				} else {
 					glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 				}
 				texturePosition++;
 			}
+
 			//Bind 5 Normal textures
+			UniformName = "NormalUVRepeat";
 			for (unsigned int i = 0; i < 5; i++) {
 				glActiveTexture(texturePosition);
-				if (job->NormalTexture.size() > i && job->NormalTexture[i] != nullptr) {
-					glBindTexture(GL_TEXTURE_2D, job->NormalTexture[i]->m_Texture);
-				}
-				else {
+				if (job->NormalTexture.size() > i && job->NormalTexture[i]->Texture != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->NormalTexture[i]->Texture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(job->NormalTexture[i]->UVRepeat));
+				} else {
 					glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 				}
 				texturePosition++;
 			}
+
 			//Bind 5 Specular textures
+			UniformName = "SpecularUVRepeat";
 			for (unsigned int i = 0; i < 5; i++) {
 				glActiveTexture(texturePosition);
-				if (job->SpecularTexture.size() > i && job->SpecularTexture[i] != nullptr) {
-					glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[i]->m_Texture);
-				}
-				else {
+				if (job->SpecularTexture.size() > i && job->SpecularTexture[i]->Texture != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[i]->Texture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(job->SpecularTexture[i]->UVRepeat));
+				} else {
 					glBindTexture(GL_TEXTURE_2D, m_GreyTexture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 				}
 				texturePosition++;
 			}
+
 			//Bind 5 Incandescence textures
+			UniformName = "GlowUVRepeat";
 			for (unsigned int i = 0; i < 5; i++) {
 				glActiveTexture(texturePosition);
-				if (job->IncandescenceTexture.size() > i && job->IncandescenceTexture[i] != nullptr) {
-					glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[i]->m_Texture);
-				}
-				else {
+				if (job->IncandescenceTexture.size() > i && job->IncandescenceTexture[i]->Texture != nullptr) {
+					glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[i]->Texture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(job->IncandescenceTexture[i]->UVRepeat));
+				} else {
 					glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+					glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 				}
 				texturePosition++;
 			}

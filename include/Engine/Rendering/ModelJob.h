@@ -46,19 +46,19 @@ struct ModelJob : RenderJob
 				::RawModel::MaterialSingleTextures* singleTextures = static_cast<::RawModel::MaterialSingleTextures*>(matProp.material);
 				TextureID = (singleTextures->ColorMap.Texture) ? singleTextures->ColorMap.Texture->ResourceID : 0;
 				if (modelComponent["DiffuseTexture"]) {
-					DiffuseTexture.push_back(singleTextures->ColorMap.Texture.get());
+					DiffuseTexture.push_back(&singleTextures->ColorMap);
 				}
 
 				if (modelComponent["NormalMap"]) {
-					NormalTexture.push_back(singleTextures->NormalMap.Texture.get());
+					NormalTexture.push_back(&singleTextures->NormalMap);
 				}
 
 				if (modelComponent["SpecularMap"]) {
-					SpecularTexture.push_back(singleTextures->SpecularMap.Texture.get());
+					SpecularTexture.push_back(&singleTextures->SpecularMap);
 				}
 
 				if (modelComponent["GlowMap"]) {
-					IncandescenceTexture.push_back(singleTextures->IncandescenceMap.Texture.get());
+					IncandescenceTexture.push_back(&singleTextures->IncandescenceMap);
 				}
 			}
 			break;
@@ -72,30 +72,30 @@ struct ModelJob : RenderJob
 				}
 				::RawModel::MaterialSplatMapping* SplatTextures = static_cast<::RawModel::MaterialSplatMapping*>(matProp.material);
 
-				SplatMap = SplatTextures->SplatMap.Texture.get();
+				SplatMap = &SplatTextures->SplatMap;
 
 				TextureID = (SplatTextures->ColorMaps[0].Texture) ? SplatTextures->ColorMaps[0].Texture->ResourceID : 0;
 				if (modelComponent["DiffuseTexture"]) {
-					for (auto texture : SplatTextures->ColorMaps) {
-						DiffuseTexture.push_back(texture.Texture.get());
+					for (auto& texture : SplatTextures->ColorMaps) {
+						DiffuseTexture.push_back(&texture);
 					}
 				}
 
 				if (modelComponent["NormalMap"]) {
-					for (auto texture : SplatTextures->NormalMaps) {
-						NormalTexture.push_back(texture.Texture.get());
+					for (auto& texture : SplatTextures->NormalMaps) {
+						NormalTexture.push_back(&texture);
 					}
 				}
 
 				if (modelComponent["SpecularMap"]) {
-					for (auto texture : SplatTextures->SpecularMaps) {
-						SpecularTexture.push_back(texture.Texture.get());
+					for (auto& texture : SplatTextures->SpecularMaps) {
+						SpecularTexture.push_back(&texture);
 					}
 				}
 
 				if (modelComponent["GlowMap"]) {
-					for (auto texture : SplatTextures->IncandescenceMaps) {
-						IncandescenceTexture.push_back(texture.Texture.get());
+					for (auto& texture : SplatTextures->IncandescenceMaps) {
+						IncandescenceTexture.push_back(&texture);
 					}
 				}
 			}
@@ -132,11 +132,11 @@ struct ModelJob : RenderJob
 	::RawModel::MaterialType Type;
     EntityID Entity;
     glm::mat4 Matrix;
-	const Texture* SplatMap;
-    std::vector<const Texture*> DiffuseTexture;
-	std::vector<const Texture*> NormalTexture;
-	std::vector<const Texture*> SpecularTexture;
-	std::vector<const Texture*> IncandescenceTexture;
+	const ::RawModel::TextureProperties* SplatMap;
+    std::vector<const ::RawModel::TextureProperties*> DiffuseTexture;
+	std::vector<const ::RawModel::TextureProperties*> NormalTexture;
+	std::vector<const ::RawModel::TextureProperties*> SpecularTexture;
+	std::vector<const ::RawModel::TextureProperties*> IncandescenceTexture;
     float Shininess = 0.f;
     glm::vec4 Color;
     const ::Model* Model = nullptr;
