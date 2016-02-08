@@ -25,32 +25,6 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 
 void SoundSystem::Update(double dt)
 {
-    playerStep(dt);
-}
-
-void SoundSystem::playerStep(double dt)
-{
-    if (!m_LocalPlayer.Valid()) {
-        return;
-    }
-    // Position of the local player, used see how far a player has moved.
-    glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
-    // Velocity of the local player, used to see if a player is airborne.
-    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
-    m_DistanceMoved += glm::length(pos - m_LastPosition);
-    // Set the last position for next iteration
-    m_LastPosition = pos;
-    bool isAirborne = vel.y != 0;
-    if (m_DistanceMoved > m_PlayerStepLength && !isAirborne) {
-        // Player moved a step's distance
-        // Create footstep sound
-        Events::PlaySoundOnEntity e;
-        e.EmitterID = createChildEmitter(m_LocalPlayer);
-        e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
-        m_LeftFoot = !m_LeftFoot;
-        m_EventBroker->Publish(e);
-        m_DistanceMoved = 0.f;
-    }
 }
 
 bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)

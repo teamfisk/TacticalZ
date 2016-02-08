@@ -56,6 +56,12 @@ void PlayerMovementSystem::Update(double dt)
             } else {
                 wishSpeed = playerMovementSpeed;
             }
+            if (player.ID == m_LocalPlayer.ID) {
+                if (glm::length(wishDirection) == 0) {
+                    // If no key is pressed, reset the distance moved since last step.
+                    m_DistanceMoved = 0;
+                }
+            }
             glm::vec3& velocity = cPhysics["Velocity"];
             ImGui::Text("velocity: (%f, %f, %f)", velocity.x, velocity.y, velocity.z);
             glm::vec3 groundVelocity(0.f, 0.f, 0.f);
@@ -135,6 +141,7 @@ void PlayerMovementSystem::Update(double dt)
 
         controller->Reset();
     }
+    playerStep(dt);
 }
 
 void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
@@ -169,10 +176,41 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     position += velocity * (float)dt;
 }
 
+void PlayerMovementSystem::playerStep(double dt)
+{
+    if (!m_LocalPlayer.Valid()) {
+        return;
+    }
+    // Position of the local player, used see how far a player has moved.
+    glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
+    // Velocity of the local player, used to see if a player is airborne.
+    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
+    m_DistanceMoved += glm::length(pos - m_LastPosition);
+    // Set the last position for next iteration
+    m_LastPosition = pos;
+    bool isAirborne = vel.y != 0;
+    if (m_DistanceMoved > m_PlayerStepLength && !isAirborne) {
+        // Player moved a step's distance
+        // Create footstep sound
+        Events::PlaySoundOnEntity e;
+        EntityID child = m_World->CreateEntity(m_LocalPlayer.ID);
+        m_World->AttachComponent(child, "Transform");
+        m_World->AttachComponent(child, "SoundEmitter");
+        e.EmitterID = child;
+        e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
+        m_LeftFoot = !m_LeftFoot;
+        m_EventBroker->Publish(e);
+        m_DistanceMoved = 0.f;
+    }
+}
+
 bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player spawns, create an input controller for them
     m_PlayerInputControllers[e.Player] = new FirstPersonInputController<PlayerMovementSystem>(m_EventBroker, e.PlayerID);
-
+    if (e.PlayerID == -1) {
+        // Keep track of the local player
+        m_LocalPlayer = e.Player;
+    }
     return true;
 }

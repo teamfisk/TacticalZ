@@ -30,8 +30,6 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt) override;
     virtual void Update(double dt) override;
 private:
-    // The logic for making the sound play when player is moving
-    void playerStep(double dt);
     EntityWrapper m_LocalPlayer = EntityWrapper();
 
     World* m_World = nullptr;
