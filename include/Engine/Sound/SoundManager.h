@@ -49,7 +49,7 @@ class SoundManager
 {
 public:
     SoundManager() { }
-    SoundManager(World* world, EventBroker* eventBroker, bool editorMode);
+    SoundManager(World* world, EventBroker* eventBroker);
     ~SoundManager();
     // Update emitters / listener
     void Update(double dt); 
@@ -93,7 +93,6 @@ private:
 
     float m_BGMVolumeChannel = 1.0f;
     float m_SFXVolumeChannel = 1.0f;
-    bool m_EditorEnabled = false;
     EntityWrapper m_LocalPlayer = EntityWrapper();
 
     // Events

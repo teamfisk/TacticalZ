@@ -74,7 +74,7 @@ Game::Game(int argc, char* argv[])
     }
 
     // Create the sound manager
-    m_SoundManager = new SoundManager(m_World, m_EventBroker, true);
+    m_SoundManager = new SoundManager(m_World, m_EventBroker);
 
     // Create Octrees
     m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);

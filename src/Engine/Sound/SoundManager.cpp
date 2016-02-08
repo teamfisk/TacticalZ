@@ -1,11 +1,10 @@
 #include "Sound/SoundManager.h"
 
-SoundManager::SoundManager(World* world, EventBroker* eventBroker, bool editorMode)
+SoundManager::SoundManager(World* world, EventBroker* eventBroker)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_EventBroker = eventBroker;
     m_World = world;
-    m_EditorEnabled = editorMode;
     m_BGMVolumeChannel = config->Get<float>("Sound.BGMVolume", 1.f);
     m_SFXVolumeChannel = config->Get<float>("Sound.SFXVolume", 1.f);
 
@@ -103,9 +102,9 @@ void SoundManager::updateEmitters(double dt)
         if (!m_World->ValidEntity(it->first)) {
             return;
         }
-        if (!m_World->HasComponent(it->first, "SoundEmitter")) 
+        if (!m_World->HasComponent(it->first, "SoundEmitter"))
             return;
-        
+
         glm::vec3 previousPos;
         alGetSource3f(it->second->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
         // Get next pos
@@ -123,14 +122,11 @@ void SoundManager::updateEmitters(double dt)
         auto emitter = m_World->GetComponent(it->first, "SoundEmitter");
         setSoundProperties(it->second, &emitter);
 
-        // To make an emitter play when spawned in editor mode
-        if (m_EditorEnabled) {
-            // Path changed
-            if (it->second->SoundResource->Path() != (std::string)emitter["FilePath"]) {
-                it->second->SoundResource = ResourceManager::Load<Sound>((std::string)emitter["FilePath"]);
-                if (it->second->SoundResource->Buffer() != 0) {
-                    playSound(it->second);
-                }
+        // Path changed
+        if (it->second->SoundResource->Path() != (std::string)emitter["FilePath"]) {
+            it->second->SoundResource = ResourceManager::Load<Sound>((std::string)emitter["FilePath"]);
+            if (it->second->SoundResource->Buffer() != 0) {
+                playSound(it->second);
             }
         }
     }
@@ -145,8 +141,7 @@ void SoundManager::updateListener(double dt)
     }
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
         EntityWrapper listener(m_World, (*it).EntityID);
-        if (!listener.Valid())
-        {
+        if (!listener.Valid()) {
             break;
         }
         if (listener.IsChildOf(m_LocalPlayer) || listener == m_LocalPlayer) {
@@ -242,9 +237,8 @@ bool SoundManager::OnContinueSound(const Events::ContinueSound & e)
 bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
 {
     auto listenerComponents = m_World->GetComponents("Listener");
-    LOG_INFO("SIZZE:    %i", listenerComponents->size());
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
-        if((*it).EntityID != m_LocalPlayer.ID) {
+        if ((*it).EntityID != m_LocalPlayer.ID) {
             break;
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
