@@ -253,43 +253,33 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         //mesh.getPoint(vertexIndex, pos, MSpace::kPostTransform);
                         pos = positions[vertexIndex];
                         pos = pos * transformMatrix;
-                        if (abs(pos.x) > 0.0001)
-                            thisVertex.Pos[0] = pos.x;
-                        if (abs(pos.y) > 0.0001)
-                            thisVertex.Pos[1] = pos.y;
-                        if (abs(pos.z) > 0.0001)
-                            thisVertex.Pos[2] = pos.z;
+
+                        thisVertex.Pos[0] = pos.x;
+                        thisVertex.Pos[1] = pos.y;
+                        thisVertex.Pos[2] = pos.z;
 
                         status = faceVert.getNormal(normal, MSpace::kObject);
                         if (status != MS::kSuccess) {
                             MGlobal::displayError(MString() + "faceVert.getNormal() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
                             break;
                         }
-                        if (abs(normal[0]) > 0.0001)
-                            thisVertex.Normal[0] = normal[0];
-                        if (abs(normal[1]) > 0.0001)
-                            thisVertex.Normal[1] = normal[1];
-                        if (abs(normal[2]) > 0.0001)
-                            thisVertex.Normal[2] = normal[2];
+
+                        thisVertex.Normal[0] = normal[0];
+                        thisVertex.Normal[1] = normal[1];
+                        thisVertex.Normal[2] = normal[2];
 
                         MFloatVector Tangent = Tangents[faceVert.tangentId()];
                         //MVector tmp = faceVert.getTangent(MSpace::kObject, NULL);
                         //tmp.get(biTangent);
-                        if (abs(Tangent[0]) > 0.0001)
-                            thisVertex.Tangent[0] = Tangent[0];
-                        if (abs(Tangent[1]) > 0.0001)
-                            thisVertex.Tangent[1] = Tangent[1];
-                        if (abs(Tangent[2]) > 0.0001)
-                            thisVertex.Tangent[2] = Tangent[2];
+						thisVertex.Tangent[0] = Tangent[0];
+						thisVertex.Tangent[1] = Tangent[1];
+						thisVertex.Tangent[2] = Tangent[2];
 
                         MFloatVector biNormal = biNormals[faceVert.tangentId()];
                         //faceVert.getBinormal().get(biNormal);
-                        if (abs(biNormal[0]) > 0.0001)
-                            thisVertex.BiNormal[0] = biNormal[0];
-                        if (abs(biNormal[1]) > 0.0001)
-                            thisVertex.BiNormal[1] = biNormal[1];
-                        if (abs(biNormal[2]) > 0.0001)
-                            thisVertex.BiNormal[2] = biNormal[2];
+                        thisVertex.BiNormal[0] = biNormal[0];
+                        thisVertex.BiNormal[1] = biNormal[1];
+                        thisVertex.BiNormal[2] = biNormal[2];
 
                         status = faceVert.getUV(UV);
                         if (status != MS::kSuccess) {

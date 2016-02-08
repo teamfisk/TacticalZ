@@ -97,7 +97,7 @@
           <Intensity>0.80000001192092896</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.mesh</Resource>
+          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
         </c:Model>
         <c:RaptorCopter>
           <Speed>1</Speed>
@@ -126,7 +126,7 @@
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
-              <Resource>models/AssaultAnimated.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0.786919653" Y="0" Z="0"/>
@@ -142,7 +142,7 @@
               <Speed>1</Speed>
             </c:Animation>
             <c:Model>
-              <Resource>models/AssaultAnimated.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -200,7 +200,7 @@
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Model>
-                      <Resource>Models/AssaultAnimated.mesh</Resource>
+                      <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -224,7 +224,7 @@
         <Entity name="CombinedSpheres">
           <Components>
             <c:Model>
-              <Resource>models/NormSpecIncdMapSphere.mesh</Resource>
+              <Resource>Models/Test/NormSpecIncdMapSphere.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -308,7 +308,7 @@
             <Entity name="NormalSphere">
               <Components>
                 <c:Model>
-                  <Resource>Models/NormalMapSphere.mesh</Resource>
+                  <Resource>Models/Test/NormalMapSphere.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="1.82700014" Y="0" Z="-0.166000009"/>
@@ -319,7 +319,7 @@
             <Entity name="SpecularSphere">
               <Components>
                 <c:Model>
-                  <Resource>Models/SpecularMapSphere.mesh</Resource>
+                  <Resource>Models/Test/SpecularMapSphere.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-1.06487739" Y="0" Z="1.52336037"/>
@@ -361,7 +361,7 @@
             <Entity name="GlowMap">
               <Components>
                 <c:Model>
-                  <Resource>Models/IncandescenceMapSphere.mesh</Resource>
+                  <Resource>Models/Test/IncandescenceMapSphere.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-1.10000002" Y="0" Z="-1.80000007"/>
@@ -422,7 +422,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -435,7 +435,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -448,7 +448,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -461,7 +461,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -493,7 +493,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -506,7 +506,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -519,7 +519,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -532,7 +532,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -608,7 +608,7 @@
         <Entity name="Assault">
           <Components>
             <c:Model>
-              <Resource>Models/Assault.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
               <Color A="0.572549045" B="1" G="1" R="0"/>
               <Transparent>true</Transparent>
             </c:Model>
@@ -690,7 +690,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/AssaultWeaponBlue.mesh</Resource>
+                      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -737,7 +737,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/AssaultWeaponRed.mesh</Resource>
+                      <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -797,7 +797,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/SecondaryWeapon.mesh</Resource>
+                      <Resource>Models/Weapons/SecondaryWeapon.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -844,7 +844,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/AssualtSoft.mesh</Resource>
+                      <Resource>Models/Test/AssaultTPoseSoftEdge.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -890,7 +890,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/DefenderGunBlue.mesh</Resource>
+                      <Resource>Models/Weapons/Blue/DefenderGunBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -937,7 +937,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/DefenderGunRed.mesh</Resource>
+                      <Resource>Models/Weapons/Red/DefenderGunRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -984,7 +984,7 @@
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/Assualt.mesh</Resource>
+                      <Resource>Models/Test/AssaultTPoseHardEdge.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -1021,7 +1021,7 @@
         <Entity name="RedTeamHomeCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-30"/>
@@ -1073,7 +1073,7 @@
         <Entity name="RedMiddleCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-15"/>
@@ -1118,7 +1118,7 @@
         <Entity name="MiddleCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -1161,7 +1161,7 @@
         <Entity name="BlueMiddleCaapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="15"/>
@@ -1207,7 +1207,7 @@
         <Entity name="BlueTeamHomeCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="30"/>
@@ -1389,7 +1389,7 @@
                       <Randomness>true</Randomness>
                     </c:ExplosionEffect>
                     <c:Model>
-                      <Resource>Models/AssaultWeaponBlue.mesh</Resource>
+                      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                       <Transparent>true</Transparent>
                     </c:Model>
                     <c:Transform>
@@ -1442,7 +1442,7 @@
                       <TimeSinceDeath>1.1999860997035228</TimeSinceDeath>
                     </c:ExplosionEffect>
                     <c:Model>
-                      <Resource>Models/Assault.mesh</Resource>
+                      <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                       <Transparent>true</Transparent>
                     </c:Model>
                     <c:Transform>
@@ -1502,7 +1502,7 @@
                       <Randomness>true</Randomness>
                     </c:ExplosionEffect>
                     <c:Model>
-                      <Resource>Models/AssaultAnimated.mesh</Resource>
+                      <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
                       <Transparent>true</Transparent>
                     </c:Model>
                     <c:Transform>
