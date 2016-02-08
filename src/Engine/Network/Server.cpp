@@ -9,7 +9,6 @@ Server::Server()
 }
 Server::~Server()
 {
-
 }
 void Server::Start(World* world, EventBroker* eventBroker)
 {
@@ -154,15 +153,19 @@ void Server::checkForTimeOuts()
     int startPing = 1000 * m_StartPingTime
         / static_cast<double>(CLOCKS_PER_SEC);
 
+    std::vector<PlayerID> playersToRemove;
     for (auto& kv : m_ConnectedPlayers) {
         if (kv.second.Address != boost::asio::ip::address()) {
             int stopPing = 1000 * kv.second.StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
             if (startPing > stopPing + m_TimeoutMs) {
                 LOG_INFO("User %i timed out!", kv.second.Name);
-                disconnect(kv.first);
+                playersToRemove.push_back(kv.first);
             }
         }
+    }
+    for (size_t i = 0; i < playersToRemove.size(); i++) {
+        disconnect(playersToRemove.at(i));
     }
 }
 

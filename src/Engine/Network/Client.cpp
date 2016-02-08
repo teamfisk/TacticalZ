@@ -17,7 +17,8 @@ Client::Client(ConfigFile* config)
 }
 
 Client::~Client()
-{ }
+{ 
+}
 
 void Client::Start(World* world, EventBroker* eventBroker)
 {

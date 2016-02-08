@@ -5,7 +5,7 @@ using namespace boost::asio::ip;
 TCPClient::TCPClient(ConfigFile * config) : Client(config)
 {
     m_Endpoint = tcp::endpoint(boost::asio::ip::address::from_string(address), port);
-    m_Socket = boost::shared_ptr<tcp::socket>(new tcp::socket(m_IOService, m_Endpoint));
+    m_Socket = std::unique_ptr<tcp::socket>(new tcp::socket(m_IOService, m_Endpoint));
     tcp::no_delay option(true);
     m_Socket->set_option(option);
 }
@@ -15,10 +15,6 @@ TCPClient::~TCPClient()
 
 }
 
-void TCPClient::Start(World * world, EventBroker * eventBroker)
-{
-    Client::Start(world, eventBroker);
-}
 void TCPClient::connect()
 {
     if (!m_IsConnected) {
@@ -34,7 +30,7 @@ void TCPClient::connect()
         }
     }
 }
-// TODO FIX CRASH TCP CLIENT SEVER DISCONNECTS FIRST
+
 void TCPClient::readFromServer()
 {
     while (m_Socket->available()) {
@@ -50,14 +46,14 @@ int TCPClient::receive(char * data)
     // Read size of packet
     int bytesReceived = m_Socket->read_some(boost
         ::asio::buffer((void*)data, sizeof(int)),
-         error);
+        error);
     int sizeOfPacket = 0;
     memcpy(&sizeOfPacket, data, sizeof(int));
 
     // Read the rest of the message
     bytesReceived += m_Socket->read_some(boost
         ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
-         error);
+        error);
     // Network Debug data
     if (isReadingData) {
         m_NetworkData.TotalDataReceived += bytesReceived;
@@ -73,9 +69,10 @@ int TCPClient::receive(char * data)
 void TCPClient::send(Packet & packet)
 {
     packet.UpdateSize();
+    boost::system::error_code error;
     m_Socket->send(boost::asio::buffer(
         packet.Data(),
-        packet.Size()));
+        packet.Size()), 0, error);
     // Network Debug data
     if (isReadingData) {
         m_NetworkData.TotalDataSent += packet.Size();

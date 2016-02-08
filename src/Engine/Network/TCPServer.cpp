@@ -8,7 +8,6 @@ TCPServer::TCPServer()
 
 TCPServer::~TCPServer()
 {
-
 }
 
 void TCPServer::readFromClients()
@@ -135,7 +134,6 @@ void TCPServer::send(Packet & packet)
     }
 }
 
-//boost::shared_ptr<boost::asio::ip::tcp::socket> socket
 int TCPServer::receive(char * data, boost::asio::ip::tcp::socket& socket)
 {
     boost::system::error_code error;
