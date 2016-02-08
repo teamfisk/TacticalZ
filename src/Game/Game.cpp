@@ -8,6 +8,7 @@
 #include "Systems/PlayerMovementSystem.h"
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
+#include "Systems/PlayerDeathSystem.h"
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/WeaponSystem.h"
@@ -88,6 +89,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerDeathSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
