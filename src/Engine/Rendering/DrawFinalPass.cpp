@@ -2,8 +2,10 @@
 
 DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass)
 {
+    //TODO: Make sure that uniforms are not sent into shader if not needed.
     m_Renderer = renderer;
     m_LightCullingPass = lightCullingPass;
+    m_ShieldPixelRate = 8;
     InitializeTextures();
     InitializeShaderPrograms();
     InitializeFrameBuffers();
@@ -37,13 +39,18 @@ void DrawFinalPass::InitializeFrameBuffers()
     m_FinalPassFrameBuffer.Generate();
     GLERROR("FBO generation");
 
-    GenerateTexture(&m_SceneTextureLowRes, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/16, m_Renderer->GetViewportSize().Height/16), GL_RGB16F, GL_RGB, GL_FLOAT);
+    glGenRenderbuffers(1, &m_DepthBufferLowRes);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBufferLowRes);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate));
+    GLERROR("RenderBufferLowRes generation");
+
+    GenerateTexture(&m_SceneTextureLowRes, GL_CLAMP_TO_EDGE, GL_NEAREST, glm::vec2((int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate)), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    GenerateTexture(&m_BloomTextureLowRes, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/16, m_Renderer->GetViewportSize().Height/16), GL_RGB16F, GL_RGB, GL_FLOAT);
+    GenerateTexture(&m_BloomTextureLowRes, GL_CLAMP_TO_EDGE, GL_NEAREST, glm::vec2((int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate)), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
     //GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
 
-    m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+    m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBufferLowRes, GL_DEPTH_STENCIL_ATTACHMENT)));
     //m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
     m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTextureLowRes, GL_COLOR_ATTACHMENT0)));
     m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTextureLowRes, GL_COLOR_ATTACHMENT1)));
@@ -79,6 +86,12 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ShieldToStencilProgram->Link();
     GLERROR("Creating Shield program");
 
+    m_FillDepthBufferProgram = ResourceManager::Load<ShaderProgram>("#FillDepthBufferProgram");
+    m_FillDepthBufferProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/FillDepthBuffer.vert.glsl")));
+    m_FillDepthBufferProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/FillDepthBuffer.frag.glsl")));
+    m_FillDepthBufferProgram->Compile();
+    m_FillDepthBufferProgram->Link();
+    GLERROR("Creating DepthFill program");
 }
 
 void DrawFinalPass::Draw(RenderScene& scene)
@@ -122,36 +135,59 @@ void DrawFinalPass::Draw(RenderScene& scene)
 
     DrawFinalPassState* stateLowRes = new DrawFinalPassState(m_FinalPassFrameBufferLowRes.GetHandle());
     //Draw the lowres texture that will be shown behind the shield.
-    if (scene.ClearDepth) {
-        glClear(GL_DEPTH_BUFFER_BIT);
-    }
-    //TODO: Do we need check for this or will it be per scene always?
-    //glClearStencil(0x00);
-    //glClear(GL_STENCIL_BUFFER_BIT);
+    state->Enable(GL_SCISSOR_TEST);
+    state->Enable(GL_DEPTH_TEST);
+    //TODO: Viewports and scissor should be in state
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_ShieldPixelRate, m_Renderer->GetViewportSize().Height/m_ShieldPixelRate);
+    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 
-    //state->StencilMask(0x00);
-    //state->StencilFunc(GL_ALWAYS, 1, 0xFF);
-    state->Disable(GL_STENCIL_TEST);
-    state->Disable(GL_DEPTH_TEST);
+    glClearStencil(0x00);
+    glClear(GL_STENCIL_BUFFER_BIT);
+
+    //TODO: This should not be here...
+    state->StencilFunc(GL_ALWAYS, 1, 0xFF);
+    state->StencilMask(0x00);
+    DrawToDepthBuffer(scene.Jobs.OpaqueObjects, scene);
+    DrawToDepthBuffer(scene.Jobs.TransparentObjects, scene);
+
+    //Draw shields to stencil pass
+    state->StencilFunc(GL_ALWAYS, 1, 0xFF);
+    state->StencilMask(0xFF);
+    state->Enable(GL_DEPTH_TEST);
+    DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
+    GLERROR("StencilPass");
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    state->Enable(GL_DEPTH_TEST);
+    state->StencilFunc(GL_LEQUAL, 1, 0xFF);
+    state->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     delete stateLowRes;
 }
 
 
 void DrawFinalPass::ClearBuffer()
 {
+    m_FinalPassFrameBufferLowRes.Bind();
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_ShieldPixelRate, m_Renderer->GetViewportSize().Height/m_ShieldPixelRate);
+    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_SCISSOR_TEST);
+    m_FinalPassFrameBufferLowRes.Unbind();
+
     m_FinalPassFrameBuffer.Bind();
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_FinalPassFrameBuffer.Unbind();
-
-    m_FinalPassFrameBufferLowRes.Bind();
-    glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_FinalPassFrameBufferLowRes.Unbind();
 }
 
 void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
@@ -383,6 +419,39 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
             }
         }
     }
+}
+
+
+void DrawFinalPass::DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
+{
+    m_FillDepthBufferProgram->Bind();
+    GLuint shaderHandle = m_FillDepthBufferProgram->GetHandle();
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+
+    for (auto &job : jobs) {
+        auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+      
+        //bind uniforms
+        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+
+        if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
+
+            if (modelJob->Animation != nullptr) {
+                std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
+                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+            }
+        }
+
+        //draw
+        glBindVertexArray(modelJob->Model->VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+        glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex*sizeof(unsigned int)));
+        if (GLERROR("models end")) {
+            continue;
+        }
+    }
+
 }
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)

@@ -38,6 +38,7 @@ private:
     void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+    void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
 
     void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
@@ -57,6 +58,10 @@ private:
     GLuint m_BloomTextureLowRes;
     GLuint m_SceneTextureLowRes;
     GLuint m_DepthBuffer;
+    GLuint m_DepthBufferLowRes;
+
+    //maqke this component based i guess?
+    GLuint m_ShieldPixelRate = 16;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
@@ -64,6 +69,7 @@ private:
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;
     ShaderProgram* m_ShieldToStencilProgram;
+    ShaderProgram* m_FillDepthBufferProgram;
 };
 
 #endif 
