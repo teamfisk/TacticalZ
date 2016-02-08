@@ -22,5 +22,8 @@ public:
 private:
     EventRelay<PlayerDeathSystem, Events::PlayerDeath> m_OnPlayerDeath;
     bool OnPlayerDeath(Events::PlayerDeath& e);
+
+    void createDeathEffect(EntityWrapper player);
+
 };
 #endif
