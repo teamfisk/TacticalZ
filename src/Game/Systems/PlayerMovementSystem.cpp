@@ -41,8 +41,15 @@ void PlayerMovementSystem::Update(double dt)
 
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
-
+            //Assault Dash Check
+            if (player.HasComponent("DashAbility")) {
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"]);
+            }
             glm::vec3 wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
+            //this makes sure you can only dash in the 4 directions: forw,backw,left,right
+            if (controller->AssaultDashDoubleTapped() && controller->Movement().z != 0 && controller->Movement().x != 0) {
+                wishDirection = glm::vec3(controller->Movement().x, 0, 0)* glm::inverse(glm::quat(ori));
+            }
             float wishSpeed;
             if (controller->Crouching()) {
                 wishSpeed = playerCrouchSpeed;
@@ -71,7 +78,9 @@ void PlayerMovementSystem::Update(double dt)
                 static float surfaceFriction = 5.f;
                 ImGui::InputFloat("surfaceFriction", &surfaceFriction);
                 float accelerationSpeed = actualAccel * (float)dt * wishSpeed * surfaceFriction;
-                accelerationSpeed = glm::min(accelerationSpeed, addSpeed);
+                //if doubleTapped do Assault Dash - but only boost maximum 50.0f
+                float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
+                accelerationSpeed = glm::min(doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed), 50.0f);
                 //if player has Boost from an Assault class, accelerate the player faster
                 if (player.HasComponent("BoostAssault")) {
                     accelerationSpeed *= (double) player["BoostAssault"]["StrengthOfEffect"];
@@ -80,7 +89,8 @@ void PlayerMovementSystem::Update(double dt)
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
 
-            if (controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
+            //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
+            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
                 if (velocity.y == 0.f) {
                     controller->SetDoubleJumping(false);
                 } else {
@@ -104,6 +114,7 @@ void PlayerMovementSystem::Update(double dt)
                 ComponentWrapper cAnimation = playerModel["Animation"];
 
                 float movementLength = glm::length(groundVelocity);
+                //TODO: add assault dash animation here
                 if (glm::length(controller->Movement()) > 0.f) {
                     if (controller->Crouching()) {
                         cAnimation["Name"] = "Crouch Walk";

@@ -7,7 +7,8 @@
     </c:Lifetime>
     <c:Model>
       <Resource>Models/CylinderBullet.mesh</Resource>
-      <Color A="1" B="39.2156868" G="7.84313726" R="0"/>
+      <Color A="0.156862751" B="39.2156868" G="7.84313726" R="0"/>
+      <Transparent>true</Transparent>
     </c:Model>
     <c:Transform>
       <Scale X="0.0109999999" Y="0.0289999992" Z="100"/>
