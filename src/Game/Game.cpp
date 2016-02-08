@@ -16,6 +16,7 @@
 #include "Game/Systems/PlayerHUD.h"
 #include "Game/Systems/LifetimeSystem.h"
 #include "../Engine/Rendering/AnimationSystem.h"
+#include "../Engine/Core/UniformScaleSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -101,7 +102,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
     m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
-
+    m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);

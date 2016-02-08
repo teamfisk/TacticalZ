@@ -2,14 +2,17 @@
 
 Texture::Texture(std::string path)
 {
+
     PNG image(path);
 
     if (image.Width == 0 && image.Height == 0 || image.Format == Image::ImageFormat::Unknown) {
-        image = PNG("Textures/Core/ErrorTexture.png");
+        //image = PNG("Textures/Core/ErrorTexture.png");
+        return; // Temporary fix to remove crash
+        /*
         if (image.Width == 0 && image.Height == 0 || image.Format == Image::ImageFormat::Unknown) {
             LOG_ERROR("Couldn't even load the error texture. This is a dark day indeed.");
             return;
-        }
+        }*/
     }
 
     this->Width = image.Width;
