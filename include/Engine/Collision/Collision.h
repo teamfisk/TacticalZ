@@ -78,6 +78,8 @@ bool AABBVsAABB(const AABB& a, const AABB& b);
 //Also outputs the minimum translation that box [a] would need in order to resolve collision.
 bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation);
 
+//Attaches an AABB which contains all vertices in the entitys Model.
+bool AttachAABBComponentFromModel(EntityWrapper entity);
 // Calculates an absolute AABB from an entity AABB component
 boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity);
 
