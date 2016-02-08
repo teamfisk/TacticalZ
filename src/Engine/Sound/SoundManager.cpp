@@ -101,9 +101,17 @@ void SoundManager::updateEmitters(double dt)
         if (!m_World->ValidEntity(it->first)) {
             return;
         }
+        if (!m_World->HasComponent(it->first, "SoundEmitter")) 
+            return;
+        
         glm::vec3 previousPos;
         alGetSource3f(it->second->ALsource, AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z);
         // Get next pos
+        if (!m_World->HasComponent(it->first, "Transform"))
+            return;
+        if (!m_World->ValidEntity(m_World->GetParent(it->first))) {
+            return;
+        }
         glm::vec3 nextPos = Transform::AbsolutePosition(m_World, it->first);
         // Calculate velocity
         glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt;
@@ -135,6 +143,10 @@ void SoundManager::updateListener(double dt)
     }
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
         EntityWrapper listener(m_World, (*it).EntityID);
+        if (!listener.Valid())
+        {
+            break;
+        }
         if (listener.IsChildOf(m_LocalPlayer) || listener == m_LocalPlayer) {
             glm::vec3 previousPos;
             alGetListener3f(AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
@@ -228,7 +240,11 @@ bool SoundManager::OnContinueSound(const Events::ContinueSound & e)
 bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
 {
     auto listenerComponents = m_World->GetComponents("Listener");
+    LOG_INFO("SIZZE:    %i", listenerComponents->size());
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
+        if((*it).EntityID != m_LocalPlayer.ID) {
+            break;
+        }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
         (bool&)emitter["Loop"] = false;

@@ -3,7 +3,7 @@
 SoundSystem::SoundSystem(World* world, EventBroker* eventbroker)
     : System(world, eventbroker)
     , PureSystem("SoundEmitter")
-    , ImpureSystem()
+    //, ImpureSystem()
 {
     m_World = world;
     m_EventBroker = eventbroker;
@@ -12,7 +12,6 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventbroker)
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &SoundSystem::OnDashAbility);
     EVENT_SUBSCRIBE_MEMBER(m_EShoot, &SoundSystem::OnShoot);
-    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
@@ -31,10 +30,10 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
     if (e.PlayerID == -1) { // Local player
         m_World->AttachComponent(e.Player.ID, "Listener");
         m_LocalPlayer = e.Player;
-        Events::PlaySoundOnEntity event;
-        event.EmitterID = createChildEmitter(m_LocalPlayer);
-        event.FilePath = "Audio/announcer/go.wav";
-        m_EventBroker->Publish(event);
+        Events::PlaySoundOnEntity go;
+        go.EmitterID = createChildEmitter(m_LocalPlayer);
+        go.FilePath = "Audio/announcer/go.wav";
+        m_EventBroker->Publish(go);
         // TEMP: starts bgm
         {
             Events::PlayBackgroundMusic ev;
@@ -131,7 +130,7 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
     //if (e.PlayerID == m_LocalPlayer.ID) {
     Events::PlaySoundOnEntity ev;
     ev.EmitterID = createChildEmitter(m_LocalPlayer);
-    ev.FilePath = "Audio/die/die2.wav"; // should random between a bunch
+    ev.FilePath = "Audio/die/die2.wav"; 
     m_EventBroker->Publish(ev);
     //}
     return false;
