@@ -24,8 +24,7 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 }
 
 void SoundSystem::Update(double dt)
-{
-}
+{ }
 
 bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
@@ -129,23 +128,23 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 
 bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
-    if (e.PlayerID == m_LocalPlayer.ID) {
-        Events::PlaySoundOnEntity ev;
-        ev.EmitterID = createChildEmitter(m_LocalPlayer);
-        ev.FilePath = "Audio/die/die2.wav"; // should random between a bunch
-        m_EventBroker->Publish(ev);
-    }
+    //if (e.PlayerID == m_LocalPlayer.ID) {
+    Events::PlaySoundOnEntity ev;
+    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.FilePath = "Audio/die/die2.wav"; // should random between a bunch
+    m_EventBroker->Publish(ev);
+    //}
     return false;
 }
 
 bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
-    if (e.PlayerHealedID == m_LocalPlayer.ID) {
-        Events::PlaySoundOnEntity ev;
-        ev.EmitterID = createChildEmitter(m_LocalPlayer);
-        ev.FilePath = "Audio/pickup/pickup2.wav";
-        m_EventBroker->Publish(ev);
-    }
+    //if (e.PlayerHealedID == m_LocalPlayer.ID) {
+    Events::PlaySoundOnEntity ev;
+    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.FilePath = "Audio/pickup/pickup2.wav";
+    m_EventBroker->Publish(ev);
+    //}
     return false;
 }
 
