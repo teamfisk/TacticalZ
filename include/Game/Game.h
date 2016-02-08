@@ -30,7 +30,7 @@
 #include "Network/Client.h"
 
 // Sound
-//#include "Sound/SoundManager.h"
+#include "Sound/SoundManager.h"
 #include "Systems/SoundSystem.h"
 
 class Game

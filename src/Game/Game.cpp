@@ -71,6 +71,8 @@ Game::Game(int argc, char* argv[])
         fp.MergeEntities(m_World);
     }
 
+    // Create the sound manager
+    m_SoundManager = new SoundManager(m_World, m_EventBroker, true);
 
     // Create Octrees
     m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
@@ -123,6 +125,7 @@ Game::~Game()
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
     delete m_OctreeTrigger;
+    delete m_SoundManager;
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;
@@ -149,6 +152,8 @@ void Game::Tick()
     m_EventBroker->Swap();
     m_InputProxy->Process();
     m_EventBroker->Swap();
+
+    m_SoundManager->Update(dt);
 
     // Update network
     if (m_IsClientOrServer) {

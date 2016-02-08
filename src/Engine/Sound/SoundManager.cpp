@@ -20,16 +20,11 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker, bool editorMo
     EVENT_SUBSCRIBE_MEMBER(m_EContinueSound, &SoundManager::OnContinueSound);
     EVENT_SUBSCRIBE_MEMBER(m_ESetBGMGain, &SoundManager::OnSetBGMGain);
     EVENT_SUBSCRIBE_MEMBER(m_ESetSFXGain, &SoundManager::OnSetSFXGain);
-    EVENT_SUBSCRIBE_MEMBER(m_EShoot, &SoundManager::OnShoot);
-    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundManager::OnPlayerSpawned);
-    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundManager::OnPlayerDamage);
-    EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundManager::OnCaptured);
-    EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundManager::OnTriggerTouch);
     EVENT_SUBSCRIBE_MEMBER(m_EPause, &SoundManager::OnPause);
     EVENT_SUBSCRIBE_MEMBER(m_EResume, &SoundManager::OnResume);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentAttached, &SoundManager::OnComponentAttached);
-    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundManager::OnDoubleJump);
-    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &SoundManager::OnDashAbility);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundManager::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayQueueOnEntity, &SoundManager::OnPlayQueueOnEntity);
 }
 
 SoundManager::~SoundManager()
@@ -135,18 +130,21 @@ void SoundManager::updateListener(double dt)
 {
     // Should only be one listener.
     auto listenerComponents = m_World->GetComponents("Listener");
-    if (listenerComponents == nullptr) {
+    if (listenerComponents == nullptr || !m_LocalPlayer.Valid()) {
         return;
     }
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
-        EntityID listener = (*it).EntityID;
-        glm::vec3 previousPos;
-        alGetListener3f(AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
-        glm::vec3 nextPos = Transform::AbsolutePosition(m_World, listener); // Get next (current) pos
-        glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt; // Calculate velocity
-        setListenerPos(nextPos);
-        setListenerVel(velocity);
-        setListenerOri(glm::eulerAngles(Transform::AbsoluteOrientation(m_World, listener)));
+        EntityWrapper listener(m_World, (*it).EntityID);
+        if (listener.IsChildOf(m_LocalPlayer) || listener == m_LocalPlayer) {
+            glm::vec3 previousPos;
+            alGetListener3f(AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
+            glm::vec3 nextPos = Transform::AbsolutePosition(listener); // Get next (current) pos
+            glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt; // Calculate velocity
+            setListenerPos(nextPos);
+            setListenerVel(velocity);
+            setListenerOri(glm::eulerAngles(Transform::AbsoluteOrientation(listener)));
+            break;
+        }
     }
 }
 
@@ -179,21 +177,6 @@ void SoundManager::playQueue(QueuedBuffers qb)
 void SoundManager::stopSound(Source* source)
 {
     alSourceStop(source->ALsource);
-}
-
-
-
-void SoundManager::playerStep(double dt)
-{
-   
-}
-
-EntityID SoundManager::createChildEmitter(EntityWrapper localPlayer)
-{ 
-    EntityID child = m_World->CreateEntity(localPlayer.ID);
-    m_World->AttachComponent(child, "Transform");
-    m_World->AttachComponent(child, "SoundEmitter");
-    return child;
 }
 
 bool SoundManager::OnPlaySoundOnEntity(const Events::PlaySoundOnEntity & e)
@@ -272,103 +255,12 @@ bool SoundManager::OnSetSFXGain(const Events::SetSFXGain & e)
     return true;
 }
 
-bool SoundManager::OnShoot(const Events::Shoot & e)
-{
-    Source* source = createSource("Audio/laser/laser1.wav");
-    //auto emitterID = m_World->CreateEntity(e.Player.ID);
-    //m_World->AttachComponent(emitterID, "Transform");
-    //auto emitter = m_World->AttachComponent(emitterID, "SoundEmitter");
-    source->Type = SoundType::SFX;
-    m_Sources[createChildEmitter(m_LocalPlayer)] = source;
-    playSound(source);
-    return true;
-}
-
-bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned & e)
-{
-    if (e.PlayerID == -1) { // Local player
-        m_World->AttachComponent(e.Player.ID, "Listener");
-        m_LocalPlayer.ID = e.Player.ID;
-    }
-    return true;
-}
-
-
-bool SoundManager::OnCaptured(const Events::Captured & e)
-{
-    int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
-    int team = (int)m_World->GetComponent(m_LocalPlayer.ID, "Team")["Team"];
-    Events::PlaySoundOnEntity ev;
-    if (team == homeTeam) {
-        ev.FilePath = "Audio/announcer/objective_achieved.wav";
-    } else {
-        ev.FilePath = "Audio/announcer/objective_failed.wav"; // have not been tested
-    }
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
-    m_EventBroker->Publish(ev);
-    return false;
-}
-
-bool SoundManager::OnPlayerDamage(const Events::PlayerDamage & e)
-{
-    // Should check for only local players here...
-
-    std::uniform_int_distribution<int> dist(1, 12);
-    int rand = dist(generator);
-    Source* source = createSource("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
-    source->Type = SoundType::SFX;
-    m_Sources[createChildEmitter(m_LocalPlayer)] = source;
-
-    // Breathe
-    std::vector<ALuint> buffers;
-    buffers.push_back(source->SoundResource->Buffer());
-    int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
-    for (int i = 0; i < ammountOfbreaths; i++) {
-        buffers.push_back(ResourceManager::Load<Sound>("Audio/exhausted/breath.wav")->Buffer());
-    }
-    playQueue(QueuedBuffers(std::make_pair(source->ALsource, buffers)));
-
-    return false;
-}
-
-bool SoundManager::OnPlayerDeath(const Events::PlayerDeath & e)
-{
-    if (e.PlayerID == m_LocalPlayer.ID) {
-        Events::PlaySoundOnEntity ev;
-        ev.EmitterID = createChildEmitter(m_LocalPlayer);
-        ev.FilePath = "Audio/die/die2.wav"; // should random between a bunch
-        m_EventBroker->Publish(ev);
-    }
-    return false;
-}
-
-bool SoundManager::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
-{
-    if (e.PlayerHealedID == m_LocalPlayer.ID) {
-        Events::PlaySoundOnEntity ev;
-        ev.EmitterID = createChildEmitter(m_LocalPlayer);
-        ev.FilePath = "Audio/pickup/pickup2.wav";
-        m_EventBroker->Publish(ev);
-    }
-    return false;
-}
-
 bool SoundManager::OnComponentAttached(const Events::ComponentAttached & e)
 {
     if (e.Component.Info.Name == "SoundEmitter") {
         auto component = m_World->GetComponent(e.Entity.ID, "SoundEmitter");
         Source* source = createSource(component["FilePath"]);
         m_Sources[e.Entity.ID] = source;
-    }
-    return false;
-}
-
-bool SoundManager::OnTriggerTouch(const Events::TriggerTouch & e)
-{
-    if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
-        Events::PlayBackgroundMusic ev;
-        ev.FilePath = "Audio/bgm/drumstest.wav";
-        m_EventBroker->Publish(ev);
     }
     return false;
 }
@@ -389,22 +281,29 @@ bool SoundManager::OnResume(const Events::Resume &e)
     return false;
 }
 
-bool SoundManager::OnDoubleJump(const Events::DoubleJump & e)
+
+bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
-    ev.FilePath = "Audio/jump/jump2.wav";
-    m_EventBroker->Publish(ev);
+    if (e.PlayerID == -1) { // Local player
+        m_LocalPlayer = e.Player;
+        return true;
+    }
     return false;
 }
 
-bool SoundManager::OnDashAbility(const Events::DashAbility &e)
+
+bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
 {
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
-    ev.FilePath = "Audio/jump/dash1.wav";
-    m_EventBroker->Publish(ev);
-    return false;
+    Source* source = createSource(*e.FilePaths.begin());
+    std::vector<ALuint> buffers;
+    buffers.push_back(source->SoundResource->Buffer());
+    source->Type = SoundType::BGM;
+    std::vector<std::string>::const_iterator it;
+    for (it = e.FilePaths.begin() + 1; it != e.FilePaths.end(); it++) {
+        buffers.push_back(ResourceManager::Load<Sound>(*it)->Buffer());
+    }
+    playQueue(QueuedBuffers(source->ALsource, buffers));
+    return true;
 }
 
 ALenum SoundManager::getSourceState(ALuint source)
