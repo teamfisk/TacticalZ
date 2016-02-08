@@ -7,11 +7,11 @@
 namespace Events
 {
 
-struct PlayerHealthPickup : Event
-{
-    EntityWrapper Player;
-    double HealthAmount;
-};
+    struct PlayerHealthPickup : Event
+    {
+        EntityWrapper Player;
+        double HealthAmount;
+    };
 
 }
 
