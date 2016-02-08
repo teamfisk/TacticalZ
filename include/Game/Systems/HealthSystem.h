@@ -12,6 +12,7 @@
 
 #include <tuple>
 #include <vector>
+#include <algorithm>
 
 class HealthSystem : public PureSystem
 {

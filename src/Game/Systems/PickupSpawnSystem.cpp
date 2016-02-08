@@ -43,10 +43,16 @@ bool PickupSpawnSystem::OnTriggerTouch(Events::TriggerTouch& e)
     if (!e.Trigger.HasComponent("HealthPickup")) {
         return false;
     }
+    double healthGiven = 0.01*(double)e.Trigger["HealthPickup"]["HealthGain"] * (double)e.Entity["Health"]["MaxHealth"];
+    //cant pick up healthpacks if you are already at MaxHealth
+    if ((double)e.Entity["Health"]["Health"] >= (double)e.Entity["Health"]["MaxHealth"]) {
+        return false;
+    }
+
     //personEntered = e.Entity, thingEntered = e.Trigger
     Events::PlayerHealthPickup ePlayerHealthPickup;
-    ePlayerHealthPickup.HealthAmount = e.Trigger["HealthPickup"]["HealthGain"];
-    ePlayerHealthPickup.PlayerHealedID = e.Entity.ID;
+    ePlayerHealthPickup.HealthAmount = healthGiven;
+    ePlayerHealthPickup.Player = e.Entity;
     m_EventBroker->Publish(ePlayerHealthPickup);
 
     //copy position, healthgain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)

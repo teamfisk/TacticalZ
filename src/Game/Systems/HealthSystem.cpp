@@ -18,7 +18,7 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
     ComponentWrapper cHealth = e.Player["Health"];
     double& health = cHealth["Health"];
     health -= e.Damage;
-    
+
     if (health <= 0.0) {
         m_World->DeleteEntity(e.Player.ID);
     }
@@ -30,8 +30,8 @@ bool HealthSystem::OnPlayerHealthPickup(Events::PlayerHealthPickup& e)
 {
     ComponentWrapper cHealth = e.Player["Health"];
     double& health = cHealth["Health"];
-    //NOTE: its possible to get more than MaxHealth health
     health += e.HealthAmount;
+    health = std::min(health, (double)cHealth["MaxHealth"]);
 
     return true;
 }
