@@ -40,8 +40,8 @@ void RawModelCustom::ReadMeshFile(std::string filePath)
 void RawModelCustom::ReadMeshFileHeader(std::size_t& offset, char* fileData)
 {
 #ifdef BOOST_LITTLE_ENDIAN
-	hasSkin = true;//*(bool*)(fileData + offset);
-	//offset += sizeof(bool);
+	hasSkin = *(bool*)(fileData + offset);
+	offset += sizeof(bool);
 	if (hasSkin) {
 		m_SkinedVertices.resize(static_cast<std::size_t>(*(unsigned int*)(fileData + offset)));
 	}
@@ -290,7 +290,10 @@ void RawModelCustom::ReadAnimationFile(std::string filePath)
     if (!in.is_open()) {
         //throw Resource::FailedLoadingException("Open animation file failed");
         return;
-    }
+	} else if (hasSkin) {
+		throw Resource::FailedLoadingException("Open animation file for a skinned mesh failed, unknown stuff will happen");
+		return;
+	}
 
     unsigned int fileByteSize = static_cast<unsigned int>(in.tellg());
     in.seekg(0, std::ios_base::beg);

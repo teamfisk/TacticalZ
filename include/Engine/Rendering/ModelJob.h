@@ -28,20 +28,20 @@ struct ModelJob : RenderJob
 		switch(matProp.type){
 		case ::RawModel::MaterialType::Basic:
 			if (Model->isSkined()) {
-				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
+				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
 			}
 			else {
-				//JOHAN TODO: Add Non-skined shader
+				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
 			}
 			TextureID = 0;
 			break;
 		case ::RawModel::MaterialType::SingleTextures:
 			{
 				if (Model->isSkined()) {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
 				}
 				else {
-					//JOHAN TODO: Add Non-skined shader
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
 				}
 				::RawModel::MaterialSingleTextures* singleTextures = static_cast<::RawModel::MaterialSingleTextures*>(matProp.material);
 				TextureID = (singleTextures->ColorMap.Texture) ? singleTextures->ColorMap.Texture->ResourceID : 0;
@@ -65,10 +65,10 @@ struct ModelJob : RenderJob
 		case ::RawModel::MaterialType::SplatMapping:
 			{
 				if (Model->isSkined()) {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram")->ResourceID;
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapSkinnedProgram")->ResourceID;
 				}
 				else {
-					//JOHAN TODO: Add Non-skinned shader
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram")->ResourceID;
 				}
 				::RawModel::MaterialSplatMapping* SplatTextures = static_cast<::RawModel::MaterialSplatMapping*>(matProp.material);
 

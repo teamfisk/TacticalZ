@@ -62,7 +62,7 @@ public:
 
 class Mesh : public OutputData {
 public:
-	bool hasSkin = true; //Should be false by default... Have it true now since pipeline only support skinned vertecies
+	bool hasSkin = false;
     unsigned int NumVertices;
     unsigned int NumIndices;
     std::vector<VertexLayout> Vertices;
@@ -70,7 +70,7 @@ public:
 
     virtual void WriteBinary(std::ostream& out)
     {
-		//out.write((char*)&hasSkin, sizeof(bool));
+		out.write((char*)&hasSkin, sizeof(bool));
         out.write((char*)&NumVertices, sizeof(int));
         out.write((char*)&NumIndices, sizeof(int));
         for (auto aVertex : Vertices) {
