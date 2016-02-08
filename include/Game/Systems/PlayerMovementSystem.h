@@ -8,7 +8,7 @@
 class PlayerMovementSystem : public ImpureSystem, PureSystem
 {
 public:
-    PlayerMovementSystem(World* world, EventBroker* eventBroker);
+    PlayerMovementSystem(SystemParams params);
     ~PlayerMovementSystem();
 
     virtual void Update(double dt) override;

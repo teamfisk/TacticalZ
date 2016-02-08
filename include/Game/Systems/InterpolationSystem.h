@@ -26,7 +26,7 @@ class InterpolationSystem : public PureSystem
         float interpolationTime;
     };
 public:
-    InterpolationSystem(World* world, EventBroker* eventBroker);
+    InterpolationSystem(SystemParams params);
     ~InterpolationSystem() { }
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt) override;
 private:

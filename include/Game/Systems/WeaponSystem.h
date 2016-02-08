@@ -21,7 +21,7 @@
 class WeaponSystem : public ImpureSystem
 {
 public:
-    WeaponSystem(World* world, EventBroker* eventBroker, IRenderer* renderer);
+    WeaponSystem(SystemParams params, IRenderer* renderer);
 
     virtual void Update(double dt) override;
 

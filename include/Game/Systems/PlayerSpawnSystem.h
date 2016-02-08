@@ -9,7 +9,7 @@
 class PlayerSpawnSystem : public ImpureSystem
 {
 public:
-    PlayerSpawnSystem(World* world, EventBroker* eventBroker);
+    PlayerSpawnSystem(SystemParams params);
 
     virtual void Update(double dt) override;
 

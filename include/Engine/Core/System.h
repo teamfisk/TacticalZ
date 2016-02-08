@@ -6,20 +6,38 @@
 #include "EntityWrapper.h"
 #include "ComponentWrapper.h"
 
+struct SystemParams
+{
+    SystemParams(::World* World, ::EventBroker* EventBroker, bool IsClient, bool IsServer)
+        : World(World)
+        , EventBroker(EventBroker)
+        , IsClient(IsClient)
+        , IsServer(IsServer)
+    { }
+
+    ::World* World;
+    ::EventBroker* EventBroker;
+    bool IsClient = false;
+    bool IsServer = false;
+};
+
 class System
 {
     friend class SystemPipeline;
 
 protected:
-    System(World* world, EventBroker) { }
-    System(World* world, EventBroker* eventBroker)
-        : m_World(world)
-        , m_EventBroker(eventBroker)
+    System(SystemParams params)
+        : m_World(params.World)
+        , m_EventBroker(params.EventBroker)
+        , IsClient(params.IsClient)
+        , IsServer(params.IsServer)
     { }
     virtual ~System() = default;
 
     World* m_World;
     EventBroker* m_EventBroker;
+    bool IsClient = false;
+    bool IsServer = false;
 };
 
 class PureSystem : public virtual System

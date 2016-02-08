@@ -55,24 +55,13 @@ private:
     Octree<EntityAABB>* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
     RenderFrame* m_RenderFrame;
-    // Network variables
-    boost::thread m_NetworkThread;
+    Network* m_Network = nullptr;
 
-    // Network methods
-    void networkFunction();
-    Network* m_ClientOrServer;
-    bool m_IsClientOrServer = false;
+    bool m_IsClient = false;
+    bool m_IsServer = false;
 
     // Sound
     SoundSystem* m_SoundSystem;
-
-    //EventRelay<Game, Events::InputCommand> m_EInputCommand;
-    //bool debugOnInputCommand(const Events::InputCommand& e);
-
-    void debugInitialize();
-    void debugTick(double dt);
-	EventRelay<Client, Events::KeyDown> m_EKeyDown;
-
 };
 
 #endif

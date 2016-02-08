@@ -1,10 +1,9 @@
 #include "Rendering/RenderSystem.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(world, eventBroker)
+RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, RenderFrame* renderFrame) 
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
-    , m_World(world)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);

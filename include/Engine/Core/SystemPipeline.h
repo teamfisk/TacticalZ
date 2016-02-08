@@ -10,9 +10,11 @@
 class SystemPipeline
 {
 public:
-    SystemPipeline(World* world, EventBroker* eventBroker)
+    SystemPipeline(World* world, EventBroker* eventBroker, bool isClient, bool isServer)
         : m_World(world)
         , m_EventBroker(eventBroker)
+        , m_IsClient(isClient)
+        , m_IsServer(isServer)
     {
         EVENT_SUBSCRIBE_MEMBER(m_EPause, &SystemPipeline::OnPause);
         EVENT_SUBSCRIBE_MEMBER(m_EResume, &SystemPipeline::OnResume);
@@ -35,7 +37,7 @@ public:
             m_OrderedSystemGroups.resize(updateOrderLevel + 1);
         }
         UnorderedSystems& group = m_OrderedSystemGroups[updateOrderLevel];
-        System* system = new T(m_World, m_EventBroker, args...);
+        System* system = new T(SystemParams(m_World, m_EventBroker, m_IsClient, m_IsServer), args...);
         group.Systems[typeid(T).name()] = system;
 
         PureSystem* pureSystem = dynamic_cast<PureSystem*>(system);
@@ -88,6 +90,8 @@ public:
 private:
     World* m_World;
     EventBroker* m_EventBroker;
+    bool m_IsClient = false;
+    bool m_IsServer = false;
     bool m_Paused = false;
 
     struct UnorderedSystems

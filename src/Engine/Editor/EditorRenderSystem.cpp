@@ -1,7 +1,7 @@
 #include "Editor/EditorRenderSystem.h"
 
-EditorRenderSystem::EditorRenderSystem(World* m_World, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(m_World, eventBroker)
+EditorRenderSystem::EditorRenderSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {

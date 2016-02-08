@@ -4,8 +4,8 @@
 class RaptorCopterSystem : public PureSystem
 {
 public:
-    RaptorCopterSystem(World* world, EventBroker* eventBroker)
-        : System(world, eventBroker)
+    RaptorCopterSystem(SystemParams params)
+        : System(params)
         , PureSystem("RaptorCopter")
     { }
 

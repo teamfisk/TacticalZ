@@ -11,7 +11,7 @@
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/WeaponSystem.h"
-#include "Game/Systems/PlayerHUD.h"
+#include "Game/Systems/PlayerHUDSystem.h"
 #include "Game/Systems/LifetimeSystem.h"
 #include "../Engine/Rendering/AnimationSystem.h"
 
@@ -71,13 +71,25 @@ Game::Game(int argc, char* argv[])
         fp.MergeEntities(m_World);
     }
 
+    // Initialize network
+    if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
+        bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
+        if (isServer) {
+            m_Network = new Server();
+            m_IsServer = true;
+        } else {
+            m_Network = new Client(m_Config);
+            m_IsClient = true;
+        }
+        m_Network->Start(m_World, m_EventBroker);
+    }
 
     // Create Octrees
     m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     m_OctreeTrigger = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     m_OctreeFrustrumCulling = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker, m_IsClient, m_IsServer);
 
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
@@ -95,7 +107,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
-    m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
 
     // Collision and TriggerSystem should update after player.
@@ -106,12 +118,6 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
-
-    // Invoke network
-    if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
-        //boost::thread workerThread(&Game::networkFunction, this);
-        networkFunction();
-    }
 
     // Invoke sound system
     m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
@@ -126,6 +132,9 @@ Game::~Game()
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
     delete m_OctreeTrigger;
+    if (m_Network != nullptr) {
+        delete m_Network;
+    }
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;
@@ -154,39 +163,17 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     // Update network
-    if (m_IsClientOrServer) {
-        m_ClientOrServer->Update();
+    if (m_Network != nullptr) {
+        m_Network->Update();
     }
+
     // Iterate through systems and update world!
     m_EventBroker->Process<SystemPipeline>();
     m_SystemPipeline->Update(dt);
-    debugTick(dt);
     m_Renderer->Update(dt);
     m_SoundSystem->Update(dt);
-    GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
     m_RenderFrame->Clear();
-    GLERROR("Game::Tick m_Renderer->Draw");
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-}
-
-void Game::debugTick(double dt)
-{
-    m_EventBroker->Process<Game>();
-}
-
-void Game::networkFunction()
-{
-    bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
-    if (!isServer) {
-        m_IsClientOrServer = true;
-        m_ClientOrServer = new Client(m_Config);
-    }
-    if (isServer) {
-        m_IsClientOrServer = true;
-        m_ClientOrServer = new Server();
-    }
-    m_ClientOrServer->Start(m_World, m_EventBroker);
-
 }

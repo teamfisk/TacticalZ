@@ -4,8 +4,8 @@
 class ExplosionEffectSystem : public PureSystem
 {
 public:
-    ExplosionEffectSystem(World* world, EventBroker* eventBroker)
-        : System(world, eventBroker)
+    ExplosionEffectSystem(SystemParams params)
+        : System(params)
         , PureSystem("ExplosionEffect")
     { }
 

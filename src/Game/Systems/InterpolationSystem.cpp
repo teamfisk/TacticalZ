@@ -1,7 +1,7 @@
 #include "Systems/InterpolationSystem.h"
 
-InterpolationSystem::InterpolationSystem(World* world, EventBroker* eventBroker) 
-    : System(world, eventBroker)
+InterpolationSystem::InterpolationSystem(SystemParams params) 
+    : System(params)
     , PureSystem("Transform")
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");

@@ -9,8 +9,8 @@
 class CollidableOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    CollidableOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree, const std::string& componentType)
-        : System(world, eventBroker)
+    CollidableOctreeSystem(SystemParams params, Octree<EntityAABB>* octree, const std::string& componentType)
+        : System(params)
         , PureSystem(componentType)
         , m_Octree(octree)
     { }

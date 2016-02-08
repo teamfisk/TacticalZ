@@ -1,7 +1,7 @@
 #include "Systems/PlayerSpawnSystem.h"
 
-PlayerSpawnSystem::PlayerSpawnSystem(World* m_World, EventBroker* eventBroker) 
-    : System(m_World, eventBroker)
+PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params) 
+    : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerSpawnerd, &PlayerSpawnSystem::OnPlayerSpawned);

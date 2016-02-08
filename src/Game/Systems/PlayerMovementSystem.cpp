@@ -1,7 +1,7 @@
 #include "Systems/PlayerMovementSystem.h"
 
-PlayerMovementSystem::PlayerMovementSystem(World* world, EventBroker* eventBroker)
-    : System(world, eventBroker)
+PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
+    : System(params)
     , PureSystem("Player")
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);

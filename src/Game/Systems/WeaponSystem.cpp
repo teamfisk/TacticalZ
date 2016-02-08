@@ -1,7 +1,7 @@
 #include "Systems/WeaponSystem.h"
 
-WeaponSystem::WeaponSystem(World* world, EventBroker* eventBroker, IRenderer* renderer)
-    : System(world, eventBroker)
+WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer)
+    : System(params)
     , ImpureSystem()
     , m_Renderer(renderer)
 {
