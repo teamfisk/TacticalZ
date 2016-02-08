@@ -23,7 +23,7 @@ struct ExplosionEffectJob : ModelJob
         ExplosionDuration = (double)explosionEffectComponent["ExplosionDuration"];
         EndColor = (glm::vec4)explosionEffectComponent["EndColor"];
         Randomness = (bool)explosionEffectComponent["Randomness"];
-        RandomnessScalar = (double)explosionEffectComponent["RandomnessScalar"];
+        RandomnessScalar = (float)((double)explosionEffectComponent["RandomnessScalar"]);
         Velocity = (glm::vec2)explosionEffectComponent["Velocity"];
         ColorByDistance = (bool)explosionEffectComponent["ColorByDistance"];
         ExponentialAccelaration = (bool)explosionEffectComponent["ExponentialAccelaration"];

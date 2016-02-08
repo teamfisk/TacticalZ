@@ -22,9 +22,9 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
-    m_Camera->SetFOV((double)cCamera["FOV"]);
-    m_Camera->SetNearClip((double)cCamera["NearClip"]);
-    m_Camera->SetFarClip((double)cCamera["FarClip"]);
+    m_Camera->SetFOV((float)cCamera["FOV"]);
+    m_Camera->SetNearClip((float)cCamera["NearClip"]);
+    m_Camera->SetFarClip((float)cCamera["FarClip"]);
     m_Camera->SetPosition(cTransform["Position"]);
     m_Camera->SetOrientation(glm::quat((const glm::vec3&)cTransform["Orientation"]));
     m_CurrentCamera = e.CameraEntity;

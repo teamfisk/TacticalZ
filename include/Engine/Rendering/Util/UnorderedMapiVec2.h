@@ -11,7 +11,7 @@ struct std::hash<glm::ivec2>
 {
     inline std::size_t operator()(const glm::ivec2 &v) const
     {
-        return boost::hash<float>()(v.x) ^ boost::hash<float>()(v.y);
+        return boost::hash<int>()(v.x) ^ boost::hash<int>()(v.y);
     }
 
     inline bool operator()(const glm::ivec2& a, const glm::ivec2& b)const

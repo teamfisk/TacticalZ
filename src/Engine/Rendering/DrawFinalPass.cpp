@@ -90,7 +90,7 @@ void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum fil
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, (GLsizei)dimensions.x, (GLsizei)dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("Texture initialization failed");
 }
 
@@ -98,8 +98,8 @@ void DrawFinalPass::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm:
 {
     glGenTextures(1, texture);
     glBindTexture(GL_TEXTURE_2D, *texture);
-    glTexStorage2D(GL_TEXTURE_2D, numMipMaps, GL_RGBA8, dimensions.x, dimensions.y);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dimensions.x, dimensions.y, format, type, texture);
+    glTexStorage2D(GL_TEXTURE_2D, numMipMaps, GL_RGBA8, (GLsizei)dimensions.x, (GLsizei)dimensions.y);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)dimensions.x, (GLsizei)dimensions.y, format, type, texture);
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
@@ -131,7 +131,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 
                 if (explosionEffectJob->Animation != nullptr) {
                     std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(*explosionEffectJob->Animation, explosionEffectJob->AnimationTime);
-                    glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                    glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), (GLsizei)frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
             }
 
@@ -147,7 +147,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             if (modelJob) {
                 //bind forward program
                 m_ForwardPlusProgram->Bind();
-                glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+                glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), (GLfloat)m_Renderer->GetViewportSize().Width, (GLfloat)m_Renderer->GetViewportSize().Height);
 
                 //bind uniforms
                 BindModelUniforms(forwardHandle, modelJob, scene);
@@ -159,7 +159,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 
                     if (modelJob->Animation != nullptr) {
                         std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
-                        glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                        glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), (GLsizei)frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                     }
                 }
 
@@ -178,13 +178,13 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 {
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), (GLfloat)m_Renderer->Resolution().Width, (GLfloat)m_Renderer->Resolution().Height);
 
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(job->Matrix));
     glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(job->Color));
     glUniform3fv(glGetUniformLocation(shaderHandle, "ExplosionOrigin"), 1, glm::value_ptr(job->ExplosionOrigin));
-    glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), job->TimeSinceDeath);
-    glUniform1f(glGetUniformLocation(shaderHandle, "ExplosionDuration"), job->ExplosionDuration);
+    glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), (GLfloat)job->TimeSinceDeath);
+    glUniform1f(glGetUniformLocation(shaderHandle, "ExplosionDuration"), (GLfloat)job->ExplosionDuration);
     glUniform4fv(glGetUniformLocation(shaderHandle, "EndColor"), 1, glm::value_ptr(job->EndColor));
     glUniform1i(glGetUniformLocation(shaderHandle, "Randomness"), job->Randomness);
     glUniform1f(glGetUniformLocation(shaderHandle, "RandomnessScalar"), job->RandomnessScalar);
@@ -199,7 +199,7 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 {
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), (GLfloat)m_Renderer->Resolution().Width, (GLfloat)m_Renderer->Resolution().Height);
 
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(job->Matrix));
     glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(job->Color));

@@ -92,7 +92,7 @@ void PickingPass::Draw(RenderScene& scene)
 
                 if (modelJob->Animation != nullptr) {
                     std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
-                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), (GLsizei)frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
             }
 
@@ -138,7 +138,7 @@ void PickingPass::Draw(RenderScene& scene)
 
                 if (modelJob->Animation != nullptr) {
                     std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
-                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), (GLsizei)frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
             }
 
@@ -208,6 +208,6 @@ void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filte
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, (GLsizei)dimensions.x, (GLsizei)dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("Texture initialization failed");
 }

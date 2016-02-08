@@ -81,7 +81,7 @@ void DrawBloomPass::Draw(GLuint texture)
         , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].StartIndex);
 
     //Iterate some times to make it more gaussian.
-    for (int i = 1; i < m_iterations; i++) {
+    for (int i = 1; i < (int)m_iterations; i++) {
         //Vertical pass
         m_GaussianFrameBuffer_vert.Bind();
         m_GaussianProgram_vert->Bind();
@@ -129,6 +129,6 @@ void DrawBloomPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum fil
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, (GLsizei)dimensions.x, (GLsizei)dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("Texture initialization failed");
 }

@@ -18,9 +18,9 @@ struct PointLightJob : RenderJob
         Position = glm::vec4((glm::vec3)transformComponent["Position"], 1.0f);
         Position = glm::vec4(Transform::AbsolutePosition(m_World, transformComponent.EntityID), 1.f);
         Color = (glm::vec4)pointLightComponent["Color"];
-        Radius = (double)pointLightComponent["Radius"];
-        Intensity = (double)pointLightComponent["Intensity"];
-        Falloff = (double)pointLightComponent["Falloff"];
+        Radius = (float)((double)pointLightComponent["Radius"]);
+        Intensity = (float)pointLightComponent["Intensity"];
+        Falloff = (float)pointLightComponent["Falloff"];
     };
 
     glm::vec4 Position;
