@@ -39,17 +39,7 @@ private:
     void playerJumps();
     // Helper function
     EntityID createChildEmitter(EntityWrapper parent);
-
-    // Walking logic
-    // Keeps track of how far the player has walked within this "key press session".
-    float m_DistanceMoved = 0.0f;
-    // How far a step is (How often the step sound will be played).
-    const float m_PlayerStepLength = 1.75f;
-    // To get a difference when calculating the walking state.
-    glm::vec3 m_LastPosition = glm::vec3();
-    // Determine what sound file to play.
-    bool m_LeftFoot = false;
-
+    
     std::default_random_engine generator;
 
     EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;

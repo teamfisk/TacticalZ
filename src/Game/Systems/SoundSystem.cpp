@@ -18,9 +18,7 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventbroker)
 }
 
 void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt)
-{
-
-}
+{ }
 
 void SoundSystem::Update(double dt)
 { }
@@ -50,13 +48,6 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
         if (e.PlayerID == -1) { // local player
             playerJumps();
             return true;
-        }
-    }
-    if (e.Command == "Forward" || e.Command == "Right") {
-        if (e.Value == 0) {
-            // Key released
-            // Reset the distance moved (player walk logic)
-            m_DistanceMoved = 0.f;
         }
     }
     if (e.Command == "TakeDamage" && e.Value > 0) {
