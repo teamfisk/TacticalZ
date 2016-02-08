@@ -106,6 +106,9 @@ void DrawFinalPass::Draw(RenderScene& scene)
     glClearStencil(0x00);
     glClear(GL_STENCIL_BUFFER_BIT);
 
+    //Fill depth buffer
+
+
     state->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
@@ -135,8 +138,8 @@ void DrawFinalPass::Draw(RenderScene& scene)
 
     DrawFinalPassState* stateLowRes = new DrawFinalPassState(m_FinalPassFrameBufferLowRes.GetHandle());
     //Draw the lowres texture that will be shown behind the shield.
-    state->Enable(GL_SCISSOR_TEST);
-    state->Enable(GL_DEPTH_TEST);
+    stateLowRes->Enable(GL_SCISSOR_TEST);
+    stateLowRes->Enable(GL_DEPTH_TEST);
     //TODO: Viewports and scissor should be in state
     glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_ShieldPixelRate, m_Renderer->GetViewportSize().Height/m_ShieldPixelRate);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
@@ -145,23 +148,23 @@ void DrawFinalPass::Draw(RenderScene& scene)
     glClear(GL_STENCIL_BUFFER_BIT);
 
     //TODO: This should not be here...
-    state->StencilFunc(GL_ALWAYS, 1, 0xFF);
-    state->StencilMask(0x00);
+    stateLowRes->StencilFunc(GL_ALWAYS, 1, 0xFF);
+    stateLowRes->StencilMask(0x00);
     DrawToDepthBuffer(scene.Jobs.OpaqueObjects, scene);
     DrawToDepthBuffer(scene.Jobs.TransparentObjects, scene);
 
     //Draw shields to stencil pass
-    state->StencilFunc(GL_ALWAYS, 1, 0xFF);
-    state->StencilMask(0xFF);
-    state->Enable(GL_DEPTH_TEST);
+    stateLowRes->StencilFunc(GL_ALWAYS, 1, 0xFF);
+    stateLowRes->StencilMask(0xFF);
+    stateLowRes->Enable(GL_DEPTH_TEST);
     DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
     GLERROR("StencilPass");
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    state->Enable(GL_DEPTH_TEST);
-    state->StencilFunc(GL_LEQUAL, 1, 0xFF);
-    state->StencilMask(0x00);
+    stateLowRes->Enable(GL_DEPTH_TEST);
+    stateLowRes->StencilFunc(GL_LEQUAL, 1, 0xFF);
+    stateLowRes->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
