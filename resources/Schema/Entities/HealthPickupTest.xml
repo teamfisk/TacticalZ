@@ -8,10 +8,6 @@
   <Children>
     <Entity name="Scenemesh">
       <Components>
-        <c:AABB>
-          <Size X="150" Y="64" Z="180"/>
-        </c:AABB>
-        <c:Collidable/>
         <c:Model>
           <Resource>Models\MapVersion1.mesh</Resource>
         </c:Model>
@@ -143,7 +139,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="57.7363472" Y="2.38900018" Z="79.5"/>
+          <Position X="57.7363472" Y="1.18853188" Z="79.5"/>
         </c:Transform>
       </Components>
       <Children>
@@ -205,7 +201,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="-60.2567062" Y="3.4000001" Z="-78.1000061"/>
+          <Position X="-60.2567062" Y="1.60000002" Z="-78.1000061"/>
         </c:Transform>
       </Components>
       <Children>
@@ -241,6 +237,57 @@
           <Children/>
         </Entity>
       </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:HealthPickup>
+          <RespawnTimer>1</RespawnTimer>
+          <HealthGain>22</HealthGain>
+        </c:HealthPickup>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="60" Y="1" Z="80"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:HealthPickup>
+          <RespawnTimer>1</RespawnTimer>
+          <HealthGain>22</HealthGain>
+        </c:HealthPickup>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="60" Y="1" Z="80"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:HealthPickup>
+          <RespawnTimer>4</RespawnTimer>
+          <HealthGain>44</HealthGain>
+        </c:HealthPickup>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="60" Y="1" Z="80"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
     </Entity>
   </Children>
 

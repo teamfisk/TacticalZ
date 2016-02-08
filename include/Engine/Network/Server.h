@@ -36,14 +36,14 @@ private:
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
     // HACK: Fix INPUTSIZE
     char readBuffer[INPUTSIZE] = { 0 };
-    int bytesRead = 0;
+    size_t bytesRead = 0;
     // time for previouse message
     std::clock_t previousePingMessage = std::clock();
     std::clock_t previousSnapshotMessage = std::clock();
     std::clock_t timOutTimer = std::clock();
     // How often we send messages (milliseconds)
-    int pingIntervalMs;
-    int snapshotInterval;
+    float pingIntervalMs;
+    float snapshotInterval;
     int checkTimeOutInterval = 100;
     int m_NextPlayerID = 0;
 
@@ -59,7 +59,7 @@ private:
     PacketID m_PreviousPacketID = 0;
 
     // Private member functions
-    int  receive(char* data);
+    size_t receive(char* data);
     void readFromClients();
     void send(PlayerID player, Packet& packet);
     void send(Packet& packet);

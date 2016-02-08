@@ -2,16 +2,16 @@
 #define EPlayerHealthPickup_h__
 
 #include "EventBroker.h"
-#include "../Core/Entity.h"
+#include "../Core/EntityWrapper.h"
 
 namespace Events
 {
 
-struct PlayerHealthPickup : Event
-{
-    double HealthAmount;
-    EntityID PlayerHealedID;
-};
+    struct PlayerHealthPickup : Event
+    {
+        EntityWrapper Player;
+        double HealthAmount;
+    };
 
 }
 
