@@ -2,12 +2,14 @@
 
 SoundManager::SoundManager(World* world, EventBroker* eventBroker, bool editorMode)
 {
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_EventBroker = eventBroker;
     m_World = world;
     m_EditorEnabled = editorMode;
+    m_BGMVolumeChannel = config->Get<float>("Sound.BGMVolume", 1.f);
+    m_SFXVolumeChannel = config->Get<float>("Sound.SFXVolume", 1.f);
 
     initOpenAL();
-
     alSpeedOfSound(340.29f);
     alDistanceModel(AL_LINEAR_DISTANCE);
     alDopplerFactor(1);

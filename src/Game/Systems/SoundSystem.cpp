@@ -5,6 +5,8 @@ SoundSystem::SoundSystem(World* world, EventBroker* eventbroker)
     , PureSystem("SoundEmitter")
     //, ImpureSystem()
 {
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_Announcer = ResourceManager::Load<ConfigFile>("Config.ini")->Get<std::string>("Sound.Announcer", "female");
     m_World = world;
     m_EventBroker = eventbroker;
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
@@ -30,7 +32,7 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
         m_LocalPlayer = e.Player;
         Events::PlaySoundOnEntity go;
         go.EmitterID = createChildEmitter(m_LocalPlayer);
-        go.FilePath = "Audio/announcer/go.wav";
+        go.FilePath = "Audio/announcer/" + m_Announcer + "/go.wav";
         m_EventBroker->Publish(go);
         // TEMP: starts bgm
         {
@@ -86,9 +88,9 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     int team = (int)m_World->GetComponent(m_LocalPlayer.ID, "Team")["Team"];
     Events::PlaySoundOnEntity ev;
     if (team == homeTeam) {
-        ev.FilePath = "Audio/announcer/objective_achieved.wav";
+        ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_achieved.wav";
     } else {
-        ev.FilePath = "Audio/announcer/objective_failed.wav"; // have not been tested
+        ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_failed.wav"; // have not been tested
     }
     ev.EmitterID = createChildEmitter(m_LocalPlayer);
     m_EventBroker->Publish(ev);

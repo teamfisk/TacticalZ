@@ -5,6 +5,7 @@
 
 #include "../Engine/Core/System.h"
 #include "../Engine/Core/ResourceManager.h"
+#include "../Engine/Core/ConfigFile.h"
 #include "../Engine/Sound/Sound.h"
 #include "../Engine/Sound/EPlayQueueOnEntity.h"
 #include "../Engine/Core/EPlayerSpawned.h"
@@ -34,6 +35,7 @@ private:
 
     World* m_World = nullptr;
     EventBroker* m_EventBroker = nullptr;
+    std::string m_Announcer = "";
 
     // Logic for playing a sound when a player jumps
     void playerJumps();

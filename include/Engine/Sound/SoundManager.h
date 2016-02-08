@@ -13,6 +13,8 @@
 
 #include "Core/World.h"
 #include "Core/EventBroker.h"
+#include "../Engine/Core/ResourceManager.h"
+#include "../Engine/Core/ConfigFile.h"
 #include "Core/Transform.h" // Absolute transform
 #include "Sound/Sound.h"
 #include "../Engine/Sound/EPlayQueueOnEntity.h"
