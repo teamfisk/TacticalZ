@@ -275,9 +275,4 @@ std::vector<int> Child::childIndicesContainingBox(const AABB& box) const
     }
 }
 
-bool Child::hasChildren() const
-{
-    return m_Children[0] != nullptr;
-}
-
 }
