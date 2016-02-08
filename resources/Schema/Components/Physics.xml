@@ -2,4 +2,6 @@
 <Physics xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Physics.xsd">
 	<Velocity X="0" Y="0" Z="0"/>
 	<Gravity>true</Gravity>
+	<IsOnGround>false</IsOnGround>
+	<VerticalStepHeight>0.33</VerticalStepHeight>
 </Physics>
