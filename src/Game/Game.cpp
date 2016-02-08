@@ -12,6 +12,7 @@
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
+#include "Game/Systems/DamageIndicatorSystem.h"
 #include "Game/Systems/WeaponSystem.h"
 #include "Game/Systems/PlayerHUD.h"
 #include "Game/Systems/LifetimeSystem.h"
@@ -96,6 +97,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");

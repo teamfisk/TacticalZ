@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Sprite>
+      <DiffuseTexture>Textures/DefenderGunRedDiff.png</DiffuseTexture>
+      <GlowMap>Textures/DefenderGunRedIncd.png</GlowMap>
+      <Color A="1" B="0.721568644" G="1" R="0.839215696"/>
+    </c:Sprite>
+    <c:Model>
+      <Resource>Models/Core/UnitQuad.mesh</Resource>
+    </c:Model>
+    <c:Transform>
+      <Position X="0" Y="0" Z="-0.472000033"/>
+      <Scale X="0.100000001" Y="0.200000003" Z="0.5"/>
+    </c:Transform>
+    <c:Lifetime>
+      <Lifetime>1.5</Lifetime>
+    </c:Lifetime>
+  </Components>
+
+  <Children/>
+
+</Entity>

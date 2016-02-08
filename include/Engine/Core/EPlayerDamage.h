@@ -11,6 +11,7 @@ struct PlayerDamage : Event
 {
     //NOTE: this struct is missing information on what the damageSource is
     EntityWrapper Player;
+    EntityWrapper PlayerShooter;
     double Damage;
 };
 
