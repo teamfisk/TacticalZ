@@ -2,6 +2,7 @@
 
 WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer)
     : System(params)
+    , PureSystem("Player")
     , ImpureSystem()
     , m_Renderer(renderer)
 {
@@ -14,8 +15,23 @@ void WeaponSystem::Update(double dt)
 
 }
 
+void WeaponSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt)
+{
+
+}
+
 bool WeaponSystem::OnInputCommand(Events::InputCommand& e)
 {
+    // Make sure player is alive
+    if (!e.Player.Valid()) {
+        return false;
+    }
+
+    // Weapon selection
+    if (e.Command == "SelectWeapon") {
+        selectWeapon(e.Player, static_cast<ComponentInfo::EnumType>(e.Value));
+    }
+
     // Only shoot client-side!
     if (!IsClient) {
         return false;
@@ -39,7 +55,29 @@ bool WeaponSystem::OnInputCommand(Events::InputCommand& e)
     return true;
 }
 
-bool WeaponSystem::OnShoot(Events::Shoot& eShoot) 
+void WeaponSystem::selectWeapon(EntityWrapper player, ComponentInfo::EnumType slot)
+{
+    // Primary
+    if (slot == 1) {
+        // TODO: if class...
+        m_ActiveWeapons[player] = std::make_shared<AssaultWeaponBehaviour>();
+    }
+
+    // Secondary
+    if (slot == 2) {
+        //m_ActiveWeapons[player] = std::make_shared<PistolWeaponBehaviour>();
+    }
+}
+
+bool WeaponSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
+{
+    // Select primary weapon on player spawn
+    // TODO: Select the active one specified by player component
+    selectWeapon(e.Player, 1);
+    return true;
+}
+
+bool WeaponSystem::OnShoot(Events::Shoot& eShoot)
 {
     if (!eShoot.Player.Valid()) {
         return false;

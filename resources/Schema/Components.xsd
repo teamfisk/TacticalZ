@@ -31,4 +31,5 @@
 	<xs:include schemaLocation="Components/Lifetime.xsd"/>
 	<xs:include schemaLocation="Components/HiddenForLocalPlayer.xsd"/>
 	<xs:include schemaLocation="Components/DashAbility.xsd"/>
+	<xs:include schemaLocation="Components/AssaultWeapon.xsd"/>
 </xs:schema>
