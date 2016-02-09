@@ -204,10 +204,12 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
 						//bind textures
 						BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
-						if (explosionEffectJob->Animation != nullptr) {
-							std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(*explosionEffectJob->Animation, explosionEffectJob->AnimationTime);
-							glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-						}
+                        std::vector<glm::mat4> frameBones;
+                        if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+                            frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+                        } else {
+                            frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+                        }
 					}
 					else {
 						m_ExplosionEffectProgram->Bind();
@@ -229,10 +231,12 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						//bind textures
 						BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
 						GLERROR("asdasd");
-						if (explosionEffectJob->Animation != nullptr) {
-							std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(*explosionEffectJob->Animation, explosionEffectJob->AnimationTime);
-							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-						}
+                        std::vector<glm::mat4> frameBones;
+                        if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+                            frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+                        } else {
+                            frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+                        }
 					}
 					else {
 						m_ExplosionEffectSplatMapProgram->Bind();
@@ -271,10 +275,12 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 							BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
 							//bind textures
 							BindModelTextures(forwardSkinnedHandle, modelJob);
-							if (modelJob->Animation != nullptr) {
-								std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
-								glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-							}
+                            std::vector<glm::mat4> frameBones;
+                            if (modelJob->AnimationOffset.animation != nullptr) {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                            } else {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                            }
 						} else {
 							m_ForwardPlusProgram->Bind();
 							GLERROR("Bind ForwardPlusProgram");
@@ -295,10 +301,12 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 							//bind textures
 							BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
 							GLERROR("asdasd");
-							if (modelJob->Animation != nullptr) {
-								std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(*modelJob->Animation, modelJob->AnimationTime);
-								glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-							}
+                            std::vector<glm::mat4> frameBones;
+                            if (modelJob->AnimationOffset.animation != nullptr) {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                            } else {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                            }
 						} else {
 							m_ForwardPlusSplatMapProgram->Bind();
 							GLERROR("Bind SplatMap program");
