@@ -16,6 +16,7 @@
 #include "Rendering/ESetCamera.h"
 
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 class DamageIndicatorSystem : public ImpureSystem
 {
