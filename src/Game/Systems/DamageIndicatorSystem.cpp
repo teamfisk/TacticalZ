@@ -44,7 +44,7 @@ bool DamageIndicatorSystem::OnPlayerDamageTaken(Events::PlayerDamage& e)
     }
 
     //load & set the "2d" sprite
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/SpriteTestTemporary.xml");
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
     EntityFileParser parser(entityFile);
     EntityID spriteID = parser.MergeEntities(m_World);
     m_World->SetParent(spriteID, m_CurrentCamera);
