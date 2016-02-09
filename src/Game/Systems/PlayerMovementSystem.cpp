@@ -2,7 +2,6 @@
 
 PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
     : System(params)
-    , PureSystem("Player")
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
 }
@@ -15,6 +14,12 @@ PlayerMovementSystem::~PlayerMovementSystem()
 }
 
 void PlayerMovementSystem::Update(double dt)
+{
+    updateMovementControllers(dt);
+    updateVelocity(dt);
+}
+
+void PlayerMovementSystem::updateMovementControllers(double dt)
 {
     for (auto& kv : m_PlayerInputControllers) {
         EntityWrapper player = kv.first;
@@ -135,14 +140,16 @@ void PlayerMovementSystem::Update(double dt)
     }
 }
 
-void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
+
+void PlayerMovementSystem::updateVelocity(double dt)
 {
-    ComponentWrapper& cTransform = entity["Transform"];
-    if (!entity.HasComponent("Physics")) {
+    // Only apply velocity to local player
+    if (!LocalPlayer.Valid()) {
         return;
     }
 
-    ComponentWrapper& cPhysics = entity["Physics"];
+    ComponentWrapper& cTransform = LocalPlayer["Transform"];
+    ComponentWrapper& cPhysics = LocalPlayer["Physics"];
     glm::vec3& velocity = cPhysics["Velocity"];
 
     // Ground friction
@@ -159,6 +166,7 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         velocity.z *= multiplier;
     }
 
+    // Gravity
     if (cPhysics["Gravity"]) {
         velocity.y -= 9.82f * (float)dt;
     }
@@ -171,6 +179,5 @@ bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player spawns, create an input controller for them
     m_PlayerInputControllers[e.Player] = new FirstPersonInputController<PlayerMovementSystem>(m_EventBroker, e.PlayerID);
-
     return true;
 }
