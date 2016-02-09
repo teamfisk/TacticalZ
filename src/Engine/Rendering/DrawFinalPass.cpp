@@ -127,13 +127,12 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             //Bind uniforms
             BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
 
-            if (explosionEffectJob->Model->m_RawModel->m_Skeleton != nullptr) {
+            if (explosionEffectJob->Skeleton != nullptr) {
+                std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+                glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
-                if (explosionEffectJob->Animation != nullptr) {
-                    std::vector<glm::mat4> frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animation, explosionEffectJob->AnimationTime);
-                    glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-                }
             }
+
 
             //bind textures
             BindExplosionTextures(explosionEffectJob);
@@ -154,8 +153,13 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                 //bind textures
                 BindModelTextures(modelJob);
 
-                if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-                    std::vector<glm::mat4> frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animation, modelJob->AnimationTime);
+                if (modelJob->Skeleton != nullptr) {
+                    std::vector<glm::mat4> frameBones;
+                    if(modelJob->AnimationOffset.animation != nullptr) {
+                        frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                    } else {
+                        frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                    }
                     glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
 

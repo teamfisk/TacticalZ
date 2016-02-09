@@ -21,7 +21,7 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
 
 
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
-    const Skeleton::Animation* animation = skeleton->GetAnimation(parent["Animation"]["AnimationName"]);
+    const Skeleton::Animation* animation = skeleton->GetAnimation(parent["Animation"]["AnimationName1"]);
 
     if (!animation) {
         return;
@@ -34,9 +34,7 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     }
 
 
-    glm::mat4 boneTransform = skeleton->GetBoneTransform(skeleton->Bones[id], animation, (double)parent["Animation"]["Time"], glm::mat4(1));
-
-
+    glm::mat4 boneTransform = skeleton->GetBoneTransform(skeleton->Bones[id], animation, (double)parent["Animation"]["Time1"], glm::mat4(1));
 
     glm::vec3 scale;
     glm::quat rotation;
