@@ -568,10 +568,10 @@ bool AABBvsTriangles(const AABB& box,
 boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
 {
     AABB modelSpaceBox;
-    /*if (entity.HasComponent("AABB")) {
+    if (entity.HasComponent("AABB")) {
         ComponentWrapper& cAABB = entity["AABB"];
         modelSpaceBox = EntityAABB::FromOriginSize((glm::vec3)cAABB["Origin"], (glm::vec3)cAABB["Size"]);
-    } else */if (entity.HasComponent("Model")) {
+    } else if (entity.HasComponent("Model")) {
         Model* model;
         std::string res = entity["Model"]["Resource"];
         if (res.empty()) {
@@ -584,7 +584,6 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
         } catch (const std::exception&) {
             return boost::none;
         }
-        entity.AttachComponent("AABB");
         modelSpaceBox = model->Box();
     } else {
         return boost::none;
@@ -610,8 +609,6 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
     aabb = AABB(mini, maxi);
 
     aabb.Entity = entity;
-    (glm::vec3&)entity["AABB"]["Origin"] = aabb.Origin();
-    (glm::vec3&)entity["AABB"]["Size"] = aabb.Size();
     return aabb;
 }
 
