@@ -61,6 +61,9 @@ public:
             dt = 0.0;
         }
 
+        // Process utility events for the System base class
+        m_EventBroker->Process<System>();
+
         for (UnorderedSystems& group : m_OrderedSystemGroups) {
             // Process events
             for (auto& pair : group.Systems) {

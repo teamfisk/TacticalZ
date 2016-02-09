@@ -5,6 +5,7 @@
 #include "World.h"
 #include "EntityWrapper.h"
 #include "ComponentWrapper.h"
+#include "EPlayerSpawned.h"
 
 struct SystemParams
 {
@@ -31,13 +32,28 @@ protected:
         , m_EventBroker(params.EventBroker)
         , IsClient(params.IsClient)
         , IsServer(params.IsServer)
-    { }
+    {
+        if (IsClient) {
+            EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &System::OnPlayerSpawned);
+        }
+    }
     virtual ~System() = default;
 
     World* m_World;
     EventBroker* m_EventBroker;
     bool IsClient = false;
     bool IsServer = false;
+    EntityWrapper LocalPlayer = EntityWrapper::Invalid;
+
+private:
+    EventRelay<System, Events::PlayerSpawned> m_EPlayerSpawned;
+    bool OnPlayerSpawned(Events::PlayerSpawned& e)
+    {
+        if (e.PlayerID == -1) {
+            LocalPlayer = e.Player;
+        }
+        return true;
+    }
 };
 
 class PureSystem : public virtual System
