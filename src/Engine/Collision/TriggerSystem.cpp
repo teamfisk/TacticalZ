@@ -6,6 +6,10 @@
 void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapper& cTrigger, double dt)
 {
     // The trigger *should* have a bounding box, or something, to test against so it can be triggered.
+    // If it doesn't, add one as big as the model for now, then size can be modified in editor if necessary.
+    if (!triggerEntity.HasComponent("AABB")) {
+        Collision::AttachAABBComponentFromModel(triggerEntity);
+    }
     boost::optional<EntityAABB> triggerBox = Collision::EntityAbsoluteAABB(triggerEntity);
     if (!triggerBox) {
         return;

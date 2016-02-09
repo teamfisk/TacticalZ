@@ -564,33 +564,29 @@ bool AABBvsTriangles(const AABB& box,
     return hit;
 }
 
-bool attachAABBComponentFromModel(World* world, EntityID id)
+bool AttachAABBComponentFromModel(EntityWrapper entity)
 {
-    if (!world->HasComponent(id, "Model")) {
+    if (!entity.HasComponent("Model")) {
         return false;
     }
-    ComponentWrapper model = world->GetComponent(id, "Model");
-    ComponentWrapper collision = world->AttachComponent(id, "AABB");
-    Model* modelRes = ResourceManager::Load<Model>(model["Resource"]);
-    if (modelRes == nullptr) {
+    //Derive AABB from model
+    RawModel* model;
+    try {
+        model = ResourceManager::Load<RawModel, true>(entity["Model"]["Resource"]);
+    } catch (const std::exception&) {
         return false;
     }
 
-    glm::mat4 modelMatrix = modelRes->Matrix();
-
-    glm::vec3 mini = glm::vec3(INFINITY, INFINITY, INFINITY);
-    glm::vec3 maxi = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
-    for (const auto& v : modelRes->Vertices()) {
-        const auto& wPos = modelMatrix * glm::vec4(v.Position.x, v.Position.y, v.Position.z, 1);
-        maxi.x = std::max(wPos.x, maxi.x);
-        maxi.y = std::max(wPos.y, maxi.y);
-        maxi.z = std::max(wPos.z, maxi.z);
-        mini.x = std::min(wPos.x, mini.x);
-        mini.y = std::min(wPos.y, mini.y);
-        mini.z = std::min(wPos.z, mini.z);
+    glm::vec3 mini(INFINITY);
+    glm::vec3 maxi(-INFINITY);
+    for (const auto& v : model->m_Vertices) {
+        mini = glm::min(mini, v.Position);
+        maxi = glm::max(maxi, v.Position);
     }
-    collision["Origin"] = 0.5f * (maxi + mini);
-    collision["Size"] = maxi - mini;
+
+    entity.AttachComponent("AABB");
+    entity["AABB"]["Origin"] = 0.5f * (maxi + mini);
+    entity["AABB"]["Size"] = maxi - mini;
     return true;
 }
 

@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "Collision/CollidableOctreeSystem.h"
+#include "Collision/FillOctreeSystem.h"
 #include "Collision/EntityAABB.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
@@ -98,8 +98,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
-    m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
+    m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
+    m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
     m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling, "Model");
     m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);

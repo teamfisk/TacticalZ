@@ -6,12 +6,12 @@
 #include "Collision.h"
 #include "EntityAABB.h"
 
-class CollidableOctreeSystem : public ImpureSystem, public PureSystem
+class FillOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    CollidableOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree, const std::string& componentType)
+    FillOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree, const std::string& fillComponentType)
         : System(world, eventBroker)
-        , PureSystem(componentType)
+        , PureSystem(fillComponentType)
         , m_Octree(octree)
     { }
 
