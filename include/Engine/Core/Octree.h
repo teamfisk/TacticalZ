@@ -2,7 +2,6 @@
 #define Octree_h__
 
 #include <type_traits>
-#include <bitset>
 
 #include "../Common.h"
 #include "AABB.h"

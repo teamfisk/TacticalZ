@@ -75,6 +75,7 @@ Game::Game(int argc, char* argv[])
 
 
     // Create Octrees
+    // TODO: Perhaps the world bounds should be set in some non-arbitrary way instead of this.
     AABB boxContainingTheWorld(glm::vec3(-300), glm::vec3(300));
     m_OctreeCollision = new Octree<EntityAABB>(boxContainingTheWorld, 4);
     m_OctreeTrigger = new Octree<EntityAABB>(boxContainingTheWorld, 4);
