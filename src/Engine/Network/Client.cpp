@@ -17,8 +17,7 @@ Client::Client(ConfigFile* config)
 }
 
 Client::~Client()
-{ 
-}
+{ }
 
 void Client::Start(World* world, EventBroker* eventBroker)
 {
@@ -35,17 +34,23 @@ void Client::Start(World* world, EventBroker* eventBroker)
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    readFromServer();
+    while (m_UDPClient.IsSocketAvailable()) {
+        // Packet will get real data in receive
+        Packet packet(MessageType::Invalid);
+        m_UDPClient.Receive(packet);
+        parseMessageType(packet);
+    }
+
     if (m_IsConnected) {
         hasServerTimedOut();
-        // Don't sent 1 input in 1 packet, bunch em up.
+        // Don't send 1 input in 1 packet, bunch em up.
         if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
             sendInputCommands();
             m_TimeSinceSentInputs = std::clock();
         }
         sendLocalPlayerTransform();
     }
-    Network::Update();
+    //Network::Update();
 }
 
 void Client::parseMessageType(Packet& packet)
@@ -59,7 +64,7 @@ void Client::parseMessageType(Packet& packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    identifyPacketLoss();
+    //identifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
     case MessageType::Connect:
@@ -118,7 +123,7 @@ void Client::parsePing()
 
     Packet packet(MessageType::Ping, m_SendPacketID);
     packet.WriteString("Ping recieved");
-    send(packet);
+    m_UDPClient.Send(packet);
 }
 
 void Client::parseKick()
@@ -250,14 +255,14 @@ void Client::disconnect()
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
-    send(packet);
+    m_UDPClient.Send(packet);
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            connect();
+            m_UDPClient.Connect(m_PlayerName, address, port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -280,7 +285,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
             m_SaveDataTimer = std::clock();
         }
     } else {
-        if (m_IsConnected) { 
+        if (m_IsConnected) {
             m_InputCommandBuffer.push_back(e);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -294,7 +299,7 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
     packet.WritePrimitive(e.Damage);
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Player.ID));
-    send(packet);
+    m_UDPClient.Send(packet);
     return false;
 }
 
@@ -322,7 +327,7 @@ void Client::sendLocalPlayerTransform()
     packet.WritePrimitive(orientation.x);
     packet.WritePrimitive(orientation.y);
     packet.WritePrimitive(orientation.z);
-    send(packet);
+    m_UDPClient.Send(packet);
 }
 
 void Client::identifyPacketLoss()
@@ -365,7 +370,7 @@ void Client::sendInputCommands()
             packet.WriteString(m_InputCommandBuffer[i].Command);
             packet.WritePrimitive(m_InputCommandBuffer[i].Value);
         }
-        send(packet);
+        m_UDPClient.Send(packet);
         m_InputCommandBuffer.clear();
     }
 }
@@ -373,7 +378,7 @@ void Client::sendInputCommands()
 void Client::becomePlayer()
 {
     Packet packet = Packet(MessageType::BecomePlayer, m_SendPacketID);
-    send(packet);
+    m_UDPClient.Send(packet);
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

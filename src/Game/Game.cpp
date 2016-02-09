@@ -43,7 +43,7 @@ Game::Game(int argc, char* argv[])
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-    ));
+        ));
     m_Renderer->Initialize();
     //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
     m_RenderFrame = new RenderFrame();
@@ -155,7 +155,11 @@ void Game::Tick()
 
     // Update network
     if (m_IsClientOrServer) {
-        m_ClientOrServer->Update();
+        if (m_IsServer)
+            m_ClientOrServer->Update();
+        else if (!m_IsServer) {
+            m_Client->Update();
+        }
     }
     // Iterate through systems and update world!
     m_EventBroker->Process<SystemPipeline>();
@@ -178,19 +182,25 @@ void Game::debugTick(double dt)
 
 void Game::networkFunction()
 {
-    bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
-    if (!isServer) {
+    m_IsServer = m_Config->Get<bool>("Networking.IsServer", false);
+    if (!m_IsServer) {
         m_IsClientOrServer = true;
-        m_ClientOrServer = new UDPClient(m_Config);
-        //m_ClientOrServer = new TCPClient(m_Config);
-        //m_ClientOrServer = new HybridClient(m_Config);
+        m_Client = std::unique_ptr<Client>(new Client(m_Config));
+        m_Client->Start(m_World, m_EventBroker);
     }
-    if (isServer) {
+    //if (!isServer) {
+    //    m_IsClientOrServer = true;
+    //    m_ClientOrServer = new UDPClient(m_Config);
+    //    //m_ClientOrServer = new TCPClient(m_Config);
+    //    //m_ClientOrServer = new HybridClient(m_Config);
+    //}
+    if (m_IsServer) {
         m_IsClientOrServer = true;
-        m_ClientOrServer = new UDPServer();
-       // m_ClientOrServer = new TCPServer();
+        // m_ClientOrServer = new UDPServer();
+        m_ClientOrServer = new TCPServer();
         //m_ClientOrServer = new HybridServer();
+        m_ClientOrServer->Start(m_World, m_EventBroker);
     }
-    m_ClientOrServer->Start(m_World, m_EventBroker);
+
 
 }

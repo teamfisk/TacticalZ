@@ -8,8 +8,7 @@ Server::Server()
     pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
 }
 Server::~Server()
-{
-}
+{ }
 void Server::Start(World* world, EventBroker* eventBroker)
 {
     m_World = world;
@@ -25,11 +24,27 @@ void Server::Start(World* world, EventBroker* eventBroker)
 void Server::Update()
 {
     readFromClients();
+
+    std::clock_t currentTime = std::clock();
+    // Send snapshot
+    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+        sendSnapshot();
+        previousSnapshotMessage = currentTime;
+    }
+    // Send pings each 
+    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+        sendPing();
+        previousePingMessage = currentTime;
+    }
+    // Time out logic
+    if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
+        checkForTimeOuts();
+        timOutTimer = currentTime;
+    }
     m_EventBroker->Process<Server>();
     if (isReadingData) {
         Network::Update();
     }
-
 }
 
 void Server::parseMessageType(Packet& packet)

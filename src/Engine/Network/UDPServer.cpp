@@ -6,8 +6,7 @@ UDPServer::UDPServer()
 }
 
 UDPServer::~UDPServer()
-{ 
-}
+{ }
 
 void UDPServer::readFromClients()
 {
@@ -21,24 +20,6 @@ void UDPServer::readFromClients()
         } catch (const std::exception& err) {
             //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
         }
-    }
-    std::clock_t currentTime = std::clock();
-    // Send snapshot
-    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-        sendSnapshot();
-        previousSnapshotMessage = currentTime;
-    }
-
-    // Send pings each 
-    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
-        sendPing();
-        previousePingMessage = currentTime;
-    }
-
-    // Time out logic
-    if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
-        checkForTimeOuts();
-        timOutTimer = currentTime;
     }
 }
 

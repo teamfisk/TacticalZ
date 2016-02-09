@@ -26,6 +26,8 @@
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"
+// Client
+#include "Network/Client.h"
 // Hybrid
 #include "Network/HybridServer.h"
 #include "Network/HybridClient.h"
@@ -68,7 +70,9 @@ private:
     // Network methods
     void networkFunction();
     Network* m_ClientOrServer;
+    std::unique_ptr<Client> m_Client;
     bool m_IsClientOrServer = false;
+    bool m_IsServer = false;
 
     // Sound
     SoundSystem* m_SoundSystem;

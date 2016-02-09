@@ -2,65 +2,69 @@
 
 using namespace boost::asio::ip;
 
-UDPClient::UDPClient(ConfigFile * config) : Client(config), m_Socket(m_IOService)
-{
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
-    m_Socket.connect(m_ReceiverEndpoint);
+UDPClient::UDPClient()
+{ 
 }
 
 UDPClient::~UDPClient()
-{
+{ 
 }
 
-void UDPClient::readFromServer()
+void UDPClient::Connect(std::string playerName, std::string address, int port)
 {
-    while (m_Socket.available()) {
-        bytesRead = receive(readBuffer);
-        if (bytesRead > 0) {
-            Packet packet(readBuffer, bytesRead);
-            parseMessageType(packet);
-        }
+    if (m_Socket) {
+        return;
+    }
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
+    m_Socket = boost::shared_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService));
+    m_Socket->connect(m_ReceiverEndpoint);
+
+    Packet packet(MessageType::Connect, m_SendPacketID);
+    packet.WriteString(playerName);
+    Send(packet);
+}
+
+void UDPClient::Disconnect()
+{
+
+}
+
+void UDPClient::Receive(Packet& packet)
+{
+    int bytesRead = readBuffer(m_ReadBuffer);
+    if (bytesRead > 0) { 
+        packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
 }
 
-int UDPClient::receive(char* data)
+int UDPClient::readBuffer(char* data)
 {
+    if (!m_Socket) {
+        return 0;
+    }
     boost::system::error_code error;
-
-    int bytesReceived = m_Socket.receive_from(boost
+    int bytesReceived = m_Socket->receive_from(boost
         ::asio::buffer((void*)data, BUFFERSIZE),
         m_ReceiverEndpoint,
         0, error);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataReceived += bytesReceived;
-        m_NetworkData.DataReceivedThisInterval += bytesReceived;
-        m_NetworkData.AmountOfMessagesReceived++;
-    }
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
     return bytesReceived;
 }
 
-void UDPClient::send(Packet& packet)
+void UDPClient::Send(Packet& packet)
 {
-    m_Socket.send_to(boost::asio::buffer(
+    m_Socket->send_to(boost::asio::buffer(
         packet.Data(),
         packet.Size()),
         m_ReceiverEndpoint, 0);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataSent += packet.Size();
-        m_NetworkData.DataSentThisInterval += packet.Size();
-        m_NetworkData.AmountOfMessagesSent++;
-    }
 }
 
-void UDPClient::connect()
+bool UDPClient::IsSocketAvailable()
 {
-    Packet packet(MessageType::Connect, m_SendPacketID);
-    packet.WriteString(m_PlayerName);
-    m_StartPingTime = std::clock();
-    send(packet);
+    if (!m_Socket) { 
+        return false;
+    }
+    return m_Socket->available();
 }

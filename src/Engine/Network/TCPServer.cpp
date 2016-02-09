@@ -7,8 +7,7 @@ TCPServer::TCPServer()
 }
 
 TCPServer::~TCPServer()
-{
-}
+{ }
 
 void TCPServer::readFromClients()
 {
@@ -29,25 +28,6 @@ void TCPServer::readFromClients()
                 //LOG_ERROR("%i: Read from client crashed %s", m_PacketID, err.what());
             }
         }
-    }
-
-    std::clock_t currentTime = std::clock();
-    // Send snapshot
-    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
-        sendSnapshot();
-        previousSnapshotMessage = currentTime;
-    }
-
-    // Send pings each 
-    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
-        sendPing();
-        previousePingMessage = currentTime;
-    }
-
-    // Time out logic
-    if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
-        checkForTimeOuts();
-        timOutTimer = currentTime;
     }
 }
 
@@ -80,7 +60,7 @@ void TCPServer::parseConnect(Packet & packet)
     LOG_INFO("Parsing connections");
     // Check if player is already connected
     PlayerID playerID = GetPlayerIDFromEndpoint();
-    if(playerID = -1){
+    if (playerID = -1) {
         return;
     }
 

@@ -30,6 +30,8 @@ protected:
     std::clock_t m_SaveDataTimer;
     unsigned int m_MaxConnections;
     unsigned int m_TimeoutMs;
+    void logSentData(int bytesSent);
+    void logReceivedData(int bytesReceived);
     void saveToFile();
     void updateNetworkData();
     void initialize();

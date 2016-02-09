@@ -13,6 +13,8 @@
 #include "Network/Network.h"
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
+#include "Network/UDPClient.h"
+#include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"
@@ -35,7 +37,6 @@ protected:
     int port = 0;
     // Sending message to server logic
     int bytesRead = -1;
-    char readBuffer[BUFFERSIZE] = { 0 };
 
     // Packet loss logic
     PacketID m_PacketID = 0;
@@ -66,9 +67,6 @@ protected:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    virtual void send(Packet& packet) = 0;
-    virtual void readFromServer() = 0;
-    virtual void connect() = 0;
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
@@ -103,6 +101,11 @@ protected:
     bool OnPlayerDamage(const Events::PlayerDamage& e);
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
+
+private:
+    //UDPClient m_UDPClient;
+    //TCPClient m_TCPClient;
+    TCPClient m_UDPClient;
 };
 
 #endif
