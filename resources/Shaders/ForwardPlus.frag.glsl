@@ -114,27 +114,10 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
-//float CalcShadowValue(vec4 positionLightSpace, vec4 normal, vec4 lightDir, sampler2D depthTexture)
-//{
-//    // perform perspective divide
-//    //vec3 projCoords = positionLightSpace.xyz / positionLightSpace.w;
-//    // Transform to [0,1] range
-//    //projCoords = projCoords * 0.5 + 0.5;
-//    // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-//    float closestDepth = texture(depthTexture, positionLightSpace.xy).r; 
-//    // Get depth of current fragment from light's perspective
-//    float currentDepth = positionLightSpace.z;
-//    // Check whether current frag pos is in shadow
-//    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
-//
-//    return shadow;
-//	
-//} 
-
 float CalcShadowValue(vec4 positionLightSpace, vec4 normal, vec4 lightDir, sampler2D depthTexture)
 {
 	
-	//float bias = max(0.05 * (1.0 - dot(normal, -lightDir)), 0.005); 
+	float bias = max(0.05 * (1.0 - dot(normal, -lightDir)), 0.005); 
     // perform perspective divide
     vec3 projCoords = positionLightSpace.xyz / positionLightSpace.w;
     // Transform to [0,1] range
@@ -188,7 +171,7 @@ void main()
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
-			shadowFactor = CalcShadowValue(Input.PositionLightSpace, normal, light.Direction, DepthMap);
+			shadowFactor = CalcShadowValue(Input.PositionLightSpace, vec4(Input.Normal, 0.0), light.Direction, DepthMap);
 		}
 	
 		totalLighting.Diffuse += light_result.Diffuse;

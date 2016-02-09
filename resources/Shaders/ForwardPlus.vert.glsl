@@ -47,7 +47,7 @@ void main()
 				  + BoneWeights[3] * Bones[int(BoneIndices[3])];
 	}
 	
-	//vec4 lightPos = biasMatrix * LightP * LightV * M * vec4(Position, 1.0); // N
+	//vec4 lightPos = LightP * LightV * M * vec4(Position, 1.0); // N
 	
 	gl_Position = P*V*M*boneTransform * vec4(Position, 1.0);
 	//gl_Position = lightPos; // N
@@ -61,5 +61,5 @@ void main()
 	Output.ExplosionPercentageElapsed = 0.0;
 	
 	//Output.PositionLightSpace = lightPos; // N
-	Output.PositionLightSpace = lightSpaceMatrix * (M * vec4(Position, 1.0));
+	Output.PositionLightSpace = lightSpaceMatrix * M * vec4(Position, 1.0);
 }
