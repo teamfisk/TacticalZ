@@ -216,11 +216,11 @@ void DrawFinalPass::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm:
 
     glGenTextures(1, texture);
     glBindTexture(GL_TEXTURE_2D, *texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR); //TODO: THIS SHIS IS BROKEN WHY YOU NO LINEAR MIPMAP? SHITTY FUCK
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //TODO: THIS SHIS IS BROKEN WHY YOU NO LINEAR MIPMAP? SHITTY FUCK
     glGenerateMipmap(GL_TEXTURE_2D);
     GLERROR("MipMap Texture initialization failed");
 
@@ -324,6 +324,9 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             }
         }
     }
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_BloomTexture);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
 }
 

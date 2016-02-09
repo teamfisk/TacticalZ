@@ -8,6 +8,7 @@
 #include "ShaderProgram.h"
 //#include "Util/UnorderedMapVec2.h"
 #include "Texture.h"
+#include "imgui/imgui.h"
 
 class DrawBloomPass
 {
@@ -26,27 +27,36 @@ public:
 
     //Getters
     //Return the blurred result of the texture that was sent into draw
-    GLuint GaussianTexture() const { return m_GaussianTexture_vert; }
+    GLuint GaussianTexture() const { return m_FinalBlurTexture; }
 
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
+    void BlurOneMipMapLevel(GLuint* texture, GLint iterations, GLint mipMapLevel);
 
     Texture* m_WhiteTexture;
     Model* m_ScreenQuad;
 
     const IRenderer* m_Renderer;
     //const LightCullingPass* m_LightCullingPass 
-    GLuint m_iterations = 9;
+    //GLuint m_iterations = 5;
+    GLint m_DebugTextureToDraw = 0;
+    GLint m_Iterations = 3;
 
+    float m_ScreenSizes[10];
+
+    GLuint m_FinalBlurTexture;
     GLuint m_GaussianTexture_horiz;
     GLuint m_GaussianTexture_vert;
 
     FrameBuffer m_GaussianFrameBuffer_horiz;
     FrameBuffer m_GaussianFrameBuffer_vert;
+    FrameBuffer m_BlurredFinalTexture;
 
     ShaderProgram* m_GaussianProgram_horiz;
     ShaderProgram* m_GaussianProgram_vert;
+    ShaderProgram* m_GaussianProgram_both;
+    ShaderProgram* m_CombineProgram;
 
 };
 
