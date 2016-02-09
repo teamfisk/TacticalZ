@@ -74,8 +74,8 @@ struct Output
 //Contains points P in: dot(normal, P) + d = 0
 struct Plane
 {
-    glm::vec3 normal;
-    float distance;
+    glm::vec3 Normal;
+    float Distance;
 };
 
 //A frustum defined by 6 planes.
@@ -87,14 +87,14 @@ struct Frustum
         Outside,
         Intersects
     };
-    Plane planes[6];
+    Plane Planes[6];
 
     Output VsAABB(const AABB& box) const
     {
         const glm::vec3& maxCorner = box.MaxCorner();
         const glm::vec3& minCorner = box.MinCorner();
         bool completelyInside = true;
-        for (const Plane& p : planes) {
+        for (const Plane& p : Planes) {
             bool anyWasInside = false;
             bool anyWasOutside = false;
             //If points are on both sides of the plane, we can stop.
@@ -104,7 +104,7 @@ struct Frustum
                 corner.x = bits.test(0) ? maxCorner.x : minCorner.x;
                 corner.y = bits.test(1) ? maxCorner.y : minCorner.y;
                 corner.z = bits.test(2) ? maxCorner.z : minCorner.z;
-                if (glm::dot(p.normal, corner) > p.distance) {
+                if (glm::dot(p.Normal, corner) > p.Distance) {
                     anyWasInside = true;
                 } else {
                     anyWasOutside = true;
@@ -214,17 +214,18 @@ void Octree<T>::ObjectsInFrustum(const glm::mat4x4& viewProj, std::vector<T>& ou
 {
     falsifyObjectChecks();
     OctSpace::Frustum frustum;
+    //Order: Right, left, top, bottom, far, near.
     for (int i = 0; i < 6; ++i) {
         int sign = 2 * (i % 2) - 1;
         int index = i / 2;
-        OctSpace::Plane& plane = frustum.planes[i];
-        plane.normal.x = viewProj[0].w + sign * viewProj[0][index];
-        plane.normal.y = viewProj[1].w + sign * viewProj[1][index];
-        plane.normal.z = viewProj[2].w + sign * viewProj[2][index];
-        plane.distance = viewProj[3].w + sign * viewProj[3][index];
-        float divByNormalLength = 1.0f / glm::length(plane.normal);
-        plane.normal *= divByNormalLength;
-        plane.distance *= divByNormalLength;
+        OctSpace::Plane& plane = frustum.Planes[i];
+        plane.Normal.x = viewProj[0].w + sign * viewProj[0][index];
+        plane.Normal.y = viewProj[1].w + sign * viewProj[1][index];
+        plane.Normal.z = viewProj[2].w + sign * viewProj[2][index];
+        plane.Distance = viewProj[3].w + sign * viewProj[3][index];
+        float divByNormalLength = 1.0f / glm::length(plane.Normal);
+        plane.Normal *= divByNormalLength;
+        plane.Distance *= divByNormalLength;
     }
     m_Root->ObjectsInFrustum(frustum, outObjects, false);
 }

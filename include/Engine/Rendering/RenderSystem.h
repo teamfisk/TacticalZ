@@ -33,6 +33,7 @@ private:
     Camera* m_Camera;
     Camera* m_LastCullCamera;
     Camera** m_FrustumCamPtr;
+    EntityWrapper frustumEntity;
     World* m_World;
     EntityWrapper m_CurrentCamera = EntityWrapper::Invalid;
     EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
