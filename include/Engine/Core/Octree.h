@@ -6,6 +6,7 @@
 
 #include "../Common.h"
 #include "AABB.h"
+#include "Frustum.h"
 
 //Fwd declarations.
 class Ray;
@@ -41,8 +42,8 @@ public:
     //The type Box must be AABB, or inherit from AABB.
     template<typename Box>
     void ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects);
-    //Get the objects that are inside the frustum defined by the viewProjection matrix, the objects are put in outObjects.
-    void ObjectsInFrustum(const glm::mat4x4& viewProj, std::vector<T>& outObjects);
+    //Get the objects that are inside the frustum, the objects are put in outObjects.
+    void ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects);
     //Empty the tree of all objects, static and dynamic.
     void ClearObjects();
     //Empty the tree of all dynamic objects. Static objects remain in the tree.
@@ -69,56 +70,6 @@ namespace OctSpace
 struct Output
 {
     float CollideDistance;
-};
-
-//Contains points P in: dot(normal, P) + d = 0
-struct Plane
-{
-    glm::vec3 Normal;
-    float Distance;
-};
-
-//A frustum defined by 6 planes.
-struct Frustum
-{
-    enum Output
-    {
-        Inside,
-        Outside,
-        Intersects
-    };
-    Plane Planes[6];
-
-    Output VsAABB(const AABB& box) const
-    {
-        const glm::vec3& maxCorner = box.MaxCorner();
-        const glm::vec3& minCorner = box.MinCorner();
-        bool completelyInside = true;
-        for (const Plane& p : Planes) {
-            bool anyWasInside = false;
-            bool anyWasOutside = false;
-            //If points are on both sides of the plane, we can stop.
-            for (int i = 0; i < 8 && (!anyWasInside || !anyWasOutside); ++i) {
-                std::bitset<3> bits(i);
-                glm::vec3 corner;
-                corner.x = bits.test(0) ? maxCorner.x : minCorner.x;
-                corner.y = bits.test(1) ? maxCorner.y : minCorner.y;
-                corner.z = bits.test(2) ? maxCorner.z : minCorner.z;
-                if (glm::dot(p.Normal, corner) > p.Distance) {
-                    anyWasInside = true;
-                } else {
-                    anyWasOutside = true;
-                }
-            }
-            if (!anyWasInside) {
-                return Outside;
-            }
-            if (anyWasOutside) {
-                completelyInside = false;
-            }
-        }
-        return completelyInside ? Inside : Intersects;
-    }
 };
 
 struct ContainedObject
@@ -210,23 +161,9 @@ void Octree<T>::ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects)
 }
 
 template<typename T>
-void Octree<T>::ObjectsInFrustum(const glm::mat4x4& viewProj, std::vector<T>& outObjects)
+void Octree<T>::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects)
 {
     falsifyObjectChecks();
-    OctSpace::Frustum frustum;
-    //Order: Right, left, top, bottom, far, near.
-    for (int i = 0; i < 6; ++i) {
-        int sign = 2 * (i % 2) - 1;
-        int index = i / 2;
-        OctSpace::Plane& plane = frustum.Planes[i];
-        plane.Normal.x = viewProj[0].w + sign * viewProj[0][index];
-        plane.Normal.y = viewProj[1].w + sign * viewProj[1][index];
-        plane.Normal.z = viewProj[2].w + sign * viewProj[2][index];
-        plane.Distance = viewProj[3].w + sign * viewProj[3][index];
-        float divByNormalLength = 1.0f / glm::length(plane.Normal);
-        plane.Normal *= divByNormalLength;
-        plane.Distance *= divByNormalLength;
-    }
     m_Root->ObjectsInFrustum(frustum, outObjects, false);
 }
 
@@ -311,14 +248,14 @@ void OctSpace::Child::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& o
 {
     if (hasChildren()) {
         for (const Child* c : m_Children) {
-            Frustum::Output out = Frustum::Inside;
+            Frustum::Output out = Frustum::Output::Inside;
             if (!takeAllDontTest) {
                 out = frustum.VsAABB(c->m_Box);
-                if (out == Frustum::Outside) {
+                if (out == Frustum::Output::Outside) {
                     continue;
                 }
             }
-            c->ObjectsInFrustum(frustum, outObjects, out == Frustum::Inside);
+            c->ObjectsInFrustum(frustum, outObjects, out == Frustum::Output::Inside);
         }
     } else {
         size_t startIndex = outObjects.size();
@@ -326,7 +263,7 @@ void OctSpace::Child::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& o
         outObjects.resize(outObjects.size() + m_StaticObjIndices.size() + m_DynamicObjIndices.size());
         for (size_t i = 0; i < m_StaticObjIndices.size(); ++i) {
             ContainedObject& obj = m_StaticObjectsRef[m_StaticObjIndices[i]];
-            if (obj.Checked || !frustum.VsAABB(obj.Box)) {
+            if (obj.Checked || frustum.VsAABB(*obj.Box) == Frustum::Output::Outside) {
                 ++numDuplicates;
             } else {
                 obj.Checked = true;
@@ -335,7 +272,7 @@ void OctSpace::Child::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& o
         }
         for (size_t i = 0; i < m_DynamicObjIndices.size(); ++i) {
             ContainedObject& obj = m_DynamicObjectsRef[m_DynamicObjIndices[i]];
-            if (obj.Checked || !frustum.VsAABB(obj.Box)) {
+            if (obj.Checked || frustum.VsAABB(*obj.Box) == Frustum::Output::Outside) {
                 ++numDuplicates;
             } else {
                 obj.Checked = true;

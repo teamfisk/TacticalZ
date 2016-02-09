@@ -1,5 +1,6 @@
 #include "Rendering/RenderSystem.h"
 #include "Collision/Collision.h"
+#include "Core/Frustum.h"
 
 RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
     : System(world, eventBroker)
@@ -13,31 +14,15 @@ RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRender
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &RenderSystem::OnPlayerSpawned);
 
     m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
-    m_LastCullCamera = new Camera(*m_Camera);
-    m_FrustumCamPtr = &m_Camera;
 }
 
 RenderSystem::~RenderSystem()
 {
     delete m_Camera;
-    delete m_LastCullCamera;
 }
 
 bool RenderSystem::OnSetCamera(Events::SetCamera& e)
 {
-    //Right now, lets set the camera to cull away stuff if it is connected to a player.
-    //TODO: This won't work with spectators, or death anim.
-    if (e.CameraEntity.FirstParentWithComponent("Player").Valid()) {
-        m_FrustumCamPtr = &m_Camera;
-        LOG_INFO("Setting frustum to new camera.");
-    } else if (e.CameraEntity != m_CurrentCamera) {
-        //If the camera has no parents, i.e. a free camera, 
-        //then we cull from the last camera, so we can see if the culling works.
-        //Copy the camera into the last frustum camera, without allocating new memory.
-        new ((void*)m_LastCullCamera) Camera(*m_Camera);
-        m_FrustumCamPtr = &m_LastCullCamera;
-        LOG_INFO("New camera, frustum remains at old camera.");
-    }
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
     m_Camera->SetFOV((double)cCamera["FOV"]);
@@ -58,55 +43,15 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
     return entity == m_CurrentCamera || entity.IsChildOf(m_CurrentCamera);
 }
 
-float frustrumTODO = 0.f;
-
 void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
 {
-    if (!frustumEntity.Valid() && m_World->GetComponentPools().size() > 0) {
-        frustumEntity = EntityWrapper(m_World, m_World->CreateEntity());
-        m_World->AttachComponent(frustumEntity.ID, "Transform");
-        m_World->AttachComponent(frustumEntity.ID, "Model");
-        frustumEntity["Model"]["Resource"] = "Models/Core/UnitCube.mesh";
-    }
-
+    Frustum frustum(m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix());
     std::vector<EntityAABB> seenEntities;
-    //m_Octree->ObjectsInFrustum((*m_FrustumCamPtr)->ProjectionMatrix() * (*m_FrustumCamPtr)->ViewMatrix(), seenEntities);
+    m_Octree->ObjectsInFrustum(frustum, seenEntities);
 
-    glm::mat4x4 viewProj = (*m_FrustumCamPtr)->ProjectionMatrix() * (*m_FrustumCamPtr)->ViewMatrix();
-    OctSpace::Frustum frustum;
-    //Order: Right, left, top, bottom, far, near.
-    int sign = 1;
-    for (int i = 0; i < 6; ++i) {
-        sign = -sign;
-        int index = i / 2;
-        OctSpace::Plane& plane = frustum.Planes[i];
-        plane.Normal.x = viewProj[0].w + sign * viewProj[0][index];
-        plane.Normal.y = viewProj[1].w + sign * viewProj[1][index];
-        plane.Normal.z = viewProj[2].w + sign * viewProj[2][index];
-        plane.Distance = viewProj[3].w + sign * viewProj[3][index];
-        float divByNormalLength = 1.0f / glm::length(plane.Normal);
-        plane.Normal *= divByNormalLength;
-        plane.Distance *= divByNormalLength;
-    }
-    if (frustumEntity.Valid()) {
-        int planeI = 0;
-        glm::vec3 pos = (*m_FrustumCamPtr)->Position() + frustrumTODO * (*m_FrustumCamPtr)->Forward();
-        float dist = glm::dot(frustum.Planes[planeI].Normal, pos) + frustum.Planes[planeI].Distance;
-        frustumEntity["Transform"]["Position"] = pos - dist * frustum.Planes[planeI].Normal;
-        frustumEntity["Transform"]["Scale"] = glm::vec3(0.15f);
-    }
-    if (++frustrumTODO > 75) {
-        frustrumTODO = 0.f;
-    }
-
-    //for (auto& seenEntity : seenEntities) {
-    //    EntityWrapper entity = seenEntity.Entity;
-    //    ComponentWrapper cModel = entity["Model"];
-    auto models = m_World->GetComponents("Model");
-    if (models == nullptr) {
-        return;
-    }
-    for (auto& cModel : *models) {
+    for (auto& seenEntity : seenEntities) {
+        EntityWrapper entity = seenEntity.Entity;
+        ComponentWrapper cModel = entity["Model"];
         bool visible = cModel["Visible"];
         if (!visible) {
             continue;
@@ -116,8 +61,6 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
             continue;
         }
 
-        EntityWrapper entity = EntityWrapper(m_World, cModel.EntityID);
-
         // Only render children of a camera if that camera is currently active
         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
             continue;
@@ -126,15 +69,6 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
             continue;
-        }
-
-        if (entity.HasComponent("AABB")) {
-            OctSpace::Frustum::Output o = frustum.VsAABB(*Collision::EntityAbsoluteAABB(entity));
-            if (o == OctSpace::Frustum::Outside && entity != frustumEntity) {
-                resource = "Models/Core/UnitRaptor.mesh";
-            }
-        } else if (entity != frustumEntity){
-            resource = "Models/Core/Error.mesh";
         }
 
         Model* model;
