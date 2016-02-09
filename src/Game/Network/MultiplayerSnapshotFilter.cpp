@@ -12,7 +12,11 @@ bool MultiplayerSnapshotFilter::FilterComponent(EntityWrapper entity, SharedComp
         return false;
     }
 
-    if (component.Info.Name == "Transform") {
+    if (component.Info.Name == "Physics") {
+        return false;
+    }
+
+    if (component.Info.Name == "Transform" || component.Info.Name == "Physics") {
         m_EventBroker->Publish(Events::Interpolate(entity, component));
         return false;
     }

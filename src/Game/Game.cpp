@@ -95,11 +95,12 @@ Game::Game(int argc, char* argv[])
 
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
+    m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
+    ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);

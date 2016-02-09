@@ -2,74 +2,96 @@
 
 InterpolationSystem::InterpolationSystem(SystemParams params) 
     : System(params)
-    , PureSystem("Transform")
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_SnapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05f);
     EVENT_SUBSCRIBE_MEMBER(m_EInterpolate, &InterpolationSystem::OnInterpolate);
-    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &InterpolationSystem::OnPlayerSpawned);
 }
 
-void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt)
+void InterpolationSystem::Update(double dt)
 {
-    // Don't interpolate entities that might already have been removed
-    if (!entity.Valid()) {
-        return;
+    // Position
+    for (auto& kv : m_InterpolatePosition) {
+        EntityWrapper entity = kv.first;
+        if (!entity.Valid()) {
+            continue;
+        }
+        auto& iPosition = kv.second;
+        glm::vec3& position = iPosition.Component[iPosition.Field];
+
+        iPosition.Alpha += dt;
+        float alpha = glm::min(iPosition.Alpha / m_SnapshotInterval, 1.0);
+        position = iPosition.Start + ((iPosition.Goal - iPosition.Start) * alpha);
     }
 
-    //return;
-    if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
-        m_NextTransform[transform.EntityID].interpolationTime += static_cast<float>(dt);
-        Transform sTransform = m_NextTransform[transform.EntityID];
-        float time = sTransform.interpolationTime;
-        if (time > m_SnapshotInterval) {
-            if (m_LastReceivedTransform.find(transform.EntityID) != m_LastReceivedTransform.end()) {
-                m_NextTransform[transform.EntityID] = m_LastReceivedTransform[transform.EntityID];
-                m_NextTransform[transform.EntityID].interpolationTime = time - m_SnapshotInterval;
-                sTransform = m_NextTransform[transform.EntityID];
-                m_LastReceivedTransform.erase(transform.EntityID);
-            } else {
-                m_NextTransform.erase(transform.EntityID);
-            }
+    // Orientation
+    for (auto& kv : m_InterpolateOrientation) {
+        EntityWrapper entity = kv.first;
+        if (!entity.Valid()) {
+            continue;
         }
-        if (transform.Info.Name == "Transform") {
-            // Position
-            glm::vec3 nextPosition = sTransform.Position;
-            glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
-            (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
-            // Orientation
-            glm::quat nextOrientation = sTransform.Orientation;
-            glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
-            (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, glm::max(sTransform.interpolationTime / m_SnapshotInterval, 1.f)));
-            // Scale
-            glm::vec3 nextScale = sTransform.Scale;
-            glm::vec3 currentScale = static_cast<glm::vec3>(transform["Scale"]);
-            (glm::vec3&)transform["Scale"] += vectorInterpolation<glm::vec3>(currentScale, nextScale, sTransform.interpolationTime);
-        }
-    }
-}
+        auto& iOrientation = kv.second;
+        glm::vec3& orientation = iOrientation.Component[iOrientation.Field];
 
-bool InterpolationSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
-{
-    m_LocalPlayer = e.Player;
-    return true;
+        iOrientation.Alpha += dt / m_SnapshotInterval;
+        iOrientation.Alpha = glm::min(iOrientation.Alpha, 1.0);
+        orientation = glm::eulerAngles(glm::slerp(iOrientation.Start, iOrientation.Goal, (float)iOrientation.Alpha));
+    }
+
+    // Velocity
+    for (auto& kv : m_InterpolateVelocity) {
+        EntityWrapper entity = kv.first;
+        if (!entity.Valid()) {
+            continue;
+        }
+        auto& iVelocity = kv.second;
+        glm::vec3& position = iVelocity.Component[iVelocity.Field];
+
+        iVelocity.Alpha += dt;
+        float alpha = glm::min(iVelocity.Alpha / m_SnapshotInterval, 1.0);
+        position = iVelocity.Start + ((iVelocity.Goal - iVelocity.Start) * alpha);
+    }
 }
 
 bool InterpolationSystem::OnInterpolate(Events::Interpolate& e)
 {
-    // TODO: Make this work for arbitrary component types
     if (e.Component.Info.Name == "Transform") {
-        Transform transform;
-        transform.Position = e.Component["Position"];
-        transform.Orientation = glm::quat((glm::vec3)e.Component["Orientation"]);
-        transform.Scale = e.Component["Scale"];
-        transform.interpolationTime = 0.0f;
+        auto cTransform = e.Entity["Transform"];
 
-        if (m_NextTransform.find(e.Entity.ID) != m_NextTransform.end()) { // Did exist
-            m_LastReceivedTransform[e.Entity.ID] = transform;
-        } else { // Did not
-            m_NextTransform[e.Entity.ID] = transform;
+        // Position
+        Interpolation<glm::vec3> iPosition(
+            cTransform,
+            "Position",
+            cTransform["Position"],
+            e.Component["Position"]
+        );
+        m_InterpolatePosition.erase(e.Entity);
+        m_InterpolatePosition.insert(std::make_pair(e.Entity, iPosition));
+
+        // Orientation
+        Interpolation<glm::quat> iOrientation(
+            cTransform,
+            "Orientation",
+            glm::quat((glm::vec3&)cTransform["Orientation"]),
+            glm::quat((glm::vec3&)e.Component["Orientation"])
+        );
+        m_InterpolateOrientation.erase(e.Entity);
+        m_InterpolateOrientation.insert(std::make_pair(e.Entity, iOrientation));
+    } else if (e.Component.Info.Name == "Physics") {
+        auto cPhysics = e.Entity["Physics"];
+        if (!e.Entity.HasComponent("Player")) {
+            return false;
         }
+
+        // Velocity
+        Interpolation<glm::vec3> iVelocity(
+            cPhysics,
+            "Velocity",
+            cPhysics["Velocity"],
+            e.Component["Velocity"]
+        );
+        m_InterpolateVelocity.erase(e.Entity);
+        m_InterpolateVelocity.insert(std::make_pair(e.Entity, iVelocity));
     }
 
     return true;

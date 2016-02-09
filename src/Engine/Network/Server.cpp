@@ -240,7 +240,7 @@ void Server::checkForTimeOuts()
             double stopPing = 1000 * m_ConnectedPlayers[i].StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
             if (startPing > stopPing + m_TimeoutMs) {
-                LOG_INFO("User %i timed out!", i);
+                //LOG_INFO("User %i timed out!", i);
                 //disconnect(i);
             }
         }
