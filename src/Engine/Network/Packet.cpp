@@ -37,7 +37,6 @@ void Packet::Init(MessageType type, unsigned int & packetID)
     // allocate memory for size of packet(only used in tcp)
     Packet::WritePrimitive<int>(0);
     // Add message type
-    m_MessageType = type;
     int messageType = static_cast<int>(type);
     Packet::WritePrimitive<int>(messageType);
     Packet::WritePrimitive<int>(packetID);
@@ -118,6 +117,13 @@ void Packet::ChangePacketID(unsigned int & packetID)
     packetID = packetID + 1;
     // Overwrite old PacketID
     memcpy(m_Data + 2*sizeof(int), &packetID, sizeof(int));
+}
+
+MessageType Packet::GetMessageType()
+{
+    MessageType messagType;
+    memcpy(&messagType, m_Data + sizeof(int), sizeof(int));
+    return messagType;
 }
 
 void Packet::resizeData()

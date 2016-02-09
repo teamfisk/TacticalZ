@@ -57,7 +57,7 @@ public:
     void ChangePacketID(unsigned int& packetID);
     int Size() { return m_Offset; };
     char* Data() { return m_Data; };
-    MessageType GetMessageType() { return m_MessageType; };
+    MessageType GetMessageType();
     unsigned int DataReadSize() { return m_ReturnDataOffset; }
     unsigned int MaxSize() { return m_MaxPacketSize; }
     unsigned int HeaderSize() { return m_HeaderSize; }
@@ -68,7 +68,6 @@ private:
     int m_Offset = 0;
     unsigned int m_MaxPacketSize = 512;
     unsigned int m_HeaderSize = 0;
-    MessageType m_MessageType = MessageType::Invalid;
     void resizeData();
     void resizeData(int size);
 };

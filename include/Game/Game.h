@@ -28,15 +28,8 @@
 #include "Network/Network.h"
 // Client
 #include "Network/Client.h"
-// Hybrid
-#include "Network/HybridServer.h"
-#include "Network/HybridClient.h"
-// TCP
-#include "Network/TCPClient.h"
-#include "Network/TCPServer.h"
-// UDP
-#include "Network/UDPServer.h"
-#include "Network/UDPClient.h"
+// Server
+#include "Network/Server.h"
 
 // Sound
 #include "Sound/SoundSystem.h"
@@ -69,8 +62,8 @@ private:
 
     // Network methods
     void networkFunction();
-    Network* m_ClientOrServer;
     std::unique_ptr<Client> m_Client;
+    std::unique_ptr<Server> m_Server;
     bool m_IsClientOrServer = false;
     bool m_IsServer = false;
 

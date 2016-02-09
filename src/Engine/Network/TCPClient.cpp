@@ -13,6 +13,12 @@ TCPClient::~TCPClient()
 void TCPClient::Connect(std::string playerName, std::string address, int port)
 {
     if (m_Socket) {
+        if (m_IsConnected) {
+            Packet packet(MessageType::Connect, m_SendPacketID);
+            packet.WriteString(playerName);
+            Send(packet);
+            LOG_INFO("Connect message sent again!");
+        }
         return;
     }
     if (!m_IsConnected) {
@@ -29,6 +35,7 @@ void TCPClient::Connect(std::string playerName, std::string address, int port)
             Packet packet(MessageType::Connect, m_SendPacketID);
             packet.WriteString(playerName);
             Send(packet);
+            LOG_INFO("Connect message sent!");
         }
     }
 }

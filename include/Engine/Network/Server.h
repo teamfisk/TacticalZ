@@ -6,6 +6,8 @@
 
 #include <glm/common.hpp>
 
+#include "Network/TCPServer.h"
+#include "Network/UDPServer.h"
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
@@ -17,6 +19,7 @@
 #include "Core/EPlayerSpawned.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
+
 class Server : public Network
 {
 public:
@@ -49,7 +52,7 @@ protected:
     // Game logic
     World* m_World;
     EventBroker* m_EventBroker;
-    
+
     // Packet loss logic
     PacketID m_PacketID = 0;
     PacketID m_PreviousPacketID = 0;
@@ -70,13 +73,15 @@ protected:
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
-    void parsePing();
+    void parsePing();    
+    void parseConnect(Packet & packet, PlayerDefinition & pd);
+    void parseTCPConnect(Packet & packet);
     void parseDisconnect();
-    // Pure virtual functions
-    virtual void readFromClients() = 0;
-    virtual void send(Packet& packet, PlayerDefinition & playerDefinition) = 0;
-    virtual void send(Packet& packet) = 0;
-    virtual void parseConnect(Packet& packet) = 0;
+    //// Pure virtual functions
+    //virtual void readFromClients() = 0;
+    //virtual void send(Packet& packet, PlayerDefinition & playerDefinition) = 0;
+    //virtual void send(Packet& packet) = 0;
+
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
@@ -86,6 +91,9 @@ protected:
     bool OnEntityDeleted(const Events::EntityDeleted& e);
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
+private:
+    TCPServer m_TCPServer;
+    //UDPServer m_UDPServer;
 };
 
 #endif

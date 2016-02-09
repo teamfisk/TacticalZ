@@ -156,7 +156,7 @@ void Game::Tick()
     // Update network
     if (m_IsClientOrServer) {
         if (m_IsServer)
-            m_ClientOrServer->Update();
+            m_Server->Update();
         else if (!m_IsServer) {
             m_Client->Update();
         }
@@ -197,9 +197,9 @@ void Game::networkFunction()
     if (m_IsServer) {
         m_IsClientOrServer = true;
         // m_ClientOrServer = new UDPServer();
-        m_ClientOrServer = new TCPServer();
+        m_Server = std::unique_ptr<Server>(new Server());
         //m_ClientOrServer = new HybridServer();
-        m_ClientOrServer->Start(m_World, m_EventBroker);
+        m_Server->Start(m_World, m_EventBroker);
     }
 
 
