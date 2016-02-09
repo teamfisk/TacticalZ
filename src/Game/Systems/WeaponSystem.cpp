@@ -134,6 +134,7 @@ bool WeaponSystem::OnShoot(Events::Shoot& eShoot)
     // TODO: Weapon damage calculations etc
     Events::PlayerDamage ePlayerDamage;
     ePlayerDamage.Player = player;
+    ePlayerDamage.PlayerShooter = eShoot.Player;
     ePlayerDamage.Damage = 100;
     m_EventBroker->Publish(ePlayerDamage);
 
