@@ -13,10 +13,13 @@
 #include "Game/Systems/WeaponSystem.h"
 #include "Game/Systems/PlayerHUDSystem.h"
 #include "Game/Systems/LifetimeSystem.h"
-#include "../Engine/Rendering/AnimationSystem.h"
+#include "Rendering/AnimationSystem.h"
+#include "Network/MultiplayerSnapshotFilter.h"
 
 Game::Game(int argc, char* argv[])
 {
+    parseArgs(argc, argv);
+
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
     ResourceManager::RegisterType<Sound>("Sound");
     ResourceManager::RegisterType<Model>("Model");
@@ -73,15 +76,14 @@ Game::Game(int argc, char* argv[])
 
     // Initialize network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
-        bool isServer = m_Config->Get<bool>("Networking.IsServer", false);
-        if (isServer) {
-            m_Network = new Server();
-            m_IsServer = true;
-        } else {
-            m_Network = new Client(m_Config);
-            m_IsClient = true;
+        if (m_IsServer) {
+            m_NetworkServer = new Server(m_World, m_EventBroker, m_NetworkPort);
+            m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " SERVER");
+        } else if (m_IsClient) {
+            m_NetworkClient = new Client(m_World, m_EventBroker, std::make_unique<MultiplayerSnapshotFilter>(m_EventBroker));
+            m_NetworkClient->Connect(m_NetworkAddress, m_NetworkPort);
+            m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " CLIENT");
         }
-        m_Network->Start(m_World, m_EventBroker);
     }
 
     // Create Octrees
@@ -132,8 +134,11 @@ Game::~Game()
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
     delete m_OctreeTrigger;
-    if (m_Network != nullptr) {
-        delete m_Network;
+    if (m_NetworkClient != nullptr) {
+        delete m_NetworkClient;
+    }
+    if (m_NetworkServer != nullptr) {
+        delete m_NetworkServer;
     }
     delete m_World;
     delete m_FrameStack;
@@ -163,8 +168,12 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     // Update network
-    if (m_Network != nullptr) {
-        m_Network->Update();
+    m_EventBroker->Process<MultiplayerSnapshotFilter>();
+    if (m_NetworkClient != nullptr) {
+        m_NetworkClient->Update();
+    }
+    if (m_NetworkServer != nullptr) {
+        m_NetworkServer->Update();
     }
 
     // Iterate through systems and update world!
@@ -176,4 +185,37 @@ void Game::Tick()
     m_RenderFrame->Clear();
     m_EventBroker->Swap();
     m_EventBroker->Clear();
+}
+
+int Game::parseArgs(int argc, char* argv[])
+{
+    namespace po = boost::program_options;
+
+    po::options_description desc("Options");
+    desc.add_options()
+        ("help", "Help")
+        ("server,s", po::bool_switch(&m_IsServer), "Launch game in server mode")
+        ("connect", po::value<std::string>(&m_NetworkAddress)->default_value(""), "Connect to this address in client mode")
+        ("port,p", po::value<int>(&m_NetworkPort), "Port to listen on or connect to");
+    ;
+
+    po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+    } catch (std::exception& e) {
+        LOG_ERROR(e.what());
+        return 1;
+    }
+
+    if (vm.count("help")) {
+        std::cout << desc << std::endl;
+        exit(1);
+    }
+
+    if (vm.count("connect")) {
+        m_IsClient = true;
+    }
+
+    return 0;
 }

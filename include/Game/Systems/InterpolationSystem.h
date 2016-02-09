@@ -18,6 +18,13 @@
 
 class InterpolationSystem : public PureSystem
 {
+public:
+    InterpolationSystem(SystemParams params);
+    ~InterpolationSystem() { }
+
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt) override;
+
+private:
     struct Transform 
     {
         glm::vec3 Position;
@@ -25,27 +32,22 @@ class InterpolationSystem : public PureSystem
         glm::quat Orientation;
         float interpolationTime;
     };
-public:
-    InterpolationSystem(SystemParams params);
-    ~InterpolationSystem() { }
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& transform, double dt) override;
-private:
+
     std::unordered_map<EntityID, Transform> m_NextTransform;
     std::unordered_map<EntityID, Transform> m_LastReceivedTransform;
     EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
 
-    //glm::vec3 vectorInterpolation(glm::vec3 prev, glm::vec3 next, double currentTime);
     template <typename T>
     T vectorInterpolation(T prev, T next, double currentTime)
     {
         T difference = next - prev;
-        T vector = (difference / m_SnapshotInterval) * static_cast<float>(currentTime);
+        T vector = difference * (static_cast<float>(currentTime) / m_SnapshotInterval);
         return vector;
     }
     float m_SnapshotInterval;
 
     EventRelay<InterpolationSystem, Events::Interpolate> m_EInterpolate;
-    bool InterpolationSystem::OnInterpolate(const Events::Interpolate& e);
+    bool InterpolationSystem::OnInterpolate(Events::Interpolate& e);
     EventRelay<InterpolationSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
 };

@@ -1,6 +1,8 @@
 #ifndef Game_h__
 #define Game_h__
 
+#include <boost/program_options.hpp>
+
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
 #include "Core/EventBroker.h"
@@ -14,7 +16,7 @@
 #include "Core/EKeyDown.h"
 #include "Core/EntityFilePreprocessor.h"
 #include "Core/SystemPipeline.h"
-#include "ExplosionEffectSystem.h"
+#include "Systems/ExplosionEffectSystem.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
 #include "Rendering/RenderSystem.h"
@@ -42,7 +44,9 @@ public:
 	void Tick();
 
 private:
-	double m_LastTime;
+    std::string m_NetworkAddress;
+    int m_NetworkPort;
+
 	ConfigFile* m_Config = nullptr;
 	EventBroker* m_EventBroker;
 	IRenderer* m_Renderer;
@@ -55,13 +59,15 @@ private:
     Octree<EntityAABB>* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
     RenderFrame* m_RenderFrame;
-    Network* m_Network = nullptr;
+    Client* m_NetworkClient = nullptr;
+    Server* m_NetworkServer = nullptr;
+    SoundSystem* m_SoundSystem;
+	double m_LastTime;
 
     bool m_IsClient = false;
     bool m_IsServer = false;
 
-    // Sound
-    SoundSystem* m_SoundSystem;
+    int parseArgs(int argc, char* argv[]);
 };
 
 #endif

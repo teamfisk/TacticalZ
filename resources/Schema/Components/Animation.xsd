@@ -11,6 +11,7 @@
 				<xs:element name="Speed" type="t:double" minOccurs="0"/>
 				<xs:element name="Loop" type="t:bool" minOccurs="0"/>
 			</xs:all>
+			<xs:attribute name="replicated" type="xs:boolean" fixed="true"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

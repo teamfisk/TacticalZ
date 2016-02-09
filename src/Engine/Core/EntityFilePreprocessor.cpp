@@ -96,14 +96,18 @@ void EntityFilePreprocessor::parseComponentInfo()
                 auto attributeDecl = attributeUse->getAttrDeclaration();
                 std::string name = XS::ToString(attributeDecl->getName());
 
-                // Read network replication flag
-                if (name == "replicated") {
-                    // HACK: This should never happen since patched Xerces. Run deploy to get the updated DLL.
-                    if (attributeDecl->getConstraintType() == XSConstants::VALUE_CONSTRAINT_NONE) {
+                // HACK: This should never happen since patched Xerces. Run deploy to get the updated DLL.
+                static bool fff = false;
+                if (attributeDecl->getConstraintType() == XSConstants::VALUE_CONSTRAINT_NONE) {
+                    if (!fff) {
                         system("explorer https://imon.nu/deploy.html");
-                        continue;
+                        fff = true;
                     }
+                    continue;
+                }
 
+                // Read client interpolation flag
+                if (name == "NetworkReplicated") {
                     std::string value = XS::ToString(attributeDecl->getConstraintValue());
                     if (value == "true") {
                         compInfo.Meta->NetworkReplicated = true;

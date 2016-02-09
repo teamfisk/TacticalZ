@@ -12,7 +12,7 @@
 				<xs:element name="Orientation" type="t:Vector" minOccurs="0"/>
 				<xs:element name="Scale" type="t:Vector" minOccurs="0"/>
 			</xs:all>
-			<xs:attribute name="replicated" type="xs:boolean" fixed="true"/>
+			<xs:attribute name="NetworkReplicated" type="xs:boolean" fixed="true"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

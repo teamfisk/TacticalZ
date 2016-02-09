@@ -1,29 +1,30 @@
 #include "Network/Server.h"
 
-Server::Server() : m_Socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 27666))
+Server::Server(World* world, EventBroker* eventBroker, int port) 
+    : Network(world, eventBroker)
 {
-    Network::initialize();
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
     pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
 
-}
-
-Server::~Server()
-{
-
-}
-
-void Server::Start(World* world, EventBroker* eventBroker)
-{
-    m_World = world;
-    m_EventBroker = eventBroker;
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &Server::OnEntityDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
-    LOG_INFO("I am Server. BIP BOP\n");
+
+    // Bind
+    if (port == 0) {
+        port = config->Get<float>("Networking.Port", 27666);
+    }
+    m_Port = port;
+    m_Socket = std::make_unique<boost::asio::ip::udp::socket>(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port));
+    LOG_INFO("Server initialized and bound to port %i", port);
+}
+
+Server::~Server()
+{
+
 }
 
 void Server::Update()
@@ -38,7 +39,7 @@ void Server::Update()
 
 void Server::readFromClients()
 {
-    while (m_Socket.available()) {
+    while (m_Socket->available()) {
         try {
             bytesRead = receive(readBuffer);
             Packet packet(readBuffer, bytesRead);
@@ -105,7 +106,7 @@ void Server::parseMessageType(Packet& packet)
 
 size_t Server::receive(char * data)
 {
-    size_t length = m_Socket.receive_from(
+    size_t length = m_Socket->receive_from(
         boost::asio::buffer((void*)data
             , INPUTSIZE)
         , m_ReceiverEndpoint, 0);
@@ -121,7 +122,7 @@ size_t Server::receive(char * data)
 void Server::send(PlayerID player, Packet& packet)
 {
     try {
-        size_t bytesSent = m_Socket.send_to(
+        size_t bytesSent = m_Socket->send_to(
             boost::asio::buffer(packet.Data(), packet.Size()),
             m_ConnectedPlayers[player].Endpoint,
             0);
@@ -139,7 +140,7 @@ void Server::send(PlayerID player, Packet& packet)
 
 void Server::send(Packet & packet)
 {
-    m_Socket.send_to(
+    m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
             packet.Size()),
@@ -240,7 +241,7 @@ void Server::checkForTimeOuts()
                 static_cast<double>(CLOCKS_PER_SEC);
             if (startPing > stopPing + m_TimeoutMs) {
                 LOG_INFO("User %i timed out!", i);
-                disconnect(i);
+                //disconnect(i);
             }
         }
     }

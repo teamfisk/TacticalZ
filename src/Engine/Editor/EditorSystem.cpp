@@ -100,9 +100,9 @@ void EditorSystem::Enable()
     }
 
     // Pause the world we're editing
-    Events::Pause ePause;
-    ePause.World = m_World;
-    m_EventBroker->Publish(ePause);
+    //Events::Pause ePause;
+    //ePause.World = m_World;
+    //m_EventBroker->Publish(ePause);
 
     m_Enabled = true;
 }

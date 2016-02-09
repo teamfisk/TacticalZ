@@ -2,40 +2,50 @@
 
 using namespace boost::asio::ip;
 
-
-Client::Client(ConfigFile* config) : m_Socket(m_IOService)
+Client::Client(World* world, EventBroker* eventBroker) 
+    : Network(world, eventBroker)
+    , m_Socket(m_IOService)
 {
-    Network::initialize();
-
     // Asumes root node is EntityID_Invalid
     insertIntoServerClientMaps(EntityID_Invalid, EntityID_Invalid);
     // Init timer
     m_TimeSinceSentInputs = std::clock();
-    // Default is local host
-    std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
-    int port = config->Get<int>("Networking.Port", 27666);
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
-    // Set up network stream
+
+    auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
     m_SendInputIntervalMs = config->Get<int>("Networking.SendInputIntervalMs", 33);
 
+    LOG_INFO("Client initialized");
+}
+
+Client::Client(World* world, EventBroker* eventBroker, std::unique_ptr<SnapshotFilter> snapshotFilter)
+    : Client(world, eventBroker)
+{
+    m_SnapshotFilter = std::move(snapshotFilter);
 }
 
 Client::~Client()
 { }
 
-void Client::Start(World* world, EventBroker* eventBroker)
+void Client::Connect(std::string address, int port)
 {
-    m_EventBroker = eventBroker;
-    m_World = world;
-
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
 
+    auto config = ResourceManager::Load<ConfigFile>("Config.ini");
+    if (address.empty()) {
+        address = config->Get<std::string>("Networking.Address", "127.0.0.1");
+    }
+    if (port == 0) {
+        port = config->Get<int>("Networking.Port", 27666);
+    }
+
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
+    LOG_INFO("Client connecting...");
     m_Socket.connect(m_ReceiverEndpoint);
-    LOG_INFO("I am client. BIP BOP");
+    connect();
 }
 
 void Client::Update()
@@ -49,6 +59,7 @@ void Client::Update()
             sendInputCommands();
             m_TimeSinceSentInputs = std::clock();
         }
+        // HACK: Send absolute player positions for now to avoid desync until we have reliable messages
         sendLocalPlayerTransform();
     }
     Network::Update();
@@ -173,34 +184,46 @@ void Client::parseComponentDeletion(Packet & packet)
     }
 }
 
-// Fields with strings will not work right now
-void Client::InterpolateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
-{
-    int sizeOfFields = 0;
-    for (auto field : componentInfo.FieldsInOrder) {
-        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
-        sizeOfFields += fieldInfo.Stride;
-    }
-    // Is the size correct?
-    boost::shared_array<char> eventData(new char[componentInfo.Stride]);
-    memcpy(eventData.get(), packet.ReadData(componentInfo.Stride), componentInfo.Stride);
-    //Send event to interpolat system
-    Events::Interpolate e;
-    e.Entity = entityID;
-    e.DataArray = eventData;
-    m_EventBroker->Publish(e);
-
-}
-
-void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
+void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)
 {
     for (auto field : componentInfo.FieldsInOrder) {
         ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
         if (fieldInfo.Type == "string") {
             std::string& value = packet.ReadString();
-            m_World->GetComponent(entityID, componentType)[fieldInfo.Name] = value;
+            m_World->GetComponent(entityID, componentInfo.Name)[fieldInfo.Name] = value;
         } else {
-            memcpy(m_World->GetComponent(entityID, componentType).Data + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+            memcpy(m_World->GetComponent(entityID, componentInfo.Name).Data + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+        }
+    }
+}
+
+SharedComponentWrapper Client::createSharedComponent(Packet& packet, EntityID entityID, const ComponentInfo& componentInfo)
+{
+    // Create shared allocation
+    char* data = new char[sizeof(EntityID) + componentInfo.Stride];
+    // Copy entity ID to start of data buffer
+    memcpy(data, &entityID, sizeof(EntityID));
+    // Read and copy fields
+    for (auto& field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        if (fieldInfo.Type == "string") {
+            new (data + sizeof(EntityID) + fieldInfo.Offset) std::string(packet.ReadString());
+        } else {
+            memcpy(data + sizeof(EntityID) + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+        }
+    }
+
+    return SharedComponentWrapper(componentInfo, boost::shared_array<char>(data));
+}
+
+void Client::ignoreFields(Packet& packet, const ComponentInfo& componentInfo)
+{
+    for (auto field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        if (fieldInfo.Type == "string") {
+            packet.ReadString();
+        } else {
+            packet.ReadData(fieldInfo.Stride);
         }
     }
 }
@@ -214,26 +237,32 @@ void Client::parseSnapshot(Packet& packet)
         int ammountOfComponents = packet.ReadPrimitive<int>();
         for (int i = 0; i < ammountOfComponents; i++) {
             std::string componentType = packet.ReadString();
-            ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
+            const ComponentInfo& componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
             if (serverClientMapsHasEntity(serverEntityID)) {
                 EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
+                EntityWrapper localEntity(m_World, localEntityID);
+                
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
-                    // Update component
-                    if (componentType == "Transform") {
-                        // Interpolate only transform components
-                        InterpolateFields(packet, componentInfo, localEntityID, componentType);
-                    } else if (componentType == "Physics" && m_World->HasComponent(localEntityID, "Player")) {
-                        // HACK: Ignore velocity of physics
-                        packet.ReadData(componentInfo.Stride);
-                    } else {
-                        // Set component values
-                        updateFields(packet, componentInfo, localEntityID, componentType);
+                    SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
+                    bool shouldApply = true;
+                    // Apply potential filter function
+                    if (m_SnapshotFilter != nullptr) {
+                        shouldApply = m_SnapshotFilter->FilterComponent(localEntity, newComponent);
                     }
+                    if (shouldApply) {
+                        ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
+                        memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
+                    }
+                    //if (localEntity != m_LocalPlayer && !localEntity.IsChildOf(m_LocalPlayer)) {
+                    //    updateFields(packet, componentInfo, localEntityID);
+                    //} else {
+                    //    ignoreFields(packet, componentInfo);
+                    //}
                 } else {
                     // Has entity but no component
                     m_World->AttachComponent(localEntityID, componentType);
-                    updateFields(packet, componentInfo, localEntityID, componentType);
+                    updateFields(packet, componentInfo, localEntityID);
                 }
             } else {
                 // Create Entity and component
@@ -246,7 +275,7 @@ void Client::parseSnapshot(Packet& packet)
                 m_World->SetName(newLocalEntityID, serverEntityName);
                 insertIntoServerClientMaps(serverEntityID, newLocalEntityID);
                 m_World->AttachComponent(newLocalEntityID, componentType);
-                updateFields(packet, componentInfo, newLocalEntityID, componentType);
+                updateFields(packet, componentInfo, newLocalEntityID);
             }
         }
         // Parent logic

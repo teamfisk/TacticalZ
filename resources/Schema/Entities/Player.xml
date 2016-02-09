@@ -6,10 +6,10 @@
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
-    <c:DashAbility>
-      <CoolDownMaxTimer>2.0</CoolDownMaxTimer>
-    </c:DashAbility>
     <c:Collidable/>
+    <c:DashAbility>
+      <CoolDownMaxTimer>2</CoolDownMaxTimer>
+    </c:DashAbility>
     <c:Health/>
     <c:Physics>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
@@ -23,7 +23,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="9.56501799e-22" Y="-0.471999973" Z="4.35902473e-22"/>
+      <Position X="1.28011036e-21" Y="0.0264999866" Z="1.82592022"/>
     </c:Transform>
   </Components>
 
@@ -104,15 +104,9 @@
             </Entity>
             <Entity name="Weapon">
               <Components>
-                <c:ExplosionEffect>
-                  <ColorByDistance>true</ColorByDistance>
-                  <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                  <ExplosionDuration>3.7999999523162842</ExplosionDuration>
-                  <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
-                  <Randomness>true</Randomness>
-                </c:ExplosionEffect>
                 <c:Model>
                   <Resource>Models/AssaultWeaponRed.mesh</Resource>
+                  <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
                   <Position X="0.180000007" Y="-0.183000013" Z="0"/>
@@ -151,7 +145,7 @@
       <Components>
         <c:Animation>
           <Name>Hold Pos</Name>
-          <Time>0.73506627647571587</Time>
+          <Time>0.79606322555778508</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:HiddenForLocalPlayer/>

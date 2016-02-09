@@ -17,6 +17,7 @@ void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
         return;
     }
 
+    //return;
     if (m_NextTransform.find(transform.EntityID) != m_NextTransform.end()) { // Exists in map
         m_NextTransform[transform.EntityID].interpolationTime += static_cast<float>(dt);
         Transform sTransform = m_NextTransform[transform.EntityID];
@@ -32,21 +33,14 @@ void InterpolationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
             }
         }
         if (transform.Info.Name == "Transform") {
-            bool isLocalPlayer = entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer);
             // Position
             glm::vec3 nextPosition = sTransform.Position;
             glm::vec3 currentPosition = static_cast<glm::vec3>(transform["Position"]);
-            // HACK: Don't force position for players 
-            if (!isLocalPlayer) {
-                (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
-            }
+            (glm::vec3&)transform["Position"] += vectorInterpolation<glm::vec3>(currentPosition, nextPosition, sTransform.interpolationTime);
             // Orientation
-            // Don't force orientation for players
-            if (!isLocalPlayer) {
-                glm::quat nextOrientation = sTransform.Orientation;
-                glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
-                (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, sTransform.interpolationTime / m_SnapshotInterval));
-            }
+            glm::quat nextOrientation = sTransform.Orientation;
+            glm::quat currentOrientation = glm::quat(static_cast<glm::vec3>(transform["Orientation"]));
+            (glm::vec3&)transform["Orientation"] = glm::eulerAngles(glm::slerp<float>(currentOrientation, nextOrientation, glm::max(sTransform.interpolationTime / m_SnapshotInterval, 1.f)));
             // Scale
             glm::vec3 nextScale = sTransform.Scale;
             glm::vec3 currentScale = static_cast<glm::vec3>(transform["Scale"]);
@@ -61,24 +55,22 @@ bool InterpolationSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     return true;
 }
 
-bool InterpolationSystem::OnInterpolate(const Events::Interpolate & e)
+bool InterpolationSystem::OnInterpolate(Events::Interpolate& e)
 {
-    Transform transform;
-    int offset = 0;
-    // Read the data
-    memcpy(&transform.Position, e.DataArray.get() + offset, sizeof(glm::vec3));
-    offset += sizeof(glm::vec3);
-    glm::vec3 tempOrientation;
-    memcpy(&tempOrientation, e.DataArray.get() + offset, sizeof(glm::vec3));
-    transform.Orientation = glm::quat(tempOrientation);
-    offset += sizeof(glm::vec3);
-    memcpy(&transform.Scale, e.DataArray.get() + offset, sizeof(glm::vec3));
-    transform.interpolationTime = 0.0f;
+    // TODO: Make this work for arbitrary component types
+    if (e.Component.Info.Name == "Transform") {
+        Transform transform;
+        transform.Position = e.Component["Position"];
+        transform.Orientation = glm::quat((glm::vec3)e.Component["Orientation"]);
+        transform.Scale = e.Component["Scale"];
+        transform.interpolationTime = 0.0f;
 
-    if (m_NextTransform.find(e.Entity) != m_NextTransform.end()) { // Did exist
-        m_LastReceivedTransform[e.Entity] = transform;
-    } else { // Did not
-        m_NextTransform[e.Entity] = transform;
+        if (m_NextTransform.find(e.Entity.ID) != m_NextTransform.end()) { // Did exist
+            m_LastReceivedTransform[e.Entity.ID] = transform;
+        } else { // Did not
+            m_NextTransform[e.Entity.ID] = transform;
+        }
     }
-    return false;
+
+    return true;
 }
