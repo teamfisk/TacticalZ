@@ -114,6 +114,13 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
+vec2 poissonDisk[4] = vec2[](
+   vec2( -0.94201624, -0.39906216 ),
+   vec2( 0.94558609, -0.76890725 ),
+   vec2( -0.094184101, -0.92938870 ),
+   vec2( 0.34495938, 0.29387760 )
+ );
+
 float CalcShadowValue(vec4 positionLightSpace, vec4 normal, vec4 lightDir, sampler2D depthTexture)
 {
 	
@@ -129,8 +136,21 @@ float CalcShadowValue(vec4 positionLightSpace, vec4 normal, vec4 lightDir, sampl
 	//float currentDepth = positionLightSpace.z;
     float currentDepth = projCoords.z;
     // Check whether current frag pos is in shadow
-	float shadow = currentDepth /*- bias*/ > closestDepth ? 1.0 : 0.0;
+	//float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
    // float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+   
+   float shadow = 0.0;
+   //soft shadow - using percentage-closer filtering (PCF) is to simply sample the surrounding texels of the depth map and average the results:
+   vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
+	for(int x = -1; x <= 1; ++x)
+	{
+		for(int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(depthTexture, projCoords.xy + vec2(x, y) * texelSize).r; 
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+		}    
+	}
+	shadow /= 9.0;
 
     return shadow;
 	

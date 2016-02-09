@@ -25,7 +25,7 @@ void ShadowPass::InitializeFrameBuffers()
     // Depth texture
     glGenTextures(1, &m_DepthMap);
     glBindTexture(GL_TEXTURE_2D, m_DepthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, resolutionSizeWidth, resolutionSizeHeigth, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_RGB, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -65,9 +65,9 @@ void ShadowPass::Draw(RenderScene & scene)
     GLuint shaderHandle = m_ShadowProgram->GetHandle();
     m_ShadowProgram->Bind();
 
-    //if (scene.ClearDepth) {
-    //    glClear(GL_COLOR_BUFFER_BIT);
-    //}
+    glViewport(0, 0, resolutionSizeWidth, resolutionSizeHeigth);
+    glCullFace(GL_FRONT);
+
 
     ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
     ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
@@ -111,8 +111,9 @@ void ShadowPass::Draw(RenderScene & scene)
 
 
 
-
-    //m_ShadowProgram->Unbind();
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glCullFace(GL_BACK);
+    m_ShadowProgram->Unbind();
 
 
 

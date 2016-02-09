@@ -32,8 +32,8 @@ public:
     glm::mat4 lightSpaceMatrix() const { return m_LightSpaceMatrix; }
     glm::mat4 lightP() const { return m_LightProjection; }
     glm::mat4 lightV() const { return m_LightView; }
-    //glm::mat4 lightV() const { return m_LightProjection; } //swapped m_P -> m_V
-    //glm::mat4 lightP() const { return m_LightView; } // swapped m_V -> m_P
+
+    void setResolution(GLuint width, GLuint height) { resolutionSizeWidth = width; resolutionSizeHeigth = height; }
 
 private:
 
@@ -57,6 +57,10 @@ private:
     glm::mat4 m_LightProjection;
     glm::mat4 m_LightView;
     glm::mat4 m_LightSpaceMatrix;
+
+    GLuint resolutionSizeWidth = 2048;
+    GLuint resolutionSizeHeigth = 2048;
+
 };
 
 #endif
