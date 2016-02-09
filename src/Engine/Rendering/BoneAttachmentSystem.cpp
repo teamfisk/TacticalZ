@@ -21,6 +21,11 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
 
 
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+
+    if(skeleton == nullptr) {
+        return;
+    }
+
     const Skeleton::Animation* animation = skeleton->GetAnimation(parent["Animation"]["AnimationName1"]);
 
     if (!animation) {
