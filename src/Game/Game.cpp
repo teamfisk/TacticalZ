@@ -218,5 +218,10 @@ int Game::parseArgs(int argc, char* argv[])
         m_IsClient = true;
     }
 
+    // HACK: Right now, client and server are mutually exclusive
+    if (m_IsServer) {
+        m_IsClient = false;
+    }
+
     return 0;
 }

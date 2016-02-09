@@ -230,6 +230,18 @@ void Client::ignoreFields(Packet& packet, const ComponentInfo& componentInfo)
 
 void Client::parseSnapshot(Packet& packet)
 {
+    // Read input commands
+    std::size_t numInputCommands = packet.ReadPrimitive<std::size_t>();
+    for (std::size_t i = 0; i < numInputCommands; ++i) {
+        Events::InputCommand e;
+        e.PlayerID = packet.ReadPrimitive<EntityID>();
+        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(packet.ReadPrimitive<EntityID>()));
+        e.Command = packet.ReadString();
+        e.Value = packet.ReadPrimitive<float>();
+        m_EventBroker->Publish(e);
+    }
+
+    // Read world state
     while (packet.DataReadSize() < packet.Size()) {
         EntityID serverEntityID = packet.ReadPrimitive<EntityID>();
         EntityID serverParentID = packet.ReadPrimitive<EntityID>();
@@ -339,6 +351,10 @@ void Client::disconnect()
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
+    if (e.PlayerID != -1) {
+        return false;
+    }
+
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
             connect();

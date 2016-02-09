@@ -165,8 +165,22 @@ void Server::broadcast(Packet& packet)
 void Server::sendSnapshot()
 {
     Packet packet(MessageType::Snapshot);
+    addInputCommandsToPacket(packet);
     addChildrenToPacket(packet, EntityID_Invalid);
     broadcast(packet);
+}
+
+void Server::addInputCommandsToPacket(Packet& packet)
+{
+    // Number of input commands
+    packet.WritePrimitive(m_InputCommandsToBroadcast.size());
+    for (auto& command : m_InputCommandsToBroadcast) {
+        packet.WritePrimitive(command.PlayerID);
+        packet.WritePrimitive(m_ConnectedPlayers.at(command.PlayerID).EntityID);
+        packet.WriteString(command.Command);
+        packet.WritePrimitive(command.Value);
+    }
+    m_InputCommandsToBroadcast.clear();
 }
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
@@ -273,6 +287,10 @@ void Server::parseOnInputCommand(Packet& packet)
             e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
+
+            if (e.Command == "PrimaryFire") {
+                m_InputCommandsToBroadcast.push_back(e);
+            }
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         }
     }

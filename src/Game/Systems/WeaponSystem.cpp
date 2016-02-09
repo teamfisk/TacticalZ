@@ -5,7 +5,6 @@ WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer)
     , ImpureSystem()
     , m_Renderer(renderer)
 {
-    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &WeaponSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EShoot, &WeaponSystem::OnShoot);
 }
@@ -15,30 +14,22 @@ void WeaponSystem::Update(double dt)
 
 }
 
-bool WeaponSystem::OnPlayerSpawned(const Events::PlayerSpawned& e)
-{
-    if (e.PlayerID == -1) {
-        m_LocalPlayer = e.Player;
-    }
-    return true;
-}
-
-bool WeaponSystem::OnInputCommand(const Events::InputCommand& e)
+bool WeaponSystem::OnInputCommand(Events::InputCommand& e)
 {
     // Only shoot client-side!
-    if (e.PlayerID != -1) {
+    if (!IsClient) {
         return false;
     }
 
     // Only shoot if the player is alive
-    if (!m_LocalPlayer.Valid()) {
+    if (!e.Player.Valid()) {
         return false;
     }
 
     if (e.Command == "PrimaryFire" && e.Value > 0) {
         Events::Shoot eShoot;
         if (e.PlayerID == -1) {
-            eShoot.Player = m_LocalPlayer;
+            eShoot.Player = LocalPlayer;
         } else {
             eShoot.Player = e.Player;
         }
@@ -97,8 +88,8 @@ bool WeaponSystem::OnShoot(Events::Shoot& eShoot)
         //(glm::vec3&)ray["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(weapon);
     }
 
-    // Only run further picking code client-side!
-    if (eShoot.Player != m_LocalPlayer) {
+    // Only run further picking code for the local player!
+    if (eShoot.Player != LocalPlayer) {
         return false;
     }
 
