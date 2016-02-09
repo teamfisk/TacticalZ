@@ -230,7 +230,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             MTime time = MAnimControl::currentTime();
 
             MFnTransform thisJoint(jointIt.currentItem());
-            MMatrix transformationMatrix = thisJoint.transformationMatrix();
+			MTransformationMatrix transformationMatrix = thisJoint.transformationMatrix();
 
             double doubleMat[4][4];
 
@@ -256,7 +256,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
 
                 MMatrix LastJointMatrix(doubleMat);
                 //Is same as last KeyFrame
-                if (LastJointMatrix.isEquivalent(transformationMatrix)) {
+                if (LastJointMatrix.isEquivalent(transformationMatrix.asMatrix())) {
                     //jointID++;
                     //jointIt.next();
                     currentFrame++;
@@ -264,7 +264,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
                     continue;
                 } else if(!haxBool){
                     haxBool = true;
-                    MTransformationMatrix TransformationMatrix = LastJointMatrix;
+                    MTransformationMatrix LastJointTransformationMatrix = LastJointMatrix;
                     MObject jointOrientObj = thisJoint.attribute("jointOrient");
                     MFnNumericAttribute jointOrient(jointOrientObj);
                     double jointOrientDouble[3];
@@ -279,7 +279,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
                     MQuaternion jo = joEuler.asQuaternion();
 
                     double tmp[4];
-                    TransformationMatrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
+					LastJointTransformationMatrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
                     MQuaternion rotation(tmp);
 
                     rotation = rotation * jo;
@@ -294,11 +294,11 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
                     previousKeyFrame.Rotation[1] = tmp[1];
                     previousKeyFrame.Rotation[2] = tmp[2];
                     previousKeyFrame.Rotation[3] = tmp[3];
-                    TransformationMatrix.getTranslation(MSpace::kTransform).get(tmp);
+					LastJointTransformationMatrix.getTranslation(MSpace::kTransform).get(tmp);
                     previousKeyFrame.Position[0] = tmp[0];
                     previousKeyFrame.Position[1] = tmp[1];
                     previousKeyFrame.Position[2] = tmp[2];
-                    TransformationMatrix.getScale(tmp, MSpace::kTransform);
+					LastJointTransformationMatrix.getScale(tmp, MSpace::kTransform);
                     previousKeyFrame.Scale[0] = tmp[0];
                     previousKeyFrame.Scale[1] = tmp[1];
                     previousKeyFrame.Scale[2] = tmp[2];
@@ -307,8 +307,9 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
                 }
             }
 
-            transformationMatrix.get(doubleMat);
+            transformationMatrix.asMatrix().get(doubleMat);
 
+			//Save transformationMatrix to joinCheckMap
             joinCheckMap[thisJoint.name().asChar()][0][0] = doubleMat[0][0];
             joinCheckMap[thisJoint.name().asChar()][0][1] = doubleMat[0][1];
             joinCheckMap[thisJoint.name().asChar()][0][2] = doubleMat[0][2];
@@ -325,8 +326,6 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             joinCheckMap[thisJoint.name().asChar()][3][1] = doubleMat[3][1];
             joinCheckMap[thisJoint.name().asChar()][3][2] = doubleMat[3][2];
             joinCheckMap[thisJoint.name().asChar()][3][3] = doubleMat[3][3];
-
-            MTransformationMatrix TransformationMatrix = thisJoint.transformation();
 
             if (currentFrame == startFrame) {
                 MPlug thisJointBindPose = thisJoint.findPlug("bindPose");
@@ -347,7 +346,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
                     thisJointBindPoseMatrix = thisJointBindPoseMatrix * parentBindPoseMatrix.inverse();
                 }
 
-                if (thisJointBindPoseMatrix.isEquivalent(TransformationMatrix.asMatrix())) {
+                if (thisJointBindPoseMatrix.isEquivalent(transformationMatrix.asMatrix())) {
                     //jointID++;
                     //jointIt.next();
                     currentFrame++;
@@ -371,7 +370,7 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             MQuaternion jo = joEuler.asQuaternion();
 
             double tmp[4];
-            TransformationMatrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
+            transformationMatrix.getRotationQuaternion(tmp[0], tmp[1], tmp[2], tmp[3]);
             MQuaternion rotation(tmp);
 
             rotation = rotation * jo;
@@ -385,11 +384,11 @@ Animation Skeleton::GetAnimData(std::string animationName, int startFrame, int e
             thisKeyFrame.Rotation[1] = tmp[1];
             thisKeyFrame.Rotation[2] = tmp[2];
             thisKeyFrame.Rotation[3] = tmp[3];
-            TransformationMatrix.getTranslation(MSpace::kTransform).get(tmp);
+            transformationMatrix.getTranslation(MSpace::kTransform).get(tmp);
             thisKeyFrame.Position[0] = tmp[0];
             thisKeyFrame.Position[1] = tmp[1];
             thisKeyFrame.Position[2] = tmp[2];
-            TransformationMatrix.getScale(tmp, MSpace::kTransform);
+            transformationMatrix.getScale(tmp, MSpace::kTransform);
             thisKeyFrame.Scale[0] = tmp[0];
             thisKeyFrame.Scale[1] = tmp[1];
             thisKeyFrame.Scale[2] = tmp[2];

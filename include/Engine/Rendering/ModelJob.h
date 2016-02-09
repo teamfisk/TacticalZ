@@ -14,39 +14,98 @@
 #include "../Core/World.h"
 #include "../Core/Transform.h"
 #include "Skeleton.h"
+#include "ShaderProgram.h"
 
 struct ModelJob : RenderJob
 {
-    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialGroup matGroup, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage)
+    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage)
         : RenderJob()
     {
         Model = model;
-        TextureID = (matGroup.Texture) ? matGroup.Texture->ResourceID : 0;
-        if (modelComponent["DiffuseTexture"]) {
-            DiffuseTexture = matGroup.Texture.get();
-        } else {
-            DiffuseTexture = nullptr;
-        }
-        if (modelComponent["NormalMap"]) {
-            NormalTexture = matGroup.NormalMap.get();
-        } else {
-            NormalTexture = nullptr;
-        }
-        if (modelComponent["SpecularMap"]) {
-            SpecularTexture = matGroup.SpecularMap.get();
-        } else {
-            SpecularTexture = nullptr;
-        }
-        if (modelComponent["GlowMap"]) {
-            IncandescenceTexture = matGroup.IncandescenceMap.get();
-        } else {
-            IncandescenceTexture = nullptr;
-        }
-        DiffuseColor = matGroup.DiffuseColor;
-        SpecularColor = matGroup.SpecularColor;
-        IncandescenceColor = matGroup.IncandescenceColor;
-        StartIndex = matGroup.StartIndex;
-        EndIndex = matGroup.EndIndex;
+		ModelID = model->ResourceID;
+		Type = matProp.type;
+		::RawModel::MaterialBasic* matGroup = matProp.material;
+		switch(matProp.type){
+		case ::RawModel::MaterialType::Basic:
+			if (Model->isSkined()) {
+				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
+			}
+			else {
+				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
+			}
+			TextureID = 0;
+			break;
+		case ::RawModel::MaterialType::SingleTextures:
+			{
+				if (Model->isSkined()) {
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
+				}
+				else {
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
+				}
+				::RawModel::MaterialSingleTextures* singleTextures = static_cast<::RawModel::MaterialSingleTextures*>(matProp.material);
+				TextureID = (singleTextures->ColorMap.Texture) ? singleTextures->ColorMap.Texture->ResourceID : 0;
+				if (modelComponent["DiffuseTexture"]) {
+					DiffuseTexture.push_back(&singleTextures->ColorMap);
+				}
+
+				if (modelComponent["NormalMap"]) {
+					NormalTexture.push_back(&singleTextures->NormalMap);
+				}
+
+				if (modelComponent["SpecularMap"]) {
+					SpecularTexture.push_back(&singleTextures->SpecularMap);
+				}
+
+				if (modelComponent["GlowMap"]) {
+					IncandescenceTexture.push_back(&singleTextures->IncandescenceMap);
+				}
+			}
+			break;
+		case ::RawModel::MaterialType::SplatMapping:
+			{
+				if (Model->isSkined()) {
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapSkinnedProgram")->ResourceID;
+				}
+				else {
+					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram")->ResourceID;
+				}
+				::RawModel::MaterialSplatMapping* SplatTextures = static_cast<::RawModel::MaterialSplatMapping*>(matProp.material);
+
+				SplatMap = &SplatTextures->SplatMap;
+
+				TextureID = (SplatTextures->ColorMaps[0].Texture) ? SplatTextures->ColorMaps[0].Texture->ResourceID : 0;
+				if (modelComponent["DiffuseTexture"]) {
+					for (auto& texture : SplatTextures->ColorMaps) {
+						DiffuseTexture.push_back(&texture);
+					}
+				}
+
+				if (modelComponent["NormalMap"]) {
+					for (auto& texture : SplatTextures->NormalMaps) {
+						NormalTexture.push_back(&texture);
+					}
+				}
+
+				if (modelComponent["SpecularMap"]) {
+					for (auto& texture : SplatTextures->SpecularMaps) {
+						SpecularTexture.push_back(&texture);
+					}
+				}
+
+				if (modelComponent["GlowMap"]) {
+					for (auto& texture : SplatTextures->IncandescenceMaps) {
+						IncandescenceTexture.push_back(&texture);
+					}
+				}
+			}
+			break;
+		}
+        DiffuseColor = matGroup->DiffuseColor;
+        SpecularColor = matGroup->SpecularColor;
+        IncandescenceColor = matGroup->IncandescenceColor;
+        StartIndex = matGroup->StartIndex;
+        EndIndex = matGroup->EndIndex;
         Matrix = matrix;
         Color = modelComponent["Color"];
         Entity = modelComponent.EntityID;
@@ -89,13 +148,16 @@ struct ModelJob : RenderJob
 
     unsigned int TextureID;
     unsigned int ShaderID;
+	unsigned int ModelID;
 
+	::RawModel::MaterialType Type;
     EntityID Entity;
     glm::mat4 Matrix;
-    const Texture* DiffuseTexture;
-    const Texture* NormalTexture;
-    const Texture* SpecularTexture;
-    const Texture* IncandescenceTexture;
+	const ::RawModel::TextureProperties* SplatMap;
+    std::vector<const ::RawModel::TextureProperties*> DiffuseTexture;
+	std::vector<const ::RawModel::TextureProperties*> NormalTexture;
+	std::vector<const ::RawModel::TextureProperties*> SpecularTexture;
+	std::vector<const ::RawModel::TextureProperties*> IncandescenceTexture;
     float Shininess = 0.f;
     glm::vec4 Color;
     const ::Model* Model = nullptr;
@@ -119,7 +181,7 @@ struct ModelJob : RenderJob
 
     void CalculateHash() override
     {
-        Hash = TextureID;
+        Hash = TextureID + ModelID << 10 + ShaderID << 20;
     }
 };
 

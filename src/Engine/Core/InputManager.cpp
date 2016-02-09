@@ -218,7 +218,7 @@ void InputManager::PublishGamepadAxisIfChanged(int gamepadID, Gamepad::Axis axis
 void InputManager::PublishGamepadButtonIfChanged(int gamepadID, Gamepad::Button button)
 {
 	bool currentState = m_CurrentGamepadButtonState[gamepadID][static_cast<int>(button)];
-	float lastState = m_LastGamepadButtonState[gamepadID][static_cast<int>(button)];
+	bool lastState = m_LastGamepadButtonState[gamepadID][static_cast<int>(button)];
 	if (currentState != lastState) {
 		if (currentState == true) {
 			Events::GamepadButtonDown e;

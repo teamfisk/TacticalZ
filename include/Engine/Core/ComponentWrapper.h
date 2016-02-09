@@ -81,7 +81,7 @@ class ComponentWrapperFactory
 {
 public:
     ComponentWrapperFactory() = default;
-    ComponentWrapperFactory(std::string componentTypeName, std::size_t allocation = 0)
+    ComponentWrapperFactory(std::string componentTypeName, unsigned int allocation = 0)
     {
         m_ComponentInfo.Name = componentTypeName;
         m_ComponentInfo.Meta->Allocation = allocation;

@@ -23,6 +23,12 @@ void EditorRenderSystem::Update(double dt)
     scene.Camera = m_EditorCamera;
     scene.Viewport = Rectangle(1920, 1080);
 
+    auto cSceneLight = m_World->GetComponents("SceneLight");
+    if (cSceneLight != nullptr) {
+        //these are hardcoded since they want special light treatment and a component just for widgets is stupid.
+        scene.AmbientColor = glm::vec4(0.8, 0.8, 0.8, 1.0);
+    }
+
     auto models = m_World->GetComponents("Model");
     if (models != nullptr) {
         for (auto& cModel : *models) {
@@ -49,7 +55,7 @@ void EditorRenderSystem::Update(double dt)
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
                 std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f);
-                if(cModel["Transparent"]) {
+                if (cModel["Transparent"]) {
                     scene.TransparentObjects.push_back(modelJob);
                 } else {
                     scene.OpaqueObjects.push_back(modelJob);
@@ -80,9 +86,9 @@ bool EditorRenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
-    m_EditorCamera->SetFOV((double)cCamera["FOV"]);
-    m_EditorCamera->SetNearClip((double)cCamera["NearClip"]);
-    m_EditorCamera->SetFarClip((double)cCamera["FarClip"]);
+    m_EditorCamera->SetFOV(static_cast<float>((double)cCamera["FOV"]));
+    m_EditorCamera->SetNearClip(static_cast<float>((double)cCamera["NearClip"]));
+    m_EditorCamera->SetFarClip(static_cast<float>((double)cCamera["FarClip"]));
     m_EditorCamera->SetPosition(cTransform["Position"]);
     m_EditorCamera->SetOrientation(glm::quat((const glm::vec3&)cTransform["Orientation"]));
     m_CurrentCamera = e.CameraEntity;

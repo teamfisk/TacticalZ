@@ -7,7 +7,7 @@
 #include <nativefiledialog/nfd.h>
 #include <boost/filesystem.hpp>
 #include <boost/any.hpp>
-#include <boost/sort/spreadsort/string_sort.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include "../Common.h"
 #include "../GLM.h"
 #include <glm/gtx/common.hpp>
@@ -19,6 +19,8 @@
 #include "../Core/ResourceManager.h"
 #include "../Core/EPause.h"
 #include "../Core/EKeyDown.h"
+#include "../Core/ELockMouse.h"
+#include "../Core/EFileDropped.h"
 #include "../Rendering/Texture.h"
 
 class EditorGUI
@@ -31,6 +33,12 @@ public:
         Translate,
         Rotate,
         Scale
+    };
+
+    enum class WidgetSpace
+    {
+        Global,
+        Local
     };
 
     void Draw();
@@ -74,6 +82,9 @@ public:
     // Called when the user selects a widget mode.
     typedef std::function<void(WidgetMode)> OnWidgetMode_t;
     void SetWidgetModeCallback(OnWidgetMode_t f) { m_OnWidgetMode = f; }
+    // Called when the user selects a widget space.
+    typedef std::function<void(WidgetSpace)> OnWidgetSpace_t;
+    void SetWidgetSpaceCallback(OnWidgetSpace_t f) { m_OnWidgetSpace = f; }
 
 private:
     World* m_World;
@@ -94,8 +105,12 @@ private:
     EntityWrapper m_CurrentlyDragging = EntityWrapper::Invalid;
     std::string m_LastErrorMessage;
     WidgetMode m_CurrentWidgetMode = WidgetMode::Translate;
+    WidgetSpace m_CurrentWidgetSpace = WidgetSpace::Global;
     std::set<std::string> m_ModalsToOpen;
     std::map<std::string, boost::any> m_ModalData;
+    std::string m_DroppedFile = "";
+    bool m_Paused = false;
+    bool m_MouseLocked = false;
 
     // Callbacks
     OnEntitySelectedCallback_t m_OnEntitySelected = nullptr;
@@ -108,10 +123,21 @@ private:
     OnComponentAttach_t m_OnComponentAttach = nullptr;
     OnComponentDelete_t m_OnComponentDelete = nullptr;
     OnWidgetMode_t m_OnWidgetMode = nullptr;
+    OnWidgetSpace_t m_OnWidgetSpace = nullptr;
 
     // Events
     EventRelay<EditorGUI, Events::KeyDown> m_EKeyDown;
     bool OnKeyDown(const Events::KeyDown& e);
+    EventRelay<EditorGUI, Events::FileDropped> m_EFileDropped;
+    bool OnFileDropped(const Events::FileDropped& e);
+    EventRelay<EditorGUI, Events::Pause> m_EPause;
+    bool OnPause(const Events::Pause& e);
+    EventRelay<EditorGUI, Events::Resume> m_EResume;
+    bool OnResume(const Events::Resume& e);
+    EventRelay<EditorGUI, Events::LockMouse> m_ELockMouse;
+    bool OnLockMouse(const Events::LockMouse& e);
+    EventRelay<EditorGUI, Events::UnlockMouse> m_EUnlockMouse;
+    bool OnUnlockMouse(const Events::UnlockMouse& e);
 
     // Utility functions
     boost::filesystem::path fileOpenDialog();
@@ -119,6 +145,8 @@ private:
     const std::string formatEntityName(EntityWrapper entity);
     GLuint tryLoadTexture(std::string filePath);
     void openModal(const std::string& modal);
+    void setWidgetMode(WidgetMode mode);
+    void toggleWidgetSpace();
     static bool compareCharArray(const char* c1, const char* c2);
 
     // Entity file handling methods

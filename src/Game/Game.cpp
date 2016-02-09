@@ -75,6 +75,7 @@ Game::Game(int argc, char* argv[])
 
     // Create Octrees
     m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    m_OctreeTrigger = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     m_OctreeFrustrumCulling = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
@@ -93,7 +94,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
+    m_SystemPipeline->AddSystem<CollidableOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
     m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
 
@@ -101,7 +103,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
-    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeTrigger);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
     ++updateOrderLevel;
@@ -125,6 +127,7 @@ Game::~Game()
     delete m_SoundSystem;
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
+    delete m_OctreeTrigger;
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;

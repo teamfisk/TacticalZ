@@ -59,10 +59,9 @@ void Renderer::InitializeWindow()
 		exit(EXIT_FAILURE);
 	}
 
-    int res[2];
-    glfwGetWindowSize(m_Window, &res[0], &res[1]);
-    SetViewPortSize(Rectangle::Rectangle(res[0], res[1]));
-
+    int windowSize[2];
+    glfwGetWindowSize(m_Window, &windowSize[0], &windowSize[1]);
+    m_ViewportSize = Rectangle(windowSize[0], windowSize[1]);
 }
 
 void Renderer::InitializeShaders()
@@ -120,8 +119,8 @@ void Renderer::Draw(RenderFrame& frame)
 
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
-    if(m_DebugTextureToDraw == 0) {
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture());
+    if (m_DebugTextureToDraw == 0) {
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
     }
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());

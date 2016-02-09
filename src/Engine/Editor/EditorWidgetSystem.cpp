@@ -23,14 +23,18 @@ void EditorWidgetSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper
     
     Events::WidgetDelta e;
 
-    EntityWrapper moveEntity = entity.Parent();
-    if (!moveEntity.Valid()) {
-        moveEntity = entity;
+    // Widget axes should have a common parent
+    EntityWrapper widgetBase = entity.Parent();
+    if (!widgetBase.Valid()) {
+        widgetBase = entity;
     }
+    glm::vec3 widgetBasePos = widgetBase["Transform"]["Position"];
+    glm::quat widgetBaseOri = glm::quat((glm::vec3)widgetBase["Transform"]["Orientation"]);
 
     auto camera = m_PickData.Camera;
-    glm::vec3 axis = cEditorWidget["Axis"];
-    glm::vec2 axisScreen = camera->WorldToScreen(axis, m_Renderer->GetViewPortSize()) - camera->WorldToScreen(glm::vec3(0, 0, 0), m_Renderer->GetViewPortSize());
+    glm::vec3 axis = (glm::vec3)cEditorWidget["Axis"];
+    glm::vec3 axisOriented = widgetBaseOri * axis;
+    glm::vec2 axisScreen = camera->WorldToScreen(widgetBasePos + axisOriented, m_Renderer->GetViewportSize()) - camera->WorldToScreen(widgetBasePos, m_Renderer->GetViewportSize());
     float dot = glm::dot(m_MouseDelta, glm::normalize(axisScreen)) / glm::length(axisScreen);
     glm::vec3 worldMovement = dot * axis;
 

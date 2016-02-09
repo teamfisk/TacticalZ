@@ -70,7 +70,7 @@ public:
 
     virtual void WriteBinary(std::ostream& out)
     {
-		//out.write((char*)&hasSkin, sizeof(bool));
+		out.write((char*)&hasSkin, sizeof(bool));
         out.write((char*)&NumVertices, sizeof(int));
         out.write((char*)&NumIndices, sizeof(int));
         for (auto aVertex : Vertices) {

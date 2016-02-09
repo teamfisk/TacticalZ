@@ -1,0 +1,1558 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform>
+      <Position X="0" Y="-1" Z="0"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Ground">
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitPlane.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Scale X="100" Y="1" Z="100"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="SoundTestOrigin">
+      <Components>
+        <c:Camera>
+          <FOV>90</FOV>
+        </c:Camera>
+        <c:Listener/>
+        <c:Transform>
+          <Position X="6.86900043" Y="1.30500007" Z="28.6792946"/>
+          <Orientation X="-0.0349078141" Y="0.157154545" Z="-2.60252193e-07"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="rotationPoint">
+          <Components>
+            <c:RaptorCopter>
+              <Speed>1</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Orientation X="0" Y="7364.7876" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="SoundEmitter">
+              <Components>
+                <c:SoundEmitter>
+                  <FilePath>Audio/crosscounter.wav</FilePath>
+                  <Loop>true</Loop>
+                </c:SoundEmitter>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="3.9000001"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="SoundEmitterText">
+                  <Components>
+                    <c:Text>
+                      <Content>SoundEmitter</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                    </c:Text>
+                    <c:Transform>
+                      <Scale X="0.5" Y="0.5" Z="0.5"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ListenerText">
+          <Components>
+            <c:Text>
+              <Content>Sound Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Orientation X="0" Y="3.31600022" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="DirectionalLight">
+      <Components>
+        <c:DirectionalLight>
+          <Intensity>0.80000001192092896</Intensity>
+        </c:DirectionalLight>
+        <c:Model>
+          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
+        </c:Model>
+        <c:RaptorCopter>
+          <Speed>1</Speed>
+          <Axis X="0" Y="1" Z="0"/>
+        </c:RaptorCopter>
+        <c:Transform>
+          <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
+          <Orientation X="4.16300011" Y="15381.7266" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="AnimationTestOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-9.21499538" Y="0" Z="8.55711079"/>
+          <Orientation X="0" Y="4.829" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="RunAnim">
+          <Components>
+            <c:Animation>
+              <Name>Run</Name>
+              <Time>0.28223692849998105</Time>
+              <Speed>1</Speed>
+            </c:Animation>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.786919653" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Walkanim">
+          <Components>
+            <c:Animation>
+              <Name>Walk</Name>
+              <Time>0.44951638260048998</Time>
+              <Speed>1</Speed>
+            </c:Animation>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AnimationText">
+          <Components>
+            <c:Text>
+              <Content>Animation test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="2.4000001" Z="0"/>
+              <Orientation X="0" Y="3.08300018" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="-1.10000002" Y="-0.231354833" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="2019.28503" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Animation>
+                      <Name>Run</Name>
+                      <Time>0.021047045591223501</Time>
+                      <Speed>1</Speed>
+                    </c:Animation>
+                    <c:Model>
+                      <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="0.5" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="SpheresOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-1.36880863" Y="2.44893074" Z="13.6345663"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="CombinedSpheres">
+          <Components>
+            <c:Model>
+              <Resource>Models/Test/NormSpecIncdMapSphere.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="RotationPoint">
+          <Components>
+            <c:RaptorCopter>
+              <Speed>1</Speed>
+              <Axis X="1" Y="1" Z="1"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Orientation X="13996.3721" Y="13996.3721" Z="13996.3721"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="PointLight">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                  <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                </c:Model>
+                <c:PointLight>
+                  <Radius>3</Radius>
+                  <Intensity>1.1399998664855957</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="-1.70000005" Y="0" Z="0"/>
+                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="PointLight">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                  <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                </c:Model>
+                <c:PointLight>
+                  <Radius>5.0100002288818359</Radius>
+                  <Intensity>0.69999998807907104</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0.900000036" Y="1.10000002" Z="0"/>
+                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="PointLight">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                  <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                </c:Model>
+                <c:PointLight>
+                  <Radius>4</Radius>
+                  <Intensity>0.80000001192092896</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0.400000006" Y="-1" Z="-1.50000012"/>
+                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="SphereRotationOrigin">
+          <Components>
+            <c:RaptorCopter>
+              <Speed>1</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Orientation X="0" Y="13793.4053" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="NormalSphere">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Test/NormalMapSphere.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="1.82700014" Y="0" Z="-0.166000009"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpecularSphere">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Test/SpecularMapSphere.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-1.06487739" Y="0" Z="1.52336037"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Rotationpoint">
+                  <Components>
+                    <c:RaptorCopter>
+                      <Speed>1</Speed>
+                      <Axis X="0.699999988" Y="1" Z="0.300000012"/>
+                    </c:RaptorCopter>
+                    <c:Transform>
+                      <Orientation X="10188.9443" Y="14517.8643" Z="4350.31738"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="PointLight">
+                      <Components>
+                        <c:Model>
+                          <Resource>Models/Core/UnitSphere.mesh</Resource>
+                          <Color A="1" B="0" G="3.92156863" R="3.92156863"/>
+                        </c:Model>
+                        <c:PointLight>
+                          <Radius>3</Radius>
+                          <Intensity>1.1399998664855957</Intensity>
+                        </c:PointLight>
+                        <c:Transform>
+                          <Position X="0.600000024" Y="0.5" Z="0"/>
+                          <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="GlowMap">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Test/IncandescenceMapSphere.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-1.10000002" Y="0" Z="-1.80000007"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Text">
+          <Components>
+            <c:Text>
+              <Content>TextureMap's Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="1.60000002" Z="0"/>
+              <Orientation X="0" Y="3.20000005" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="SceneColors">
+      <Components>
+        <c:SceneLight>
+          <Gamma>1.3999999761581421</Gamma>
+        </c:SceneLight>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlayerSpawnOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="2.51321125" Y="0.600000024" Z="-0.134501517"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="SpawnerRedTeam">
+          <Components>
+            <c:PlayerSpawn/>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/Player.xml</EntityFile>
+            </c:Spawner>
+            <c:Team>
+              <Team>
+                <Red/>
+              </Team>
+            </c:Team>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-3"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="SpawnPointRedTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="0" G="0" R="1"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="1" Y="0" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpawnPointRedTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="0" G="0" R="1"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-1" Y="0" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpawnPointRedTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="0" G="0" R="1"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpawnPointRedTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="0" G="0" R="1"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="SpawnerBlueTeam">
+          <Components>
+            <c:PlayerSpawn/>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/Player.xml</EntityFile>
+            </c:Spawner>
+            <c:Team>
+              <Team>
+                <Blue/>
+              </Team>
+            </c:Team>
+            <c:Transform>
+              <Position X="0" Y="0" Z="3"/>
+              <Orientation X="0" Y="3.20000005" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="SpawnPointBlueTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="1" G="0" R="0"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="1" Y="0" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpawnPointBlueTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="1" G="0" R="0"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-1" Y="0" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpawnPointBlueTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="1" G="0" R="0"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpawnPointBlueTeam">
+              <Components>
+                <c:SpawnPoint/>
+                <c:Model>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                  <Color A="1" B="1" G="0" R="0"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="SpawnText">
+          <Components>
+            <c:Text>
+              <Content>Spawn Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0.200000003" Y="2.5" Z="0"/>
+              <Orientation X="0" Y="4.71200037" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="TransparancyTestOriginss">
+      <Components>
+        <c:Transform>
+          <Position X="-5.29043961" Y="0" Z="-14.8755674"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Cube1">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+              <Color A="0.505882382" B="0" G="1" R="0"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.5" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Cylinder">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="0.623529434" B="0" G="0.811764717" R="0.917647064"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.258742422" Y="0.5" Z="-1.8603574"/>
+              <Orientation X="2.03600001" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Raptor">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitRaptor.mesh</Resource>
+              <Color A="0.396078438" B="1" G="1" R="1"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="1.64195371" Y="1.37490404" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Assault">
+          <Components>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Color A="0.572549045" B="1" G="1" R="0"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-1.4000001"/>
+              <Orientation X="0" Y="0.873000026" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Cube2">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+              <Color A="0.36470589" B="1" G="0" R="1"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="1.16991854" Y="0.5" Z="-1.42708254"/>
+              <Scale X="3.70000029" Y="1" Z="1"/>
+              <Orientation X="1.80400014" Y="3.6650002" Z="4.94500017"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Text">
+          <Components>
+            <c:Text>
+              <Content>Transparency Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="3.2192595" Z="0"/>
+              <Orientation X="0" Y="0.407000005" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="AssetTestOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-9.45424175" Y="0" Z="-0.110523224"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="316.504456" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="1" Z="0"/>
+                      <Orientation X="0.524000049" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="1.19180429"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="316.504456" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="1" Z="0"/>
+                      <Orientation X="0.524000049" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetText">
+          <Components>
+            <c:Text>
+              <Content>Asset Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="2.4000001" Z="0"/>
+              <Orientation X="0" Y="1.5710001" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="2.4000001"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="316.504456" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Weapons/SecondaryWeapon.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="1" Z="0"/>
+                      <Orientation X="0.640000045" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="-2.27346039" Y="-0.231354833" Z="-0.0611162409"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="316.504456" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Test/AssaultTPoseSoftEdge.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="0.5" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="-1.30000007"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="316.504456" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Weapons/Blue/DefenderGunBlue.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="1" Z="0"/>
+                      <Orientation X="0.524000049" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="-2.57585168"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="316.504456" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Weapons/Red/DefenderGunRed.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="1" Z="0"/>
+                      <Orientation X="0.524000049" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="-2.22662115" Y="-0.231354833" Z="-1.91447401"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="316.504456" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Test/AssaultTPoseHardEdge.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="0.5" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="CapturePointTestOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="12.7591639" Y="0" Z="-7.50489998"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="CapturePointTestText">
+          <Components>
+            <c:Text>
+              <Content>CapturePoint Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="6.9000001" Z="0"/>
+              <Orientation X="0" Y="4.71200037" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="RedTeamHomeCapturePoint">
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-30"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Trigger">
+              <Components>
+                <c:AABB/>
+                <c:CapturePoint>
+                  <HomePointForTeam>
+                    <Red/>
+                  </HomePointForTeam>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCube.mesh</Resource>
+                  <Color A="1" B="0" G="0.200000003" R="1"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team>
+                  <Team>
+                    <Red/>
+                  </Team>
+                </c:Team>
+                <c:Transform>
+                  <Position X="0" Y="2" Z="0"/>
+                  <Scale X="8" Y="4" Z="8"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Red team home point</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="4" Z="0"/>
+                  <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
+                  <Orientation X="0" Y="4.71200037" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="RedMiddleCapturePoint">
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-15"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Trigger">
+              <Components>
+                <c:AABB/>
+                <c:CapturePoint>
+                  <CapturePointNumber>1</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCube.mesh</Resource>
+                  <Color A="1" B="0" G="1" R="1"/>
+                </c:Model>
+                <c:Team/>
+                <c:Transform>
+                  <Position X="0" Y="2" Z="0"/>
+                  <Scale X="8" Y="4" Z="8"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>RedMiddle Point</Content>
+                  <Resource>Fonts/DroidSans.ttf</Resource>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="4" Z="0"/>
+                  <Scale X="0.400000006" Y="0.400000006" Z="1"/>
+                  <Orientation X="0" Y="4.71200037" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="MiddleCapturePoint">
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Trigger">
+              <Components>
+                <c:AABB/>
+                <c:CapturePoint>
+                  <CapturePointNumber>2</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCube.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team/>
+                <c:Transform>
+                  <Position X="0" Y="2" Z="0"/>
+                  <Scale X="8" Y="4" Z="8"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Middle Point</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="4" Z="0"/>
+                  <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
+                  <Orientation X="0" Y="4.71200037" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="BlueMiddleCaapturePoint">
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0" Z="15"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Trigger">
+              <Components>
+                <c:AABB/>
+                <c:CapturePoint>
+                  <CaptureTimer>-12.033302729641917</CaptureTimer>
+                  <CapturePointNumber>3</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCube.mesh</Resource>
+                  <Color A="1" B="1" G="1" R="0"/>
+                </c:Model>
+                <c:Team/>
+                <c:Transform>
+                  <Position X="0" Y="2" Z="0"/>
+                  <Scale X="8" Y="4" Z="8"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>BlueMiddle Point</Content>
+                  <Resource>Fonts/DroidSans.ttf</Resource>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="4" Z="0"/>
+                  <Scale X="0.400000006" Y="0.400000006" Z="1"/>
+                  <Orientation X="0" Y="4.71200037" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="BlueTeamHomeCapturePoint">
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0" Z="30"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Trigger">
+              <Components>
+                <c:AABB/>
+                <c:CapturePoint>
+                  <HomePointForTeam>
+                    <Blue/>
+                  </HomePointForTeam>
+                  <CapturePointNumber>4</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCube.mesh</Resource>
+                  <Color A="1" B="1" G="0.200000003" R="0"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team>
+                  <Team>
+                    <Blue/>
+                  </Team>
+                </c:Team>
+                <c:Transform>
+                  <Position X="0" Y="2" Z="0"/>
+                  <Scale X="8" Y="4" Z="8"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Blue team home point</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="4" Z="0"/>
+                  <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
+                  <Orientation X="0" Y="4.71200037" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="CollisionTestOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="50.0696526" Y="0" Z="-0.550000012"/>
+          <Orientation X="0" Y="1.5710001" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="CollisionMesh">
+          <Components>
+            <c:AABB>
+              <Size X="50" Y="50" Z="50"/>
+            </c:AABB>
+            <c:Collidable/>
+            <c:Model>
+              <Resource>Models/Test/ObstacleCourse.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.0199999996" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="CollisionText">
+          <Components>
+            <c:Text>
+              <Content>Collision Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="13.1000004" Z="0"/>
+              <Scale X="2" Y="2" Z="2"/>
+              <Orientation X="0" Y="3.08300018" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="WallFront">
+          <Components>
+            <c:AABB/>
+            <c:Collidable/>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="6.80000019" Y="4.60000038" Z="23.7000008"/>
+              <Scale X="51.4000015" Y="12.500001" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="WellLeft">
+          <Components>
+            <c:AABB/>
+            <c:Collidable/>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="32.1000023" Y="4.5999999" Z="0"/>
+              <Scale X="1" Y="12.5" Z="49.0000038"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="WallRight">
+          <Components>
+            <c:AABB/>
+            <c:Collidable/>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-17.8151627" Y="4.5999999" Z="0.000119187171"/>
+              <Scale X="1" Y="12.5" Z="47.5000038"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="DeathEffectTestOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-15.2719116" Y="0" Z="-13.4612761"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="850.206848" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:ExplosionEffect>
+                      <ColorByDistance>true</ColorByDistance>
+                      <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
+                      <TimeSinceDeath>0.75008034908941568</TimeSinceDeath>
+                      <ExplosionDuration>3.7999999523162842</ExplosionDuration>
+                      <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
+                      <Randomness>true</Randomness>
+                    </c:ExplosionEffect>
+                    <c:Model>
+                      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="1" Z="0"/>
+                      <Orientation X="0.524000049" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="1.4000001"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="850.206848" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:ExplosionEffect>
+                      <Velocity X="0.5" Y="1" Z="0"/>
+                      <ExplosionOrigin X="0" Y="0.900000036" Z="0"/>
+                      <TimeSinceDeath>1.1999860997035228</TimeSinceDeath>
+                    </c:ExplosionEffect>
+                    <c:Model>
+                      <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="0.5" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="AssetBase">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCylinder.mesh</Resource>
+              <Color A="1" B="1.56862748" G="1.56862748" R="1.56862748"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="-0.231354833" Z="-1.4516592"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight/>
+                <c:Transform>
+                  <Position X="0" Y="0.663784981" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="RotationOrigin">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.5</Speed>
+                  <Axis X="0" Y="1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Orientation X="0" Y="850.206848" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Asset">
+                  <Components>
+                    <c:Animation>
+                      <Name>Walk</Name>
+                      <Time>0.23053304095120097</Time>
+                      <Speed>1</Speed>
+                    </c:Animation>
+                    <c:ExplosionEffect>
+                      <ColorByDistance>true</ColorByDistance>
+                      <Velocity X="0.300000012" Y="2" Z="0"/>
+                      <ExplosionOrigin X="0" Y="1.30000007" Z="-0.200000003"/>
+                      <TimeSinceDeath>0.68343188336345406</TimeSinceDeath>
+                      <EndColor A="0" B="0.333333343" G="0.933333337" R="3.92156863"/>
+                      <Randomness>true</Randomness>
+                    </c:ExplosionEffect>
+                    <c:Model>
+                      <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="0.5" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Text">
+          <Components>
+            <c:Text>
+              <Content>ExplosionEffect Test</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="3.80000019" Z="0"/>
+              <Orientation X="0" Y="1.5710001" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="PickingOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-26.0923824" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Text">
+          <Components>
+            <c:Text>
+              <Content>Remember to pick random entities.</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="7.57566977" Y="8.63030624" Z="-0.00154382922"/>
+              <Scale X="2" Y="2" Z="1"/>
+              <Orientation X="0" Y="1.5710001" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

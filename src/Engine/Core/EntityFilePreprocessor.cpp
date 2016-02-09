@@ -114,7 +114,7 @@ void EntityFilePreprocessor::parseComponentInfo()
             std::string baseType = XS::ToString(elementDeclaration->getTypeDefinition()->getBaseType()->getName());
 
             std::string effectiveType = type;
-            size_t stride = EntityFile::GetTypeStride(type);
+            unsigned int stride = EntityFile::GetTypeStride(type);
             if (stride == 0) {
                 stride = EntityFile::GetTypeStride(baseType);
                 if (stride == 0) {
