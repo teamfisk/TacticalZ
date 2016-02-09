@@ -1,21 +1,26 @@
 #include "Rendering/RenderSystem.h"
+#include "Collision/Collision.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame) 
+RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
     : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
     , m_World(world)
+    , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &RenderSystem::OnPlayerSpawned);
 
     m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_LastCullCamera = new Camera(*m_Camera);
+    m_FrustumCamPtr = &m_Camera;
 }
 
 RenderSystem::~RenderSystem()
 {
     delete m_Camera;
+    delete m_LastCullCamera;
 }
 
 bool RenderSystem::OnSetCamera(Events::SetCamera& e)
@@ -28,6 +33,17 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
     m_Camera->SetPosition(cTransform["Position"]);
     m_Camera->SetOrientation(glm::quat((const glm::vec3&)cTransform["Orientation"]));
     m_CurrentCamera = e.CameraEntity;
+    //Right now, lets set the camera to cull away stuff if it is connected to anything.
+    //TODO: This won't work with spectators, or death anim.
+    if (m_CurrentCamera.Parent().Valid()) {
+        //Copy the camera into the last frustum camera, without allocating new memory.
+        new ((void*)m_LastCullCamera) Camera(*m_Camera);
+        m_FrustumCamPtr = &m_Camera;
+    } else {
+        //If the camera has no parents, i.e. a free camera, 
+        //then we cull from the last camera, so we can see if the culling works.
+        m_FrustumCamPtr = &m_LastCullCamera;
+    }
     return true;
 }
 
@@ -42,11 +58,33 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
 
 void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
 {
+
+    std::vector<EntityAABB> seenEntities;
+    //m_Octree->ObjectsInFrustum((*m_FrustumCamPtr)->ProjectionMatrix() * (*m_FrustumCamPtr)->ViewMatrix(), seenEntities);
+    //m_Octree->ObjectsInFrustum((*m_FrustumCamPtr)->ViewMatrix() * (*m_FrustumCamPtr)->ProjectionMatrix(), seenEntities);
+
+    glm::mat4x4 viewProj = (*m_FrustumCamPtr)->ViewMatrix() * (*m_FrustumCamPtr)->ProjectionMatrix();
+    OctSpace::Frustum frustum;
+    for (int i = 0; i < 6; ++i) {
+        int sign = 2 * (i % 2) - 1;
+        int index = i / 2;
+        OctSpace::Plane& plane = frustum.planes[i];
+        plane.normal.x = viewProj[0].w + sign * viewProj[0][index];
+        plane.normal.y = viewProj[1].w + sign * viewProj[1][index];
+        plane.normal.z = viewProj[2].w + sign * viewProj[2][index];
+        plane.distance = viewProj[3].w + sign * viewProj[3][index];
+        float divByNormalLength = 1.0f / glm::length(plane.normal);
+        plane.normal *= divByNormalLength;
+        plane.distance *= divByNormalLength;
+    }
+
+    //for (auto& seenEntity : seenEntities) {
+    //    EntityWrapper entity = seenEntity.Entity;
+    //    ComponentWrapper cModel = entity["Model"];
     auto models = m_World->GetComponents("Model");
     if (models == nullptr) {
         return;
     }
-
     for (auto& cModel : *models) {
         bool visible = cModel["Visible"];
         if (!visible) {
@@ -57,7 +95,7 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
             continue;
         }
 
-        EntityWrapper entity(m_World, cModel.EntityID);
+        EntityWrapper entity = EntityWrapper(m_World, cModel.EntityID);
 
         // Only render children of a camera if that camera is currently active
         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
@@ -66,6 +104,15 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+            continue;
+        }
+
+        if (entity.HasComponent("AABB")) {
+            OctSpace::Frustum::Output o = frustum.VsAABB(*Collision::EntityAbsoluteAABB(entity));
+            if (o == OctSpace::Frustum::Outside) {
+                continue;
+            }
+        } else {
             continue;
         }
 
