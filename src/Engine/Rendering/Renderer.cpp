@@ -138,7 +138,6 @@ void Renderer::Draw(RenderFrame& frame)
     } 
     if (m_DebugTextureToDraw == 5) {
         m_DrawScreenQuadPass->Draw(m_ShadowPass->DepthMap());
-       // m_DrawScreenQuadPass->Draw();
     }
 
     m_ImGuiRenderPass->Draw();
@@ -179,9 +178,9 @@ void Renderer::InitializeRenderPasses()
 {
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
+    m_ShadowPass = new ShadowPass(this);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_ShadowPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
-    m_ShadowPass = new ShadowPass(this);
 }

@@ -3,6 +3,9 @@
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
+uniform mat4 lightSpaceMatrix; // Shadow map PV
+uniform mat4 LightV;
+uniform mat4 LightP;
 uniform mat4 Bones[100];
 
 layout(location = 0) in vec3 Position;
@@ -21,7 +24,16 @@ out VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace;
 }Output;
+
+// N
+mat4 biasMatrix = mat4(
+vec4(0.5, 0.0, 0.0, 0.0),
+vec4(0.0, 0.5, 0.0, 0.0),
+vec4(0.0, 0.0, 0.5, 0.0),
+vec4(0.5, 0.5, 0.5, 1.0)
+);
 
 void main()
 {
@@ -34,9 +46,12 @@ void main()
 				  + BoneWeights[2] * Bones[int(BoneIndices[2])]
 				  + BoneWeights[3] * Bones[int(BoneIndices[3])];
 	}
-
-	gl_Position = P*V*M*boneTransform * vec4(Position, 1.0);
 	
+	//vec4 lightPos = biasMatrix * LightP * LightV * M * vec4(Position, 1.0); // N
+	
+	gl_Position = P*V*M*boneTransform * vec4(Position, 1.0);
+	//gl_Position = lightPos; // N
+
 	Output.Position = (boneTransform * vec4(Position, 1.0)).xyz;
 	Output.TextureCoordinate = TextureCoords;
 	Output.Normal = vec3(M * vec4(Normal, 0.0));
@@ -44,4 +59,7 @@ void main()
  	Output.BiTangent = vec3(M * vec4(BiTangent, 0.0));
 	Output.ExplosionColor = vec4(1.0);
 	Output.ExplosionPercentageElapsed = 0.0;
+	
+	//Output.PositionLightSpace = lightPos; // N
+	Output.PositionLightSpace = lightSpaceMatrix * (M * vec4(Position, 1.0));
 }

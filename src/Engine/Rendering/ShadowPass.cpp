@@ -71,23 +71,20 @@ void ShadowPass::Draw(RenderScene & scene)
     //}
 
     ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
+    ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
 
     for (auto &job : scene.DirectionalLightJobs) {
         auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
         
         if(directionalLightJob) {
-            glm::mat4 lightProjection = glm::ortho(m_LRBT[0], m_LRBT[1], m_LRBT[2], m_LRBT[3], m_NearPlane, m_FarPlane);
+            //m_LightProjection = glm::ortho(m_LRBT[Left], m_LRBT[Right], m_LRBT[Bottom], m_LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
+            m_LightProjection = glm::ortho(m_LRBT[Left], m_LRBT[Right], m_LRBT[Bottom], m_LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
+            m_LightView = glm::lookAt(-glm::normalize(glm::vec3(directionalLightJob->Direction)), glm::vec3(0.f,0.f,0.f), glm::vec3(0.f,1.f,0.f));
+            //m_LightView = glm::lookAt(glm::vec3(-20.0f, 20.0f, -20.0f), glm::vec3(0.0f), glm::vec3(1.0));
+            m_LightSpaceMatrix = m_LightProjection * m_LightView;
 
-            // broken?
-            glm::mat4 lightView = glm::lookAt(-glm::normalize(glm::vec3(directionalLightJob->Direction)) * (float)20.0 , glm::vec3(0,0,0), glm::vec3(0,1,0));
-            //glm::mat4 lightView = glm::lookAt(glm::vec3(10.f, 10.f, 50.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-            //glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(lightProjection));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(lightView));
-
-          /*  glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));*/
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView));
 
             GLERROR("ShadowLight ERROR");
 

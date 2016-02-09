@@ -13,6 +13,7 @@ layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
 layout (binding = 2) uniform sampler2D SpecularMapTexture;
 layout (binding = 3) uniform sampler2D GlowMapTexture;
+layout (binding = 4) uniform sampler2D DepthMap;
 
 #define TILE_SIZE 16
 
@@ -56,6 +57,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace;
 }Input;
 
 out vec4 sceneColor;
@@ -112,6 +114,45 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
+//float CalcShadowValue(vec4 positionLightSpace, vec4 normal, vec4 lightDir, sampler2D depthTexture)
+//{
+//    // perform perspective divide
+//    //vec3 projCoords = positionLightSpace.xyz / positionLightSpace.w;
+//    // Transform to [0,1] range
+//    //projCoords = projCoords * 0.5 + 0.5;
+//    // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+//    float closestDepth = texture(depthTexture, positionLightSpace.xy).r; 
+//    // Get depth of current fragment from light's perspective
+//    float currentDepth = positionLightSpace.z;
+//    // Check whether current frag pos is in shadow
+//    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+//
+//    return shadow;
+//	
+//} 
+
+float CalcShadowValue(vec4 positionLightSpace, vec4 normal, vec4 lightDir, sampler2D depthTexture)
+{
+	
+	//float bias = max(0.05 * (1.0 - dot(normal, -lightDir)), 0.005); 
+    // perform perspective divide
+    vec3 projCoords = positionLightSpace.xyz / positionLightSpace.w;
+    // Transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+	//float lightDepth = texture(depthTexture, positionLightSpace.xy).r; 
+    float closestDepth = texture(depthTexture, projCoords.xy).r; 
+    // Get depth of current fragment from light's perspective
+	//float currentDepth = positionLightSpace.z;
+    float currentDepth = projCoords.z;
+    // Check whether current frag pos is in shadow
+	float shadow = currentDepth /*- bias*/ > closestDepth ? 1.0 : 0.0;
+   // float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+
+    return shadow;
+	
+} 
+
 void main()
 {
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate);
@@ -134,24 +175,42 @@ void main()
 	int start = int(LightGrids.Data[currentTile].Start);
 	int amount = int(LightGrids.Data[currentTile].Amount);
 
+	float shadowFactor = 1.0;
+	
 	for(int i = start; i < start + amount; i++) {
 
 		int l = int(LightIndex[i]);
 		LightSource light = LightSources.List[l];
-
+		
 		LightResult light_result;
 		//These if statements should be removed.
 		if(light.Type == 1) { // point
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
+			shadowFactor = CalcShadowValue(Input.PositionLightSpace, normal, light.Direction, DepthMap);
 		}
+	
 		totalLighting.Diffuse += light_result.Diffuse;
-		totalLighting.Specular += light_result.Specular;
+		totalLighting.Specular += light_result.Specular; 
 	}
 
+	totalLighting.Diffuse += (1.0 - shadowFactor); 
+	totalLighting.Specular += (1.0 - shadowFactor);
+	//LightResult getInformation;
+	
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
+	
+	//color_result = (totalLighting.Diffuse + (1.0 - shadowFactor) * (getInformation.Diffuse + (getInformation.Specular * specularTexel))) * color_result;
+	
+
+	
+	
+
+	
+	
+	
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 

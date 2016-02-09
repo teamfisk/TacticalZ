@@ -22,6 +22,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace;
 }Input[];
 
 out VertexData{
@@ -32,6 +33,7 @@ out VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace;
 }Output;
 
 layout(triangles) in;
@@ -145,6 +147,7 @@ void main()
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
 			Output.Tangent = Input[i].Tangent;
 			Output.BiTangent = Input[i].BiTangent;
+			Output.PositionLightSpace = Input[i].PositionLightSpace;
 			
 			// convert to model space for the gravity to always be in -y
 			vec4 ExplodedPositionInModelSpace = M * vec4(ExplodedPosition, 1.0);
@@ -186,6 +189,7 @@ void main()
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
 			Output.Tangent = Input[i].Tangent;
 			Output.BiTangent = Input[i].BiTangent;
+			Output.PositionLightSpace = Input[i].PositionLightSpace;
 
 			// no change in position, pass through vertex
 			gl_Position = gl_in[i].gl_Position;

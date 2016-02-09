@@ -11,7 +11,8 @@
 
 //#include "ShadowPassState.h" // not created yet
 
-
+enum NearFar { Near = 0, Far = 1 };
+enum LRBT { Left = 0, Right = 1, Bottom = 2, Top = 3 };
 
 class ShadowPass
 {
@@ -28,7 +29,11 @@ public:
  
 
     GLuint DepthMap() const { return m_DepthMap; }
-
+    glm::mat4 lightSpaceMatrix() const { return m_LightSpaceMatrix; }
+    glm::mat4 lightP() const { return m_LightProjection; }
+    glm::mat4 lightV() const { return m_LightView; }
+    //glm::mat4 lightV() const { return m_LightProjection; } //swapped m_P -> m_V
+    //glm::mat4 lightP() const { return m_LightView; } // swapped m_V -> m_P
 
 private:
 
@@ -46,14 +51,12 @@ private:
 
     GLuint m_DepthFBO;
 
-    GLfloat m_NearPlane = -40.f;
-    GLfloat m_FarPlane = 80.f;
-    //GLfloat m_Left = -10.f;
-    //GLfloat m_Right = 10.f;
-    //GLfloat m_Bottom = -10.f;
-    //GLfloat m_Top = 10.f;
+    GLfloat m_NearFarPlane[2] = { -40.f, 30.f };
     GLfloat m_LRBT[4] = { -40.f, 100.f, -50.f, 50.f };
 
+    glm::mat4 m_LightProjection;
+    glm::mat4 m_LightView;
+    glm::mat4 m_LightSpaceMatrix;
 };
 
 #endif

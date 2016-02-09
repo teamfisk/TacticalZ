@@ -49,7 +49,6 @@ void FrameBuffer::Generate()
         case GL_TEXTURE_2D:
             glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
             GLERROR("FrameBuffer generate: glFramebufferTexture2D");
-
             break;
         case GL_RENDERBUFFER:
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);

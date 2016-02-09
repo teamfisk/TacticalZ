@@ -8,11 +8,12 @@
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
 #include "Texture.h"
+#include "ShadowPass.h"
 
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, ShadowPass* shadowPass);
     ~DrawFinalPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -50,6 +51,7 @@ private:
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
+    const ShadowPass* m_ShadowPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;

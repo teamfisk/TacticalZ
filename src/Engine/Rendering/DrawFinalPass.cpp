@@ -1,9 +1,10 @@
 #include "Rendering/DrawFinalPass.h"
 
-DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass)
+DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, ShadowPass* shadowPass)
 {
     m_Renderer = renderer;
     m_LightCullingPass = lightCullingPass;
+    m_ShadowPass = shadowPass;
     InitializeTextures();
     InitializeShaderPrograms();
     InitializeFrameBuffers();
@@ -242,6 +243,16 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
     glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), job->FillPercentage);
     glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
 
+    //Shadow
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightSpaceMatrix()));
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightP()));
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightV()));
+    //GLfloat m_NearFarPlane[2] = { -40.f, 30.f };
+    //GLfloat m_LRBT[4] = { -40.f, 100.f, -50.f, 50.f };
+    //glm::mat4 m_LightProjection = glm::ortho(m_LRBT[Left], m_LRBT[Right], m_LRBT[Bottom], m_LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
+    //glm::mat4 m_LightView = glm::lookAt(glm::vec3(-20.0f, 20.0f, -20.0f), glm::vec3(0.0f), glm::vec3(1.0));
+    //glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), 1, GL_FALSE, glm::value_ptr(m_LightProjection));
+    //glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), 1, GL_FALSE, glm::value_ptr(m_LightView));
     GLERROR("END");
 }
 
@@ -305,6 +316,13 @@ void DrawFinalPass::BindModelTextures(std::shared_ptr<ModelJob>& job)
         glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture->m_Texture);
     } else {
         glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+    }
+
+    glActiveTexture(GL_TEXTURE4);
+    if (m_ShadowPass->DepthMap() != NULL) {
+        glBindTexture(GL_TEXTURE_2D, m_ShadowPass->DepthMap());
+    } else {
+        glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
     }
 }
 
