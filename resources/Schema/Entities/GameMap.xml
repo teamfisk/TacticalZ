@@ -9,7 +9,8 @@
     <Entity name="Scenemesh">
       <Components>
         <c:AABB>
-          <Size X="150" Y="64" Z="180"/>
+          <Origin X="0.195705414" Y="26.0382366" Z="-0.010017395"/>
+          <Size X="135.414337" Y="68.3848572" Z="180.020035"/>
         </c:AABB>
         <c:Collidable/>
         <c:Model>

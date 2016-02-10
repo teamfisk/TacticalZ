@@ -95,7 +95,7 @@ void PlayerMovementSystem::Update(double dt)
                 } else {
                     controller->SetDoubleJumping(true);
                 }
-                velocity.y += 4.f;
+                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
