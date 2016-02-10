@@ -62,14 +62,14 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
         }
 
         // Only render children of a camera if that camera is currently active
-//         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-//             continue;
-//         } DO NOT COMMIT THIS  DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS
+         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+             continue;
+         } 
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-//         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
-//             continue;
-//         }  DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS DO NOT COMMIT THIS
+         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+             continue;
+         }
 
         Model* model;
         try {
