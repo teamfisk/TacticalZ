@@ -42,8 +42,8 @@ public:
     ~PickupSpawnTest();
 
     void Tick();
-    bool m_TestSucceeded = false;
-    int m_NumLoops = 0;
+    bool TestSucceeded = false;
+    int NumLoops = 0;
 
     bool Game_Loop_OneHundredTimes();
 
@@ -64,8 +64,8 @@ private:
     EventRelay<PickupSpawnSystem, Events::PickupSpawned> m_PS;
     bool OnPickupSpawned(Events::PickupSpawned& e);
 
-    bool testStage1Success = false;
-    bool testStage2Success = false;
+    bool m_TestStage1Success = false;
+    bool m_TestStage2Success = false;
 
 
 };

@@ -4,7 +4,6 @@ using boost::unit_test_framework::test_case;
 
 #include "PickupSpawnTest.h"
 
-
 BOOST_AUTO_TEST_SUITE(PickupSpawnTestSuite)
 
 //dont use the same name as the classname in test cases...
@@ -73,15 +72,15 @@ bool PickupSpawnTest::OnHealthPickup(Events::PlayerHealthPickup& e) {
     //very that the event has the correct healthgain number and playerid
     if (m_RunTestNumber == 1) {
         if (e.HealthAmount == 22.0 && e.Player.ID == m_PlayerID) {
-            testStage1Success = true;
+            m_TestStage1Success = true;
         }
     }
     if (m_RunTestNumber == 2) {
-        testStage1Success = false;
+        m_TestStage1Success = false;
     }
     if (m_RunTestNumber == 3) {
         if (e.HealthAmount == 50.0 && e.Player.ID == m_PlayerID) {
-            testStage1Success = true;
+            m_TestStage1Success = true;
         }
     }
     return true;
@@ -90,22 +89,24 @@ bool PickupSpawnTest::OnPickupSpawned(Events::PickupSpawned& e) {
     //verify that the newly spawned pickup has the same variable values as the original one
     if (m_RunTestNumber == 1) {
         if ((double)e.Pickup["HealthPickup"]["HealthGain"] == 22.0 && (double)e.Pickup["HealthPickup"]["RespawnTimer"] == 2.0) {
-            testStage2Success = true;
+            m_TestStage2Success = true;
         }
     }
     if (m_RunTestNumber == 2) {
-        testStage2Success = false;
+        m_TestStage2Success = false;
     }
     if (m_RunTestNumber == 3) {
-        testStage2Success = false;
+        m_TestStage2Success = false;
     }
     return true;
 }
 
 void PickupSpawnTest::TestSetup(int testNumber)
 {
-    //cant use switch here, since each case might initialize different variables
-    if (m_RunTestNumber == 1) {
+    switch (m_RunTestNumber)
+    {
+    case 1:
+    {
         //PickupSpawnTest_HealthPickupRespawns_PlayerHealthPickupEventTriggers
         auto& healthPickupEW = EntityWrapper(m_World, m_HealthPickupID);
         healthPickupEW["HealthPickup"]["RespawnTimer"] = 2.0;
@@ -115,11 +116,10 @@ void PickupSpawnTest::TestSetup(int testNumber)
         auto& health = m_World->AttachComponent(m_PlayerID, "Health");
         health["Health"] = 20.0;
         health["MaxHealth"] = 100.0;
-
-        Events::TriggerTouch eTriggerTouch;
-        DoTouchEvent(m_PlayerID, m_HealthPickupID);
     }
-    if (m_RunTestNumber == 2) {
+    break;
+    case 2:
+    {
         //PickupSpawnTest_APlayerAtMaxHealth_CantTakeHealthPickup
         auto& healthPickupEW = EntityWrapper(m_World, m_HealthPickupID);
         healthPickupEW["HealthPickup"]["RespawnTimer"] = 1.0;
@@ -129,11 +129,10 @@ void PickupSpawnTest::TestSetup(int testNumber)
         auto& health = m_World->AttachComponent(m_PlayerID, "Health");
         health["Health"] = 100.0;
         health["MaxHealth"] = 100.0;
-
-        Events::TriggerTouch eTriggerTouch;
-        DoTouchEvent(m_PlayerID, m_HealthPickupID);
     }
-    if (m_RunTestNumber == 3) {
+    break;
+    case 3:
+    {
         //PickupSpawnTest_APickupCanRespawnSlowly
         auto& healthPickupEW = EntityWrapper(m_World, m_HealthPickupID);
         healthPickupEW["HealthPickup"]["RespawnTimer"] = 100.0;
@@ -143,10 +142,14 @@ void PickupSpawnTest::TestSetup(int testNumber)
         auto& health = m_World->AttachComponent(m_PlayerID, "Health");
         health["Health"] = 1.0;
         health["MaxHealth"] = 100.0;
-
-        Events::TriggerTouch eTriggerTouch;
-        DoTouchEvent(m_PlayerID, m_HealthPickupID);
     }
+    break;
+    default:
+        break;
+    }
+    //do the triggerTouch event to get the pickupSpawnTest started
+    Events::TriggerTouch eTriggerTouch;
+    DoTouchEvent(m_PlayerID, m_HealthPickupID);
 }
 
 //generic stuff
@@ -164,16 +167,16 @@ void PickupSpawnTest::Tick()
     m_EventBroker->Clear();
 
     //verify that healthgain event has been published and pickup has respawned
-    if (m_RunTestNumber == 1 && testStage1Success && testStage2Success) {
-        m_TestSucceeded = true;
+    if (m_RunTestNumber == 1 && m_TestStage1Success && m_TestStage2Success) {
+        TestSucceeded = true;
     }
     //verify that no healthgain event has been published and that no pickup has respawned
-    if (m_NumLoops > 90 && m_RunTestNumber == 2 && !testStage1Success && !testStage2Success) {
-        m_TestSucceeded = true;
+    if (NumLoops > 90 && m_RunTestNumber == 2 && !m_TestStage1Success && !m_TestStage2Success) {
+        TestSucceeded = true;
     }
     //3: verify that the pickup hasnt spawned
-    if (m_NumLoops > 90 && m_RunTestNumber == 3 && testStage1Success && !testStage2Success) {
-        m_TestSucceeded = true;
+    if (NumLoops > 90 && m_RunTestNumber == 3 && m_TestStage1Success && !m_TestStage2Success) {
+        TestSucceeded = true;
     }
 }
 bool PickupSpawnTest::Game_Loop_OneHundredTimes() {
@@ -182,8 +185,8 @@ bool PickupSpawnTest::Game_Loop_OneHundredTimes() {
     bool success = false;
     while (loops > 0) {
         Tick();
-        m_NumLoops++;
-        if (m_TestSucceeded) {
+        NumLoops++;
+        if (TestSucceeded) {
             success = true;
             break;
         }
