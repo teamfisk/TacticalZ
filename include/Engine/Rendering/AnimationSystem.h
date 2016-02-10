@@ -23,9 +23,7 @@ public:
     ~AnimationSystem() { }
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& animationComponent, double dt) override;
 private:
-    float angle = 0.f;
-    bool b_forward = false;
-    char bone[100];
+
 };
 
 #endif
