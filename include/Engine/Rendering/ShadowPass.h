@@ -58,8 +58,8 @@ private:
     glm::mat4 m_LightView;
     glm::mat4 m_LightSpaceMatrix;
 
-    GLuint resolutionSizeWidth = 2048 * 2;
-    GLuint resolutionSizeHeigth = 2048 * 2;
+    GLuint resolutionSizeWidth = 1024 * 8;
+    GLuint resolutionSizeHeigth = 1024 * 8;
 
     bool m_ShadowOn = true;
 };
