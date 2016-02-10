@@ -69,8 +69,8 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
 
 void SoundSystem::playerJumps()
 {
-    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
-    if (vel.y == 0) {
+    bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
+    if (grounded) {
         Events::PlaySoundOnEntity e;
         e.EmitterID = m_LocalPlayer.ID;
         e.FilePath = "Audio/jump/jump1.wav";

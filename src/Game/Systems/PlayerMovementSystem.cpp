@@ -187,13 +187,12 @@ void PlayerMovementSystem::playerStep(double dt)
     }
     // Position of the local player, used see how far a player has moved.
     glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
-    // Velocity of the local player, used to see if a player is airborne.
-    glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
+    // Used to see if a player is airborne.
+    bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
     m_DistanceMoved += glm::length(pos - m_LastPosition);
     // Set the last position for next iteration
     m_LastPosition = pos;
-    bool isAirborne = vel.y != 0;
-    if (m_DistanceMoved > m_PlayerStepLength && !isAirborne) {
+    if (m_DistanceMoved > m_PlayerStepLength && grounded) {
         // Player moved a step's distance
         // Create footstep sound
         Events::PlaySoundOnEntity e;
