@@ -13,7 +13,7 @@ DrawBloomPass::DrawBloomPass(IRenderer* renderer)
 
 void DrawBloomPass::InitializeTextures()
 {
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
+    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
 }
 
 void DrawBloomPass::InitializeShaderPrograms()

@@ -11,10 +11,11 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
 
 void DrawFinalPass::InitializeTextures()
 {
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
-    m_BlackTexture = ResourceManager::Load<Texture>("Textures/Core/Black.png");
-    m_NeutralNormalTexture = ResourceManager::Load<Texture>("Textures/Core/NeutralNormalMap.png");
-    m_GreyTexture = ResourceManager::Load<Texture>("Textures/Core/Grey.png");
+    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
+    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+    m_NeutralNormalTexture = CommonFunctions::LoadTexture("Textures/Core/NeutralNormalMap.png", false);
+    m_GreyTexture = CommonFunctions::LoadTexture("Textures/Core/Grey.png", false);
+    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
 }
 
 void DrawFinalPass::InitializeFrameBuffers()
@@ -56,7 +57,7 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ExplosionEffectProgram->Link();
     GLERROR("Creating explosion program");
 
-    m_SpriteProgram = ResourceManager::Load<ShaderProgram>("#m_SpriteProgram");
+    m_SpriteProgram = ResourceManager::Load<ShaderProgram>("#SpriteProgram");
     m_SpriteProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Sprite.vert.glsl")));
     m_SpriteProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Sprite.frag.glsl")));
     m_SpriteProgram->Compile();
@@ -222,10 +223,12 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
     for(auto& job : jobs) {
         auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
 
-        if(spriteJob) {
+        if (spriteJob) {
+
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+            glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPos"), 1, glm::value_ptr(scene.Camera->Position()));
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(spriteJob->Color));
             glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(spriteJob->FillColor));
             glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), spriteJob->FillPercentage);
@@ -234,7 +237,7 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
             if (spriteJob->DiffuseTexture != nullptr) {
                 glBindTexture(GL_TEXTURE_2D, spriteJob->DiffuseTexture->m_Texture);
             } else {
-                glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                glBindTexture(GL_TEXTURE_2D, m_ErrorTexture->m_Texture);
             }
 
             glActiveTexture(GL_TEXTURE1);

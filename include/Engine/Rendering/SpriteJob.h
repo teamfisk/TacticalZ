@@ -24,23 +24,17 @@ struct SpriteJob : RenderJob
         ::RawModel::MaterialGroup matGroup = Model->MaterialGroups().front();
         TextureID = (matGroup.Texture) ? matGroup.Texture->ResourceID : 0;
 
-        if (cSprite["DiffuseTexture"]) {
-            DiffuseTexture = ResourceManager::Load<Texture>(cSprite["DiffuseTexture"]);
-        } else {
-            DiffuseTexture = nullptr;
-        }
-        if (cSprite["GlowMap"]) {
-            IncandescenceTexture = ResourceManager::Load<Texture>(cSprite["GlowMap"]);
-        } else {
-            IncandescenceTexture = nullptr;
-        }
+        DiffuseTexture = CommonFunctions::LoadTexture(cSprite["DiffuseTexture"], true);
+
+        IncandescenceTexture = CommonFunctions::LoadTexture(cSprite["GlowMap"], true);
+
         StartIndex = matGroup.StartIndex;
         EndIndex = matGroup.EndIndex;
         Matrix = matrix;
         Color = cSprite["Color"];
         Entity = cSprite.EntityID;
-        glm::vec3 abspos = Transform::AbsolutePosition(world, cSprite.EntityID);
-        glm::vec3 viewpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
+        Position = Transform::AbsolutePosition(world, cSprite.EntityID);
+        glm::vec3 viewpos = glm::vec3(camera->ViewMatrix() * glm::vec4(Position, 1));
         Depth = viewpos.z;
         World = world;
 
@@ -58,6 +52,7 @@ struct SpriteJob : RenderJob
     const Texture* IncandescenceTexture;
     float Shininess = 0.f;
     glm::vec4 Color;
+    glm::vec3 Position;
     const ::Model* Model = nullptr;
     unsigned int StartIndex = 0;
     unsigned int EndIndex = 0;

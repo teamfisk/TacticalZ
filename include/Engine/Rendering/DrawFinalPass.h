@@ -7,6 +7,7 @@
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
+#include "Util/CommonFunctions.h"
 #include "Texture.h"
 
 class DrawFinalPass
@@ -43,6 +44,7 @@ private:
     Texture* m_BlackTexture;
     Texture* m_NeutralNormalTexture;
     Texture* m_GreyTexture;
+    Texture* m_ErrorTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
     GLuint m_BloomTexture;

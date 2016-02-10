@@ -7,16 +7,16 @@ Model::Model(std::string fileName)
 
     for (auto& group : m_RawModel->MaterialGroups) {
         if (!group.TexturePath.empty()) {
-            group.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.TexturePath));
+            group.Texture = std::shared_ptr<Texture>(CommonFunctions::LoadTexture(group.TexturePath, false));
         }
         if (!group.NormalMapPath.empty()) {
-            group.NormalMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.NormalMapPath));
+            group.NormalMap = std::shared_ptr<Texture>(CommonFunctions::LoadTexture(group.NormalMapPath, false));
         }
         if (!group.SpecularMapPath.empty()) {
-            group.SpecularMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.SpecularMapPath));
+            group.SpecularMap = std::shared_ptr<Texture>(CommonFunctions::LoadTexture(group.SpecularMapPath, false));
         }
         if (!group.IncandescenceMapPath.empty()) {
-            group.IncandescenceMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.IncandescenceMapPath));
+            group.IncandescenceMap = std::shared_ptr<Texture>(CommonFunctions::LoadTexture(group.IncandescenceMapPath, false));
         }
     }
 

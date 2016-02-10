@@ -106,16 +106,21 @@ void Renderer::Draw(RenderFrame& frame)
     for (auto scene : frame.RenderScenes){
         
         SortRenderJobsByDepth(*scene);
+        GLERROR("SortByDepth");
         m_PickingPass->Draw(*scene);
+        GLERROR("Drawing pickingpass");
         m_LightCullingPass->GenerateNewFrustum(*scene);
+        GLERROR("Generate frustums");
         m_LightCullingPass->FillLightList(*scene);
+        GLERROR("Filling light list");
         m_LightCullingPass->CullLights(*scene);
+        GLERROR("LightCulling");
         m_DrawFinalPass->Draw(*scene);
+        GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
-        GLERROR("Renderer::Draw m_DrawScenePass->Draw");
-
         m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
+        GLERROR("Draw Text");
 
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
@@ -136,7 +141,8 @@ void Renderer::Draw(RenderFrame& frame)
     }
 
     m_ImGuiRenderPass->Draw();
-	glfwSwapBuffers(m_Window);
+    GLERROR("Imgui draw");
+    glfwSwapBuffers(m_Window);
 }
 
 PickData Renderer::Pick(glm::vec2 screenCoord)
@@ -146,8 +152,8 @@ PickData Renderer::Pick(glm::vec2 screenCoord)
 
 void Renderer::InitializeTextures()
 {
-    m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
+    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
+    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
 }
 
 
@@ -155,6 +161,7 @@ void Renderer::SortRenderJobsByDepth(RenderScene &scene)
 {
     //Sort all forward jobs so transparency is good.
     scene.TransparentObjects.sort(Renderer::DepthSort);
+    scene.SpriteJobs.sort(Renderer::DepthSort);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)

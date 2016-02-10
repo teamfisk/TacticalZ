@@ -2,6 +2,7 @@
 #define Model_h__
 
 #include "Rendering/RawModelCustom.h"
+#include "Util/CommonFunctions.h"
 //#include "Rendering/RawModelAssimp.h"
 #include "../OpenGL.h"
 
