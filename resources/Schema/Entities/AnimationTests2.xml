@@ -17,7 +17,7 @@
           <Components>
             <c:DirectionalLight/>
             <c:Model>
-              <Resource>Models/DirectionalLightWidget.mesh</Resource>
+              <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="2.42800021" Z="-2.80000019"/>
@@ -31,21 +31,21 @@
             <c:Animation>
               <AnimationName1>Run</AnimationName1>
               <Weight1>0.5</Weight1>
-              <Time1>0.052207647453917483</Time1>
+              <Time1>0.44037772975435119</Time1>
               <Speed1>1</Speed1>
               <Speed2>1</Speed2>
-              <AnimationName2>Strafe Right</AnimationName2>
+              <AnimationName2>StrafeRight</AnimationName2>
               <Weight2>0.5</Weight2>
-              <Time2>0.90342197388335332</Time2>
-              <AnimationName3>Reload Switch</AnimationName3>
-              <Time3>0.11766622175243757</Time3>
+              <Time2>0.62650761653875175</Time2>
+              <AnimationName3>ReloadSwitch</AnimationName3>
+              <Time3>0.88913372073808805</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
             <c:AnimationOffset>
-              <AnimationName>Aim</AnimationName>
+              <AnimationName>AimRifle</AnimationName>
             </c:AnimationOffset>
             <c:Model>
-              <Resource>Models/Characters/Assault/HelloCube.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
               <Color A="1" B="0.984313726" G="1" R="1"/>
               <Transparent>true</Transparent>
             </c:Model>
@@ -53,23 +53,7 @@
               <Position X="-0.690088332" Y="0" Z="0"/>
             </c:Transform>
           </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:BoneAttachment>
-                  <BoneName>R_Arm_Weapon_Joint</BoneName>
-                </c:BoneAttachment>
-                <c:Model>
-                  <Resource>Models/WepTest.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="0.14501974" Y="1.07601345" Z="-0.237269819"/>
-                  <Orientation X="1.05669272" Y="0.762659967" Z="-0.223463327"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
+          <Children/>
         </Entity>
         <Entity>
           <Components>

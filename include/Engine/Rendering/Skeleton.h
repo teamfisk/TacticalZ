@@ -104,7 +104,7 @@ public:
     std::vector<glm::mat4> GetFrameBones(std::vector<AnimationData> animations, bool noRootMotion = false);
     std::vector<glm::mat4> GetFrameBones(std::vector<AnimationData> animations, AnimationOffset animationOffset, bool noRootMotion = false);
 
-    void  AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+    //void  AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
     void  AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
     void  AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, AnimationOffset animationOffset, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
 

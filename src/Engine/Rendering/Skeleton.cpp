@@ -80,6 +80,7 @@ std::vector<glm::mat4> Skeleton::GetFrameBones(std::vector<AnimationData> animat
     }
     return finalMatrices;
 }
+/*
 
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
 {
@@ -153,6 +154,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
         AccumulateBoneTransforms(noRootMotion, animation, time, boneMatrices, child, boneMatrix);
     }  
 }
+*/
 
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
 {
