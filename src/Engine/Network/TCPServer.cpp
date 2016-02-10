@@ -12,8 +12,6 @@ TCPServer::~TCPServer()
 
 void TCPServer::AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers)
 {
-    //PlayerDefinition pd;
-    //connectedPlayers[nextPlayerID++] = pd;
     boost::shared_ptr<tcp::socket> newSocket = boost::shared_ptr<tcp::socket>(new tcp::socket(m_IOService));
     m_IOService.poll();
     acceptor->async_accept(*newSocket,

@@ -16,17 +16,6 @@ public:
     virtual void Send(Packet & packet) = 0;
 protected:
     char m_ReadBuffer[BUFFERSIZE] = { 0 };
-    //void handle_accept(boost::shared_ptr<boost::asio::ip::tcp::socket> socket, const boost::system::error_code & error);
-    //void parseConnect(Packet & packet);
-    //void readFromClients();
-
-    //public:
-    //    virtual void Connect(std::string playerName, std::string address, int port) = 0;
-    //    virtual void Disconnect() = 0;
-    //    virtual Packet Receive() = 0;
-    //    virtual void Send(Packet & packet) = 0;
-    //protected:
-    //    char m_ReadBuffer[BUFFERSIZE] = { 0 };
 };
 
 #endif

@@ -6,8 +6,7 @@ UDPServer::UDPServer()
 }
 
 UDPServer::~UDPServer()
-{
-}
+{ }
 
 void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
 {
@@ -49,13 +48,16 @@ bool UDPServer::IsSocketAvailable()
 
 int UDPServer::readBuffer(char* data)
 {
+    boost::system::error_code error = boost::asio::error::host_not_found;
     unsigned int length = m_Socket->receive_from(
         boost::asio::buffer((void*)data
             , BUFFERSIZE)
-        , m_ReceiverEndpoint, 0);
+        , m_ReceiverEndpoint, 0, error);
+    if (error) {
+        LOG_WARNING(error.message().c_str());
+    }
     return length;
 }
 
 void UDPServer::AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers)
-{
-}
+{ }

@@ -83,7 +83,6 @@ void TCPClient::Send(Packet & packet)
     m_Socket->send(boost::asio::buffer(
         packet.Data(),
         packet.Size()), 0, error);
-    //Network::logSentData(packet.Size());
 }
 
 bool TCPClient::IsSocketAvailable()

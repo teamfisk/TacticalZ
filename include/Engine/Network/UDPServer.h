@@ -3,11 +3,6 @@
 
 #include "NetworkServer.h"
 #include <boost/asio/ip/udp.hpp>
-//
-//virtual void AcceptNewConnections() = 0;
-//virtual void Receive(Packet & packet, PlayerDefinition & playerDefinition) = 0;
-//virtual void Send(Packet & packet, PlayerDefinition & playerDefinition) = 0;
-//virtual  void Send(Packet & packet) = 0;
 
 class UDPServer : public NetworkServer
 {
@@ -16,7 +11,6 @@ public:
     ~UDPServer();
     void AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers);
     void Receive(Packet & packet, PlayerDefinition & playerDefinition);
-    //void parseConnect(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet);
     bool IsSocketAvailable();

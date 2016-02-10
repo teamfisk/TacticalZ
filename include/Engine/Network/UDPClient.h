@@ -3,10 +3,6 @@
 
 #include <boost/asio.hpp>
 #include "Network/NetworkClient.h"
-//virtual void Connect(std::string address, int port) = 0;
-//virtual int Receive(char * data) = 0;
-//virtual void Send(Packet & packet) = 0;
-//virtual void Disconnect() = 0;
 
 class UDPClient : public NetworkClient
 {

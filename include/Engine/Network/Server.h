@@ -92,8 +92,8 @@ protected:
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
 private:
-    TCPServer m_TCPServer;
-    //UDPServer m_UDPServer;
+    //TCPServer m_TCPServer;
+    UDPServer m_UDPServer;
 };
 
 #endif

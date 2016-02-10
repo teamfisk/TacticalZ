@@ -103,9 +103,9 @@ protected:
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
 
 private:
-    //UDPClient m_UDPClient;
+    UDPClient m_UDPClient;
     //TCPClient m_TCPClient;
-    TCPClient m_UDPClient;
+    //TCPClient m_UDPClient;
 };
 
 #endif
