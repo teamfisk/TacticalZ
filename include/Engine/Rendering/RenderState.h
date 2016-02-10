@@ -2,6 +2,7 @@
 #define RenderState_h__
 
 #include <functional>
+#include <boost/range/adaptor/reversed.hpp>
 #include "../Common.h"
 #include "../OpenGL.h"
 #include "../GLM.h"
@@ -19,6 +20,9 @@ public:
     bool BindFramebuffer(GLint framebuffer);
     bool BlendEquation(GLenum mode);
     bool BlendFunc(GLenum sfactor, GLenum dfactor);
+    bool StencilOp(GLenum sfail, GLenum dpfail, GLenum dppass);
+    bool StencilFunc(GLenum func, GLint ref, GLuint mask);
+    bool StencilMask(GLuint mask);
     bool DepthMask(GLboolean flag);
 
 private:

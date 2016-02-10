@@ -5,6 +5,7 @@
 #include "Common.h"
 #include "../GLM.h"
 #include <glm/gtx/matrix_decompose.hpp>
+#include <imgui/imgui.h>
 
 //struct Bone
 //{
@@ -53,21 +54,38 @@ public:
 		{
 			struct BoneProperty
 			{
-				int ID;
-				glm::vec3 Position;
-				glm::quat Rotation;
+                glm::vec3 Position;
+                glm::quat Rotation;
 				glm::vec3 Scale = glm::vec3(1);
 			};
 
-			int Index = 0;
-			double Time = 0.0;
-			std::map<int, Keyframe::BoneProperty> BoneProperties;
+            int Index = 0;
+            double Time = 0.0;
+            BoneProperty BoneProperties;
 		};
-
-		std::string Name;
-		double Duration;
-		std::vector<Keyframe> Keyframes;
+        std::string Name;
+        double Duration;
+        std::map<int, std::vector<Keyframe>> JointAnimations;
 	};
+
+    struct AnimationData
+    {
+        const Animation* animation;
+        float time;
+        float weight;
+    };
+
+    struct JointFrameTransform {
+        glm::vec3 PositionInterp = glm::vec3(0);
+        glm::quat RotationInterp = glm::quat();
+        glm::vec3 ScaleInterp = glm::vec3(0);
+        float Weight;
+    };
+
+    struct AnimationOffset {
+        const Animation* animation;
+        float time;
+    };
 
 	Skeleton() { }
 	~Skeleton();
@@ -82,17 +100,27 @@ public:
 
 	int GetBoneID(std::string name);
 
-	const Animation* GetAnimation(std::string name);
-	std::vector<glm::mat4> GetFrameBones(const Animation& animation, double time, bool noRootMotion = false);
-	void AccumulateBoneTransforms(bool noRootMotion, const Animation::Keyframe& currentFrame, const Animation::Keyframe& nextFrame, float progress, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
-	void PrintSkeleton();
+    const Animation* GetAnimation(std::string name);
+    std::vector<glm::mat4> GetFrameBones(std::vector<AnimationData> animations, bool noRootMotion = false);
+    std::vector<glm::mat4> GetFrameBones(std::vector<AnimationData> animations, AnimationOffset animationOffset, bool noRootMotion = false);
+
+    //void  AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, float time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+    void  AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+    void  AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, AnimationOffset animationOffset, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+
+    void PrintSkeleton();
 	void PrintSkeleton(const Bone* parent, int depthCount);
 	std::map<std::string, Animation> Animations;
 
-private:
-	std::map<std::string, Bone*> m_BonesByName;
+    glm::mat4 GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 childMatrix);
+    int GetKeyframe(const Animation& animation, double time);
 
-	int GetKeyframe(const Animation& animation, double time);
+private:
+
+    glm::mat4 GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset);
+
+	std::map<std::string, Bone*> m_BonesByName;
+    float aim = 0.f;
 };
 
 #endif

@@ -12,4 +12,11 @@ private:
 
 };
 
+class DrawStencilState : public RenderState
+{
+public:
+    DrawStencilState(GLuint frameBuffer);
+    ~DrawStencilState();
+};
+
 #endif

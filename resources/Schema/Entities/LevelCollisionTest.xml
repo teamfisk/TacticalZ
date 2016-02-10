@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Collidable/>
+    <c:Model>
+      <Resource>../assets/Models/MapVersion1.mesh</Resource>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Physics>
+          <Gravity>false</Gravity>
+        </c:Physics>
+        <c:Player/>
+        <c:Transform>
+          <Position X="-1.48400009" Y="3.68200016" Z="24.7580013"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:DirectionalLight/>
+        <c:Transform>
+          <Orientation X="3.80300021" Y="1.37800002" Z="4.10000038"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

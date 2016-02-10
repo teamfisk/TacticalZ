@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>../assets/Models/Test/ObstacleCourse.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0" Z="0.00638055196"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:DirectionalLight>
+          <Intensity>0.46000027656555176</Intensity>
+        </c:DirectionalLight>
+        <c:Transform>
+          <Orientation X="0" Y="2.59000015" Z="0.799000025"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>../assets/Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-1.52309108" Y="5.72108126" Z="0"/>
+          <Scale X="5" Y="5" Z="5"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="BluSpawn">
+      <Components>
+        <c:PlayerSpawn/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="1" Y="1.60000002" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Transform>
+              <Position X="-2.05988312" Y="0" Z="2.79573512"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="1.85022807" Y="0" Z="-2.08909845"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="2.98651481" Y="0" Z="-4.67667246"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="-5.16323137" Y="0" Z="3.62892342"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="RedSpawn">
+      <Components>
+        <c:PlayerSpawn/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-1.20000005" Y="1.60000002" Z="-8.40000057"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0" Z="2.24403"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="2.20245028" Y="0" Z="-1.97843659"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="4.79769945" Y="0" Z="-5.2088728"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

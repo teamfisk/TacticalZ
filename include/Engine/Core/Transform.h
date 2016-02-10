@@ -18,6 +18,7 @@ glm::vec3 AbsoluteScale(EntityWrapper entity);
 glm::vec3 AbsoluteScale(World* world, EntityID entity);
 glm::mat4 ModelMatrix(EntityWrapper entity);
 glm::mat4 ModelMatrix(EntityID entity, World* world);
+glm::vec3 TransformPoint(const glm::vec3& point, const glm::mat4& matrix);
 
 }
 

@@ -8,8 +8,13 @@
   <Children>
     <Entity name="Scenemesh">
       <Components>
+        <c:AABB>
+          <Origin X="0.195705414" Y="26.0382366" Z="-0.010017395"/>
+          <Size X="135.414337" Y="68.3848572" Z="180.020035"/>
+        </c:AABB>
+        <c:Collidable/>
         <c:Model>
-          <Resource>Models\MapVersion1.mesh</Resource>
+          <Resource>Models/LevelBase/MapVersion1.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -21,7 +26,7 @@
           <Intensity>2</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.mesh</Resource>
+          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>
@@ -139,7 +144,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="57.7363472" Y="1.18853188" Z="79.5"/>
+          <Position X="57.7363472" Y="2.38900018" Z="79.5"/>
         </c:Transform>
       </Components>
       <Children>
@@ -201,7 +206,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="-60.2567062" Y="1.60000002" Z="-78.1000061"/>
+          <Position X="-60.2567062" Y="3.4000001" Z="-78.1000061"/>
         </c:Transform>
       </Components>
       <Children>

@@ -41,10 +41,10 @@ void Network::saveToFile()
     outfile << "Total messages received," + std::to_string(m_NetworkData.AmountOfMessagesReceived) + "\n";
     outfile << "Total messages sent," + std::to_string(m_NetworkData.AmountOfMessagesSent) + "\n";
 
-    float messagesReceivedPerSec = (float)m_NetworkData.AmountOfMessagesReceived / (m_NetworkData.TotalTime / 1000);
-    float messagesSentPerSec = (float)m_NetworkData.AmountOfMessagesSent / (m_NetworkData.TotalTime / 1000);
-    float dataReceivedPerSec = (float)m_NetworkData.TotalDataReceived / (m_NetworkData.TotalTime / 1000);
-    float dataSentPerSec = (float)m_NetworkData.TotalDataSent / (m_NetworkData.TotalTime / 1000);
+    double messagesReceivedPerSec = m_NetworkData.AmountOfMessagesReceived / (m_NetworkData.TotalTime / 1000);
+    double messagesSentPerSec = m_NetworkData.AmountOfMessagesSent / (m_NetworkData.TotalTime / 1000);
+    double dataReceivedPerSec = m_NetworkData.TotalDataReceived / (m_NetworkData.TotalTime / 1000);
+    double dataSentPerSec = m_NetworkData.TotalDataSent / (m_NetworkData.TotalTime / 1000);
     outfile << "Avarage messages received / s: " + std::to_string(messagesReceivedPerSec) + "\n";
     outfile << "Avarage messages sents / s: " + std::to_string(messagesSentPerSec) + "\n";
     outfile << "Avarage data received B/s: " + std::to_string(dataReceivedPerSec) + "\n";
@@ -67,7 +67,7 @@ void Network::updateNetworkData()
     if (m_SaveDataIntervalMs < (1000 * (currentTime - m_SaveDataTimer) / (double)CLOCKS_PER_SEC)) {
         // Set values
         m_NetworkData.TotalTime += (1000 * (currentTime - m_SaveDataTimer) / (double)CLOCKS_PER_SEC);
-        m_NetworkData.BandwidthBytes.push_back(std::pair<unsigned int, unsigned int>(m_NetworkData.DataReceivedThisInterval, m_NetworkData.DataSentThisInterval));
+        m_NetworkData.BandwidthBytes.push_back(std::pair<size_t, size_t>(m_NetworkData.DataReceivedThisInterval, m_NetworkData.DataSentThisInterval));
         // Reset interval stuff
         m_SaveDataTimer = std::clock();
         m_NetworkData.DataSentThisInterval = 0;

@@ -29,7 +29,7 @@ protected:
     unsigned int m_SaveDataIntervalMs = 1000;
     std::clock_t m_SaveDataTimer;
     unsigned int m_MaxConnections;
-    unsigned int m_TimeoutMs;
+    double m_TimeoutMs;
     void logSentData(int bytesSent);
     void logReceivedData(int bytesReceived);
     void saveToFile();

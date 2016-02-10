@@ -376,7 +376,7 @@ void Client::identifyPacketLoss()
 bool Client::hasServerTimedOut()
 {
     // Time in ms
-    float timeSincePing = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
+    double timeSincePing = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
     if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");

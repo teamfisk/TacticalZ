@@ -3,50 +3,63 @@
 
 #include <vector>
 #include <array>
+#include <map>
 #include <algorithm>
 #include "MayaIncludes.h"
 #include "OutputData.h"
 
 class Animation : public OutputData {
 public:
-	struct Keyframe
-	{
-		struct JointProperty
-		{
-			int ID = 0;
+	//struct Keyframe
+	//{
+	//	struct JointProperty
+	//	{
+	//		int ID = 0;
+ //           float Position[3]{ 0 };
+ //           float Rotation[4]{ 0 };
+ //           float Scale[3]{ 0 };
+	//	};
+
+	//	int Index = 0;
+	//	float Time = 0;
+ //       int NumberOfJoints;
+	//	std::vector<JointProperty> JointProperties;
+	//};
+
+    struct JointAnimation {
+        struct KeyFrame {
+            int Index = 0;
+            float Time = 0;
             float Position[3]{ 0 };
             float Rotation[4]{ 0 };
             float Scale[3]{ 0 };
-		};
-
-		int Index = 0;
-		float Time = 0;
-		std::vector<JointProperty> JointProperties;
-	};
+        };
+        unsigned int numberOFKeyFrames = 0;
+        std::vector<KeyFrame> m_KeyFrames;
+    };
 
 	std::string Name;
     int nameLength = 0;
 	float Duration = 0;
-    int NumKeyFrames = 0;
-    int NumberOfJoints = 0;
-	std::vector<Keyframe> Keyframes;
+    int NumOfJointFrames = 0;
+	std::map<int, JointAnimation> JointsFrameMap;
 
 	virtual void WriteBinary(std::ostream& out)
 	{
         out.write((char*)&nameLength, sizeof(int));
 		out.write(Name.c_str(), Name.size() + 1);
 		out.write((char*)&Duration, sizeof(float));
-        out.write((char*)&NumKeyFrames, sizeof(int));
-        out.write((char*)&NumberOfJoints, sizeof(int));
+        out.write((char*)&NumOfJointFrames, sizeof(int));
         //Här under loopas alla key frames igenom
-		for (auto aKeyframe : Keyframes) {
-			out.write((char*)&aKeyframe.Index, sizeof(int));
-			out.write((char*)&aKeyframe.Time, sizeof(float));
-			for (auto aJoint : aKeyframe.JointProperties) {
-				out.write((char*)&aJoint.ID, sizeof(int));
-				out.write((char*)aJoint.Position, sizeof(float) * 3);
-				out.write((char*)aJoint.Rotation, sizeof(float) * 4);
-				out.write((char*)aJoint.Scale, sizeof(float) * 3);
+		for (auto aJointAnimation : JointsFrameMap) {
+			out.write((char*)&aJointAnimation.first, sizeof(int));
+            out.write((char*)&aJointAnimation.second.numberOFKeyFrames, sizeof(int));
+			for (auto aJointKeyFrame : aJointAnimation.second.m_KeyFrames) {
+                out.write((char*)&aJointKeyFrame.Index, sizeof(int));
+                out.write((char*)&aJointKeyFrame.Time, sizeof(float));
+				out.write((char*)&aJointKeyFrame.Position, sizeof(float) * 3);
+				out.write((char*)&aJointKeyFrame.Rotation, sizeof(float) * 4);
+				out.write((char*)&aJointKeyFrame.Scale, sizeof(float) * 3);
 			}
 		}
 	}
@@ -55,16 +68,17 @@ public:
 	{
 		out << "Animation Name: " << Name << endl;
 		out << "Duration: " << Duration << endl;
-        out << "Number of KeyFrames: " << NumKeyFrames << endl;
-        out << "Number of Joints: " << NumberOfJoints << endl;
-		for (auto aKeyframe : Keyframes) {
-			out << "Frame: " << aKeyframe.Index << endl;
-			out << "Time: " << aKeyframe.Time << endl;
-			for (auto aJoint : aKeyframe.JointProperties) {
-				out << "Joint ID: " << aJoint.ID << endl;
-				out << aJoint.Position[0] << " " << aJoint.Position[1] << " " << aJoint.Position[2] << endl;
-				out << aJoint.Rotation[0] << " " << aJoint.Rotation[1] << " " << aJoint.Rotation[2] << " " << aJoint.Rotation[3] << endl;
-				out << aJoint.Scale[0] << " " << aJoint.Scale[1] << " " << aJoint.Scale[2] << endl;
+        out << "Number of KeyFrames: " << NumOfJointFrames << endl;
+		for (auto aJointAnimation : JointsFrameMap) {
+			out << "Bone: " << aJointAnimation.first << endl;
+			//out << "Time: " << aJointAnimation.Time << endl;
+            //out << "Number of Joints: " << aKeyframe.NumberOfJoints << endl;
+			for (auto aJointKeyFrame :  aJointAnimation.second.m_KeyFrames) {
+				//out << "Joint ID: " << aJoint.ID << endl;
+                out << "Time: " << aJointKeyFrame.Time << endl;
+				out << aJointKeyFrame.Position[0] << " " << aJointKeyFrame.Position[1] << " " << aJointKeyFrame.Position[2] << endl;
+				out << aJointKeyFrame.Rotation[0] << " " << aJointKeyFrame.Rotation[1] << " " << aJointKeyFrame.Rotation[2] << " " << aJointKeyFrame.Rotation[3] << endl;
+				out << aJointKeyFrame.Scale[0] << " " << aJointKeyFrame.Scale[1] << " " << aJointKeyFrame.Scale[2] << endl;
 			}
 		}
 		

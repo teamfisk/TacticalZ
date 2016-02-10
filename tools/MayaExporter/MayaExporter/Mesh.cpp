@@ -8,95 +8,91 @@ MeshClass::MeshClass()
 
 }
 
-std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
-{
-    MS status;
-    map<int, WeightInfo> weightMap;
-
-	MItDependencyNodes it(MFn::kSkinClusterFilter);
-
-	while (!it.isDone()) {
-
-        MObject object = it.thisNode(&status);
-        if (status != MS::kSuccess) {
-            MGlobal::displayError(MString() + " it.thisNode() ERROR: " + status.errorString());
-            break;
-        }
-        MFnSkinCluster skinCluster(object, &status);
-        if (status != MS::kSuccess) {
-            MGlobal::displayError(MString() + "skinCluster() ERROR: " + status.errorString());
-            break;
-        }
-        MDagPathArray influences;
-
-        unsigned int nrOfInfluences = skinCluster.influenceObjects(influences,&status);
-        if (status != MS::kSuccess) {
-            MGlobal::displayError(MString() + "skinCluster.influenceObjects() ERROR: " + status.errorString());
-            break;
-        }
-
-        unsigned int index;
-        index = skinCluster.indexForOutputConnection(0,&status);
-        if (status != MS::kSuccess) {
-            MGlobal::displayError(MString() + "skinCluster.indexForOutputConnection() ERROR: " + status.errorString());
-            break;
-        }
-        MDagPath skinPath;
-        status = skinCluster.getPathAtIndex(index, skinPath);
-        if (status != MS::kSuccess) {
-            MGlobal::displayError(MString() + "skinCluster.getPathAtIndex() ERROR: " + status.errorString());
-            break;
-        }
-
-        MItGeometry geomIter(skinPath);
-        //for (unsigned int i = 0; i < nrOfInfluences; i++) {
-        //    MGlobal::displayInfo(MString() + " Influence object name: " + influences[i].partialPathName().asChar());
-        //}
-        WeightInfo weightInfo;
-
-        while (!geomIter.isDone()) {
-            MObject comp = geomIter.component(&status);
-            if (status != MS::kSuccess) {
-                MGlobal::displayError(MString() + "geomIter.component() ERROR: " + status.errorString());
-                break;
-            }
-            MFloatArray weights;
-            unsigned int influenceCount;
-            status = skinCluster.getWeights(skinPath, comp, weights, influenceCount);
-            if (status != MS::kSuccess) {
-                MGlobal::displayError(MString() + "skinCluster.getWeights() ERROR: " + status.errorString());
-                break;
-            }
-            MFnDependencyNode test(comp);
-            unsigned int nrOfWeights = 0;
-
-            for (unsigned int j = 0; j < weights.length() && nrOfWeights != 4; j++) {
-                if (weights[j] > 0.00001) {
-                    weightInfo.BoneWeights[nrOfWeights] = weights[j];
-                    weightInfo.BoneIndices[nrOfWeights] = j;
-                    nrOfWeights++;
-                }
-            }
-
-            float totalWeight = 0.0f;
-            for (unsigned int i = 0; i < 4; i++) {
-                totalWeight += weightInfo.BoneWeights[i];
-            }
-            for (unsigned int i = 0; i < 4; i++) {
-                weightInfo.BoneWeights[i] /= totalWeight;
-            }
-            weightMap[geomIter.index()] = weightInfo;
-
-
-            for (unsigned int k = 0; k!=nrOfWeights; k++) {
-                MGlobal::displayInfo(MString() + "influence: " + weightInfo.BoneIndices[k] + " weight: " + weightInfo.BoneWeights[k]);
-            }
-            geomIter.next();
-        }
-        it.next();
-	}
-    return weightMap;
-}
+//std::map<int, MeshClass::WeightInfo> MeshClass::GetWeightData()
+//{
+//    MS status;
+//    map<int, WeightInfo> weightMap;
+//
+//	MItDependencyNodes it(MFn::kSkinClusterFilter);
+//
+//	while (!it.isDone()) {
+//
+//        MObject object = it.thisNode(&status);
+//        if (status != MS::kSuccess) {
+//            MGlobal::displayError(MString() + " it.thisNode() ERROR: " + status.errorString());
+//            break;
+//        }
+//        MFnSkinCluster skinCluster(object, &status);
+//        if (status != MS::kSuccess) {
+//            MGlobal::displayError(MString() + "skinCluster() ERROR: " + status.errorString());
+//            break;
+//        }
+//        MDagPathArray influences;
+//
+//        unsigned int nrOfInfluences = skinCluster.influenceObjects(influences,&status);
+//        if (status != MS::kSuccess) {
+//            MGlobal::displayError(MString() + "skinCluster.influenceObjects() ERROR: " + status.errorString());
+//            break;
+//        }
+//
+//        unsigned int index;
+//        index = skinCluster.indexForOutputConnection(0,&status);
+//        if (status != MS::kSuccess) {
+//            MGlobal::displayError(MString() + "skinCluster.indexForOutputConnection() ERROR: " + status.errorString());
+//            break;
+//        }
+//        MDagPath skinPath;
+//        status = skinCluster.getPathAtIndex(index, skinPath);
+//        if (status != MS::kSuccess) {
+//            MGlobal::displayError(MString() + "skinCluster.getPathAtIndex() ERROR: " + status.errorString());
+//            break;
+//        }
+//
+//        MItGeometry geomIter(skinPath);
+//        //for (unsigned int i = 0; i < nrOfInfluences; i++) {
+//        //    MGlobal::displayInfo(MString() + " Influence object name: " + influences[i].partialPathName().asChar());
+//        //}
+//        WeightInfo weightInfo;
+//
+//        while (!geomIter.isDone()) {
+//            MObject comp = geomIter.component(&status);
+//            if (status != MS::kSuccess) {
+//                MGlobal::displayError(MString() + "geomIter.component() ERROR: " + status.errorString());
+//                break;
+//            }
+//            MFloatArray weights;
+//            unsigned int influenceCount;
+//            status = skinCluster.getWeights(skinPath, comp, weights, influenceCount);
+//            if (status != MS::kSuccess) {
+//                MGlobal::displayError(MString() + "skinCluster.getWeights() ERROR: " + status.errorString());
+//                break;
+//            }
+//            MFnDependencyNode test(comp);
+//            unsigned int nrOfWeights = 0;
+//
+//            for (unsigned int j = 0; j < weights.length() && nrOfWeights != 4; j++) {
+//                if (weights[j] > 0.00001) {
+//                    weightInfo.BoneWeights[nrOfWeights] = weights[j];
+//                    weightInfo.BoneIndices[nrOfWeights] = j;
+//                    nrOfWeights++;
+//                }
+//            }
+//
+//            float totalWeight = 0.0f;
+//            for (unsigned int i = 0; i < 4; i++) {
+//                totalWeight += weightInfo.BoneWeights[i];
+//            }
+//            for (unsigned int i = 0; i < 4; i++) {
+//                weightInfo.BoneWeights[i] /= totalWeight;
+//            }
+//            weightMap[geomIter.index()] = weightInfo;
+//
+//            geomIter.next();
+//        }
+//        it.next();
+//	}
+//    return weightMap;
+//}
 
 Mesh MeshClass::GetMeshData(MObjectArray object)
 {
@@ -112,8 +108,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         MFnDependencyNode thisNode(node);
         MPlugArray connections;
         thisNode.findPlug("inMesh").connectedTo(connections, true, true);
-        MGlobal::displayInfo(MString() + "inMesh");
-        bool hasSkin = false;
         MPlug weightList, weights;
         MObject weightListObject;
         for (unsigned int i = 0; i < connections.length(); i++) {
@@ -122,7 +116,7 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                 weightList = skinCluster.findPlug("weightList", &status);
                 weightListObject = weightList.attribute();
                 weights = skinCluster.findPlug("weights");
-                hasSkin = true;
+				newMesh.hasSkin = true;
                 break;
             }
         }
@@ -138,7 +132,6 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
         }
 
         for (int pathID = 0; pathID < dagPaths.length(); pathID++) {
-            MGlobal::displayInfo(dagPaths[pathID].fullPathName());
             MDagPath thisMeshPath(dagPaths[pathID]);
 
             MMatrix transformMatrix = thisMeshPath.inclusiveMatrix(&status);
@@ -173,8 +166,7 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                 break;
             }
             map<string, vector<int>> materialFaceIDs;
-            MGlobal::displayInfo(MString() + "shaderIndexList: " + shaderIndexList.length());
-            MGlobal::displayInfo(MString() + "shaderList: " + shaderList.length());
+
             MPlugArray plugArray;
             for (int i = 0; i < shaderIndexList.length(); i++) {
                 MFnDependencyNode shader(shaderList[shaderIndexList[i]]);
@@ -261,43 +253,33 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         //mesh.getPoint(vertexIndex, pos, MSpace::kPostTransform);
                         pos = positions[vertexIndex];
                         pos = pos * transformMatrix;
-                        if (abs(pos.x) > 0.0001)
-                            thisVertex.Pos[0] = pos.x;
-                        if (abs(pos.y) > 0.0001)
-                            thisVertex.Pos[1] = pos.y;
-                        if (abs(pos.z) > 0.0001)
-                            thisVertex.Pos[2] = pos.z;
+
+                        thisVertex.Pos[0] = pos.x;
+                        thisVertex.Pos[1] = pos.y;
+                        thisVertex.Pos[2] = pos.z;
 
                         status = faceVert.getNormal(normal, MSpace::kObject);
                         if (status != MS::kSuccess) {
                             MGlobal::displayError(MString() + "faceVert.getNormal() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
                             break;
                         }
-                        if (abs(normal[0]) > 0.0001)
-                            thisVertex.Normal[0] = normal[0];
-                        if (abs(normal[1]) > 0.0001)
-                            thisVertex.Normal[1] = normal[1];
-                        if (abs(normal[2]) > 0.0001)
-                            thisVertex.Normal[2] = normal[2];
+
+                        thisVertex.Normal[0] = normal[0];
+                        thisVertex.Normal[1] = normal[1];
+                        thisVertex.Normal[2] = normal[2];
 
                         MFloatVector Tangent = Tangents[faceVert.tangentId()];
                         //MVector tmp = faceVert.getTangent(MSpace::kObject, NULL);
                         //tmp.get(biTangent);
-                        if (abs(Tangent[0]) > 0.0001)
-                            thisVertex.Tangent[0] = Tangent[0];
-                        if (abs(Tangent[1]) > 0.0001)
-                            thisVertex.Tangent[1] = Tangent[1];
-                        if (abs(Tangent[2]) > 0.0001)
-                            thisVertex.Tangent[2] = Tangent[2];
+						thisVertex.Tangent[0] = Tangent[0];
+						thisVertex.Tangent[1] = Tangent[1];
+						thisVertex.Tangent[2] = Tangent[2];
 
                         MFloatVector biNormal = biNormals[faceVert.tangentId()];
                         //faceVert.getBinormal().get(biNormal);
-                        if (abs(biNormal[0]) > 0.0001)
-                            thisVertex.BiNormal[0] = biNormal[0];
-                        if (abs(biNormal[1]) > 0.0001)
-                            thisVertex.BiNormal[1] = biNormal[1];
-                        if (abs(biNormal[2]) > 0.0001)
-                            thisVertex.BiNormal[2] = biNormal[2];
+                        thisVertex.BiNormal[0] = biNormal[0];
+                        thisVertex.BiNormal[1] = biNormal[1];
+                        thisVertex.BiNormal[2] = biNormal[2];
 
                         status = faceVert.getUV(UV);
                         if (status != MS::kSuccess) {
@@ -308,7 +290,8 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         thisVertex.Uv[1] = UV[1];
 
                         
-                        if (hasSkin) {
+                        if (newMesh.hasSkin) {
+							thisVertex.useWeights = true;
                             float totalWeight = 0.0f;
                             unsigned int totalBones = 0;
                             MIntArray jointIDs /* ??? */;
@@ -324,9 +307,11 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                             }
                            
                             for (unsigned int i = 0; i < 4; i++) {
-                                thisVertex.BoneWeights[i] = thisVertex.BoneWeights[i] / totalWeight;
+                                //thisVertex.BoneWeights[i] = thisVertex.BoneWeights[i] / totalWeight;
                             }
-                        }
+						} else {
+							thisVertex.useWeights = false;
+						}
 
                         //float totalWeight = thisVertex.BoneWeights[0] + thisVertex.BoneWeights[1] + thisVertex.BoneWeights[2] + thisVertex.BoneWeights[3];
                         //if (totalWeight > 0.0001f) {

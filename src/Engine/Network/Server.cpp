@@ -4,7 +4,7 @@ Server::Server()
 {
     Network::initialize();
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
-    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05);
+    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
     pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
 }
 Server::~Server()
@@ -202,7 +202,7 @@ void Server::sendPing()
 
 void Server::checkForTimeOuts()
 {
-    int startPing = 1000 * m_StartPingTime
+    double startPing = 1000 * m_StartPingTime
         / static_cast<double>(CLOCKS_PER_SEC);
 
     std::vector<PlayerID> playersToRemove;

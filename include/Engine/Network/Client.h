@@ -36,7 +36,7 @@ protected:
     std::string address;
     int port = 0;
     // Sending message to server logic
-    int bytesRead = -1;
+    size_t bytesRead = 0;
 
     // Packet loss logic
     PacketID m_PacketID = 0;
@@ -67,6 +67,7 @@ protected:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
+    size_t  receive(char* data);
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);

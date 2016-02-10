@@ -7,12 +7,17 @@ uniform vec4 Color;
 uniform vec4 DiffuseColor;
 uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
+uniform vec4 AmbientColor;
 uniform float FillPercentage;
+
+uniform vec2 DiffuseUVRepeat;
+uniform vec2 NormalUVRepeat;
+uniform vec2 SpecularUVRepeat;
+uniform vec2 GlowUVRepeat;
 layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
 layout (binding = 2) uniform sampler2D SpecularMapTexture;
 layout (binding = 3) uniform sampler2D GlowMapTexture;
-
 
 #define TILE_SIZE 16
 
@@ -55,12 +60,11 @@ in VertexData{
 	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
+	float ExplosionPercentageElapsed;
 }Input;
 
 out vec4 sceneColor;
 out vec4 bloomColor;
-
-vec4 scene_ambient = vec4(0.3,0.3,0.3,1);
 
 struct LightResult {
 	vec4 Diffuse;
@@ -115,11 +119,12 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 
 void main()
 {
-	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate);
-	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate);
-	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate);
+	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
+	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
+	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate * SpecularUVRepeat);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
-	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, NormalMapTexture);
+	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
+	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position); 
 
@@ -128,7 +133,7 @@ void main()
 	tilePos.y = int(gl_FragCoord.y/TILE_SIZE);
 
 	LightResult totalLighting;
-	totalLighting.Diffuse = scene_ambient;
+	totalLighting.Diffuse = vec4(AmbientColor.rgb, 1.0);
 	int currentTile = int(floor(gl_FragCoord.x/TILE_SIZE) + (floor(gl_FragCoord.y/TILE_SIZE) * int(ScreenDimensions.x/TILE_SIZE)));
 
 	int start = int(LightGrids.Data[currentTile].Start);
@@ -150,8 +155,9 @@ void main()
 		totalLighting.Specular += light_result.Specular;
 	}
 
-	
-	vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
+	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
+	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
+	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
@@ -160,7 +166,7 @@ void main()
 		color_result += FillColor;
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
-	color_result += glowTexel;
+	color_result += glowTexel*3;
 
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
 
