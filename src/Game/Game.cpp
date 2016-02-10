@@ -103,7 +103,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     // Populate Octree with collidables

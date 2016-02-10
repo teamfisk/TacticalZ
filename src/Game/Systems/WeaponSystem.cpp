@@ -1,13 +1,15 @@
 #include "Systems/WeaponSystem.h"
 
-WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer)
+WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer, Octree<EntityAABB>* collisionOctree)
     : System(params)
     , PureSystem("Player")
-    , ImpureSystem()
+    , m_SystemParams(params)
     , m_Renderer(renderer)
+    , m_CollisionOctree(collisionOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EShoot, &WeaponSystem::OnShoot);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &WeaponSystem::OnPlayerSpawned);
 }
 
 void WeaponSystem::Update(double dt)
@@ -15,41 +17,48 @@ void WeaponSystem::Update(double dt)
 
 }
 
-void WeaponSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt)
+void WeaponSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPlayer, double dt)
 {
-
+    // Update potential weapon behaviour for player
+    //auto it = m_ActiveWeapons.find(entity);
+    //if (it != m_ActiveWeapons.end()) {
+    //    //if (it->first.Valid()) {
+    //        it->second->Update(dt);
+    //    //} else {
+    //    //    m_ActiveWeapons.erase(it);
+    //    //}
+    //}
 }
 
 bool WeaponSystem::OnInputCommand(Events::InputCommand& e)
 {
+    EntityWrapper player = e.Player;
+    if (e.PlayerID == -1) {
+        player = LocalPlayer;
+    }
+
     // Make sure player is alive
-    if (!e.Player.Valid()) {
+    if (!player.Valid()) {
         return false;
     }
 
     // Weapon selection
     if (e.Command == "SelectWeapon") {
-        selectWeapon(e.Player, static_cast<ComponentInfo::EnumType>(e.Value));
-    }
-
-    // Only shoot client-side!
-    if (!IsClient) {
-        return false;
-    }
-
-    // Only shoot if the player is alive
-    if (!e.Player.Valid()) {
-        return false;
-    }
-
-    if (e.Command == "PrimaryFire" && e.Value > 0) {
-        Events::Shoot eShoot;
-        if (e.PlayerID == -1) {
-            eShoot.Player = LocalPlayer;
-        } else {
-            eShoot.Player = e.Player;
+        if (e.Value != 0) {
+            selectWeapon(player, static_cast<ComponentInfo::EnumType>(e.Value));
         }
-        m_EventBroker->Publish(eShoot);
+    }
+
+    // Fire
+    if (e.Command == "PrimaryFire") {
+        if (m_ActiveWeapons.find(player) != m_ActiveWeapons.end()) {
+            auto weapon = m_ActiveWeapons.at(player);
+            if (e.Value > 0) {
+                weapon->Fire();
+            } else {
+                weapon->CeaseFire();
+            }
+        }
     }
 
     return true;
@@ -60,7 +69,11 @@ void WeaponSystem::selectWeapon(EntityWrapper player, ComponentInfo::EnumType sl
     // Primary
     if (slot == 1) {
         // TODO: if class...
-        m_ActiveWeapons[player] = std::make_shared<AssaultWeaponBehaviour>();
+        if (m_ActiveWeapons.count(player) == 0) {
+            m_ActiveWeapons.insert(std::make_pair(player, std::make_shared<AssaultWeaponBehaviour>(m_SystemParams, m_CollisionOctree, player)));
+        } else {
+            m_ActiveWeapons.erase(player);
+        }
     }
 
     // Secondary
@@ -81,49 +94,6 @@ bool WeaponSystem::OnShoot(Events::Shoot& eShoot)
 {
     if (!eShoot.Player.Valid()) {
         return false;
-    }
-
-    // TODO: Weapon firing effects here
-
-    auto rayRed = ResourceManager::Load<EntityFile>("Schema/Entities/RayRed.xml");
-    auto rayBlue = ResourceManager::Load<EntityFile>("Schema/Entities/RayBlue.xml");
-
-    EntityWrapper weapon = eShoot.Player.FirstChildByName("WeaponMuzzle");
-    if (weapon.Valid()) {
-        EntityWrapper ray;
-        if ((ComponentInfo::EnumType)eShoot.Player["Team"]["Team"] == eShoot.Player["Team"]["Team"].Enum("Red")) {
-            EntityFileParser parser(rayRed);
-            EntityID rayID = parser.MergeEntities(m_World);
-            ray = EntityWrapper(m_World, rayID);
-        } else {
-            EntityFileParser parser(rayBlue);
-            EntityID rayID = parser.MergeEntities(m_World);
-            ray = EntityWrapper(m_World, rayID);
-        }
-
-        glm::mat4 transformation = Transform::AbsoluteTransformation(weapon);
-        glm::vec3 scale;
-        glm::vec3 translation;
-        glm::quat orientation;
-        glm::vec3 skew;
-        glm::vec4 perspective;
-        glm::decompose(transformation, scale, orientation, translation, skew, perspective);
-        
-        // Matrix to euler angles
-        glm::vec3 euler;
-        euler.y = glm::asin(-transformation[0][2]);
-        if (cos(euler.y) != 0) {
-            euler.x = atan2(transformation[1][2], transformation[2][2]);
-            euler.z = atan2(transformation[0][1], transformation[0][0]);
-        } else {
-            euler.x = atan2(-transformation[2][0], transformation[1][1]);
-            euler.z = 0;
-        }
-
-        //LOG_DEBUG("rotation: %f %f %f", euler.x, euler.y, euler.z);
-        (glm::vec3&)ray["Transform"]["Position"] = translation;
-        (glm::vec3&)ray["Transform"]["Orientation"] = euler;
-        //(glm::vec3&)ray["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(weapon);
     }
 
     // Only run further picking code for the local player!

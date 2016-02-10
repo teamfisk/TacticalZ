@@ -6,6 +6,9 @@
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
+    <c:AssaultWeapon>
+      <RPM>600</RPM>
+    </c:AssaultWeapon>
     <c:Collidable/>
     <c:DashAbility>
       <CoolDownMaxTimer>2</CoolDownMaxTimer>
@@ -118,7 +121,7 @@
             <Entity name="WeaponMuzzle">
               <Components>
                 <c:Transform>
-                  <Position X="0.215000004" Y="-0.153000012" Z="-0.266000003"/>
+                  <Position X="0.215000004" Y="-0.153000012" Z="-0.923000038"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -145,7 +148,7 @@
       <Components>
         <c:Animation>
           <Name>Hold Pos</Name>
-          <Time>0.79606322555778508</Time>
+          <Time>0.86415395295813102</Time>
           <Speed>1</Speed>
         </c:Animation>
         <c:HiddenForLocalPlayer/>

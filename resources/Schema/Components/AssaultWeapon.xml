@@ -4,5 +4,6 @@
 	<MagazineSize>32</MagazineSize>
 	<Ammo>360</Ammo>
 	<MaxAmmo>360</MaxAmmo>
-	<RPM>40</RPM>
+	<BaseDamage>5</BaseDamage>
+	<RPM>120</RPM>
 </AssaultWeapon>

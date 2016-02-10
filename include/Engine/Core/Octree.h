@@ -5,9 +5,7 @@
 
 #include "../Common.h"
 #include "AABB.h"
-
-//Fwd declarations.
-class Ray;
+#include "Ray.h"
 
 namespace OctSpace
 {

@@ -10,10 +10,9 @@ BaseEventRelay::~BaseEventRelay()
 void EventBroker::Unsubscribe(BaseEventRelay& relay) // ?
 {
     auto identifier = std::make_tuple(relay.m_EventID, relay.m_ContextTypeName, relay.m_EventTypeName);
-
     relay.m_Broker = nullptr;
     if (m_IsProcessing) {
-        m_RelaysToUnsubscribe.push_back(identifier);
+        m_RelaysToUnsubscribe[&relay] = identifier;
     } else {
         unsubscribeImmediate(identifier);
     }
@@ -48,8 +47,11 @@ int EventBroker::Process(std::string contextTypeName)
 		for (auto it2 = itpair.first; it2 != itpair.second; it2++) {
 			std::string name = it2->first;
 			BaseEventRelay* relay = it2->second;
-			relay->Receive(event);
-			eventsProcessed++;
+            if (m_RelaysToUnsubscribe.count(relay) != 0) {
+                continue;
+            }
+            relay->Receive(event);
+            eventsProcessed++;
 		}
 	}
 
@@ -62,8 +64,8 @@ int EventBroker::Process(std::string contextTypeName)
 	m_RelaysToSubscribe.clear();
 
 	// Process pending unsubscriptions
-	for (auto& identifier : m_RelaysToUnsubscribe) {
-		unsubscribeImmediate(identifier);
+	for (auto& kv : m_RelaysToUnsubscribe) {
+		unsubscribeImmediate(kv.second);
 	}
 	m_RelaysToUnsubscribe.clear();
 
