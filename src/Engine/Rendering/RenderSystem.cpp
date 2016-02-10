@@ -1,10 +1,13 @@
 #include "Rendering/RenderSystem.h"
+#include "Collision/Collision.h"
+#include "Core/Frustum.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame) 
+RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
     : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
     , m_World(world)
+    , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
@@ -42,12 +45,13 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
 
 void RenderSystem::fillModels(RenderScene::Queues &Jobs)
 {
-    auto models = m_World->GetComponents("Model");
-    if (models == nullptr) {
-        return;
-    }
+    Frustum frustum(m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix());
+    std::vector<EntityAABB> seenEntities;
+    m_Octree->ObjectsInFrustum(frustum, seenEntities);
 
-    for (auto& cModel : *models) {
+    for (auto& seenEntity : seenEntities) {
+        EntityWrapper entity = seenEntity.Entity;
+        ComponentWrapper cModel = entity["Model"];
         bool visible = cModel["Visible"];
         if (!visible) {
             continue;
@@ -56,8 +60,6 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
         if (resource.empty()) {
             continue;
         }
-
-        EntityWrapper entity(m_World, cModel.EntityID);
 
         // Only render children of a camera if that camera is currently active
         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {

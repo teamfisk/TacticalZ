@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Collision/FillOctreeSystem.h"
+#include "Collision/FillFrustumOctreeSystem.h"
 #include "Collision/EntityAABB.h"
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
@@ -77,9 +78,11 @@ Game::Game(int argc, char* argv[])
     m_SoundManager = new SoundManager(m_World, m_EventBroker);
 
     // Create Octrees
-    m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
-    m_OctreeTrigger = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
-    m_OctreeFrustrumCulling = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
+    // TODO: Perhaps the world bounds should be set in some non-arbitrary way instead of this.
+    AABB boxContainingTheWorld(glm::vec3(-300), glm::vec3(300));
+    m_OctreeCollision = new Octree<EntityAABB>(boxContainingTheWorld, 4);
+    m_OctreeTrigger = new Octree<EntityAABB>(boxContainingTheWorld, 4);
+    m_OctreeFrustrumCulling = new Octree<EntityAABB>(boxContainingTheWorld, 4);
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
 
@@ -102,6 +105,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
+    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
 
@@ -110,7 +114,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeTrigger);
     ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
+    m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame, m_OctreeFrustrumCulling);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 

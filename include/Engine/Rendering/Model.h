@@ -4,6 +4,7 @@
 #include "Rendering/RawModelCustom.h"
 //#include "Rendering/RawModelAssimp.h"
 #include "../OpenGL.h"
+#include "Core/AABB.h"
 
 class Model : public ThreadUnsafeResource
 {
@@ -17,13 +18,15 @@ public:
     const std::vector<RawModel::MaterialGroup>& MaterialGroups() const { return m_RawModel->MaterialGroups; }
     const glm::mat4& Matrix() const { return m_RawModel->m_Matrix; }
     const std::vector<RawModel::Vertex>& Vertices() const { return m_RawModel->m_Vertices; }
+    const AABB& Box() const { return m_Box; }
 
 	GLuint VAO;
 	GLuint ElementBuffer;
     RawModel* m_RawModel;
 
 private:
-    
+    AABB m_Box;
+
 	GLuint VertexBuffer;
 	GLuint NormalBuffer;
 	GLuint TangentNormalsBuffer;
