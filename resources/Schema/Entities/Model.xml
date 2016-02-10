@@ -19,7 +19,7 @@
     <Entity>
       <Components>
         <c:Model>
-          <Resource>models/animTest.mesh</Resource>
+          <Resource>Models/Test/AnimTest.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>

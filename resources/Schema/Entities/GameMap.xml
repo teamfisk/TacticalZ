@@ -14,7 +14,7 @@
         </c:AABB>
         <c:Collidable/>
         <c:Model>
-          <Resource>Models\MapVersion1.mesh</Resource>
+          <Resource>Models/LevelBase/MapVersion1.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -26,7 +26,7 @@
           <Intensity>2</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.mesh</Resource>
+          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>

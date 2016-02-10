@@ -43,8 +43,8 @@ private:
     void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
 
-    void BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job);
-    void BindModelTextures(std::shared_ptr<ModelJob>& job);
+    void BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job);
+    void BindModelTextures(GLuint shaderHandle, std::shared_ptr<ModelJob>& job);
 
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;
@@ -68,8 +68,18 @@ private:
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;
+	ShaderProgram* m_ExplosionEffectSplatMapProgram;
+	ShaderProgram* m_ForwardPlusSplatMapProgram;
     ShaderProgram* m_ShieldToStencilProgram;
     ShaderProgram* m_FillDepthBufferProgram;
+
+
+	ShaderProgram* m_ForwardPlusSkinnedProgram;
+	ShaderProgram* m_ExplosionEffectSkinnedProgram;
+	ShaderProgram* m_ExplosionEffectSplatMapSkinnedProgram;
+	ShaderProgram* m_ForwardPlusSplatMapSkinnedProgram;
+    ShaderProgram* m_ShieldToStencilSkinnedProgram;
+    ShaderProgram* m_FillDepthBufferSkinnedProgram;
 };
 
 #endif 

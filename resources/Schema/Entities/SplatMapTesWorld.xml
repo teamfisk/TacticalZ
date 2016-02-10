@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:SceneLight/>
+        <c:Model>
+          <Resource>Models/Test/SplatMapTest.mesh</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

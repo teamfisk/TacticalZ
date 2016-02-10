@@ -14,9 +14,10 @@
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
 #include "Game/Systems/WeaponSystem.h"
+#include "Rendering/AnimationSystem.h"
+#include "Rendering/BoneAttachmentSystem.h"
 #include "Game/Systems/PlayerHUD.h"
 #include "Game/Systems/LifetimeSystem.h"
-#include "../Engine/Rendering/AnimationSystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -111,6 +112,7 @@ Game::Game(int argc, char* argv[])
 
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeTrigger);
     ++updateOrderLevel;
