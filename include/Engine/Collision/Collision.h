@@ -79,7 +79,8 @@ bool AABBVsAABB(const AABB& a, const AABB& b);
 bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation);
 
 // Calculates an absolute AABB from an entity AABB component
-boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity);
+boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeModelBox = false);
+boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity);
 
 }
 
