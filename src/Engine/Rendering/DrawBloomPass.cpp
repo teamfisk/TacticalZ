@@ -98,18 +98,18 @@ void DrawBloomPass::Draw(GLuint texture)
     ImGui::SliderInt("Iterations", &m_Iterations, 0, 10);
 
     if (m_DebugTextureToDraw == 1)
-        BlurOneMipMapLevel(&texture, m_Iterations, 0);
+        BlurOneMipMapLevel(&texture, m_Iterations, 1);
     else if (m_DebugTextureToDraw == 2)
-        BlurOneMipMapLevel(&texture, m_Iterations, 1);
+        BlurOneMipMapLevel(&texture, m_Iterations, 2);
     else if (m_DebugTextureToDraw == 3)
-        BlurOneMipMapLevel(&texture, m_Iterations, 2);
-    else if (m_DebugTextureToDraw == 4)
         BlurOneMipMapLevel(&texture, m_Iterations, 3);
+    else if (m_DebugTextureToDraw == 4)
+        BlurOneMipMapLevel(&texture, m_Iterations, 4);
     else if (m_DebugTextureToDraw == 0) {
-        BlurOneMipMapLevel(&texture, m_Iterations, 0);
         BlurOneMipMapLevel(&texture, m_Iterations, 1);
         BlurOneMipMapLevel(&texture, m_Iterations, 2);
         BlurOneMipMapLevel(&texture, m_Iterations, 3);
+        BlurOneMipMapLevel(&texture, m_Iterations, 4);
     }
 
 }
