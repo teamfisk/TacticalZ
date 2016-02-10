@@ -9,8 +9,14 @@
     <Entity>
       <Components>
         <c:SceneLight/>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
         <c:Model>
-          <Resource>Models/Test/SplatMapTest.mesh</Resource>
+          <Resource>Models/Ground.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
