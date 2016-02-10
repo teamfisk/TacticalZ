@@ -11,7 +11,7 @@ void FillFrustumOctreeSystem::UpdateComponent(EntityWrapper& entity, ComponentWr
     if (entity.HasComponent("ExplosionEffect")) {
         absoluteAABB = Collision::AbsoluteAABBExplosionEffect(entity);
     } else {
-        absoluteAABB = Collision::EntityAbsoluteAABB(entity);
+        absoluteAABB = Collision::EntityAbsoluteAABB(entity, true);
     }
     if (absoluteAABB) {
         m_Octree->AddDynamicObject(*absoluteAABB);

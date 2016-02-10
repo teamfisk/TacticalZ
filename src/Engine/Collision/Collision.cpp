@@ -565,10 +565,10 @@ bool AABBvsTriangles(const AABB& box,
     return hit;
 }
 
-boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
+boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeModelBox)
 {
     AABB modelSpaceBox;
-    if (entity.HasComponent("AABB")) {
+    if (entity.HasComponent("AABB") && !takeModelBox) {
         ComponentWrapper& cAABB = entity["AABB"];
         modelSpaceBox = EntityAABB::FromOriginSize((glm::vec3)cAABB["Origin"], (glm::vec3)cAABB["Size"]);
     } else if (entity.HasComponent("Model")) {
@@ -614,7 +614,7 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
 
 boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity)
 {
-    boost::optional<EntityAABB> modelBox = EntityAbsoluteAABB(entity);
+    boost::optional<EntityAABB> modelBox = EntityAbsoluteAABB(entity, true);
     if (!modelBox) {
         return boost::none;
     }
