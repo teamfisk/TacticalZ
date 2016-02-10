@@ -56,6 +56,12 @@ void PlayerMovementSystem::Update(double dt)
             } else {
                 wishSpeed = playerMovementSpeed;
             }
+            if (player.ID == m_LocalPlayer.ID) {
+                if (glm::length(wishDirection) == 0) {
+                    // If no key is pressed, reset the distance moved since last step.
+                    m_DistanceMoved = 0;
+                }
+            }
             glm::vec3& velocity = cPhysics["Velocity"];
             bool isOnGround = (bool)cPhysics["IsOnGround"];
             ImGui::Text(isOnGround ? "On ground" : "In air");
@@ -94,8 +100,10 @@ void PlayerMovementSystem::Update(double dt)
                     controller->SetDoubleJumping(false);
                 } else {
                     controller->SetDoubleJumping(true);
+                    Events::DoubleJump e;
+                    m_EventBroker->Publish(e);
                 }
-                velocity.y += 4.f;
+                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
@@ -116,19 +124,19 @@ void PlayerMovementSystem::Update(double dt)
                 //TODO: add assault dash animation here
                 if (glm::length(controller->Movement()) > 0.f) {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch Walk";
-                        (double&)cAnimation["Speed"] = 1.f * -glm::sign(controller->Movement().z);
+                        cAnimation["AnimationName1"] = "Crouch Walk";
+                        (double&)cAnimation["Speed1"] = 1.f * -glm::sign(controller->Movement().z);
                     } else {
-                        cAnimation["Name"] = "Run";
-                        (double&)cAnimation["Speed"] = 2.f * -glm::sign(controller->Movement().z);
+                        cAnimation["AnimationName1"] = "Run";
+                        (double&)cAnimation["Speed1"] = 2.f * -glm::sign(controller->Movement().z);
                     }
                 } else {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch";
+                        cAnimation["AnimationName1"] = "Crouch";
                         (double&)cAnimation["Speed"] = 1.f;
                     } else {
-                        cAnimation["Name"] = "Hold Pos";
-                        (double&)cAnimation["Speed"] = 1.f;
+                        cAnimation["AnimationName1"] = "Hold Pos";
+                        (double&)cAnimation["Speed1"] = 1.f;
                     }
                 }
             }
@@ -136,6 +144,7 @@ void PlayerMovementSystem::Update(double dt)
 
         controller->Reset();
     }
+    playerStep(dt);
 }
 
 void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
@@ -171,10 +180,37 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     position += velocity * (float)dt;
 }
 
+void PlayerMovementSystem::playerStep(double dt)
+{
+    if (!m_LocalPlayer.Valid()) {
+        return;
+    }
+    // Position of the local player, used see how far a player has moved.
+    glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
+    // Used to see if a player is airborne.
+    bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
+    m_DistanceMoved += glm::length(pos - m_LastPosition);
+    // Set the last position for next iteration
+    m_LastPosition = pos;
+    if (m_DistanceMoved > m_PlayerStepLength && grounded) {
+        // Player moved a step's distance
+        // Create footstep sound
+        Events::PlaySoundOnEntity e;
+        e.EmitterID = m_LocalPlayer.ID;
+        e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
+        m_LeftFoot = !m_LeftFoot;
+        m_EventBroker->Publish(e);
+        m_DistanceMoved = 0.f;
+    }
+}
+
 bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player spawns, create an input controller for them
     m_PlayerInputControllers[e.Player] = new FirstPersonInputController<PlayerMovementSystem>(m_EventBroker, e.PlayerID);
-
+    if (e.PlayerID == -1) {
+        // Keep track of the local player
+        m_LocalPlayer = e.Player;
+    }
     return true;
 }

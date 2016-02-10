@@ -28,9 +28,13 @@
 	<xs:include schemaLocation="Components/HealthHUD.xsd"/>
 	<xs:include schemaLocation="Components/Animation.xsd"/>
 	<xs:include schemaLocation="Components/Fill.xsd"/>
+	<xs:include schemaLocation="Components/BoneAttachment.xsd"/>
 	<xs:include schemaLocation="Components/Lifetime.xsd"/>
 	<xs:include schemaLocation="Components/HiddenForLocalPlayer.xsd"/>
 	<xs:include schemaLocation="Components/HealthPickup.xsd"/>
+	<xs:include schemaLocation="Components/AnimationOffset.xsd"/>
 	<xs:include schemaLocation="Components/DashAbility.xsd"/>
+	<xs:include schemaLocation="Components/Shield.xsd"/>
 	<xs:include schemaLocation="Components/Sprite.xsd"/>
+	<xs:include schemaLocation="Components/Shielded.xsd"/>
 </xs:schema>
