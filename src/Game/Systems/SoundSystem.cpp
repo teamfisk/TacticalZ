@@ -23,7 +23,12 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 { }
 
 void SoundSystem::Update(double dt)
-{ }
+{
+    // Temp for play test.
+    if(m_DrumsIsPlaying) {
+        m_DrumsIsPlaying = !drumTimer(dt);
+    }
+}
 
 bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
@@ -73,6 +78,17 @@ void SoundSystem::playerJumps()
     }
 }
 
+bool SoundSystem::drumTimer(double dt)
+{
+    m_DrumTimer += dt;
+    if (m_DrumTimer > 15) {
+        m_DrumTimer = 0.0;
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool SoundSystem::OnShoot(const Events::Shoot & e)
 {
     Events::PlaySoundOnEntity ev;
@@ -94,6 +110,8 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     }
     ev.EmitterID = m_LocalPlayer.ID;
     m_EventBroker->Publish(ev);
+    // Temp for play test.
+    m_DrumsIsPlaying = false;
     return false;
 }
 
@@ -106,11 +124,11 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     std::vector<std::string> paths;
     paths.push_back("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
 
-    // Breathe
-    int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
-    for (int i = 0; i < ammountOfbreaths; i++) {
-        paths.push_back("Audio/exhausted/breath.wav");
-    }
+//     // Breathe
+//     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
+//     for (int i = 0; i < ammountOfbreaths; i++) {
+//         paths.push_back("Audio/exhausted/breath.wav");
+//     }
     Events::PlayQueueOnEntity ev;
     ev.Emitter = m_LocalPlayer;
     ev.FilePaths = paths;
@@ -120,32 +138,35 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 
 bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
-    //if (e.PlayerID == m_LocalPlayer.ID) {
     Events::PlaySoundOnEntity ev;
     ev.EmitterID = m_LocalPlayer.ID;
     ev.FilePath = "Audio/die/die2.wav"; 
     m_EventBroker->Publish(ev);
-    //}
     return false;
 }
 
 bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
-    //if (e.PlayerHealedID == m_LocalPlayer.ID) {
     Events::PlaySoundOnEntity ev;
     ev.EmitterID = m_LocalPlayer.ID;
     ev.FilePath = "Audio/pickup/pickup2.wav";
     m_EventBroker->Publish(ev);
-    //}
     return false;
 }
 
 bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
 {
+    // Temp for play test.
+    if (m_DrumsIsPlaying) {
+        return false;
+    }
     if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
-        Events::PlayBackgroundMusic ev;
+        Events::PlaySoundOnEntity ev; // should be BGM
+        ev.EmitterID = m_LocalPlayer.ID;
         ev.FilePath = "Audio/bgm/drumstest.wav";
         m_EventBroker->Publish(ev);
+        // Temp for play test.
+        m_DrumsIsPlaying = true;
     }
     return false;
 }
