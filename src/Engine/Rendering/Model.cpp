@@ -5,26 +5,77 @@ Model::Model(std::string fileName)
     //Try loading the model asyncronously, if it throws any exceptions then let it propagate back to caller.
     m_RawModel = ResourceManager::Load<RawModel, true>(fileName);
 
-    for (auto& group : m_RawModel->MaterialGroups) {
-        if (!group.TexturePath.empty()) {
-            group.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.TexturePath));
-        }
-        if (!group.NormalMapPath.empty()) {
-            group.NormalMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.NormalMapPath));
-        }
-        if (!group.SpecularMapPath.empty()) {
-            group.SpecularMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.SpecularMapPath));
-        }
-        if (!group.IncandescenceMapPath.empty()) {
-            group.IncandescenceMap = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(group.IncandescenceMapPath));
-        }
+    for (auto& materialProperty : m_RawModel->m_Materials) {
+		switch (materialProperty.type) {
+		case RawModel::MaterialType::SingleTextures:
+		{
+			RawModel::MaterialSingleTextures* materialSingleTexture = static_cast<RawModel::MaterialSingleTextures*>(materialProperty.material);
+			if (!materialSingleTexture->ColorMap.TexturePath.empty()) {
+				materialSingleTexture->ColorMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->ColorMap.TexturePath));
+			}
+			if (!materialSingleTexture->NormalMap.TexturePath.empty()) {
+				materialSingleTexture->NormalMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->NormalMap.TexturePath));
+			}
+			if (!materialSingleTexture->SpecularMap.TexturePath.empty()) {
+				materialSingleTexture->SpecularMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->SpecularMap.TexturePath));
+			}
+			if (!materialSingleTexture->IncandescenceMap.TexturePath.empty()) {
+				materialSingleTexture->IncandescenceMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->IncandescenceMap.TexturePath));
+			}
+		}
+			break;
+		case RawModel::MaterialType::SplatMapping:
+		{
+			RawModel::MaterialSplatMapping* materialSplatMapping = static_cast<RawModel::MaterialSplatMapping*>(materialProperty.material);
+			if (!materialSplatMapping->SplatMap.TexturePath.empty()) {
+				materialSplatMapping->SplatMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSplatMapping->SplatMap.TexturePath));
+			}
+			for (auto& texture : materialSplatMapping->ColorMaps)
+			{
+				if (!texture.TexturePath.empty()) {
+					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
+				}
+				else {
+					texture.Texture = nullptr;
+				}
+			}
+			for (auto& texture : materialSplatMapping->NormalMaps)
+			{
+				if (!texture.TexturePath.empty()) {
+					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
+				} else {
+					texture.Texture = nullptr;
+				}
+			}
+			for (auto& texture : materialSplatMapping->SpecularMaps)
+			{
+				if (!texture.TexturePath.empty()) {
+					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
+				}
+				else {
+					texture.Texture = nullptr;
+				}
+			}
+			for (auto& texture : materialSplatMapping->IncandescenceMaps)
+			{
+				if (!texture.TexturePath.empty()) {
+					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
+				}
+				else {
+					texture.Texture = nullptr;
+				}
+			}
+		}
+			break;
+		}
     }
 
     // Generate GL buffers
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, m_RawModel->m_Vertices.size() * sizeof(RawModel::Vertex), &m_RawModel->m_Vertices[0], GL_STATIC_DRAW);
+
+	glBufferData(GL_ARRAY_BUFFER, m_RawModel->NumVertices() * m_RawModel->VertexSize(), m_RawModel->Vertices(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &ElementBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBuffer);
@@ -35,7 +86,13 @@ Model::Model(std::string fileName)
     GLERROR("GLEW: BufferFail4");
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	std::vector<int> structSizes = { 3, 3, 3, 3, 2, 4, 4 };
+	std::vector<int> structSizes;
+	if (m_RawModel->IsSkinned()) {
+		structSizes = { 3, 3, 3, 3, 2, 4, 4 };
+	} else {
+		structSizes = { 3, 3, 3, 3, 2 };
+	}
+
     int stride = 0;
     for (int size : structSizes) {
         stride += size;
@@ -49,8 +106,10 @@ Model::Model(std::string fileName)
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
-        glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
-        glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
+		if (m_RawModel->IsSkinned()) {
+			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
+			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
+		}
     }
     GLERROR("GLEW: BufferFail5");
 
@@ -59,15 +118,19 @@ Model::Model(std::string fileName)
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
-    glEnableVertexAttribArray(5);
-    glEnableVertexAttribArray(6);
+	if (m_RawModel->IsSkinned()) {
+		glEnableVertexAttribArray(5);
+		glEnableVertexAttribArray(6);
+	}
     GLERROR("GLEW: BufferFail5");
 
     //CreateBuffers();
 
     glm::vec3 mini(INFINITY);
     glm::vec3 maxi(-INFINITY);
-    for (const auto& v : m_RawModel->m_Vertices) {
+
+    for (unsigned int i = 0; i < m_RawModel->NumVertices(); i++) {
+        const auto& v = m_RawModel->Vertices()[i];
         mini = glm::min(mini, v.Position);
         maxi = glm::max(maxi, v.Position);
     }

@@ -124,19 +124,19 @@ void PlayerMovementSystem::Update(double dt)
                 //TODO: add assault dash animation here
                 if (glm::length(controller->Movement()) > 0.f) {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch Walk";
-                        (double&)cAnimation["Speed"] = 1.f * -glm::sign(controller->Movement().z);
+                        cAnimation["AnimationName1"] = "Crouch Walk";
+                        (double&)cAnimation["Speed1"] = 1.f * -glm::sign(controller->Movement().z);
                     } else {
-                        cAnimation["Name"] = "Run";
-                        (double&)cAnimation["Speed"] = 2.f * -glm::sign(controller->Movement().z);
+                        cAnimation["AnimationName1"] = "Run";
+                        (double&)cAnimation["Speed1"] = 2.f * -glm::sign(controller->Movement().z);
                     }
                 } else {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch";
+                        cAnimation["AnimationName1"] = "Crouch";
                         (double&)cAnimation["Speed"] = 1.f;
                     } else {
-                        cAnimation["Name"] = "Hold Pos";
-                        (double&)cAnimation["Speed"] = 1.f;
+                        cAnimation["AnimationName1"] = "Hold Pos";
+                        (double&)cAnimation["Speed1"] = 1.f;
                     }
                 }
             }

@@ -62,14 +62,14 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
         }
 
         // Only render children of a camera if that camera is currently active
-        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-            continue;
-        }
+         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+             continue;
+         } 
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
-            continue;
-        }
+         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+             continue;
+         }
 
         Model* model;
         try {
@@ -111,6 +111,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillPercentage
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
+                    explosionEffectJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(explosionEffectJob);
                 } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
                     || m_World->HasComponent(cModel.EntityID, "Player")) {
@@ -122,6 +123,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
                     } else {
+					    explosionEffectJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
                     }
                 } else {
@@ -132,6 +134,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentObjects.push_back(explosionEffectJob);
                     } else {
+                        explosionEffectJob->CalculateHash();
                         Jobs.OpaqueObjects.push_back(explosionEffectJob);
                     }
                 }
@@ -147,6 +150,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillPercentage
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
+                    modelJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(modelJob);
                 } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
                     || m_World->HasComponent(cModel.EntityID, "Player")) {
@@ -158,6 +162,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentShieldedObjects.push_back(modelJob);
                     } else {
+					    modelJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(modelJob);
                     }
                 } else {
@@ -168,6 +173,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentObjects.push_back(modelJob);
                     } else {
+                        modelJob->CalculateHash();
                         Jobs.OpaqueObjects.push_back(modelJob);
                     }
                 }
@@ -233,7 +239,7 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
     if (texts == nullptr) {
         return;
     }
-
+	
     for (auto& textComponent : *texts) {
         bool visible = textComponent["Visible"];
         if (!visible) {
@@ -290,6 +296,8 @@ void RenderSystem::Update(double dt)
 
     fillModels(scene.Jobs);
     fillPointLights(scene.Jobs.PointLight, m_World);
+    //TODO: Make sure all objects needed are also sorted.
+	scene.Jobs.OpaqueObjects.sort();
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);

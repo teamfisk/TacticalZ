@@ -64,7 +64,7 @@ bool RayVsModel(const Ray& ray,
     float& outVCoord);
 
 bool AABBvsTriangles(const AABB& box,
-    const std::vector<RawModel::Vertex>& modelVertices,
+    const RawModel::Vertex* modelVertices,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix,
     glm::vec3& boxVelocity,
