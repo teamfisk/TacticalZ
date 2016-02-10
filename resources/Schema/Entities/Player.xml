@@ -101,13 +101,6 @@
             </Entity>
             <Entity name="Weapon">
               <Components>
-                <c:ExplosionEffect>
-                  <ColorByDistance>true</ColorByDistance>
-                  <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                  <ExplosionDuration>3.7999999523162842</ExplosionDuration>
-                  <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
-                  <Randomness>true</Randomness>
-                </c:ExplosionEffect>
                 <c:Model>
                   <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                 </c:Model>

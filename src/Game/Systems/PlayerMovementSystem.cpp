@@ -57,11 +57,13 @@ void PlayerMovementSystem::Update(double dt)
                 wishSpeed = playerMovementSpeed;
             }
             glm::vec3& velocity = cPhysics["Velocity"];
-            ImGui::Text("velocity: (%f, %f, %f)", velocity.x, velocity.y, velocity.z);
+            bool isOnGround = (bool)cPhysics["IsOnGround"];
+            ImGui::Text(isOnGround ? "On ground" : "In air");
+            ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             glm::vec3 groundVelocity(0.f, 0.f, 0.f);
-            groundVelocity.x = glm::dot(velocity, glm::vec3(1.f, 0.f, 0.f));
-            groundVelocity.z = glm::dot(velocity, glm::vec3(0.f, 0.f, 1.f));
-            ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(wishDirection));
+            groundVelocity.x = velocity.x;
+            groundVelocity.z = velocity.z;
+            ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(groundVelocity));
             ImGui::Text("wishDirection: (%f, %f, %f) |%f|", wishDirection.x, wishDirection.y, wishDirection.z, glm::length(wishDirection));
             float currentSpeedProj = glm::dot(groundVelocity, wishDirection);
             float addSpeed = wishSpeed - currentSpeedProj;
@@ -74,7 +76,7 @@ void PlayerMovementSystem::Update(double dt)
                 ImGui::InputFloat("accel", &accel);
                 static float airAccel = 0.5f;
                 ImGui::InputFloat("airAccel", &airAccel);
-                float actualAccel = (velocity.y != 0) ? airAccel : accel;
+                float actualAccel = isOnGround ? accel : airAccel;
                 static float surfaceFriction = 5.f;
                 ImGui::InputFloat("surfaceFriction", &surfaceFriction);
                 float accelerationSpeed = actualAccel * (float)dt * wishSpeed * surfaceFriction;
@@ -86,13 +88,14 @@ void PlayerMovementSystem::Update(double dt)
             }
 
             //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
-            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
+            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (isOnGround || !controller->DoubleJumping())) {
+                (bool)cPhysics["IsOnGround"] = false;
                 if (velocity.y == 0.f) {
                     controller->SetDoubleJumping(false);
                 } else {
                     controller->SetDoubleJumping(true);
                 }
-                velocity.y += 4.f;
+                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
@@ -144,6 +147,7 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
 
     ComponentWrapper& cPhysics = entity["Physics"];
     glm::vec3& velocity = cPhysics["Velocity"];
+    bool isOnGround = (bool)cPhysics["IsOnGround"];
 
     // Ground friction
     float speed = glm::length(velocity);
@@ -151,7 +155,7 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     ImGui::InputFloat("groundFriction", &groundFriction);
     static float airFriction = 0.f;
     ImGui::InputFloat("airFriction", &airFriction);
-    float friction = (velocity.y != 0) ? airFriction : groundFriction;
+    float friction = isOnGround ? groundFriction : airFriction;
     if (speed > 0) {
         float drop = speed * friction * (float)dt;
         float multiplier = glm::max(speed - drop, 0.f) / speed;

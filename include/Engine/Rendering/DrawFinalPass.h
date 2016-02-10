@@ -22,15 +22,23 @@ public:
 
     //Return the texture that is used in later stages to apply the bloom effect
     GLuint BloomTexture() const { return m_BloomTexture; }
+    GLuint BloomTextureLowRes() const { return m_BloomTextureLowRes; }
     //Return the texture with diffuse and lighting of the scene.
     GLuint SceneTexture() const { return m_SceneTexture; }
+    GLuint SceneTextureLowRes() const { return m_SceneTextureLowRes; }
+    //Return the framebuffer used in the scene rendering stage.
     FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
+    FrameBuffer* FinalPassFrameBufferLowRes() { return &m_FinalPassFrameBufferLowRes; }
 
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
     void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
-    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& job, RenderScene& scene);
+
+    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+    void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+    void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+    void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
 
     void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
@@ -44,9 +52,16 @@ private:
     Texture* m_GreyTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
+    FrameBuffer m_FinalPassFrameBufferLowRes;
     GLuint m_BloomTexture;
     GLuint m_SceneTexture;
+    GLuint m_BloomTextureLowRes;
+    GLuint m_SceneTextureLowRes;
     GLuint m_DepthBuffer;
+    GLuint m_DepthBufferLowRes;
+
+    //maqke this component based i guess?
+    GLuint m_ShieldPixelRate = 16;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
@@ -55,6 +70,8 @@ private:
     ShaderProgram* m_ExplosionEffectProgram;
 	ShaderProgram* m_ExplosionEffectSplatMapProgram;
 	ShaderProgram* m_ForwardPlusSplatMapProgram;
+    ShaderProgram* m_ShieldToStencilProgram;
+    ShaderProgram* m_FillDepthBufferProgram;
 
 
 	ShaderProgram* m_ForwardPlusSkinnedProgram;

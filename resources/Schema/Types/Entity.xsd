@@ -39,6 +39,8 @@
 							<xs:element ref="c:Fill" minOccurs="0"/>
 							<xs:element ref="c:Animation" minOccurs="0"/>
 							<xs:element ref="c:BoneAttachment" minOccurs="0"/>
+							<xs:element ref="c:Shield" minOccurs="0"/>
+							<xs:element ref="c:Shielded" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

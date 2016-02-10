@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:AABB/>
+    <c:HealthPickup/>
+    <c:Model>
+      <Resource>Models/Core/UnitSphere.mesh</Resource>
+    </c:Model>
+    <c:Transform>
+      <Position X="0" Y="1" Z="0"/>
+    </c:Transform>
+    <c:Trigger/>
+  </Components>
+
+  <Children/>
+
+</Entity>

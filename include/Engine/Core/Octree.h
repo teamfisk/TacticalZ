@@ -111,7 +111,7 @@ struct Child
     std::vector<ContainedObject>& m_StaticObjectsRef;
     std::vector<ContainedObject>& m_DynamicObjectsRef;
 
-    bool hasChildren() const;
+    inline bool hasChildren() const { return m_Children[0] != nullptr; }
     int childIndexContainingPoint(const glm::vec3& point) const;
     std::vector<int> childIndicesContainingBox(const AABB& box) const;
 };
