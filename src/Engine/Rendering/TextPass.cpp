@@ -35,7 +35,7 @@ void TextPass::Draw(RenderScene& scene, FrameBuffer& frameBuffer)
 {
     GLERROR("Derp1");
     TextPassState* state = new TextPassState(frameBuffer.GetHandle());
-    for (auto &job : scene.TextJobs) {
+    for (auto &job : scene.Jobs.Text) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
 

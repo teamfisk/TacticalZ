@@ -61,12 +61,20 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             } else {
                 wishSpeed = playerMovementSpeed;
             }
+            if (player.ID == m_LocalPlayer.ID) {
+                if (glm::length(wishDirection) == 0) {
+                    // If no key is pressed, reset the distance moved since last step.
+                    m_DistanceMoved = 0;
+                }
+            }
             glm::vec3& velocity = cPhysics["Velocity"];
-            ImGui::Text("velocity: (%f, %f, %f)", velocity.x, velocity.y, velocity.z);
+            bool isOnGround = (bool)cPhysics["IsOnGround"];
+            ImGui::Text(isOnGround ? "On ground" : "In air");
+            ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             glm::vec3 groundVelocity(0.f, 0.f, 0.f);
-            groundVelocity.x = glm::dot(velocity, glm::vec3(1.f, 0.f, 0.f));
-            groundVelocity.z = glm::dot(velocity, glm::vec3(0.f, 0.f, 1.f));
-            ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(wishDirection));
+            groundVelocity.x = velocity.x;
+            groundVelocity.z = velocity.z;
+            ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(groundVelocity));
             ImGui::Text("wishDirection: (%f, %f, %f) |%f|", wishDirection.x, wishDirection.y, wishDirection.z, glm::length(wishDirection));
             float currentSpeedProj = glm::dot(groundVelocity, wishDirection);
             float addSpeed = wishSpeed - currentSpeedProj;
@@ -79,7 +87,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 ImGui::InputFloat("accel", &accel);
                 static float airAccel = 0.5f;
                 ImGui::InputFloat("airAccel", &airAccel);
-                float actualAccel = (velocity.y != 0) ? airAccel : accel;
+                float actualAccel = isOnGround ? accel : airAccel;
                 static float surfaceFriction = 5.f;
                 ImGui::InputFloat("surfaceFriction", &surfaceFriction);
                 float accelerationSpeed = actualAccel * (float)dt * wishSpeed * surfaceFriction;
@@ -91,13 +99,16 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             }
 
             //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
-            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (velocity.y == 0.f || !controller->DoubleJumping())) {
+            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (isOnGround || !controller->DoubleJumping())) {
+                (bool)cPhysics["IsOnGround"] = false;
                 if (velocity.y == 0.f) {
                     controller->SetDoubleJumping(false);
                 } else {
                     controller->SetDoubleJumping(true);
+                    Events::DoubleJump e;
+                    m_EventBroker->Publish(e);
                 }
-                velocity.y += 4.f;
+                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
@@ -118,19 +129,19 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 //TODO: add assault dash animation here
                 if (glm::length(controller->Movement()) > 0.f) {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch Walk";
-                        (double&)cAnimation["Speed"] = 1.f * -glm::sign(controller->Movement().z);
+                        cAnimation["AnimationName1"] = "Crouch Walk";
+                        (double&)cAnimation["Speed1"] = 1.f * -glm::sign(controller->Movement().z);
                     } else {
-                        cAnimation["Name"] = "Run";
-                        (double&)cAnimation["Speed"] = 2.f * -glm::sign(controller->Movement().z);
+                        cAnimation["AnimationName1"] = "Run";
+                        (double&)cAnimation["Speed1"] = 2.f * -glm::sign(controller->Movement().z);
                     }
                 } else {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch";
+                        cAnimation["AnimationName1"] = "Crouch";
                         (double&)cAnimation["Speed"] = 1.f;
                     } else {
-                        cAnimation["Name"] = "Hold Pos";
-                        (double&)cAnimation["Speed"] = 1.f;
+                        cAnimation["AnimationName1"] = "Hold Pos";
+                        (double&)cAnimation["Speed1"] = 1.f;
                     }
                 }
             }
@@ -138,6 +149,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
 
         controller->Reset();
     }
+    playerStep(dt);
 }
 
 
@@ -151,6 +163,7 @@ void PlayerMovementSystem::updateVelocity(double dt)
     ComponentWrapper& cTransform = LocalPlayer["Transform"];
     ComponentWrapper& cPhysics = LocalPlayer["Physics"];
     glm::vec3& velocity = cPhysics["Velocity"];
+    bool isOnGround = (bool)cPhysics["IsOnGround"];
 
     // Ground friction
     float speed = glm::length(velocity);
@@ -158,7 +171,7 @@ void PlayerMovementSystem::updateVelocity(double dt)
     ImGui::InputFloat("groundFriction", &groundFriction);
     static float airFriction = 0.f;
     ImGui::InputFloat("airFriction", &airFriction);
-    float friction = (velocity.y != 0) ? airFriction : groundFriction;
+    float friction = isOnGround ? groundFriction : airFriction;
     if (speed > 0) {
         float drop = speed * friction * (float)dt;
         float multiplier = glm::max(speed - drop, 0.f) / speed;
@@ -175,9 +188,37 @@ void PlayerMovementSystem::updateVelocity(double dt)
     position += velocity * (float)dt;
 }
 
+void PlayerMovementSystem::playerStep(double dt)
+{
+    if (!m_LocalPlayer.Valid()) {
+        return;
+    }
+    // Position of the local player, used see how far a player has moved.
+    glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
+    // Used to see if a player is airborne.
+    bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
+    m_DistanceMoved += glm::length(pos - m_LastPosition);
+    // Set the last position for next iteration
+    m_LastPosition = pos;
+    if (m_DistanceMoved > m_PlayerStepLength && grounded) {
+        // Player moved a step's distance
+        // Create footstep sound
+        Events::PlaySoundOnEntity e;
+        e.EmitterID = m_LocalPlayer.ID;
+        e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
+        m_LeftFoot = !m_LeftFoot;
+        m_EventBroker->Publish(e);
+        m_DistanceMoved = 0.f;
+    }
+}
+
 bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player spawns, create an input controller for them
     m_PlayerInputControllers[e.Player] = new FirstPersonInputController<PlayerMovementSystem>(m_EventBroker, e.PlayerID);
+    if (e.PlayerID == -1) {
+        // Keep track of the local player
+        m_LocalPlayer = e.Player;
+    }
     return true;
 }

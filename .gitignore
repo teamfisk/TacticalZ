@@ -12,3 +12,6 @@ tools/MayaExporter/x64/Debug/
 
 tools/MayaExporter/MayaExporter/Debug/
 tools/MayaExporter/MayaExporter/GeneratedFiles/
+
+tools/MayaExporter/MayaExporter/x64/*
+tools/MayaExporter/x64/*

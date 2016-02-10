@@ -1,17 +1,17 @@
-#ifndef CollidableOctreeSystem_h__
-#define CollidableOctreeSystem_h__
+#ifndef FillFrustumOctreeSystem_h__
+#define FillFrustumOctreeSystem_h__
 
 #include "../Core/System.h"
 #include "../Core/Octree.h"
 #include "Collision.h"
 #include "EntityAABB.h"
 
-class CollidableOctreeSystem : public ImpureSystem, public PureSystem
+class FillFrustumOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    CollidableOctreeSystem(SystemParams params, Octree<EntityAABB>* octree, const std::string& componentType)
+    FillFrustumOctreeSystem(SystemParams params, Octree<EntityAABB>* octree)
         : System(params)
-        , PureSystem(componentType)
+        , PureSystem("Model")
         , m_Octree(octree)
     { }
 

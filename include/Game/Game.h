@@ -32,7 +32,8 @@
 #include "Network/Client.h"
 
 // Sound
-#include "Sound/SoundSystem.h"
+#include "Sound/SoundManager.h"
+#include "Systems/SoundSystem.h"
 
 class Game
 {
@@ -61,7 +62,7 @@ private:
     RenderFrame* m_RenderFrame;
     Client* m_NetworkClient = nullptr;
     Server* m_NetworkServer = nullptr;
-    SoundSystem* m_SoundSystem;
+    SoundManager* m_SoundManager;
 	double m_LastTime;
 
     bool m_IsClient = false;

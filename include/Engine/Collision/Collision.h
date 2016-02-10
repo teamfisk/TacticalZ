@@ -28,6 +28,21 @@ bool RayVsAABB(const Ray& ray, const AABB& box);
 //Return true if the ray hits the box, also outputs distance from ray origin to intersection point in [outDistance].
 bool RayVsAABB(const Ray& ray, const AABB& box, float& outDistance);
 
+//Return true if the ray hits the triangle.
+bool RayVsTriangle(const Ray& ray,
+    const glm::vec3& v0,
+    const glm::vec3& v1,
+    const glm::vec3& v2,
+    bool trueOnNegativeDistance = false);
+//Return true if the ray hits the triangle, and the distance is less than outDistance.
+bool RayVsTriangle(const Ray& ray,
+    const glm::vec3& v0,
+    const glm::vec3& v1,
+    const glm::vec3& v2,
+    float& outDistance,
+    float& outUCoord,
+    float& outVCoord,
+    bool trueOnNegativeDistance = false);
 //Return true if the ray hits any of the triangles in the model. Stops checking when a hit is detected.
 bool RayVsModel(const Ray& ray, 
     const std::vector<RawModel::Vertex>& modelVertices,
@@ -49,9 +64,12 @@ bool RayVsModel(const Ray& ray,
     float& outVCoord);
 
 bool AABBvsTriangles(const AABB& box,
-    const std::vector<RawModel::Vertex>& modelVertices,
+    const RawModel::Vertex* modelVertices,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix,
+    glm::vec3& boxVelocity,
+    float verticalStepHeight,
+    bool& isOnGround,
     glm::vec3& outResolutionVector);
 
 //Return true if the boxes are intersecting.

@@ -44,6 +44,11 @@ struct ComponentWrapper
     // Specialization for string literals
     template <std::size_t N>
     void SetField(std::string name, const char(&value)[N]) { Field<std::string>(name) = std::string(value); }
+
+    void Copy(ComponentWrapper& destination)
+    {
+        memcpy(destination.Data, this->Data, Info.Stride);
+    }
     
     struct SubscriptProxy
     {

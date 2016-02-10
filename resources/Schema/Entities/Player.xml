@@ -56,7 +56,7 @@
         <Entity name="CameraModel">
           <Components>
             <c:Model>
-              <Resource>Models/Camera.mesh</Resource>
+              <Resource>Models/Widgets/Camera.mesh</Resource>
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
@@ -95,7 +95,7 @@
             <Entity name="Crosshair">
               <Components>
                 <c:Model>
-                  <Resource>Models/CrosshairQuad.mesh</Resource>
+                  <Resource>Models/Weapons/CrosshairQuad.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="0" Y="0" Z="0.200000003"/>
@@ -108,7 +108,7 @@
             <Entity name="Weapon">
               <Components>
                 <c:Model>
-                  <Resource>Models/AssaultWeaponRed.mesh</Resource>
+                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
@@ -134,7 +134,7 @@
       <Components>
         <c:Camera/>
         <c:Model>
-          <Resource>Models/Camera.mesh</Resource>
+          <Resource>Models/Widgets/Camera.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>
@@ -153,7 +153,7 @@
         </c:Animation>
         <c:HiddenForLocalPlayer/>
         <c:Model>
-          <Resource>Models/AssaultAnimated.mesh</Resource>
+          <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>
         </c:Model>
         <c:Transform/>

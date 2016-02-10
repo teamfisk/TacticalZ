@@ -78,7 +78,9 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     // Check if a player already exists
     if (m_PlayerEntities.count(e.PlayerID) != 0) {
         // TODO: Disallow infinite respawning here
-        m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
+        if (m_PlayerEntities[e.PlayerID].Valid()) {
+            m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
+        }
     }
 
     // Store the player for future reference

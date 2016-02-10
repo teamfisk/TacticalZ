@@ -5,6 +5,7 @@
 
 #include "../Common.h"
 #include "AABB.h"
+#include "Frustum.h"
 #include "Ray.h"
 
 namespace OctSpace
@@ -38,6 +39,8 @@ public:
     //The type Box must be AABB, or inherit from AABB.
     template<typename Box>
     void ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects);
+    //Get the objects that are inside the frustum, the objects are put in outObjects.
+    void ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects);
     //Empty the tree of all objects, static and dynamic.
     void ClearObjects();
     //Empty the tree of all dynamic objects. Static objects remain in the tree.
@@ -95,6 +98,8 @@ struct Child
     void AddStaticObject(const AABB& box);
     template<typename T, typename Box>
     void ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects) const;
+    template<typename T>
+    void ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects, bool takeAllDontTest) const;
     void ClearObjects();
     void ClearDynamicObjects();
     bool RayCollides(const Ray& ray, Output& data) const;
@@ -109,7 +114,7 @@ struct Child
     std::vector<ContainedObject>& m_StaticObjectsRef;
     std::vector<ContainedObject>& m_DynamicObjectsRef;
 
-    bool hasChildren() const;
+    inline bool hasChildren() const { return m_Children[0] != nullptr; }
     int childIndexContainingPoint(const glm::vec3& point) const;
     std::vector<int> childIndicesContainingBox(const AABB& box) const;
 };
@@ -150,6 +155,13 @@ void Octree<T>::ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects)
     static_assert(std::is_base_of<AABB, Box>::value, "template argument type Box in Octree<T>::ObjectsInSameRegion must be a subclass of AABB.");
     falsifyObjectChecks();
     m_Root->ObjectsInSameRegion(box, outObjects);
+}
+
+template<typename T>
+void Octree<T>::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects)
+{
+    falsifyObjectChecks();
+    m_Root->ObjectsInFrustum(frustum, outObjects, false);
 }
 
 template<typename T>
@@ -216,6 +228,48 @@ void OctSpace::Child::ObjectsInSameRegion(const Box& box, std::vector<T>& outObj
         for (size_t i = 0; i < m_DynamicObjIndices.size(); ++i) {
             ContainedObject& obj = m_DynamicObjectsRef[m_DynamicObjIndices[i]];
             if (obj.Checked) {
+                ++numDuplicates;
+            } else {
+                obj.Checked = true;
+                outObjects[startIndex + i - numDuplicates] = *static_cast<T*>(obj.Box.get());
+            }
+        }
+        for (size_t i = 0; i < numDuplicates; ++i) {
+            outObjects.pop_back();
+        }
+    }
+}
+
+template<typename T>
+void OctSpace::Child::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects, bool takeAllDontTest) const
+{
+    if (hasChildren()) {
+        for (const Child* c : m_Children) {
+            Frustum::Output out = Frustum::Output::Inside;
+            if (!takeAllDontTest) {
+                out = frustum.VsAABB(c->m_Box);
+                if (out == Frustum::Output::Outside) {
+                    continue;
+                }
+            }
+            c->ObjectsInFrustum(frustum, outObjects, out == Frustum::Output::Inside);
+        }
+    } else {
+        size_t startIndex = outObjects.size();
+        int numDuplicates = 0;
+        outObjects.resize(outObjects.size() + m_StaticObjIndices.size() + m_DynamicObjIndices.size());
+        for (size_t i = 0; i < m_StaticObjIndices.size(); ++i) {
+            ContainedObject& obj = m_StaticObjectsRef[m_StaticObjIndices[i]];
+            if (obj.Checked || frustum.VsAABB(*obj.Box) == Frustum::Output::Outside) {
+                ++numDuplicates;
+            } else {
+                obj.Checked = true;
+                outObjects[startIndex + i - numDuplicates] = *static_cast<T*>(obj.Box.get());
+            }
+        }
+        for (size_t i = 0; i < m_DynamicObjIndices.size(); ++i) {
+            ContainedObject& obj = m_DynamicObjectsRef[m_DynamicObjIndices[i]];
+            if (obj.Checked || frustum.VsAABB(*obj.Box) == Frustum::Output::Outside) {
                 ++numDuplicates;
             } else {
                 obj.Checked = true;

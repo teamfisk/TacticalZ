@@ -6,10 +6,21 @@
 	<xs:element name="Animation">
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="Name" type="t:string" minOccurs="0"/>
-				<xs:element name="Time" type="t:double" minOccurs="0"/>
-				<xs:element name="Speed" type="t:double" minOccurs="0"/>
-				<xs:element name="Loop" type="t:bool" minOccurs="0"/>
+				<xs:element name="AnimationName1" type="t:string" minOccurs="0"/>
+				<xs:element name="Weight1" type="t:double" minOccurs="0"/>
+				<xs:element name="Time1" type="t:double" minOccurs="0"/>
+				<xs:element name="Speed1" type="t:double" minOccurs="0"/>
+				<xs:element name="Loop1" type="t:bool" minOccurs="0"/>
+				<xs:element name="AnimationName2" type="t:string" minOccurs="0"/>
+				<xs:element name="Weight2" type="t:double" minOccurs="0"/>
+				<xs:element name="Time2" type="t:double" minOccurs="0"/>
+				<xs:element name="Speed2" type="t:double" minOccurs="0"/>
+				<xs:element name="Loop2" type="t:bool" minOccurs="0"/>
+				<xs:element name="AnimationName3" type="t:string" minOccurs="0"/>
+				<xs:element name="Weight3" type="t:double" minOccurs="0"/>
+				<xs:element name="Time3" type="t:double" minOccurs="0"/>
+				<xs:element name="Speed3" type="t:double" minOccurs="0"/>
+				<xs:element name="Loop3" type="t:bool" minOccurs="0"/>
 			</xs:all>
 			<xs:attribute name="replicated" type="xs:boolean" fixed="true"/>
 		</xs:complexType>

@@ -35,7 +35,7 @@
         <Entity name="Asset">
           <Components>
             <c:Model>
-              <Resource>Models/AssaultWeaponBlue.mesh</Resource>
+              <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="1" Z="0"/>

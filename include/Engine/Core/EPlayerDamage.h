@@ -9,6 +9,7 @@ namespace Events
 
 struct PlayerDamage : Event
 {
+    //NOTE: this struct is missing information on what the damageSource is
     EntityWrapper Player;
     double Damage;
 };

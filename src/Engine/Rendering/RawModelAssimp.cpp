@@ -271,7 +271,7 @@ RawModelAssimp::RawModelAssimp(std::string fileName)
 			skelAnim.Keyframes.push_back(animationFrame);
 		}
 
-		m_Skeleton->Animations[animationName] = skelAnim;
+		m_Skeleton->Animations[animationName1] = skelAnim;
 	}
 }
 
