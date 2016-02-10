@@ -96,6 +96,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
                 float progress;
 
                 if (nextFrame.Index == 0) {
+                    nextFrame = currentFrame;
                     progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
                 } else {
                     progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
@@ -225,6 +226,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
                 float progress;
 
                 if (nextFrame.Index == 0) {
+                    nextFrame = currentFrame;
                     progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
                 } else {
                     progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
@@ -343,6 +345,7 @@ glm::mat4 Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animati
             float progress;
 
             if (nextFrame.Index == 0) {
+                nextFrame = currentFrame;
                 progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
             } else {
                 progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
@@ -394,6 +397,7 @@ glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation* animatio
             float progress;
 
             if (nextFrame.Index == 0) {
+                nextFrame = currentFrame;
                 progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
             } else {
                 progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
