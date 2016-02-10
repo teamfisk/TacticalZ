@@ -78,6 +78,8 @@ private:
 	ShaderProgram* m_ExplosionEffectSkinnedProgram;
 	ShaderProgram* m_ExplosionEffectSplatMapSkinnedProgram;
 	ShaderProgram* m_ForwardPlusSplatMapSkinnedProgram;
+    ShaderProgram* m_ShieldToStencilSkinnedProgram;
+    ShaderProgram* m_FillDepthBufferSkinnedProgram;
 };
 
 #endif 

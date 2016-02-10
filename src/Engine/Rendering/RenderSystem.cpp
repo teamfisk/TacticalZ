@@ -109,7 +109,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillPercentage
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
-                TODO Calc hash
+                    explosionEffectJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(explosionEffectJob);
                 } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
                     || m_World->HasComponent(cModel.EntityID, "Player")) {
@@ -119,10 +119,9 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     }
 
                     if (cModel["Transparent"]) {
-                    TODO: Calc hash
                         Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
                     } else {
-					explosionEffectJob->CalculateHash();
+					    explosionEffectJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
                     }
                 } else {
@@ -131,10 +130,9 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     }
 
                     if (cModel["Transparent"]) {
-                    TODO CALC HASH
                         Jobs.TransparentObjects.push_back(explosionEffectJob);
                     } else {
-                    TODO CALC HASH
+                        explosionEffectJob->CalculateHash();
                         Jobs.OpaqueObjects.push_back(explosionEffectJob);
                     }
                 }
@@ -150,7 +148,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillPercentage
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
-                TODO: CALC HASH
+                    modelJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(modelJob);
                 } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
                     || m_World->HasComponent(cModel.EntityID, "Player")) {
@@ -160,10 +158,9 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     }
 
                     if (cModel["Transparent"]) {
-                    TODO CALC HASH
                         Jobs.TransparentShieldedObjects.push_back(modelJob);
                     } else {
-					modelJob->CalculateHash();
+					    modelJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(modelJob);
                     }
                 } else {
@@ -172,10 +169,9 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     }
 
                     if (cModel["Transparent"]) {
-                    CALC HASH
                         Jobs.TransparentObjects.push_back(modelJob);
                     } else {
-                    CALC HASH
+                        modelJob->CalculateHash();
                         Jobs.OpaqueObjects.push_back(modelJob);
                     }
                 }
@@ -298,7 +294,8 @@ void RenderSystem::Update(double dt)
 
     fillModels(scene.Jobs);
     fillPointLights(scene.Jobs.PointLight, m_World);
-	scene.OpaqueObjects.sort();
+    //TODO: Make sure all objects needed are also sorted.
+	scene.Jobs.OpaqueObjects.sort();
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);

@@ -183,7 +183,7 @@ bool RayVsTriangle(const Ray& ray,
     }
     outDistance = dist;
     outUCoord = glm::dot(m, DxE2) * DetInv;
-    outVCoord  = glm::dot(ray.Direction(), MxE1) * DetInv;
+    outVCoord = glm::dot(ray.Direction(), MxE1) * DetInv;
 
     //u,v can be very close to 0 but still negative sometimes. added a deltafactor to compensate for that problem
     //If u and v are positive, u+v <= 1, dist is positive, and less than closest.
@@ -330,7 +330,7 @@ bool rectangleVsTriangle(const glm::vec2& boxMin,
         float push = rightRes < -leftRes ? rightRes : leftRes;
         float absPushSq = abs(push);
         absPushSq *= absPushSq;
-        
+
         if (absPushSq < resolutionDistanceSq) {
             resolutionDistanceSq = absPushSq;
             resolutionDirection = push * normal;
@@ -355,8 +355,8 @@ constexpr bool FaceIsGround(float faceNormalY)
 //An array containing 3 int pairs { 0, 2 }, { 0, 1 }, { 1, 2 }
 constexpr std::array<std::pair<int, int>, 3> dimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
 
-bool AABBvsTriangle(const AABB& box, 
-    const std::array<glm::vec3, 3>& triPos, 
+bool AABBvsTriangle(const AABB& box,
+    const std::array<glm::vec3, 3>& triPos,
     const glm::vec3& originalBoxVelocity,
     float verticalStepHeight,
     bool& isOnGround,
@@ -385,7 +385,7 @@ bool AABBvsTriangle(const AABB& box,
         Resolution()
             : DistanceSq(INFINITY)
             , Vector(0.f)
-        {}
+        { }
         BoxTriResolveCase Case;
         float DistanceSq;
         glm::vec3 Vector;
@@ -525,9 +525,9 @@ bool AABBvsTriangle(const AABB& box,
     return true;
 }
 
-bool AABBvsTriangles(const AABB& box, 
-    const std::vector<RawModel::Vertex>& modelVertices, 
-    const std::vector<unsigned int>& modelIndices, 
+bool AABBvsTriangles(const AABB& box,
+    const RawModel::Vertex* modelVertices,
+    const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix,
     glm::vec3& boxVelocity,
     float verticalStepHeight,
@@ -579,12 +579,11 @@ bool AttachAABBComponentFromModel(EntityWrapper entity)
 
     glm::vec3 mini(INFINITY);
     glm::vec3 maxi(-INFINITY);
-    for (const auto& v : model->m_Vertices) {
+    for (unsigned int i = 0; i < model->NumVertices(); i++) {
+        const auto& v = model->Vertices()[i];
         mini = glm::min(mini, v.Position);
-	for (unsigned int i = 0; i < modelRes->NumberOfVertices(); i++) {
-		const auto& v = modelRes->Vertices()[i];
+        maxi = glm::max(maxi, v.Position);
     }
-
     entity.AttachComponent("AABB");
     entity["AABB"]["Origin"] = 0.5f * (maxi + mini);
     entity["AABB"]["Size"] = maxi - mini;
