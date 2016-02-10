@@ -19,7 +19,7 @@ bool EntityWrapper::HasComponent(const std::string& componentName)
 void EntityWrapper::AttachComponent(const char* componentName)
 {
     if (!Valid()) {
-        LOG_WARNING("Could not attach \"%s\" component to #%i, component is not valid.", componentName, ID);
+        LOG_WARNING("Could not attach \"%s\" component to #%i, entity is not valid.", componentName, ID);
         return;
     }
     World->AttachComponent(ID, componentName);

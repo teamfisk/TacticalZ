@@ -43,7 +43,7 @@ private:
     EventRelay<RenderSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
 
-    void fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs);
+    void fillModels(RenderScene::Queues &jobs);
     void fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);

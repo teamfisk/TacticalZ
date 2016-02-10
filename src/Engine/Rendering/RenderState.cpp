@@ -6,9 +6,10 @@ bool RenderState::Enable(GLenum cap)
         //LOG_WARNING("Trying to enable somthing that is already enabled.");
         return false;
     }
+
     m_ResetFunctions.push_back(std::bind(glDisable, cap));
     glEnable(cap);
-    return !GLERROR("RenderState::Enable");
+    return !GLERROR("Enable");
 }
 
 bool RenderState::Disable(GLenum cap)
@@ -16,9 +17,10 @@ bool RenderState::Disable(GLenum cap)
     if (!glIsEnabled(cap)) {
         return false;
     }
+
     m_ResetFunctions.push_back(std::bind(glEnable, cap));
     glDisable(cap);
-    return !GLERROR("RenderState::Disable");
+    return !GLERROR("Disable");
 }
 
 bool RenderState::CullFace(GLenum mode)
@@ -32,7 +34,7 @@ bool RenderState::CullFace(GLenum mode)
     glGetIntegerv(GL_CULL_FACE_MODE, &original);
     m_ResetFunctions.push_back(std::bind(glCullFace, original));
     glCullFace(mode);
-    return !GLERROR("RenderState::CullFace");
+    return !GLERROR("CullFace");
 }
 
 bool RenderState::ClearColor(glm::vec4 color)
@@ -41,7 +43,7 @@ bool RenderState::ClearColor(glm::vec4 color)
     glGetFloatv(GL_COLOR_CLEAR_VALUE, &original[0]);
     m_ResetFunctions.push_back(std::bind(glClearColor, original[0], original[1], original[2], original[3]));
     glClearColor(color.r, color.g, color.b, color.a);
-    return !GLERROR("RenderState::ClearColor");
+    return !GLERROR("ClearColor");
 }
 
 bool RenderState::BindFramebuffer(GLint framebuffer)
@@ -55,7 +57,7 @@ bool RenderState::BindFramebuffer(GLint framebuffer)
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, originalDraw); 
     });
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    return !GLERROR("RenderState::BindBuffer");
+    return !GLERROR("BindBuffer");
 }
 
 
@@ -67,7 +69,7 @@ bool RenderState::BlendEquation(GLenum mode)
     glGetIntegerv(GL_BLEND_EQUATION_ALPHA, &originalAlpha);
     m_ResetFunctions.push_back(std::bind(glBlendEquationSeparate, originalRGB, originalAlpha));
     glBlendEquation(mode);
-    return !GLERROR("RenderState::BlendEquation");
+    return !GLERROR("BlendEquation");
 }
 
 bool RenderState::BlendFunc(GLenum sfactor, GLenum dfactor)
@@ -82,7 +84,46 @@ bool RenderState::BlendFunc(GLenum sfactor, GLenum dfactor)
     glGetIntegerv(GL_BLEND_DST_ALPHA, &originalDestAlpha);
     m_ResetFunctions.push_back(std::bind(glBlendFuncSeparate, originalSrcRGB, originalSrcAlpha, originalDestRGB, originalDestAlpha));
     glBlendFunc(sfactor, dfactor);
-    return !GLERROR("RenderState::BlendFunc");
+    return !GLERROR("BlendFunc");
+}
+
+
+bool RenderState::StencilOp(GLenum sfail, GLenum dpfail, GLenum dppass)
+{
+    GLint originalSFail;
+    glGetIntegerv(GL_STENCIL_FAIL, &originalSFail);
+    GLint originalDPFail;
+    glGetIntegerv(GL_STENCIL_PASS_DEPTH_FAIL, &originalDPFail);
+    GLint originalDPPass;
+    glGetIntegerv(GL_STENCIL_PASS_DEPTH_PASS, &originalDPPass);
+    m_ResetFunctions.push_back(std::bind(glStencilOp, originalSFail, originalDPFail, originalDPPass));
+    glStencilOp(sfail, dpfail, dppass);
+    return !GLERROR("StencilOp");
+}
+
+
+bool RenderState::StencilFunc(GLenum func, GLint ref, GLuint mask)
+{
+    GLint originalFunc;
+    glGetIntegerv(GL_STENCIL_FUNC, &originalFunc);
+    GLint originalRef;
+    glGetIntegerv(GL_STENCIL_REF, &originalRef);
+    GLint originalMask;
+    glGetIntegerv(GL_STENCIL_VALUE_MASK, &originalMask);
+    m_ResetFunctions.push_back(std::bind(glStencilFunc, originalFunc, originalRef, originalMask));
+    glStencilFunc(func, ref, mask);
+    return !GLERROR("StencilFunc");
+}
+
+
+
+bool RenderState::StencilMask(GLuint mask)
+{
+    GLint originalMask;
+    glGetIntegerv(GL_STENCIL_WRITEMASK, &originalMask);
+    m_ResetFunctions.push_back(std::bind(glStencilMask, mask));
+    glStencilMask(mask);
+    return !GLERROR("StencilMask");
 }
 
 bool RenderState::DepthMask(GLboolean flag)
@@ -91,12 +132,12 @@ bool RenderState::DepthMask(GLboolean flag)
     glGetBooleanv(GL_DEPTH_WRITEMASK, &original);
     m_ResetFunctions.push_back(std::bind(glDepthMask, original));
     glDepthMask(flag);
-    return !GLERROR("RenderState::DepthMask");
+    return !GLERROR("DepthMask");
 }
 
 RenderState::~RenderState()
 {
-    for (auto& f : m_ResetFunctions) {
+    for (auto& f : boost::adaptors::reverse(m_ResetFunctions)) {
         f();
     }
 }
