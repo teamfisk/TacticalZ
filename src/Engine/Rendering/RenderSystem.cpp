@@ -346,7 +346,7 @@ void RenderSystem::Update(double dt)
     fillPointLights(scene.Jobs.PointLight, m_World);
     //TODO: Make sure all objects needed are also sorted.
 	scene.Jobs.OpaqueObjects.sort();
-    fillSprites(scene.SpriteJobs, m_World);
+    fillSprites(scene.Jobs.SpriteJob, m_World);
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);

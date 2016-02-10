@@ -21,15 +21,15 @@ struct SpriteJob : RenderJob
         : RenderJob()
     {
         Model = ResourceManager::Load<::Model>("Models/Core/UnitQuad.mesh");
-        ::RawModel::MaterialGroup matGroup = Model->MaterialGroups().front();
-        TextureID = (matGroup.Texture) ? matGroup.Texture->ResourceID : 0;
+        ::RawModel::MaterialProperties matProp = Model->MaterialGroups().front();
+        TextureID = 0;
 
         DiffuseTexture = CommonFunctions::LoadTexture(cSprite["DiffuseTexture"], true);
 
         IncandescenceTexture = CommonFunctions::LoadTexture(cSprite["GlowMap"], true);
 
-        StartIndex = matGroup.StartIndex;
-        EndIndex = matGroup.EndIndex;
+        StartIndex = matProp.material->StartIndex;
+        EndIndex = matProp.material->EndIndex;
         Matrix = matrix;
         Color = cSprite["Color"];
         Entity = cSprite.EntityID;

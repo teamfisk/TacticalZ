@@ -37,4 +37,5 @@
 	<xs:include schemaLocation="Components/Shield.xsd"/>
 	<xs:include schemaLocation="Components/Sprite.xsd"/>
 	<xs:include schemaLocation="Components/Shielded.xsd"/>
+	<xs:include schemaLocation="Components/CampturePointHUD.xsd"/>
 </xs:schema>

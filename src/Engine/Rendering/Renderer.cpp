@@ -167,7 +167,7 @@ void Renderer::SortRenderJobsByDepth(RenderScene &scene)
 {
     //Sort all forward jobs so transparency is good.
     scene.Jobs.TransparentObjects.sort(Renderer::DepthSort);
-    scene.SpriteJobs.sort(Renderer::DepthSort);
+    scene.Jobs.SpriteJob.sort(Renderer::DepthSort);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)

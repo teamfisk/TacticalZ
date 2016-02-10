@@ -193,7 +193,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
-    DrawSprites(scene.SpriteJobs, scene);
+    DrawSprites(scene.Jobs.SpriteJob, scene);
     GLERROR("SpriteJobs");
 
     //DrawStencilState* stencilState = new DrawStencilState(m_FinalPassFrameBuffer.GetHandle());
