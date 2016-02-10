@@ -23,7 +23,7 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 void SoundSystem::Update(double dt)
 {
     // Temp for play test.
-    if(m_DrumsIsPlaying) {
+    if (m_DrumsIsPlaying) {
         m_DrumsIsPlaying = !drumTimer(dt);
     }
 }
@@ -66,6 +66,10 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
 
 void SoundSystem::playerJumps()
 {
+    if (!LocalPlayer.Valid()) {
+        return;
+    }
+
     bool grounded = (bool)m_World->GetComponent(LocalPlayer.ID, "Physics")["IsOnGround"];
     if (grounded) {
         Events::PlaySoundOnEntity e;
@@ -121,11 +125,11 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     std::vector<std::string> paths;
     paths.push_back("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
 
-//     // Breathe
-//     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
-//     for (int i = 0; i < ammountOfbreaths; i++) {
-//         paths.push_back("Audio/exhausted/breath.wav");
-//     }
+    //     // Breathe
+    //     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
+    //     for (int i = 0; i < ammountOfbreaths; i++) {
+    //         paths.push_back("Audio/exhausted/breath.wav");
+    //     }
     Events::PlayQueueOnEntity ev;
     ev.Emitter = LocalPlayer;
     ev.FilePaths = paths;
@@ -137,7 +141,7 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
     Events::PlaySoundOnEntity ev;
     ev.EmitterID = LocalPlayer.ID;
-    ev.FilePath = "Audio/die/die2.wav"; 
+    ev.FilePath = "Audio/die/die2.wav";
     m_EventBroker->Publish(ev);
     return false;
 }
