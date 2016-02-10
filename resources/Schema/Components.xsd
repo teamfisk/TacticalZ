@@ -32,4 +32,6 @@
 	<xs:include schemaLocation="Components/HiddenForLocalPlayer.xsd"/>
 	<xs:include schemaLocation="Components/HealthPickup.xsd"/>
 	<xs:include schemaLocation="Components/DashAbility.xsd"/>
+	<xs:include schemaLocation="Components/Shield.xsd"/>
+	<xs:include schemaLocation="Components/Shielded.xsd"/>
 </xs:schema>

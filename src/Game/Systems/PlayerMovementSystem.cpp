@@ -103,7 +103,7 @@ void PlayerMovementSystem::Update(double dt)
                     Events::DoubleJump e;
                     m_EventBroker->Publish(e);
                 }
-                velocity.y += 4.f;
+                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
