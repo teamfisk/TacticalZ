@@ -210,6 +210,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                         } else {
                             frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
                         }
+                        glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 					}
 					else {
 						m_ExplosionEffectProgram->Bind();
@@ -237,6 +238,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                         } else {
                             frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
                         }
+                        glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 					}
 					else {
 						m_ExplosionEffectSplatMapProgram->Bind();
@@ -281,6 +284,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             } else {
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
                             }
+                            glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 						} else {
 							m_ForwardPlusProgram->Bind();
 							GLERROR("Bind ForwardPlusProgram");
@@ -307,6 +312,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             } else {
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
                             }
+                            glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 						} else {
 							m_ForwardPlusSplatMapProgram->Bind();
 							GLERROR("Bind SplatMap program");

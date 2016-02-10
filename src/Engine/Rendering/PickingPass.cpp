@@ -110,6 +110,8 @@ void PickingPass::Draw(RenderScene& scene)
                     } else {
                         frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
                     }
+                    glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 				}
 			} else {
 				m_PickingProgram->Bind();
@@ -190,6 +192,8 @@ void PickingPass::Draw(RenderScene& scene)
                 } else {
                     frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
                 }
+                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
             }
 
             glBindVertexArray(modelJob->Model->VAO);

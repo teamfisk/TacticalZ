@@ -45,7 +45,7 @@
               <AnimationName>Aim</AnimationName>
             </c:AnimationOffset>
             <c:Model>
-              <Resource>Models/AssaultAnims.mesh</Resource>
+              <Resource>Models/Characters/Assault/HelloCube.mesh</Resource>
               <Color A="1" B="0.984313726" G="1" R="1"/>
               <Transparent>true</Transparent>
             </c:Model>
