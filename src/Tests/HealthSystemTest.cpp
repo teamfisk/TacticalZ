@@ -101,7 +101,7 @@ void GameHealthSystemTest::Tick()
     
     double currentHealth = (double)m_World->GetComponent(m_PlayersID, "Health")["Health"];
     //if players health reach 50 means he got damaged by 50
-    if (currentHealth == 50) {
+    if (currentHealth == 50.0) {
         m_TestStage1Success = true;
         //heal player with 40
         Events::PlayerHealthPickup e3;

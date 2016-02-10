@@ -42,11 +42,8 @@ public:
     ~PickupSpawnTest();
 
     void Tick();
-    bool TestSucceeded = false;
-    int NumLoops = 0;
 
     bool Game_Loop_OneHundredTimes();
-
     void TestSetup(int testNumber);
     void DoTouchEvent(EntityID whoDidSomething, EntityID onWhatObject);
 
@@ -67,6 +64,8 @@ private:
     bool m_TestStage1Success = false;
     bool m_TestStage2Success = false;
 
+    bool m_TestSucceeded = false;
+    int m_NumLoops = 0;
 
 };
 
