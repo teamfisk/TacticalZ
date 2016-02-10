@@ -36,11 +36,8 @@ private:
     World* m_World = nullptr;
     EventBroker* m_EventBroker = nullptr;
     std::string m_Announcer = "";
-
     // Logic for playing a sound when a player jumps
     void playerJumps();
-    // Helper function
-    EntityID createChildEmitter(EntityWrapper parent);
     
     std::default_random_engine generator;
 

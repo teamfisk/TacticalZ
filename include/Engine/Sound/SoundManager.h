@@ -94,7 +94,7 @@ private:
     float m_BGMVolumeChannel = 1.0f;
     float m_SFXVolumeChannel = 1.0f;
     EntityWrapper m_LocalPlayer = EntityWrapper();
-
+    
     // Events
     EventRelay<SoundManager, Events::PlaySoundOnEntity> m_EPlaySoundOnEntity;
     bool OnPlaySoundOnEntity(const Events::PlaySoundOnEntity &e);

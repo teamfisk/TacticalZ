@@ -31,7 +31,7 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
         m_World->AttachComponent(e.Player.ID, "Listener");
         m_LocalPlayer = e.Player;
         Events::PlaySoundOnEntity go;
-        go.EmitterID = createChildEmitter(m_LocalPlayer);
+        go.EmitterID = m_LocalPlayer.ID;
         go.FilePath = "Audio/announcer/" + m_Announcer + "/go.wav";
         m_EventBroker->Publish(go);
         // TEMP: starts bgm
@@ -67,7 +67,7 @@ void SoundSystem::playerJumps()
     glm::vec3 vel = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["Velocity"];
     if (vel.y == 0) {
         Events::PlaySoundOnEntity e;
-        e.EmitterID = createChildEmitter(m_LocalPlayer);
+        e.EmitterID = m_LocalPlayer.ID;
         e.FilePath = "Audio/jump/jump1.wav";
         m_EventBroker->Publish(e);
     }
@@ -76,7 +76,7 @@ void SoundSystem::playerJumps()
 bool SoundSystem::OnShoot(const Events::Shoot & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.EmitterID = m_LocalPlayer.ID;
     ev.FilePath = "Audio/laser/laser1.wav";
     m_EventBroker->Publish(ev);
     return true;
@@ -92,7 +92,7 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     } else {
         ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_failed.wav"; // have not been tested
     }
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.EmitterID = m_LocalPlayer.ID;
     m_EventBroker->Publish(ev);
     return false;
 }
@@ -122,7 +122,7 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
     //if (e.PlayerID == m_LocalPlayer.ID) {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.EmitterID = m_LocalPlayer.ID;
     ev.FilePath = "Audio/die/die2.wav"; 
     m_EventBroker->Publish(ev);
     //}
@@ -133,7 +133,7 @@ bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
     //if (e.PlayerHealedID == m_LocalPlayer.ID) {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.EmitterID = m_LocalPlayer.ID;
     ev.FilePath = "Audio/pickup/pickup2.wav";
     m_EventBroker->Publish(ev);
     //}
@@ -153,7 +153,7 @@ bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
 bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.EmitterID = m_LocalPlayer.ID;
     ev.FilePath = "Audio/jump/jump2.wav";
     m_EventBroker->Publish(ev);
     return false;
@@ -162,16 +162,8 @@ bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
 bool SoundSystem::OnDashAbility(const Events::DashAbility &e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = createChildEmitter(m_LocalPlayer);
+    ev.EmitterID = m_LocalPlayer.ID;
     ev.FilePath = "Audio/jump/dash1.wav";
     m_EventBroker->Publish(ev);
     return false;
-}
-
-EntityID SoundSystem::createChildEmitter(EntityWrapper localPlayer)
-{
-    EntityID child = m_World->CreateEntity(localPlayer.ID);
-    m_World->AttachComponent(child, "Transform");
-    m_World->AttachComponent(child, "SoundEmitter");
-    return child;
 }

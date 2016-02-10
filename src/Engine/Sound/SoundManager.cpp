@@ -192,7 +192,10 @@ bool SoundManager::OnPlaySoundOnEntity(const Events::PlaySoundOnEntity & e)
 {
     Source* source = createSource(e.FilePath);
     source->Type = SoundType::SFX;
-    m_Sources[e.EmitterID] = source;
+    EntityID child = m_World->CreateEntity(e.EmitterID);
+    m_World->AttachComponent(child, "Transform");
+    m_World->AttachComponent(child, "SoundEmitter");
+    m_Sources[child] = source;
     playSound(source);
     return false;
 }
@@ -243,7 +246,7 @@ bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
-        (bool&)emitter["Loop"] = false;
+        (bool&)emitter["Loop"] = true;
         (std::string&)emitter["FilePath"] = e.FilePath;
         m_World->AttachComponent(emitterChild, "Transform");
         Source* source = createSource(e.FilePath);
