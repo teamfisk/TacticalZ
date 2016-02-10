@@ -199,7 +199,7 @@
                   <Resource>Models/Props/Pillars/SciFiPillar1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-10.0514088" Y="-0.537525415" Z="36.6833954"/>
+                  <Position X="-10.0514088" Y="3.28355169" Z="39.8049278"/>
                   <Scale X="0.5" Y="0.5" Z="0.5"/>
                   <Orientation X="0" Y="3.11000013" Z="0"/>
                 </c:Transform>
@@ -213,7 +213,7 @@
                   <Resource>Models/Props/Pillars/SciFiPillar1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="10.0194788" Y="-0.873246074" Z="-36.6531715"/>
+                  <Position X="10.6207619" Y="2.81769013" Z="-39.8644447"/>
                   <Scale X="0.5" Y="0.5" Z="0.5"/>
                   <Orientation X="0" Y="0.0940000042" Z="0"/>
                 </c:Transform>
@@ -1284,98 +1284,8 @@
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-37.5227966" Y="-0.41070056" Z="38.790432"/>
+                  <Position X="-35.8035164" Y="1.16988516" Z="39.7118454"/>
                   <Orientation X="6.28300047" Y="3.10100007" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="9.60634995" Y="1.52460146" Z="-5.21804142"/>
-                  <Orientation X="0" Y="1.94300008" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-2.47664142" Y="1.59185469" Z="-11.3620119"/>
-                  <Orientation X="0" Y="0.455000013" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-1.92246199" Y="6.09209681" Z="53.5233116"/>
-                  <Orientation X="0" Y="1.44700003" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Walls/MediumWall3.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="3.74861288" Y="-0.139425397" Z="-2.81379604"/>
-                      <Orientation X="0" Y="0.455000013" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-4.77972078" Y="-0.105246112" Z="0.0494093895"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-2.8357935" Y="-0.000614338554" Z="-6.64941311"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Walls/SmallWall2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-40.921154" Y="7.30084991" Z="44.8426819"/>
-                  <Orientation X="0" Y="2.68700004" Z="0"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -1394,8 +1304,8 @@
                   <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="21.6150742" Y="7.07962322" Z="-55.6971359"/>
-                  <Scale X="1" Y="1" Z="1.20000005"/>
+                  <Position X="21.3445625" Y="6.68856239" Z="-55.6971359"/>
+                  <Scale X="1" Y="1" Z="1.60000002"/>
                   <Orientation X="0" Y="1.61400008" Z="0.0160000008"/>
                 </c:Transform>
               </Components>
@@ -1422,8 +1332,8 @@
                   <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-10.3387833" Y="4.3345933" Z="-20.2740135"/>
-                  <Orientation X="0.155000001" Y="2.03299999" Z="0"/>
+                  <Position X="-10.3387833" Y="4.1665206" Z="-20.566534"/>
+                  <Orientation X="0.172000006" Y="1.87600005" Z="0"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -1449,118 +1359,12 @@
                   <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-40.4783669" Y="6.4836359" Z="73.4907455"/>
+                  <Position X="-40.5293236" Y="6.4836359" Z="70.4517899"/>
                   <Scale X="0.899999976" Y="0.899999976" Z="0.899999976"/>
                   <Orientation X="0" Y="2.92200017" Z="0"/>
                 </c:Transform>
               </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="2.02681065" Y="-0.209855437" Z="2.92769241"/>
-                      <Orientation X="0" Y="4.5880003" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Collidable/>
-                        <c:Model>
-                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="-1.96250451" Y="0" Z="0.108926408"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity>
-                          <Components>
-                            <c:Collidable/>
-                            <c:Model>
-                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="-1.85260701" Y="0" Z="0.340662181"/>
-                              <Orientation X="0" Y="0.142000005" Z="0"/>
-                            </c:Transform>
-                          </Components>
-                          <Children>
-                            <Entity>
-                              <Components>
-                                <c:Collidable/>
-                                <c:Model>
-                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                                </c:Model>
-                                <c:Transform>
-                                  <Position X="-1.83422697" Y="0" Z="0"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-2.05343437" Y="0" Z="2.89228034"/>
-                      <Orientation X="0" Y="1.52900004" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Collidable/>
-                        <c:Model>
-                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="1.9744426" Y="0" Z="0"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity>
-                          <Components>
-                            <c:Collidable/>
-                            <c:Model>
-                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="1.89133775" Y="0" Z="0"/>
-                            </c:Transform>
-                          </Components>
-                          <Children>
-                            <Entity>
-                              <Components>
-                                <c:Collidable/>
-                                <c:Model>
-                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                                </c:Model>
-                                <c:Transform>
-                                  <Position X="1.93167973" Y="0" Z="-0.0598336607"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
+              <Children/>
             </Entity>
             <Entity>
               <Components>
@@ -1604,7 +1408,7 @@
                   <Resource>Models/Props/Pillars/SciFiBridgePillar1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-41.889534" Y="-0.22502327" Z="78.9695282"/>
+                  <Position X="-41.6568489" Y="-0.22502327" Z="76.1196365"/>
                   <Scale X="1.10000002" Y="1.10000002" Z="1.10000002"/>
                   <Orientation X="0" Y="1.35300004" Z="0"/>
                 </c:Transform>
@@ -2056,7 +1860,7 @@
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="36.8391495" Y="0.354240507" Z="-36.1228752"/>
+                  <Position X="36.8391495" Y="1.4105947" Z="-40.2976341"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -2860,18 +2664,6 @@
               </Components>
               <Children/>
             </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="0.942072928" Y="1.37803173" Z="6.50973177"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
           </Children>
         </Entity>
         <Entity name="PickupHolders">
@@ -2886,7 +2678,7 @@
                   <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-42.0772552" Y="6.29388857" Z="79.0305328"/>
+                  <Position X="-42.3380203" Y="6.29388857" Z="76.5014801"/>
                   <Scale X="2" Y="2" Z="2"/>
                   <Orientation X="0" Y="1.89300013" Z="0"/>
                 </c:Transform>
@@ -2995,134 +2787,6 @@
                 </Entity>
               </Children>
             </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="24.6602573" Y="3.90737295" Z="-59.5525932"/>
-                  <Orientation X="0" Y="4.20900011" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-4.16804934" Y="1.05876386" Z="0.867759585"/>
-                      <Orientation X="0" Y="2.73100019" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="44.7766609" Y="3.13732195" Z="-8.09564495"/>
-                  <Orientation X="0" Y="2.77000022" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0.618423283" Y="0.791353941" Z="-2.63876128"/>
-                      <Orientation X="0" Y="2.93500018" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Collidable/>
-                        <c:Model>
-                          <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="-0.470557451" Y="0.586074114" Z="2.9248631"/>
-                          <Orientation X="0" Y="4.671" Z="0"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity>
-                          <Components>
-                            <c:Collidable/>
-                            <c:Model>
-                              <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="2.85375357" Y="0.555770278" Z="-0.639914274"/>
-                              <Orientation X="0" Y="1.61200011" Z="0"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
-          </Children>
-        </Entity>
-        <Entity name="SciFiHolders">
-          <Components>
-            <c:Transform/>
-          </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-9.69552517" Y="6.26487875" Z="40.9345284"/>
-                  <Orientation X="0" Y="3.18300009" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="9.57436943" Y="6.18900824" Z="-41.0811234"/>
-                  <Orientation X="0" Y="0.207000017" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-39.0847282" Y="5.59481907" Z="66.1773682"/>
-                  <Orientation X="0" Y="6.08500051" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
           </Children>
         </Entity>
       </Children>
@@ -3134,6 +2798,9 @@
       <Children>
         <Entity>
           <Components>
+            <c:AABB>
+              <Size X="9.19999981" Y="20" Z="9.19999981"/>
+            </c:AABB>
             <c:CapturePoint>
               <HomePointForTeam>
                 <Blue/>
@@ -3158,6 +2825,7 @@
         </Entity>
         <Entity>
           <Components>
+            <c:AABB/>
             <c:CapturePoint>
               <CapturePointNumber>1</CapturePointNumber>
             </c:CapturePoint>
@@ -3176,6 +2844,7 @@
         </Entity>
         <Entity>
           <Components>
+            <c:AABB/>
             <c:CapturePoint>
               <CapturePointNumber>2</CapturePointNumber>
             </c:CapturePoint>
@@ -3194,6 +2863,7 @@
         </Entity>
         <Entity>
           <Components>
+            <c:AABB/>
             <c:CapturePoint>
               <CapturePointNumber>3</CapturePointNumber>
             </c:CapturePoint>
@@ -3212,6 +2882,7 @@
         </Entity>
         <Entity>
           <Components>
+            <c:AABB/>
             <c:CapturePoint>
               <HomePointForTeam>
                 <Red/>
@@ -3313,7 +2984,7 @@
               <Intensity>1</Intensity>
             </c:DirectionalLight>
             <c:Transform>
-              <Orientation X="0" Y="2.43900013" Z="2.08000016"/>
+              <Orientation X="0" Y="0.958000064" Z="2.08000016"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -3326,7 +2997,7 @@
           <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="-42.040062" Y="6.33049583" Z="78.0530777"/>
+          <Position X="-42.040062" Y="6.33049583" Z="75.7784882"/>
         </c:Transform>
       </Components>
       <Children/>
