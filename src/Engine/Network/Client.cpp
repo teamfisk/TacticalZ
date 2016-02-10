@@ -58,13 +58,14 @@ void Client::Update()
     }
 
     if (m_IsConnected) {
-        hasServerTimedOut();
         // Don't send 1 input in 1 packet, bunch em up.
         if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
             sendInputCommands();
             m_TimeSinceSentInputs = std::clock();
         }
         sendLocalPlayerTransform();
+       
+        m_IsConnected = !hasServerTimedOut();
     }
     //Network::Update();
 }
@@ -380,7 +381,7 @@ bool Client::hasServerTimedOut()
     if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
-        m_IsConnected = false;
+        m_Reliable.Disconnect();
         return true;
     }
     return false;

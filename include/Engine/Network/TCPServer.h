@@ -15,6 +15,7 @@ public:
     void Receive(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet);
+    void Disconnect();
 private:
     // TCP logic
     boost::asio::io_service m_IOService;

@@ -302,6 +302,8 @@ void Server::disconnect(PlayerID playerID)
     e.PlayerID = playerID;
     m_EventBroker->Publish(e);
 
+    m_ConnectedPlayers[playerID].TCPSocket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    m_ConnectedPlayers[playerID].TCPSocket->close();
     m_ConnectedPlayers.erase(playerID);
 }
 

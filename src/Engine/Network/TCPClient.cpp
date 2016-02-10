@@ -51,7 +51,10 @@ void TCPClient::Connect(std::string playerName, std::string address, int port)
 
 void TCPClient::Disconnect()
 { 
-
+    m_Socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    m_Socket->close();
+    m_Socket = nullptr;
+    m_IsConnected = false;
 }
 
 void TCPClient::Receive(Packet& packet)
@@ -87,6 +90,10 @@ int TCPClient::readBuffer(char* data)
 
 void TCPClient::Send(Packet & packet)
 {
+    if (!m_Socket) {
+        LOG_WARNING("TCPClient::Send: Socket is null");
+        return;
+    }
     packet.UpdateSize();
     boost::system::error_code error;
     m_Socket->send(boost::asio::buffer(

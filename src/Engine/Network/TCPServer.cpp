@@ -72,6 +72,11 @@ void TCPServer::Send(Packet & packet)
         0);
 }
 
+void TCPServer::Disconnect()
+{ 
+
+}
+
 void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {
     int bytesRead = readBuffer(m_ReadBuffer, playerDefinition);
