@@ -64,8 +64,8 @@ void Client::Update()
             m_TimeSinceSentInputs = std::clock();
         }
         sendLocalPlayerTransform();
-       
-        m_IsConnected = !hasServerTimedOut();
+
+        hasServerTimedOut();
     }
     //Network::Update();
 }
@@ -290,6 +290,7 @@ void Client::disconnect()
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
     m_Reliable.Send(packet);
+    m_Reliable.Disconnect();
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
@@ -374,17 +375,15 @@ void Client::identifyPacketLoss()
     }
 }
 
-bool Client::hasServerTimedOut()
+void Client::hasServerTimedOut()
 {
     // Time in ms
     double timeSincePing = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
     if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
-        m_Reliable.Disconnect();
-        return true;
+        disconnect();
     }
-    return false;
 }
 
 EntityID Client::createPlayer()

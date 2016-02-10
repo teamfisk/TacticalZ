@@ -53,6 +53,11 @@ void Server::Update()
             parseMessageType(packet);
         }
     }
+    // Check if players have disconnected
+    for (int i = 0; i < m_PlayersToDisconnect.size(); i++) {
+        disconnect(m_PlayersToDisconnect.at(i));
+    }
+    m_PlayersToDisconnect.clear();
 
     std::clock_t currentTime = std::clock();
     // Send snapshot
@@ -74,6 +79,7 @@ void Server::Update()
     if (isReadingData) {
         Network::Update();
     }
+
 }
 
 void Server::parseMessageType(Packet& packet)
@@ -249,7 +255,7 @@ void Server::parseTCPConnect(Packet & packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-
+    
     LOG_INFO("Parsing connections");
     // Check if player is already connected
     // Ska vara till lagd i TCPServer receive
@@ -286,7 +292,7 @@ void Server::parseDisconnect()
     for (auto& kv : m_ConnectedPlayers) {
         if (kv.second.TCPAddress == m_Address &&
             kv.second.TCPPort == m_Port) {
-            disconnect(kv.first);
+            m_PlayersToDisconnect.push_back(kv.first);
             break;
         }
     }
@@ -301,10 +307,11 @@ void Server::disconnect(PlayerID playerID)
     e.Entity = m_ConnectedPlayers.at(playerID).EntityID;
     e.PlayerID = playerID;
     m_EventBroker->Publish(e);
-
+    //m_World->DeleteEntity(m_ConnectedPlayers[playerID].EntityID);
     m_ConnectedPlayers[playerID].TCPSocket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     m_ConnectedPlayers[playerID].TCPSocket->close();
     m_ConnectedPlayers.erase(playerID);
+    // Send disconnect to the other players.
 }
 
 void Server::parseOnPlayerDamage(Packet & packet)

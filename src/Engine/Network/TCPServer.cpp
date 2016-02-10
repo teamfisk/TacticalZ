@@ -93,7 +93,7 @@ int TCPServer::readBuffer(char* data, PlayerDefinition & playerDefinition)
     }
     boost::system::error_code error;
     // Read size of packet
-    int bytesReceived = playerDefinition.TCPSocket->read_some(boost
+    size_t bytesReceived = playerDefinition.TCPSocket->read_some(boost
         ::asio::buffer((void*)data, sizeof(int)),
         error);
     int sizeOfPacket = 0;

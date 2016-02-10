@@ -81,7 +81,7 @@ std::string Packet::ReadString()
     return returnValue;
 }
 
-void Packet::ReconstructFromData(char * data, int sizeOfData)
+void Packet::ReconstructFromData(char * data, size_t sizeOfData)
 {
     if (sizeOfData > m_MaxPacketSize) {
         // Delete our data

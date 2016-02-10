@@ -50,7 +50,7 @@ public:
     // Pops the first element as if it was a string.
     std::string ReadString();
     // Construct a packet
-    void ReconstructFromData(char* data, int SizeOfData);
+    void ReconstructFromData(char* data, size_t SizeOfData);
     // Update size of packet variable in header
     void UpdateSize();
     char* ReadData(int SizeOfData);

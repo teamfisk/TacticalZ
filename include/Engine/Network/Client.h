@@ -82,7 +82,7 @@ protected:
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
-    bool hasServerTimedOut();
+    void hasServerTimedOut();
     EntityID createPlayer();
     void sendInputCommands();
     void sendLocalPlayerTransform();

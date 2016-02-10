@@ -51,6 +51,9 @@ void TCPClient::Connect(std::string playerName, std::string address, int port)
 
 void TCPClient::Disconnect()
 { 
+    if (!m_IsConnected) {
+        return;
+    }
     m_Socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     m_Socket->close();
     m_Socket = nullptr;
@@ -59,20 +62,20 @@ void TCPClient::Disconnect()
 
 void TCPClient::Receive(Packet& packet)
 {
-    int bytesRead = readBuffer(m_ReadBuffer);
+    size_t bytesRead = readBuffer(m_ReadBuffer);
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
 }
 
-int TCPClient::readBuffer(char* data)
+size_t TCPClient::readBuffer(char* data)
 { 
     if (!m_Socket) {
         return 0;
     }
     boost::system::error_code error;
     // Read size of packet
-    int bytesReceived = m_Socket->read_some(boost
+    size_t bytesReceived = m_Socket->read_some(boost
         ::asio::buffer((void*)data, sizeof(int)),
         error);
     int sizeOfPacket = 0;

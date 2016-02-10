@@ -27,12 +27,16 @@ public:
     ~Server();
     void Start(World* m_world, EventBroker *eventBroker) override;
     void Update() override;
-protected:
+private:
+    // Network channels
+    TCPServer m_Reliable;
+    UDPServer m_Unreliable;
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
     unsigned short m_Port;
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
+    std::vector<PlayerID> m_PlayersToDisconnect;
     // HACK: Fix INPUTSIZE
     char readBuffer[BUFFERSIZE] = { 0 };
     size_t bytesRead = 0;
@@ -88,9 +92,6 @@ protected:
     bool OnEntityDeleted(const Events::EntityDeleted& e);
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
-private:
-    TCPServer m_Reliable;
-    UDPServer m_Unreliable;
 };
 
 #endif
