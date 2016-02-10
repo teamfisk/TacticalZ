@@ -125,6 +125,17 @@ Model::Model(std::string fileName)
     GLERROR("GLEW: BufferFail5");
 
     //CreateBuffers();
+
+    glm::vec3 mini(INFINITY);
+    glm::vec3 maxi(-INFINITY);
+
+    for (unsigned int i = 0; i < m_RawModel->NumVertices(); i++) {
+        const auto& v = m_RawModel->Vertices()[i];
+        mini = glm::min(mini, v.Position);
+        maxi = glm::max(maxi, v.Position);
+    }
+
+    m_Box = AABB(maxi, mini);
 }
 
 Model::~Model()

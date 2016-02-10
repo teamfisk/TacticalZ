@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <bitset>
 
 #include "Collision/Collision.h"
 #include "Engine/GLM.h"
@@ -564,47 +565,50 @@ bool AABBvsTriangles(const AABB& box,
     return hit;
 }
 
-bool AttachAABBComponentFromModel(EntityWrapper entity)
-{
-    if (!entity.HasComponent("Model")) {
-        return false;
-    }
-    //Derive AABB from model
-    RawModel* model;
-    try {
-        model = ResourceManager::Load<RawModel, true>(entity["Model"]["Resource"]);
-    } catch (const std::exception&) {
-        return false;
-    }
-
-    glm::vec3 mini(INFINITY);
-    glm::vec3 maxi(-INFINITY);
-    for (unsigned int i = 0; i < model->NumVertices(); i++) {
-        const auto& v = model->Vertices()[i];
-        mini = glm::min(mini, v.Position);
-        maxi = glm::max(maxi, v.Position);
-    }
-    entity.AttachComponent("AABB");
-    entity["AABB"]["Origin"] = 0.5f * (maxi + mini);
-    entity["AABB"]["Size"] = maxi - mini;
-    return true;
-}
-
 boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
 {
-    if (!entity.HasComponent("AABB")) {
+    AABB modelSpaceBox;
+    if (entity.HasComponent("AABB")) {
+        ComponentWrapper& cAABB = entity["AABB"];
+        modelSpaceBox = EntityAABB::FromOriginSize((glm::vec3)cAABB["Origin"], (glm::vec3)cAABB["Size"]);
+    } else if (entity.HasComponent("Model")) {
+        Model* model;
+        std::string res = entity["Model"]["Resource"];
+        if (res.empty()) {
+            return boost::none;
+        }
+        try {
+            model = ResourceManager::Load<::Model, true>(res);
+        } catch (const Resource::StillLoadingException&) {
+            return boost::none;
+        } catch (const std::exception&) {
+            return boost::none;
+        }
+        modelSpaceBox = model->Box();
+    } else {
         return boost::none;
     }
 
-    ComponentWrapper& cAABB = entity["AABB"];
-    glm::vec3 absPosition = Transform::AbsolutePosition(entity.World, entity.ID);
-    glm::vec3 absScale = Transform::AbsoluteScale(entity.World, entity.ID);
-    glm::vec3 origin = absPosition + (glm::vec3)cAABB["Origin"];
-    glm::vec3 size = (glm::vec3)cAABB["Size"] * absScale;
+    glm::mat4 modelMat = Transform::AbsoluteTransformation(entity);
+    glm::vec3 mini(INFINITY);
+    glm::vec3 maxi(-INFINITY);
+    glm::vec3 maxCorner = modelSpaceBox.MaxCorner();
+    glm::vec3 minCorner = modelSpaceBox.MinCorner();
+    for (int i = 0; i < 8; ++i) {
+        std::bitset<3> bits(i);
+        glm::vec3 corner;
+        corner.x = bits.test(0) ? maxCorner.x : minCorner.x;
+        corner.y = bits.test(1) ? maxCorner.y : minCorner.y;
+        corner.z = bits.test(2) ? maxCorner.z : minCorner.z;
+        corner = Transform::TransformPoint(corner, modelMat);
+        mini = glm::min(mini, corner);
+        maxi = glm::max(maxi, corner);
+    }
 
-    EntityAABB aabb = EntityAABB::FromOriginSize(origin, size);
+    EntityAABB aabb;
+    aabb = AABB(mini, maxi);
+
     aabb.Entity = entity;
-
     return aabb;
 }
 
