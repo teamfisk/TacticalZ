@@ -13,9 +13,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
         return;
     }
     
-
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
-
     if(skeleton == nullptr) {
         return;
     }
