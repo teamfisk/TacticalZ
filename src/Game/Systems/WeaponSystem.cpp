@@ -20,14 +20,14 @@ void WeaponSystem::Update(double dt)
 void WeaponSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPlayer, double dt)
 {
     // Update potential weapon behaviour for player
-    //auto it = m_ActiveWeapons.find(entity);
-    //if (it != m_ActiveWeapons.end()) {
-    //    //if (it->first.Valid()) {
-    //        it->second->Update(dt);
-    //    //} else {
-    //    //    m_ActiveWeapons.erase(it);
-    //    //}
-    //}
+    auto it = m_ActiveWeapons.find(entity);
+    if (it != m_ActiveWeapons.end()) {
+        if (it->first.Valid()) {
+            it->second->Update(dt);
+        } else {
+            m_ActiveWeapons.erase(it);
+        }
+    }
 }
 
 bool WeaponSystem::OnInputCommand(Events::InputCommand& e)

@@ -15,6 +15,7 @@
 #include "Core/EntityFileParser.h"
 #include "Core/Octree.h"
 #include "Collision/EntityAABB.h"
+#include "Systems/SpawnerSystem.h"
 
 class WeaponBehaviour;
 
@@ -150,69 +151,80 @@ private:
 
     void spawnTracer()
     {
-        ComponentWrapper cTeam = m_Entity["Team"];
-        ComponentInfo::EnumType team = cTeam["Team"];
+        EntityWrapper spawner;
+        if (m_Entity == LocalPlayer) {
+            spawner = m_Entity.FirstChildByName("WeaponMuzzle");
+        } else {
+            spawner = m_Entity.FirstChildByName("ThirdPersonWeaponMuzzle");
+        }
 
-        // Select the right color of effect
-        EntityFile* rayFile = nullptr;
-        if (team == cTeam["Team"].Enum("Red")) {
-            rayFile = m_RayRed;
-        }
-        if (team == cTeam["Team"].Enum("Blue")) {
-            rayFile = m_RayBlue;
-        }
-        if (rayFile == nullptr) {
+        if (!spawner.Valid()) {
             return;
         }
 
-        // Create the entity
-        EntityFileParser parser(rayFile);
-        EntityID rayID = parser.MergeEntities(m_World);
-        EntityWrapper ray(m_World, rayID);
+        Events::SpawnerSpawn e;
+        e.Spawner = spawner;
+        m_EventBroker->Publish(e);
 
-        // Figure out where to put it
-        EntityWrapper attachment;
-        if (m_Entity == LocalPlayer || true) {
-            // Spawn the effect from the weapon view model for the local player
-            attachment = m_Entity.FirstChildByName("WeaponMuzzle");
-        }
-        // TODO: Spawn the effect from the weapon world model once it exists
+        //ComponentWrapper cTeam = m_Entity["Team"];
+        //ComponentInfo::EnumType team = cTeam["Team"];
 
-        glm::mat4 transformation = Transform::AbsoluteTransformation(attachment);
-        glm::vec3 _scale;
-        glm::vec3 translation;
-        glm::quat _orientation;
-        glm::vec3 _skew;
-        glm::vec4 _perspective;
-        glm::decompose(transformation, _scale, _orientation, translation, _skew, _perspective);
-        
-        // Matrix to euler angles
-        glm::vec3 euler;
-        euler.y = glm::asin(-transformation[0][2]);
-        if (cos(euler.y) != 0) {
-            euler.x = atan2(transformation[1][2], transformation[2][2]);
-            euler.z = atan2(transformation[0][1], transformation[0][0]);
-        } else {
-            euler.x = atan2(-transformation[2][0], transformation[1][1]);
-            euler.z = 0;
-        }
+        //// Select the right color of effect
+        //EntityFile* rayFile = nullptr;
+        //if (team == cTeam["Team"].Enum("Red")) {
+        //    rayFile = m_RayRed;
+        //}
+        //if (team == cTeam["Team"].Enum("Blue")) {
+        //    rayFile = m_RayBlue;
+        //}
+        //if (rayFile == nullptr) {
+        //    return;
+        //}
 
-        // TODO: Spread?
+        //// Create the entity
+        //EntityFileParser parser(rayFile);
+        //EntityID rayID = parser.MergeEntities(m_World);
+        //EntityWrapper ray(m_World, rayID);
 
-        (glm::vec3&)ray["Transform"]["Position"] = translation;
-        (glm::vec3&)ray["Transform"]["Orientation"] = euler;
-        glm::vec3& scale = ray["Transform"]["Scale"];
-        scale.z = traceRayDistance(translation, glm::quat(euler) * glm::vec3(0.f, 0.f, -1.f));
+        //// Figure out where to put it
+        //EntityWrapper attachment;
+        //if (m_Entity == LocalPlayer || true) {
+        //    // Spawn the effect from the weapon view model for the local player
+        //    attachment = m_Entity.FirstChildByName("WeaponMuzzle");
+        //}
+        //// TODO: Spawn the effect from the weapon world model once it exists
+
+        //glm::mat4 transformation = Transform::AbsoluteTransformation(attachment);
+        //glm::vec3 _scale;
+        //glm::vec3 translation;
+        //glm::quat _orientation;
+        //glm::vec3 _skew;
+        //glm::vec4 _perspective;
+        //glm::decompose(transformation, _scale, _orientation, translation, _skew, _perspective);
+        //
+        //// Matrix to euler angles
+        //glm::vec3 euler;
+        //euler.y = glm::asin(-transformation[0][2]);
+        //if (cos(euler.y) != 0) {
+        //    euler.x = atan2(transformation[1][2], transformation[2][2]);
+        //    euler.z = atan2(transformation[0][1], transformation[0][0]);
+        //} else {
+        //    euler.x = atan2(-transformation[2][0], transformation[1][1]);
+        //    euler.z = 0;
+        //}
+
+        //// TODO: Spread?
+
+        //(glm::vec3&)ray["Transform"]["Position"] = translation;
+        //(glm::vec3&)ray["Transform"]["Orientation"] = euler;
+        //glm::vec3& scale = ray["Transform"]["Scale"];
+        //scale.z = traceRayDistance(translation, glm::quat(euler) * glm::vec3(0.f, 0.f, -1.f));
     }
 
     float traceRayDistance(glm::vec3 origin, glm::vec3 direction)
     {
-        OctSpace::Output result;
-        if (m_CollisionOctree->RayCollides(Ray(origin, direction), result)) {
-            return result.CollideDistance;
-        } else {
-            return 0.f;
-        }
+        // TODO: Cast a ray and size tracer appropriately
+        return 100.f;
     }
 };
 

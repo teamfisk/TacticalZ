@@ -26,6 +26,8 @@ bool MultiplayerSnapshotFilter::FilterComponent(EntityWrapper entity, SharedComp
 
 bool MultiplayerSnapshotFilter::OnPlayerSpawned(Events::PlayerSpawned ePlayerSpawned)
 {
-    m_LocalPlayer = ePlayerSpawned.Player;
+    if (ePlayerSpawned.PlayerID == -1) {
+        m_LocalPlayer = ePlayerSpawned.Player;
+    }
     return true;
 }

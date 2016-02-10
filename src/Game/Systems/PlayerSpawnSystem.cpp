@@ -91,7 +91,7 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     if (cameraEntity.Valid()) {
         Events::SetCamera e;
         e.CameraEntity = cameraEntity;
-        m_EventBroker->Publish(e);
+        //m_EventBroker->Publish(e);
     }
 
     // HACK: Set the player model color to team color

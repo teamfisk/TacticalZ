@@ -29,12 +29,20 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             continue;
         }
 
+        // Aim pitch
         EntityWrapper cameraEntity = player.FirstChildByName("Camera");
         if (cameraEntity.Valid()) {
             glm::vec3& cameraOrientation = cameraEntity["Transform"]["Orientation"];
             cameraOrientation.x += controller->Rotation().x;
             // Limit camera pitch so we don't break our necks
             cameraOrientation.x = glm::clamp(cameraOrientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
+            // Set third person model aim pitch
+            EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+            if (playerModel.Valid()) {
+                ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
+                double time = (cameraOrientation.x + glm::half_pi<float>()) / glm::pi<float>();
+                cAnimationOffset["Time"] = time;
+            }
         }
 
         ComponentWrapper& cTransform = player["Transform"];
@@ -124,24 +132,74 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 ComponentWrapper cAnimation = playerModel["Animation"];
+                std::string& animationName1 = cAnimation["AnimationName1"];
+                std::string& animationName2 = cAnimation["AnimationName2"];
+                double& animationTime1 = cAnimation["Time1"];
+                double& animationTime2 = cAnimation["Time2"];
+                double& animationSpeed1 = cAnimation["Speed1"];
+                double& animationSpeed2 = cAnimation["Speed2"];
+                double& animationWeight1 = cAnimation["Weight1"];
+                double& animationWeight2 = cAnimation["Weight2"];
 
                 float movementLength = glm::length(groundVelocity);
                 //TODO: add assault dash animation here
                 if (glm::length(controller->Movement()) > 0.f) {
-                    if (controller->Crouching()) {
-                        cAnimation["AnimationName1"] = "Crouch Walk";
-                        (double&)cAnimation["Speed1"] = 1.f * -glm::sign(controller->Movement().z);
+                    double forwardMovement = controller->Movement().z;
+                    double strafeMovement = controller->Movement().x;
+
+                    if (controller->Crouching() && animationName1 != "CrouchWalk") {
+                        animationName1 = "CrouchWalk";
+                        animationSpeed1 = 1.0 * -glm::sign(controller->Movement().z);
                     } else {
-                        cAnimation["AnimationName1"] = "Run";
-                        (double&)cAnimation["Speed1"] = 2.f * -glm::sign(controller->Movement().z);
+                        if (glm::abs(forwardMovement) > 0) {
+                            if (animationName1 != "Run") {
+                                animationName1 = "Run";
+                                if (animationName2 == "StrafeLeft" || animationName2 == "StrafeRight") {
+                                    animationTime1 = animationTime2;
+                                } else {
+                                    animationTime1 = 0.0;
+                                }
+                            }
+                            animationSpeed1 = 2.f * -glm::sign(forwardMovement);
+                        }
+
+                        if (glm::abs(strafeMovement) > 0) {
+                            if (animationName2 != "StrafeLeft" && animationName2 != "StrafeRight") {
+                                if (strafeMovement < 0) {
+                                    animationName2 = "StrafeLeft";
+                                }
+                                if (strafeMovement > 0) {
+                                    animationName2 = "StrafeRight";
+                                }
+                                if (animationName1 == "Run") {
+                                    animationTime2 = animationTime1;
+                                } else {
+                                    animationTime2 = 0.0;
+                                }
+                            }
+                            animationSpeed2 = 2.f * glm::abs(strafeMovement);
+                        }
+
+                        double strafeWeight = glm::abs(strafeMovement) / (glm::abs(forwardMovement) + glm::abs(strafeMovement));
+                        animationWeight2 = strafeWeight;
+                        animationWeight1 = 1.0 - strafeWeight;
                     }
                 } else {
                     if (controller->Crouching()) {
-                        cAnimation["AnimationName1"] = "Crouch";
-                        (double&)cAnimation["Speed"] = 1.f;
+                        animationName1 = "Crouch";
+                        animationName2 = "";
+                        animationSpeed1 = 1.0;
+                        animationSpeed2 = 0.0;
+                        animationWeight1 = 1.0;
+                        animationWeight2 = 0.0;
                     } else {
-                        cAnimation["AnimationName1"] = "Hold Pos";
-                        (double&)cAnimation["Speed1"] = 1.f;
+                        animationName1 = "Idle";
+                        animationName2 = "";
+                        animationSpeed1 = 1.f;
+                        animationSpeed2 = 0.0;
+                        animationWeight1 = 1.0;
+                        animationWeight2 = 0.0;
+                        //cAnimation["AnimationName2"] = "Idle";
                     }
                 }
             }

@@ -227,11 +227,8 @@ int Game::parseArgs(int argc, char* argv[])
         exit(1);
     }
 
-    if (vm.count("connect")) {
-        m_IsClient = true;
-    }
-
     // HACK: Right now, client and server are mutually exclusive
+    m_IsClient = true;
     if (m_IsServer) {
         m_IsClient = false;
     }

@@ -46,7 +46,7 @@ public:
 
 private:
     std::string m_NetworkAddress;
-    int m_NetworkPort;
+    int m_NetworkPort = 0;
 
 	ConfigFile* m_Config = nullptr;
 	EventBroker* m_EventBroker;
