@@ -33,7 +33,7 @@ void ShadowPass::InitializeFrameBuffers()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+	//glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 
 
     m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
@@ -71,7 +71,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
     glViewport(0, 0, resolutionSizeWidth, resolutionSizeHeigth);
 
-	//glCullFace(GL_FRONT);
+	glCullFace(GL_FRONT);
     //state->Disable(GL_CULL_FACE);
 
     ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
@@ -121,7 +121,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
 
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-    //glCullFace(GL_BACK);
+    glCullFace(GL_BACK);
     m_ShadowProgram->Unbind();
 
 

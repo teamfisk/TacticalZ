@@ -121,16 +121,15 @@ float CalcShadowValue(vec4 positionLightSpace, vec3 normal, vec3 lightDir, sampl
 	//float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 	//float bias = 0.005 * tan(acos(clamp(dot(normal, lightDir), 0,1))); bias = clamp(bias, 0,0.01);
 	
-    vec3 projCoords = positionLightSpace.xyz / positionLightSpace.w;
+    vec3 projCoords = vec3(positionLightSpace.xy, positionLightSpace.z + bias) / positionLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
     //float shadowMapDepth = texture(depthTexture, projCoords.xy).r; 
-    float shadowMapDepth = 1.0 - texture(depthTexture, projCoords); 
+    float shadowMapDepth = texture(depthTexture, projCoords); 
 	float geometryDepth = projCoords.z;
 	//float shadow = geometryDepth - bias > shadowMapDepth ? 1.0 : 0.0;
-	//float shadow = geometryDepth - bias > shadowMapDepth ? 0.0 : 1.0;
-	float shadow = shadowMapDepth;
+	//float shadow = 1.0 - bias > shadowMapDepth ? 0.0 : 1.0;
 	
-	//float shadow = 0.0;
+	float shadow = 1.0 - shadowMapDepth;
 	
 	//vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
 	//for(int x = -1; x <= 1; x++)
