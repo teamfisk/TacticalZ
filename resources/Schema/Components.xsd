@@ -30,7 +30,10 @@
 	<xs:include schemaLocation="Components/Fill.xsd"/>
 	<xs:include schemaLocation="Components/Lifetime.xsd"/>
 	<xs:include schemaLocation="Components/HiddenForLocalPlayer.xsd"/>
+	<xs:include schemaLocation="Components/HealthPickup.xsd"/>
 	<xs:include schemaLocation="Components/DashAbility.xsd"/>
 	<xs:include schemaLocation="Components/BoostAssault.xsd"/>
 	<xs:include schemaLocation="Components/BoostDefender.xsd"/>
+	<xs:include schemaLocation="Components/Shield.xsd"/>
+	<xs:include schemaLocation="Components/Shielded.xsd"/>
 </xs:schema>

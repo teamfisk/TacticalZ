@@ -1,10 +1,13 @@
 #include "Rendering/RenderSystem.h"
+#include "Collision/Collision.h"
+#include "Core/Frustum.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame) 
+RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
     : System(world, eventBroker)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
     , m_World(world)
+    , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
@@ -40,14 +43,15 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
     return entity == m_CurrentCamera || entity.IsChildOf(m_CurrentCamera);
 }
 
-void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
+void RenderSystem::fillModels(RenderScene::Queues &Jobs)
 {
-    auto models = m_World->GetComponents("Model");
-    if (models == nullptr) {
-        return;
-    }
+    Frustum frustum(m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix());
+    std::vector<EntityAABB> seenEntities;
+    m_Octree->ObjectsInFrustum(frustum, seenEntities);
 
-    for (auto& cModel : *models) {
+    for (auto& seenEntity : seenEntities) {
+        EntityWrapper entity = seenEntity.Entity;
+        ComponentWrapper cModel = entity["Model"];
         bool visible = cModel["Visible"];
         if (!visible) {
             continue;
@@ -56,8 +60,6 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
         if (resource.empty()) {
             continue;
         }
-
-        EntityWrapper entity(m_World, cModel.EntityID);
 
         // Only render children of a camera if that camera is currently active
         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
@@ -92,7 +94,9 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
+        //Loop through all materialgroups of a model
         for (auto matGroup : model->MaterialGroups()) {
+            //If the model has an explosioneffect component, we will add an explosioneffectjob
             if (m_World->HasComponent(cModel.EntityID, "ExplosionEffect")) {
                 auto explosionEffectComponent = m_World->GetComponent(cModel.EntityID, "ExplosionEffect");
                 std::shared_ptr<ExplosionEffectJob> explosionEffectJob = std::shared_ptr<ExplosionEffectJob>(new ExplosionEffectJob(
@@ -106,14 +110,30 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     fillColor, 
                     fillPercentage
                 ));
-                if(explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
-                    cModel["Transparent"] = true;
-                }
+                if (m_World->HasComponent(cModel.EntityID, "Shield")){
+                    Jobs.ShieldObjects.push_back(explosionEffectJob);
+                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
+                    || m_World->HasComponent(cModel.EntityID, "Player")) {
 
-                if (cModel["Transparent"]) {
-                    transparentJobs.push_back(explosionEffectJob);
+                    if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
+                    } else {
+                        Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
+                    }
                 } else {
-                    opaqueJobs.push_back(explosionEffectJob);
+                    if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentObjects.push_back(explosionEffectJob);
+                    } else {
+                        Jobs.OpaqueObjects.push_back(explosionEffectJob);
+                    }
                 }
             } else {
                 std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
@@ -126,13 +146,30 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     fillColor, 
                     fillPercentage
                 ));
-                if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
-                    cModel["Transparent"] = true;
-                }
-                if (cModel["Transparent"]) {
-                    transparentJobs.push_back(modelJob);
+                if (m_World->HasComponent(cModel.EntityID, "Shield")) {
+                    Jobs.ShieldObjects.push_back(modelJob);
+                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
+                    || m_World->HasComponent(cModel.EntityID, "Player")) {
+
+                    if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentShieldedObjects.push_back(modelJob);
+                    } else {
+                        Jobs.OpaqueShieldedObjects.push_back(modelJob);
+                    }
                 } else {
-                    opaqueJobs.push_back(modelJob);
+                    if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentObjects.push_back(modelJob);
+                    } else {
+                        Jobs.OpaqueObjects.push_back(modelJob);
+                    }
                 }
             }
         }
@@ -251,10 +288,10 @@ void RenderSystem::Update(double dt)
         scene.AmbientColor = (glm::vec4)(*cSceneLight->begin())["AmbientColor"];
     }
 
-    fillModels(scene.OpaqueObjects, scene.TransparentObjects);
-    fillPointLights(scene.PointLightJobs, m_World);
-    fillDirectionalLights(scene.DirectionalLightJobs, m_World);
-    fillText(scene.TextJobs, m_World);
+    fillModels(scene.Jobs);
+    fillPointLights(scene.Jobs.PointLight, m_World);
+    fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
+    fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);
    
 }
