@@ -612,4 +612,30 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity)
     return aabb;
 }
 
+boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity)
+{
+    boost::optional<EntityAABB> modelBox = EntityAbsoluteAABB(entity);
+    if (!modelBox) {
+        return boost::none;
+    }
+    bool isRandom = (bool)entity["ExplosionEffect"]["Randomness"];
+    float random = isRandom ? (float)(double)entity["ExplosionEffect"]["RandomnessScalar"] : 0;
+    glm::vec3 origin = (glm::vec3)entity["ExplosionEffect"]["ExplosionOrigin"];
+    glm::vec3 randomVel = (glm::vec3)entity["ExplosionEffect"]["Velocity"];
+    randomVel *= (random + 1);
+    float endVelocity = randomVel.y;
+    if ((bool)entity["ExplosionEffect"]["ExponentialAccelaration"]) {
+        endVelocity *= endVelocity / 2.f;
+    }
+    float maxRadius = (float)(double)entity["ExplosionEffect"]["ExplosionDuration"] * endVelocity;
+    glm::vec3 size;
+    AABB explosionBox(origin - (size / 2.f), origin + (size / 2.f));
+
+    glm::vec3 mini = glm::min(explosionBox.MinCorner(), (*modelBox).MinCorner());
+    glm::vec3 maxi = glm::max(explosionBox.MaxCorner(), (*modelBox).MaxCorner());
+    EntityAABB aabb = AABB(mini, maxi);
+    aabb.Entity = entity;
+    return aabb;
+}
+
 }

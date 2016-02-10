@@ -7,15 +7,13 @@ void FillFrustumOctreeSystem::Update(double dt)
 
 void FillFrustumOctreeSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
+    boost::optional<EntityAABB> absoluteAABB;
     if (entity.HasComponent("ExplosionEffect")) {
-        //TODO: Fix hack, get real box by using shader equation.
-        EntityAABB aabb = AABB(glm::vec3(-300), glm::vec3(300));
-        aabb.Entity = entity;
-        m_Octree->AddDynamicObject(aabb);
+        absoluteAABB = Collision::AbsoluteAABBExplosionEffect(entity);
     } else {
-        boost::optional<EntityAABB> absoluteAABB = Collision::EntityAbsoluteAABB(entity);
-        if (absoluteAABB) {
-            m_Octree->AddDynamicObject(*absoluteAABB);
-        }
+        absoluteAABB = Collision::EntityAbsoluteAABB(entity);
+    }
+    if (absoluteAABB) {
+        m_Octree->AddDynamicObject(*absoluteAABB);
     }
 }
