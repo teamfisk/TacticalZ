@@ -31,14 +31,14 @@
             <c:Animation>
               <AnimationName1>Run</AnimationName1>
               <Weight1>0.5</Weight1>
-              <Time1>0.44037772975435119</Time1>
+              <Time1>0.23980116887997371</Time1>
               <Speed1>1</Speed1>
               <Speed2>1</Speed2>
               <AnimationName2>StrafeRight</AnimationName2>
               <Weight2>0.5</Weight2>
-              <Time2>0.62650761653875175</Time2>
+              <Time2>0.42593105566437428</Time2>
               <AnimationName3>ReloadSwitch</AnimationName3>
-              <Time3>0.88913372073808805</Time3>
+              <Time3>0.68855715986371058</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
             <c:AnimationOffset>
@@ -47,7 +47,6 @@
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
               <Color A="1" B="0.984313726" G="1" R="1"/>
-              <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
               <Position X="-0.690088332" Y="0" Z="0"/>
