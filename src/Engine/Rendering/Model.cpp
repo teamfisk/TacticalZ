@@ -135,7 +135,7 @@ Model::Model(std::string fileName)
         maxi = glm::max(maxi, v.Position);
     }
 
-    m_Box = AABB(maxi, mini);
+    m_Box = AABB(mini, maxi);
 }
 
 Model::~Model()
