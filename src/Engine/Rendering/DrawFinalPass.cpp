@@ -320,7 +320,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             case RawModel::MaterialType::Basic:
             case RawModel::MaterialType::SingleTextures:
             {
-                if (explosionEffectJob->Model->isSkined()) {
+                if (explosionEffectJob->Model->IsSkinned()) {
                     m_ExplosionEffectSkinnedProgram->Bind();
                     GLERROR("Bind ExplosionEffectSkinned program");
                     //bind uniforms
@@ -346,7 +346,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             }
             case RawModel::MaterialType::SplatMapping:
             {
-                if (explosionEffectJob->Model->isSkined()) {
+                if (explosionEffectJob->Model->IsSkinned()) {
                     m_ExplosionEffectSplatMapSkinnedProgram->Bind();
                     GLERROR("Bind ExplosionEffectSplatMapSkinned program");
                     //bind uniforms
@@ -392,7 +392,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     case RawModel::MaterialType::Basic:
                     case RawModel::MaterialType::SingleTextures:
                     {
-                        if (modelJob->Model->isSkined()) {
+                        if (modelJob->Model->IsSkinned()) {
                             m_ForwardPlusSkinnedProgram->Bind();
                             GLERROR("Bind ForwardPlusSkinnedProgram");
                             //bind uniforms
@@ -419,7 +419,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     }
                     case RawModel::MaterialType::SplatMapping:
                     {
-                        if (modelJob->Model->isSkined()) {
+                        if (modelJob->Model->IsSkinned()) {
                             m_ForwardPlusSplatMapSkinnedProgram->Bind();
                             GLERROR("Bind SplatMap program");
                             //bind uniforms
@@ -468,7 +468,7 @@ void DrawFinalPass::DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJo
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
         if (modelJob) {
 
-            if(modelJob->Model->isSkined()) {
+            if(modelJob->Model->IsSkinned()) {
                 m_ShieldToStencilSkinnedProgram->Bind();
                 GLuint shaderHandle = m_ShieldToStencilSkinnedProgram->GetHandle();
 
@@ -602,7 +602,7 @@ void DrawFinalPass::DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& job
     for (auto &job : jobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
       
-        if(modelJob->Model->isSkined()) {
+        if(modelJob->Model->IsSkinned()) {
             m_FillDepthBufferSkinnedProgram->Bind();
             GLuint shaderHandle = m_FillDepthBufferSkinnedProgram->GetHandle();
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));

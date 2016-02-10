@@ -114,7 +114,7 @@ public:
 		}
 	};
 
-	bool isSkined() const { return hasSkin; };
+	bool IsSkinned() const { return hasSkin; };
 
 	std::vector<MaterialProperties> m_Materials;
 

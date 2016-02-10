@@ -20,7 +20,7 @@ public:
     const RawModel::Vertex* Vertices() const { return m_RawModel->Vertices(); }
 	unsigned int NumberOfVertices() const { return m_RawModel->NumVertices(); }
     const AABB& Box() const { return m_Box; }
-	bool isSkined() const { return m_RawModel->isSkined(); }
+	bool IsSkinned() const { return m_RawModel->IsSkinned(); }
 	GLuint VAO;
 	GLuint ElementBuffer;
     RawModel* m_RawModel;

@@ -27,7 +27,7 @@ struct ModelJob : RenderJob
 		::RawModel::MaterialBasic* matGroup = matProp.material;
 		switch(matProp.type){
 		case ::RawModel::MaterialType::Basic:
-			if (Model->isSkined()) {
+			if (Model->IsSkinned()) {
 				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
 			}
 			else {
@@ -37,7 +37,7 @@ struct ModelJob : RenderJob
 			break;
 		case ::RawModel::MaterialType::SingleTextures:
 			{
-				if (Model->isSkined()) {
+				if (Model->IsSkinned()) {
 					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
 				}
 				else {
@@ -64,7 +64,7 @@ struct ModelJob : RenderJob
 			break;
 		case ::RawModel::MaterialType::SplatMapping:
 			{
-				if (Model->isSkined()) {
+				if (Model->IsSkinned()) {
 					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapSkinnedProgram")->ResourceID;
 				}
 				else {
