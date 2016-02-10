@@ -24,31 +24,31 @@ void Server::Start(World* world, EventBroker* eventBroker)
 void Server::Update()
 {
     PlayerDefinition pd;
-    
-    //m_TCPServer.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
-    //for (auto& kv : m_ConnectedPlayers) {
-    //    while (kv.second.TCPSocket->available()) {
-    //        // Packet will get real data in receive
-    //        Packet packet(MessageType::Invalid);
-    //        m_TCPServer.Receive(packet, kv.second);
-    //        m_Address = kv.second.TCPSocket->remote_endpoint().address();
-    //        m_Port = kv.second.TCPSocket->remote_endpoint().port();
-    //        if (packet.GetMessageType() == MessageType::Connect) {
-    //            parseTCPConnect(packet);
-    //        } else {
-    //            parseMessageType(packet);
-    //        }
-    //    }
-    //}
 
-    while (m_UDPServer.IsSocketAvailable()) {
+    m_Reliable.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
+    for (auto& kv : m_ConnectedPlayers) {
+        while (kv.second.TCPSocket->available()) {
+            // Packet will get real data in receive
+            Packet packet(MessageType::Invalid);
+            m_Reliable.Receive(packet, kv.second);
+            m_Address = kv.second.TCPSocket->remote_endpoint().address();
+            m_Port = kv.second.TCPSocket->remote_endpoint().port();
+            if (packet.GetMessageType() == MessageType::Connect) {
+                parseTCPConnect(packet);
+            } else {
+                parseMessageType(packet);
+            }
+        }
+    }
+
+    while (m_Unreliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
-        m_UDPServer.Receive(packet, pd);
+        m_Unreliable.Receive(packet, pd);
         m_Address = pd.Endpoint.address();
         m_Port = pd.Endpoint.port();
         if (packet.GetMessageType() == MessageType::Connect) {
-            parseConnect(packet, pd);
+            parseUDPConnect(packet);
         } else {
             parseMessageType(packet);
         }
@@ -115,11 +115,19 @@ void Server::parseMessageType(Packet& packet)
     }
 }
 
-void Server::broadcast(Packet& packet)
+void Server::reliableBroadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
         packet.ChangePacketID(kv.second.PacketID);
-        m_UDPServer.Send(packet, kv.second);
+        m_Reliable.Send(packet, kv.second);
+    }
+}
+
+void Server::unreliableBroadcast(Packet& packet)
+{
+    for (auto& kv : m_ConnectedPlayers) {
+        packet.ChangePacketID(kv.second.PacketID);
+        m_Unreliable.Send(packet, kv.second);
     }
 }
 
@@ -128,7 +136,7 @@ void Server::sendSnapshot()
 {
     Packet packet(MessageType::Snapshot);
     addChildrenToPacket(packet, EntityID_Invalid);
-    broadcast(packet);
+    unreliableBroadcast(packet);
 }
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
@@ -189,7 +197,7 @@ void Server::sendPing()
     // Time message
     m_StartPingTime = std::clock();
     // Send message
-    broadcast(packet);
+    reliableBroadcast(packet);
 }
 
 void Server::checkForTimeOuts()
@@ -199,7 +207,7 @@ void Server::checkForTimeOuts()
 
     std::vector<PlayerID> playersToRemove;
     for (auto& kv : m_ConnectedPlayers) {
-        if (kv.second.Address != boost::asio::ip::address()) {
+        if (kv.second.TCPAddress != boost::asio::ip::address()) {
             int stopPing = 1000 * kv.second.StopTime /
                 static_cast<double>(CLOCKS_PER_SEC);
             if (startPing > stopPing + m_TimeoutMs) {
@@ -213,63 +221,71 @@ void Server::checkForTimeOuts()
     }
 }
 
-void Server::parseConnect(Packet & packet, PlayerDefinition & pd)
+void Server::parseUDPConnect(Packet & packet)
 {
+    // Pop size of message int
+    packet.ReadPrimitive<int>();
+    int messageType = packet.ReadPrimitive<int>();
+    // Read packet ID 
+    m_PreviousPacketID = m_PacketID;    // Set previous packet id
+    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+    // parse player id and other stuff
+    PlayerID playerID = packet.ReadPrimitive<int>();
+    // Do something here?
+    boost::asio::ip::udp::endpoint endpoint(m_Address, m_Port);
+    m_ConnectedPlayers.at(playerID).Endpoint = endpoint;
+    LOG_INFO("parseUDPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
+    // Send a message to the player that connected
+    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
+    m_Unreliable.Send(connnectPacket);
+    LOG_INFO("UDP Connect sent to client");
+}
+
+void Server::parseTCPConnect(Packet & packet)
+{
+    // Pop size of message int
+    packet.ReadPrimitive<int>();
+    int messageType = packet.ReadPrimitive<int>();
+    // Read packet ID 
+    m_PreviousPacketID = m_PacketID;    // Set previous packet id
+    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+
     LOG_INFO("Parsing connections");
     // Check if player is already connected
-    if (GetPlayerIDFromEndpoint() != -1) {
+    // Ska vara till lagd i TCPServer receive
+    PlayerID playerID = GetPlayerIDFromEndpoint();
+    if (playerID == -1) {
         return;
     }
     // Create a new player
-    pd.EntityID = 0; // Overlook this
-    pd.Address = pd.Endpoint.address();
-    pd.Port = pd.Endpoint.port();
-    pd.Name = packet.ReadString();
-    pd.PacketID = 0;
-    pd.StopTime = std::clock();
-    m_ConnectedPlayers[m_NextPlayerID++] = pd;
-    LOG_INFO("Spectator \"%s\" connected on IP: %s", pd.Name.c_str(), pd.Endpoint.address().to_string().c_str());
+    m_ConnectedPlayers.at(playerID).EntityID = 0; // Overlook this
+    m_ConnectedPlayers.at(playerID).Name = packet.ReadString();
+    m_ConnectedPlayers.at(playerID).PacketID = 0;
+    m_ConnectedPlayers.at(playerID).StopTime = std::clock();
+    m_ConnectedPlayers.at(playerID).TCPAddress = m_Address;
+    m_ConnectedPlayers.at(playerID).TCPPort = m_Port;
+
+    LOG_INFO("parseTCPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(),
+        m_ConnectedPlayers.at(playerID).TCPAddress);
 
     // Send a message to the player that connected
-    Packet connnectPacket(MessageType::Connect, pd.PacketID);
-    m_UDPServer.Send(connnectPacket);
+    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
+    // Write playerID to packet
+    connnectPacket.WritePrimitive(playerID);
+    m_Reliable.Send(connnectPacket);
 
     // Send notification that a player has connected
-    Packet notificationPacket(MessageType::PlayerConnected);
-    broadcast(notificationPacket);
+    //Packet notificationPacket(MessageType::PlayerConnected);
+    //broadcast(notificationPacket);
 }
-//
-//void Server::parseTCPConnect(Packet & packet)
-//{
-//    LOG_INFO("Parsing connections");
-//    // Check if player is already connected
-//    PlayerID playerID = GetPlayerIDFromEndpoint();
-//    if (playerID = -1) {
-//        return;
-//    }
-//    // Create a new player
-//    m_ConnectedPlayers.at(playerID).EntityID = 0; // Overlook this
-//    m_ConnectedPlayers.at(playerID).Name = packet.ReadString();
-//    m_ConnectedPlayers.at(playerID).PacketID = 0;
-//    m_ConnectedPlayers.at(playerID).StopTime = std::clock();
-//    LOG_INFO("Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
-//
-//    // Send a message to the player that connected
-//    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
-//    m_TCPServer.Send(connnectPacket);
-//
-//    // Send notification that a player has connected
-//    Packet notificationPacket(MessageType::PlayerConnected);
-//    //broadcast(notificationPacket);
-//}
 
 void Server::parseDisconnect()
 {
     LOG_INFO("%i: Parsing disconnect", m_PacketID);
 
     for (auto& kv : m_ConnectedPlayers) {
-        if (kv.second.Address == m_Address &&
-            kv.second.Port == m_Port) {
+        if (kv.second.TCPAddress == m_Address &&
+            kv.second.TCPPort == m_Port) {
             disconnect(kv.first);
             break;
         }
@@ -311,7 +327,7 @@ void Server::kick(PlayerID player)
 {
     disconnect(player);
     Packet packet = Packet(MessageType::Kick);
-    m_UDPServer.Send(packet);
+    m_Reliable.Send(packet);
 }
 
 bool Server::OnInputCommand(const Events::InputCommand & e)
@@ -340,7 +356,7 @@ bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
     packet.WritePrimitive<EntityID>(e.Spawner.ID);
     // We don't send PlayerID here because it will always be set to -1
     packet.WriteString(m_ConnectedPlayers[e.PlayerID].Name);
-    m_UDPServer.Send(packet, m_ConnectedPlayers[e.PlayerID]);
+    m_Reliable.Send(packet, m_ConnectedPlayers[e.PlayerID]);
     return false;
 }
 
@@ -349,7 +365,7 @@ bool Server::OnEntityDeleted(const Events::EntityDeleted & e)
     if (!e.Cascaded) {
         Packet packet = Packet(MessageType::EntityDeleted);
         packet.WritePrimitive<EntityID>(e.DeletedEntity);
-        broadcast(packet);
+        reliableBroadcast(packet);
     }
     return false;
 }
@@ -360,7 +376,7 @@ bool Server::OnComponentDeleted(const Events::ComponentDeleted & e)
         Packet packet = Packet(MessageType::ComponentDeleted);
         packet.WritePrimitive<EntityID>(e.Entity);
         packet.WriteString(e.ComponentType);
-        broadcast(packet);
+        reliableBroadcast(packet);
     }
     return false;
 }
@@ -376,14 +392,14 @@ void Server::parseClientPing()
     // Return ping
     Packet packet(MessageType::Ping, m_ConnectedPlayers[player].PacketID);
     packet.WriteString("Ping received");
-    m_UDPServer.Send(packet);
+    m_Reliable.Send(packet);
 }
 
 void Server::parsePing()
 {
     for (auto& kv : m_ConnectedPlayers) {
-        if (kv.second.Address == m_Address &&
-            kv.second.Port == m_Port) {
+        if (kv.second.TCPAddress == m_Address &&
+            kv.second.TCPPort == m_Port) {
             kv.second.StopTime = std::clock();
             break;
         }
@@ -430,9 +446,12 @@ void Server::parsePlayerTransform(Packet& packet)
 
 PlayerID Server::GetPlayerIDFromEndpoint()
 {
+    // check both tcp and udp connection
     for (auto& kv : m_ConnectedPlayers) {
-        if (kv.second.Address == m_Address &&
-            kv.second.Port == m_Port) {
+        if ((kv.second.TCPAddress == m_Address
+            && kv.second.TCPPort == m_Port)
+            || (kv.second.Endpoint.address() == m_Address
+                && kv.second.Endpoint.port() == m_Port)) {
             return kv.first;
         }
     }

@@ -23,8 +23,8 @@ PlayerID GetPlayerIDFromEndpoint(const std::map<PlayerID, PlayerDefinition>& con
     boost::asio::ip::address address, unsigned short port)
 {
     for (auto& kv : connectedPlayers) {
-        if (kv.second.Address == address &&
-            kv.second.Port == port) {
+        if (kv.second.TCPAddress == address &&
+            kv.second.TCPPort == port) {
             return kv.first;
         }
     }
@@ -43,8 +43,8 @@ void TCPServer::handle_accept(boost::shared_ptr<tcp::socket> socket,
         PlayerDefinition pd;
         pd.StopTime = std::clock();
         pd.TCPSocket = socket;
-        pd.Address = socket.get()->remote_endpoint().address();
-        pd.Port = socket.get()->remote_endpoint().port();
+        pd.TCPAddress = socket.get()->remote_endpoint().address();
+        pd.TCPPort = socket.get()->remote_endpoint().port();
         connectedPlayers[nextPlayerID++] = pd;
     }
 }
@@ -78,6 +78,7 @@ void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
+    lastReceivedSocket = playerDefinition.TCPSocket;
 }
 
 int TCPServer::readBuffer(char* data, PlayerDefinition & playerDefinition)

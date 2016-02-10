@@ -70,7 +70,8 @@ protected:
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
-    void parseConnect(Packet& packet);
+    void parseUDPConnect(Packet& packet);
+    void parseTCPConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
     void parseKick();
@@ -103,9 +104,8 @@ protected:
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
 
 private:
-    UDPClient m_UDPClient;
-    //TCPClient m_TCPClient;
-    //TCPClient m_UDPClient;
+    UDPClient m_Unreliable;
+    TCPClient m_Reliable;
 };
 
 #endif

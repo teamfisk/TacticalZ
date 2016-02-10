@@ -10,8 +10,8 @@ struct PlayerDefinition {
     boost::asio::ip::udp::endpoint Endpoint;
     unsigned int PacketID;
     std::clock_t StopTime;
-    boost::asio::ip::address Address;
-    unsigned short Port;
+    boost::asio::ip::address TCPAddress;
+    unsigned short TCPPort;
     // use for tcp connections
     boost::shared_ptr<boost::asio::ip::tcp::socket> TCPSocket;
 };

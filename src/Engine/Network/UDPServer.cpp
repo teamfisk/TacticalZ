@@ -31,7 +31,6 @@ void UDPServer::Send(Packet & packet)
         0);
 }
 
-
 void UDPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {
     int bytesRead = readBuffer(m_ReadBuffer);

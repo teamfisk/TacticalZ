@@ -59,7 +59,8 @@ protected:
 
     // Private member functions
     //int  receive(char* data);
-    void broadcast(Packet& packet);
+    void reliableBroadcast(Packet& packet);
+    void unreliableBroadcast(Packet& packet);
     void sendSnapshot();
     void addChildrenToPacket(Packet& packet, EntityID entityID);
     void sendPing();
@@ -74,13 +75,9 @@ protected:
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
     void parsePing();    
-    void parseConnect(Packet & packet, PlayerDefinition & pd);
+    void parseUDPConnect(Packet & packet);
     void parseTCPConnect(Packet & packet);
     void parseDisconnect();
-    //// Pure virtual functions
-    //virtual void readFromClients() = 0;
-    //virtual void send(Packet& packet, PlayerDefinition & playerDefinition) = 0;
-    //virtual void send(Packet& packet) = 0;
 
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
@@ -92,8 +89,8 @@ protected:
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
 private:
-    //TCPServer m_TCPServer;
-    UDPServer m_UDPServer;
+    TCPServer m_Reliable;
+    UDPServer m_Unreliable;
 };
 
 #endif
