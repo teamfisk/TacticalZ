@@ -13,7 +13,7 @@ layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
 layout (binding = 2) uniform sampler2D SpecularMapTexture;
 layout (binding = 3) uniform sampler2D GlowMapTexture;
-layout (binding = 4) uniform sampler2D DepthMap;
+layout (binding = 4) uniform sampler2DShadow DepthMap;
 
 #define TILE_SIZE 16
 
@@ -114,49 +114,39 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
-vec2 poissonDisk[4] = vec2[](
-   vec2( -0.94201624, -0.39906216 ),
-   vec2( 0.94558609, -0.76890725 ),
-   vec2( -0.094184101, -0.92938870 ),
-   vec2( 0.34495938, 0.29387760 )
- );
-
-float CalcShadowValue(vec4 positionLightSpace, vec4 normal, vec4 lightDir, sampler2D depthTexture)
+float CalcShadowValue(vec4 positionLightSpace, vec3 normal, vec3 lightDir, sampler2DShadow depthTexture)
 {
 	
 	float bias = 0.005;
-	//float bias = max(0.05 * (1.0 - dot(normal, -lightDir)), 0.005); 
-    // perform perspective divide
+	//float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	//float bias = 0.005 * tan(acos(clamp(dot(normal, lightDir), 0,1))); bias = clamp(bias, 0,0.01);
+	
     vec3 projCoords = positionLightSpace.xyz / positionLightSpace.w;
-    // Transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
-    // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-	//float lightDepth = texture(depthTexture, positionLightSpace.xy).r; 
-    float closestDepth = texture(depthTexture, projCoords.xy).r; 
-    // Get depth of current fragment from light's perspective
-	//float currentDepth = positionLightSpace.z;
-    float currentDepth = projCoords.z;
-    // Check whether current frag pos is in shadow
-	float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-	//float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
-   
+    //float shadowMapDepth = texture(depthTexture, projCoords.xy).r; 
+    float shadowMapDepth = 1.0 - texture(depthTexture, projCoords); 
+	float geometryDepth = projCoords.z;
+	//float shadow = geometryDepth - bias > shadowMapDepth ? 1.0 : 0.0;
+	//float shadow = geometryDepth - bias > shadowMapDepth ? 0.0 : 1.0;
+	float shadow = shadowMapDepth;
+	
 	//float shadow = 0.0;
-	////soft shadow - using percentage-closer filtering (PCF) is to simply sample the surrounding texels of the depth map and average the results:
+	
 	//vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
-	//for(int x = -1; x <= 1; ++x)
+	//for(int x = -1; x <= 1; x++)
 	//{
-	//	for(int y = -1; y <= 1; ++y)
+	//	for(int y = -1; y <= 1; y++)
 	//	{
-	//	float pcfDepth = texture(depthTexture, projCoords.xy + vec2(x, y) * texelSize).r; 
-	//		shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+	//		float pcfDepth = texture(depthTexture, projCoords.xy + vec2(x, y) * texelSize).r; 
+	//		shadow += geometryDepth - bias > pcfDepth ? 1.0 : 0.0;
 	//	}    
 	//}
 	//shadow /= 9.0;
-	//
-	if(projCoords.z > 0.9)
-	{
-		shadow = 1.0;
-	}
+	
+	//if(projCoords.z > 1.0)
+	//{
+	//	shadow = 0.0;
+	//}
 
     return shadow;
 	
@@ -184,7 +174,7 @@ void main()
 	int start = int(LightGrids.Data[currentTile].Start);
 	int amount = int(LightGrids.Data[currentTile].Amount);
 
-	float shadowFactor = 1.0;
+	float shadowFactor = 0.0;
 	
 	for(int i = start; i < start + amount; i++) {
 
@@ -197,15 +187,16 @@ void main()
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
-			shadowFactor = CalcShadowValue(Input.PositionLightSpace, vec4(Input.Normal, 0.0), light.Direction, DepthMap);
+			shadowFactor = CalcShadowValue(Input.PositionLightSpace, Input.Normal, vec3(light.Direction), DepthMap);
 		}
 	
 		totalLighting.Diffuse += light_result.Diffuse;
 		totalLighting.Specular += light_result.Specular; 
 	}
 
-	totalLighting.Diffuse += (1.0 - shadowFactor); 
-	totalLighting.Specular += (1.0 - shadowFactor);
+	totalLighting.Diffuse *= (1.0 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0); 
+	totalLighting.Specular *= (1.0 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0);
+	
 	//LightResult getInformation;
 	
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);

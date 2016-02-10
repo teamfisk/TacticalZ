@@ -51,7 +51,7 @@ private:
 
     GLuint m_DepthFBO;
 
-    GLfloat m_NearFarPlane[2] = { -84.f, 28.f };
+    GLfloat m_NearFarPlane[2] = { -34.f, 27.f };
     GLfloat m_LRBT[4] = { -77.f, 75.f, -89.f, 89.f };
 
     glm::mat4 m_LightProjection;

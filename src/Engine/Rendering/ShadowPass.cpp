@@ -25,12 +25,15 @@ void ShadowPass::InitializeFrameBuffers()
     // Depth texture
     glGenTextures(1, &m_DepthMap);
     glBindTexture(GL_TEXTURE_2D, m_DepthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, resolutionSizeWidth, resolutionSizeHeigth, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, resolutionSizeWidth, resolutionSizeHeigth, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_RGB, GL_FLOAT, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 
 
     m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
@@ -67,7 +70,8 @@ void ShadowPass::Draw(RenderScene & scene)
     m_ShadowProgram->Bind();
 
     glViewport(0, 0, resolutionSizeWidth, resolutionSizeHeigth);
-    glCullFace(GL_BACK);
+
+	//glCullFace(GL_FRONT);
     //state->Disable(GL_CULL_FACE);
 
     ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
@@ -117,7 +121,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
 
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-    glCullFace(GL_BACK);
+    //glCullFace(GL_BACK);
     m_ShadowProgram->Unbind();
 
 
