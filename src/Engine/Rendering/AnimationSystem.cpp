@@ -24,7 +24,7 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
         const Skeleton::Animation* animation = skeleton->GetAnimation(animationComponent["AnimationName" + std::to_string(i)]);
 
         if (animation == nullptr) {
-            return;
+            continue;;
         }
 
         double animationSpeed = (double)animationComponent["Speed" + std::to_string(i)];
@@ -49,5 +49,32 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
             }
         }
     } 
+
+    //Calculate bone transforms
+    if (skeleton != nullptr) {
+        std::vector<Skeleton::AnimationData> animations;
+        if (entity.HasComponent("Animation")) {
+            for (int i = 1; i <= 3; i++) {
+                Skeleton::AnimationData animationData;
+                animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(entity["Animation"]["AnimationName" + std::to_string(i)]);
+                if (animationData.animation == nullptr) {
+                    continue;
+                }
+                animationData.time = (double)entity["Animation"]["Time" + std::to_string(i)];
+                animationData.weight = (double)entity["Animation"]["Weight" + std::to_string(i)];
+
+                animations.push_back(animationData);
+            }
+        }
+
+        if (entity.HasComponent("AnimationOffset")) {
+            Skeleton::AnimationOffset animationOffset;
+            animationOffset.animation = skeleton->GetAnimation(entity["AnimationOffset"]["AnimationName"]);
+            animationOffset.time = (double)entity["AnimationOffset"]["Time"];
+            skeleton->CalculateFrameBones(animations, animationOffset);
+        } else {
+            skeleton->CalculateFrameBones(animations);
+        }
+    }
 }
 
