@@ -51,16 +51,17 @@ private:
 
     GLuint m_DepthFBO;
 
-    GLfloat m_NearFarPlane[2] = { -40.f, 30.f };
-    GLfloat m_LRBT[4] = { -40.f, 100.f, -50.f, 50.f };
+    GLfloat m_NearFarPlane[2] = { -84.f, 28.f };
+    GLfloat m_LRBT[4] = { -77.f, 75.f, -89.f, 89.f };
 
     glm::mat4 m_LightProjection;
     glm::mat4 m_LightView;
     glm::mat4 m_LightSpaceMatrix;
 
-    GLuint resolutionSizeWidth = 2048;
-    GLuint resolutionSizeHeigth = 2048;
+    GLuint resolutionSizeWidth = 2048 * 4;
+    GLuint resolutionSizeHeigth = 2048 * 4;
 
+    bool m_ShadowOn = true;
 };
 
 #endif
