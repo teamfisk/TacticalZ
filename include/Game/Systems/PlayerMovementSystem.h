@@ -5,6 +5,9 @@
 #include "Input/FirstPersonInputController.h"
 #include <imgui/imgui.h>
 
+#include "Core/EntityFile.h"
+#include "Core/EntityFileParser.h"
+
 class PlayerMovementSystem : public ImpureSystem, PureSystem
 {
 public:

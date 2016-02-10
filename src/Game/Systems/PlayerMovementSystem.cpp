@@ -90,9 +90,15 @@ void PlayerMovementSystem::Update(double dt)
             //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
             if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (isOnGround || !controller->DoubleJumping())) {
                 (bool)cPhysics["IsOnGround"] = false;
-                if (velocity.y == 0.f) {
+                if (isOnGround) {
                     controller->SetDoubleJumping(false);
                 } else {
+                    //put a hexagon at the players feet
+                    auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+                    EntityFileParser parser(hexagonEffect);
+                    EntityID hexagonEffectID = parser.MergeEntities(m_World);
+                    EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
+                    hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
                     controller->SetDoubleJumping(true);
                 }
                 velocity.y = 4.f;
