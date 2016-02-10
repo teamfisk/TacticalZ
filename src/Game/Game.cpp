@@ -73,6 +73,8 @@ Game::Game(int argc, char* argv[])
         fp.MergeEntities(m_World);
     }
 
+    // Create the sound manager
+    m_SoundManager = new SoundManager(m_World, m_EventBroker);
 
     // Create Octrees
     m_OctreeCollision = new Octree<EntityAABB>(AABB(glm::vec3(-100), glm::vec3(100)), 4);
@@ -83,6 +85,7 @@ Game::Game(int argc, char* argv[])
 
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
+    m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
@@ -117,19 +120,16 @@ Game::Game(int argc, char* argv[])
         networkFunction();
     }
 
-    // Invoke sound system
-    m_SoundSystem = new SoundSystem(m_World, m_EventBroker, m_Config->Get<bool>("Debug.EditorEnabled", false));
-
     m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
     delete m_SystemPipeline;
-    delete m_SoundSystem;
     delete m_OctreeFrustrumCulling;
     delete m_OctreeCollision;
     delete m_OctreeTrigger;
+    delete m_SoundManager;
     delete m_World;
     delete m_FrameStack;
     delete m_InputProxy;
@@ -157,16 +157,19 @@ void Game::Tick()
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
+    m_SoundManager->Update(dt);
+
     // Update network
     if (m_IsClientOrServer) {
         m_ClientOrServer->Update();
     }
+    //m_SoundManager->Update(dt);
+
     // Iterate through systems and update world!
     m_EventBroker->Process<SystemPipeline>();
     m_SystemPipeline->Update(dt);
     debugTick(dt);
     m_Renderer->Update(dt);
-    m_SoundSystem->Update(dt);
     GLERROR("Game::Tick m_RenderQueueFactory->Update");
     m_Renderer->Draw(*m_RenderFrame);
     m_RenderFrame->Clear();
