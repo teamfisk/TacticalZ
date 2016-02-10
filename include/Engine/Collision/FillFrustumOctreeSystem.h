@@ -1,17 +1,17 @@
-#ifndef FillOctreeSystem_h__
-#define FillOctreeSystem_h__
+#ifndef FillFrustumOctreeSystem_h__
+#define FillFrustumOctreeSystem_h__
 
 #include "../Core/System.h"
 #include "../Core/Octree.h"
 #include "Collision.h"
 #include "EntityAABB.h"
 
-class FillOctreeSystem : public ImpureSystem, public PureSystem
+class FillFrustumOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    FillOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree, const std::string& fillComponentType)
+    FillFrustumOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree)
         : System(world, eventBroker)
-        , PureSystem(fillComponentType)
+        , PureSystem("Model")
         , m_Octree(octree)
     { }
 
