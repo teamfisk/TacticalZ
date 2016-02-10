@@ -38,7 +38,7 @@ void main()
 	
 	Output.Position = (boneTransform * vec4(Position, 1.0)).xyz;
 	Output.TextureCoordinate = TextureCoords;
-	Output.Normal = vec3(M * vec4(Normal, 0.0));
+	Output.Normal = vec3(M * boneTransform * vec4(Normal, 0.0));
 	Output.Tangent = vec3(M * vec4(Tangent, 0.0));
  	Output.BiTangent = vec3(M * vec4(BiTangent, 0.0));
 	Output.ExplosionColor = vec4(1.0);

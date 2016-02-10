@@ -87,7 +87,7 @@ Model::Model(std::string fileName)
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
 	std::vector<int> structSizes;
-	if (m_RawModel->isSkined()) {
+	if (m_RawModel->IsSkinned()) {
 		structSizes = { 3, 3, 3, 3, 2, 4, 4 };
 	} else {
 		structSizes = { 3, 3, 3, 3, 2 };
@@ -106,7 +106,7 @@ Model::Model(std::string fileName)
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
         glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
-		if (m_RawModel->isSkined()) {
+		if (m_RawModel->IsSkinned()) {
 			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
 			glVertexAttribPointer(element, structSizes[element], GL_FLOAT, GL_FALSE, stride, (GLvoid*)(sizeof(GLfloat) * (offset += structSizes[element - 1]))); element++;
 		}
@@ -118,13 +118,24 @@ Model::Model(std::string fileName)
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
-	if (m_RawModel->isSkined()) {
+	if (m_RawModel->IsSkinned()) {
 		glEnableVertexAttribArray(5);
 		glEnableVertexAttribArray(6);
 	}
     GLERROR("GLEW: BufferFail5");
 
     //CreateBuffers();
+
+    glm::vec3 mini(INFINITY);
+    glm::vec3 maxi(-INFINITY);
+
+    for (unsigned int i = 0; i < m_RawModel->NumVertices(); i++) {
+        const auto& v = m_RawModel->Vertices()[i];
+        mini = glm::min(mini, v.Position);
+        maxi = glm::max(maxi, v.Position);
+    }
+
+    m_Box = AABB(maxi, mini);
 }
 
 Model::~Model()

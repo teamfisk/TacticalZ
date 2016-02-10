@@ -4,6 +4,7 @@
 #include "Rendering/RawModelCustom.h"
 //#include "Rendering/RawModelAssimp.h"
 #include "../OpenGL.h"
+#include "Core/AABB.h"
 
 class Model : public ThreadUnsafeResource
 {
@@ -18,13 +19,15 @@ public:
     const glm::mat4& Matrix() const { return m_RawModel->m_Matrix; }
     const RawModel::Vertex* Vertices() const { return m_RawModel->Vertices(); }
 	unsigned int NumberOfVertices() const { return m_RawModel->NumVertices(); }
-	bool isSkined() const { return m_RawModel->isSkined(); }
+    const AABB& Box() const { return m_Box; }
+	bool IsSkinned() const { return m_RawModel->IsSkinned(); }
 	GLuint VAO;
 	GLuint ElementBuffer;
     RawModel* m_RawModel;
 
 private:
-    
+    AABB m_Box;
+
 	GLuint VertexBuffer;
 	GLuint NormalBuffer;
 	GLuint TangentNormalsBuffer;
