@@ -51,6 +51,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
 
         float playerMovementSpeed = player["Player"]["MovementSpeed"];
         float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
+        glm::vec3& wishDirection = player["Player"]["CurrentWishDirection"];
 
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
@@ -58,7 +59,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             if (player.HasComponent("DashAbility")) {
                 controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"]);
             }
-            glm::vec3 wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
+            wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
             if (controller->AssaultDashDoubleTapped() && controller->Movement().z != 0 && controller->Movement().x != 0) {
                 wishDirection = glm::vec3(controller->Movement().x, 0, 0)* glm::inverse(glm::quat(ori));

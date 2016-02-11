@@ -1,4 +1,4 @@
-#include "Systems/WeaponSystem.h"
+#include "Systems/Weapon/WeaponSystem.h"
 
 WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer, Octree<EntityAABB>* collisionOctree)
     : System(params)
@@ -24,7 +24,8 @@ void WeaponSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPla
     if (it == m_ActiveWeapons.end()) {
         selectWeapon(entity, 1);
     }
-
+    
+    m_EventBroker->Process<WeaponBehaviour>();
     m_ActiveWeapons.at(entity)->Update(dt);
 }
 

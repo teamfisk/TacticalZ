@@ -13,7 +13,7 @@
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
-#include "Game/Systems/WeaponSystem.h"
+#include "Game/Systems/Weapon/WeaponSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Game/Systems/PlayerHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
