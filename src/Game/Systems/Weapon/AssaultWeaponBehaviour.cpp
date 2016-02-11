@@ -323,6 +323,7 @@ bool AssaultWeaponBehaviour::shoot(double damage)
 
     // Deal damage! 
     Events::PlayerDamage ePlayerDamage;
+    ePlayerDamage.Inflictor = m_Player;
     ePlayerDamage.Victim = victim;
     ePlayerDamage.Damage = damage;
     m_EventBroker->Publish(ePlayerDamage);

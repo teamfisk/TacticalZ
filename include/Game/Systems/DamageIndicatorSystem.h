@@ -21,8 +21,8 @@ public:
     DamageIndicatorSystem(SystemParams params);
 
 private:
-    EventRelay<DamageIndicatorSystem, Events::PlayerDamage> m_DamageTakenFromPlayer;
-    bool OnPlayerDamageTaken(Events::PlayerDamage& e);
+    EventRelay<DamageIndicatorSystem, Events::PlayerDamage> m_EPlayerDamage;
+    bool OnPlayerDamage(Events::PlayerDamage& e);
 
     EventRelay<DamageIndicatorSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(const Events::SetCamera& e);
