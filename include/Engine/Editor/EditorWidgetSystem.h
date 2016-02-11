@@ -25,7 +25,7 @@ struct WidgetDelta : Event
 class EditorWidgetSystem : public ImpureSystem, PureSystem
 {
 public:
-    EditorWidgetSystem(World* world, EventBroker* eventBroker, IRenderer* renderer);
+    EditorWidgetSystem(SystemParams params, IRenderer* renderer);
 
     virtual void Update(double dt) override;
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cEditorWidget, double dt) override;

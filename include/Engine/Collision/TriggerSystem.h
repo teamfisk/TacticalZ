@@ -15,8 +15,8 @@ class AABB;
 class TriggerSystem : public PureSystem
 {
 public:
-    TriggerSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree)
-        : System(world, eventBroker)
+    TriggerSystem(SystemParams params, Octree<EntityAABB>* octree)
+        : System(params)
         , PureSystem("Trigger")
         , m_Octree(octree)
     {

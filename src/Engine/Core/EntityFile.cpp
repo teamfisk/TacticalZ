@@ -38,6 +38,7 @@ void EntityFile::setReaderFeatures(xercesc::SAX2XMLReader* reader)
     reader->setFeature(XMLUni::fgXercesSchema, true);
     reader->setFeature(XMLUni::fgXercesSchemaFullChecking, true);
     reader->setFeature(XMLUni::fgXercesCalculateSrcOfs, true);
+    reader->setFeature(XMLUni::fgXercesIdentityConstraintChecking, true);
 }
 
 unsigned int EntityFile::GetTypeStride(std::string typeName)

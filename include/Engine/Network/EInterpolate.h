@@ -11,8 +11,13 @@ namespace Events
 
 struct Interpolate : Event
 {
-    EntityID Entity;
-    boost::shared_array<char> DataArray;
+    Interpolate(EntityWrapper Entity, SharedComponentWrapper Component)
+        : Entity(Entity)
+        , Component(Component)
+    { }
+
+    EntityWrapper Entity;
+    SharedComponentWrapper Component;
 };
 
 }

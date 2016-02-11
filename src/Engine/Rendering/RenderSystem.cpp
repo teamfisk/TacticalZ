@@ -2,11 +2,10 @@
 #include "Collision/Collision.h"
 #include "Core/Frustum.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
-    : System(world, eventBroker)
+RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
-    , m_World(world)
     , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
@@ -32,6 +31,58 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
     m_Camera->SetOrientation(glm::quat((const glm::vec3&)cTransform["Orientation"]));
     m_CurrentCamera = e.CameraEntity;
     return true;
+}
+
+
+void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+{
+    auto sprites = world->GetComponents("Sprite");
+    if (sprites == nullptr) {
+        return;
+    }
+
+    for (auto& cSprite : *sprites) {
+        bool visible = cSprite["Visible"];
+        if (!visible) {
+            continue;
+        }
+       
+
+        EntityWrapper entity(world, cSprite.EntityID);
+
+        // Only render children of a camera if that camera is currently active
+        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+            continue;
+        }
+
+        // Hide things parented to local player if they have the HiddenFromLocalPlayer component
+        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+            continue;
+        }
+
+        std::string diffuseResource = cSprite["DiffuseTexture"];
+        std::string glowResource = cSprite["GlowMap"];
+        bool depthSorted = cSprite["DepthSort"];
+        if (diffuseResource.empty() && glowResource.empty()) {
+            continue;
+        }
+
+        float fillPercentage = 0.f;
+        glm::vec4 fillColor = glm::vec4(0);
+        if (world->HasComponent(entity.ID, "Fill")) {
+            auto fillComponent = world->GetComponent(entity.ID, "Fill");
+            fillPercentage = (float)(double)fillComponent["Percentage"];
+            fillColor = (glm::vec4)fillComponent["Color"];
+        }
+
+        glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, world);
+        //modelMatrix *= m_Camera->BillboardMatrix();
+
+
+        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted));
+        
+        jobs.push_back(spriteJob);
+    }
 }
 
 bool RenderSystem::isChildOfACamera(EntityWrapper entity)
@@ -62,14 +113,14 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
         }
 
         // Only render children of a camera if that camera is currently active
-         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-             continue;
-         } 
+        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+            continue;
+        }
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
-             continue;
-         }
+        if ((entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+            continue;
+        }
 
         Model* model;
         try {
@@ -210,7 +261,6 @@ void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, 
     }
 }
 
-
 void RenderSystem::fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
 {
     auto directionalLights = world->GetComponents("DirectionalLight");
@@ -231,7 +281,6 @@ void RenderSystem::fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& 
         }
     }
 }
-
 
 void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
 {
@@ -298,6 +347,7 @@ void RenderSystem::Update(double dt)
     fillPointLights(scene.Jobs.PointLight, m_World);
     //TODO: Make sure all objects needed are also sorted.
 	scene.Jobs.OpaqueObjects.sort();
+    fillSprites(scene.Jobs.SpriteJob, m_World);
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);

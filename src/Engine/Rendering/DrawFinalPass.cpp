@@ -13,10 +13,11 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
 
 void DrawFinalPass::InitializeTextures()
 {
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
-    m_BlackTexture = ResourceManager::Load<Texture>("Textures/Core/Black.png");
-    m_NeutralNormalTexture = ResourceManager::Load<Texture>("Textures/Core/NeutralNormalMap.png");
-    m_GreyTexture = ResourceManager::Load<Texture>("Textures/Core/Grey.png");
+    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
+    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+    m_NeutralNormalTexture = CommonFunctions::LoadTexture("Textures/Core/NeutralNormalMap.png", false);
+    m_GreyTexture = CommonFunctions::LoadTexture("Textures/Core/Grey.png", false);
+    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
 }
 
 void DrawFinalPass::InitializeFrameBuffers()
@@ -79,6 +80,14 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ExplosionEffectProgram->Link();
     GLERROR("Creating explosion program");
 
+    m_SpriteProgram = ResourceManager::Load<ShaderProgram>("#SpriteProgram");
+    m_SpriteProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Sprite.vert.glsl")));
+    m_SpriteProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Sprite.frag.glsl")));
+    m_SpriteProgram->Compile();
+    m_SpriteProgram->BindFragDataLocation(0, "sceneColor");
+    m_SpriteProgram->BindFragDataLocation(1, "bloomColor");
+    m_SpriteProgram->Link();
+    GLERROR("Creating sprite program");
 	m_ForwardPlusSplatMapProgram = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram");
 	m_ForwardPlusSplatMapProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
 	m_ForwardPlusSplatMapProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMapRGB.frag.glsl")));
@@ -184,6 +193,8 @@ void DrawFinalPass::Draw(RenderScene& scene)
     GLERROR("OpaqueObjects");
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
+    DrawSprites(scene.Jobs.SpriteJob, scene);
+    GLERROR("SpriteJobs");
 
     //DrawStencilState* stencilState = new DrawStencilState(m_FinalPassFrameBuffer.GetHandle());
     //Draw shields to stencil pass
@@ -312,7 +323,6 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());
 
-
     for (auto &job : jobs) {
         auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
         if (explosionEffectJob) {
@@ -328,11 +338,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     //bind textures
                     BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
                     std::vector<glm::mat4> frameBones;
-                    if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-                    } else {
-                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-                    }
+                    frameBones = explosionEffectJob->Skeleton->GetBones();
                     glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 } else {
                     m_ExplosionEffectProgram->Bind();
@@ -355,11 +361,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
                     GLERROR("asdasd");
                     std::vector<glm::mat4> frameBones;
-                    if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-                    } else {
-                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-                    }
+                    frameBones = explosionEffectJob->Skeleton->GetBones();
                     glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
                 } else {
@@ -400,11 +402,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             //bind textures
                             BindModelTextures(forwardSkinnedHandle, modelJob);
                             std::vector<glm::mat4> frameBones;
-                            if (modelJob->AnimationOffset.animation != nullptr) {
-                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-                            } else {
-                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-                            }
+                            frameBones = modelJob->Skeleton->GetBones();
                             glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
                         } else {
@@ -428,11 +426,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
                             GLERROR("asdasd");
                             std::vector<glm::mat4> frameBones;
-                            if (modelJob->AnimationOffset.animation != nullptr) {
-                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-                            } else {
-                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-                            }
+                            frameBones = modelJob->Skeleton->GetBones();
                             glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
                         } else {
@@ -476,13 +470,8 @@ void DrawFinalPass::DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJo
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
                 std::vector<glm::mat4> frameBones;
-                if (modelJob->AnimationOffset.animation != nullptr) {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-                } else {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-                }
+                frameBones = modelJob->Skeleton->GetBones();
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
             } else {
                 m_ShieldToStencilProgram->Bind();
                 GLuint shaderHandle = m_ShieldToStencilProgram->GetHandle();
@@ -535,11 +524,7 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
             }
 
             std::vector<glm::mat4> frameBones;
-            if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-                frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-            } else {
-                frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-            }
+            frameBones = explosionEffectJob->Skeleton->GetBones();
             glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
             if (GLERROR("Animation")) {
@@ -574,11 +559,7 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
                 BindModelTextures(forwardHandle ,modelJob);
 
                 std::vector<glm::mat4> frameBones;
-                if (modelJob->AnimationOffset.animation != nullptr) {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-                } else {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-                }
+                frameBones = modelJob->Skeleton->GetBones();
                 glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
 
@@ -610,11 +591,7 @@ void DrawFinalPass::DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& job
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 
             std::vector<glm::mat4> frameBones;
-            if (modelJob->AnimationOffset.animation != nullptr) {
-                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-            } else {
-                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-            }
+           frameBones = modelJob->Skeleton->GetBones();
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
         } else {
@@ -635,6 +612,55 @@ void DrawFinalPass::DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& job
         }
     }
 
+}
+
+
+void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene)
+{
+    m_SpriteProgram->Bind();
+
+    GLuint shaderHandle = m_SpriteProgram->GetHandle();
+
+    for(auto& job : jobs) {
+        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
+        RenderState jobState;
+
+        if (spriteJob) {
+            if(spriteJob->Depth == 0) {
+                jobState.Disable(GL_DEPTH_TEST);
+            }
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+            glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPos"), 1, glm::value_ptr(scene.Camera->Position()));
+            glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(spriteJob->Color));
+            glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(spriteJob->FillColor));
+            glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), spriteJob->FillPercentage);
+
+            glActiveTexture(GL_TEXTURE0);
+            if (spriteJob->DiffuseTexture != nullptr) {
+                glBindTexture(GL_TEXTURE_2D, spriteJob->DiffuseTexture->m_Texture);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, m_ErrorTexture->m_Texture);
+            }
+
+            glActiveTexture(GL_TEXTURE1);
+            if (spriteJob->IncandescenceTexture != nullptr) {
+                glBindTexture(GL_TEXTURE_2D, spriteJob->IncandescenceTexture->m_Texture);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
+            }
+
+
+            glBindVertexArray(spriteJob->Model->VAO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
+            glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
+        }
+    }
+
+    
+
+   // m_SpriteProgram->Unbind();
 }
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)

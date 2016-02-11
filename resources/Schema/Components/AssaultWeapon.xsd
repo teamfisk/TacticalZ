@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="AssaultWeapon">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="MagazineAmmo" type="t:int" minOccurs="0">
+					<xs:annotation><xs:documentation>Ammo currently loaded into the magazine</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="MagazineSize" type="t:int" minOccurs="0">
+									<xs:annotation><xs:documentation>Max number of rounds in a magazine</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Ammo" type="t:int" minOccurs="0">
+									<xs:annotation><xs:documentation>Current ammo carried</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="MaxAmmo" type="t:int" minOccurs="0">
+									<xs:annotation><xs:documentation>Maximum ammo able to be carried</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="BaseDamage" type="t:double" minOccurs="0"/>
+				<xs:element name="RPM" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Rate of fire in rounds per minute</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
