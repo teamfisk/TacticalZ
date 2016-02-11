@@ -9,12 +9,13 @@
 #include "Rendering/Model.h"
 #include "Rendering/EAnimationComplete.h"
 #include "Rendering/Skeleton.h"
+#include <imgui/imgui.h>
 
 class AnimationSystem : public PureSystem
 {
 public:
-    AnimationSystem(World* world, EventBroker* eventBroker)
-        : System(world, eventBroker)
+    AnimationSystem(SystemParams params)
+        : System(params)
         , PureSystem("Animation")
     {
 
@@ -22,7 +23,6 @@ public:
     ~AnimationSystem() { }
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& animationComponent, double dt) override;
 private:
-
 
 };
 

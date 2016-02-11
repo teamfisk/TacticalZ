@@ -20,12 +20,17 @@
 struct RenderScene
 {
     ::Camera* Camera = nullptr;
-    std::list<std::shared_ptr<RenderJob>> OpaqueObjects;
-    std::list<std::shared_ptr<RenderJob>> TransparentObjects;
-    std::list<std::shared_ptr<RenderJob>> PointLightJobs;
-    std::list<std::shared_ptr<RenderJob>> TextJobs;
-    std::list<std::shared_ptr<RenderJob>> DirectionalLightJobs;
-    std::list<std::shared_ptr<RenderJob>> SpriteJobs;
+    struct Queues {
+        std::list<std::shared_ptr<RenderJob>> OpaqueObjects;
+        std::list<std::shared_ptr<RenderJob>> TransparentObjects;
+        std::list<std::shared_ptr<RenderJob>> OpaqueShieldedObjects;
+        std::list<std::shared_ptr<RenderJob>> TransparentShieldedObjects;
+        std::list<std::shared_ptr<RenderJob>> ShieldObjects;
+        std::list<std::shared_ptr<RenderJob>> SpriteJob;
+        std::list<std::shared_ptr<RenderJob>> PointLight;
+        std::list<std::shared_ptr<RenderJob>> Text;
+        std::list<std::shared_ptr<RenderJob>> DirectionalLight;
+    } Jobs;
 
     Rectangle Viewport;
     bool ClearDepth = false;
@@ -33,12 +38,13 @@ struct RenderScene
 
 	void Clear()
 	{
-        OpaqueObjects.clear();
-        TransparentObjects.clear();
-        PointLightJobs.clear();
-        TextJobs.clear();
-        DirectionalLightJobs.clear();
-        SpriteJobs.clear();
+        Jobs.OpaqueObjects.clear();
+        Jobs.TransparentObjects.clear();
+        Jobs.OpaqueShieldedObjects.clear();
+        Jobs.TransparentShieldedObjects.clear();
+        Jobs.ShieldObjects.clear();
+        Jobs.SpriteJob.clear();
+        Jobs.DirectionalLight.clear();
 	}
 };
 

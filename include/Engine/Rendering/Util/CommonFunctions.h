@@ -4,14 +4,11 @@
 #include "../../Common.h"
 #include "../../OpenGL.h"
 #include "../../GLM.h"
+#include "../Texture.h"
 
-class CommonFuntions
-{
-public:
-    CommonFuntions() = delete;
-
-private:
-
+namespace CommonFunctions
+{ 
+Texture* LoadTexture(std::string path, bool threaded);
 };
 
 #endif

@@ -1,8 +1,8 @@
 #include "Systems/CapturePointSystem.h"
 #include <algorithm>
 
-CapturePointSystem::CapturePointSystem(World* world, EventBroker* eventBroker) 
-    : System(world, eventBroker)
+CapturePointSystem::CapturePointSystem(SystemParams params) 
+    : System(params)
     , PureSystem("CapturePoint")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
@@ -57,7 +57,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     int blueTeamPlayersStandingInside = 0;
     if (capturePointEntity.HasComponent("Model")) {
         //Now sets team color to the capturepoint, or white if it is uncaptured.
-        capturePointEntity["Model"]["Color"] = ownedBy == blueTeam ? glm::vec4(0, 0.2f, 1, 1) : ownedBy == redTeam ? glm::vec4(1, 0.2f, 0, 1) : glm::vec4(1, 1, 1, 1);
+        capturePointEntity["Model"]["Color"] = ownedBy == blueTeam ? glm::vec4(0, 0.2f, 1, 0.3) : ownedBy == redTeam ? glm::vec4(1, 0.2f, 0, 0.3) : glm::vec4(1, 1, 1, 0.3);
     }
 
     //calculate next possible capturePoint for both teams
@@ -106,10 +106,10 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
 
     //colorize next possible capturepoint
     if (nextPossibleCapturePoint["Red"] == capturePointNumber) {
-        capturePointEntity["Model"]["Color"] = glm::vec4(1, 1, 0, 1);
+        capturePointEntity["Model"]["Color"] = glm::vec4(1, 1, 0, 0.3);
     }
     if (nextPossibleCapturePoint["Blue"] == capturePointNumber) {
-        capturePointEntity["Model"]["Color"] = glm::vec4(0, 1, 1, 1);
+        capturePointEntity["Model"]["Color"] = glm::vec4(0, 1, 1, 0.3);
     }
 
     //check how many players are standing inside and are healthy

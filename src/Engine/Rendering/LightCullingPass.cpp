@@ -16,7 +16,7 @@ LightCullingPass::~LightCullingPass()
 
 void LightCullingPass::GenerateNewFrustum(RenderScene& scene)
 {
-    if (scene.PointLightJobs.size() == 0)
+    if (scene.Jobs.PointLight.size() == 0)
         return;
 
     GLERROR("CalculateFrustum Error: Pre");
@@ -83,7 +83,7 @@ void LightCullingPass::FillLightList(RenderScene& scene)
 {
     m_LightSources.clear();
 
-    for(auto &job : scene.PointLightJobs) {
+    for(auto &job : scene.Jobs.PointLight) {
         auto pointLightjob = std::dynamic_pointer_cast<PointLightJob>(job);
         if (pointLightjob) {
             LightSource p;
@@ -97,7 +97,7 @@ void LightCullingPass::FillLightList(RenderScene& scene)
             m_LightSources.push_back(p);
         }
     }
-    for(auto &job : scene.DirectionalLightJobs) {
+    for(auto &job : scene.Jobs.DirectionalLight) {
         auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
         if(directionalLightJob) {
             LightSource p;

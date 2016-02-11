@@ -15,7 +15,7 @@
 class PlayerDeathSystem : public ImpureSystem
 {
 public:
-    PlayerDeathSystem(World* world, EventBroker* eventBroker);
+    PlayerDeathSystem(SystemParams params);
 
     virtual void Update(double dt) override;
 

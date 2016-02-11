@@ -51,7 +51,7 @@ void Renderer::InitializeWindow()
 	ss << " DEBUG";
 #endif
 	LOG_INFO(ss.str().c_str());
-	glfwSetWindowTitle(m_Window, ss.str().c_str());
+    SetWindowTitle(ss.str());
 
 	// Initialize GLEW
 	if (glewInit() != GLEW_OK) {
@@ -93,7 +93,7 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -106,21 +106,26 @@ void Renderer::Draw(RenderFrame& frame)
     for (auto scene : frame.RenderScenes){
         
         SortRenderJobsByDepth(*scene);
+        GLERROR("SortByDepth");
         m_PickingPass->Draw(*scene);
+        GLERROR("Drawing pickingpass");
         m_LightCullingPass->GenerateNewFrustum(*scene);
+        GLERROR("Generate frustums");
         m_LightCullingPass->FillLightList(*scene);
+        GLERROR("Filling light list");
         m_LightCullingPass->CullLights(*scene);
+        GLERROR("LightCulling");
         m_DrawFinalPass->Draw(*scene);
+        GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
-        GLERROR("Renderer::Draw m_DrawScenePass->Draw");
-
         m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
+        GLERROR("Draw Text");
 
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
     if (m_DebugTextureToDraw == 0) {
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
     }
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
@@ -129,14 +134,21 @@ void Renderer::Draw(RenderFrame& frame)
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTexture());
     }
     if (m_DebugTextureToDraw == 3) {
-        m_DrawScreenQuadPass->Draw(m_DrawBloomPass->GaussianTexture());
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTextureLowRes());
     }
     if (m_DebugTextureToDraw == 4) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTextureLowRes());
+    }
+    if (m_DebugTextureToDraw == 5) {
+        m_DrawScreenQuadPass->Draw(m_DrawBloomPass->GaussianTexture());
+    }
+    if (m_DebugTextureToDraw == 6) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
 
     m_ImGuiRenderPass->Draw();
-	glfwSwapBuffers(m_Window);
+    GLERROR("Imgui draw");
+    glfwSwapBuffers(m_Window);
 }
 
 PickData Renderer::Pick(glm::vec2 screenCoord)
@@ -146,15 +158,16 @@ PickData Renderer::Pick(glm::vec2 screenCoord)
 
 void Renderer::InitializeTextures()
 {
-    m_ErrorTexture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
-    m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
+    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
+    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
 }
 
 
 void Renderer::SortRenderJobsByDepth(RenderScene &scene)
 {
     //Sort all forward jobs so transparency is good.
-    scene.TransparentObjects.sort(Renderer::DepthSort);
+    scene.Jobs.TransparentObjects.sort(Renderer::DepthSort);
+    scene.Jobs.SpriteJob.sort(Renderer::DepthSort);
 }
 
 void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)

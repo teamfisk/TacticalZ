@@ -17,7 +17,7 @@ class CapturePointSystem : public PureSystem
 {
 public:
     //WARNING: on new map, destroy all info in the vectors, as well as reset all variables (just make new?)
-    CapturePointSystem(World* world, EventBroker* eventBroker);
+    CapturePointSystem(SystemParams params);
 
     //updatecomponent
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt) override;

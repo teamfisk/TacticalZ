@@ -19,10 +19,15 @@ typedef unsigned int PacketID;
 class Network
 {
 public:
+    Network(World* world, EventBroker* eventBroker);
     virtual ~Network() { };
-    virtual void Start(World* m_world, EventBroker *eventBroker) = 0;
+
     virtual void Update() = 0;
+
 protected:
+    World* m_World;
+    EventBroker* m_EventBroker;
+
     // For Debug 
     bool isReadingData = false;
     NetworkData m_NetworkData;
@@ -32,7 +37,6 @@ protected:
     double m_TimeoutMs;
     void saveToFile();
     void updateNetworkData();
-    void initialize();
 };
 
 #endif

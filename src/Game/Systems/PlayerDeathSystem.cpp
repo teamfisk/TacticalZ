@@ -1,7 +1,7 @@
 #include "Systems/PlayerDeathSystem.h"
 
-PlayerDeathSystem::PlayerDeathSystem(World* m_World, EventBroker* eventBroker)
-    : System(m_World, eventBroker)
+PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
+    : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerDeathSystem::OnPlayerDeath);
 }

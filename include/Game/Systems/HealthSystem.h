@@ -17,7 +17,7 @@
 class HealthSystem : public PureSystem
 {
 public:
-    HealthSystem(World* world, EventBroker* eventBroker);
+    HealthSystem(SystemParams params);
 
     //updatecomponent
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
