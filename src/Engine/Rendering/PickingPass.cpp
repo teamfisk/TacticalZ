@@ -104,8 +104,11 @@ void PickingPass::Draw(RenderScene& scene)
 
                     std::vector<glm::mat4> frameBones;
                     frameBones = modelJob->Skeleton->GetBones();
-                    glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
+                    // temp check revise later crashed client when connectiong
+                    // frameBones.size() was 0 // Jocke
+                    if (frameBones.size() > 0) {
+                        glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                    }
 				}
 			} else {
                 m_PickingProgram->Bind();
