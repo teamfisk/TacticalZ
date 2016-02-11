@@ -626,8 +626,7 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
         RenderState jobState;
 
         if (spriteJob) {
-            if(spriteJob->Depth == 0) 
-            {
+            if(spriteJob->Depth == 0) {
                 jobState.Disable(GL_DEPTH_TEST);
             }
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
