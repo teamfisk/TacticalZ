@@ -20,7 +20,11 @@
 						<xs:documentation>CapturePointNumber specify an int number for this</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-
+				<xs:element name="CapturePointMaxTimer" type="t:double" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>The time needed to take over a Capture Point</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 				<xs:element name="HomePointForTeam" type="TeamEnum" minOccurs="0">
 					<xs:annotation>
 						<xs:documentation>Specify if this is a HomePoint for either team</xs:documentation>

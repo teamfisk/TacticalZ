@@ -32,6 +32,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     const int redTeam = (int)teamComponent["Team"].Enum("Red");
     const int blueTeam = (int)teamComponent["Team"].Enum("Blue");
     const int spectatorTeam = (int)teamComponent["Team"].Enum("Spectator");
+    const double captureTimeToTakeOver = (double)cCapturePoint["CapturePointMaxTimer"];
 
     int homePointForTeam = (int)cCapturePoint["HomePointForTeam"];
     if (m_NumberOfCapturePoints == 0 && capturePointNumber != 0 && (homePointForTeam == redTeam || homePointForTeam == blueTeam)) {
@@ -57,7 +58,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     int blueTeamPlayersStandingInside = 0;
     if (capturePointEntity.HasComponent("Model")) {
         //Now sets team color to the capturepoint, or white if it is uncaptured.
-        capturePointEntity["Model"]["Color"] = ownedBy == blueTeam ? glm::vec4(0, 0.2f, 1, 0.3) : ownedBy == redTeam ? glm::vec4(1, 0.2f, 0, 0.3) : glm::vec4(1, 1, 1, 0.3);
+        capturePointEntity["Model"]["Color"] = ownedBy == blueTeam ? glm::vec4(0, 0.0f, 1, 0.3) : ownedBy == redTeam ? glm::vec4(1, 0.0f, 0, 0.3) : glm::vec4(1, 1, 1, 0.3);
     }
 
     //calculate next possible capturePoint for both teams
@@ -98,18 +99,14 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             ComponentWrapper& capturePoint = m_CapturePointNumberToEntityMap[i]["CapturePoint"];
             if ((int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Red"] &&
                 (int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Blue"]) {
-                capturePoint["CaptureTimer"] = 0.0;
+                //RED = +, BLUE = -, NONE
+                auto teamOwners = (int)m_CapturePointNumberToEntityMap[i]["Team"]["Team"];
+                if (teamOwners == redTeam || teamOwners == blueTeam) {
+                    capturePoint["CaptureTimer"] = teamOwners == blueTeam ? -captureTimeToTakeOver : captureTimeToTakeOver;
+                }
             }
         }
         m_ResetTimers = false;
-    }
-
-    //colorize next possible capturepoint
-    if (nextPossibleCapturePoint["Red"] == capturePointNumber) {
-        capturePointEntity["Model"]["Color"] = glm::vec4(1, 1, 0, 0.3);
-    }
-    if (nextPossibleCapturePoint["Blue"] == capturePointNumber) {
-        capturePointEntity["Model"]["Color"] = glm::vec4(0, 1, 1, 0.3);
     }
 
     //check how many players are standing inside and are healthy
@@ -170,9 +167,6 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         //B. at most one of the teams have players inside
         //if capturePoint is not owned by the take-over team, just modify the CaptureTimer accordingly
         if (ownedBy != currentTeam && canCapture) {
-            if (abs((double)cCapturePoint["CaptureTimer"]) < 0.001f) {
-                LOG_DEBUG("Point is being captured by team %i", currentTeam);   //Remove when we tested sufficiently.
-            }
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //if capturePoint is owned by the team, and the other team has been trying to take it, then increase/decrease the timer towards 0.0
@@ -180,12 +174,11 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             (ownedBy == currentTeam && currentTeam == blueTeam && (double)cCapturePoint["CaptureTimer"] > 0.0)) {
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
-        //check if captureTimer > m_CaptureTimeToTakeOver and if so change owner and publish the eCaptured event
-        if (abs((double)cCapturePoint["CaptureTimer"]) > abs(m_CaptureTimeToTakeOver) && canCapture) {
+        //check if captureTimer > captureTimeToTakeOver and if so change owner and publish the eCaptured event
+        if (abs((double)cCapturePoint["CaptureTimer"]) > captureTimeToTakeOver && canCapture) {
             teamComponent["Team"] = currentTeam;
-            cCapturePoint["CaptureTimer"] = 0.0;
+            cCapturePoint["CaptureTimer"] = glm::sign((double)cCapturePoint["CaptureTimer"])*captureTimeToTakeOver;
             //publish Captured event
-            LOG_DEBUG("Point is captured by team %i!", currentTeam);    //Remove when we tested sufficiently.
             Events::Captured e;
             e.CapturePointID = cCapturePoint.EntityID;
             e.TeamNumberThatCapturedCapturePoint = currentTeam;
