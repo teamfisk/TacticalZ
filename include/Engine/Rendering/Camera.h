@@ -33,6 +33,8 @@ public:
 	glm::mat4 ViewMatrix() const { return m_ViewMatrix; }
     void SetViewMatrix(glm::mat4 val);
 
+    glm::mat4 BillboardMatrix();
+
 	float AspectRatio() const { return m_AspectRatio; }
 	void SetAspectRatio(float val);
 

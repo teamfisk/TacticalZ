@@ -1,21 +1,6 @@
-#include "Game/Systems/PlayerHUD.h"
+#include "Game/Systems/PlayerHUDSystem.h"
 
-PlayerHUD::PlayerHUD(World* world, EventBroker* eventBrokerer)
-    :System(world, eventBrokerer)
-    , m_World(world)
-    , m_EventBroker(eventBrokerer)
-{
-    
-    
-}
-
-PlayerHUD::~PlayerHUD()
-{
-    
-
-}
-
-void PlayerHUD::Update(double dt)
+void PlayerHUDSystem::Update(double dt)
 {
     auto healthHUDs = m_World->GetComponents("HealthHUD");
     if (healthHUDs == nullptr) {

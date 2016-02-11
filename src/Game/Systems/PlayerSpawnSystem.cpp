@@ -1,7 +1,7 @@
 #include "Systems/PlayerSpawnSystem.h"
 
-PlayerSpawnSystem::PlayerSpawnSystem(World* m_World, EventBroker* eventBroker) 
-    : System(m_World, eventBroker)
+PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params) 
+    : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerSpawnerd, &PlayerSpawnSystem::OnPlayerSpawned);
@@ -71,11 +71,16 @@ bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
 bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player is actually spawned (since the actual spawning is handled on the server)
+    if (!IsClient) {
+        return false;
+    }
 
     // Check if a player already exists
     if (m_PlayerEntities.count(e.PlayerID) != 0) {
         // TODO: Disallow infinite respawning here
-        m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
+        if (m_PlayerEntities[e.PlayerID].Valid()) {
+            m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
+        }
     }
 
     // Store the player for future reference

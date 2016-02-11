@@ -16,6 +16,15 @@ bool EntityWrapper::HasComponent(const std::string& componentName)
     return World->HasComponent(ID, componentName);
 }
 
+void EntityWrapper::AttachComponent(const char* componentName)
+{
+    if (!Valid()) {
+        LOG_WARNING("Could not attach \"%s\" component to #%i, entity is not valid.", componentName, ID);
+        return;
+    }
+    World->AttachComponent(ID, componentName);
+}
+
 EntityWrapper EntityWrapper::Parent()
 {
     if (this->World == nullptr || this->ID == EntityID_Invalid) {
@@ -54,7 +63,7 @@ bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
     return false;
 }
 
-bool EntityWrapper::Valid()
+bool EntityWrapper::Valid() const
 {
     if (this->World == nullptr) {
         return false;
@@ -65,7 +74,6 @@ bool EntityWrapper::Valid()
     }
 
     if (!this->World->ValidEntity(this->ID)) {
-        this->ID = EntityID_Invalid;
         return false;
     }
 

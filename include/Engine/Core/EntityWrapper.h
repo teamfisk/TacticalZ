@@ -25,11 +25,12 @@ struct EntityWrapper
 
     const std::string Name();
     bool HasComponent(const std::string& componentType);
+    void AttachComponent(const char* componentName);
     EntityWrapper Parent();
     EntityWrapper FirstChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
     bool IsChildOf(EntityWrapper potentialParent);
-    bool Valid();
+    bool Valid() const;
 
     ComponentWrapper operator[](const char* componentName);
     bool operator==(const EntityWrapper& e) const;

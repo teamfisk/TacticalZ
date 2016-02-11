@@ -4,6 +4,7 @@
 #include "../GLM.h"
 #include "../Core/InputController.h"
 #include "../Core/ELockMouse.h"
+#include "../Game/Events/EDashAbility.h"
 #include "InputHandler.h"
 
 template <typename EventContext>
@@ -54,6 +55,7 @@ protected:
     //specialabilitys
     bool m_MovementKeyDown = false;
     bool m_SpecialAbilityKeyDown = false;
+    int m_NumberOfMovementKeysDown = 0;
 
     EventRelay<EventContext, Events::LockMouse> m_ELockMouse;
     bool OnLockMouse(const Events::LockMouse& e);
@@ -131,6 +133,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
         }
         //if value = 0 then you have just released this key
         if (e.Value != 0) {
+            m_NumberOfMovementKeysDown++;
             m_MovementKeyDown = true;
             //if you pressed the same key within m_AssaultDashDoubleTapSensitivityTimer then you have doubletapped it
             if (m_AssaultDashDoubleTapDeltaTime < m_AssaultDashDoubleTapSensitivityTimer && m_AssaultDashTapDirection == m_CurrentDirectionVector) {
@@ -138,10 +141,14 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
             }
         } else {
             //== 0
-            m_MovementKeyDown = false;
-            //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
-            m_AssaultDashTapDirection = m_CurrentDirectionVector;
-            m_AssaultDashDoubleTapDeltaTime = 0.f;
+            m_NumberOfMovementKeysDown--;
+            if (m_NumberOfMovementKeysDown == 0) {
+                m_MovementKeyDown = false;
+            }
+                //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
+                m_AssaultDashTapDirection = m_CurrentDirectionVector;
+                m_AssaultDashDoubleTapDeltaTime = 0.f;
+            
         }
     }
 
@@ -201,18 +208,17 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
         m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
         m_AssaultDashDoubleTapped = true;
         m_AssaultDashDoubleTapDeltaTime = 0.f;
-        //moving to the side has priority
-        return;
-    }
-
-    //dashing with doubletap - check if doubletap to dash enabled
-    if (ResourceManager::Load<ConfigFile>("Input.ini")->Get<bool>("Keyboard.DoubleTapToDash", false)) {
         return;
     }
 
     //reset the DoubleTapped state in case we recently doubleTapped (doubletap will only happen during 1 frame)
     if (m_AssaultDashDoubleTapped) {
         m_AssaultDashDoubleTapped = false;
+    }
+
+    //dashing with doubletap - check if doubletap to dash enabled
+    if (!ResourceManager::Load<ConfigFile>("Input.ini")->Get<bool>("Keyboard.DoubleTapToDash", false)) {
+        return;
     }
 
     //check if we have received a valid doubletap
@@ -230,6 +236,9 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     m_AssaultDashDoubleTapped = true;
     m_AssaultDashDoubleTapDeltaTime = 0.f;
     m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
+
+    Events::DashAbility e;
+    m_EventBroker->Publish(e);
 }
 
 #endif

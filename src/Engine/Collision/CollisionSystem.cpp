@@ -1,6 +1,7 @@
 #include "Collision/Collision.h"
 #include "Collision/CollisionSystem.h"
 #include "Core/AABB.h"
+#include "Rendering/Model.h"
 
 void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
@@ -19,39 +20,48 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     // Collide against octree items
     m_OctreeResult.clear();
     m_Octree->ObjectsInSameRegion(*boundingBox, m_OctreeResult);
+    bool everHitTheGround = false;
     for (auto& boxB : m_OctreeResult) {
         glm::vec3 resolutionVector;
         if (boxA.Entity == boxB.Entity) {
             continue;
         }
 
-        if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
+        if (boxB.Entity.HasComponent("Model") && Collision::AABBVsAABB(boxA, boxB)) {
+            //Here we know boxB is a entity with Collideable, AABB, and Model.
+            RawModel* model;
+            try {
+                model = ResourceManager::Load<RawModel, true>(boxB.Entity["Model"]["Resource"]);
+            } catch (const std::exception&) {
+                continue;
+            }
+
+            glm::mat4 modelMatrix = Transform::ModelMatrix(boxB.Entity);
+
+            glm::vec3 inOutVelocity = (glm::vec3)cPhysics["Velocity"];
+            bool isOnGround = (bool)cPhysics["IsOnGround"];
+            float verticalStepHeight = (float)(double)cPhysics["VerticalStepHeight"];
+            if (Collision::AABBvsTriangles(boxA, model->Vertices(), model->m_Indices, modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
+                (glm::vec3&)cTransform["Position"] += resolutionVector;
+                cPhysics["Velocity"] = inOutVelocity;
+                if (isOnGround) {
+                    everHitTheGround = true;
+                    (bool)cPhysics["IsOnGround"] = true;
+                }
+            }
+        } else if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
+            //Enter here if boxB has no Model.
             (glm::vec3&)cTransform["Position"] += resolutionVector;
             if (resolutionVector.y > 0) {
+                everHitTheGround = true;
+                (bool)cPhysics["IsOnGround"] = true;
                 ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
             }
         }
     }
 
-    // HACK: Temporarily collide against all collidable models since they're not in the octree yet
-    //auto otherCollidables = world->GetComponents("Model");
-    //for (auto& cModel : *otherCollidables) {
-    //    if (cModel.EntityID == entity) {
-    //        continue;
-    //    }
-    //    if (!world->HasComponent(cModel.EntityID, "Collidable")) {
-    //        continue;
-    //    }
-
-    //    auto absPosition = RenderQueueFactory::AbsolutePosition(world, cModel.EntityID);
-    //    auto absOrientation = RenderQueueFactory::AbsoluteOrientation(world, cModel.EntityID);
-    //    auto absScale = RenderQueueFactory::AbsoluteScale(world, cModel.EntityID);
-    //    glm::mat4 modelMatrix = glm::translate(absPosition); // *glm::toMat4(absOrientation) * glm::scale(absScale);
-
-    //    auto model = ResourceManager::Load<Model>(cModel["Resource"]);
-    //    glm::vec3 resolutionVector;
-    //    if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, resolutionVector)) {
-    //        (glm::vec3&)cTransform["Position"] += resolutionVector;
-    //    }
-    //}
+    //This should apply air friction and such, iff zero models were hit.
+    if (!everHitTheGround) {
+        (bool)cPhysics["IsOnGround"] = false;
+    }
 }

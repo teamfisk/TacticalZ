@@ -255,14 +255,14 @@ void CapturePointTest::TestSetup8()
 }
 void CapturePointTest::DoTouchEvent(EntityID whoDidSomething, EntityID onWhatObject) {
     Events::TriggerTouch touchEvent;
-    touchEvent.Entity = whoDidSomething;
-    touchEvent.Trigger = onWhatObject;
+    touchEvent.Entity = EntityWrapper(m_World, whoDidSomething);
+    touchEvent.Trigger = EntityWrapper(m_World, onWhatObject);
     m_EventBroker->Publish(touchEvent);
 }
 void CapturePointTest::DoLeaveEvent(EntityID whoDidSomething, EntityID onWhatObject) {
     Events::TriggerLeave leaveEvent;
-    leaveEvent.Entity = whoDidSomething;
-    leaveEvent.Trigger = onWhatObject;
+    leaveEvent.Entity = EntityWrapper(m_World, whoDidSomething);
+    leaveEvent.Trigger = EntityWrapper(m_World, onWhatObject);
     m_EventBroker->Publish(leaveEvent);
 }
 void CapturePointTest::TestSuccess1() {

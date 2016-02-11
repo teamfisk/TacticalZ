@@ -5,7 +5,6 @@
 
 void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapper& cTrigger, double dt)
 {
-    // The trigger *should* have a bounding box, or something, to test against so it can be triggered.
     boost::optional<EntityAABB> triggerBox = Collision::EntityAbsoluteAABB(triggerEntity);
     if (!triggerBox) {
         return;

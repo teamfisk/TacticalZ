@@ -33,18 +33,27 @@ protected:
 public:
     ~RawModelCustom();
     
-    struct Vertex
-    {
-        glm::vec3 Position;
-        glm::vec3 Normal;
-        glm::vec3 Tangent;
-        glm::vec3 BiNormal;
-        glm::vec2 TextureCoords;
+	struct Vertex
+	{
+		glm::vec3 Position;
+		glm::vec3 Normal;
+		glm::vec3 Tangent;
+		glm::vec3 BiNormal;
+		glm::vec2 TextureCoords;
+	};
+
+    struct SkinedVertex : public Vertex {
         glm::vec4 BoneIndices;
         glm::vec4 BoneWeights;
     };
 
-    struct MaterialGroup
+	struct TextureProperties {
+		std::string TexturePath;
+		glm::vec2 UVRepeat;
+		Texture* Texture;	
+	};
+	
+    struct MaterialBasic
     {
         float SpecularExponent;
         float ReflectionFactor;
@@ -54,25 +63,69 @@ public:
         unsigned int StartIndex;
         unsigned int EndIndex;
         //float Transparency;
-        std::string TexturePath;
-        std::shared_ptr<::Texture> Texture;
-        std::string NormalMapPath;
-        std::shared_ptr<::Texture> NormalMap;
-        std::string SpecularMapPath;
-        std::shared_ptr<::Texture> SpecularMap;
-        std::string IncandescenceMapPath;
-        std::shared_ptr<::Texture> IncandescenceMap;
     };
 
-    std::vector<MaterialGroup> MaterialGroups;
+	struct MaterialSplatMapping : public MaterialBasic
+	{
+		TextureProperties SplatMap;
+		std::vector<TextureProperties> ColorMaps;
+		std::vector<TextureProperties> NormalMaps;
+		std::vector<TextureProperties> SpecularMaps;
+		std::vector<TextureProperties> IncandescenceMaps;
+	};
 
-    std::vector<Vertex> m_Vertices;
+	struct MaterialSingleTextures : public MaterialBasic
+	{
+		TextureProperties ColorMap;
+		TextureProperties NormalMap;
+		TextureProperties SpecularMap;
+		TextureProperties IncandescenceMap;
+	};
+
+	enum class MaterialType { Basic = 1, SplatMapping, SingleTextures };
+
+	struct MaterialProperties {
+		MaterialType type;
+		MaterialBasic* material;
+	};
+
+	const Vertex*	Vertices() const {
+		if (hasSkin) { 
+			return m_SkinedVertices.data(); 
+		} else {
+			return m_Vertices.data();
+		}
+	};
+
+	unsigned int	VertexSize() const {
+		if (hasSkin) {
+			return sizeof(SkinedVertex);
+		}
+		else {
+			return sizeof(Vertex);
+		}
+	};
+
+	unsigned int	NumVertices() const {
+		if (hasSkin) {
+			return m_SkinedVertices.size();
+		} else {
+			return m_Vertices.size();
+		}
+	};
+
+	bool IsSkinned() const { return hasSkin; };
+
+	std::vector<MaterialProperties> m_Materials;
+
     std::vector<unsigned int> m_Indices;
     Skeleton* m_Skeleton = nullptr;
     glm::mat4 m_Matrix;
 
 private:
-   
+   	bool hasSkin;
+	std::vector<Vertex> m_Vertices;
+	std::vector<SkinedVertex> m_SkinedVertices;
 
     void ReadMeshFile(std::string filePath);
     void ReadMeshFileHeader(std::size_t& offset, char* fileData);
@@ -83,13 +136,17 @@ private:
     void ReadMaterialFile(std::string filePath);
     void ReadMaterials(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
     void ReadMaterialSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+	void ReadMaterialBasic(MaterialBasic* Material, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+	void ReadMaterialSingleTexture(MaterialSingleTextures* Material, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+	void ReadMaterialSplatMapping(MaterialSplatMapping* Material, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+	void ReadMaterialTextureProperties(TextureProperties& texture, std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
 
     void ReadAnimationFile(std::string filePath);
     void ReadAnimationBindPoses(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
     void ReadAnimationJoint(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
     void ReadAnimationClips(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int numberOfClips);
     void ReadAnimationClipSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int clipIndex);
-    void ReadAnimationKeyFrame(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int numberOfJoints, Skeleton::Animation& animation);
+    void ReadAnimationKeyFrame(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, std::vector<Skeleton::Animation::Keyframe>& animation);
     
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };

@@ -6,11 +6,12 @@
       <Lifetime>0.25</Lifetime>
     </c:Lifetime>
     <c:Model>
-      <Resource>Models/CylinderBullet.mesh</Resource>
-      <Color A="1" B="39.2156868" G="7.84313726" R="0"/>
+      <Resource>Models/Effects/CylinderShot.mesh</Resource>
+      <Color A="0.149019614" B="39.2156868" G="39.2156868" R="0"/>
+      <Transparent>true</Transparent>
     </c:Model>
     <c:Transform>
-      <Scale X="0.0109999999" Y="0.0289999992" Z="100"/>
+      <Scale X="0.0690000057" Y="0.0690000057" Z="100"/>
     </c:Transform>
   </Components>
 

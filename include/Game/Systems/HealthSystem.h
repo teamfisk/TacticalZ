@@ -12,11 +12,12 @@
 
 #include <tuple>
 #include <vector>
+#include <algorithm>
 
 class HealthSystem : public PureSystem
 {
 public:
-    HealthSystem(World* world, EventBroker* eventBroker);
+    HealthSystem(SystemParams params);
 
     //updatecomponent
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
@@ -26,7 +27,7 @@ private:
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
-    bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e);
+    bool HealthSystem::OnPlayerHealthPickup(Events::PlayerHealthPickup& e);
 
     //vector which will keep track of health changes
     std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;

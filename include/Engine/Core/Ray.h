@@ -7,6 +7,10 @@
 class Ray
 {
 public:
+    Ray()
+        : m_Origin(glm::vec3(0.f))
+        , m_Direction(glm::vec3(0, 0, 1))
+    {}
     Ray(const glm::vec3& origin, const glm::vec3& dir)
         : m_Origin(origin)
         , m_Direction(glm::normalize(dir))

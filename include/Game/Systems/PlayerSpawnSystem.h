@@ -3,13 +3,14 @@
 #include "Systems/SpawnerSystem.h"
 #include "Events/ESpawnerSpawn.h"
 #include "Core/EPlayerSpawned.h"
+#include "Core/EPlayerDeath.h"
 #include "Rendering/ESetCamera.h"
 #include "Core/ConfigFile.h"
 
 class PlayerSpawnSystem : public ImpureSystem
 {
 public:
-    PlayerSpawnSystem(World* world, EventBroker* eventBroker);
+    PlayerSpawnSystem(SystemParams params);
 
     virtual void Update(double dt) override;
 
