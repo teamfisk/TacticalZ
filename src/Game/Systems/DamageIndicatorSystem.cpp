@@ -1,11 +1,15 @@
 #include "Systems/DamageIndicatorSystem.h"
 
-DamageIndicatorSystem::DamageIndicatorSystem(World* m_World, EventBroker* eventBroker)
-    : System(m_World, eventBroker)
+DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
+    : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_DamageTakenFromPlayer, &DamageIndicatorSystem::OnPlayerDamageTaken);
     //current camera
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &DamageIndicatorSystem::OnSetCamera);
+
+    //load texture to cache
+    auto texture = CommonFunctions::LoadTexture("Textures/DamageIndicator.png", false);
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
 }
 
 bool DamageIndicatorSystem::OnPlayerDamageTaken(Events::PlayerDamage& e)

@@ -3,8 +3,9 @@
 
   <Components>
     <c:Sprite>
-      <DiffuseTexture>Textures/TempDamageIndicator.png</DiffuseTexture>
-      <GlowMap>Textures/TempDamageIndicator.png</GlowMap>
+      <DiffuseTexture>Textures/DamageIndicator.png</DiffuseTexture>
+      <GlowMap></GlowMap>
+      <DepthSort>false</DepthSort>
       <Color A="1" B="0.721568644" G="1" R="0.839215696"/>
     </c:Sprite>
     <c:Transform>

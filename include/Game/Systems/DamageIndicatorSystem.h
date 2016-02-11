@@ -13,10 +13,12 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
+#include "Rendering/Util/CommonFunctions.h"
+
 class DamageIndicatorSystem : public System
 {
 public:
-    DamageIndicatorSystem(World* world, EventBroker* eventBroker);
+    DamageIndicatorSystem(SystemParams params);
 
 private:
     EventRelay<DamageIndicatorSystem, Events::PlayerDamage> m_DamageTakenFromPlayer;
@@ -26,5 +28,6 @@ private:
     bool OnSetCamera(const Events::SetCamera& e);
 
     EntityID m_CurrentCamera = -1;
+
 };
 #endif

@@ -382,14 +382,10 @@
         </Entity>
         <Entity name="PlayerModel">
           <Components>
-            <c:Animation>
-              <Name>Hold Pos</Name>
-              <Time>0.60114094473865531</Time>
-              <Speed>1</Speed>
-            </c:Animation>
+            <c:Animation/>
             <c:HiddenForLocalPlayer/>
             <c:Model>
-              <Resource>Models/AssaultAnimated.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
               <Color A="1" B="0" G="0" R="1"/>
             </c:Model>
             <c:Transform/>
