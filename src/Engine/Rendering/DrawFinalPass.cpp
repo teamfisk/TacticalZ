@@ -328,7 +328,11 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     //bind textures
                     BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
                     std::vector<glm::mat4> frameBones;
-                    frameBones = explosionEffectJob->Skeleton->GetBones();
+                    if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+                    } else {
+                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+                    }
                     glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 } else {
                     m_ExplosionEffectProgram->Bind();
@@ -351,7 +355,11 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
                     GLERROR("asdasd");
                     std::vector<glm::mat4> frameBones;
-                    frameBones = explosionEffectJob->Skeleton->GetBones();
+                    if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+                    } else {
+                        frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+                    }
                     glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
                 } else {
@@ -392,7 +400,11 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             //bind textures
                             BindModelTextures(forwardSkinnedHandle, modelJob);
                             std::vector<glm::mat4> frameBones;
-                            frameBones = modelJob->Skeleton->GetBones();
+                            if (modelJob->AnimationOffset.animation != nullptr) {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                            } else {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                            }
                             glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
                         } else {
@@ -416,7 +428,11 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
                             GLERROR("asdasd");
                             std::vector<glm::mat4> frameBones;
-                            frameBones = modelJob->Skeleton->GetBones();
+                            if (modelJob->AnimationOffset.animation != nullptr) {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                            } else {
+                                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                            }
                             glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
                         } else {
@@ -460,7 +476,11 @@ void DrawFinalPass::DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJo
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
                 std::vector<glm::mat4> frameBones;
-                frameBones = modelJob->Skeleton->GetBones();
+                if (modelJob->AnimationOffset.animation != nullptr) {
+                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                } else {
+                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                }
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
             } else {
                 m_ShieldToStencilProgram->Bind();
@@ -514,7 +534,11 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
             }
 
             std::vector<glm::mat4> frameBones;
-            frameBones = explosionEffectJob->Skeleton->GetBones();
+            if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+                frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+            } else {
+                frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+            }
             glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
             if (GLERROR("Animation")) {
@@ -549,7 +573,11 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
                 BindModelTextures(forwardHandle ,modelJob);
 
                 std::vector<glm::mat4> frameBones;
-                frameBones = modelJob->Skeleton->GetBones();
+                if (modelJob->AnimationOffset.animation != nullptr) {
+                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                } else {
+                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                }
                 glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
 
@@ -581,7 +609,11 @@ void DrawFinalPass::DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& job
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 
             std::vector<glm::mat4> frameBones;
-           frameBones = modelJob->Skeleton->GetBones();
+            if (modelJob->AnimationOffset.animation != nullptr) {
+                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+            } else {
+                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+            }
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
         } else {

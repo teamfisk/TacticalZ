@@ -38,10 +38,7 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
-
-    glm::mat4 boneTransform = skeleton->GetBoneTransformSuper(id);
-    //glm::mat4 boneTransform = skeleton->GetBoneTransform(skeleton->Bones[id], animation, (double)parent["Animation"]["Time1"], glm::mat4(1));
-
+    glm::mat4 boneTransform = skeleton->GetBoneTransform(skeleton->Bones[id], animation, (double)parent["Animation"]["Time1"], glm::mat4(1));
     glm::vec3 scale;
     glm::quat rotation;
     glm::vec3 translation;
