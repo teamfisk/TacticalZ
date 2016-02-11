@@ -1,7 +1,7 @@
 #include "Core/UniformScaleSystem.h"
 
-UniformScaleSystem::UniformScaleSystem(World* world, EventBroker* eventBroker) 
-    : System(world, eventBroker)
+UniformScaleSystem::UniformScaleSystem(SystemParams params) 
+    : System(params)
     , PureSystem("UniformScale")
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &UniformScaleSystem::OnSetCamera);

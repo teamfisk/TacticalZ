@@ -30,7 +30,7 @@ struct EntityWrapper
     EntityWrapper FirstChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
     bool IsChildOf(EntityWrapper potentialParent);
-    bool Valid();
+    bool Valid() const;
 
     ComponentWrapper operator[](const char* componentName);
     bool operator==(const EntityWrapper& e) const;

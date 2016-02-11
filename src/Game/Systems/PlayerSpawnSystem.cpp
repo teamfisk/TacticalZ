@@ -3,8 +3,8 @@
 //This should be set by the config anyway.
 float PlayerSpawnSystem::m_RespawnTime = 15.0f;
 
-PlayerSpawnSystem::PlayerSpawnSystem(World* m_World, EventBroker* eventBroker) 
-    : System(m_World, eventBroker)
+PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params) 
+    : System(params)
     , m_Timer(0.f)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
@@ -122,6 +122,9 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
 bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player is actually spawned (since the actual spawning is handled on the server)
+    if (!IsClient) {
+        return false;
+    }
 
     // Check if a player already exists
     if (m_PlayerEntities.count(e.PlayerID) != 0) {

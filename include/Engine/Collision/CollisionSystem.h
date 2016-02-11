@@ -13,8 +13,8 @@
 class CollisionSystem : public PureSystem
 {
 public:
-    CollisionSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree)
-        : System(world, eventBroker)
+    CollisionSystem(SystemParams params, Octree<EntityAABB>* octree)
+        : System(params)
         , PureSystem("Collidable")
         , m_Octree(octree)
     { }

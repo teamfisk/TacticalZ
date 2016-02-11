@@ -8,7 +8,7 @@
 class UniformScaleSystem : public PureSystem
 {
 public:
-    UniformScaleSystem(World* world, EventBroker* eventBroker);
+    UniformScaleSystem(SystemParams params);
 
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cUniformScale, double dt) override;
 

@@ -13,8 +13,8 @@
 class BoneAttachmentSystem : public PureSystem
 {
 public:
-    BoneAttachmentSystem(World* world, EventBroker* eventBroker)
-        : System(world, eventBroker)
+    BoneAttachmentSystem(SystemParams params)
+        : System(params)
         , PureSystem("BoneAttachment")
     {
 

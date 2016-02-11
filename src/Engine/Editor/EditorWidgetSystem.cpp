@@ -1,7 +1,7 @@
 #include "Editor/EditorWidgetSystem.h"
 
-EditorWidgetSystem::EditorWidgetSystem(World* world, EventBroker* eventBroker, IRenderer* renderer) 
-    : System(world, eventBroker)
+EditorWidgetSystem::EditorWidgetSystem(SystemParams params, IRenderer* renderer) 
+    : System(params)
     , PureSystem("EditorWidget")
     , m_Renderer(renderer)
 {
