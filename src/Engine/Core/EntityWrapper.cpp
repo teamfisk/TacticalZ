@@ -63,7 +63,7 @@ bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
     return false;
 }
 
-bool EntityWrapper::Valid()
+bool EntityWrapper::Valid() const
 {
     if (this->World == nullptr) {
         return false;
@@ -74,7 +74,6 @@ bool EntityWrapper::Valid()
     }
 
     if (!this->World->ValidEntity(this->ID)) {
-        this->ID = EntityID_Invalid;
         return false;
     }
 

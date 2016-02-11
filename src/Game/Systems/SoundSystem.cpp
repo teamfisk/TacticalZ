@@ -1,19 +1,15 @@
 #include "Game/Systems/SoundSystem.h"
 
-SoundSystem::SoundSystem(World* world, EventBroker* eventbroker)
-    : System(world, eventbroker)
+SoundSystem::SoundSystem(SystemParams params)
+    : System(params)
     , PureSystem("SoundEmitter")
-    //, ImpureSystem()
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Announcer = ResourceManager::Load<ConfigFile>("Config.ini")->Get<std::string>("Sound.Announcer", "female");
-    m_World = world;
-    m_EventBroker = eventbroker;
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &SoundSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &SoundSystem::OnDashAbility);
-    EVENT_SUBSCRIBE_MEMBER(m_EShoot, &SoundSystem::OnShoot);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
@@ -25,7 +21,7 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 void SoundSystem::Update(double dt)
 {
     // Temp for play test.
-    if(m_DrumsIsPlaying) {
+    if (m_DrumsIsPlaying) {
         m_DrumsIsPlaying = !drumTimer(dt);
     }
 }
@@ -34,9 +30,8 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
     if (e.PlayerID == -1) { // Local player
         m_World->AttachComponent(e.Player.ID, "Listener");
-        m_LocalPlayer = e.Player;
         Events::PlaySoundOnEntity go;
-        go.EmitterID = m_LocalPlayer.ID;
+        go.EmitterID = LocalPlayer.ID;
         go.FilePath = "Audio/announcer/" + m_Announcer + "/go.wav";
         m_EventBroker->Publish(go);
         // TEMP: starts bgm
@@ -59,7 +54,7 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
     }
     if (e.Command == "TakeDamage" && e.Value > 0) {
         Events::PlayerDamage ev;
-        ev.Player = m_LocalPlayer;
+        ev.Player = LocalPlayer;
         ev.Damage = 1.0;
         m_EventBroker->Publish(ev);
     }
@@ -69,10 +64,14 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
 
 void SoundSystem::playerJumps()
 {
-    bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
+    if (!LocalPlayer.Valid()) {
+        return;
+    }
+
+    bool grounded = (bool)m_World->GetComponent(LocalPlayer.ID, "Physics")["IsOnGround"];
     if (grounded) {
         Events::PlaySoundOnEntity e;
-        e.EmitterID = m_LocalPlayer.ID;
+        e.EmitterID = LocalPlayer.ID;
         e.FilePath = "Audio/jump/jump1.wav";
         m_EventBroker->Publish(e);
     }
@@ -89,26 +88,17 @@ bool SoundSystem::drumTimer(double dt)
     }
 }
 
-bool SoundSystem::OnShoot(const Events::Shoot & e)
-{
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = m_LocalPlayer.ID;
-    ev.FilePath = "Audio/laser/laser1.wav";
-    m_EventBroker->Publish(ev);
-    return true;
-}
-
 bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
     int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
-    int team = (int)m_World->GetComponent(m_LocalPlayer.ID, "Team")["Team"];
+    int team = (int)m_World->GetComponent(LocalPlayer.ID, "Team")["Team"];
     Events::PlaySoundOnEntity ev;
     if (team == homeTeam) {
         ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_achieved.wav";
     } else {
         ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_failed.wav"; // have not been tested
     }
-    ev.EmitterID = m_LocalPlayer.ID;
+    ev.EmitterID = LocalPlayer.ID;
     m_EventBroker->Publish(ev);
     // Temp for play test.
     m_DrumsIsPlaying = false;
@@ -124,13 +114,13 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     std::vector<std::string> paths;
     paths.push_back("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
 
-//     // Breathe
-//     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
-//     for (int i = 0; i < ammountOfbreaths; i++) {
-//         paths.push_back("Audio/exhausted/breath.wav");
-//     }
+    //     // Breathe
+    //     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
+    //     for (int i = 0; i < ammountOfbreaths; i++) {
+    //         paths.push_back("Audio/exhausted/breath.wav");
+    //     }
     Events::PlayQueueOnEntity ev;
-    ev.Emitter = m_LocalPlayer;
+    ev.Emitter = LocalPlayer;
     ev.FilePaths = paths;
     m_EventBroker->Publish(ev);
     return false;
@@ -139,8 +129,8 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = m_LocalPlayer.ID;
-    ev.FilePath = "Audio/die/die2.wav"; 
+    ev.EmitterID = LocalPlayer.ID;
+    ev.FilePath = "Audio/die/die2.wav";
     m_EventBroker->Publish(ev);
     return false;
 }
@@ -148,7 +138,7 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = m_LocalPlayer.ID;
+    ev.EmitterID = LocalPlayer.ID;
     ev.FilePath = "Audio/pickup/pickup2.wav";
     m_EventBroker->Publish(ev);
     return false;
@@ -162,7 +152,7 @@ bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
     }
     if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
         Events::PlaySoundOnEntity ev; // should be BGM
-        ev.EmitterID = m_LocalPlayer.ID;
+        ev.EmitterID = LocalPlayer.ID;
         ev.FilePath = "Audio/bgm/drumstest.wav";
         m_EventBroker->Publish(ev);
         // Temp for play test.
@@ -174,7 +164,7 @@ bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
 bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = m_LocalPlayer.ID;
+    ev.EmitterID = LocalPlayer.ID;
     ev.FilePath = "Audio/jump/jump2.wav";
     m_EventBroker->Publish(ev);
     return false;
@@ -183,7 +173,7 @@ bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
 bool SoundSystem::OnDashAbility(const Events::DashAbility &e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = m_LocalPlayer.ID;
+    ev.EmitterID = LocalPlayer.ID;
     ev.FilePath = "Audio/jump/dash1.wav";
     m_EventBroker->Publish(ev);
     return false;

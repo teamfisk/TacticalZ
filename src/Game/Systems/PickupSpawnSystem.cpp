@@ -1,7 +1,7 @@
 #include "Systems/PickupSpawnSystem.h"
 
-PickupSpawnSystem::PickupSpawnSystem(World* m_World, EventBroker* eventBroker)
-    : System(m_World, eventBroker)
+PickupSpawnSystem::PickupSpawnSystem(SystemParams params)
+    : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &PickupSpawnSystem::OnTriggerTouch);
 }

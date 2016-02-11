@@ -23,17 +23,18 @@
 class Server : public Network
 {
 public:
-    Server();
+    Server(World* world, EventBroker* eventBroker, int port);
     ~Server();
-    void Start(World* m_world, EventBroker *eventBroker) override;
+
     void Update() override;
+
 private:
     // Network channels
     TCPServer m_Reliable;
     UDPServer m_Unreliable;
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
-    unsigned short m_Port;
+    int m_Port = 27666;
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
     std::vector<PlayerID> m_PlayersToDisconnect;
@@ -50,13 +51,10 @@ private:
     float snapshotInterval;
     int checkTimeOutInterval = 100;
     int m_NextPlayerID = 0;
+    std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers
     std::clock_t m_StartPingTime;
-
-    // Game logic
-    World* m_World;
-    EventBroker* m_EventBroker;
-
+    
     // Packet loss logic
     PacketID m_PacketID = 0;
     PacketID m_PreviousPacketID = 0;
@@ -67,6 +65,7 @@ private:
     void unreliableBroadcast(Packet& packet);
     void sendSnapshot();
     void addChildrenToPacket(Packet& packet, EntityID entityID);
+    void addInputCommandsToPacket(Packet& packet);
     void sendPing();
     void checkForTimeOuts();
     void disconnect(PlayerID playerID);

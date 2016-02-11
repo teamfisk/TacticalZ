@@ -151,8 +151,6 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
-#define TEXTURE_TILE 5.0
-
 vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, sampler2D A, sampler2D D,
 	 				  vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues,  vec2 A_TileValues,  vec2 D_TileValues){
 	vec4 R_Channel = texture2D(R, Input.TextureCoordinate * R_TileValues);
@@ -163,10 +161,11 @@ vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, sa
 
 	float total = blendValue.r + blendValue.g + blendValue.b + blendValue.a;
 	if(total > 1.0f){
-		blendValue.r / total;
-		blendValue.g / total;
-		blendValue.b / total;
-		blendValue.a / total;
+		float totalDiv = 1.0f / total;
+		blendValue.r = blendValue.r * totalDiv;
+		blendValue.g = blendValue.g * totalDiv;
+		blendValue.b = blendValue.b * totalDiv;
+		blendValue.a = blendValue.a * totalDiv;
 	}
 	float D_percent = clamp( 1.0f - total, 0.0f, 1.0f);
 
@@ -188,10 +187,11 @@ vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B, s
 
 	float total = blendValue.r + blendValue.g + blendValue.b + blendValue.a;
 	if(total > 1.0f){
-		blendValue.r / total;
-		blendValue.g / total;
-		blendValue.b / total;
-		blendValue.a / total;
+		float totalDiv = 1 / total;
+		blendValue.r = blendValue.r * totalDiv;
+		blendValue.g = blendValue.g * totalDiv;
+		blendValue.b = blendValue.b * totalDiv;
+		blendValue.a = blendValue.a * totalDiv;
 	}
 	float D_percent = clamp( 1.0f - total, 0.0f, 1.0f);
 

@@ -1,24 +1,28 @@
 #include "Network/Server.h"
 
-Server::Server()
+Server::Server(World* world, EventBroker* eventBroker, int port) 
+    : Network(world, eventBroker)
 {
-    Network::initialize();
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
     pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
-}
-Server::~Server()
-{ }
-void Server::Start(World* world, EventBroker* eventBroker)
-{
-    m_World = world;
-    m_EventBroker = eventBroker;
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &Server::OnEntityDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
-    LOG_INFO("I am Server. BIP BOP\n");
+
+    // Bind
+    if (port == 0) {
+        port = config->Get<float>("Networking.Port", 27666);
+    }
+    m_Port = port;
+    LOG_INFO("Server initialized and bound to port %i", port);
+}
+
+Server::~Server()
+{
+
 }
 
 void Server::Update()
@@ -141,8 +145,22 @@ void Server::unreliableBroadcast(Packet& packet)
 void Server::sendSnapshot()
 {
     Packet packet(MessageType::Snapshot);
+    addInputCommandsToPacket(packet);
     addChildrenToPacket(packet, EntityID_Invalid);
     unreliableBroadcast(packet);
+}
+
+void Server::addInputCommandsToPacket(Packet& packet)
+{
+    // Number of input commands
+    packet.WritePrimitive(m_InputCommandsToBroadcast.size());
+    for (auto& command : m_InputCommandsToBroadcast) {
+        packet.WritePrimitive(command.PlayerID);
+        packet.WritePrimitive(m_ConnectedPlayers.at(command.PlayerID).EntityID);
+        packet.WriteString(command.Command);
+        packet.WritePrimitive(command.Value);
+    }
+    m_InputCommandsToBroadcast.clear();
 }
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
@@ -428,7 +446,10 @@ void Server::parseOnInputCommand(Packet& packet)
             e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
-            LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+            if (e.Command == "PrimaryFire") {
+                m_InputCommandsToBroadcast.push_back(e);
+            }
+            //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         }
     }
 }

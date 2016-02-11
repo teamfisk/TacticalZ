@@ -1,6 +1,8 @@
 #ifndef Game_h__
 #define Game_h__
 
+#include <boost/program_options.hpp>
+
 #include "Core/ResourceManager.h"
 #include "Core/ConfigFile.h"
 #include "Core/EventBroker.h"
@@ -14,7 +16,7 @@
 #include "Core/EKeyDown.h"
 #include "Core/EntityFilePreprocessor.h"
 #include "Core/SystemPipeline.h"
-#include "ExplosionEffectSystem.h"
+#include "Systems/ExplosionEffectSystem.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
 #include "Rendering/RenderSystem.h"
@@ -26,10 +28,8 @@
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"
-// Client
-#include "Network/Client.h"
-// Server
 #include "Network/Server.h"
+#include "Network/Client.h"
 
 // Sound
 #include "Sound/SoundManager.h"
@@ -45,7 +45,9 @@ public:
 	void Tick();
 
 private:
-	double m_LastTime;
+    std::string m_NetworkAddress;
+    int m_NetworkPort = 0;
+
 	ConfigFile* m_Config = nullptr;
 	EventBroker* m_EventBroker;
 	IRenderer* m_Renderer;
@@ -58,26 +60,15 @@ private:
     Octree<EntityAABB>* m_OctreeFrustrumCulling;
     SystemPipeline* m_SystemPipeline;
     RenderFrame* m_RenderFrame;
-    // Network variables
-    boost::thread m_NetworkThread;
+    Client* m_NetworkClient = nullptr;
+    Server* m_NetworkServer = nullptr;
+    SoundManager* m_SoundManager;
+	double m_LastTime;
 
-    // Network methods
-    void networkFunction();
-    std::unique_ptr<Client> m_Client;
-    std::unique_ptr<Server> m_Server;
-    bool m_IsClientOrServer = false;
+    bool m_IsClient = false;
     bool m_IsServer = false;
 
-    // Sound
-    SoundManager* m_SoundManager;
-
-    //EventRelay<Game, Events::InputCommand> m_EInputCommand;
-    //bool debugOnInputCommand(const Events::InputCommand& e);
-
-    void debugInitialize();
-    void debugTick(double dt);
-	EventRelay<Client, Events::KeyDown> m_EKeyDown;
-
+    int parseArgs(int argc, char* argv[]);
 };
 
 #endif

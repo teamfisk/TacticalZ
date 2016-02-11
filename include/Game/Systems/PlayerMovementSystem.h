@@ -7,14 +7,13 @@
 #include "Events/EDoubleJump.h"
 #include "../Engine/Sound/EPlaySoundOnEntity.h"
 
-class PlayerMovementSystem : public ImpureSystem, PureSystem
+class PlayerMovementSystem : public ImpureSystem
 {
 public:
-    PlayerMovementSystem(World* world, EventBroker* eventBroker);
+    PlayerMovementSystem(SystemParams params);
     ~PlayerMovementSystem();
 
     virtual void Update(double dt) override;
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt);
 
 private:
     // State
@@ -36,4 +35,6 @@ private:
     EventRelay<PlayerMovementSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
 
+    void updateMovementControllers(double dt);
+    void updateVelocity(double dt);
 };
