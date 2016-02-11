@@ -272,7 +272,7 @@ void Server::parseTCPConnect(Packet & packet)
     m_ConnectedPlayers.at(playerID).TCPPort = m_Port;
 
     LOG_INFO("parseTCPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(),
-        m_ConnectedPlayers.at(playerID).TCPAddress);
+        m_ConnectedPlayers.at(playerID).TCPAddress.to_string().c_str());
 
     // Send a message to the player that connected
     Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
