@@ -16,6 +16,9 @@ void CapturePointHUDSystem::Update(double dt)
 
     auto CapturePointHUDElements = m_World->GetComponents("CapturePointHUD");
     auto CapturePoints = m_World->GetComponents("CapturePoint");
+    if (CapturePointHUDElements == nullptr) {
+        return;
+    }
 
     if(!CapturePointHUDElements) {
         return;
