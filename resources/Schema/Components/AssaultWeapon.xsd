@@ -25,6 +25,9 @@
 				<xs:element name="ViewPunch" type="t:float" minOccurs="0">
 					<xs:annotation><xs:documentation>View punch in radians for each bullet fired</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="ReloadTime" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Time it takes to reload the weapon in seconds</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

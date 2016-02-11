@@ -7,4 +7,5 @@
 	<BaseDamage>5</BaseDamage>
 	<RPM>120</RPM>
 	<ViewPunch>0.01</ViewPunch>
+	<ReloadTime>2</ReloadTime>
 </AssaultWeapon>

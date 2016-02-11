@@ -35,8 +35,6 @@ private:
     // Events
     EventRelay<WeaponSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
-    EventRelay<WeaponSystem, Events::Shoot> m_EShoot;
-    bool OnShoot(Events::Shoot& e);
     EventRelay<WeaponSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(Events::InputCommand& e);
 

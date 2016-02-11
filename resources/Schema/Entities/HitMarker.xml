@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="HitMarker" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>0.1</Lifetime>
+    </c:Lifetime>
+    <c:Sprite>
+      <DiffuseTexture>Textures/Weapons/Crosshair/SmallThickHoleDot.png</DiffuseTexture>
+      <DepthSort>false</DepthSort>
+    </c:Sprite>
+    <c:Transform>
+      <Scale X="0.031" Y="0.031" Z="1"/>
+      <Orientation X="0" Y="0" Z="0.782"/>
+    </c:Transform>
+  </Components>
+
+  <Children/>
+
+</Entity>

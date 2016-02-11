@@ -41,7 +41,9 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     playerEntityModel.Copy(deathEffectEW["Model"]);
     playerEntityAnimation.Copy(deathEffectEW["Animation"]);
     //freeze the animation
-    deathEffectEW["Animation"]["Speed"] = 0.0;
+    deathEffectEW["Animation"]["Speed1"] = 0.0;
+    deathEffectEW["Animation"]["Speed2"] = 0.0;
+    deathEffectEW["Animation"]["Speed3"] = 0.0;
 
     //copy the models position,orientation
     deathEffectEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
@@ -50,8 +52,10 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     //deathEffectEW["ExplosionEffect"]["ExplosionOrigin"] = glm::vec3(0, 0, 0);
 
     //camera (with lifetime) behind the player
-    auto cam = deathEffectEW.FirstChildByName("Camera");
-    Events::SetCamera eSetCamera;
-    eSetCamera.CameraEntity = cam;
-    m_EventBroker->Publish(eSetCamera);
+    if (player == LocalPlayer) {
+        auto cam = deathEffectEW.FirstChildByName("Camera");
+        Events::SetCamera eSetCamera;
+        eSetCamera.CameraEntity = cam;
+        m_EventBroker->Publish(eSetCamera);
+    }
 }

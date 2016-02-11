@@ -2,16 +2,18 @@
 #define WeaponBehaviour_h__
 
 #include "Core/System.h"
+#include "Rendering/IRenderer.h"
 #include "Core/Octree.h"
 #include "Collision/EntityAABB.h"
 
 class WeaponBehaviour : public System
 {
 public:
-    WeaponBehaviour(SystemParams systemParams, Octree<EntityAABB>* collisionOctree, EntityWrapper weaponEntity)
+    WeaponBehaviour(SystemParams systemParams, IRenderer* renderer, Octree<EntityAABB>* collisionOctree, EntityWrapper player)
         : System(systemParams)
+        , m_Renderer(renderer)
         , m_CollisionOctree(collisionOctree)
-        , m_Entity(weaponEntity)
+        , m_Player(player)
     { }
     virtual ~WeaponBehaviour() = default;
 
@@ -24,8 +26,9 @@ public:
     virtual void Update(double dt) { }
 
 protected:
+    IRenderer* m_Renderer;
     Octree<EntityAABB>* m_CollisionOctree;
-    EntityWrapper m_Entity;
+    EntityWrapper m_Player;
 };
 
 #endif
