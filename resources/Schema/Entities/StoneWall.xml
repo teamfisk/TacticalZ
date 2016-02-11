@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Collidable/>
+    <c:Model>
+      <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+    </c:Model>
+    <c:Transform>
+      <Position X="47.681942" Y="0.14480646" Z="46.8966408"/>
+      <Scale X="2" Y="2" Z="2"/>
+      <Orientation X="5.9380002" Y="0" Z="0.35800001"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="1.10786498" Y="-0.615343928" Z="-0.37226662"/>
+          <Orientation X="0.443000019" Y="0.685000062" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="2.15796614" Y="-1.18461192" Z="-0.382025093"/>
+          <Orientation X="0" Y="2.18400002" Z="5.72200012"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="3.53984666" Y="-1.55501318" Z="-0.237787247"/>
+          <Orientation X="0.604000032" Y="0.640000045" Z="6.28300047"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-2.86977816" Y="0.0265773162" Z="0.530605257"/>
+          <Orientation X="0" Y="4.71200037" Z="5.89000034"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-4.06748295" Y="1.2850678" Z="1.0140655"/>
+          <Orientation X="0" Y="4.94500017" Z="5.66600037"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-1.6440227" Y="-0.104511783" Z="0.248545036"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="3.22254896" Y="-0.99158901" Z="-1.59910381"/>
+          <Orientation X="0.268000007" Y="5.9920001" Z="6.00300026"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-3.07137322" Y="0.124666147" Z="1.97699928"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-4.24249363" Y="0.303708076" Z="1.92021227"/>
+          <Orientation X="0" Y="2.95000005" Z="5.79700041"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-1.89417958" Y="-0.57703048" Z="0.874724686"/>
+          <Orientation X="0.345000029" Y="0.651000023" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>
