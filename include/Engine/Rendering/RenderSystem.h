@@ -18,6 +18,7 @@
 #include "../Core/EPlayerSpawned.h"
 #include "../Core/Octree.h"
 #include "../Collision/EntityAABB.h"
+#include "../Core/ConfigFile.h"
 
 class RenderSystem : public ImpureSystem
 {
@@ -48,6 +49,9 @@ private:
     void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
     void fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
+
+    bool isEntityVisible(EntityWrapper& entity);
+
     bool isChildOfACamera(EntityWrapper entity);
     bool isChildOfCurrentCamera(EntityWrapper entity);
 };

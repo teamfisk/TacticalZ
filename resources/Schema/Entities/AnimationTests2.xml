@@ -26,29 +26,25 @@
           </Components>
           <Children/>
         </Entity>
-        <Entity name="Wave">
+        <Entity name="Running">
           <Components>
             <c:Animation>
               <AnimationName1>Run</AnimationName1>
               <Weight1>0.5</Weight1>
-              <Time1>0.78014858943309839</Time1>
-              <Speed1>1</Speed1>
+              <Time1>0.60188997954429357</Time1>
+              <Speed1>-1</Speed1>
               <Speed2>1</Speed2>
-              <AnimationName2>StrafeRight</AnimationName2>
               <Weight2>0.5</Weight2>
-              <Time2>0.78620929522779459</Time2>
-              <AnimationName3>ShootFastRifle</AnimationName3>
-              <Time3>0.13809128482706701</Time3>
+              <Time2>0.96957233017255007</Time2>
+              <Time3>0.093923612201312068</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
             <c:AnimationOffset>
               <AnimationName>AimRifle</AnimationName>
-              <Time>0.040000014007091522</Time>
+              <Time>0.5</Time>
             </c:AnimationOffset>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
-              <Color A="0.627451003" B="19.6078434" G="1" R="3.92156863"/>
-              <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
               <Position X="-0.690088332" Y="0" Z="0"/>
@@ -62,13 +58,11 @@
                   <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
                 </c:BoneAttachment>
                 <c:Model>
-                  <Resource>Models/Weapons/Blue/AssaultWeapon.mesh</Resource>
-                  <Color A="1" B="1" G="1" R="19.6078434"/>
-                  <Transparent>true</Transparent>
+                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.144055843" Y="0.970111489" Z="-0.126199633"/>
-                  <Orientation X="-0.535831392" Y="0.0691146553" Z="-0.0608282126"/>
+                  <Position X="0.161975682" Y="1.06281972" Z="-0.216630161"/>
+                  <Orientation X="-0.064812161" Y="-0.0739696771" Z="0.143780142"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -78,13 +72,27 @@
         <Entity>
           <Components>
             <c:PointLight>
+              <Color A="1" B="0.70588237" G="0.70588237" R="1"/>
               <Radius>10</Radius>
             </c:PointLight>
             <c:Transform>
-              <Position X="0" Y="1.0823108" Z="0.738871336"/>
+              <Position X="-0.375567257" Y="2.13093901" Z="-0.718547285"/>
             </c:Transform>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.70588237" R="0.70588237"/>
+                  <Radius>10</Radius>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="-1.96873236" Y="0" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>
@@ -96,6 +104,43 @@
             </c:Transform>
           </Components>
           <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Animation>
+              <AnimationName1>ShootFastRifle</AnimationName1>
+              <Time1>0.056234247235838808</Time1>
+              <Speed1>1</Speed1>
+              <Speed2>1</Speed2>
+              <AnimationName2>Idl</AnimationName2>
+              <Weight2>0.5</Weight2>
+              <Time2>1.8308673495784191</Time2>
+              <AnimationName3>StrafeRigh</AnimationName3>
+              <Weight3>0.5</Weight3>
+              <Time3>0.32167823998061529</Time3>
+              <Speed3>1</Speed3>
+            </c:Animation>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0.803468645" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>

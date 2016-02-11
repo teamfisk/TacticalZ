@@ -277,8 +277,8 @@ void RawModelCustom::ReadMaterialTextureProperties(RawModelCustom::TextureProper
 			throw Resource::FailedLoadingException("Reading Material texture UVTiling failed");
 		}
 		memcpy(&texture.UVRepeat[0], fileData + offset, sizeof(glm::vec2));
-		offset += sizeof(glm::vec2);
 	}
+	offset += sizeof(glm::vec2);
 }
 
 void RawModelCustom::ReadAnimationFile(std::string filePath)
