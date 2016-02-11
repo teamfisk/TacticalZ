@@ -14,7 +14,7 @@
 class PickupSpawnSystem : public ImpureSystem
 {
 public:
-    PickupSpawnSystem(World* world, EventBroker* eventBroker);
+    PickupSpawnSystem(SystemParams params);
 
     virtual void Update(double dt) override;
 

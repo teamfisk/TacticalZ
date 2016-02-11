@@ -31,28 +31,49 @@
             <c:Animation>
               <AnimationName1>Run</AnimationName1>
               <Weight1>0.5</Weight1>
-              <Time1>0.23980116887997371</Time1>
+              <Time1>0.78014858943309839</Time1>
               <Speed1>1</Speed1>
               <Speed2>1</Speed2>
               <AnimationName2>StrafeRight</AnimationName2>
               <Weight2>0.5</Weight2>
-              <Time2>0.42593105566437428</Time2>
-              <AnimationName3>ReloadSwitch</AnimationName3>
-              <Time3>0.68855715986371058</Time3>
+              <Time2>0.78620929522779459</Time2>
+              <AnimationName3>ShootFastRifle</AnimationName3>
+              <Time3>0.13809128482706701</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
             <c:AnimationOffset>
               <AnimationName>AimRifle</AnimationName>
+              <Time>0.040000014007091522</Time>
             </c:AnimationOffset>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
-              <Color A="1" B="0.984313726" G="1" R="1"/>
+              <Color A="0.627451003" B="19.6078434" G="1" R="3.92156863"/>
+              <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
               <Position X="-0.690088332" Y="0" Z="0"/>
             </c:Transform>
           </Components>
-          <Children/>
+          <Children>
+            <Entity name="R_Arm_Weapon_Joint">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                  <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Blue/AssaultWeapon.mesh</Resource>
+                  <Color A="1" B="1" G="1" R="19.6078434"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0.144055843" Y="0.970111489" Z="-0.126199633"/>
+                  <Orientation X="-0.535831392" Y="0.0691146553" Z="-0.0608282126"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>

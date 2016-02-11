@@ -17,7 +17,7 @@
 class EditorSystem : public ImpureSystem
 {
 public:
-    EditorSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame);
+    EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame);
     ~EditorSystem();
 
     void Update(double dt);

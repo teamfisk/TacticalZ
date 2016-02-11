@@ -2,11 +2,10 @@
 #include "Collision/Collision.h"
 #include "Core/Frustum.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
-    : System(world, eventBroker)
+RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
-    , m_World(world)
     , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
@@ -112,14 +111,14 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
         }
 
         // Only render children of a camera if that camera is currently active
-         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-             continue;
-         } 
+        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+            continue;
+        }
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-         if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
-             continue;
-         }
+        if ((entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+            continue;
+        }
 
         Model* model;
         try {

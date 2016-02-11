@@ -3,13 +3,13 @@
 #include "Editor/EditorRenderSystem.h"
 #include "Editor/EditorWidgetSystem.h"
 
-EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(world, eventBroker)
+EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {
     m_EditorWorld = new World();
-    m_EditorWorldSystemPipeline = new SystemPipeline(m_EditorWorld, eventBroker);
+    m_EditorWorldSystemPipeline = new SystemPipeline(m_EditorWorld, m_EventBroker, IsClient, IsServer);
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
     m_EditorWorldSystemPipeline->AddSystem<EditorWidgetSystem>(0, m_Renderer);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
@@ -100,9 +100,9 @@ void EditorSystem::Enable()
     }
 
     // Pause the world we're editing
-    Events::Pause ePause;
-    ePause.World = m_World;
-    m_EventBroker->Publish(ePause);
+    //Events::Pause ePause;
+    //ePause.World = m_World;
+    //m_EventBroker->Publish(ePause);
 
     m_Enabled = true;
 }

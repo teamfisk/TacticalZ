@@ -9,8 +9,8 @@
 class FillOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    FillOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree, const std::string& fillComponentType)
-        : System(world, eventBroker)
+    FillOctreeSystem(SystemParams params, Octree<EntityAABB>* octree, const std::string& fillComponentType)
+        : System(params)
         , PureSystem(fillComponentType)
         , m_Octree(octree)
     { }

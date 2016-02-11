@@ -32,6 +32,8 @@ public:
 	virtual void SetFullscreen(bool fullscreen) { m_Fullscreen = fullscreen; }
 	bool VSYNC() const { return m_VSYNC; }
 	virtual void SetVSYNC(bool vsync) { m_VSYNC = vsync; }
+    std::string WindowTitle() const { return m_WindowTitle; }
+    virtual void SetWindowTitle(const std::string& title) { glfwSetWindowTitle(m_Window, title.c_str()); m_WindowTitle = title; }
     //Returns screen size excluding window border and header
     Rectangle GetViewportSize() const { return m_ViewportSize; }
 	virtual void Initialize() = 0;
@@ -47,6 +49,7 @@ protected:
 	int m_GLVersion[2];
 	std::string m_GLVendor;
 	GLFWwindow* m_Window = nullptr;
+    std::string m_WindowTitle;
 };
 
 #endif // Renderer_h__

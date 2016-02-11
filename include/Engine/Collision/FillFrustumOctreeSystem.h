@@ -9,8 +9,8 @@
 class FillFrustumOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    FillFrustumOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree)
-        : System(world, eventBroker)
+    FillFrustumOctreeSystem(SystemParams params, Octree<EntityAABB>* octree)
+        : System(params)
         , PureSystem("Model")
         , m_Octree(octree)
     { }
