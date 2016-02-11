@@ -3,6 +3,8 @@
 
 #include <xercesc/framework/psvi/XSElementDeclaration.hpp>
 #include <xercesc/framework/psvi/XSComplexTypeDefinition.hpp>
+#include <xercesc/framework/psvi/XSAttributeUse.hpp>
+#include <xercesc/framework/psvi/XSAttributeDeclaration.hpp>
 #include <xercesc/framework/psvi/XSParticle.hpp>
 #include <xercesc/framework/psvi/XSModelGroup.hpp>
 #include <xercesc/framework/psvi/XSModelGroupDefinition.hpp>

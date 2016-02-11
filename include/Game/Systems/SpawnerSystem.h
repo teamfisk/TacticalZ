@@ -13,7 +13,7 @@
 class SpawnerSystem : public System
 {
 public:
-    SpawnerSystem(World* world, EventBroker* eventBroker);
+    SpawnerSystem(SystemParams params);
 
     static EntityWrapper Spawn(EntityWrapper spawner, EntityWrapper parent = EntityWrapper::Invalid);
 
