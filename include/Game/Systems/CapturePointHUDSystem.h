@@ -12,7 +12,7 @@
 class CapturePointHUDSystem : public ImpureSystem
 {
 public:
-    CapturePointHUDSystem(World* world, EventBroker* eventBroker);
+    CapturePointHUDSystem(SystemParams params);
 
     virtual void Update(double dt) override;
 

@@ -1,7 +1,7 @@
 #include "Systems/CapturePointHUDSystem.h"
 
-CapturePointHUDSystem::CapturePointHUDSystem(World* world, EventBroker* eventBroker) 
-    : System(world, eventBroker)
+CapturePointHUDSystem::CapturePointHUDSystem(SystemParams params)
+    : System(params)
     , ImpureSystem()
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)

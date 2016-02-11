@@ -323,7 +323,6 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());
 
-
     for (auto &job : jobs) {
         auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
         if (explosionEffectJob) {
