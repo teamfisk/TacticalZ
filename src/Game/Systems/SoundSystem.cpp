@@ -57,10 +57,10 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
             return true;
         }
     }
-    if (e.Command == "TakeDamage" && e.Value > 0) {
+    if (e.Command == "TakeDamage" && e.Value > 0 && m_LocalPlayer.Valid()) {
         Events::PlayerDamage ev;
         ev.Player = m_LocalPlayer;
-        ev.Damage = 1.0;
+        ev.Damage = e.Value;
         m_EventBroker->Publish(ev);
     }
 

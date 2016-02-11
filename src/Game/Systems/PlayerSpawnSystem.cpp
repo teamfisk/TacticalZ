@@ -1,20 +1,39 @@
 #include "Systems/PlayerSpawnSystem.h"
 
+//This should be set by the config anyway.
+float PlayerSpawnSystem::m_RespawnTime = 15.0f;
+
 PlayerSpawnSystem::PlayerSpawnSystem(World* m_World, EventBroker* eventBroker) 
     : System(m_World, eventBroker)
+    , m_Timer(0.f)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerSpawnerd, &PlayerSpawnSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerSpawnSystem::OnPlayerDeath);
     m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }
 
 void PlayerSpawnSystem::Update(double dt)
 {
+    //Increase timer.
+    m_Timer += dt;
+    if (m_Timer < m_RespawnTime) {
+        return;
+    }
+    //If respawn time has passed, we spawn all players that have requested to be spawned.
+    m_Timer = 0.f;
+
+    //If there are no spawn requests, return immediately, if we are client the SpawnRequests should always be empty.
+    if (m_SpawnRequests.size() == 0) {
+        return;
+    }
+
     auto playerSpawns = m_World->GetComponents("PlayerSpawn");
     if (playerSpawns == nullptr) {
         return;
     }
 
+    int numSpawnedPlayers = 0;
     for (auto& req : m_SpawnRequests) {
         for (auto& cPlayerSpawn : *playerSpawns) {
             EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
@@ -40,13 +59,19 @@ void PlayerSpawnSystem::Update(double dt)
             e.Player = player;
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
-
+            ++numSpawnedPlayers;
+            break;
         }
+    }
+    if (numSpawnedPlayers != (int)m_SpawnRequests.size()) {
+        LOG_DEBUG("%i players were supposed to be spawned, but %i was spawned.", (int)m_SpawnRequests.size(), numSpawnedPlayers);
+    } else {
+        LOG_DEBUG("%i players were spawned.", numSpawnedPlayers);
     }
     m_SpawnRequests.clear();
 }
 
-bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
+bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
 {
     if (e.Command != "PickTeam") {
         return false;
@@ -58,11 +83,37 @@ bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
         return false;
     }
 
-    if (e.Value != 0) {
+    if (e.Value == 0) {
+        return false;
+    }
+
+    //TODO: Spectating?
+    if (e.Player.Valid() && e.Player.HasComponent("Team")) {
+        ComponentWrapper cTeam = e.Player["Team"];
+        if ((ComponentInfo::EnumType)e.Value == cTeam["Team"].Enum("Spectator")) {
+            return false;
+        }
+    }
+
+    auto iter = m_SpawnRequests.begin();
+    for (; iter != m_SpawnRequests.end(); ++iter) {
+        if (iter->PlayerID == e.PlayerID) {
+            break;
+        }
+    }
+
+    if (iter != m_SpawnRequests.end()) {
+        //If player is in queue to spawn, then change their team affiliation.
+        iter->Team = (ComponentInfo::EnumType)e.Value;
+    } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
+        //If player is not in queue to spawn, then create a spawn request, 
+        //but only if they are spectating and/or just connected.
         SpawnRequest req;
         req.PlayerID = e.PlayerID;
         req.Team = (ComponentInfo::EnumType)e.Value;
         m_SpawnRequests.push_back(req);
+    } else {
+        return false;
     }
 
     return true;
@@ -82,6 +133,7 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 
     // Store the player for future reference
     m_PlayerEntities[e.PlayerID] = e.Player;
+    m_PlayerIDs[e.Player.ID] = e.PlayerID;
 
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
@@ -110,4 +162,20 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     }
 
     return true;
+}
+
+bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
+{
+    if (!e.Player.HasComponent("Team")) {
+        return false;
+    }
+    ComponentWrapper cTeam = e.Player["Team"];
+    //A spectator can't die anyway
+    if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Spectator")) {
+        return false;
+    }
+    SpawnRequest req;
+    req.PlayerID = m_PlayerIDs[e.Player.ID];
+    req.Team = cTeam["Team"];
+    m_SpawnRequests.push_back(req);
 }

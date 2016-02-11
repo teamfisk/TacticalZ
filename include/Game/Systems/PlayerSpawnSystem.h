@@ -13,6 +13,8 @@ public:
     PlayerSpawnSystem(World* world, EventBroker* eventBroker);
 
     virtual void Update(double dt) override;
+    
+    static void SetRespawnTime(float respawnTime) { m_RespawnTime = respawnTime; };
 
 private:
     struct SpawnRequest
@@ -23,10 +25,19 @@ private:
 
     bool m_NetworkEnabled = false;
     std::vector<SpawnRequest> m_SpawnRequests;
+
+    //Player ID -> EntityWrapper.
     std::map<int, EntityWrapper> m_PlayerEntities;
+    //EntityWrapper ID -> Player ID.
+    std::map<EntityID, int> m_PlayerIDs;
+
+    static float m_RespawnTime;
+    float m_Timer;
 
     EventRelay<PlayerSpawnSystem, Events::InputCommand> m_OnInputCommand;
-    bool OnInputCommand(const Events::InputCommand& e);
+    bool OnInputCommand(Events::InputCommand& e);
     EventRelay<PlayerSpawnSystem, Events::PlayerSpawned> m_OnPlayerSpawnerd;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
+    EventRelay<PlayerSpawnSystem, Events::PlayerDeath> m_OnPlayerDeath;
+    bool OnPlayerDeath(Events::PlayerDeath& e);
 };

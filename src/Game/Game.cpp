@@ -34,6 +34,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
+    PlayerSpawnSystem::SetRespawnTime(m_Config->Get<float>("Debug.RespawnTime", 15.0f));
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
@@ -97,7 +98,6 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerDeathSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
@@ -109,6 +109,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     m_SystemPipeline->AddSystem<PlayerHUD>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerDeathSystem>(updateOrderLevel);
 
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
