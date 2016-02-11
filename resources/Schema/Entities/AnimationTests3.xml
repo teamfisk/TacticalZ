@@ -31,45 +31,49 @@
             <c:Animation>
               <AnimationName1>Run</AnimationName1>
               <Weight1>0.5</Weight1>
-              <Time1>0.78014858943309839</Time1>
+              <Time1>0.97312056690160276</Time1>
               <Speed1>1</Speed1>
               <Speed2>1</Speed2>
-              <AnimationName2>StrafeRight</AnimationName2>
-              <Weight2>0.5</Weight2>
-              <Time2>0.78620929522779459</Time2>
-              <AnimationName3>ShootFastRifle</AnimationName3>
-              <Time3>0.13809128482706701</Time3>
+              <AnimationName2>ReloadSwitch</AnimationName2>
+              <Time2>0.91310356788604263</Time2>
+              <AnimationName3>LeftRight</AnimationName3>
+              <Weight3>0</Weight3>
+              <Time3>0.040207288496060478</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
             <c:AnimationOffset>
-              <AnimationName>AimRifle</AnimationName>
-              <Time>0.040000014007091522</Time>
+              <AnimationName>DownUp</AnimationName>
+              <Time>0.77999961376190186</Time>
             </c:AnimationOffset>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
+              <Resource>Models/Characters/Assault/FirstPerson.mesh</Resource>
               <Color A="0.627451003" B="19.6078434" G="1" R="3.92156863"/>
               <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
-              <Position X="-0.690088332" Y="0" Z="0"/>
+              <Position X="-0.690088332" Y="1.00491476" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
-            <Entity name="R_Arm_Weapon_Joint">
+            <Entity>
               <Components>
                 <c:BoneAttachment>
                   <BoneName>R_Arm_Weapon_Joint</BoneName>
-                  <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
                 </c:BoneAttachment>
                 <c:Model>
                   <Resource>Models/Weapons/Blue/AssaultWeapon.mesh</Resource>
-                  <Color A="1" B="1" G="1" R="19.6078434"/>
-                  <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.144055843" Y="0.970111489" Z="-0.126199633"/>
-                  <Orientation X="-0.535831392" Y="0.0691146553" Z="-0.0608282126"/>
+                  <Position X="0.120548911" Y="-0.223148599" Z="-0.151705116"/>
+                  <Orientation X="0.09407565" Y="0.0181003436" Z="0.0279055703"/>
                 </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Camera/>
+                <c:Transform/>
               </Components>
               <Children/>
             </Entity>
