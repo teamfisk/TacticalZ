@@ -12,12 +12,15 @@
 #include "Systems/PlayerDeathSystem.h"
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
+#include "Game/Systems/CapturePointHUDSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
-#include "Game/Systems/WeaponSystem.h"
+#include "Game/Systems/DamageIndicatorSystem.h"
+#include "Game/Systems/Weapon/WeaponSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Game/Systems/PlayerHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
 #include "Game/Systems/LifetimeSystem.h"
+#include "../Engine/Core/UniformScaleSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
 
@@ -30,6 +33,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
+    ResourceManager::RegisterType<PNG>("Png");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
     ResourceManager::RegisterType<Font>("FontFile");
@@ -118,13 +122,16 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
     m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerHUDSystem>(updateOrderLevel);
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;

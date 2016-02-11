@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Sprite">
+		<xs:annotation>
+			<xs:documentation>A sprite that will be facing the camera</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="DiffuseTexture" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>Diffuse Texture file</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="GlowMap" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>GlowMap file</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Color" type="t:Color" minOccurs="0">
+					<xs:annotation><xs:documentation>Color tint</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Visible" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Whether the model is visible or not</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="DepthSort" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Whether the sprite should be sorted with depth or not. Only use false for textures that are on HUD</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

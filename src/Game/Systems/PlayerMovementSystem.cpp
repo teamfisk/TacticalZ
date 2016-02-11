@@ -51,6 +51,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
 
         float playerMovementSpeed = player["Player"]["MovementSpeed"];
         float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
+        glm::vec3& wishDirection = player["Player"]["CurrentWishDirection"];
 
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
@@ -58,7 +59,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             if (player.HasComponent("DashAbility")) {
                 controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"]);
             }
-            glm::vec3 wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
+            wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
             if (controller->AssaultDashDoubleTapped() && controller->Movement().z != 0 && controller->Movement().x != 0) {
                 wishDirection = glm::vec3(controller->Movement().x, 0, 0)* glm::inverse(glm::quat(ori));
@@ -109,9 +110,15 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
             if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (isOnGround || !controller->DoubleJumping())) {
                 (bool)cPhysics["IsOnGround"] = false;
-                if (velocity.y == 0.f) {
+                if (isOnGround) {
                     controller->SetDoubleJumping(false);
                 } else {
+                    //put a hexagon at the players feet
+                    auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+                    EntityFileParser parser(hexagonEffect);
+                    EntityID hexagonEffectID = parser.MergeEntities(m_World);
+                    EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
+                    hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
                     controller->SetDoubleJumping(true);
                     Events::DoubleJump e;
                     m_EventBroker->Publish(e);
@@ -227,7 +234,8 @@ void PlayerMovementSystem::updateVelocity(double dt)
     float speed = glm::length(velocity);
     static float groundFriction = 7.f;
     ImGui::InputFloat("groundFriction", &groundFriction);
-    static float airFriction = 0.f;
+    static float airFriction = 2.f;
+
     ImGui::InputFloat("airFriction", &airFriction);
     float friction = isOnGround ? groundFriction : airFriction;
     if (speed > 0) {

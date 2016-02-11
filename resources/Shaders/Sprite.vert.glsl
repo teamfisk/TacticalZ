@@ -16,7 +16,8 @@ out VertexData{
 
 void main()
 {
-	gl_Position = P  * M * vec4(Position, 1.0);
+
+	gl_Position = P * V * M * vec4(Position, 1.0);
 
 	Output.Position = Position;
 	Output.TextureCoordinate = TextureCoords;

@@ -6,6 +6,7 @@
 #include "Core/World.h"
 #include "Rendering/Model.h"
 #include "imgui/imgui.h"
+#include "Core/Octree.h"
 
 namespace Collision
 {
@@ -145,13 +146,14 @@ bool RayVsTriangle(const Ray& ray,
 }
 
 bool RayVsModel(const Ray& ray,
-    const std::vector<RawModel::Vertex>& modelVertices,
-    const std::vector<unsigned int>& modelIndices)
+    const RawModel::Vertex* modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix)
 {
-    for (int i = 0; i < modelIndices.size(); ++i) {
-        glm::vec3 v0 = modelVertices[modelIndices[i]].Position;
-        glm::vec3 v1 = modelVertices[modelIndices[++i]].Position;
-        glm::vec3 v2 = modelVertices[modelIndices[++i]].Position;
+    for (int i = 0; i < modelIndices.size();) {
+        glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         if (RayVsTriangle(ray, v0, v1, v2)) {
             return true;
         }
@@ -192,19 +194,20 @@ bool RayVsTriangle(const Ray& ray,
 }
 
 bool RayVsModel(const Ray& ray,
-    const std::vector<RawModel::Vertex>& modelVertices,
+    const RawModel::Vertex* modelVertices,
     const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix,
     float& outDistance,
     float& outUCoord,
     float& outVCoord)
 {
     outDistance = INFINITY;
     bool hit = false;
-    for (int i = 0; i < modelIndices.size(); ++i) {
-        glm::vec3 v0 = modelVertices[modelIndices[i]].Position;
-        glm::vec3 v1 = modelVertices[modelIndices[++i]].Position;
-        glm::vec3 v2 = modelVertices[modelIndices[++i]].Position;
-        float dist;
+    for (int i = 0; i < modelIndices.size();) {
+        glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        float dist = INFINITY;
         float u;
         float v;
         if (RayVsTriangle(ray, v0, v1, v2, dist, u, v)) {
@@ -218,14 +221,15 @@ bool RayVsModel(const Ray& ray,
 }
 
 bool RayVsModel(const Ray& ray,
-    const std::vector<RawModel::Vertex>& modelVertices,
+    const RawModel::Vertex* modelVertices,
     const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix,
     glm::vec3& outHitPosition)
 {
     float u;
     float v;
     float dist;
-    bool hit = RayVsModel(ray, modelVertices, modelIndices, dist, u, v);
+    bool hit = RayVsModel(ray, modelVertices, modelIndices, modelMatrix, dist, u, v);
     outHitPosition = ray.Origin() + dist * ray.Direction();
     return hit;
 }
@@ -572,11 +576,11 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
         ComponentWrapper& cAABB = entity["AABB"];
         modelSpaceBox = EntityAABB::FromOriginSize((glm::vec3)cAABB["Origin"], (glm::vec3)cAABB["Size"]);
     } else if (entity.HasComponent("Model")) {
-        Model* model;
         std::string res = entity["Model"]["Resource"];
         if (res.empty()) {
             return boost::none;
         }
+        Model* model;
         try {
             model = ResourceManager::Load<::Model, true>(res);
         } catch (const Resource::StillLoadingException&) {
@@ -636,6 +640,38 @@ boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity)
     EntityAABB aabb = AABB(mini, maxi);
     aabb.Entity = entity;
     return aabb;
+}
+
+boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<EntityAABB> entitiesPotentiallyHitSorted, float& outDistance, glm::vec3& outIntersectPos)
+{
+    for (EntityAABB& entityBox : entitiesPotentiallyHitSorted) {
+        if (!entityBox.Entity.HasComponent("Model")) {
+            continue;
+        }
+        std::string res = entityBox.Entity["Model"]["Resource"];
+        if (res.empty()) {
+            continue;
+        }
+        Model* model;
+        try {
+            model = ResourceManager::Load<::Model, true>(res);
+        } catch (const std::exception&) {
+            continue;
+        }
+        float u, v;
+        if (RayVsModel(ray, model->Vertices(), model->m_RawModel->m_Indices, Transform::ModelMatrix(entityBox.Entity), outDistance, u, v)) {
+            outIntersectPos = ray.Origin() + outDistance * ray.Direction();
+            return entityBox;
+        }
+    }
+    return boost::none;
+}
+
+boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, Octree<EntityAABB>* octree, float& outDistance, glm::vec3& outIntersectPos)
+{
+    std::vector<EntityAABB> outObjects;
+    octree->ObjectsPossiblyHitByRay(ray, outObjects);
+    return Collision::EntityFirstHitByRay(ray, outObjects, outDistance, outIntersectPos);
 }
 
 }
