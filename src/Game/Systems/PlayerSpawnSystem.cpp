@@ -95,6 +95,7 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         }
     }
 
+    //Check if the player already requested spawn.
     auto iter = m_SpawnRequests.begin();
     for (; iter != m_SpawnRequests.end(); ++iter) {
         if (iter->PlayerID == e.PlayerID) {
@@ -103,7 +104,7 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
     }
 
     if (iter != m_SpawnRequests.end()) {
-        //If player is in queue to spawn, then change their team affiliation.
+        //If player is in queue to spawn, then change their team affiliation in the request.
         iter->Team = (ComponentInfo::EnumType)e.Value;
     } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
         //If player is not in queue to spawn, then create a spawn request, 
@@ -121,6 +122,10 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
 
 bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
+    // Store the player for future reference
+    m_PlayerEntities[e.PlayerID] = e.Player;
+    m_PlayerIDs[e.Player.ID] = e.PlayerID;
+
     // When a player is actually spawned (since the actual spawning is handled on the server)
     if (!IsClient) {
         return false;
@@ -133,10 +138,6 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
             m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
         }
     }
-
-    // Store the player for future reference
-    m_PlayerEntities[e.PlayerID] = e.Player;
-    m_PlayerIDs[e.Player.ID] = e.PlayerID;
 
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
@@ -169,6 +170,9 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 
 bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
+    if (!IsServer && m_NetworkEnabled) {
+        return false;
+    }
     if (!e.Player.HasComponent("Team")) {
         return false;
     }
