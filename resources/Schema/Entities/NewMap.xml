@@ -104,6 +104,100 @@
               </Components>
               <Children/>
             </Entity>
+            <Entity name="GridWalls">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Walls/SciFiWallTop.mesh</Resource>
+                </c:Model>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallBig.mesh</Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallMedium.mesh</Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallSmall1.mesh</Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallSmall2.mesh</Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallBig.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Scale X="-1" Y="1" Z="-1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallMedium.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Scale X="-1" Y="1" Z="-1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallSmall3.mesh</Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Walls/SciFiWallSmall4.mesh</Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
           </Children>
         </Entity>
         <Entity name="Pillars">
@@ -1436,12 +1530,117 @@
                   <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="42.9323235" Y="6.46230173" Z="-69.7840118"/>
+                  <Position X="45.3988762" Y="6.10456753" Z="-73.9011993"/>
                   <Scale X="0.899999976" Y="0.899999976" Z="0.899999976"/>
-                  <Orientation X="0" Y="2.67000008" Z="0"/>
+                  <Orientation X="0" Y="2.54200006" Z="0"/>
                 </c:Transform>
               </Components>
-              <Children/>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-2.12194037" Y="-0.910161376" Z="-2.91662836"/>
+                      <Orientation X="0" Y="1.51400006" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Collidable/>
+                        <c:Model>
+                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="-1.90262771" Y="0" Z="0.157715589"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Collidable/>
+                            <c:Model>
+                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="-2.00626397" Y="0" Z="0.0953077674"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Collidable/>
+                                <c:Model>
+                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="-1.84841895" Y="0" Z="0.120156199"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="2.06068087" Y="-0.704975307" Z="-2.7707541"/>
+                      <Orientation X="0" Y="4.65500021" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Collidable/>
+                        <c:Model>
+                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="1.80583596" Y="0" Z="-0.0662016794"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Collidable/>
+                            <c:Model>
+                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="1.92975175" Y="0" Z="-0.246409908"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Collidable/>
+                                <c:Model>
+                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="1.90471327" Y="0" Z="-0.0366260633"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
             </Entity>
             <Entity>
               <Components>
@@ -1591,9 +1790,9 @@
                   <Resource>Models/Props/Pillars/SciFiBridgePillar1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="45.7417641" Y="0.242569372" Z="-75.0444489"/>
+                  <Position X="48.9192352" Y="-0.184005469" Z="-78.8985367"/>
                   <Scale X="1.10000002" Y="1.10000002" Z="1.10000002"/>
-                  <Orientation X="0" Y="1.10000002" Z="0"/>
+                  <Orientation X="0" Y="0.942000031" Z="0"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -2901,9 +3100,9 @@
                   <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="45.6545868" Y="6.77304316" Z="-75.3564148"/>
+                  <Position X="48.8548851" Y="6.34798431" Z="-79.2365799"/>
                   <Scale X="2" Y="2" Z="2"/>
-                  <Orientation X="0" Y="0.604000032" Z="0"/>
+                  <Orientation X="0" Y="0.371000022" Z="0"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3124,6 +3323,19 @@
               </Components>
               <Children/>
             </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="41.1066666" Y="5.20121813" Z="-67.5628738"/>
+                  <Orientation X="0" Y="2.54200006" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
           </Children>
         </Entity>
       </Children>
@@ -3135,106 +3347,176 @@
       <Children>
         <Entity>
           <Components>
-            <c:CapturePoint>
-              <HomePointForTeam>
-                <Blue/>
-              </HomePointForTeam>
-            </c:CapturePoint>
+            <c:Collidable/>
             <c:Model>
-              <Resource>Models/Props/CapturePoint.mesh</Resource>
-              <Color A="0.300000012" B="1" G="0.200000003" R="0"/>
-              <Transparent>true</Transparent>
+              <Resource>Models/Props/CapturePoint/CapturePointBlue.mesh</Resource>
             </c:Model>
-            <c:Team>
-              <Team>
-                <Blue/>
-              </Team>
-            </c:Team>
             <c:Transform>
-              <Position X="38.0929985" Y="0.25" Z="62.2374954"/>
+              <Position X="38.0929985" Y="0.25" Z="62.2369995"/>
             </c:Transform>
-            <c:Trigger/>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:CapturePoint>
+                  <HomePointForTeam>
+                    <Blue/>
+                  </HomePointForTeam>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCylinder.mesh</Resource>
+                  <Color A="0.300000012" B="1" G="0.200000003" R="0"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team>
+                  <Team>
+                    <Blue/>
+                  </Team>
+                </c:Team>
+                <c:Transform>
+                  <Position X="0" Y="30.5569248" Z="0"/>
+                  <Scale X="8.5" Y="62.2000046" Z="8.5"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>
-            <c:CapturePoint>
-              <CapturePointNumber>1</CapturePointNumber>
-            </c:CapturePoint>
+            <c:Collidable/>
             <c:Model>
-              <Resource>Models/Props/CapturePoint.mesh</Resource>
-              <Color A="0.300000012" B="1" G="1" R="0"/>
-              <Transparent>true</Transparent>
+              <Resource>Models/Props/CapturePoint/CapturePointNeutral.mesh</Resource>
             </c:Model>
-            <c:Team/>
             <c:Transform>
-              <Position X="-36.8407059" Y="6.93645144" Z="56.9600563"/>
+              <Position X="-36.8409996" Y="6.93599987" Z="56"/>
             </c:Transform>
-            <c:Trigger/>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:CapturePoint>
+                  <CapturePointNumber>1</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCylinder.mesh</Resource>
+                  <Color A="0.300000012" B="1" G="1" R="0"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team/>
+                <c:Transform>
+                  <Position X="0" Y="11.7901649" Z="0"/>
+                  <Scale X="8.5" Y="40" Z="8.5"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>
-            <c:CapturePoint>
-              <CapturePointNumber>2</CapturePointNumber>
-            </c:CapturePoint>
+            <c:Collidable/>
             <c:Model>
-              <Resource>Models/Props/CapturePoint.mesh</Resource>
-              <Color A="0.300000012" B="1" G="1" R="1"/>
-              <Transparent>true</Transparent>
+              <Resource>Models/Props/CapturePoint/CapturePointNeutral.mesh</Resource>
             </c:Model>
-            <c:Team/>
             <c:Transform>
-              <Position X="0" Y="1.81564617" Z="-2.44221854"/>
+              <Position X="0" Y="1.81599998" Z="-2.44199991"/>
             </c:Transform>
-            <c:Trigger/>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:CapturePoint>
+                  <CapturePointNumber>2</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCylinder.mesh</Resource>
+                  <Color A="0.300000012" B="1" G="1" R="1"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team/>
+                <c:Transform>
+                  <Position X="0" Y="20.0245457" Z="0"/>
+                  <Scale X="9" Y="40" Z="9"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>
-            <c:CapturePoint>
-              <CapturePointNumber>3</CapturePointNumber>
-            </c:CapturePoint>
+            <c:Collidable/>
             <c:Model>
-              <Resource>Models/Props/CapturePoint.mesh</Resource>
-              <Color A="0.300000012" B="0" G="1" R="1"/>
-              <Transparent>true</Transparent>
+              <Resource>Models/Props/CapturePoint/CapturePointNeutral.mesh</Resource>
             </c:Model>
-            <c:Team/>
             <c:Transform>
-              <Position X="38.0138741" Y="7.01765108" Z="-56.1907501"/>
+              <Position X="36.7999992" Y="6.9000001" Z="-56"/>
             </c:Transform>
-            <c:Trigger/>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:CapturePoint>
+                  <CapturePointNumber>3</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCylinder.mesh</Resource>
+                  <Color A="0.300000012" B="0" G="1" R="1"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team/>
+                <c:Transform>
+                  <Position X="0" Y="18.8953438" Z="0"/>
+                  <Scale X="8.5" Y="40" Z="8.5"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>
-            <c:CapturePoint>
-              <HomePointForTeam>
-                <Red/>
-              </HomePointForTeam>
-              <CapturePointNumber>4</CapturePointNumber>
-            </c:CapturePoint>
+            <c:Collidable/>
             <c:Model>
-              <Resource>Models/Props/CapturePoint.mesh</Resource>
-              <Color A="0.300000012" B="0" G="0.200000003" R="1"/>
-              <Transparent>true</Transparent>
+              <Resource>Models/Props/CapturePoint/CapturePointNeutral.mesh</Resource>
             </c:Model>
-            <c:Team>
-              <Team>
-                <Red/>
-              </Team>
-            </c:Team>
             <c:Transform>
-              <Position X="-38.0929985" Y="0.25" Z="-62.2369995"/>
+              <Position X="-38.0929985" Y="0.25156638" Z="-62.2369995"/>
             </c:Transform>
-            <c:Trigger/>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:CapturePoint>
+                  <HomePointForTeam>
+                    <Red/>
+                  </HomePointForTeam>
+                  <CapturePointNumber>4</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Model>
+                  <Resource>Models/Core/UnitCylinder.mesh</Resource>
+                  <Color A="0.300000012" B="0" G="0.200000003" R="1"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team>
+                  <Team>
+                    <Red/>
+                  </Team>
+                </c:Team>
+                <c:Transform>
+                  <Position X="0" Y="18.1249008" Z="0"/>
+                  <Scale X="8.5" Y="40" Z="8.5"/>
+                </c:Transform>
+                <c:Trigger/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>
