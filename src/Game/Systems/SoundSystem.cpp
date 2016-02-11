@@ -3,7 +3,6 @@
 SoundSystem::SoundSystem(SystemParams params)
     : System(params)
     , PureSystem("SoundEmitter")
-    //, ImpureSystem()
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Announcer = ResourceManager::Load<ConfigFile>("Config.ini")->Get<std::string>("Sound.Announcer", "female");
@@ -11,7 +10,6 @@ SoundSystem::SoundSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &SoundSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &SoundSystem::OnDashAbility);
-    EVENT_SUBSCRIBE_MEMBER(m_EShoot, &SoundSystem::OnShoot);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
@@ -88,15 +86,6 @@ bool SoundSystem::drumTimer(double dt)
     } else {
         return false;
     }
-}
-
-bool SoundSystem::OnShoot(const Events::Shoot & e)
-{
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
-    ev.FilePath = "Audio/laser/laser1.wav";
-    m_EventBroker->Publish(ev);
-    return true;
 }
 
 bool SoundSystem::OnCaptured(const Events::Captured & e)

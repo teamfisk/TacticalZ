@@ -67,7 +67,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
         if ((entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
-            //continue;
+            continue;
         }
 
         Model* model;

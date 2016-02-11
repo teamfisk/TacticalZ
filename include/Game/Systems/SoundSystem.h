@@ -52,8 +52,6 @@ private:
     bool OnDashAbility(const Events::DashAbility &e);
     EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(const Events::TriggerTouch &e);
-    EventRelay<SoundSystem, Events::Shoot> m_EShoot;
-    bool OnShoot(const Events::Shoot &e);
     EventRelay<SoundSystem, Events::Captured> m_ECaptured;
     bool OnCaptured(const Events::Captured &e);
     EventRelay<SoundSystem, Events::PlayerDamage> m_EPlayerDamage;

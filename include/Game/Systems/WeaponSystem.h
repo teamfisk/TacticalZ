@@ -16,6 +16,7 @@
 #include "Core/Octree.h"
 #include "Collision/EntityAABB.h"
 #include "Systems/SpawnerSystem.h"
+#include "Sound/EPlaySoundOnEntity.h"
 
 class WeaponBehaviour;
 
@@ -45,7 +46,7 @@ private:
     void selectWeapon(EntityWrapper player, ComponentInfo::EnumType slot);
 };
 
-class WeaponBehaviour : protected System
+class WeaponBehaviour : public System
 {
 public:
     WeaponBehaviour(SystemParams systemParams, Octree<EntityAABB>* collisionOctree, EntityWrapper weaponEntity)
@@ -73,10 +74,7 @@ class AssaultWeaponBehaviour : public WeaponBehaviour
 public:
     AssaultWeaponBehaviour(SystemParams systemParams, Octree<EntityAABB>* collisionOctree, EntityWrapper weaponEntity)
         : WeaponBehaviour(systemParams, collisionOctree, weaponEntity)
-    { 
-        m_RayRed = ResourceManager::Load<EntityFile>("Schema/Entities/RayRed.xml");
-        m_RayBlue = ResourceManager::Load<EntityFile>("Schema/Entities/RayBlue.xml");
-    }
+    { }
     
     virtual void Fire() override
     {
@@ -145,12 +143,17 @@ private:
         // Fire
         magAmmo -= 1;
         spawnTracer();
+        playSound();
 
         m_TimeSinceLastFire = 0.0;
     }
 
     void spawnTracer()
     {
+        if (!IsClient) {
+            return;
+        }
+
         EntityWrapper spawner;
         if (m_Entity == LocalPlayer) {
             spawner = m_Entity.FirstChildByName("WeaponMuzzle");
@@ -165,66 +168,24 @@ private:
         Events::SpawnerSpawn e;
         e.Spawner = spawner;
         m_EventBroker->Publish(e);
-
-        //ComponentWrapper cTeam = m_Entity["Team"];
-        //ComponentInfo::EnumType team = cTeam["Team"];
-
-        //// Select the right color of effect
-        //EntityFile* rayFile = nullptr;
-        //if (team == cTeam["Team"].Enum("Red")) {
-        //    rayFile = m_RayRed;
-        //}
-        //if (team == cTeam["Team"].Enum("Blue")) {
-        //    rayFile = m_RayBlue;
-        //}
-        //if (rayFile == nullptr) {
-        //    return;
-        //}
-
-        //// Create the entity
-        //EntityFileParser parser(rayFile);
-        //EntityID rayID = parser.MergeEntities(m_World);
-        //EntityWrapper ray(m_World, rayID);
-
-        //// Figure out where to put it
-        //EntityWrapper attachment;
-        //if (m_Entity == LocalPlayer || true) {
-        //    // Spawn the effect from the weapon view model for the local player
-        //    attachment = m_Entity.FirstChildByName("WeaponMuzzle");
-        //}
-        //// TODO: Spawn the effect from the weapon world model once it exists
-
-        //glm::mat4 transformation = Transform::AbsoluteTransformation(attachment);
-        //glm::vec3 _scale;
-        //glm::vec3 translation;
-        //glm::quat _orientation;
-        //glm::vec3 _skew;
-        //glm::vec4 _perspective;
-        //glm::decompose(transformation, _scale, _orientation, translation, _skew, _perspective);
-        //
-        //// Matrix to euler angles
-        //glm::vec3 euler;
-        //euler.y = glm::asin(-transformation[0][2]);
-        //if (cos(euler.y) != 0) {
-        //    euler.x = atan2(transformation[1][2], transformation[2][2]);
-        //    euler.z = atan2(transformation[0][1], transformation[0][0]);
-        //} else {
-        //    euler.x = atan2(-transformation[2][0], transformation[1][1]);
-        //    euler.z = 0;
-        //}
-
-        //// TODO: Spread?
-
-        //(glm::vec3&)ray["Transform"]["Position"] = translation;
-        //(glm::vec3&)ray["Transform"]["Orientation"] = euler;
-        //glm::vec3& scale = ray["Transform"]["Scale"];
-        //scale.z = traceRayDistance(translation, glm::quat(euler) * glm::vec3(0.f, 0.f, -1.f));
     }
 
     float traceRayDistance(glm::vec3 origin, glm::vec3 direction)
     {
         // TODO: Cast a ray and size tracer appropriately
         return 100.f;
+    }
+
+    void playSound()
+    { 
+        if (!IsClient) {
+            return;
+        }
+
+        Events::PlaySoundOnEntity e;
+        e.EmitterID = m_Entity.ID;
+        e.FilePath = "Audio/laser/laser1.wav";
+        m_EventBroker->Publish(e);
     }
 };
 

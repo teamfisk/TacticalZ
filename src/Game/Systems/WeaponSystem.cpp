@@ -21,13 +21,11 @@ void WeaponSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPla
 {
     // Update potential weapon behaviour for player
     auto it = m_ActiveWeapons.find(entity);
-    if (it != m_ActiveWeapons.end()) {
-        if (it->first.Valid()) {
-            it->second->Update(dt);
-        } else {
-            m_ActiveWeapons.erase(it);
-        }
+    if (it == m_ActiveWeapons.end()) {
+        selectWeapon(entity, 1);
     }
+
+    m_ActiveWeapons.at(entity)->Update(dt);
 }
 
 bool WeaponSystem::OnInputCommand(Events::InputCommand& e)
@@ -45,7 +43,7 @@ bool WeaponSystem::OnInputCommand(Events::InputCommand& e)
     // Weapon selection
     if (e.Command == "SelectWeapon") {
         if (e.Value != 0) {
-            selectWeapon(player, static_cast<ComponentInfo::EnumType>(e.Value));
+            //selectWeapon(player, static_cast<ComponentInfo::EnumType>(e.Value));
         }
     }
 
@@ -72,7 +70,7 @@ void WeaponSystem::selectWeapon(EntityWrapper player, ComponentInfo::EnumType sl
         if (m_ActiveWeapons.count(player) == 0) {
             m_ActiveWeapons.insert(std::make_pair(player, std::make_shared<AssaultWeaponBehaviour>(m_SystemParams, m_CollisionOctree, player)));
         } else {
-            m_ActiveWeapons.erase(player);
+            //m_ActiveWeapons.erase(player);
         }
     }
 
@@ -86,7 +84,6 @@ bool WeaponSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // Select primary weapon on player spawn
     // TODO: Select the active one specified by player component
-    selectWeapon(e.Player, 1);
     return true;
 }
 

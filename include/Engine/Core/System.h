@@ -34,7 +34,7 @@ protected:
         , IsServer(params.IsServer)
     {
         if (IsClient) {
-            EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &System::OnPlayerSpawned);
+            EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &System::setLocalPlayer);
         }
     }
     virtual ~System() = default;
@@ -47,7 +47,7 @@ protected:
 
 private:
     EventRelay<System, Events::PlayerSpawned> m_EPlayerSpawned;
-    bool OnPlayerSpawned(Events::PlayerSpawned& e)
+    virtual bool setLocalPlayer(Events::PlayerSpawned& e)
     {
         if (e.PlayerID == -1) {
             LocalPlayer = e.Player;

@@ -107,7 +107,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.24743387388836702</Time1>
+              <Time1>0.52743271827223559</Time1>
               <Speed1>1</Speed1>
             </c:Animation>
             <c:Model>
@@ -126,8 +126,8 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.120747976" Y="-0.229536116" Z="-0.151475713"/>
-                  <Orientation X="0.0104047507" Y="-0.00268173264" Z="0.0428441092"/>
+                  <Position X="0.120747946" Y="-0.232330009" Z="-0.151475713"/>
+                  <Orientation X="0.0104046576" Y="-0.00268170447" Z="0.0428439789"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -137,7 +137,7 @@
                       <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
                     </c:Spawner>
                     <c:Transform>
-                      <Position X="0" Y="0.0480000004" Z="-0.807000041"/>
+                      <Position X="0.00325386273" Y="0.0970000029" Z="-0.843000054"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -166,6 +166,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
+          <Time1>0.69666320633760392</Time1>
           <Speed1>1</Speed1>
         </c:Animation>
         <c:AnimationOffset>
@@ -189,8 +190,8 @@
               <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0.156722724" Y="1.03299165" Z="-0.216208369"/>
-              <Orientation X="-0.062651813" Y="-0.0297243949" Z="0.120719783"/>
+              <Position X="0.162715688" Y="1.02479136" Z="-0.215626657"/>
+              <Orientation X="-0.0629899353" Y="-0.0542047173" Z="0.11849726"/>
             </c:Transform>
           </Components>
           <Children>
