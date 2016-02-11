@@ -17,6 +17,10 @@ void CapturePointHUDSystem::Update(double dt)
     auto CapturePointHUDElements = m_World->GetComponents("CapturePointHUD");
     auto CapturePoints = m_World->GetComponents("CapturePoint");
 
+    if(!CapturePointHUDElements) {
+        return;
+    }
+
     for (auto& cCapturePointHUD : *CapturePointHUDElements) {
         int HUD_ID = cCapturePointHUD["CapturePointNumber"];
         EntityWrapper entityHUD = EntityWrapper(m_World, cCapturePointHUD.EntityID);
