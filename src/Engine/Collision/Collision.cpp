@@ -642,7 +642,7 @@ boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity)
     return aabb;
 }
 
-boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<EntityAABB> entitiesPotentiallyHitSorted, float outDistance, glm::vec3& outIntersectPos)
+boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<EntityAABB> entitiesPotentiallyHitSorted, float& outDistance, glm::vec3& outIntersectPos)
 {
     for (EntityAABB& entityBox : entitiesPotentiallyHitSorted) {
         if (!entityBox.Entity.HasComponent("Model")) {
@@ -667,7 +667,7 @@ boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<Enti
     return boost::none;
 }
 
-boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, Octree<EntityAABB>* octree, float outDistance, glm::vec3& outIntersectPos)
+boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, Octree<EntityAABB>* octree, float& outDistance, glm::vec3& outIntersectPos)
 {
     std::vector<EntityAABB> outObjects;
     octree->ObjectsPossiblyHitByRay(ray, outObjects);

@@ -15,13 +15,13 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& comp
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
-    ComponentWrapper cHealth = e.Player["Health"];
+    ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
     health -= e.Damage;
 
     if (health <= 0.0) {
         Events::PlayerDeath ePlayerDeath;
-        ePlayerDeath.Player = e.Player;
+        ePlayerDeath.Player = e.Victim;
         m_EventBroker->Publish(ePlayerDeath);
         //Note: we will delete the entity in PlayerDeathSystem
     }

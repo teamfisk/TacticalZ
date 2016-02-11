@@ -1,4 +1,4 @@
-#include "Systems/WeaponSystem.h"
+#include "Systems/Weapon/WeaponSystem.h"
 
 WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer, Octree<EntityAABB>* collisionOctree)
     : System(params)
@@ -8,7 +8,6 @@ WeaponSystem::WeaponSystem(SystemParams params, IRenderer* renderer, Octree<Enti
     , m_CollisionOctree(collisionOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponSystem::OnInputCommand);
-    EVENT_SUBSCRIBE_MEMBER(m_EShoot, &WeaponSystem::OnShoot);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &WeaponSystem::OnPlayerSpawned);
 }
 
@@ -24,7 +23,8 @@ void WeaponSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPla
     if (it == m_ActiveWeapons.end()) {
         selectWeapon(entity, 1);
     }
-
+    
+    m_EventBroker->Process<WeaponBehaviour>();
     m_ActiveWeapons.at(entity)->Update(dt);
 }
 
@@ -59,6 +59,14 @@ bool WeaponSystem::OnInputCommand(Events::InputCommand& e)
         }
     }
 
+    // Reload
+    if (e.Command == "Reload" && e.Value != 0) {
+        if (m_ActiveWeapons.find(player) != m_ActiveWeapons.end()) {
+            auto weapon = m_ActiveWeapons.at(player);
+            weapon->Reload();
+        }
+    }
+
     return true;
 }
 
@@ -68,7 +76,7 @@ void WeaponSystem::selectWeapon(EntityWrapper player, ComponentInfo::EnumType sl
     if (slot == 1) {
         // TODO: if class...
         if (m_ActiveWeapons.count(player) == 0) {
-            m_ActiveWeapons.insert(std::make_pair(player, std::make_shared<AssaultWeaponBehaviour>(m_SystemParams, m_CollisionOctree, player)));
+            m_ActiveWeapons.insert(std::make_pair(player, std::make_shared<AssaultWeaponBehaviour>(m_SystemParams, m_Renderer, m_CollisionOctree, player)));
         } else {
             //m_ActiveWeapons.erase(player);
         }
@@ -87,52 +95,4 @@ bool WeaponSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     return true;
 }
 
-bool WeaponSystem::OnShoot(Events::Shoot& eShoot)
-{
-    if (!eShoot.Player.Valid()) {
-        return false;
-    }
-
-    // Only run further picking code for the local player!
-    if (eShoot.Player != LocalPlayer) {
-        return false;
-    }
-
-    // Screen center, based on current resolution!
-    // TODO: check if player has enough ammo and if weapon has a cooldown or not
-    Rectangle screenResolution = m_Renderer->GetViewportSize();
-    glm::vec2 centerScreen = glm::vec2(screenResolution.Width / 2, screenResolution.Height / 2);
-
-    // TODO: check if player has enough ammo and if weapon has a cooldown or not
-
-    // Pick middle of screen
-    PickData pickData = m_Renderer->Pick(centerScreen);
-    if (pickData.Entity == EntityID_Invalid) {
-        return false;
-    }
-
-    EntityWrapper player(m_World, pickData.Entity);
-
-    // Only care about players being hit
-    if (!player.HasComponent("Player")) {
-        player = player.FirstParentWithComponent("Player");
-    }
-    if (!player.Valid()) {
-        return false;
-    }
-
-    // Check for friendly fire
-    EntityWrapper shooter = eShoot.Player;
-    if ((ComponentInfo::EnumType)player["Team"]["Team"] == (ComponentInfo::EnumType)shooter["Team"]["Team"]) {
-        return false;
-    }
-
-    // TODO: Weapon damage calculations etc
-    Events::PlayerDamage ePlayerDamage;
-    ePlayerDamage.Player = player;
     ePlayerDamage.PlayerShooter = eShoot.Player;
-    ePlayerDamage.Damage = 100;
-    m_EventBroker->Publish(ePlayerDamage);
-
-    return true;
-}

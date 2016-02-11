@@ -15,7 +15,7 @@
 #include "Game/Systems/CapturePointHUDSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
 #include "Game/Systems/DamageIndicatorSystem.h"
-#include "Game/Systems/WeaponSystem.h"
+#include "Game/Systems/Weapon/WeaponSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Game/Systems/PlayerHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"

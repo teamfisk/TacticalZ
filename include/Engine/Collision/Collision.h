@@ -90,10 +90,10 @@ boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity);
 //Returns the first entity hit by the input ray. entitiesPotentiallyHitSorted needs to be sorted 
 //by their distance to the ray, e.g. result from Octree<EntityAABB>::ObjectsPossiblyHitByRay.
 //Returns boost::none if none was hit. outDistance will be the distance to the intersection point if the ray intersects.
-boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<EntityAABB> entitiesPotentiallyHitSorted, float outDistance, glm::vec3& outIntersectPos);
+boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<EntityAABB> entitiesPotentiallyHitSorted, float& outDistance, glm::vec3& outIntersectPos);
 //Returns the first entity hit by the input ray that exists in the octree.
 //outDistance will be the distance to the intersection point if the ray intersects. 
-boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, Octree<EntityAABB>* octree, float outDistance, glm::vec3& outIntersectPos);
+boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, Octree<EntityAABB>* octree, float& outDistance, glm::vec3& outIntersectPos);
 
 }
 

@@ -34,19 +34,32 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
             if (!(bool)animationComponent["Loop" + std::to_string(i)]) {
                 if (nextTime > animation->Duration) {
                     nextTime = animation->Duration;
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                 } else if (nextTime < 0) {
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                     nextTime = 0;
                 }
 
                 (double&)animationComponent["Speed" + std::to_string(i)] = 0.0;
-                Events::AnimationComplete e;
-                e.Entity = entity;
-                e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
-                m_EventBroker->Publish(e);
+                
             } else {
                 if (nextTime > animation->Duration) {
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                     nextTime -= animation->Duration;
                 } else if (nextTime < 0) {
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                     nextTime += animation->Duration;
                 }
             }
