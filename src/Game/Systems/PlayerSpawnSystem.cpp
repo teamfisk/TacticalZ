@@ -78,8 +78,8 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
     }
 
     // Team picks should be processed ONLY server-side!
-    // Don't make a spawn request if PlayerID is -1, i.e. we're the client.
-    if (e.PlayerID == -1 && m_NetworkEnabled) {
+    // Don't make a spawn request if we're the client.
+    if (!IsServer && m_NetworkEnabled) {
         return false;
     }
 
@@ -88,11 +88,10 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
     }
 
     //TODO: Spectating?
-    if (e.Player.Valid() && e.Player.HasComponent("Team")) {
-        ComponentWrapper cTeam = e.Player["Team"];
-        if ((ComponentInfo::EnumType)e.Value == cTeam["Team"].Enum("Spectator")) {
-            return false;
-        }
+    //Right now, return if someone picks spectator.
+    //1 signifies spectator here, could not get Playerteam component since it may be invalid or without team comp.
+    if ((ComponentInfo::EnumType)e.Value == 1) {
+        return false;
     }
 
     //Check if the player already requested spawn.
@@ -131,13 +130,6 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         return false;
     }
 
-    // Check if a player already exists
-    if (m_PlayerEntities.count(e.PlayerID) != 0) {
-        // TODO: Disallow infinite respawning here
-        if (m_PlayerEntities[e.PlayerID].Valid()) {
-            m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
-        }
-    }
 
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
@@ -170,6 +162,7 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 
 bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
+    //Only spawn request if network is disabled or we are server.
     if (!IsServer && m_NetworkEnabled) {
         return false;
     }
@@ -182,7 +175,7 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
         return false;
     }
     SpawnRequest req;
-    req.PlayerID = m_PlayerIDs[e.Player.ID];
+    req.PlayerID = m_PlayerIDs.at(e.Player.ID);
     req.Team = cTeam["Team"];
     m_SpawnRequests.push_back(req);
 }
