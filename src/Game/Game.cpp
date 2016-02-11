@@ -17,12 +17,14 @@
 #include "Game/Systems/DamageIndicatorSystem.h"
 #include "Game/Systems/WeaponSystem.h"
 #include "Rendering/AnimationSystem.h"
-#include "Game/Systems/PlayerHUDSystem.h"
+#include "Game/Systems/HealthHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
 #include "Game/Systems/LifetimeSystem.h"
 #include "../Engine/Core/UniformScaleSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
+#include "Game/Systems/AmmunitionHUDSystem.h"
+
 
 Game::Game(int argc, char* argv[])
 {
@@ -125,6 +127,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -132,7 +135,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<HealthHUDSystem>(updateOrderLevel);
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);

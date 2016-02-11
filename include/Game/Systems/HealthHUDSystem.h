@@ -3,13 +3,11 @@
 
 #include "../../Engine/Core/System.h"
 #include "../../Engine/GLM.h"
-#include "../../Engine/Rendering/ESetCamera.h"
-#include <imgui/imgui.h>
 
-class PlayerHUDSystem : public ImpureSystem
+class HealthHUDSystem : public ImpureSystem
 {
 public:
-    PlayerHUDSystem(SystemParams params)
+    HealthHUDSystem(SystemParams params)
         : System(params)
     { }
 
