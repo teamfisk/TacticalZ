@@ -3,7 +3,7 @@
 DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
     : System(params)
 {
-    EVENT_SUBSCRIBE_MEMBER(m_DamageTakenFromPlayer, &DamageIndicatorSystem::OnPlayerDamageTaken);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &DamageIndicatorSystem::OnPlayerDamage);
     //current camera
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &DamageIndicatorSystem::OnSetCamera);
 
@@ -12,23 +12,27 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
     auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
 }
 
-bool DamageIndicatorSystem::OnPlayerDamageTaken(Events::PlayerDamage& e)
+bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
 {
-    if (m_CurrentCamera == -1) {
+    if (m_CurrentCamera == EntityID_Invalid) {
+        return false;
+    }
+
+    if (e.Victim != LocalPlayer) {
         return false;
     }
 
     //grab players direction
-    auto playerOrientation = glm::quat((glm::vec3)e.Player["Transform"]["Orientation"]);
+    auto playerOrientation = glm::quat((glm::vec3)e.Victim["Transform"]["Orientation"]);
 
     //get the position vectors, but ignore the y-height
-    auto enemyPosition = (glm::vec3) e.PlayerShooter["Transform"]["Position"];
-    auto playerPosition = (glm::vec3) e.Player["Transform"]["Position"];
+    auto enemyPosition = (glm::vec3)e.Inflictor["Transform"]["Position"];
+    auto playerPosition = (glm::vec3)e.Victim["Transform"]["Position"];
     enemyPosition.y = 0.0f;
     playerPosition.y = 0.0f;
 
     //calculate the enemy to player vector
-    auto enemyPlayerVector = glm::normalize((glm::vec3) playerPosition - enemyPosition);
+    auto enemyPlayerVector = glm::normalize(playerPosition - enemyPosition);
 
     //get angle from players current rotation, this angle is how much you rotate around the y-axis
     auto playerAngle = glm::angle(playerOrientation);

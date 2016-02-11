@@ -22,7 +22,9 @@ MKLINK "%DeployLocation%\Schema\" "resources\Schema" /J
 RMDIR /S /Q "%DeployLocation%\Shaders"
 MKLINK "%DeployLocation%\Shaders\" "resources\Shaders" /J
 :: Configuration files
+DEL "%DeployLocation%\DefaultConfig.ini"
 MKLINK "%DeployLocation%\DefaultConfig.ini" "resources\DefaultConfig.ini" /H
+DEL "%DeployLocation%\DefaultInput.ini"
 MKLINK "%DeployLocation%\DefaultInput.ini" "resources\DefaultInput.ini" /H
 
 :: Platform specific binaries

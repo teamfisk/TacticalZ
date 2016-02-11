@@ -34,19 +34,32 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
             if (!(bool)animationComponent["Loop" + std::to_string(i)]) {
                 if (nextTime > animation->Duration) {
                     nextTime = animation->Duration;
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                 } else if (nextTime < 0) {
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                     nextTime = 0;
                 }
 
                 (double&)animationComponent["Speed" + std::to_string(i)] = 0.0;
-                Events::AnimationComplete e;
-                e.Entity = entity;
-                e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
-                m_EventBroker->Publish(e);
+                
             } else {
                 if (nextTime > animation->Duration) {
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                     nextTime -= animation->Duration;
                 } else if (nextTime < 0) {
+                    Events::AnimationComplete e;
+                    e.Entity = entity;
+                    e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
+                    m_EventBroker->Publish(e);
                     nextTime += animation->Duration;
                 }
             }
@@ -54,32 +67,5 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
             (double&)animationComponent["Time" + std::to_string(i)] = nextTime;
         }
     } 
-
-    //Calculate bone transforms
-    if (skeleton != nullptr) {
-        std::vector<Skeleton::AnimationData> animations;
-        if (entity.HasComponent("Animation")) {
-            for (int i = 1; i <= 3; i++) {
-                Skeleton::AnimationData animationData;
-                animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(entity["Animation"]["AnimationName" + std::to_string(i)]);
-                if (animationData.animation == nullptr) {
-                    continue;
-                }
-                animationData.time = (double)entity["Animation"]["Time" + std::to_string(i)];
-                animationData.weight = (double)entity["Animation"]["Weight" + std::to_string(i)];
-
-                animations.push_back(animationData);
-            }
-        }
-
-        if (entity.HasComponent("AnimationOffset")) {
-            Skeleton::AnimationOffset animationOffset;
-            animationOffset.animation = skeleton->GetAnimation(entity["AnimationOffset"]["AnimationName"]);
-            animationOffset.time = (double)entity["AnimationOffset"]["Time"];
-            skeleton->CalculateFrameBones(animations, animationOffset);
-        } else {
-            skeleton->CalculateFrameBones(animations);
-        }
-    }
 }
 

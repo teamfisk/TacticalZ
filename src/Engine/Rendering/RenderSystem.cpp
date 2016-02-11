@@ -47,16 +47,8 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
             continue;
         }
        
-
         EntityWrapper entity(world, cSprite.EntityID);
-
-        // Only render children of a camera if that camera is currently active
-        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-            continue;
-        }
-
-        // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+        if (!isEntityVisible(entity)) {
             continue;
         }
 
@@ -83,6 +75,23 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
         
         jobs.push_back(spriteJob);
     }
+}
+
+bool RenderSystem::isEntityVisible(EntityWrapper& entity)
+{
+
+    // Only render children of a camera if that camera is currently active
+    if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+        return false;
+    }
+
+    // Hide things parented to local player if they have the HiddenFromLocalPlayer component
+    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) && !outOfBodyExperience) {
+        return false;
+    }
+
+    return true;
 }
 
 bool RenderSystem::isChildOfACamera(EntityWrapper entity)
@@ -112,13 +121,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
             continue;
         }
 
-        // Only render children of a camera if that camera is currently active
-        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-            continue;
-        }
-
-        // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-        if ((entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+        if (!isEntityVisible(entity)) {
             continue;
         }
 
@@ -296,6 +299,11 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
         }
         std::string resource = textComponent["Resource"];
         if (resource.empty()) {
+            continue;
+        }
+
+        EntityWrapper entity(world, textComponent.EntityID);
+        if (!isEntityVisible(entity)) {
             continue;
         }
 

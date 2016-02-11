@@ -88,7 +88,8 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
-    if (cameraEntity.Valid()) {
+    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    if (cameraEntity.Valid() && !outOfBodyExperience) {
         Events::SetCamera e;
         e.CameraEntity = cameraEntity;
         m_EventBroker->Publish(e);

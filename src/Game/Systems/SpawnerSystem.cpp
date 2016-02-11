@@ -48,10 +48,12 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
     EntityFileParser parser(entityFile);
     EntityWrapper spawnedEntity(world, parser.MergeEntities(world, parent.ID));
 
-    // Set its position and orientation to that of the SpawnPoint
-    spawnedEntity["Transform"]["Position"] = Transform::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
-    // TODO: Quaternions, bitch
-    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint));
+    if (spawnPoint != parent) {
+        // Set its position and orientation to that of the SpawnPoint
+        spawnedEntity["Transform"]["Position"] = Transform::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
+        // TODO: Quaternions, bitch
+        spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint));
+    }
 
     return spawnedEntity;
 }

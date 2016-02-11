@@ -120,6 +120,32 @@ struct ModelJob : RenderJob
 
         if (model->IsSkinned()) {
             Skeleton = Model->m_RawModel->m_Skeleton;
+
+            if (Skeleton != nullptr) {
+                if (world->HasComponent(Entity, "Animation")) {
+                    auto animationComponent = world->GetComponent(Entity, "Animation");
+
+                    for (int i = 1; i <= 3; i++) {
+                        ::Skeleton::AnimationData animationData;
+                        animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationComponent["AnimationName" + std::to_string(i)]);
+                        if (animationData.animation == nullptr) {
+                            continue;
+                        }
+                        animationData.time = (double)animationComponent["Time" + std::to_string(i)];
+                        animationData.weight = (double)animationComponent["Weight" + std::to_string(i)];
+
+                        Animations.push_back(animationData);
+                    }
+                }
+
+                if (world->HasComponent(Entity, "AnimationOffset")) {
+                    auto animationOffsetComponent = world->GetComponent(Entity, "AnimationOffset");
+                    AnimationOffset.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationOffsetComponent["AnimationName"]);
+                    AnimationOffset.time = (double)animationOffsetComponent["Time"];
+                } else {
+                    AnimationOffset.animation = nullptr;
+                }
+            }
         }
             
     };
@@ -140,8 +166,8 @@ struct ModelJob : RenderJob
     glm::vec4 Color;
     const ::Model* Model = nullptr;
     ::Skeleton* Skeleton = nullptr;
-   // const ::Skeleton::Animation* Animation = nullptr;
-
+    std::vector<::Skeleton::AnimationData> Animations;
+    ::Skeleton::AnimationOffset AnimationOffset;
     
 
 

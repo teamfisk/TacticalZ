@@ -16,6 +16,12 @@ file(GLOB SOURCE_FILES_Systems
 )
 source_group(Systems FILES ${SOURCE_FILES_Systems})
 
+file(GLOB SOURCE_FILES_Systems_Weapon
+    "${INCLUDE_PATH}/Systems/Weapon/*.h"
+    "Systems/Weapon/*.cpp"
+)
+source_group(Systems\\Weapon FILES ${SOURCE_FILES_Systems_Weapon})
+
 file(GLOB SOURCE_FILES_Events
 	"${INCLUDE_PATH}/Events/*.h"
 	"Events/*.cpp"
@@ -31,6 +37,7 @@ set(SOURCE_FILES
     ${SOURCE_FILES}
     "Game.cpp"
     ${SOURCE_FILES_Systems}
+    ${SOURCE_FILES_Systems_Weapon}
     ${SOURCE_FILES_Events}
 	${SOURCE_FILES_Network}
 )
