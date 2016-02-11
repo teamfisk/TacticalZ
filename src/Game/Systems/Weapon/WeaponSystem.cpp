@@ -94,3 +94,5 @@ bool WeaponSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     // TODO: Select the active one specified by player component
     return true;
 }
+
+    ePlayerDamage.PlayerShooter = eShoot.Player;

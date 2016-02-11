@@ -234,7 +234,8 @@ void PlayerMovementSystem::updateVelocity(double dt)
     float speed = glm::length(velocity);
     static float groundFriction = 7.f;
     ImGui::InputFloat("groundFriction", &groundFriction);
-    static float airFriction = 0.f;
+    static float airFriction = 2.f;
+
     ImGui::InputFloat("airFriction", &airFriction);
     float friction = isOnGround ? groundFriction : airFriction;
     if (speed > 0) {
