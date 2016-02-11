@@ -35,6 +35,8 @@ public:
     void Connect(std::string address, int port);
     void Update() override;
 
+    std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
+    void parseSpawnEvents();
     // Save for children
     std::unique_ptr<SnapshotFilter> m_SnapshotFilter = nullptr;
 

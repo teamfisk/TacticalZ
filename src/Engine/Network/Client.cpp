@@ -54,7 +54,6 @@ void Client::Update()
             parseMessageType(packet);
         }
     }
-
     while (m_Reliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -177,14 +176,35 @@ void Client::parseKick()
     m_IsConnected = false;
 }
 
+void Client::parseSpawnEvents()
+{
+    for (int i = 0; i < m_PlayerSpawnEvents.size(); i++) {
+        Events::PlayerSpawned e;
+        e.Player = EntityWrapper(m_World, m_ServerIDToClientID[m_PlayerSpawnEvents[i].Player.ID]);
+        e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[m_PlayerSpawnEvents[i].Spawner.ID]);
+        e.PlayerID = -1;
+        e.PlayerName = m_PlayerSpawnEvents[i].PlayerName;
+        m_EventBroker->Publish(e);
+    }
+    m_PlayerSpawnEvents.clear();
+}
+
 void Client::parsePlayersSpawned(Packet& packet)
 {
+    //Events::PlayerSpawned e;
+    //e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    //e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    //e.PlayerID = -1;
+    //e.PlayerName = packet.ReadString();
+    //m_EventBroker->Publish(e);
+
     Events::PlayerSpawned e;
-    e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
-    e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    e.Player = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
+    e.Spawner = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
     e.PlayerID = -1;
     e.PlayerName = packet.ReadString();
-    m_EventBroker->Publish(e);
+    m_PlayerSpawnEvents.push_back(e);
+    parseSpawnEvents();
 }
 
 void Client::parseEntityDeletion(Packet & packet)
@@ -322,6 +342,7 @@ void Client::parseSnapshot(Packet& packet)
             m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
         }
     }
+   // parseSpawnEvents();
 }
 
 void Client::disconnect()
