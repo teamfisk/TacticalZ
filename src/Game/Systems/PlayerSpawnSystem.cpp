@@ -71,18 +71,17 @@ bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
 bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player is actually spawned (since the actual spawning is handled on the server)
-    if (!IsClient) {
-        return false;
-    }
-
     // Check if a player already exists
+    // Hack should be moved.
     if (m_PlayerEntities.count(e.PlayerID) != 0) {
         // TODO: Disallow infinite respawning here
         if (m_PlayerEntities[e.PlayerID].Valid()) {
             m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
         }
     }
-
+    if (!IsClient) {
+        return false;
+    }
     // Store the player for future reference
     m_PlayerEntities[e.PlayerID] = e.Player;
 

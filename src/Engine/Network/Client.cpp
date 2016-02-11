@@ -287,7 +287,8 @@ void Client::parseSnapshot(Packet& packet)
     for (std::size_t i = 0; i < numInputCommands; ++i) {
         Events::InputCommand e;
         e.PlayerID = packet.ReadPrimitive<EntityID>();
-        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(packet.ReadPrimitive<EntityID>()));
+        EntityID player = packet.ReadPrimitive<EntityID>();
+        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(player));
         e.Command = packet.ReadString();
         e.Value = packet.ReadPrimitive<float>();
         m_EventBroker->Publish(e);
@@ -349,7 +350,7 @@ void Client::parseSnapshot(Packet& packet)
             m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
         }
     }
-   // parseSpawnEvents();
+    parseSpawnEvents();
 }
 
 void Client::disconnect()
