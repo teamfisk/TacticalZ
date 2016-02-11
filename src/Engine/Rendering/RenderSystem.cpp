@@ -62,6 +62,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 
         std::string diffuseResource = cSprite["DiffuseTexture"];
         std::string glowResource = cSprite["GlowMap"];
+        bool depthSorted = cSprite["DepthSort"];
         if (diffuseResource.empty() && glowResource.empty()) {
             continue;
         }
@@ -77,7 +78,8 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
         glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, world);
         //modelMatrix *= m_Camera->BillboardMatrix();
 
-        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage));
+
+        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted));
         
         jobs.push_back(spriteJob);
     }

@@ -17,33 +17,6 @@ public:
     virtual void Update(double dt) override;
 
 private:
-    //methods which will take care of specific events
-   /* EventRelay<CapturePointSystem, Events::TriggerTouch> m_ETriggerTouch;
-    bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e);
-    EventRelay<CapturePointSystem, Events::TriggerLeave> m_ETriggerLeave;
-    bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e);
-    EventRelay<CapturePointSystem, Events::Captured> m_ECaptured;
-    bool CapturePointSystem::OnCaptured(const Events::Captured& e);*/
-
-    //bool m_WinnerWasFound = false;
-    ////need to track these variables for the captureSystem to work as per design!
-    //const int m_NotACapturePoint = 999;
-    //int m_RedTeamNextPossibleCapturePoint = m_NotACapturePoint;
-    //int m_BlueTeamNextPossibleCapturePoint = m_NotACapturePoint;
-    //int m_RedTeamHomeCapturePoint = m_NotACapturePoint;
-    //int m_BlueTeamHomeCapturePoint = m_NotACapturePoint;
-
-    //int m_NumberOfCapturePoints = 0;
-    //std::map<int, EntityWrapper> m_CapturePointNumberToEntityMap;
-
-    ////std::vector<ComponentWrapper>
-
-    //const double m_CaptureTimeToTakeOver = 15.0;
-    //bool m_ResetTimers = false;
-
-    ////vectors which will keep track of enter/leave changes
-    //std::vector<std::tuple<EntityWrapper, EntityWrapper>> m_ETriggerTouchVector;
-    //std::vector<std::tuple<EntityWrapper, EntityWrapper>> m_ETriggerLeaveVector;
 };
 
 #endif

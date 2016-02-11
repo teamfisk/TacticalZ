@@ -17,7 +17,7 @@
 
 struct SpriteJob : RenderJob
 {
-    SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage)
+    SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage, bool depthSorted)
         : RenderJob()
     {
         Model = ResourceManager::Load<::Model>("Models/Core/UnitQuad.mesh");
@@ -34,8 +34,11 @@ struct SpriteJob : RenderJob
         Color = cSprite["Color"];
         Entity = cSprite.EntityID;
         Position = Transform::AbsolutePosition(world, cSprite.EntityID);
-        glm::vec3 viewpos = glm::vec3(camera->ViewMatrix() * glm::vec4(Position, 1));
-        Depth = viewpos.z;
+        Depth = 0;
+        if (depthSorted) {
+            glm::vec3 viewpos = glm::vec3(camera->ViewMatrix() * glm::vec4(Position, 1));
+            Depth = viewpos.z;
+        }
         World = world;
 
         FillColor = fillColor;
