@@ -15,9 +15,7 @@
       <Children>
         <Entity>
           <Components>
-            <c:DirectionalLight>
-              <Color A="1" B="0" G="0" R="0"/>
-            </c:DirectionalLight>
+            <c:DirectionalLight/>
             <c:Model>
               <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
             </c:Model>
@@ -33,7 +31,7 @@
             <c:Animation>
               <AnimationName1>Run</AnimationName1>
               <Weight1>0.5</Weight1>
-              <Time1>0.99150007800799234</Time1>
+              <Time1>0.60188997954429357</Time1>
               <Speed1>-1</Speed1>
               <Speed2>1</Speed2>
               <Weight2>0.5</Weight2>
@@ -43,6 +41,7 @@
             </c:Animation>
             <c:AnimationOffset>
               <AnimationName>AimRifle</AnimationName>
+              <Time>0.5</Time>
             </c:AnimationOffset>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
@@ -62,8 +61,8 @@
                   <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.144386441" Y="1.07186294" Z="-0.239227161"/>
-                  <Orientation X="-0.0163030531" Y="-0.0335932337" Z="0.195227131"/>
+                  <Position X="0.161975682" Y="1.06281972" Z="-0.216630161"/>
+                  <Orientation X="-0.064812161" Y="-0.0739696771" Z="0.143780142"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -110,21 +109,17 @@
           <Components>
             <c:Animation>
               <AnimationName1>ShootFastRifle</AnimationName1>
-              <Time1>0.068159934509623099</Time1>
+              <Time1>0.056234247235838808</Time1>
               <Speed1>1</Speed1>
               <Speed2>1</Speed2>
-              <AnimationName2>Run</AnimationName2>
+              <AnimationName2>Idl</AnimationName2>
               <Weight2>0.5</Weight2>
-              <Time2>0.19240865965109588</Time2>
-              <AnimationName3>StrafeRight</AnimationName3>
+              <Time2>1.8308673495784191</Time2>
+              <AnimationName3>StrafeRigh</AnimationName3>
               <Weight3>0.5</Weight3>
-              <Time3>0.12533627444542628</Time3>
+              <Time3>0.32167823998061529</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
-            <c:AnimationOffset>
-              <AnimationName>AimRifle</AnimationName>
-              <Time>1</Time>
-            </c:AnimationOffset>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
             </c:Model>
@@ -140,8 +135,7 @@
                   <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.0916742235" Y="1.15297461" Z="-0.231298089"/>
-                  <Orientation X="0.0628659949" Y="0.230159998" Z="0.138216347"/>
+                  <Position X="0" Y="0.803468645" Z="0"/>
                 </c:Transform>
               </Components>
               <Children/>

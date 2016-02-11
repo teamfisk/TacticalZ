@@ -19,6 +19,9 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
+    if (!model->IsSkinned()) {
+        return;
+    }
 
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
 
@@ -26,19 +29,46 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
-    const Skeleton::Animation* animation = skeleton->GetAnimation(parent["Animation"]["AnimationName1"]);
-
-    if (!animation) {
-        return;
-    }
-
     int id = skeleton->GetBoneID(entity["BoneAttachment"]["BoneName"]);
 
-    if(id == -1) {
+    if (id == -1) {
         return;
     }
 
-    glm::mat4 boneTransform = skeleton->GetBoneTransform(skeleton->Bones[id], animation, (double)parent["Animation"]["Time1"], glm::mat4(1));
+    std::vector<::Skeleton::AnimationData> Animations;
+    ::Skeleton::AnimationOffset AnimationOffset;
+    glm::mat4 boneTransform;
+
+    if (parent.HasComponent("Animation")) {
+        for (int i = 1; i <= 3; i++) {
+            ::Skeleton::AnimationData animationData;
+            animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(parent["Animation"]["AnimationName" + std::to_string(i)]);
+            if (animationData.animation == nullptr) {
+                continue;
+            }
+            animationData.time = (double)parent["Animation"]["Time" + std::to_string(i)];
+            animationData.weight = (double)parent["Animation"]["Weight" + std::to_string(i)];
+
+            Animations.push_back(animationData);
+        }
+    }
+
+    if (parent.HasComponent("AnimationOffset")) {
+        AnimationOffset.animation = model->m_RawModel->m_Skeleton->GetAnimation(parent["AnimationOffset"]["AnimationName"]);
+        AnimationOffset.time = (double)parent["AnimationOffset"]["Time"];
+
+        if(AnimationOffset.animation != nullptr) {
+            boneTransform = skeleton->GetBoneTransform(false, skeleton->Bones.at(id), Animations, AnimationOffset, glm::mat4(1));
+        } else {
+            boneTransform = skeleton->GetBoneTransform(false, skeleton->Bones.at(id), Animations, glm::mat4(1));
+        }
+        
+    } else {
+        boneTransform = skeleton->GetBoneTransform(false, skeleton->Bones.at(id), Animations, glm::mat4(1));
+    }
+    
+    
+
     glm::vec3 scale;
     glm::quat rotation;
     glm::vec3 translation;
