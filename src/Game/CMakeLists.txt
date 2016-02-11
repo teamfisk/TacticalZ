@@ -1,6 +1,6 @@
 project(TacticalZ-Game)
 
-find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
+find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono program_options)
 
 set(INCLUDE_PATH ${CMAKE_SOURCE_DIR}/include/Game)
 include_directories(
@@ -22,13 +22,17 @@ file(GLOB SOURCE_FILES_Events
 )
 source_group(Events FILES ${SOURCE_FILES_Events})
 
+file(GLOB SOURCE_FILES_Network
+	"${INCLUDE_PATH}/Network/*.h"
+	"Network/*.cpp"
+)
+source_group(Network FILES ${SOURCE_FILES_Network})
 set(SOURCE_FILES
     ${SOURCE_FILES}
     "Game.cpp"
     ${SOURCE_FILES_Systems}
     ${SOURCE_FILES_Events}
-
-    
+	${SOURCE_FILES_Network}
 )
 
 set(LIBRARIES

@@ -1,8 +1,8 @@
 #include "Systems/CapturePointSystem.h"
 #include <algorithm>
 
-CapturePointSystem::CapturePointSystem(World* world, EventBroker* eventBroker)
-    : System(world, eventBroker)
+CapturePointSystem::CapturePointSystem(SystemParams params) 
+    : System(params)
     , PureSystem("CapturePoint")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)

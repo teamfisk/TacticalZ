@@ -52,6 +52,7 @@
     </Entity>
     <Entity name="DirectionalLight">
       <Components>
+        <c:SceneLight/>
         <c:DirectionalLight/>
         <c:Model>
           <Resource>sModels/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
@@ -65,9 +66,6 @@
     </Entity>
     <Entity name="ObstacleCourse">
       <Components>
-        <c:AABB>
-          <Size X="50" Y="50" Z="50"/>
-        </c:AABB>
         <c:Collidable/>
         <c:Model>
           <Resource>Models/Test/ObstacleCourse.mesh</Resource>

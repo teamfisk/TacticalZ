@@ -47,7 +47,7 @@ ComponentWrapper ComponentPool::Allocate(EntityID entity)
 
 ComponentWrapper ComponentPool::GetByEntity(EntityID ent)
 {
-    return ComponentWrapper(m_ComponentInfo, m_EntityToComponent.at(ent));
+     return ComponentWrapper(m_ComponentInfo, m_EntityToComponent.at(ent));
 }
 
 bool ComponentPool::KnowsEntity(EntityID ent)
