@@ -81,7 +81,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 
 	m_ForwardPlusSplatMapProgram = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram");
 	m_ForwardPlusSplatMapProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
-	m_ForwardPlusSplatMapProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMap.frag.glsl")));
+	m_ForwardPlusSplatMapProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMapRGB.frag.glsl")));
 	m_ForwardPlusSplatMapProgram->Compile();
 	m_ForwardPlusSplatMapProgram->BindFragDataLocation(0, "sceneColor");
 	m_ForwardPlusSplatMapProgram->BindFragDataLocation(1, "bloomColor");
@@ -91,7 +91,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 	m_ExplosionEffectSplatMapProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectSplatMapProgram");
 	m_ExplosionEffectSplatMapProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
 	m_ExplosionEffectSplatMapProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/ExplosionEffect.geom.glsl")));
-	m_ExplosionEffectSplatMapProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMap.frag.glsl")));
+	m_ExplosionEffectSplatMapProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMapRGB.frag.glsl")));
 	m_ExplosionEffectSplatMapProgram->Compile();
 	m_ExplosionEffectSplatMapProgram->BindFragDataLocation(0, "sceneColor");
 	m_ExplosionEffectSplatMapProgram->BindFragDataLocation(1, "bloomColor");
@@ -119,7 +119,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 
 	m_ExplosionEffectSplatMapSkinnedProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectSplatMapSkinnedProgram");
 	m_ExplosionEffectSplatMapSkinnedProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlusSkinned.vert.glsl")));
-	m_ExplosionEffectSplatMapSkinnedProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMap.frag.glsl")));
+	m_ExplosionEffectSplatMapSkinnedProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMapRGB.frag.glsl")));
 	m_ExplosionEffectSplatMapSkinnedProgram->Compile();
 	m_ExplosionEffectSplatMapSkinnedProgram->BindFragDataLocation(0, "sceneColor");
 	m_ExplosionEffectSplatMapSkinnedProgram->BindFragDataLocation(1, "bloomColor");
@@ -128,7 +128,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 
 	m_ForwardPlusSplatMapSkinnedProgram = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapSkinnedProgram");
 	m_ForwardPlusSplatMapSkinnedProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlusSkinned.vert.glsl")));
-	m_ForwardPlusSplatMapSkinnedProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMap.frag.glsl")));
+	m_ForwardPlusSplatMapSkinnedProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusSplatMapRGB.frag.glsl")));
 	m_ForwardPlusSplatMapSkinnedProgram->Compile();
 	m_ForwardPlusSplatMapSkinnedProgram->BindFragDataLocation(0, "sceneColor");
 	m_ForwardPlusSplatMapSkinnedProgram->BindFragDataLocation(1, "bloomColor");
@@ -892,7 +892,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 		
 			//Bind 5 diffuse textures
 			std::string UniformName = "DiffuseUVRepeat";
-			for (unsigned int i = 0; i < 5; i++) {
+			for (unsigned int i = 0; i < 3; i++) {
 				glActiveTexture(texturePosition);
 				if (job->DiffuseTexture.size() > i && job->DiffuseTexture[i]->Texture != nullptr) {
 					glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[i]->Texture->m_Texture);
@@ -906,7 +906,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 
 			//Bind 5 Normal textures
 			UniformName = "NormalUVRepeat";
-			for (unsigned int i = 0; i < 5; i++) {
+			for (unsigned int i = 0; i < 3; i++) {
 				glActiveTexture(texturePosition);
 				if (job->NormalTexture.size() > i && job->NormalTexture[i]->Texture != nullptr) {
 					glBindTexture(GL_TEXTURE_2D, job->NormalTexture[i]->Texture->m_Texture);
@@ -920,7 +920,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 
 			//Bind 5 Specular textures
 			UniformName = "SpecularUVRepeat";
-			for (unsigned int i = 0; i < 5; i++) {
+			for (unsigned int i = 0; i < 3; i++) {
 				glActiveTexture(texturePosition);
 				if (job->SpecularTexture.size() > i && job->SpecularTexture[i]->Texture != nullptr) {
 					glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[i]->Texture->m_Texture);
@@ -934,7 +934,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 
 			//Bind 5 Incandescence textures
 			UniformName = "GlowUVRepeat";
-			for (unsigned int i = 0; i < 5; i++) {
+			for (unsigned int i = 0; i < 3; i++) {
 				glActiveTexture(texturePosition);
 				if (job->IncandescenceTexture.size() > i && job->IncandescenceTexture[i]->Texture != nullptr) {
 					glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[i]->Texture->m_Texture);
