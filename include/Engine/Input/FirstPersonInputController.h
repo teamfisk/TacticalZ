@@ -4,6 +4,7 @@
 #include "../GLM.h"
 #include "../Core/InputController.h"
 #include "../Core/ELockMouse.h"
+#include "../Game/Events/EDashAbility.h"
 #include "InputHandler.h"
 
 template <typename EventContext>
@@ -235,6 +236,9 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     m_AssaultDashDoubleTapped = true;
     m_AssaultDashDoubleTapDeltaTime = 0.f;
     m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
+
+    Events::DashAbility e;
+    m_EventBroker->Publish(e);
 }
 
 #endif

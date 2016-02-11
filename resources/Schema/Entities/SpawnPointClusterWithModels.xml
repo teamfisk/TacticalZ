@@ -19,7 +19,7 @@
       <Components>
         <c:SpawnPoint/>
         <c:Model>
-          <Resource>Models/Assault.mesh</Resource>
+          <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="1" Y="0" Z="0"/>
@@ -31,7 +31,7 @@
       <Components>
         <c:SpawnPoint/>
         <c:Model>
-          <Resource>Models/Assault.mesh</Resource>
+          <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="-1" Y="0" Z="0"/>
@@ -43,7 +43,7 @@
       <Components>
         <c:SpawnPoint/>
         <c:Model>
-          <Resource>Models/Assault.mesh</Resource>
+          <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="0" Y="0" Z="1"/>
@@ -55,7 +55,7 @@
       <Components>
         <c:SpawnPoint/>
         <c:Model>
-          <Resource>Models/Assault.mesh</Resource>
+          <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
         </c:Model>
         <c:Transform>
           <Position X="0" Y="0" Z="-1"/>

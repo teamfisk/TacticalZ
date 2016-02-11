@@ -1,8 +1,7 @@
 #include "Systems/PlayerMovementSystem.h"
 
-PlayerMovementSystem::PlayerMovementSystem(World* world, EventBroker* eventBroker)
-    : System(world, eventBroker)
-    , PureSystem("Player")
+PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
+    : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
 }
@@ -16,6 +15,12 @@ PlayerMovementSystem::~PlayerMovementSystem()
 
 void PlayerMovementSystem::Update(double dt)
 {
+    updateMovementControllers(dt);
+    updateVelocity(dt);
+}
+
+void PlayerMovementSystem::updateMovementControllers(double dt)
+{
     for (auto& kv : m_PlayerInputControllers) {
         EntityWrapper player = kv.first;
         auto& controller = kv.second;
@@ -24,12 +29,20 @@ void PlayerMovementSystem::Update(double dt)
             continue;
         }
 
+        // Aim pitch
         EntityWrapper cameraEntity = player.FirstChildByName("Camera");
         if (cameraEntity.Valid()) {
             glm::vec3& cameraOrientation = cameraEntity["Transform"]["Orientation"];
             cameraOrientation.x += controller->Rotation().x;
             // Limit camera pitch so we don't break our necks
             cameraOrientation.x = glm::clamp(cameraOrientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
+            // Set third person model aim pitch
+            EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+            if (playerModel.Valid()) {
+                ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
+                double time = (cameraOrientation.x + glm::half_pi<float>()) / glm::pi<float>();
+                cAnimationOffset["Time"] = time;
+            }
         }
 
         ComponentWrapper& cTransform = player["Transform"];
@@ -55,6 +68,12 @@ void PlayerMovementSystem::Update(double dt)
                 wishSpeed = playerCrouchSpeed;
             } else {
                 wishSpeed = playerMovementSpeed;
+            }
+            if (player.ID == m_LocalPlayer.ID) {
+                if (glm::length(wishDirection) == 0) {
+                    // If no key is pressed, reset the distance moved since last step.
+                    m_DistanceMoved = 0;
+                }
             }
             glm::vec3& velocity = cPhysics["Velocity"];
             bool isOnGround = (bool)cPhysics["IsOnGround"];
@@ -100,6 +119,8 @@ void PlayerMovementSystem::Update(double dt)
                     EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
                     hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
                     controller->SetDoubleJumping(true);
+                    Events::DoubleJump e;
+                    m_EventBroker->Publish(e);
                 }
                 velocity.y = 4.f;
             }
@@ -117,24 +138,74 @@ void PlayerMovementSystem::Update(double dt)
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 ComponentWrapper cAnimation = playerModel["Animation"];
+                std::string& animationName1 = cAnimation["AnimationName1"];
+                std::string& animationName2 = cAnimation["AnimationName2"];
+                double& animationTime1 = cAnimation["Time1"];
+                double& animationTime2 = cAnimation["Time2"];
+                double& animationSpeed1 = cAnimation["Speed1"];
+                double& animationSpeed2 = cAnimation["Speed2"];
+                double& animationWeight1 = cAnimation["Weight1"];
+                double& animationWeight2 = cAnimation["Weight2"];
 
                 float movementLength = glm::length(groundVelocity);
                 //TODO: add assault dash animation here
                 if (glm::length(controller->Movement()) > 0.f) {
-                    if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch Walk";
-                        (double&)cAnimation["Speed"] = 1.f * -glm::sign(controller->Movement().z);
+                    double forwardMovement = controller->Movement().z;
+                    double strafeMovement = controller->Movement().x;
+
+                    if (controller->Crouching() && animationName1 != "CrouchWalk") {
+                        animationName1 = "CrouchWalk";
+                        animationSpeed1 = 1.0 * -glm::sign(controller->Movement().z);
                     } else {
-                        cAnimation["Name"] = "Run";
-                        (double&)cAnimation["Speed"] = 2.f * -glm::sign(controller->Movement().z);
+                        if (glm::abs(forwardMovement) > 0) {
+                            if (animationName1 != "Run") {
+                                animationName1 = "Run";
+                                if (animationName2 == "StrafeLeft" || animationName2 == "StrafeRight") {
+                                    animationTime1 = animationTime2;
+                                } else {
+                                    animationTime1 = 0.0;
+                                }
+                            }
+                            animationSpeed1 = 2.f * -glm::sign(forwardMovement);
+                        }
+
+                        if (glm::abs(strafeMovement) > 0) {
+                            if (animationName2 != "StrafeLeft" && animationName2 != "StrafeRight") {
+                                if (strafeMovement < 0) {
+                                    animationName2 = "StrafeLeft";
+                                }
+                                if (strafeMovement > 0) {
+                                    animationName2 = "StrafeRight";
+                                }
+                                if (animationName1 == "Run") {
+                                    animationTime2 = animationTime1;
+                                } else {
+                                    animationTime2 = 0.0;
+                                }
+                            }
+                            animationSpeed2 = 2.f * glm::abs(strafeMovement);
+                        }
+
+                        double strafeWeight = glm::abs(strafeMovement) / (glm::abs(forwardMovement) + glm::abs(strafeMovement));
+                        animationWeight2 = strafeWeight;
+                        animationWeight1 = 1.0 - strafeWeight;
                     }
                 } else {
                     if (controller->Crouching()) {
-                        cAnimation["Name"] = "Crouch";
-                        (double&)cAnimation["Speed"] = 1.f;
+                        animationName1 = "Crouch";
+                        animationName2 = "";
+                        animationSpeed1 = 1.0;
+                        animationSpeed2 = 0.0;
+                        animationWeight1 = 1.0;
+                        animationWeight2 = 0.0;
                     } else {
-                        cAnimation["Name"] = "Hold Pos";
-                        (double&)cAnimation["Speed"] = 1.f;
+                        animationName1 = "Idle";
+                        animationName2 = "";
+                        animationSpeed1 = 1.f;
+                        animationSpeed2 = 0.0;
+                        animationWeight1 = 1.0;
+                        animationWeight2 = 0.0;
+                        //cAnimation["AnimationName2"] = "Idle";
                     }
                 }
             }
@@ -142,16 +213,19 @@ void PlayerMovementSystem::Update(double dt)
 
         controller->Reset();
     }
+    playerStep(dt);
 }
 
-void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
+
+void PlayerMovementSystem::updateVelocity(double dt)
 {
-    ComponentWrapper& cTransform = entity["Transform"];
-    if (!entity.HasComponent("Physics")) {
+    // Only apply velocity to local player
+    if (!LocalPlayer.Valid()) {
         return;
     }
 
-    ComponentWrapper& cPhysics = entity["Physics"];
+    ComponentWrapper& cTransform = LocalPlayer["Transform"];
+    ComponentWrapper& cPhysics = LocalPlayer["Physics"];
     glm::vec3& velocity = cPhysics["Velocity"];
     bool isOnGround = (bool)cPhysics["IsOnGround"];
 
@@ -169,6 +243,7 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         velocity.z *= multiplier;
     }
 
+    // Gravity
     if (cPhysics["Gravity"]) {
         velocity.y -= 9.82f * (float)dt;
     }
@@ -177,10 +252,37 @@ void PlayerMovementSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     position += velocity * (float)dt;
 }
 
+void PlayerMovementSystem::playerStep(double dt)
+{
+    if (!m_LocalPlayer.Valid()) {
+        return;
+    }
+    // Position of the local player, used see how far a player has moved.
+    glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
+    // Used to see if a player is airborne.
+    bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
+    m_DistanceMoved += glm::length(pos - m_LastPosition);
+    // Set the last position for next iteration
+    m_LastPosition = pos;
+    if (m_DistanceMoved > m_PlayerStepLength && grounded) {
+        // Player moved a step's distance
+        // Create footstep sound
+        Events::PlaySoundOnEntity e;
+        e.EmitterID = m_LocalPlayer.ID;
+        e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
+        m_LeftFoot = !m_LeftFoot;
+        m_EventBroker->Publish(e);
+        m_DistanceMoved = 0.f;
+    }
+}
+
 bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player spawns, create an input controller for them
     m_PlayerInputControllers[e.Player] = new FirstPersonInputController<PlayerMovementSystem>(m_EventBroker, e.PlayerID);
-
+    if (e.PlayerID == -1) {
+        // Keep track of the local player
+        m_LocalPlayer = e.Player;
+    }
     return true;
 }

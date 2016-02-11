@@ -47,13 +47,24 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
 
                     for (unsigned int i = 0; i < connections.length(); i++) {
                         if (connections[i].node().apiType() == MFn::kSkinClusterFilter) {
-                            MGlobal::select(shape.parent(i), MGlobal::kReplaceList);
-                            MGlobal::displayInfo(MString() + "Moving " + thisNode.name() + " to bindPose.");
+                            shape.parent(0, &status);
+                            if (status != MS::kSuccess) {
+                                MGlobal::displayError(MString() + "shape.parent(0, &status) failed with: " + status.errorString());
+                            }
+                            status = MGlobal::select(shape.parent(0), MGlobal::kReplaceList);
+                            if (status != MS::kSuccess) {
+                                MGlobal::displayError(MString() + "Parent to " + thisNode.name() + " failed");
+                            }
+
+                            MFnDependencyNode tmp(shape.parent(0));
+                            MGlobal::displayInfo(MString() + "Moving " + tmp.name() + " to bindPose.");
+
                             status = MGlobal::executeCommand("GoToBindPose;");
                             if (status != MS::kSuccess) {
                                 MGlobal::displayError(MString() + "GoToBindPose: " + status.errorString());
                             }
-                            MGlobal::displayInfo(MString() + "Has moved " + thisNode.name() + " to bindPose.");
+
+                            MGlobal::displayInfo(MString() + "Has moved " + tmp.name() + " to bindPose.");
                         }
                     }
                 }
@@ -109,6 +120,8 @@ bool Export::Materials(std::string pathName)
 
 bool Export::Animations(std::string pathName, std::vector<AnimationInfo> animInfo)
 { 
+	allAnimations.clear();
+	allBindPoses.clear();
     if (MAnimControl::currentTime().unit() != MTime::kNTSCField) {
 
         MGlobal::displayError(MString() + "Please change to 60 FPS under Preferences/Settings!");

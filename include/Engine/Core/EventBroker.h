@@ -5,6 +5,7 @@
 #include <functional>
 #include <list>
 #include <tuple>
+#include <set>
 
 #include "../Common.h"
 #include "Event.h"
@@ -107,7 +108,7 @@ private:
     typedef std::unordered_map<ContextTypeName_t, EventRelays_t> ContextRelays_t;
     ContextRelays_t m_ContextRelays;
     std::vector<BaseEventRelay*> m_RelaysToSubscribe;
-    std::vector<std::tuple<EventID, ContextTypeName_t, EventTypeName_t>> m_RelaysToUnsubscribe;
+    std::unordered_map<BaseEventRelay*, std::tuple<EventID, ContextTypeName_t, EventTypeName_t>> m_RelaysToUnsubscribe;
 
     typedef std::list<std::pair<EventTypeName_t, std::shared_ptr<Event>>> EventQueue_t;
     std::shared_ptr<EventQueue_t> m_EventQueueRead;

@@ -1,5 +1,5 @@
-#ifndef CollidableOctreeSystem_h__
-#define CollidableOctreeSystem_h__
+#ifndef FillOctreeSystem_h__
+#define FillOctreeSystem_h__
 
 #include "../Core/System.h"
 #include "../Core/Octree.h"
@@ -9,8 +9,8 @@
 class FillOctreeSystem : public ImpureSystem, public PureSystem
 {
 public:
-    FillOctreeSystem(World* world, EventBroker* eventBroker, Octree<EntityAABB>* octree, const std::string& fillComponentType)
-        : System(world, eventBroker)
+    FillOctreeSystem(SystemParams params, Octree<EntityAABB>* octree, const std::string& fillComponentType)
+        : System(params)
         , PureSystem(fillComponentType)
         , m_Octree(octree)
     { }

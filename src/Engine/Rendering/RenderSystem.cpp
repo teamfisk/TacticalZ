@@ -1,10 +1,12 @@
 #include "Rendering/RenderSystem.h"
+#include "Collision/Collision.h"
+#include "Core/Frustum.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(world, eventBroker)
+RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
-    , m_World(world)
+    , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
@@ -42,12 +44,13 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
 
 void RenderSystem::fillModels(RenderScene::Queues &Jobs)
 {
-    auto models = m_World->GetComponents("Model");
-    if (models == nullptr) {
-        return;
-    }
+    Frustum frustum(m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix());
+    std::vector<EntityAABB> seenEntities;
+    m_Octree->ObjectsInFrustum(frustum, seenEntities);
 
-    for (auto& cModel : *models) {
+    for (auto& seenEntity : seenEntities) {
+        EntityWrapper entity = seenEntity.Entity;
+        ComponentWrapper cModel = entity["Model"];
         bool visible = cModel["Visible"];
         if (!visible) {
             continue;
@@ -57,15 +60,13 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
             continue;
         }
 
-        EntityWrapper entity(m_World, cModel.EntityID);
-
         // Only render children of a camera if that camera is currently active
         if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
             continue;
         }
 
         // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+        if ((entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
             continue;
         }
 
@@ -109,6 +110,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillPercentage
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
+                    explosionEffectJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(explosionEffectJob);
                 } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
                     || m_World->HasComponent(cModel.EntityID, "Player")) {
@@ -120,6 +122,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
                     } else {
+					    explosionEffectJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
                     }
                 } else {
@@ -130,6 +133,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentObjects.push_back(explosionEffectJob);
                     } else {
+                        explosionEffectJob->CalculateHash();
                         Jobs.OpaqueObjects.push_back(explosionEffectJob);
                     }
                 }
@@ -145,6 +149,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     fillPercentage
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
+                    modelJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(modelJob);
                 } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
                     || m_World->HasComponent(cModel.EntityID, "Player")) {
@@ -156,6 +161,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentShieldedObjects.push_back(modelJob);
                     } else {
+					    modelJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(modelJob);
                     }
                 } else {
@@ -166,6 +172,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     if (cModel["Transparent"]) {
                         Jobs.TransparentObjects.push_back(modelJob);
                     } else {
+                        modelJob->CalculateHash();
                         Jobs.OpaqueObjects.push_back(modelJob);
                     }
                 }
@@ -231,7 +238,7 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
     if (texts == nullptr) {
         return;
     }
-
+	
     for (auto& textComponent : *texts) {
         bool visible = textComponent["Visible"];
         if (!visible) {
@@ -288,6 +295,8 @@ void RenderSystem::Update(double dt)
 
     fillModels(scene.Jobs);
     fillPointLights(scene.Jobs.PointLight, m_World);
+    //TODO: Make sure all objects needed are also sorted.
+	scene.Jobs.OpaqueObjects.sort();
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);

@@ -41,7 +41,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
             glm::vec3 inOutVelocity = (glm::vec3)cPhysics["Velocity"];
             bool isOnGround = (bool)cPhysics["IsOnGround"];
             float verticalStepHeight = (float)(double)cPhysics["VerticalStepHeight"];
-            if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
+            if (Collision::AABBvsTriangles(boxA, model->Vertices(), model->m_Indices, modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
                 (glm::vec3&)cTransform["Position"] += resolutionVector;
                 cPhysics["Velocity"] = inOutVelocity;
                 if (isOnGround) {
