@@ -1,7 +1,7 @@
 #include "Systems/HealthSystem.h"
 
-HealthSystem::HealthSystem(World* m_World, EventBroker* eventBroker)
-    : System(m_World, eventBroker)
+HealthSystem::HealthSystem(SystemParams params)
+    : System(params)
     , PureSystem("Health")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)

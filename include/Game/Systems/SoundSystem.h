@@ -27,14 +27,10 @@
 class SoundSystem : public PureSystem, ImpureSystem
 {
 public:
-    SoundSystem(World* world, EventBroker* eventbroker);
+    SoundSystem(SystemParams params);
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt) override;
     virtual void Update(double dt) override;
 private:
-    EntityWrapper m_LocalPlayer = EntityWrapper();
-
-    World* m_World = nullptr;
-    EventBroker* m_EventBroker = nullptr;
     std::string m_Announcer = "";
     // Logic for playing a sound when a player jumps
     void playerJumps();
@@ -56,8 +52,6 @@ private:
     bool OnDashAbility(const Events::DashAbility &e);
     EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(const Events::TriggerTouch &e);
-    EventRelay<SoundSystem, Events::Shoot> m_EShoot;
-    bool OnShoot(const Events::Shoot &e);
     EventRelay<SoundSystem, Events::Captured> m_ECaptured;
     bool OnCaptured(const Events::Captured &e);
     EventRelay<SoundSystem, Events::PlayerDamage> m_EPlayerDamage;

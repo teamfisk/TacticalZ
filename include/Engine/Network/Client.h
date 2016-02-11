@@ -20,16 +20,22 @@
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 #include "Network/EInterpolate.h"
+#include "Network/SnapshotFilter.h"
 #include "Core/EPlayerSpawned.h"
 
 class Client : public Network
 {
 public:
-    Client(ConfigFile* config);
+    Client(World* world, EventBroker* eventBroker);
+    Client(World* world, EventBroker* eventBroker, std::unique_ptr<SnapshotFilter> snapshotFilter);
     ~Client();
-    void Start(World* world, EventBroker* eventBroker) override;
+
+    void Connect(std::string address, int port);
     void Update() override;
+
 private:
+    std::unique_ptr<SnapshotFilter> m_SnapshotFilter = nullptr;
+
     // Assio UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
@@ -45,10 +51,8 @@ private:
     PacketID m_SendPacketID = 0;
 
     // Game logic
-    World* m_World;
     std::string m_PlayerName;
     PlayerID m_PlayerID = -1;
-    EntityID m_ServerEntityID = std::numeric_limits<EntityID>::max();
     bool m_IsConnected = false;
     EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
     // Server Client Lookup map
@@ -74,7 +78,9 @@ private:
     void connect();
     void disconnect();
     void parseMessageType(Packet& packet);
-    void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
+    void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
+    SharedComponentWrapper createSharedComponent(Packet& packet, EntityID entityID, const ComponentInfo& componentInfo);
+    void ignoreFields(Packet& packet, const ComponentInfo& componentInfo);
     void parseConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
@@ -99,7 +105,6 @@ private:
     void deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
 
     // Events
-    EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
     EventRelay<Client, Events::PlayerDamage> m_EPlayerDamage;

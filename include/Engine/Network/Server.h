@@ -22,15 +22,17 @@
 class Server : public Network
 {
 public:
-    Server();
+    Server(World* world, EventBroker* eventBroker, int port);
     ~Server();
-    void Start(World* m_world, EventBroker *eventBroker) override;
+
     void Update() override;
+
 private:
+    int m_Port = 27666;
     // UDP logic
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::asio::io_service m_IOService;
-    boost::asio::ip::udp::socket m_Socket;
+    std::unique_ptr<boost::asio::ip::udp::socket> m_Socket;
 
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
@@ -46,13 +48,10 @@ private:
     float snapshotInterval;
     int checkTimeOutInterval = 100;
     int m_NextPlayerID = 0;
+    std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
 
     //Timers
     std::clock_t m_StartPingTime;
-
-    // Game logic
-    World* m_World;
-    EventBroker* m_EventBroker;
     
     // Packet loss logic
     PacketID m_PacketID = 0;
@@ -66,6 +65,7 @@ private:
     void broadcast(Packet& packet);
     void sendSnapshot();
     void addChildrenToPacket(Packet& packet, EntityID entityID);
+    void addInputCommandsToPacket(Packet& packet);
     void sendPing();
     void checkForTimeOuts();
     void disconnect(PlayerID playerID);

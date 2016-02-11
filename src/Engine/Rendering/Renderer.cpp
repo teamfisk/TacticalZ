@@ -51,7 +51,7 @@ void Renderer::InitializeWindow()
 	ss << " DEBUG";
 #endif
 	LOG_INFO(ss.str().c_str());
-	glfwSetWindowTitle(m_Window, ss.str().c_str());
+    SetWindowTitle(ss.str());
 
 	// Initialize GLEW
 	if (glewInit() != GLEW_OK) {

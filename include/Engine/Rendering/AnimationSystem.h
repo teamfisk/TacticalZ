@@ -14,8 +14,8 @@
 class AnimationSystem : public PureSystem
 {
 public:
-    AnimationSystem(World* world, EventBroker* eventBroker)
-        : System(world, eventBroker)
+    AnimationSystem(SystemParams params)
+        : System(params)
         , PureSystem("Animation")
     {
 

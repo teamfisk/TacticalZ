@@ -105,7 +105,6 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
 
 
                 if (progress > 1.0f || progress < 0.0f) {
-                    LOG_INFO("Progress: %f", progress);
                     progress = glm::clamp(progress, 0.0f, 1.0f);
                 }
                 Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
@@ -182,7 +181,6 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
         }
 
 
-
         if (offset != glm::mat4(1)) {
             boneMatrix = parentMatrix * ((glm::translate(finalPosInterp) * glm::toMat4(finalRotInterp) * glm::scale(finalScaleInterp)) + offset);
         } else {
@@ -235,9 +233,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
 
                 }
 
-
                 if (progress > 1.0f || progress < 0.0f) {
-                    LOG_INFO("Progress: %f", progress);
                     progress = glm::clamp(progress, 0.0f, 1.0f);
                 }
                 Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
@@ -356,9 +352,7 @@ glm::mat4 Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animati
 
             }
 
-
             if (progress > 1.0f || progress < 0.0f) {
-                LOG_INFO("Progress: %f", progress);
                 progress = glm::clamp(progress, 0.0f, 1.0f);
             }
             Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
