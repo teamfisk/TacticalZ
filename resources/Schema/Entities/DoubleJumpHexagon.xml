@@ -3,8 +3,8 @@
 
   <Components>
     <c:Model>
-      <Resource>Models/JumpEffectHexagon.mesh</Resource>
-      <Color A="0.576470613" B="0.635294139" G="0.788235307" R="0.854901969"/>
+      <Resource>Models/Effects/JumpEffectHexagon.mesh</Resource>
+      <Color A="0.576470613" B="500" G="255" R="0.854901969"/>
       <Transparent>true</Transparent>
     </c:Model>
     <c:Transform>
@@ -12,14 +12,14 @@
       <Scale X="0.50000012" Y="0.50000019" Z="0.50000014"/>
     </c:Transform>
     <c:Lifetime>
-      <Lifetime>1.5</Lifetime>
+      <Lifetime>0.5</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
       <ColorByDistance>true</ColorByDistance>
       <Velocity X="0" Y="-7.76300049" Z="0"/>
       <ExplosionOrigin X="0" Y="2.67900002" Z="0"/>
       <ExponentialAccelaration>true</ExponentialAccelaration>
-      <ExplosionDuration>3</ExplosionDuration>
+      <ExplosionDuration>0.5</ExplosionDuration>
       <EndColor A="0" B="0" G="0" R="1"/>
       <Randomness>true</Randomness>
     </c:ExplosionEffect>
