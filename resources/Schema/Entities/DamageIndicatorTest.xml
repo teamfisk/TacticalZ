@@ -9,11 +9,10 @@
     <Entity name="Scenemesh">
       <Components>
         <c:AABB>
-          <Origin X="0.195705414" Y="26.0382366" Z="-0.010017395"/>
-          <Size X="135.414337" Y="68.3848572" Z="180.020035"/>
+          <Size X="150" Y="64" Z="180"/>
         </c:AABB>
         <c:Model>
-          <Resource>Models/LevelBase/MapVersion1.mesh</Resource>
+          <Resource>Models\MapVersion1.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -25,7 +24,7 @@
           <Intensity>2</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
+          <Resource>Models/DirectionalLightWidget.mesh</Resource>
           <Visible>false</Visible>
         </c:Model>
         <c:Transform>
@@ -242,120 +241,185 @@
         </Entity>
       </Children>
     </Entity>
-    <Entity>
+    <Entity name="Player">
       <Components>
-        <c:AABB/>
-        <c:CapturePoint>
-          <HomePointForTeam>
-            <Red/>
-          </HomePointForTeam>
-          <CaptureTimer>15</CaptureTimer>
-        </c:CapturePoint>
-        <c:Model>
-          <Resource>Models/Core/UnitSphere.mesh</Resource>
-          <Color A="0.300000012" B="0" G="0" R="1"/>
-          <Transparent>true</Transparent>
-        </c:Model>
+        <c:AABB>
+          <Origin X="0" Y="0.772000015" Z="0"/>
+          <Size X="1" Y="1.60000002" Z="1"/>
+        </c:AABB>
+        <c:Collidable/>
+        <c:DashAbility/>
+        <c:Health>
+          <Health>99</Health>
+        </c:Health>
+        <c:Physics>
+          <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
+        </c:Physics>
+        <c:Player>
+          <MovementSpeed>5</MovementSpeed>
+        </c:Player>
         <c:Team>
           <Team>
             <Red/>
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="56.0000038" Y="1.50000012" Z="77.1000061"/>
+          <Position X="57" Y="0.212861136" Z="77"/>
         </c:Transform>
-        <c:Trigger/>
       </Components>
-      <Children/>
-    </Entity>
-    <Entity>
-      <Components>
-        <c:AABB/>
-        <c:CapturePoint>
-          <CapturePointNumber>1</CapturePointNumber>
-        </c:CapturePoint>
-        <c:Model>
-          <Resource>Models/Core/UnitSphere.mesh</Resource>
-          <Color A="0.300000012" B="1" G="1" R="1"/>
-          <Transparent>true</Transparent>
-        </c:Model>
-        <c:Team/>
-        <c:Transform>
-          <Position X="56.0000038" Y="1.70000005" Z="78.5"/>
-        </c:Transform>
-        <c:Trigger/>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity>
-      <Components>
-        <c:AABB/>
-        <c:CapturePoint>
-          <CapturePointNumber>2</CapturePointNumber>
-        </c:CapturePoint>
-        <c:Model>
-          <Resource>Models/Core/UnitSphere.mesh</Resource>
-          <Color A="0.300000012" B="1" G="1" R="1"/>
-          <Transparent>true</Transparent>
-        </c:Model>
-        <c:Team/>
-        <c:Transform>
-          <Position X="56.0000038" Y="1.10000002" Z="79.6000061"/>
-        </c:Transform>
-        <c:Trigger/>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity>
-      <Components>
-        <c:AABB/>
-        <c:CapturePoint>
-          <CaptureTimer>-15</CaptureTimer>
-          <CapturePointNumber>3</CapturePointNumber>
-        </c:CapturePoint>
-        <c:Model>
-          <Resource>Models/Core/UnitSphere.mesh</Resource>
-          <Color A="0.300000012" B="1" G="0" R="0"/>
-          <Transparent>true</Transparent>
-        </c:Model>
-        <c:Team>
-          <Team>
-            <Blue/>
-          </Team>
-        </c:Team>
-        <c:Transform>
-          <Position X="56.0000038" Y="1.60000002" Z="80.6000061"/>
-        </c:Transform>
-        <c:Trigger/>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity>
-      <Components>
-        <c:AABB/>
-        <c:CapturePoint>
-          <HomePointForTeam>
-            <Blue/>
-          </HomePointForTeam>
-          <CaptureTimer>-15</CaptureTimer>
-          <CapturePointNumber>4</CapturePointNumber>
-        </c:CapturePoint>
-        <c:Model>
-          <Resource>Models/Core/UnitSphere.mesh</Resource>
-          <Color A="0.300000012" B="1" G="0" R="0"/>
-          <Transparent>true</Transparent>
-        </c:Model>
-        <c:Team>
-          <Team>
-            <Blue/>
-          </Team>
-        </c:Team>
-        <c:Transform>
-          <Position X="56.0000038" Y="1.4000001" Z="82.1000061"/>
-        </c:Transform>
-        <c:Trigger/>
-      </Components>
-      <Children/>
+      <Children>
+        <Entity name="Camera">
+          <Components>
+            <c:Camera/>
+            <c:Transform>
+              <Position X="0" Y="1.37700009" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="PlayerName">
+              <Components>
+                <c:Text>
+                  <Resource>Fonts/DroidSans.ttf,100</Resource>
+                  <Color A="1" B="0" G="1" R="0"/>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0.100000001" Y="0.248000011" Z="-0.248000011"/>
+                  <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
+                  <Orientation X="0" Y="3.14199996" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="CameraModel">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Camera.mesh</Resource>
+                  <Visible>false</Visible>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0.0331346765" Z="-0.0792061687"/>
+                  <Scale X="1.30000007" Y="1.50000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="HUD">
+              <Components>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-0.5"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="HealthBar">
+                  <Components>
+                    <c:Fill>
+                      <Percentage>0.99000000953674316</Percentage>
+                      <Color A="0" B="0.99000001" G="0" R="0.00999999046"/>
+                    </c:Fill>
+                    <c:HealthHUD/>
+                    <c:Model>
+                      <Resource>Models/Core/UnitHexagon.mesh</Resource>
+                      <Color A="1" B="0.70588237" G="0.70588237" R="0.70588237"/>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-0.383000016" Y="-0.185000002" Z="0"/>
+                      <Scale X="0.150000006" Y="0.150000006" Z="0.150000006"/>
+                      <Orientation X="0" Y="0.594000041" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Crosshair">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/CrosshairQuad.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="0.200000003"/>
+                      <Scale X="0.00600000005" Y="1" Z="0.00600000005"/>
+                      <Orientation X="1.57000005" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Weapon">
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/AssaultWeaponRed.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0.180000007" Y="-0.183000013" Z="0"/>
+                      <Orientation X="0" Y="3.08300018" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="WeaponMuzzle">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0.215000004" Y="-0.153000012" Z="-0.266000003"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ThirdPersonCamera">
+          <Components>
+            <c:Camera/>
+            <c:Model>
+              <Resource>Models/Camera.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.284000009" Y="1.83800006" Z="1.18900001"/>
+              <Orientation X="5.95600033" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlayerModel">
+          <Components>
+            <c:Animation/>
+            <c:HiddenForLocalPlayer/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
+              <Color A="1" B="0" G="0" R="1"/>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AABBStanding">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+              <Color A="0.427450985" B="1" G="1" R="1"/>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.772000015" Z="0"/>
+              <Scale X="1" Y="1.60000002" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AABBCrouching">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitCube.mesh</Resource>
+              <Color A="0.745098054" B="1" G="0" R="1"/>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.772000015" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
   </Children>
 

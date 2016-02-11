@@ -50,7 +50,7 @@ public:
 	struct TextureProperties {
 		std::string TexturePath;
 		glm::vec2 UVRepeat;
-		std::shared_ptr<::Texture> Texture;	
+		Texture* Texture;	
 	};
 	
     struct MaterialBasic

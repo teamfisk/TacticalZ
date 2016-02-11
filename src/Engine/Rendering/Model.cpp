@@ -10,60 +10,31 @@ Model::Model(std::string fileName)
 		case RawModel::MaterialType::SingleTextures:
 		{
 			RawModel::MaterialSingleTextures* materialSingleTexture = static_cast<RawModel::MaterialSingleTextures*>(materialProperty.material);
-			if (!materialSingleTexture->ColorMap.TexturePath.empty()) {
-				materialSingleTexture->ColorMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->ColorMap.TexturePath));
-			}
-			if (!materialSingleTexture->NormalMap.TexturePath.empty()) {
-				materialSingleTexture->NormalMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->NormalMap.TexturePath));
-			}
-			if (!materialSingleTexture->SpecularMap.TexturePath.empty()) {
-				materialSingleTexture->SpecularMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->SpecularMap.TexturePath));
-			}
-			if (!materialSingleTexture->IncandescenceMap.TexturePath.empty()) {
-				materialSingleTexture->IncandescenceMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSingleTexture->IncandescenceMap.TexturePath));
-			}
+            materialSingleTexture->ColorMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->ColorMap.TexturePath, false);
+            materialSingleTexture->NormalMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->NormalMap.TexturePath, false);
+            materialSingleTexture->SpecularMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->SpecularMap.TexturePath, false);
+            materialSingleTexture->IncandescenceMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->IncandescenceMap.TexturePath, false);
 		}
 			break;
 		case RawModel::MaterialType::SplatMapping:
 		{
 			RawModel::MaterialSplatMapping* materialSplatMapping = static_cast<RawModel::MaterialSplatMapping*>(materialProperty.material);
-			if (!materialSplatMapping->SplatMap.TexturePath.empty()) {
-				materialSplatMapping->SplatMap.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(materialSplatMapping->SplatMap.TexturePath));
-			}
+			materialSplatMapping->SplatMap.Texture = CommonFunctions::LoadTexture(materialSplatMapping->SplatMap.TexturePath, false);
 			for (auto& texture : materialSplatMapping->ColorMaps)
 			{
-				if (!texture.TexturePath.empty()) {
-					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
-				}
-				else {
-					texture.Texture = nullptr;
-				}
+				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
 			}
 			for (auto& texture : materialSplatMapping->NormalMaps)
 			{
-				if (!texture.TexturePath.empty()) {
-					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
-				} else {
-					texture.Texture = nullptr;
-				}
+				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
 			}
 			for (auto& texture : materialSplatMapping->SpecularMaps)
 			{
-				if (!texture.TexturePath.empty()) {
-					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
-				}
-				else {
-					texture.Texture = nullptr;
-				}
+				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
 			}
 			for (auto& texture : materialSplatMapping->IncandescenceMaps)
 			{
-				if (!texture.TexturePath.empty()) {
-					texture.Texture = std::shared_ptr<Texture>(ResourceManager::Load<Texture>(texture.TexturePath));
-				}
-				else {
-					texture.Texture = nullptr;
-				}
+				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
 			}
 		}
 			break;

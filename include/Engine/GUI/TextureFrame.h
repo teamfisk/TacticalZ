@@ -3,6 +3,7 @@
 
 #include "Frame.h"
 #include "../Rendering/Texture.h"
+#include "../Rendering/Util/CommonFunctions.h"
 
 namespace GUI
 {
@@ -55,10 +56,10 @@ public:
 			return;
 		}
 
-		m_Texture = ResourceManager::Load<Texture>(resourceName);
+		m_Texture = CommonFunctions::LoadTexture(resourceName, false);
 		m_TextureName = resourceName;
 		if (m_Texture == nullptr) {
-			m_Texture = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
+			m_Texture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
 		}
 
 		SizeToTexture();

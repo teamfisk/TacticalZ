@@ -7,6 +7,9 @@
 #include "Events/EDoubleJump.h"
 #include "../Engine/Sound/EPlaySoundOnEntity.h"
 
+#include "Core/EntityFile.h"
+#include "Core/EntityFileParser.h"
+
 class PlayerMovementSystem : public ImpureSystem
 {
 public:
