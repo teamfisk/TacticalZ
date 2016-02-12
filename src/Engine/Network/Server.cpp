@@ -335,6 +335,7 @@ void Server::disconnect(PlayerID playerID)
     //m_World->DeleteEntity(m_ConnectedPlayers[playerID].EntityID);
     m_ConnectedPlayers[playerID].TCPSocket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     m_ConnectedPlayers[playerID].TCPSocket->close();
+    m_World->DeleteEntity(m_ConnectedPlayers[playerID].EntityID);
     m_ConnectedPlayers.erase(playerID);
     // Send disconnect to the other players.
 }
