@@ -7,6 +7,7 @@ HealthSystem::HealthSystem(SystemParams params)
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &HealthSystem::OnPlayerDamaged);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerHealthPickup, &HealthSystem::OnPlayerHealthPickup);
+    EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &HealthSystem::OnInputCommand);
 }
 
 void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
@@ -26,6 +27,17 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
         //Note: we will delete the entity in PlayerDeathSystem
     }
 
+    return true;
+}
+
+bool HealthSystem::OnInputCommand(Events::InputCommand& e)
+{
+    if (e.Command == "TakeDamage" && e.Value > 0 && LocalPlayer.Valid()) {
+        Events::PlayerDamage ev;
+        ev.Victim = LocalPlayer;
+        ev.Damage = e.Value;
+        m_EventBroker->Publish(ev);
+    }
     return true;
 }
 
