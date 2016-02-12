@@ -9,7 +9,15 @@ MultiplayerSnapshotFilter::MultiplayerSnapshotFilter(EventBroker* eventBroker)
 bool MultiplayerSnapshotFilter::FilterComponent(EntityWrapper entity, SharedComponentWrapper& component)
 {
     if (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) {
-        return false;
+        if (
+            component.Info.Name == "Transform"
+            || component.Info.Name == "Physics"
+            || component.Info.Name == "AssaultWeapon"
+            || component.Info.Name == "Animation"
+            || component.Info.Name == "AnimationOffset"
+        ) {
+            return false;
+        }
     }
 
     if (component.Info.Name == "Physics") {
