@@ -562,7 +562,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="30.0050449" Y="0.0844396874" Z="73.2238235"/>
@@ -573,7 +573,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="-0.173209071" Z="0"/>
@@ -588,7 +588,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="56.3723755" Y="-0.458255291" Z="53.1675453"/>
@@ -599,7 +599,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Orientation X="0" Y="1.44000006" Z="0"/>
@@ -613,7 +613,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-30.1580982" Y="0" Z="-73.6972046"/>
@@ -625,7 +625,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-0.0403924771" Y="0" Z="0"/>
@@ -640,7 +640,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-55.7269592" Y="0" Z="-50.9566498"/>
@@ -652,7 +652,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-0.0867935717" Y="0" Z="0"/>
@@ -667,7 +667,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-19.5711384" Y="-0.178739399" Z="-34.5879555"/>
@@ -679,7 +679,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="2.77035999" Y="0" Z="-0.474606007"/>
@@ -693,7 +693,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-2.8605547" Y="-0.258339167" Z="-0.140743136"/>
@@ -709,7 +709,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="19.8690948" Y="-0.393896669" Z="38.6984329"/>
@@ -721,7 +721,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-2.87285304" Y="0" Z="0.0110195652"/>
@@ -734,7 +734,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="2.9002583" Y="0" Z="-0.00627081469"/>
@@ -980,7 +980,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="57.6499786" Y="-0.0872376561" Z="-53.4101181"/>
@@ -991,7 +991,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="2.88718605" Y="0" Z="0"/>
@@ -1003,7 +1003,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-2.91727138" Y="0" Z="0"/>
@@ -1014,7 +1014,7 @@
                       <Components>
                         <c:Collidable/>
                         <c:Model>
-                          <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                          <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                         </c:Model>
                         <c:Transform>
                           <Orientation X="0" Y="1.47700012" Z="0"/>
@@ -1030,7 +1030,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-34.824955" Y="0.944195449" Z="-7.16943455"/>
@@ -1043,7 +1043,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-4.54836559" Y="0" Z="-0.0983672738"/>
@@ -1057,7 +1057,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-54.7825966" Y="-0.593182802" Z="57.3844719"/>
@@ -1068,7 +1068,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-5.79986715" Y="0" Z="0"/>
@@ -1080,7 +1080,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-2.88392401" Y="7.18422234e-06" Z="0"/>
@@ -1092,7 +1092,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Orientation X="0" Y="1.41000009" Z="0"/>
@@ -1106,7 +1106,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="35.7009506" Y="0.947129667" Z="2.89333916"/>
@@ -1196,7 +1196,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="3.72586966" Y="-0.0922626778" Z="76.7861786"/>
@@ -1208,7 +1208,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-3.18490481" Y="0" Z="-0.0282496698"/>
@@ -1219,7 +1219,7 @@
                       <Components>
                         <c:Collidable/>
                         <c:Model>
-                          <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                          <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                         </c:Model>
                         <c:Transform>
                           <Position X="0.159084529" Y="0" Z="-0.00601554103"/>
@@ -1259,7 +1259,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-2.52126598" Y="-0.192428172" Z="0"/>
@@ -1270,7 +1270,7 @@
                       <Components>
                         <c:Collidable/>
                         <c:Model>
-                          <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                          <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                         </c:Model>
                         <c:Transform>
                           <Orientation X="0" Y="1.5710001" Z="0"/>
@@ -1286,7 +1286,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="42.3930092" Y="-0.436794043" Z="53.3168259"/>
@@ -1297,7 +1297,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="2.79896975" Y="0" Z="0"/>
@@ -1309,7 +1309,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="5.67178059" Y="0" Z="0"/>
@@ -1321,7 +1321,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="8.55263519" Y="0" Z="0"/>
@@ -1335,7 +1335,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="32.7753677" Y="-0.522610307" Z="46.3780251"/>
@@ -1347,7 +1347,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="2.84155083" Y="0" Z="0.455994934"/>
@@ -1375,7 +1375,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-45.7707558" Y="-0.0230546892" Z="-50.9324951"/>
@@ -1386,7 +1386,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-2.90289617" Y="0" Z="0"/>
@@ -1398,7 +1398,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="-5.81941414" Y="0" Z="0"/>
@@ -1412,7 +1412,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-36.5094986" Y="-0.434375852" Z="-42.7675552"/>
@@ -1424,7 +1424,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="2.86418843" Y="0" Z="0.000762880314"/>
@@ -1438,7 +1438,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                  <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-4.52009678" Y="-0.0828877687" Z="-84.9576416"/>
@@ -1450,7 +1450,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Orientation X="0" Y="1.45400012" Z="0"/>
@@ -1474,7 +1474,7 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Walls/BigWall.mesh</Resource>
+                      <Resource>Models/Props/Walls/BigWallRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="3.14642739" Y="0" Z="-0.0387783162"/>
@@ -1611,16 +1611,7 @@
                   <Orientation X="0" Y="2.68700004" Z="0"/>
                 </c:Transform>
               </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model/>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
+              <Children/>
             </Entity>
             <Entity>
               <Components>
