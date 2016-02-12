@@ -7,6 +7,7 @@
 #include "Core/EPlayerDamage.h"
 #include "Core/EShoot.h"
 
+
 class AssaultWeaponBehaviour : public WeaponBehaviour
 {
 public:
@@ -36,7 +37,8 @@ private:
     void fireRound();
     void spawnTracer();
     float traceRayDistance(glm::vec3 origin, glm::vec3 direction);
-    void playSound();
+    void playFireSound();
+    void playEmptySound();
     void viewPunch();
     void finishReload();
     void playShootAnimation();
