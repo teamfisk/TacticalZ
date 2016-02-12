@@ -165,17 +165,16 @@ void Server::addInputCommandsToPacket(Packet& packet)
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
 {
-    // HACK: Only sync players for now, since the map turned out to be TOO LARGE to send in one snapshot and Simon's computer shits itself
-    EntityWrapper entity(m_World, entityID);
-    if (!entity.Valid() || !shouldSendToClient(entity)) {
-        return;
-    }
-
     auto itPair = m_World->GetChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
         EntityID childEntityID = it->second;
+        // HACK: Only sync players for now, since the map turned out to be TOO LARGE to send in one snapshot and Simon's computer shits itself
+        EntityWrapper childEntity(m_World, childEntityID);
+        if (!shouldSendToClient(childEntity)) {
+            continue;
+        }
 
         // Write EntityID and parentsID and Entity name
         packet.WritePrimitive(childEntityID);
@@ -398,11 +397,9 @@ bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
 bool Server::OnEntityDeleted(const Events::EntityDeleted & e)
 {
     if (!e.Cascaded) {
-        if (shouldSendToClient(EntityWrapper(m_World, e.DeletedEntity))) {
-            Packet packet = Packet(MessageType::EntityDeleted);
-            packet.WritePrimitive<EntityID>(e.DeletedEntity);
-        	reliableBroadcast(packet);
-        }
+        Packet packet = Packet(MessageType::EntityDeleted);
+        packet.WritePrimitive<EntityID>(e.DeletedEntity);
+        reliableBroadcast(packet);
     }
     return false;
 }
@@ -458,7 +455,7 @@ void Server::parseOnInputCommand(Packet& packet)
             e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
-            if (e.Command == "PrimaryFire") {
+            if (e.Command == "PrimaryFire" || e.Command == "Reload") {
                 m_InputCommandsToBroadcast.push_back(e);
             }
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);

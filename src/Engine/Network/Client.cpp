@@ -181,14 +181,13 @@ void Client::parseSpawnEvents()
     std::vector<Events::PlayerSpawned> tempSpawn;
     for (int i = 0; i < m_PlayerSpawnEvents.size(); i++) {
         Events::PlayerSpawned e;
-        if (!serverClientMapsHasEntity(m_PlayerSpawnEvents.at(i).Player.ID) ||
-            !serverClientMapsHasEntity(m_PlayerSpawnEvents.at(i).Spawner.ID)) {
+        if (!serverClientMapsHasEntity(m_PlayerSpawnEvents.at(i).Player.ID)) {
             tempSpawn.push_back(m_PlayerSpawnEvents.at(i));
             continue;
         }
         e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Player.ID));
-        e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Spawner.ID));
-        e.PlayerID = -1;
+        //e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Spawner.ID));
+        e.PlayerID = -1; 
         e.PlayerName = m_PlayerSpawnEvents.at(i).PlayerName;
         m_EventBroker->Publish(e);
     }
