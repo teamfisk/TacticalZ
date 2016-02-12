@@ -411,16 +411,26 @@ void Client::sendLocalPlayerTransform()
         return;
     }
 
+    Packet packet(MessageType::PlayerTransform, m_SendPacketID);
+
     ComponentWrapper cTransform = m_LocalPlayer["Transform"];
     glm::vec3& position = cTransform["Position"];
     glm::vec3& orientation = cTransform["Orientation"];
-    Packet packet(MessageType::PlayerTransform, m_SendPacketID);
     packet.WritePrimitive(position.x);
     packet.WritePrimitive(position.y);
     packet.WritePrimitive(position.z);
     packet.WritePrimitive(orientation.x);
     packet.WritePrimitive(orientation.y);
     packet.WritePrimitive(orientation.z);
+
+    bool hasAssaultWeapon = m_LocalPlayer.HasComponent("AssaultWeapon");
+    packet.WritePrimitive(hasAssaultWeapon);
+    if (hasAssaultWeapon) {
+        ComponentWrapper cAssaultWeapon = m_LocalPlayer["AssaultWeapon"];
+        packet.WritePrimitive((int)cAssaultWeapon["MagazineAmmo"]);
+        packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
+    }
+
     send(packet);
 }
 
