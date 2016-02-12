@@ -185,11 +185,18 @@ void Server::addInputCommandsToPacket(Packet& packet)
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
 {
+    // HACK: Only sync players for now, since the map turned out to be TOO LARGE to send in one snapshot and Simon's computer shits itself
+    EntityWrapper entity(m_World, entityID);
+    if (entityID != EntityID_Invalid && !shouldSendToClient(entity)) {
+        return;
+    }
+
     auto itPair = m_World->GetChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
         EntityID childEntityID = it->second;
+
         // Write EntityID and parentsID and Entity name
         packet.WritePrimitive(childEntityID);
         packet.WritePrimitive(entityID);
@@ -435,9 +442,11 @@ bool Server::OnPlayerSpawned(const Events::PlayerSpawned & e)
 bool Server::OnEntityDeleted(const Events::EntityDeleted & e)
 {
     if (!e.Cascaded) {
-        Packet packet = Packet(MessageType::EntityDeleted);
-        packet.WritePrimitive<EntityID>(e.DeletedEntity);
-        broadcast(packet);
+        if (shouldSendToClient(EntityWrapper(m_World, e.DeletedEntity))) {
+            Packet packet = Packet(MessageType::EntityDeleted);
+            packet.WritePrimitive<EntityID>(e.DeletedEntity);
+            broadcast(packet);
+        }
     }
     return false;
 }
@@ -445,10 +454,12 @@ bool Server::OnEntityDeleted(const Events::EntityDeleted & e)
 bool Server::OnComponentDeleted(const Events::ComponentDeleted & e)
 {
     if (!e.Cascaded) {
-        Packet packet = Packet(MessageType::ComponentDeleted);
-        packet.WritePrimitive<EntityID>(e.Entity);
-        packet.WriteString(e.ComponentType);
-        broadcast(packet);
+        if (shouldSendToClient(EntityWrapper(m_World, e.Entity))) {
+            Packet packet = Packet(MessageType::ComponentDeleted);
+            packet.WritePrimitive<EntityID>(e.Entity);
+            packet.WriteString(e.ComponentType);
+            broadcast(packet);
+        }
     }
     return false;
 }
@@ -483,4 +494,9 @@ void Server::parsePlayerTransform(Packet& packet)
             player["AssaultWeapon"]["Ammo"] = ammo;
         }
     }
+}
+
+bool Server::shouldSendToClient(EntityWrapper childEntity)
+{
+    return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid();
 }

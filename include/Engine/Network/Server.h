@@ -89,6 +89,7 @@ private:
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
     void parsePlayerTransform(Packet& packet);
+    bool shouldSendToClient(EntityWrapper childEntity);
 };
 
 #endif
