@@ -89,6 +89,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Highground5.mesh</Resource>
+                  <Color A="1" B="7.84313726" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform/>
               </Components>
@@ -99,6 +100,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Highground6.mesh</Resource>
+                  <Color A="1" B="7.84313726" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform/>
               </Components>
@@ -1515,6 +1517,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="-37.5227966" Y="-0.41070056" Z="38.790432"/>
@@ -1885,7 +1888,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="45.3988762" Y="6.10456753" Z="-73.9011993"/>
@@ -2004,7 +2007,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-41.0066338" Y="6.08244133" Z="75.8575821"/>
@@ -2138,7 +2141,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-47.6850471" Y="7.0585866" Z="38.1646194"/>
@@ -2151,7 +2154,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-25.9571095" Y="6.43997049" Z="41.7452164"/>
@@ -2178,7 +2181,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="46.3167992" Y="6.36057663" Z="-37.5957794"/>
@@ -2191,7 +2194,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="25.2147388" Y="6.4451251" Z="-41.7257042"/>
@@ -2730,6 +2733,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="36.8391495" Y="0.354240507" Z="-36.1228752"/>
@@ -2948,6 +2952,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="-15.8430891" Y="2.84977508" Z="55.3108711"/>
@@ -3061,6 +3066,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="16.3593407" Y="4.03186893" Z="-54.4961166"/>
