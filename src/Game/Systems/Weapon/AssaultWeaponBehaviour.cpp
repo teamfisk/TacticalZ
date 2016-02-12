@@ -43,6 +43,10 @@ void AssaultWeaponBehaviour::Reload()
     m_Reloading = true;
     m_ReloadTimer = cAssaultWeapon["ReloadTime"];
     playReloadAnimation();
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = cAssaultWeapon.EntityID;
+    e.FilePath = "Audio/weapon/reload.wav";
+    m_EventBroker->Publish(e);
 }
 
 void AssaultWeaponBehaviour::Update(double dt)
@@ -337,5 +341,9 @@ void AssaultWeaponBehaviour::showHitMarker()
     EntityWrapper hitMarkerSpawner = m_Player.FirstChildByName("HitMarkerSpawner");
     if (hitMarkerSpawner.Valid()) {
         SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
+        Events::PlaySoundOnEntity e;
+        e.EmitterID = hitMarkerSpawner.ID; // This might not be the optimal spawner entity
+        e.FilePath = "Audio/weapon/hitclick.wav";
+        m_EventBroker->Publish(e);
     }
 }

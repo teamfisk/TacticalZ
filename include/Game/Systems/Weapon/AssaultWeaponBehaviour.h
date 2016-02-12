@@ -6,6 +6,7 @@
 #include "Core/EPlayerDamage.h"
 #include "Core/EShoot.h"
 
+
 class AssaultWeaponBehaviour : public WeaponBehaviour
 {
 public:
