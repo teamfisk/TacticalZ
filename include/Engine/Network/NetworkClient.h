@@ -2,7 +2,7 @@
 #define NetworkClient_h__
 
 #include "Network/Packet.h"
-#define BUFFERSIZE 32000
+#define BUFFERSIZE 64000
 typedef unsigned int PlayerID;
 typedef unsigned int PacketID;
 

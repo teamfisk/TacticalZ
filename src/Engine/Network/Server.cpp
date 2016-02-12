@@ -335,6 +335,7 @@ void Server::disconnect(PlayerID playerID)
     //m_World->DeleteEntity(m_ConnectedPlayers[playerID].EntityID);
     m_ConnectedPlayers[playerID].TCPSocket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     m_ConnectedPlayers[playerID].TCPSocket->close();
+    m_World->DeleteEntity(m_ConnectedPlayers[playerID].EntityID);
     m_ConnectedPlayers.erase(playerID);
     // Send disconnect to the other players.
 }
@@ -476,6 +477,11 @@ void Server::parseOnInputCommand(Packet& packet)
 
 void Server::parsePlayerTransform(Packet& packet)
 {
+    PlayerID playerID = GetPlayerIDFromEndpoint();
+    if (playerID == -1) {
+        return;
+    }
+
     glm::vec3 position;
     glm::vec3 orientation;
     position.x = packet.ReadPrimitive<float>();
@@ -485,7 +491,6 @@ void Server::parsePlayerTransform(Packet& packet)
     orientation.y = packet.ReadPrimitive<float>();
     orientation.z = packet.ReadPrimitive<float>();
 
-    PlayerID playerID = GetPlayerIDFromEndpoint();
     bool hasAssaultWeapon = packet.ReadPrimitive<bool>();
     int magazineAmmo;
     int ammo;

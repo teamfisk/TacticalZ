@@ -436,7 +436,11 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
 void Client::parsePlayerDamage(Packet& packet)
 {
     Events::PlayerDamage e;
-    e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(packet.ReadPrimitive<EntityID>()));
+    PlayerID victimID = packet.ReadPrimitive<EntityID>();
+    if(serverClientMapsHasEntity(victimID)){
+        return;
+    }
+    e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(victimID));
     e.Victim = EntityWrapper(m_World, m_ServerIDToClientID.at(packet.ReadPrimitive<EntityID>()));
     e.Damage = packet.ReadPrimitive<double>();
     // Don't rebroadcast our own player damage events or we'll have an infinite loop!
