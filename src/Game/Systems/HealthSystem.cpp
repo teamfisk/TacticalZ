@@ -8,6 +8,7 @@ HealthSystem::HealthSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &HealthSystem::OnPlayerDamaged);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerHealthPickup, &HealthSystem::OnPlayerHealthPickup);
     EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &HealthSystem::OnInputCommand);
+    m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }
 
 void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHealth, double dt)
@@ -23,7 +24,7 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHea
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
-    if (!IsServer) {
+    if (!IsServer && m_NetworkEnabled) {
         return false;
     }
 
