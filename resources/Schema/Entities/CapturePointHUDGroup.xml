@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Entity name="HudOrigin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+<Entity name="CapturePointHUD" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
     <c:Transform>
-      <Position X="-24.3529072" Y="0" Z="6.95243597"/>
+      <Position X="0" Y="0.190541431" Z="0"/>
+      <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
     </c:Transform>
   </Components>
 
