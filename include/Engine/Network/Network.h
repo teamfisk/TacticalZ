@@ -12,7 +12,7 @@
 #include <fstream>
 #include <iostream>
 
-#define INPUTSIZE 32000
+#define BUFFERSIZE 32000
 typedef unsigned int PlayerID;
 typedef unsigned int PacketID;
 
@@ -35,6 +35,8 @@ protected:
     std::clock_t m_SaveDataTimer;
     unsigned int m_MaxConnections;
     double m_TimeoutMs;
+    void logSentData(int bytesSent);
+    void logReceivedData(int bytesReceived);
     void saveToFile();
     void updateNetworkData();
 };

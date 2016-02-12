@@ -4,6 +4,7 @@ AssaultWeaponBehaviour::AssaultWeaponBehaviour(SystemParams systemParams, IRende
     : WeaponBehaviour(systemParams, renderer, collisionOctree, player)
 {
     m_FirstPersonModel = m_Player.FirstChildByName("Hands");
+    m_ThirdPersonModel = m_Player.FirstChildByName("PlayerModel");
     EVENT_SUBSCRIBE_MEMBER(m_EAnimationComplete, &AssaultWeaponBehaviour::OnAnimationComplete);
 }
 
@@ -56,9 +57,14 @@ void AssaultWeaponBehaviour::Update(double dt)
     if (m_Reloading) {
         m_ReloadTimer -= dt;
         // Re-enable glow on reload impersonator half-way through the animation
-        if (m_ReloadTimer <= (double)m_Player["AssaultWeapon"]["ReloadTime"] / 2.0) {
-            if (m_ReloadImpersonator.Valid()) {
-                m_ReloadImpersonator["Model"]["GlowMap"] = true;
+        if (IsClient) {
+            if (m_ReloadTimer <= (double)m_Player["AssaultWeapon"]["ReloadTime"] / 2.0) {
+                if (m_FirstPersonReloadImpersonator.Valid()) {
+                    m_FirstPersonReloadImpersonator["Model"]["GlowMap"] = true;
+                }
+                if (m_ThirdPersonReloadImpersonator.Valid()) {
+                    m_ThirdPersonReloadImpersonator["Model"]["GlowMap"] = true;
+                }
             }
         }
         if (m_ReloadTimer <= 0) {
@@ -75,14 +81,18 @@ void AssaultWeaponBehaviour::Update(double dt)
     }
 
     if (!m_Firing && !m_Reloading) {
-        playIdleAnimation();
+        if (IsClient) {
+            playIdleAnimation();
+        }
     }
 
     // Disable glow map on weapon if it's out of ammo
     // Make real first person weapon model visible again
-    EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
-    if (firstPersonWeaponModel.Valid()) {
-        firstPersonWeaponModel["Model"]["GlowMap"] = hasAmmo();
+    if (IsClient) {
+        EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
+        if (firstPersonWeaponModel.Valid()) {
+            firstPersonWeaponModel["Model"]["GlowMap"] = hasAmmo();
+        }
     }
 }
 
@@ -127,16 +137,19 @@ void AssaultWeaponBehaviour::fireRound()
 
     // Fire
     magAmmo -= 1;
-    spawnTracer();
-    playFireSound();  
-    viewPunch();
-    playShootAnimation();
-    bool hit = shoot(cAssaultWeapon["BaseDamage"]);
-    if (hit) {
-        showHitMarker();
-    }
-
     m_TimeSinceLastFire = 0.0;
+
+    // Effects
+    if (IsClient) {
+        spawnTracer();
+    playFireSound();  
+        viewPunch();
+        playShootAnimation();
+        bool hit = shoot(cAssaultWeapon["BaseDamage"]);
+        if (hit) {
+            showHitMarker();
+        }
+    }
 }
 
 void AssaultWeaponBehaviour::spawnTracer()
@@ -146,7 +159,8 @@ void AssaultWeaponBehaviour::spawnTracer()
     }
 
     EntityWrapper spawner;
-    if (m_Player == LocalPlayer) {
+    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    if (m_Player == LocalPlayer && !outOfBodyExperience) {
         spawner = m_Player.FirstChildByName("WeaponMuzzle");
     } else {
         spawner = m_Player.FirstChildByName("ThirdPersonWeaponMuzzle");
@@ -225,7 +239,13 @@ void AssaultWeaponBehaviour::finishReload()
 
     // Make real first person weapon model visible again
     EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
-    firstPersonWeaponModel["Model"]["Visible"] = true;
+    if (firstPersonWeaponModel.Valid()) {
+        firstPersonWeaponModel["Model"]["Visible"] = true;
+    }
+    EntityWrapper thirdPersonWeaponModel = m_Player.FirstChildByName("ThirdPersonWeaponModel");
+    if (thirdPersonWeaponModel.Valid()) {
+        thirdPersonWeaponModel["Model"]["Visible"] = true;
+    }
 
     m_Reloading = false;
 }
@@ -278,19 +298,45 @@ void AssaultWeaponBehaviour::playIdleAnimation()
 void AssaultWeaponBehaviour::playReloadAnimation()
 {
     // Play animation
-    ComponentWrapper cAnimation = m_FirstPersonModel["Animation"];
-    cAnimation["AnimationName1"] = "ReloadSwitch";
-    cAnimation["Weight1"] = 1.0;
-    cAnimation["Time1"] = 0.0;
-    cAnimation["Speed1"] = 0.5;
-    cAnimation["Loop1"] = true;
+    // First person
+    if (IsClient)
+    {
+        ComponentWrapper cAnimation = m_FirstPersonModel["Animation"];
+        cAnimation["AnimationName1"] = "ReloadSwitch";
+        cAnimation["Weight1"] = 1.0;
+        cAnimation["Time1"] = 0.0;
+        cAnimation["Speed1"] = 0.5;
+        cAnimation["Loop1"] = true;
+    }
+    // TODO: Third person
+    //{
+    //    ComponentWrapper cAnimation = m_ThirdPersonModel["Animation"];
+    //    cAnimation["AnimationName1"] = "ReloadSwitch";
+    //    cAnimation["Weight1"] = 1.0;
+    //    cAnimation["Time1"] = 0.0;
+    //    cAnimation["Speed1"] = 0.5;
+    //    cAnimation["Loop1"] = true;
+    //}
 
     // Hide weapon model and spawn the exploding version
-    EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
-    EntityWrapper reloadSpawner = m_Player.FirstChildByName("FirstPersonReloadSpawner");
-    m_ReloadImpersonator = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
-    firstPersonWeaponModel["Model"].Copy(m_ReloadImpersonator["Model"]);
-    firstPersonWeaponModel["Model"]["Visible"] = false;
+    {
+        EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
+        EntityWrapper reloadSpawner = m_Player.FirstChildByName("FirstPersonReloadSpawner");
+        if (IsClient) {
+            m_FirstPersonReloadImpersonator = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
+            firstPersonWeaponModel["Model"].Copy(m_FirstPersonReloadImpersonator["Model"]);
+        }
+        firstPersonWeaponModel["Model"]["Visible"] = false;
+    }
+    {
+        EntityWrapper thirdPersonWeaponModel = m_Player.FirstChildByName("ThirdPersonWeaponModel");
+        EntityWrapper reloadSpawner = m_Player.FirstChildByName("ThirdPersonReloadSpawner");
+        if (IsClient) {
+            m_ThirdPersonReloadImpersonator = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
+            thirdPersonWeaponModel["Model"].Copy(m_ThirdPersonReloadImpersonator["Model"]);
+        }
+        thirdPersonWeaponModel["Model"]["Visible"] = false;
+    }
 }
 
 bool AssaultWeaponBehaviour::shoot(double damage)
@@ -321,6 +367,9 @@ bool AssaultWeaponBehaviour::shoot(double damage)
     }
 
     EntityWrapper victim(m_World, pickData.Entity);
+    if (!victim.Valid()) {
+        return false;
+    }
 
     // Don't let us shoot ourselves in the foot
     if (victim == LocalPlayer) {

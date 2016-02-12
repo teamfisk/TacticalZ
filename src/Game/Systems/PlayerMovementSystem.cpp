@@ -40,7 +40,8 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
-                double time = (cameraOrientation.x + glm::half_pi<float>()) / glm::pi<float>();
+                float pitch = cameraOrientation.x + 0.2;
+                double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
                 cAnimationOffset["Time"] = time;
             }
         }
@@ -113,15 +114,17 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 if (isOnGround) {
                     controller->SetDoubleJumping(false);
                 } else {
-                    //put a hexagon at the players feet
-                    auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
-                    EntityFileParser parser(hexagonEffect);
-                    EntityID hexagonEffectID = parser.MergeEntities(m_World);
-                    EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
-                    hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
-                    controller->SetDoubleJumping(true);
-                    Events::DoubleJump e;
-                    m_EventBroker->Publish(e);
+                    if (IsClient) {
+                        //put a hexagon at the players feet
+                        auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+                        EntityFileParser parser(hexagonEffect);
+                        EntityID hexagonEffectID = parser.MergeEntities(m_World);
+                        EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
+                        hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                        controller->SetDoubleJumping(true);
+                        Events::DoubleJump e;
+                        m_EventBroker->Publish(e);
+                    }
                 }
                 velocity.y = 4.f;
             }

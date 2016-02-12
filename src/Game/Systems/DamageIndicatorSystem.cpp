@@ -18,12 +18,15 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
         return false;
     }
 
-    if (e.Victim != LocalPlayer) {
+    //if (e.Victim != LocalPlayer) {
+    //    return false;
+    //}
+    if (e.Victim != LocalPlayer && !e.Victim.IsChildOf(LocalPlayer)) {
         return false;
     }
 
     if (!e.Inflictor.Valid() || !e.Victim.Valid()) {
-        return false;
+        return false; 
     }
 
     //grab players direction

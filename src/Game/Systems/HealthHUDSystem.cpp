@@ -1,6 +1,6 @@
-#include "Game/Systems/PlayerHUDSystem.h"
+#include "Game/Systems/HealthHUDSystem.h"
 
-void PlayerHUDSystem::Update(double dt)
+void HealthHUDSystem::Update(double dt)
 {
     auto healthHUDs = m_World->GetComponents("HealthHUD");
     if (healthHUDs == nullptr) {
@@ -27,13 +27,13 @@ void PlayerHUDSystem::Update(double dt)
                 s = s + "/";
                 s = s + std::to_string((int)(double)entityIDParent["Health"]["MaxHealth"]);
                 float healthPercentage = (double)entityIDParent["Health"]["Health"]/(double)entityIDParent["Health"]["MaxHealth"];
-                (glm::vec4&)entity["Text"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, 1.f);
+                //(glm::vec4&)entity["Text"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Text"]["Color"]).a);
                 entity["Text"]["Content"] = s;
             }
 
             if(entity.HasComponent("Fill")) {
                 float healthPercentage = (double)entityIDParent["Health"]["Health"]/(double)entityIDParent["Health"]["MaxHealth"];
-                (glm::vec4&)entity["Fill"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, 0.f);
+                (glm::vec4&)entity["Fill"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Fill"]["Color"]).a);
                 (double&)entity["Fill"]["Percentage"] = healthPercentage;
 
             }

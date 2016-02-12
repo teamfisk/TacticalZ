@@ -9,7 +9,8 @@
 #include "Core/EPlayerDamage.h"
 #include "Core/EPlayerHealthPickup.h"
 #include "Core/EPlayerDeath.h"
-#include "../Engine/Input/EInputCommand.h"
+#include "Core/ConfigFile.h"
+#include "Input/EInputCommand.h"
 
 #include <tuple>
 #include <vector>
@@ -24,6 +25,8 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
+    bool m_NetworkEnabled;
+
     //methods which will take care of specific events
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
@@ -34,7 +37,7 @@ private:
     
     //vector which will keep track of health changes
     std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;
-   
+
 };
 
 #endif

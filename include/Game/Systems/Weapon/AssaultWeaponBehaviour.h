@@ -1,6 +1,7 @@
 #include "Sound/EPlaySoundOnEntity.h"
 #include "Collision/Collision.h"
 #include "Rendering/AnimationSystem.h"
+#include "Core/ConfigFile.h"
 #include "WeaponBehaviour.h"
 #include "../SpawnerSystem.h"
 #include "Core/EPlayerDamage.h"
@@ -20,11 +21,13 @@ public:
 
 private:
     EntityWrapper m_FirstPersonModel;
+    EntityWrapper m_ThirdPersonModel;
     // State
     bool m_Firing = false;
     bool m_Reloading = false;
     double m_ReloadTimer = 0.0;
-    EntityWrapper m_ReloadImpersonator;
+    EntityWrapper m_FirstPersonReloadImpersonator;
+    EntityWrapper m_ThirdPersonReloadImpersonator;
     double m_TimeSinceLastFire = 0.0;
 
     EventRelay<WeaponBehaviour, Events::AnimationComplete> m_EAnimationComplete;
