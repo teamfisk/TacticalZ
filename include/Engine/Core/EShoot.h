@@ -9,7 +9,8 @@ namespace Events
 
 struct Shoot : Event
 {
-    EntityWrapper Player;
+    EntityWrapper Inflictor;
+    double Damage;
 };
 
 }
