@@ -70,5 +70,11 @@ bool KillFeedSystem::OnPlayerDeath(Events::PlayerDeath& e)
             m_DeathQueue.push_back(kfInfo);
         }
     }
+
+
+    if(m_DeathQueue.size() > 3) {
+        m_DeathQueue.pop_front();
+    }
+
     return true;
 }
