@@ -10,8 +10,15 @@ HealthSystem::HealthSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &HealthSystem::OnInputCommand);
 }
 
-void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
+void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHealth, double dt)
 {
+    double& health = cHealth["Health"];
+    if (health <= 0.0) {
+        Events::PlayerDeath ePlayerDeath;
+        ePlayerDeath.Player = entity;
+        m_EventBroker->Publish(ePlayerDeath);
+        //Note: we will delete the entity in PlayerDeathSystem
+    }
 }
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
@@ -19,13 +26,6 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
     ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
     health -= e.Damage;
-
-    if (health <= 0.0) {
-        Events::PlayerDeath ePlayerDeath;
-        ePlayerDeath.Player = e.Victim;
-        m_EventBroker->Publish(ePlayerDeath);
-        //Note: we will delete the entity in PlayerDeathSystem
-    }
 
     return true;
 }
