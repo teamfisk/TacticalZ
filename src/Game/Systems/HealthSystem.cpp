@@ -23,6 +23,10 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHea
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
+    if (!IsServer) {
+        return false;
+    }
+
     ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
     health -= e.Damage;

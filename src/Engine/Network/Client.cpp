@@ -119,6 +119,9 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::ComponentDeleted:
         parseComponentDeletion(packet);
         break;
+    case MessageType::OnPlayerDamage:
+        parsePlayerDamage(packet);
+        break;
     default:
         break;
     }
@@ -409,12 +412,17 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 
 bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
 {
+    if (e.Inflictor != m_LocalPlayer) {
+        return false;
+    }
+
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Inflictor.ID));
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Victim.ID));
     packet.WritePrimitive(e.Damage);
     m_Reliable.Send(packet);
-    return false;
+
+    return true;
 }
 
 bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
@@ -423,6 +431,18 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
         m_LocalPlayer = e.Player;
     }
     return true;
+}
+
+void Client::parsePlayerDamage(Packet& packet)
+{
+    Events::PlayerDamage e;
+    e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(packet.ReadPrimitive<EntityID>()));
+    e.Victim = EntityWrapper(m_World, m_ServerIDToClientID.at(packet.ReadPrimitive<EntityID>()));
+    e.Damage = packet.ReadPrimitive<double>();
+    // Don't rebroadcast our own player damage events or we'll have an infinite loop!
+    if (e.Inflictor != m_LocalPlayer) {
+        m_EventBroker->Publish(e);
+    }
 }
 
 void Client::sendLocalPlayerTransform()

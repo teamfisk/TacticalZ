@@ -11,6 +11,7 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &Server::OnEntityDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Server::OnPlayerDamage);
 
     // Bind
     if (port == 0) {
@@ -411,12 +412,22 @@ bool Server::OnComponentDeleted(const Events::ComponentDeleted & e)
             Packet packet = Packet(MessageType::ComponentDeleted);
             packet.WritePrimitive<EntityID>(e.Entity);
             packet.WriteString(e.ComponentType);
-        reliableBroadcast(packet);
+            reliableBroadcast(packet);
         }
     }
     return false;
 }
 
+bool Server::OnPlayerDamage(const Events::PlayerDamage& e)
+{
+    Packet packet(MessageType::OnPlayerDamage);
+    packet.WritePrimitive(e.Inflictor.ID);
+    packet.WritePrimitive(e.Victim.ID);
+    packet.WritePrimitive(e.Damage);
+    reliableBroadcast(packet);
+
+    return false;
+}
 
 void Server::parseClientPing()
 {

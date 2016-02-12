@@ -109,7 +109,7 @@ public:
     bool OnPlayerDamage(const Events::PlayerDamage& e);
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
-
+    void parsePlayerDamage(Packet& packet);
 private:
     UDPClient m_Unreliable;
     TCPClient m_Reliable;

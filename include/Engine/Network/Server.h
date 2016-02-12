@@ -81,6 +81,7 @@ private:
     void parseUDPConnect(Packet & packet);
     void parseTCPConnect(Packet & packet);
     void parseDisconnect();
+    bool shouldSendToClient(EntityWrapper childEntity);
 
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
@@ -91,7 +92,8 @@ private:
     bool OnEntityDeleted(const Events::EntityDeleted& e);
     EventRelay<Server, Events::ComponentDeleted> m_EComponentDeleted;
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
-    bool shouldSendToClient(EntityWrapper childEntity);
+    EventRelay<Server, Events::PlayerDamage> m_EPlayerDamage;
+    bool OnPlayerDamage(const Events::PlayerDamage& e);
 };
 
 #endif
