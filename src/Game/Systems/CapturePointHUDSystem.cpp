@@ -43,14 +43,14 @@ void CapturePointHUDSystem::Update(double dt)
                 }
                 //Color hud with team color
                 auto capturePointTeam = (int)teamComponent["Team"];
-                entityHUDparent["Sprite"]["Color"] = capturePointTeam == blueTeam ? glm::vec4(0, 0.2f, 1, 0.7) : capturePointTeam == redTeam ? glm::vec4(1, 0.2f, 0, 0.7) : glm::vec4(1, 1, 1, 0.3);
+                entityHUDparent["Sprite"]["Color"] = capturePointTeam == blueTeam ? glm::vec4(0, 0.2f, 1, 0.7f) : capturePointTeam == redTeam ? glm::vec4(1, 0.0f, 0, 0.7f) : glm::vec4(1, 1, 1, 0.3f);
 
                 //Progress is scaled with time
                 double currentCaptureTime = (double)entityCP["CapturePoint"]["CaptureTimer"];
                 double progress = glm::abs(currentCaptureTime)/15.0;
                 int currentCapturingTeam = currentCaptureTime > 0 ? redTeam : currentCaptureTime < 0 ? blueTeam : spectatorTeam;
                 ((glm::vec3&)entityHUD["Transform"]["Orientation"]).z = currentCapturingTeam == redTeam ? glm::half_pi<float>()+glm::pi<float>() : glm::half_pi<float>();
-                glm::vec4 fillColor = currentCapturingTeam == redTeam ? glm::vec4(1, 0.2f, 0, 0.7) : glm::vec4(0, 0.2f, 1, 0.7);
+                glm::vec4 fillColor = currentCapturingTeam == redTeam ? glm::vec4(1, 0.f, 0, 0.7f) : glm::vec4(0, 0.2f, 1, 0.7f);
                 entityHUD["Fill"]["Color"] = fillColor;
                 entityHUD["Fill"]["Percentage"] = progress;
             }
