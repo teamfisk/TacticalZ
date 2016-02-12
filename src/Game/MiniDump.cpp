@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <ctime>
 
 #include <windows.h>
 #include <tlhelp32.h>
@@ -80,25 +81,28 @@ void WINAPI Create_Dump(PEXCEPTION_POINTERS pException, BOOL File_Flag, BOOL Sho
 	    CHAR	Dump_Path[MAX_PATH];
 
 	    GetModuleFileName(NULL, Dump_Path, sizeof(Dump_Path));	//path of current process
+        std::time_t t = std::time(NULL);
+        char tStr[16];
+        std::strftime(tStr, 32, " %a %H-%M-%S", std::localtime(&t));
+        std::string time(tStr);
+        std::string path(Dump_Path);
+        path = path.substr(0, path.length() - 4);
+        path += time + ".dmp";
 
 		MINIDUMP_EXCEPTION_INFORMATION	M;
-
 		M.ThreadId = GetCurrentThreadId();
 		M.ExceptionPointers = pException;
 		M.ClientPointers = 0;
 
-		lstrcpy(Dump_Path + lstrlen(Dump_Path) - 3, "dmp");
-
-		hDump_File = CreateFile(Dump_Path,
-			GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		hDump_File = CreateFile(path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 		MiniDumpWriteDump_(GetCurrentProcess(), GetCurrentProcessId(), hDump_File,
 			MiniDumpNormal, (pException) ? &M : NULL, NULL, NULL);
 
 		CloseHandle(hDump_File);
 
-        std::cout << "Memory dumped to: \"" << Dump_Path << "\"";
-        MessageBox(NULL, ("Application crashed, memory dumped to: " + std::string(Dump_Path)).c_str(), "MiniDump", MB_ICONHAND | MB_OK);
+        std::cout << "Memory dumped to: \"" << path.c_str() << "\"";
+        MessageBox(NULL, ("Application crashed, memory dumped to: " + path).c_str(), "MiniDump", MB_ICONHAND | MB_OK);
     } else {
         MessageBox(NULL, "Application crashed, memory dump failed.", "MiniDump", MB_ICONHAND | MB_OK);
     }
