@@ -4987,11 +4987,6 @@
         </Entity>
       </Children>
     </Entity>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
-    </Entity>
     <Entity name="SpawnerBlueTeam">
       <Components>
         <c:PlayerSpawn/>
@@ -5004,7 +4999,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="-6.323915" Y="6.93366003" Z="-3.64382958"/>
+          <Position X="-4.2177043" Y="5.59916019" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -5053,6 +5048,11 @@
             <c:Transform>
               <Position X="0" Y="0" Z="-1"/>
             </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
   </Children>
 
 </Entity>
