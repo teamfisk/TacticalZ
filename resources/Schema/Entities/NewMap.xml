@@ -593,7 +593,7 @@
                   <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="56.3723755" Y="-0.458255291" Z="53.1675453"/>
+                  <Position X="57.2414131" Y="-0.458255291" Z="53.1675453"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -726,7 +726,7 @@
                       <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="-2.87285304" Y="0" Z="0.0110195652"/>
+                      <Position X="-3.20842171" Y="0" Z="0.0110195652"/>
                       <Scale X="1" Y="0.800000012" Z="1"/>
                     </c:Transform>
                   </Components>
@@ -739,7 +739,7 @@
                       <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="2.9002583" Y="0" Z="-0.00627081469"/>
+                      <Position X="3.16696811" Y="0" Z="-0.00627081469"/>
                       <Scale X="1" Y="0.800000012" Z="1"/>
                     </c:Transform>
                   </Components>
@@ -1291,7 +1291,7 @@
                   <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="42.3930092" Y="-0.436794043" Z="53.3168259"/>
+                  <Position X="42.6762505" Y="-0.436794043" Z="53.3168259"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1302,7 +1302,7 @@
                       <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="2.79896975" Y="0" Z="0"/>
+                      <Position X="3.02606034" Y="0" Z="0"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -1314,7 +1314,7 @@
                       <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="5.67178059" Y="0" Z="0"/>
+                      <Position X="6.20324564" Y="0" Z="0"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -1326,7 +1326,7 @@
                       <Resource>Models/Props/Walls/BigWallBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="8.55263519" Y="0" Z="0"/>
+                      <Position X="9.40820885" Y="0" Z="0"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -3310,6 +3310,60 @@
                   </Components>
                   <Children/>
                 </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="2.85156512" Y="-1.23010564" Z="-1.48294902"/>
+                      <Scale X="1.50000012" Y="1" Z="1.4000001"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-8.1107378" Y="1.61279738" Z="6.04347277"/>
+                      <Scale X="2.70000005" Y="2.20000005" Z="2.4000001"/>
+                      <Orientation X="1.02200007" Y="1.27200007" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-12.3116245" Y="3.30153632" Z="2.33947349"/>
+                      <Orientation X="0" Y="3.46600008" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Collidable/>
+                        <c:Model>
+                          <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="2.7208035" Y="0.631672204" Z="1.97706997"/>
+                          <Orientation X="0" Y="0" Z="5.86300039"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
               </Children>
             </Entity>
             <Entity>
@@ -3319,7 +3373,7 @@
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-32.077774" Y="1.78250229" Z="-52.9675865"/>
+                  <Position X="-32.141304" Y="1.78250229" Z="-52.9675865"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -3345,6 +3399,46 @@
                     <c:Transform>
                       <Position X="0.560652435" Y="-0.512874305" Z="2.32908034"/>
                       <Orientation X="4.57200003" Y="4.06700039" Z="1.25100005"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="13.3016024" Y="-1.04082656" Z="-2.06582665"/>
+                      <Orientation X="0" Y="1.17200005" Z="6.28300047"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="7.52924776" Y="0.407071143" Z="-2.09290624"/>
+                      <Scale X="3.4000001" Y="5.70000029" Z="3.70000029"/>
+                      <Orientation X="0" Y="1.7700001" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-5.73053885" Y="-0.909733951" Z="4.32710028"/>
+                      <Orientation X="0" Y="3.46600008" Z="0"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -3698,7 +3792,7 @@
                       <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="17.9978104" Y="0.729522109" Z="64.9478226"/>
+                      <Position X="17.9978104" Y="0.729522109" Z="65.3742523"/>
                       <Scale X="3" Y="3" Z="3"/>
                       <Orientation X="2.68900013" Y="3.5940001" Z="0"/>
                     </c:Transform>
@@ -3948,7 +4042,7 @@
                 </c:Model>
                 <c:Transform>
                   <Position X="-40.5458374" Y="-0.729142785" Z="-45.7907982"/>
-                  <Orientation X="4.93700027" Y="3.5" Z="1.37700009"/>
+                  <Orientation X="4.93700027" Y="4.81200027" Z="1.37700009"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -5071,7 +5165,7 @@
             <c:Transform>
               <Position X="48.9189453" Y="7.06223536" Z="-78.9347992"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="22.6496716" Z="0"/>
+              <Orientation X="0" Y="71.4059677" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5090,7 +5184,7 @@
             <c:Transform>
               <Position X="-59.3499641" Y="7.46932745" Z="-20.6276321"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="19.304081" Z="0"/>
+              <Orientation X="0" Y="68.0603104" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5109,7 +5203,7 @@
             <c:Transform>
               <Position X="-1.13644195" Y="1.38919806" Z="38.9768829"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="16.9120293" Z="0"/>
+              <Orientation X="0" Y="65.6683426" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5128,7 +5222,7 @@
             <c:Transform>
               <Position X="54.7225227" Y="6.51863909" Z="29.0052128"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="17.2259693" Z="0"/>
+              <Orientation X="0" Y="65.9822693" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5147,7 +5241,7 @@
             <c:Transform>
               <Position X="-51.6792374" Y="8.44526482" Z="32.5153465"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="16.6746445" Z="0"/>
+              <Orientation X="0" Y="65.4309921" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5166,7 +5260,7 @@
             <c:Transform>
               <Position X="-42.3974304" Y="7.28327894" Z="81.9305344"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="14.8039036" Z="0"/>
+              <Orientation X="0" Y="63.560215" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5185,7 +5279,7 @@
             <c:Transform>
               <Position X="-9.85184956" Y="8.25567532" Z="39.6119232"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="13.8527527" Z="0"/>
+              <Orientation X="0" Y="62.6090584" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5204,7 +5298,7 @@
             <c:Transform>
               <Position X="49.2257118" Y="7.39368248" Z="-31.1810112"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="11.0639687" Z="0"/>
+              <Orientation X="0" Y="59.8201942" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
