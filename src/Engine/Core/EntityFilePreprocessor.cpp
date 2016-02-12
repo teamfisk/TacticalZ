@@ -65,7 +65,6 @@ void EntityFilePreprocessor::parseComponentInfo()
 
         // Name
         compInfo.Name = XS::ToString(element->getName());
-        bool brk = compInfo.Name == "HiddenForLocalPlayer";
         // Known allocation
         compInfo.Meta->Allocation = m_ComponentCounts[compInfo.Name];
         // Annotation

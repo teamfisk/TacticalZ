@@ -407,8 +407,9 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
 {
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Inflictor.ID));
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Victim.ID));
     packet.WritePrimitive(e.Damage);
-    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player.ID));
     m_Reliable.Send(packet);
     return false;
 }
