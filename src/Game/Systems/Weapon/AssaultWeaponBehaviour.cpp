@@ -348,6 +348,9 @@ bool AssaultWeaponBehaviour::shoot(double damage)
     }
 
     EntityWrapper victim(m_World, pickData.Entity);
+    if (!victim.Valid()) {
+        return false;
+    }
 
     // Don't let us shoot ourselves in the foot
     if (victim == LocalPlayer) {
