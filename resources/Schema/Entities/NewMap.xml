@@ -89,6 +89,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Highground5.mesh</Resource>
+                  <Color A="1" B="7.84313726" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform/>
               </Components>
@@ -99,6 +100,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Highground6.mesh</Resource>
+                  <Color A="1" B="7.84313726" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform/>
               </Components>
@@ -368,7 +370,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Pillars/SciFiPillar2.mesh</Resource>
+                  <Resource>Models/Props/Pillars/SciFiPillar2Blue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="55.0098839" Y="0" Z="80.7891693"/>
@@ -381,7 +383,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Pillars/SciFiPillar2.mesh</Resource>
+                  <Resource>Models/Props/Pillars/SciFiPillar2Red.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-57.6669235" Y="-0.0117412386" Z="-84.8278427"/>
@@ -1515,6 +1517,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="-37.5227966" Y="-0.41070056" Z="38.790432"/>
@@ -1885,7 +1888,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="45.3988762" Y="6.10456753" Z="-73.9011993"/>
@@ -2004,7 +2007,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-41.0066338" Y="6.08244133" Z="75.8575821"/>
@@ -2138,7 +2141,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-47.6850471" Y="7.0585866" Z="38.1646194"/>
@@ -2151,7 +2154,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-25.9571095" Y="6.43997049" Z="41.7452164"/>
@@ -2178,7 +2181,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="46.3167992" Y="6.36057663" Z="-37.5957794"/>
@@ -2191,7 +2194,7 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge.mesh</Resource>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="25.2147388" Y="6.4451251" Z="-41.7257042"/>
@@ -2730,6 +2733,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="36.8391495" Y="0.354240507" Z="-36.1228752"/>
@@ -2948,6 +2952,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="-15.8430891" Y="2.84977508" Z="55.3108711"/>
@@ -3061,6 +3066,7 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
                 </c:Model>
                 <c:Transform>
                   <Position X="16.3593407" Y="4.03186893" Z="-54.4961166"/>
@@ -4058,21 +4064,7 @@
                   <Orientation X="0" Y="1.93500006" Z="0"/>
                 </c:Transform>
               </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0" Y="2.53721571" Z="0"/>
-                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
+              <Children/>
             </Entity>
             <Entity>
               <Components>
@@ -4933,7 +4925,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="0" Y="6.69097853" Z="0"/>
+          <Position X="-60.3695679" Y="2.14482641" Z="-79.3789597"/>
         </c:Transform>
       </Components>
       <Children>
@@ -4942,9 +4934,10 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="1" Y="0" Z="0"/>
+              <Position X="9.3347702" Y="2.70210314" Z="2.33294678"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4954,9 +4947,10 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="-1" Y="0" Z="0"/>
+              <Position X="5.59104443" Y="2.14147282" Z="6.07936668"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4966,9 +4960,10 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="0" Y="0" Z="1"/>
+              <Position X="-2.2788806" Y="0" Z="3.17202592"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4978,9 +4973,10 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="0" Y="0" Z="-1"/>
+              <Position X="1.14053249" Y="0" Z="-1.67306876"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4999,7 +4995,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="-4.2177043" Y="5.59916019" Z="0"/>
+          <Position X="60.0169258" Y="2.37972379" Z="76.2893906"/>
         </c:Transform>
       </Components>
       <Children>
@@ -5008,9 +5004,10 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="1" Y="0" Z="0"/>
+              <Position X="2.02889442" Y="0.194165871" Z="-1.17950201"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5020,9 +5017,10 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="-1" Y="0" Z="0"/>
+              <Position X="-9.04242706" Y="1.82531989" Z="-0.421615779"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5032,9 +5030,10 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="0" Y="0" Z="1"/>
+              <Position X="1.64179754" Y="0.634559035" Z="4.27690458"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5044,10 +5043,170 @@
             <c:SpawnPoint/>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="0" Y="0" Z="-1"/>
+              <Position X="-6.58577824" Y="1.97348273" Z="-2.86768818"/>
             </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="HealthPickups">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="48.9189453" Y="7.06223536" Z="-78.9347992"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="22.6496716" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="-59.3499641" Y="7.46932745" Z="-20.6276321"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="19.304081" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="-1.13644195" Y="1.38919806" Z="38.9768829"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="16.9120293" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="54.7225227" Y="6.51863909" Z="29.0052128"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="17.2259693" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="-51.6792374" Y="8.44526482" Z="32.5153465"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="16.6746445" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="-42.3974304" Y="7.28327894" Z="81.9305344"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="14.8039036" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="-9.85184956" Y="8.25567532" Z="39.6119232"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="13.8527527" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="49.2257118" Y="7.39368248" Z="-31.1810112"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="0" Y="11.0639687" Z="0"/>
+            </c:Transform>
+            <c:Trigger/>
           </Components>
           <Children/>
         </Entity>
