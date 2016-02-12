@@ -287,10 +287,14 @@ void Client::parseSnapshot(Packet& packet)
         Events::InputCommand e;
         e.PlayerID = packet.ReadPrimitive<EntityID>();
         EntityID player = packet.ReadPrimitive<EntityID>();
-        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(player));
-        e.Command = packet.ReadString();
-        e.Value = packet.ReadPrimitive<float>();
-        m_EventBroker->Publish(e);
+        std::string command = packet.ReadString();
+        float value = packet.ReadPrimitive<float>();
+        if (m_ServerIDToClientID.find(player) != m_ServerIDToClientID.end()) {
+            e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(player));
+            e.Command = command;
+            e.Value = value;
+            m_EventBroker->Publish(e);
+        }
     }
 
     // Read world state
