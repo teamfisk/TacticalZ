@@ -4765,6 +4765,7 @@
                   <HomePointForTeam>
                     <Blue/>
                   </HomePointForTeam>
+                  <CapturePointNumber>4</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
@@ -4800,7 +4801,7 @@
             <Entity>
               <Components>
                 <c:CapturePoint>
-                  <CapturePointNumber>1</CapturePointNumber>
+                  <CapturePointNumber>3</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
@@ -4865,7 +4866,7 @@
               <Components>
                 <c:CapturePoint>
                   <CaptureTimer>1.5498908015879351</CaptureTimer>
-                  <CapturePointNumber>3</CapturePointNumber>
+                  <CapturePointNumber>1</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
@@ -4900,7 +4901,6 @@
                   <HomePointForTeam>
                     <Red/>
                   </HomePointForTeam>
-                  <CapturePointNumber>4</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
