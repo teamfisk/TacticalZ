@@ -22,6 +22,10 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
         return false;
     }
 
+    if (!e.Inflictor.Valid() || !e.Victim.Valid()) {
+        return false;
+    }
+
     //grab players direction
     auto playerOrientation = glm::quat((glm::vec3)e.Victim["Transform"]["Orientation"]);
 

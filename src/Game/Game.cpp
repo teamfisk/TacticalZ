@@ -14,6 +14,7 @@
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
+#include "Game/Systems/AmmoPickupSystem.h"
 #include "Game/Systems/DamageIndicatorSystem.h"
 #include "Game/Systems/Weapon/WeaponSystem.h"
 #include "Rendering/AnimationSystem.h"
@@ -44,6 +45,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
+    PlayerSpawnSystem::SetRespawnTime(m_Config->Get<float>("Debug.RespawnTime", 15.0f));
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
@@ -120,12 +122,12 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerDeathSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
     // Populate Octree with collidables
@@ -136,6 +138,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PlayerDeathSystem>(updateOrderLevel);
     // Collision and TriggerSystem should update after player.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
