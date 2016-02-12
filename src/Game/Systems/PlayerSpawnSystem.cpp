@@ -128,6 +128,12 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     // When a player is actually spawned (since the actual spawning is handled on the server)
     // Hack should be moved.
 
+    // TODO: Set the player name to whatever
+    EntityWrapper playerName = e.Player.FirstChildByName("PlayerName");
+    if (playerName.Valid()) {
+        playerName["Text"]["Content"] = e.PlayerName;
+    }
+
     if (!IsClient) {
         return false;
     }
@@ -153,12 +159,6 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         }
     }
 
-    // TODO: Set the player name to whatever
-    EntityWrapper playerName = e.Player.FirstChildByName("PlayerName");
-    if (playerName.Valid()) {
-        playerName["Text"]["Content"] = e.PlayerName;
-    }
-
     return true;
 }
 
@@ -181,10 +181,10 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
         return false;
     }
 
-        SpawnRequest req;
-        req.PlayerID = m_PlayerIDs.at(e.Player.ID);
-        req.Team = cTeam["Team"];
-        m_SpawnRequests.push_back(req);
+    SpawnRequest req;
+    req.PlayerID = m_PlayerIDs.at(e.Player.ID);
+    req.Team = cTeam["Team"];
+    m_SpawnRequests.push_back(req);
 
     return true;
 }

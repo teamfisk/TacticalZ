@@ -79,18 +79,18 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             }
             glm::vec3& velocity = cPhysics["Velocity"];
             bool isOnGround = (bool)cPhysics["IsOnGround"];
-            ImGui::Text(isOnGround ? "On ground" : "In air");
-            ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
+            //ImGui::Text(isOnGround ? "On ground" : "In air");
+            //ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             glm::vec3 groundVelocity(0.f, 0.f, 0.f);
             groundVelocity.x = velocity.x;
             groundVelocity.z = velocity.z;
-            ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(groundVelocity));
-            ImGui::Text("wishDirection: (%f, %f, %f) |%f|", wishDirection.x, wishDirection.y, wishDirection.z, glm::length(wishDirection));
+            //ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(groundVelocity));
+            //ImGui::Text("wishDirection: (%f, %f, %f) |%f|", wishDirection.x, wishDirection.y, wishDirection.z, glm::length(wishDirection));
             float currentSpeedProj = glm::dot(groundVelocity, wishDirection);
             float addSpeed = wishSpeed - currentSpeedProj;
-            ImGui::Text("currentSpeedProj: %f", currentSpeedProj);
-            ImGui::Text("wishSpeed: %f", wishSpeed);
-            ImGui::Text("addSpeed: %f", addSpeed);
+            //ImGui::Text("currentSpeedProj: %f", currentSpeedProj);
+            //ImGui::Text("wishSpeed: %f", wishSpeed);
+            //ImGui::Text("addSpeed: %f", addSpeed);
 
             if (addSpeed > 0) {
                 static float accel = 15.f;

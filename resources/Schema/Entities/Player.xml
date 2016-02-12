@@ -23,9 +23,7 @@
         <Blue/>
       </Team>
     </c:Team>
-    <c:Transform>
-      <Position X="0" Y="0.0288832653" Z="0"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
@@ -37,20 +35,6 @@
         </c:Transform>
       </Components>
       <Children>
-        <Entity name="PlayerName">
-          <Components>
-            <c:Text>
-              <Resource>Fonts/DroidSans.ttf,100</Resource>
-              <Color A="1" B="0" G="1" R="0"/>
-            </c:Text>
-            <c:Transform>
-              <Position X="0.100000001" Y="0.248000011" Z="-0.248000011"/>
-              <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
-              <Orientation X="0" Y="3.14199996" Z="0"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
         <Entity name="CameraModel">
           <Components>
             <c:Model>
@@ -504,7 +488,6 @@
         <c:Model>
           <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
           <Color A="1" B="1" G="0.309803933" R="0"/>
-          <Visible>false</Visible>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -570,6 +553,21 @@
         </c:Model>
         <c:Transform>
           <Position X="0" Y="0.772000015" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlayerName">
+      <Components>
+        <c:Text>
+          <Content>Insert name here</Content>
+          <Resource>Fonts/DroidSans.ttf,100</Resource>
+          <Color A="1" B="0" G="1" R="0"/>
+        </c:Text>
+        <c:Transform>
+          <Position X="0.100000001" Y="1.50176644" Z="-0.248000011"/>
+          <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
+          <Orientation X="0" Y="3.14199996" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
