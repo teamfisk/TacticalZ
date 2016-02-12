@@ -79,7 +79,6 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 
 bool RenderSystem::isEntityVisible(EntityWrapper& entity)
 {
-
     // Only render children of a camera if that camera is currently active
     if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
         return false;
@@ -87,7 +86,11 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
 
     // Hide things parented to local player if they have the HiddenFromLocalPlayer component
     bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
-    if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) && !outOfBodyExperience) {
+    if (
+        (entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) 
+        && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) 
+        && !outOfBodyExperience
+    ) {
         return false;
     }
 

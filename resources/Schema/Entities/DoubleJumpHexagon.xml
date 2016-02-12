@@ -2,27 +2,26 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Model>
-      <Resource>Models/Effects/JumpEffectHexagon.mesh</Resource>
-      <Color A="0.576470613" B="500" G="255" R="0.854901969"/>
-      <Transparent>true</Transparent>
-    </c:Model>
-    <c:Transform>
-      <Position X="0.600000024" Y="0.800000012" Z="0"/>
-      <Scale X="0.50000012" Y="0.50000019" Z="0.50000014"/>
-    </c:Transform>
     <c:Lifetime>
       <Lifetime>0.5</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
       <ColorByDistance>true</ColorByDistance>
-      <Velocity X="0" Y="-7.76300049" Z="0"/>
-      <ExplosionOrigin X="0" Y="2.67900002" Z="0"/>
+      <Velocity X="3.60000014" Y="3.93700027" Z="0"/>
       <ExponentialAccelaration>true</ExponentialAccelaration>
       <ExplosionDuration>0.5</ExplosionDuration>
-      <EndColor A="0" B="0" G="0" R="1"/>
+      <EndColor A="0" B="1" G="1" R="1"/>
       <Randomness>true</Randomness>
     </c:ExplosionEffect>
+    <c:Model>
+      <Resource>Models/Effects/JumpEffectHexagon.mesh</Resource>
+      <Color A="0.545098066" B="500" G="255" R="0.854901969"/>
+      <Transparent>true</Transparent>
+    </c:Model>
+    <c:Transform>
+      <Position X="0.600000024" Y="0.800000012" Z="0"/>
+      <Scale X="0.500000119" Y="0.500000179" Z="0.500000119"/>
+    </c:Transform>
   </Components>
 
   <Children/>

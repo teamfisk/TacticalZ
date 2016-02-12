@@ -40,7 +40,8 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
-                double time = (cameraOrientation.x + glm::half_pi<float>()) / glm::pi<float>();
+                float pitch = cameraOrientation.x + 0.2;
+                double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
                 cAnimationOffset["Time"] = time;
             }
         }

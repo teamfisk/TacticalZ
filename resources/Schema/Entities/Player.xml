@@ -24,7 +24,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="0" Y="0.0288832653" Z="2.64837074"/>
+      <Position X="5519.44287" Y="0.0288832653" Z="2.64837074"/>
     </c:Transform>
   </Components>
 
@@ -138,8 +138,8 @@
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.120747983" Y="-0.228997007" Z="-0.151475653"/>
-                  <Orientation X="0.0104046585" Y="-0.00268164417" Z="0.0428441912"/>
+                  <Position X="0.1204307" Y="-0.228431284" Z="-0.181454539"/>
+                  <Orientation X="0.0104045458" Y="-0.00268182717" Z="0.0428440496"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -154,16 +154,16 @@
                   </Components>
                   <Children/>
                 </Entity>
+                <Entity name="FirstPersonReloadSpawner">
+                  <Components>
+                    <c:Spawner>
+                      <EntityFile>Schema/Entities/ReloadEffectView.xml</EntityFile>
+                    </c:Spawner>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
               </Children>
-            </Entity>
-            <Entity name="FirstPersonReloadSpawner">
-              <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/WeaponReloadEffect.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform/>
-              </Components>
-              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -209,11 +209,10 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
-              <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="0.15859656" Y="1.02875519" Z="-0.21540691"/>
-              <Orientation X="-0.0626692101" Y="-0.0361935496" Z="0.120095037"/>
+              <Position X="0.139178902" Y="0.782200813" Z="-0.246610582"/>
+              <Orientation X="-0.228463098" Y="0.0975924358" Z="0.182726845"/>
             </c:Transform>
           </Components>
           <Children>
@@ -225,6 +224,15 @@
                 <c:Transform>
                   <Position X="0.00644115033" Y="0.096679531" Z="-0.436609417"/>
                 </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="ThirdPersonReloadSpawner">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/ReloadEffectWorld.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
               </Components>
               <Children/>
             </Entity>

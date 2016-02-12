@@ -288,7 +288,7 @@ void Server::parseOnInputCommand(Packet& packet)
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
 
-            if (e.Command == "PrimaryFire") {
+            if (e.Command == "PrimaryFire" || e.Command == "Reload") {
                 m_InputCommandsToBroadcast.push_back(e);
             }
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -464,11 +464,23 @@ void Server::parsePlayerTransform(Packet& packet)
     orientation.y = packet.ReadPrimitive<float>();
     orientation.z = packet.ReadPrimitive<float>();
 
+    bool hasAssaultWeapon = packet.ReadPrimitive<bool>();
+    int magazineAmmo;
+    int ammo;
+    if (hasAssaultWeapon) {
+        magazineAmmo = packet.ReadPrimitive<int>();
+        ammo = packet.ReadPrimitive<int>();
+    }
+
     PlayerID playerID = GetPlayerIDFromEndpoint(m_ReceiverEndpoint);
     EntityWrapper player(m_World, m_ConnectedPlayers.at(playerID).EntityID);
-
     if (player.Valid()) {
         player["Transform"]["Position"] = position;
         player["Transform"]["Orientation"] = orientation;
+
+        if (hasAssaultWeapon) {
+            player["AssaultWeapon"]["MagazineAmmo"] = magazineAmmo;
+            player["AssaultWeapon"]["Ammo"] = ammo;
+        }
     }
 }

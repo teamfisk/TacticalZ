@@ -2,15 +2,12 @@
 <Entity name="WeaponModel" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:BoneAttachment>
-      <BoneName>R_Arm_Weapon_Joint</BoneName>
-    </c:BoneAttachment>
     <c:Lifetime>
       <Lifetime>2</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
       <ColorByDistance>true</ColorByDistance>
-      <Velocity X="3.33300018" Y="0.0320000015" Z="0"/>
+      <Velocity X="1.63300014" Y="0.0320000015" Z="0"/>
       <ExplosionOrigin X="0" Y="0.0790000036" Z="-0.329000026"/>
       <ExponentialAccelaration>true</ExponentialAccelaration>
       <EndColor A="0" B="19.6078434" G="19.6078434" R="1"/>
@@ -18,12 +15,8 @@
     </c:ExplosionEffect>
     <c:Model>
       <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
-      <Transparent>true</Transparent>
     </c:Model>
-    <c:Transform>
-      <Position X="0.120747991" Y="-0.229502052" Z="-0.151475638"/>
-      <Orientation X="0.0104046296" Y="-0.00268167513" Z="0.0428442545"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children/>
