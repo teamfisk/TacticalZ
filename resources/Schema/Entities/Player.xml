@@ -306,13 +306,67 @@
                 </Entity>
               </Children>
             </Entity>
+            <Entity name="KillFeed">
+              <Components>
+                <c:KillFeed/>
+                <c:Transform>
+                  <Position X="0.486000031" Y="0.266000003" Z="0"/>
+                  <Scale X="0.00999999978" Y="0.00999999978" Z="0.00999999978"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="KillFeed1">
+                  <Components>
+                    <c:Text>
+                      <Content></Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Right/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KillFeed2">
+                  <Components>
+                    <c:Text>
+                      <Content></Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Right/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="0" Y="-1" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KillFeed3">
+                  <Components>
+                    <c:Text>
+                      <Content></Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Right/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="0" Y="-2" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
           </Children>
         </Entity>
         <Entity name="Hands">
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.24990652025910975</Time1>
+              <Time1>1.6050530664521858</Time1>
               <Speed1>1</Speed1>
             </c:Animation>
             <c:Model>
@@ -332,8 +386,8 @@
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.120430604" Y="-0.231020898" Z="-0.181454644"/>
-                  <Orientation X="0.010404571" Y="-0.00268170657" Z="0.0428442396"/>
+                  <Position X="0.12043035" Y="-0.234149337" Z="-0.181454644"/>
+                  <Orientation X="0.0104045281" Y="-0.00268131681" Z="0.0428438708"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -439,7 +493,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.6484966474501377</Time1>
+          <Time1>1.620305457513453</Time1>
           <Speed1>1</Speed1>
         </c:Animation>
         <c:AnimationOffset>
@@ -464,8 +518,8 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="0.160097197" Y="1.02626872" Z="-0.215123743"/>
-              <Orientation X="-0.0627320632" Y="-0.0421531461" Z="0.119530022"/>
+              <Position X="0.160351232" Y="1.02591991" Z="-0.215102971"/>
+              <Orientation X="-0.0627480298" Y="-0.0432248674" Z="0.119431816"/>
             </c:Transform>
           </Components>
           <Children>
