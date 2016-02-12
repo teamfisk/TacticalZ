@@ -59,6 +59,8 @@ private:
 
     int m_ColorCounter[2];
     std::map<std::tuple<EntityID, const World*, Camera*>, glm::ivec2> m_EntityColors;
+
+    Texture* m_WhiteTexture;
 };
 
 #endif 

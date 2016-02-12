@@ -17,6 +17,7 @@ PickingPass::~PickingPass()
 
 void PickingPass::InitializeTextures()
 {
+    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
     GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
         glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
 }
@@ -98,7 +99,17 @@ void PickingPass::Draw(RenderScene& scene)
 				glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 				glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
 				glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderSkinnedHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
 				glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
 
 				if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
 
@@ -112,7 +123,17 @@ void PickingPass::Draw(RenderScene& scene)
 				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
 				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
 				glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
 			}
 
             glBindVertexArray(modelJob->Model->VAO);
@@ -153,7 +174,17 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderSkinnedHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
 
                 std::vector<glm::mat4> frameBones;
                 frameBones = modelJob->Skeleton->GetBones();
@@ -163,7 +194,18 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
                 glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
+
             }
 
             glBindVertexArray(modelJob->Model->VAO);
@@ -174,6 +216,7 @@ void PickingPass::Draw(RenderScene& scene)
 
     for (auto &job : scene.Jobs.OpaqueShieldedObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+
 
         if (modelJob) {
             int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
@@ -204,7 +247,18 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderSkinnedHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
+
 
                 std::vector<glm::mat4> frameBones;
                 frameBones = modelJob->Skeleton->GetBones();
@@ -215,7 +269,18 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
                 glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
+
             }
 
             glBindVertexArray(modelJob->Model->VAO);
@@ -259,7 +324,17 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderSkinnedHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
 
                 if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
 
@@ -274,11 +349,18 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(modelJob->Color));
                 glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
+
+                glActiveTexture(GL_TEXTURE0);
+                if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+                    glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+                } else {
+                    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+                    glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+                }
             }
-
-            
-
 
             glBindVertexArray(modelJob->Model->VAO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);

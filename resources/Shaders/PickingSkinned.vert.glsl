@@ -15,6 +15,7 @@ layout(location = 6) in vec4 BoneWeights;
 
 out VertexData{
 	vec3 Position;
+	vec2 TextureCoord;
 }Output;
 
 void main()
@@ -29,4 +30,5 @@ void main()
 
 	gl_Position = P*V*M*boneTransform * vec4(Position, 1.0);
 	Output.Position = (boneTransform * vec4(Position, 1.0)).xyz;
+	Output.TextureCoord = TextureCoords;
 }

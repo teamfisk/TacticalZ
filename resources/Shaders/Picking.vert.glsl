@@ -12,10 +12,12 @@ layout(location = 4) in vec2 TextureCoords;
 
 out VertexData{
 	vec3 Position;
+	vec2 TextureCoord;
 }Output;
 
 void main()
 {
 	gl_Position = P*V*M * vec4(Position, 1.0);
 	Output.Position = Position, 1.0;
+	Output.TextureCoord = TextureCoords;
 }
