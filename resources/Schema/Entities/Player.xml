@@ -76,14 +76,14 @@
                   <Color A="0.196078435" B="1" G="0" R="0"/>
                 </c:Fill>
                 <c:Sprite>
-                  <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                  <Color A="0.392156869" B="0.392156869" G="0.392156869" R="0.392156869"/>
+                  <DiffuseTexture>Textures/HealthHUD3.png</DiffuseTexture>
+                  <Color A="0.588235319" B="0" G="0" R="0"/>
                 </c:Sprite>
                 <c:HealthHUD/>
                 <c:Transform>
-                  <Position X="-0.383000016" Y="-0.185000002" Z="0"/>
-                  <Scale X="0.150000006" Y="0.150000006" Z="0.150000006"/>
-                  <Orientation X="0" Y="0.592000008" Z="0"/>
+                  <Position X="-0.263000011" Y="-0.185000002" Z="0"/>
+                  <Scale X="0.106000006" Y="0.333000004" Z="0.150000006"/>
+                  <Orientation X="5.87300014" Y="0" Z="4.71200037"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -279,13 +279,33 @@
                 </Entity>
               </Children>
             </Entity>
+            <Entity name="HealthText">
+              <Components>
+                <c:Fill>
+                  <Percentage>1</Percentage>
+                  <Color A="1" B="1" G="0" R="0"/>
+                </c:Fill>
+                <c:HealthHUD/>
+                <c:Text>
+                  <Content>100/100</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="0.392156869" B="1" G="0" R="0"/>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.355000019" Y="-0.203000009" Z="0.0410000011"/>
+                  <Scale X="0.0350000001" Y="0.0350000001" Z="0.0350000001"/>
+                  <Orientation X="0" Y="0.410000026" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
           </Children>
         </Entity>
         <Entity name="Hands">
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.1719161089749548</Time1>
+              <Time1>1.1017089512865343</Time1>
               <Speed1>1</Speed1>
             </c:Animation>
             <c:Model>
@@ -305,8 +325,8 @@
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.120747983" Y="-0.228997007" Z="-0.151475653"/>
-                  <Orientation X="0.0104046585" Y="-0.00268164417" Z="0.0428441912"/>
+                  <Position X="0.120430365" Y="-0.244535804" Z="-0.181454837"/>
+                  <Orientation X="0.0104046855" Y="-0.00268163485" Z="0.0428442024"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -327,36 +347,55 @@
                     <c:Transform>
                       <Position X="-0.0430000015" Y="0.131501317" Z="-0.0670000017"/>
                       <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
-                      <Orientation X="0" Y="5.96400023" Z="0"/>
                     </c:Transform>
                   </Components>
                   <Children>
-                    <Entity name="MagazineAmmo">
+                    <Entity name="AmmunitionHUDBackground">
                       <Components>
-                        <c:Text>
-                          <Content>32</Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
-                          <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
-                        </c:Text>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <Color A="0.588235319" B="0" G="0" R="0"/>
+                        </c:Sprite>
                         <c:Transform>
-                          <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                          <Position X="0" Y="0" Z="-0.00200000009"/>
+                          <Scale X="0.119999997" Y="0.119999997" Z="0.119999997"/>
                         </c:Transform>
                       </Components>
                       <Children/>
                     </Entity>
-                    <Entity name="Ammo">
+                    <Entity>
                       <Components>
-                        <c:Text>
-                          <Content>360</Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
-                          <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
-                        </c:Text>
-                        <c:Transform>
-                          <Position X="5.2833886e-05" Y="-0.0407950208" Z="0"/>
-                          <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
-                        </c:Transform>
+                        <c:Transform/>
                       </Components>
-                      <Children/>
+                      <Children>
+                        <Entity name="MagazineAmmo">
+                          <Components>
+                            <c:Text>
+                              <Content>32</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="Ammo">
+                          <Components>
+                            <c:Text>
+                              <Content>360</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="5.2833886e-05" Y="-0.0407950208" Z="0"/>
+                              <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
                     </Entity>
                   </Children>
                 </Entity>
@@ -393,7 +432,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.8038469763698401</Time1>
+          <Time1>1.5336333336960681</Time1>
           <Speed1>1</Speed1>
         </c:Animation>
         <c:AnimationOffset>
@@ -418,8 +457,8 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="0.15859656" Y="1.02875519" Z="-0.21540691"/>
-              <Orientation X="-0.0626692101" Y="-0.0361935496" Z="0.120095037"/>
+              <Position X="0.161089346" Y="1.02501774" Z="-0.215083182"/>
+              <Orientation X="-0.0628042594" Y="-0.0464361608" Z="0.119145073"/>
             </c:Transform>
           </Components>
           <Children>
