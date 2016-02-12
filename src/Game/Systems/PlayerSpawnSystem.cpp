@@ -126,10 +126,11 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
     m_PlayerIDs[e.Player.ID] = e.PlayerID;
 
     // When a player is actually spawned (since the actual spawning is handled on the server)
+    // Hack should be moved.
+
     if (!IsClient) {
         return false;
     }
-
 
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
@@ -180,10 +181,10 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
         return false;
     }
 
-    SpawnRequest req;
-    req.PlayerID = m_PlayerIDs.at(e.Player.ID);
-    req.Team = cTeam["Team"];
-    m_SpawnRequests.push_back(req);
+        SpawnRequest req;
+        req.PlayerID = m_PlayerIDs.at(e.Player.ID);
+        req.Team = cTeam["Team"];
+        m_SpawnRequests.push_back(req);
 
     return true;
 }

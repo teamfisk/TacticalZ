@@ -13,6 +13,8 @@
 #include "Network/Network.h"
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
+#include "Network/UDPClient.h"
+#include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"
@@ -33,17 +35,15 @@ public:
     void Connect(std::string address, int port);
     void Update() override;
 
-private:
+    std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
+    void parseSpawnEvents();
+    // Save for children
     std::unique_ptr<SnapshotFilter> m_SnapshotFilter = nullptr;
 
-    // Assio UDP logic
-    boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
-    boost::asio::io_service m_IOService;
-    boost::asio::ip::udp::socket m_Socket;
-
+    std::string m_Address;
+    int m_Port = 0;
     // Sending message to server logic
     size_t bytesRead = 0;
-    char readBuf[INPUTSIZE] = { 0 };
 
     // Packet loss logic
     PacketID m_PacketID = 0;
@@ -72,16 +72,14 @@ private:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    void readFromServer();
     size_t  receive(char* data);
-    void send(Packet& packet);
-    void connect();
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
     SharedComponentWrapper createSharedComponent(Packet& packet, EntityID entityID, const ComponentInfo& componentInfo);
     void ignoreFields(Packet& packet, const ComponentInfo& componentInfo);
-    void parseConnect(Packet& packet);
+    void parseUDPConnect(Packet& packet);
+    void parseTCPConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
     void parseKick();
@@ -91,7 +89,7 @@ private:
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
-    bool hasServerTimedOut();
+    void hasServerTimedOut();
     EntityID createPlayer();
     void sendInputCommands();
     void sendLocalPlayerTransform();
@@ -111,6 +109,10 @@ private:
     bool OnPlayerDamage(const Events::PlayerDamage& e);
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
+    void parsePlayerDamage(Packet& packet);
+private:
+    UDPClient m_Unreliable;
+    TCPClient m_Reliable;
 };
 
 #endif

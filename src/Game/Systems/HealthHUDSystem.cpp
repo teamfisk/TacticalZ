@@ -27,7 +27,7 @@ void HealthHUDSystem::Update(double dt)
                 s = s + "/";
                 s = s + std::to_string((int)(double)entityIDParent["Health"]["MaxHealth"]);
                 float healthPercentage = (double)entityIDParent["Health"]["Health"]/(double)entityIDParent["Health"]["MaxHealth"];
-                (glm::vec4&)entity["Text"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Text"]["Color"]).a);
+                //(glm::vec4&)entity["Text"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Text"]["Color"]).a);
                 entity["Text"]["Content"] = s;
             }
 
