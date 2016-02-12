@@ -34,7 +34,8 @@ private:
     void fireRound();
     void spawnTracer();
     float traceRayDistance(glm::vec3 origin, glm::vec3 direction);
-    void playSound();
+    void playFireSound();
+    void playEmptySound();
     void viewPunch();
     void finishReload();
     void playShootAnimation();

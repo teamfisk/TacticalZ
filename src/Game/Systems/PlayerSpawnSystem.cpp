@@ -175,6 +175,9 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
     if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Spectator")) {
         return false;
     }
+    if (m_PlayerIDs.find(e.Player.ID) == m_PlayerIDs.end()) {
+        return false;
+    }
     SpawnRequest req;
     req.PlayerID = m_PlayerIDs.at(e.Player.ID);
     req.Team = cTeam["Team"];

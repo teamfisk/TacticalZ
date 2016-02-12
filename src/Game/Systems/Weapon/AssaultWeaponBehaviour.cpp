@@ -37,6 +37,8 @@ void AssaultWeaponBehaviour::Reload()
 
     // Don't reload if we're completly out of ammo
     if (ammo == 0) {
+        playEmptySound();
+        m_TimeSinceLastFire = -0.0f; // HACK: To make empty sound play with interval
         return;
     }
 
@@ -121,12 +123,12 @@ void AssaultWeaponBehaviour::fireRound()
     if (magAmmo <= 0) {
         Reload();
         return;
-    }
+    } 
 
     // Fire
     magAmmo -= 1;
     spawnTracer();
-    playSound();
+    playFireSound();  
     viewPunch();
     playShootAnimation();
     bool hit = shoot(cAssaultWeapon["BaseDamage"]);
@@ -172,7 +174,7 @@ float AssaultWeaponBehaviour::traceRayDistance(glm::vec3 origin, glm::vec3 direc
     }
 }
 
-void AssaultWeaponBehaviour::playSound()
+void AssaultWeaponBehaviour::playFireSound()
 {
     if (!IsClient) {
         return;
@@ -181,6 +183,19 @@ void AssaultWeaponBehaviour::playSound()
     Events::PlaySoundOnEntity e;
     e.EmitterID = m_Player.ID;
     e.FilePath = "Audio/laser/laser1.wav";
+    m_EventBroker->Publish(e);
+}
+
+
+void AssaultWeaponBehaviour::playEmptySound()
+{
+    if (!IsClient) {
+        return;
+    }
+
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = m_Player.ID;
+    e.FilePath = "Audio/weapon/zeroAmmo.wav";
     m_EventBroker->Publish(e);
 }
 
@@ -342,7 +357,7 @@ void AssaultWeaponBehaviour::showHitMarker()
     if (hitMarkerSpawner.Valid()) {
         SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
         Events::PlaySoundOnEntity e;
-        e.EmitterID = hitMarkerSpawner.ID; // This might not be the optimal spawner entity
+        e.EmitterID = m_Player.ID; 
         e.FilePath = "Audio/weapon/hitclick.wav";
         m_EventBroker->Publish(e);
     }
