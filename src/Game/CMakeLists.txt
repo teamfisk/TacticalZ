@@ -36,6 +36,7 @@ source_group(Network FILES ${SOURCE_FILES_Network})
 set(SOURCE_FILES
     ${SOURCE_FILES}
     "Game.cpp"
+	"MiniDump.cpp"
     ${SOURCE_FILES_Systems}
     ${SOURCE_FILES_Systems_Weapon}
     ${SOURCE_FILES_Events}
