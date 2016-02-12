@@ -187,7 +187,7 @@ void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
 {
     // HACK: Only sync players for now, since the map turned out to be TOO LARGE to send in one snapshot and Simon's computer shits itself
     EntityWrapper entity(m_World, entityID);
-    if (entityID != EntityID_Invalid && !shouldSendToClient(entity)) {
+    if (!entity.Valid() || !shouldSendToClient(entity)) {
         return;
     }
 
