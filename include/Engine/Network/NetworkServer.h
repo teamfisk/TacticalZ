@@ -3,7 +3,7 @@
 #include <boost/asio.hpp>
 #include "Network/Packet.h"
 #include "Network/PlayerDefinition.h"
-#define BUFFERSIZE 32000
+#define BUFFERSIZE 64000
 typedef unsigned int PlayerID;
 typedef unsigned int PacketID;
 

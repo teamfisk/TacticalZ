@@ -38,6 +38,7 @@ bool HealthSystem::OnInputCommand(Events::InputCommand& e)
 {
     if (e.Command == "TakeDamage" && e.Value > 0 && LocalPlayer.Valid()) {
         Events::PlayerDamage ev;
+        ev.Inflictor = LocalPlayer;
         ev.Victim = LocalPlayer;
         ev.Damage = e.Value;
         m_EventBroker->Publish(ev);

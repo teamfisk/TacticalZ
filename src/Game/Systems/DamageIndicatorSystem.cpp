@@ -21,7 +21,7 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
     //if (e.Victim != LocalPlayer) {
     //    return false;
     //}
-    if (e.Victim != LocalPlayer && !e.Victim.IsChildOf(LocalPlayer)) {
+    if (e.Victim.Valid() && e.Victim != LocalPlayer && !e.Victim.IsChildOf(LocalPlayer)) {
         return false;
     }
 
