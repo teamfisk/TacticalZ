@@ -34,10 +34,12 @@ void Packet::Init(MessageType type, unsigned int & packetID)
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
+    // allocate memory for size of packet(only used in tcp)
+    WritePrimitive<int>(0);
     // Add message type
     int messageType = static_cast<int>(type);
-    Packet::WritePrimitive<int>(messageType);
-    Packet::WritePrimitive<int>(packetID);
+    WritePrimitive<int>(messageType);
+    WritePrimitive<int>(packetID);
     packetID++;
     m_HeaderSize = m_Offset;
 }
@@ -56,9 +58,12 @@ void Packet::WriteString(const std::string& str)
 
 void Packet::WriteData(char * data, int sizeOfData)
 {
+
     if (m_Offset + sizeOfData > m_MaxPacketSize) {
         //LOG_WARNING("Packet::WriteData(): Data size in packet exceeded maximum packet size. New size is %i bytes\n", m_MaxPacketSize*2);
-        resizeData();
+        while (m_Offset + sizeOfData > m_MaxPacketSize) {
+            resizeData();
+        }
     }
     memcpy(m_Data + m_Offset, data, sizeOfData);
     m_Offset += sizeOfData;
@@ -76,14 +81,35 @@ std::string Packet::ReadString()
     return returnValue;
 }
 
-char * Packet::ReadData(int SizeOfData)
+void Packet::ReconstructFromData(char * data, size_t sizeOfData)
 {
-    if (m_Offset < m_ReturnDataOffset + SizeOfData) {
+    if (sizeOfData > m_MaxPacketSize) {
+        // Delete our data
+        delete[] m_Data;
+        // Set new max size
+        m_MaxPacketSize = sizeOfData;
+        m_Data = new char[m_MaxPacketSize];
+        // while we resized the old data container.
+    }
+    memcpy(m_Data, data, sizeOfData);
+    m_Offset = sizeOfData;
+
+}
+
+void Packet::UpdateSize()
+{
+    int whatisoffset = m_Offset;
+    memcpy(m_Data, &m_Offset, sizeof(int));
+}
+
+char * Packet::ReadData(int sizeOfData)
+{
+    if (m_Offset < m_ReturnDataOffset + sizeOfData) {
         //LOG_WARNING("packet ReadData(): Oh no! You are trying to remove things outside my memory kingdom");
         return nullptr;
     }
     size_t oldReturnDataOffset = m_ReturnDataOffset;
-    m_ReturnDataOffset += SizeOfData;
+    m_ReturnDataOffset += sizeOfData;
     return (m_Data + oldReturnDataOffset);
 }
 
@@ -91,25 +117,36 @@ void Packet::ChangePacketID(unsigned int & packetID)
 {
     packetID = packetID + 1;
     // Overwrite old PacketID
-    memcpy(m_Data + sizeof(int), &packetID, sizeof(int));
+    memcpy(m_Data + 2*sizeof(int), &packetID, sizeof(int));
+}
+
+MessageType Packet::GetMessageType()
+{
+    MessageType messagType;
+    memcpy(&messagType, m_Data + sizeof(int), sizeof(int));
+    return messagType;
 }
 
 void Packet::resizeData()
 {
+    resizeData(m_MaxPacketSize * 2);
+}
 
+void Packet::resizeData(int size)
+{
     // Allocate memory to store our data in
     char* holdData = new char[m_MaxPacketSize];
     // Copy our data to the newly allocated memory
     memcpy(holdData, m_Data, m_Offset);
     // Increase max packet size
-    m_MaxPacketSize = m_MaxPacketSize * 2;
+    m_MaxPacketSize = size;
     // Delete our data
-    delete m_Data;
-    // Allocate twice the memory we had before
+    delete[] m_Data;
+    // Allocate memory
     m_Data = new char[m_MaxPacketSize];
     // Copy our data to new location
     memcpy(m_Data, holdData, m_Offset);
     // Delete the memory allocated to hold our data
     // while we resized the old data container.
-    delete holdData;
+    delete[] holdData;
 }

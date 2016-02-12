@@ -1,10 +1,8 @@
 #include "Network/Client.h"
-
 using namespace boost::asio::ip;
 
 Client::Client(World* world, EventBroker* eventBroker) 
     : Network(world, eventBroker)
-    , m_Socket(m_IOService)
 {
     // Asumes root node is EntityID_Invalid
     insertIntoServerClientMaps(EntityID_Invalid, EntityID_Invalid);
@@ -14,7 +12,6 @@ Client::Client(World* world, EventBroker* eventBroker)
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
     m_SendInputIntervalMs = config->Get<int>("Networking.SendInputIntervalMs", 33);
-
     LOG_INFO("Client initialized");
 }
 
@@ -26,70 +23,77 @@ Client::Client(World* world, EventBroker* eventBroker, std::unique_ptr<SnapshotF
 
 Client::~Client()
 { }
-
+// Need to call connect at start
 void Client::Connect(std::string address, int port)
 {
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
-
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_Address = address;
     if (address.empty()) {
-        address = config->Get<std::string>("Networking.Address", "127.0.0.1");
+        m_Address = config->Get<std::string>("Networking.Address", "127.0.0.1");
     }
+    m_Port = port;
     if (port == 0) {
-        port = config->Get<int>("Networking.Port", 27666);
+        m_Port = config->Get<int>("Networking.Port", 27666);
     }
-
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
-    LOG_INFO("Client connecting...");
-    m_Socket.connect(m_ReceiverEndpoint);
-    connect();
 }
 
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    readFromServer();
+    while (m_Unreliable.IsSocketAvailable()) {
+        // Packet will get real data in receive
+        Packet packet(MessageType::Invalid);
+        m_Unreliable.Receive(packet);
+        if (packet.GetMessageType() == MessageType::Connect) {
+            parseUDPConnect(packet);
+        } else {
+            parseMessageType(packet);
+        }
+    }
+    while (m_Reliable.IsSocketAvailable()) {
+        // Packet will get real data in receive
+        Packet packet(MessageType::Invalid);
+        m_Reliable.Receive(packet);
+        if (packet.GetMessageType() == MessageType::Connect) {
+            parseTCPConnect(packet);
+        } else {
+            parseMessageType(packet);
+        }
+
+    }
+
     if (m_IsConnected) {
-        hasServerTimedOut();
-        // Don't sent 1 input in 1 packet, bunch em up.
+        // Don't send 1 input in 1 packet, bunch em up.
         if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
             sendInputCommands();
             m_TimeSinceSentInputs = std::clock();
         }
         // HACK: Send absolute player positions for now to avoid desync until we have reliable messages
         sendLocalPlayerTransform();
-    }
-    Network::Update();
-}
 
-void Client::readFromServer()
-{
-    while (m_Socket.available()) {
-        bytesRead = receive(readBuf);
-        if (bytesRead > 0) {
-            Packet packet(readBuf, bytesRead);
-            parseMessageType(packet);
-        }
+        hasServerTimedOut();
     }
+    //Network::Update();
 }
 
 void Client::parseMessageType(Packet& packet)
 {
+    // Pop packetSize which is used by TCP Client to
+    // create a packet of the correct size
+    packet.ReadPrimitive<int>();
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
         return;
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    identifyPacketLoss();
+    //identifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
-    case MessageType::Connect:
-        parseConnect(packet);
-        break;
     case MessageType::Ping:
         parsePing();
         break;
@@ -120,10 +124,30 @@ void Client::parseMessageType(Packet& packet)
     }
 }
 
-void Client::parseConnect(Packet& packet)
+void Client::parseUDPConnect(Packet& packet)
 {
     // Map ServerEntityID and your PlayerID
     LOG_INFO("I be connected PogChamp");
+}
+
+void Client::parseTCPConnect(Packet& packet)
+{
+    LOG_INFO("Received TCP connect from server");
+    // Pop size of message int
+    packet.ReadPrimitive<int>();
+    int messageType = packet.ReadPrimitive<int>();
+    // Read packet ID 
+    m_PreviousPacketID = m_PacketID;    // Set previous packet id
+    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+    // parse player id and other stuff
+    m_PlayerID = packet.ReadPrimitive<int>();
+    m_PlayerID = packet.ReadPrimitive<int>();
+    LOG_INFO("A Player connected");
+    Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
+    // Add player id and other stuff
+    packet.WritePrimitive(m_PlayerID);
+    m_Unreliable.Send(packet);
+    LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -143,7 +167,7 @@ void Client::parsePing()
 
     Packet packet(MessageType::Ping, m_SendPacketID);
     packet.WriteString("Ping recieved");
-    send(packet);
+    m_Reliable.Send(packet);
 }
 
 void Client::parseKick()
@@ -152,14 +176,42 @@ void Client::parseKick()
     m_IsConnected = false;
 }
 
+void Client::parseSpawnEvents()
+{
+    std::vector<Events::PlayerSpawned> tempSpawn;
+    for (int i = 0; i < m_PlayerSpawnEvents.size(); i++) {
+        Events::PlayerSpawned e;
+        if (!serverClientMapsHasEntity(m_PlayerSpawnEvents.at(i).Player.ID) ||
+            !serverClientMapsHasEntity(m_PlayerSpawnEvents.at(i).Spawner.ID)) {
+            tempSpawn.push_back(m_PlayerSpawnEvents.at(i));
+            continue;
+        }
+        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Player.ID));
+        e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Spawner.ID));
+        e.PlayerID = -1;
+        e.PlayerName = m_PlayerSpawnEvents.at(i).PlayerName;
+        m_EventBroker->Publish(e);
+    }
+    m_PlayerSpawnEvents = tempSpawn;
+   // m_PlayerSpawnEvents.clear();
+}
+
 void Client::parsePlayersSpawned(Packet& packet)
 {
+    //Events::PlayerSpawned e;
+    //e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    //e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    //e.PlayerID = -1;
+    //e.PlayerName = packet.ReadString();
+    //m_EventBroker->Publish(e);
+
     Events::PlayerSpawned e;
-    e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
-    e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    e.Player = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
+    e.Spawner = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
     e.PlayerID = -1;
     e.PlayerName = packet.ReadString();
-    m_EventBroker->Publish(e);
+    m_PlayerSpawnEvents.push_back(e);
+    parseSpawnEvents();
 }
 
 void Client::parseEntityDeletion(Packet & packet)
@@ -235,7 +287,8 @@ void Client::parseSnapshot(Packet& packet)
     for (std::size_t i = 0; i < numInputCommands; ++i) {
         Events::InputCommand e;
         e.PlayerID = packet.ReadPrimitive<EntityID>();
-        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(packet.ReadPrimitive<EntityID>()));
+        EntityID player = packet.ReadPrimitive<EntityID>();
+        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(player));
         e.Command = packet.ReadString();
         e.Value = packet.ReadPrimitive<float>();
         m_EventBroker->Publish(e);
@@ -297,56 +350,17 @@ void Client::parseSnapshot(Packet& packet)
             m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
         }
     }
-}
-
-size_t Client::receive(char* data)
-{
-    boost::system::error_code error;
-
-    size_t bytesReceived = m_Socket.receive_from(boost
-        ::asio::buffer((void*)data, INPUTSIZE),
-        m_ReceiverEndpoint,
-        0, error);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataReceived += bytesReceived;
-        m_NetworkData.DataReceivedThisInterval += bytesReceived;
-        m_NetworkData.AmountOfMessagesReceived++;
-    }
-    if (error) {
-        //LOG_ERROR("receive: %s", error.message().c_str());
-    }
-    return bytesReceived;
-}
-
-void Client::send(Packet& packet)
-{
-    m_Socket.send_to(boost::asio::buffer(
-        packet.Data(),
-        packet.Size()),
-        m_ReceiverEndpoint, 0);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataSent += packet.Size();
-        m_NetworkData.DataSentThisInterval += packet.Size();
-        m_NetworkData.AmountOfMessagesSent++;
-    }
-}
-
-void Client::connect()
-{
-    Packet packet(MessageType::Connect, m_SendPacketID);
-    packet.WriteString(m_PlayerName);
-    m_StartPingTime = std::clock();
-    send(packet);
+    parseSpawnEvents();
 }
 
 void Client::disconnect()
 {
+    m_IsConnected = false;
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
-    send(packet);
+    m_Reliable.Send(packet);
+    m_Reliable.Disconnect();
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
@@ -357,7 +371,8 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            connect();
+            m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
+            m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -380,7 +395,9 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
             m_SaveDataTimer = std::clock();
         }
     } else {
-        m_InputCommandBuffer.push_back(e);
+        if (m_IsConnected) {
+            m_InputCommandBuffer.push_back(e);
+        }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     }
@@ -393,7 +410,7 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Inflictor.ID));
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Victim.ID));
     packet.WritePrimitive(e.Damage);
-    send(packet);
+    m_Reliable.Send(packet);
     return false;
 }
 
@@ -422,7 +439,7 @@ void Client::sendLocalPlayerTransform()
     packet.WritePrimitive(orientation.x);
     packet.WritePrimitive(orientation.y);
     packet.WritePrimitive(orientation.z);
-
+ 
     bool hasAssaultWeapon = m_LocalPlayer.HasComponent("AssaultWeapon");
     packet.WritePrimitive(hasAssaultWeapon);
     if (hasAssaultWeapon) {
@@ -430,8 +447,8 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["MagazineAmmo"]);
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
-
-    send(packet);
+    
+    m_Unreliable.Send(packet);
 }
 
 void Client::identifyPacketLoss()
@@ -443,17 +460,15 @@ void Client::identifyPacketLoss()
     }
 }
 
-bool Client::hasServerTimedOut()
+void Client::hasServerTimedOut()
 {
     // Time in ms
     double timeSincePing = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
     if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
-        m_IsConnected = false;
-        return true;
+        disconnect();
     }
-    return false;
 }
 
 EntityID Client::createPlayer()
@@ -474,7 +489,7 @@ void Client::sendInputCommands()
             packet.WriteString(m_InputCommandBuffer[i].Command);
             packet.WritePrimitive(m_InputCommandBuffer[i].Value);
         }
-        send(packet);
+        m_Reliable.Send(packet);
         m_InputCommandBuffer.clear();
     }
 }
@@ -482,7 +497,7 @@ void Client::sendInputCommands()
 void Client::becomePlayer()
 {
     Packet packet = Packet(MessageType::BecomePlayer, m_SendPacketID);
-    send(packet);
+    m_Reliable.Send(packet);
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)
@@ -513,7 +528,6 @@ void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID client
 {
     m_ServerIDToClientID.insert(std::make_pair(serverEntityID, clientEntityID));
     m_ClientIDToServerID.insert(std::make_pair(clientEntityID, serverEntityID));
-
 }
 
 void Client::deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)

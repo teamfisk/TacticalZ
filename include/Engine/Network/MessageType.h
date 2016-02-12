@@ -18,7 +18,8 @@ enum class MessageType
     OnPlayerSpawned,
     EntityDeleted,
     ComponentDeleted,
-    PlayerTransform
+    PlayerTransform,
+    Invalid
 };
 
 #endif
