@@ -79,11 +79,12 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
             m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
         }
     }
+    // Store the player for future reference
+    m_PlayerEntities[e.PlayerID] = e.Player;
+
     if (!IsClient) {
         return false;
     }
-    // Store the player for future reference
-    m_PlayerEntities[e.PlayerID] = e.Player;
 
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
