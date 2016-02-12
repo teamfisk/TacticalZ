@@ -14,6 +14,7 @@
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
+#include "Game/Systems/AmmoPickupSystem.h"
 #include "Game/Systems/DamageIndicatorSystem.h"
 #include "Game/Systems/Weapon/WeaponSystem.h"
 #include "Rendering/AnimationSystem.h"
@@ -124,6 +125,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
