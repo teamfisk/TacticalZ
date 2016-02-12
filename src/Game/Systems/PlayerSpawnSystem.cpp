@@ -181,10 +181,10 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
         return false;
     }
 
-    SpawnRequest req;
-    req.PlayerID = m_PlayerIDs.at(e.Player.ID);
-    req.Team = cTeam["Team"];
-    m_SpawnRequests.push_back(req);
+        SpawnRequest req;
+        req.PlayerID = m_PlayerIDs.at(e.Player.ID);
+        req.Team = cTeam["Team"];
+        m_SpawnRequests.push_back(req);
 
     return true;
 }
