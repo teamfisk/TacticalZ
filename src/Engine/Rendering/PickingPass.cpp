@@ -125,7 +125,7 @@ void PickingPass::Draw(RenderScene& scene)
         }
     }
 
-    for (auto &job : scene.Jobs.TransparentObjects) {
+   /* for (auto &job : scene.Jobs.TransparentObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
@@ -178,7 +178,7 @@ void PickingPass::Draw(RenderScene& scene)
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
             glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
         }
-    }
+    }*/
 
     for (auto &job : scene.Jobs.OpaqueShieldedObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
@@ -236,7 +236,7 @@ void PickingPass::Draw(RenderScene& scene)
         }
     }
 
-    for (auto &job : scene.Jobs.TransparentShieldedObjects) {
+ /*   for (auto &job : scene.Jobs.TransparentShieldedObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
@@ -300,7 +300,7 @@ void PickingPass::Draw(RenderScene& scene)
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
             glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
         }
-    }
+    }*/
     
     m_PickingBuffer.Unbind();
     GLERROR("PickingPass Error");

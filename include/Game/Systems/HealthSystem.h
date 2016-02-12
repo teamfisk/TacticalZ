@@ -9,6 +9,7 @@
 #include "Core/EPlayerDamage.h"
 #include "Core/EPlayerHealthPickup.h"
 #include "Core/EPlayerDeath.h"
+#include "../Engine/Input/EInputCommand.h"
 
 #include <tuple>
 #include <vector>
@@ -28,7 +29,9 @@ private:
     bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
     bool HealthSystem::OnPlayerHealthPickup(Events::PlayerHealthPickup& e);
-
+    EventRelay<HealthSystem, Events::InputCommand> m_InputCommand;
+    bool HealthSystem::OnInputCommand(Events::InputCommand& e);
+    
     //vector which will keep track of health changes
     std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;
    
