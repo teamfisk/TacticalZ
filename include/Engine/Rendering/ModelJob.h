@@ -108,6 +108,7 @@ struct ModelJob : RenderJob
         EndIndex = matGroup->EndIndex;
         Matrix = matrix;
         Color = modelComponent["Color"];
+        GlowIntencity = ((double)modelComponent["GlowIntensity"]);
         Entity = modelComponent.EntityID;
         glm::vec3 abspos = Transform::AbsolutePosition(world, modelComponent.EntityID);
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
@@ -170,7 +171,7 @@ struct ModelJob : RenderJob
     ::Skeleton::AnimationOffset AnimationOffset;
     
 
-
+    float GlowIntencity = 8.0;
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;
     glm::vec4 IncandescenceColor;

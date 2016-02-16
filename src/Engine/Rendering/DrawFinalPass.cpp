@@ -738,6 +738,8 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
     glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), job->FillPercentage);
 	GLERROR("Bind 19 uniform");
     glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+    GLERROR("Bind 20 uniform");
+    glUniform1f(glGetUniformLocation(shaderHandle, "GlowIntensity"), job->GlowIntencity);
     GLERROR("END");
 }
 
@@ -772,6 +774,11 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 	GLERROR("Bind 9 uniform");
 	GLint Location_AmbientColor = glGetUniformLocation(shaderHandle, "AmbientColor");
 	glUniform4fv(Location_AmbientColor, 1, glm::value_ptr(scene.AmbientColor));
+
+    GLERROR("Bind 10 uniform");
+    GLint Location_GlowIntensity = glGetUniformLocation(shaderHandle, "GlowIntensity");
+
+    glUniform1f(Location_GlowIntensity, job->GlowIntencity);
 
 	GLERROR("END");
 }

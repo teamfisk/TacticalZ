@@ -9,6 +9,7 @@ uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
+uniform float GlowIntensity = 10;
 
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
@@ -166,7 +167,7 @@ void main()
 		color_result += FillColor;
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
-	color_result += glowTexel*3;
+	color_result += glowTexel*GlowIntensity;
 
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
 
