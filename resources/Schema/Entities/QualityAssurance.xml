@@ -40,7 +40,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="7364.79053" Z="0"/>
+              <Orientation X="0" Y="7877.16357" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -105,7 +105,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.16300011" Y="17199.7988" Z="0"/>
+          <Orientation X="4.16300011" Y="17713.8125" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -180,7 +180,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="2019.28589" Z="0"/>
+                  <Orientation X="0" Y="2275.49121" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -225,7 +225,7 @@
               <Axis X="1" Y="1" Z="1"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="15792.2051" Y="15792.2051" Z="15792.2051"/>
+              <Orientation X="16304.2705" Y="16304.2705" Z="16304.2705"/>
             </c:Transform>
           </Components>
           <Children>
@@ -289,7 +289,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="15589.2383" Z="0"/>
+              <Orientation X="0" Y="16101.3037" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -321,7 +321,7 @@
                       <Axis X="0.699999988" Y="1" Z="0.300000012"/>
                     </c:RaptorCopter>
                     <c:Transform>
-                      <Orientation X="11456.2695" Y="16313.6973" Z="4881.66504"/>
+                      <Orientation X="11816.6787" Y="16827.6992" Z="5034.95752"/>
                     </c:Transform>
                   </Components>
                   <Children>
@@ -671,7 +671,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="316.505432" Z="0"/>
+                  <Orientation X="0" Y="573.163879" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -718,7 +718,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="316.505432" Z="0"/>
+                  <Orientation X="0" Y="573.163879" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -778,7 +778,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="316.505432" Z="0"/>
+                  <Orientation X="0" Y="573.163879" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -825,7 +825,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="316.505432" Z="0"/>
+                  <Orientation X="0" Y="573.163879" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -871,7 +871,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="316.505432" Z="0"/>
+                  <Orientation X="0" Y="573.163879" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -918,7 +918,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="316.505432" Z="0"/>
+                  <Orientation X="0" Y="573.163879" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -965,7 +965,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="316.505432" Z="0"/>
+                  <Orientation X="0" Y="573.163879" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1027,7 +1027,7 @@
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCube.mesh</Resource>
-                  <Color A="0.300000012" B="0" G="0.200000003" R="1"/>
+                  <Color A="0.300000012" B="0" G="0" R="1"/>
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Team>
@@ -1077,7 +1077,7 @@
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCube.mesh</Resource>
-                  <Color A="0.300000012" B="0" G="1" R="1"/>
+                  <Color A="0.300000012" B="1" G="1" R="1"/>
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Team/>
@@ -1167,7 +1167,7 @@
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCube.mesh</Resource>
-                  <Color A="0.300000012" B="1" G="1" R="0"/>
+                  <Color A="0.300000012" B="1" G="1" R="1"/>
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Team/>
@@ -1217,7 +1217,7 @@
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCube.mesh</Resource>
-                  <Color A="0.300000012" B="1" G="0.200000003" R="0"/>
+                  <Color A="0.300000012" B="1" G="0" R="0"/>
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Team>
@@ -1379,7 +1379,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="850.207886" Z="0"/>
+                  <Orientation X="0" Y="1106.86328" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1388,7 +1388,7 @@
                     <c:ExplosionEffect>
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                      <TimeSinceDeath>0.75205058136495551</TimeSinceDeath>
+                      <TimeSinceDeath>2.5166344949826396</TimeSinceDeath>
                       <ExplosionDuration>3.7999999523162842</ExplosionDuration>
                       <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
                       <Randomness>true</Randomness>
@@ -1435,7 +1435,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="850.207886" Z="0"/>
+                  <Orientation X="0" Y="1106.86328" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1444,7 +1444,7 @@
                     <c:ExplosionEffect>
                       <Velocity X="0.5" Y="1" Z="0"/>
                       <ExplosionOrigin X="0" Y="0.900000036" Z="0"/>
-                      <TimeSinceDeath>1.2019563319790627</TimeSinceDeath>
+                      <TimeSinceDeath>0.35000808291962926</TimeSinceDeath>
                     </c:ExplosionEffect>
                     <c:Model>
                       <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
@@ -1487,7 +1487,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="850.207886" Z="0"/>
+                  <Orientation X="0" Y="1106.86328" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1498,7 +1498,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.300000012" Y="2" Z="0"/>
                       <ExplosionOrigin X="0" Y="1.30000007" Z="-0.200000003"/>
-                      <TimeSinceDeath>0.68540211563899389</TimeSinceDeath>
+                      <TimeSinceDeath>0.35000808291962926</TimeSinceDeath>
                       <EndColor A="0" B="0.333333343" G="0.933333337" R="3.92156863"/>
                       <Randomness>true</Randomness>
                     </c:ExplosionEffect>
@@ -1543,7 +1543,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="857.984314" Z="0"/>
+                  <Orientation X="0" Y="1114.64343" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1553,7 +1553,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0" Y="0.699999988" Z="0"/>
                       <ExplosionOrigin X="0" Y="-1.10000002" Z="0"/>
-                      <TimeSinceDeath>0.95150063648635763</TimeSinceDeath>
+                      <TimeSinceDeath>9.4833086749886775</TimeSinceDeath>
                       <ExplosionDuration>10</ExplosionDuration>
                       <EndColor A="1" B="0" G="0" R="1"/>
                       <RandomnessScalar>3</RandomnessScalar>
@@ -1601,7 +1601,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="456.136078" Z="0"/>
+                  <Orientation X="0" Y="712.784302" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1611,7 +1611,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="6" Y="0.100000001" Z="0"/>
                       <ExplosionOrigin X="0" Y="-10" Z="0"/>
-                      <TimeSinceDeath>1.3515288978624223</TimeSinceDeath>
+                      <TimeSinceDeath>4.0667207575903603</TimeSinceDeath>
                       <ExponentialAccelaration>true</ExponentialAccelaration>
                       <ExplosionDuration>5</ExplosionDuration>
                       <Randomness>true</Randomness>
@@ -1678,10 +1678,10 @@
         </Entity>
         <Entity name="ShieldedCube">
           <Components>
+            <c:Shielded/>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
             </c:Model>
-            <c:Shielded/>
             <c:Transform>
               <Position X="-3.34650159" Y="1.19966424" Z="3.09996605"/>
             </c:Transform>
@@ -1792,7 +1792,7 @@
                         <c:ExplosionEffect>
                           <ColorByDistance>true</ColorByDistance>
                           <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                          <TimeSinceDeath>1.3682019578975679</TimeSinceDeath>
+                          <TimeSinceDeath>2.5166344949826396</TimeSinceDeath>
                           <ExplosionDuration>3.7999999523162842</ExplosionDuration>
                           <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
                           <Randomness>true</Randomness>
@@ -1836,12 +1836,12 @@
             <Entity name="PlayerModel">
               <Components>
                 <c:Animation/>
+                <c:Shielded/>
                 <c:HiddenForLocalPlayer/>
                 <c:Model>
                   <Resource>Models/AssaultAnimated.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
-                <c:Shielded/>
                 <c:Transform/>
               </Components>
               <Children/>
@@ -2095,7 +2095,7 @@
           <Components>
             <c:Sprite>
               <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-              <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
+              <Color A="0.699999988" B="0" G="0" R="1"/>
             </c:Sprite>
             <c:Transform>
               <Position X="-1.58304751" Y="0.919596612" Z="0"/>
@@ -2107,7 +2107,7 @@
                 <c:CapturePointHUD/>
                 <c:Fill>
                   <Percentage>1</Percentage>
-                  <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
+                  <Color A="0.699999988" B="0" G="0" R="1"/>
                 </c:Fill>
                 <c:Sprite>
                   <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
@@ -2139,6 +2139,315 @@
             </c:Model>
             <c:Transform>
               <Position X="0" Y="1.32321239" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="MenuOirign">
+      <Components>
+        <c:Transform>
+          <Position X="-23.0533829" Y="0.938369572" Z="14.068408"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Camera">
+          <Components>
+            <c:Camera/>
+            <c:Model>
+              <Resource>Models/Widgets/Camera.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="MenuCenterPoint">
+          <Components>
+            <c:Menu/>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Page0">
+              <Components>
+                <c:Page/>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="MenuBackground">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/ErrorTexture.png</DiffuseTexture>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="-1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.388422519" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Play</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.214031488" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Host</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.0367300175" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Connect</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="-0.148274168" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Settings</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="-0.335298717" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Quit</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Page1">
+              <Components>
+                <c:Page>
+                  <ID>1</ID>
+                </c:Page>
+                <c:Transform>
+                  <Orientation X="0" Y="0.989000022" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="MenuBackground">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/ErrorTexture.png</DiffuseTexture>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="-1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.375197947" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Resolution</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.199327558" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Option2</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Button">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.0159880854" Z="0.0627754927"/>
+                          <Scale X="0.600000024" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Butts</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="1" G="0.847058833" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00710564246" Y="-0.203304529" Z="0.00999999978"/>
+                              <Scale X="0.300000012" Y="0.699999988" Z="4.30000019"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Text">
+          <Components>
+            <c:Text>
+              <Content>Menu test area</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+            </c:Text>
+            <c:Transform>
+              <Position X="0" Y="4.22317314" Z="0"/>
+              <Orientation X="0" Y="1.68700004" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
