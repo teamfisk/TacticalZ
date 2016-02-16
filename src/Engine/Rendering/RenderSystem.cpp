@@ -67,11 +67,16 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, world);
-        //modelMatrix *= m_Camera->BillboardMatrix();
+		glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, world);
 
+		bool isIndicator = false;
+		if (world->HasComponent(entity.ID, "Indicator") || entity.FirstParentWithComponent("Indicator").Valid())
+		{
+			isIndicator = true;
+			modelMatrix = modelMatrix * m_Camera->BillboardMatrix();
+		}
 
-        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted));
+        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted, isIndicator));
         
         jobs.push_back(spriteJob);
     }
@@ -94,6 +99,30 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
         return false;
     }
 
+	// If a sprite is an Indicator, it's not local on player and object is in the same team, then dispaly it	
+	if (
+		(entity.HasComponent("Indicator"))
+		&& (entity != m_LocalPlayer || !entity.IsChildOf(m_LocalPlayer))
+		&& (entity.HasComponent("Team") || entity.FirstParentWithComponent("Team").Valid())
+		&& entity.HasComponent("Sprite")
+		&& m_LocalPlayer.World != nullptr
+	) {
+		EntityWrapper entityTeam;
+		if (!entity.HasComponent("Team")) {
+			entityTeam = entity.FirstParentWithComponent("Team");
+		}
+		else {
+			entityTeam = entity;
+		}
+		ComponentWrapper& entityTeamComponent = entityTeam["Team"];
+		ComponentWrapper& localComponent = m_LocalPlayer["Team"];
+		int entityTeamInt = entityTeamComponent["Team"];
+		int localComponentInt = localComponent["Team"];
+		int SpectatorInt = localComponent["Team"].Enum("Spectator");
+		if (entityTeamInt != localComponentInt && localComponentInt != SpectatorInt) {
+			return false;
+		}
+	}
     return true;
 }
 
