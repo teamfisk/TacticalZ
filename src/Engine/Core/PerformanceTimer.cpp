@@ -27,15 +27,11 @@ void PerformanceTimer::StartTimerAndStopPrevious(std::string nameOfTimer)
     currentTimerRunning = nameOfTimer;
 }
 
-
-
 void PerformanceTimer::StopTimer(std::string nameOfTimer)
 {
     timers[nameOfTimer].stop();
     currentTimerRunning = nameOfTimer;
 }
-
-
 
 void PerformanceTimer::SetFrameNumber(int frameNumber)
 {
@@ -54,9 +50,6 @@ void PerformanceTimer::ResetAllTimers()
 
 void PerformanceTimer::CreateExcelData()
 {
-    //wall = http://theboostcpplibraries.com/boost.timer
-    //http://www.boost.org/doc/libs/1_48_0/libs/timer/doc/cpu_timers.html
-
     //get path,time
     char	Dump_Path[MAX_PATH];
     GetModuleFileName(NULL, Dump_Path, sizeof(Dump_Path));	//path of current process
@@ -70,6 +63,8 @@ void PerformanceTimer::CreateExcelData()
     std::ofstream someFileStream;
     someFileStream.open(path, std::ofstream::out);
     someFileStream << "classname" << ',' << "walltime" << ',' << "userTime" << ',' << "systemTime" << '\n';
+
+    //write all timers to file
     for (auto aTimer : timers)
     {
         //remove the "class" name in front of the string

@@ -19,18 +19,11 @@ public:
     static void ResetAllTimers();
     static void CreateExcelData();
 
-    //set timer/start
-    //get performance excel nånting
-
 private:
     static std::map<std::string, cpu_timer> timers;
     static double m_TimeElapsed;
     static cpu_timer m_Timer;
     static std::string currentTimerRunning;
-    static bool active;
-    //static map
-
-
 };
 
 #endif
