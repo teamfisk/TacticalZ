@@ -119,7 +119,7 @@ void Server::parseMessageType(Packet& packet)
         parseOnPlayerDamage(packet);
         break;
     case MessageType::PlayerTransform:
-        parsePlayerTransform(packet);
+//       parsePlayerTransform(packet);
         break;
     default:
         break;
@@ -376,7 +376,7 @@ bool Server::OnInputCommand(const Events::InputCommand & e)
         isReadingData = !isReadingData;
         m_SaveDataTimer = std::clock();
     }
-    if (e.Command == "KickPlayer" && e.Value > 0) {
+    else if (e.Command == "KickPlayer" && e.Value > 0) {
         kick(0);
     }
 

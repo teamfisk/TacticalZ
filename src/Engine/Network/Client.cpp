@@ -73,7 +73,7 @@ void Client::Update()
             m_TimeSinceSentInputs = std::clock();
         }
         // HACK: Send absolute player positions for now to avoid desync until we have reliable messages
-        sendLocalPlayerTransform();
+        //sendLocalPlayerTransform();
 
         hasServerTimedOut();
     }
