@@ -40,6 +40,7 @@ private:
     const IRenderer* m_Renderer;
 
     ShaderProgram* m_PickingProgram;
+	ShaderProgram* m_PickingSkinnedProgram;
     Camera* m_Camera;
 
     struct PickingInfo

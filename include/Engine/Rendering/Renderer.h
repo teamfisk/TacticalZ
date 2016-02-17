@@ -22,6 +22,7 @@
 #include "../Core/Transform.h"
 #include "imgui/imgui.h"
 #include "TextPass.h"
+#include "Util/CommonFunctions.h"
 
 class Renderer : public IRenderer
 {

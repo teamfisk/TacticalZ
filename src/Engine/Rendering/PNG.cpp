@@ -4,40 +4,35 @@ PNG::PNG(std::string path)
 {
 	FILE* file = fopen(path.c_str(), "rb");
 	if (!file) {
-		LOG_ERROR("Failed to open texture file \"%s\": %s", path.c_str(), const_cast<const char*>(strerror(errno)));
-		return;
+        throw Resource::FailedLoadingException("Failed to open texture file.");
 	}
 
 	png_byte header[8];
 	fread(header, 1, 8, file);
 	bool isPNG = !png_sig_cmp(header, 0, 8);
 	if (!isPNG) {
-		LOG_ERROR("Failed to load texture file \"%s\": File isn't PNG", path.c_str());
 		fclose(file);
-		return;
+        throw Resource::FailedLoadingException("File is not PNG.");
 	}
 
 	// Initialize libpng
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, (png_error_ptr)&PNG::pngErrorFunction, (png_error_ptr)&PNG::pngErrorFunction);
 	if (!png_ptr) {
-		LOG_ERROR("libpng: Failed to initialze png_struct");
 		png_destroy_read_struct(&png_ptr, nullptr, nullptr);
 		fclose(file);
-		return;
+        throw Resource::FailedLoadingException("Failed to initialze png_struct.");
 	}
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
-		LOG_ERROR("libpng: Failed to initialze png_info");
 		png_destroy_read_struct(&png_ptr, nullptr, nullptr);
 		fclose(file);
-		return;
+        throw Resource::FailedLoadingException("Failed to initialze png_info.");
 	}
 	png_infop info_end_ptr = png_create_info_struct(png_ptr);
 	if (!info_end_ptr) {
-		LOG_ERROR("libpng: Failed to initialze second png_info");
 		png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
 		fclose(file);
-		return;
+        throw Resource::FailedLoadingException("Failed to initialze second png_info.");
 	}
 	png_init_io(png_ptr, file);
 
@@ -51,8 +46,8 @@ PNG::PNG(std::string path)
 	unsigned int width, height;
 	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, NULL, NULL, NULL);
 	if (bit_depth != 8) {
-		LOG_ERROR("libpng: Unsupported bit depth \"%i\" of image \"%s\", must be 8", bit_depth, path.c_str());
-		return;
+        throw Resource::FailedLoadingException("Unsupported bit depth. Must be 8");
+
 	}
 	switch (color_type) {
 		case PNG_COLOR_TYPE_RGB:
@@ -60,8 +55,7 @@ PNG::PNG(std::string path)
 			Format = Image::ImageFormat::RGBA;
 			break;
 		default:
-			LOG_ERROR("libpng: Unsupported color format \"%i\" of image \"%s\"", color_type, path.c_str());
-			return;
+            throw Resource::FailedLoadingException("Unsupported color format.");
 	}
 
 	// Convert RGB to RGBA, since DirectX rather treat them all the same way

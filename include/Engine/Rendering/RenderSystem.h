@@ -18,11 +18,12 @@
 #include "../Core/EPlayerSpawned.h"
 #include "../Core/Octree.h"
 #include "../Collision/EntityAABB.h"
+#include "../Core/ConfigFile.h"
 
 class RenderSystem : public ImpureSystem
 {
 public:
-    RenderSystem(World* world, EventBroker* eventBrokerer, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree);
+    RenderSystem(SystemParams params, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree);
     ~RenderSystem();
 
     virtual void Update(double dt) override;
@@ -31,7 +32,6 @@ private:
     const IRenderer* m_Renderer;
     RenderFrame* m_RenderFrame;
     Camera* m_Camera;
-    World* m_World;
     EntityWrapper m_CurrentCamera = EntityWrapper::Invalid;
     EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
     Octree<EntityAABB>* m_Octree;
@@ -48,9 +48,12 @@ private:
     void fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
     void fillLight(std::list<std::shared_ptr<RenderJob>>& jobs);
+    void fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, World* world);
+
+    bool isEntityVisible(EntityWrapper& entity);
+
     bool isChildOfACamera(EntityWrapper entity);
     bool isChildOfCurrentCamera(EntityWrapper entity);
-
 };
 
 #endif

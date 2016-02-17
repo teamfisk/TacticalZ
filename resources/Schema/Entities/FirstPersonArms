@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Wave" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Animation>
+      <AnimationName1>Run</AnimationName1>
+      <Weight1>0.5</Weight1>
+      <Time1>0.97312056690160276</Time1>
+      <Speed1>1</Speed1>
+      <Speed2>1</Speed2>
+      <AnimationName2>ReloadSwitch</AnimationName2>
+      <Time2>0.91310356788604263</Time2>
+      <AnimationName3>LeftRight</AnimationName3>
+      <Weight3>0</Weight3>
+      <Time3>0.040207288496060478</Time3>
+      <Speed3>1</Speed3>
+    </c:Animation>
+    <c:AnimationOffset>
+      <AnimationName>DownUp</AnimationName>
+      <Time>0.77999961376190186</Time>
+    </c:AnimationOffset>
+    <c:Model>
+      <Resource>Models/Characters/Assault/FirstPerson.mesh</Resource>
+      <Color A="0.627451003" B="19.6078434" G="1" R="3.92156863"/>
+      <Transparent>true</Transparent>
+    </c:Model>
+    <c:Transform>
+      <Position X="-0.690088332" Y="1.00491476" Z="0"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:BoneAttachment>
+          <BoneName>R_Arm_Weapon_Joint</BoneName>
+        </c:BoneAttachment>
+        <c:Model>
+          <Resource>Models/Weapons/Blue/AssaultWeapon.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0.120778561" Y="-0.223796993" Z="-0.15143311"/>
+          <Orientation X="0.0957378224" Y="0.0132024018" Z="0.0284451656"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Camera/>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -71,7 +71,7 @@ GameHealthSystemTest::GameHealthSystemTest()
     //damage player with 50
     Events::PlayerDamage e;
     e.Damage = 50.0f;
-    e.Player = EntityWrapper(m_World, player.EntityID);
+    e.Victim = EntityWrapper(m_World, player.EntityID);
     m_EventBroker->Publish(e);
 
     //heal some other player with 40

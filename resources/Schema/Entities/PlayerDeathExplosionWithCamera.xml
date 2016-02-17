@@ -2,9 +2,7 @@
 <Entity name="Explosion" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Animation>
-      <Name>Hold Pos</Name>
-    </c:Animation>
+    <c:Animation/>
     <c:Lifetime>
       <Lifetime>2.5</Lifetime>
     </c:Lifetime>

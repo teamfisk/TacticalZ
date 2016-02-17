@@ -15,6 +15,7 @@
 #include "PointLightJob.h"
 #include "DirectionalLightJob.h"
 #include "ExplosionEffectJob.h"
+#include "SpriteJob.h"
 
 struct RenderScene
 {
@@ -25,6 +26,7 @@ struct RenderScene
         std::list<std::shared_ptr<RenderJob>> OpaqueShieldedObjects;
         std::list<std::shared_ptr<RenderJob>> TransparentShieldedObjects;
         std::list<std::shared_ptr<RenderJob>> ShieldObjects;
+        std::list<std::shared_ptr<RenderJob>> SpriteJob;
         std::list<std::shared_ptr<RenderJob>> PointLight;
         std::list<std::shared_ptr<RenderJob>> Text;
         std::list<std::shared_ptr<RenderJob>> DirectionalLight;
@@ -41,7 +43,7 @@ struct RenderScene
         Jobs.OpaqueShieldedObjects.clear();
         Jobs.TransparentShieldedObjects.clear();
         Jobs.ShieldObjects.clear();
-        Jobs.Text.clear();
+        Jobs.SpriteJob.clear();
         Jobs.DirectionalLight.clear();
 	}
 };

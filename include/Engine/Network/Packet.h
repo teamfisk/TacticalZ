@@ -49,10 +49,15 @@ public:
     void WriteData(char* data, int sizeOfData);
     // Pops the first element as if it was a string.
     std::string ReadString();
+    // Construct a packet
+    void ReconstructFromData(char* data, size_t SizeOfData);
+    // Update size of packet variable in header
+    void UpdateSize();
     char* ReadData(int SizeOfData);
     void ChangePacketID(unsigned int& packetID);
     size_t Size() { return m_Offset; };
     char* Data() { return m_Data; };
+    MessageType GetMessageType();
     size_t DataReadSize() { return m_ReturnDataOffset; }
     size_t MaxSize() { return m_MaxPacketSize; }
     size_t HeaderSize() { return m_HeaderSize; }
@@ -64,6 +69,7 @@ private:
     size_t m_MaxPacketSize = 512;
     size_t m_HeaderSize = 0;
     void resizeData();
+    void resizeData(int size);
 };
 
 #endif

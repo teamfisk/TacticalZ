@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="MagazineAmmo">
+      <Components>
+        <c:Text>
+          <Content>0</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+          <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+        </c:Text>
+        <c:Transform>
+          <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Ammo">
+      <Components>
+        <c:Text>
+          <Content>360</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+          <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+        </c:Text>
+        <c:Transform>
+          <Position X="5.2833886e-05" Y="-0.0407950208" Z="0"/>
+          <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

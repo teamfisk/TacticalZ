@@ -6,9 +6,10 @@
 #include <png.h>
 
 #include "../Common.h"
+#include "../Core/ResourceManager.h"
 #include "Image.h"
 
-class PNG : public Image
+class PNG : public Image, public Resource
 {
 public:
 	PNG(std::string path);

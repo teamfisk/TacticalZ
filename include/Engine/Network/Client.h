@@ -13,6 +13,8 @@
 #include "Network/Network.h"
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
+#include "Network/UDPClient.h"
+#include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
 #include "Core/EventBroker.h"
@@ -20,24 +22,28 @@
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 #include "Network/EInterpolate.h"
+#include "Network/SnapshotFilter.h"
 #include "Core/EPlayerSpawned.h"
 
 class Client : public Network
 {
 public:
-    Client(ConfigFile* config);
+    Client(World* world, EventBroker* eventBroker);
+    Client(World* world, EventBroker* eventBroker, std::unique_ptr<SnapshotFilter> snapshotFilter);
     ~Client();
-    void Start(World* world, EventBroker* eventBroker) override;
-    void Update() override;
-private:
-    // Assio UDP logic
-    boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
-    boost::asio::io_service m_IOService;
-    boost::asio::ip::udp::socket m_Socket;
 
+    void Connect(std::string address, int port);
+    void Update() override;
+
+    std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
+    void parseSpawnEvents();
+    // Save for children
+    std::unique_ptr<SnapshotFilter> m_SnapshotFilter = nullptr;
+
+    std::string m_Address;
+    int m_Port = 0;
     // Sending message to server logic
     size_t bytesRead = 0;
-    char readBuf[INPUTSIZE] = { 0 };
 
     // Packet loss logic
     PacketID m_PacketID = 0;
@@ -45,10 +51,8 @@ private:
     PacketID m_SendPacketID = 0;
 
     // Game logic
-    World* m_World;
     std::string m_PlayerName;
     PlayerID m_PlayerID = -1;
-    EntityID m_ServerEntityID = std::numeric_limits<EntityID>::max();
     bool m_IsConnected = false;
     EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
     // Server Client Lookup map
@@ -68,14 +72,14 @@ private:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    void readFromServer();
     size_t  receive(char* data);
-    void send(Packet& packet);
-    void connect();
     void disconnect();
     void parseMessageType(Packet& packet);
-    void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType);
-    void parseConnect(Packet& packet);
+    void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
+    SharedComponentWrapper createSharedComponent(Packet& packet, EntityID entityID, const ComponentInfo& componentInfo);
+    void ignoreFields(Packet& packet, const ComponentInfo& componentInfo);
+    void parseUDPConnect(Packet& packet);
+    void parseTCPConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
     void parseKick();
@@ -85,7 +89,7 @@ private:
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
-    bool hasServerTimedOut();
+    void hasServerTimedOut();
     EntityID createPlayer();
     void sendInputCommands();
     void sendLocalPlayerTransform();
@@ -99,13 +103,16 @@ private:
     void deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID);
 
     // Events
-    EventBroker* m_EventBroker;
     EventRelay<Client, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
     EventRelay<Client, Events::PlayerDamage> m_EPlayerDamage;
     bool OnPlayerDamage(const Events::PlayerDamage& e);
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
+    void parsePlayerDamage(Packet& packet);
+private:
+    UDPClient m_Unreliable;
+    TCPClient m_Reliable;
 };
 
 #endif

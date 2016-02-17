@@ -40,7 +40,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="9161.41992" Z="0"/>
+              <Orientation X="0" Y="7364.79053" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -97,7 +97,7 @@
           <Intensity>0.80000001192092896</Intensity>
         </c:DirectionalLight>
         <c:Model>
-          <Resource>Models/DirectionalLightWidget.mesh</Resource>
+          <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
         </c:Model>
         <c:RaptorCopter>
           <Speed>1</Speed>
@@ -120,13 +120,9 @@
       <Children>
         <Entity name="RunAnim">
           <Components>
-            <c:Animation>
-              <Name>Run</Name>
-              <Time>0.79292191744688711</Time>
-              <Speed>1</Speed>
-            </c:Animation>
+            <c:Animation/>
             <c:Model>
-              <Resource>models/AssaultAnimated.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0.786919653" Y="0" Z="0"/>
@@ -136,13 +132,9 @@
         </Entity>
         <Entity name="Walkanim">
           <Components>
-            <c:Animation>
-              <Name>Walk</Name>
-              <Time>0.96020137154739604</Time>
-              <Speed>1</Speed>
-            </c:Animation>
+            <c:Animation/>
             <c:Model>
-              <Resource>models/AssaultAnimated.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -188,19 +180,15 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="2918.14136" Z="0"/>
+                  <Orientation X="0" Y="2019.28589" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
-                    <c:Animation>
-                      <Name>Run</Name>
-                      <Time>0.53173203453812956</Time>
-                      <Speed>1</Speed>
-                    </c:Animation>
+                    <c:Animation/>
                     <c:Model>
-                      <Resource>Models/AssaultAnimated.mesh</Resource>
+                      <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -224,7 +212,7 @@
         <Entity name="CombinedSpheres">
           <Components>
             <c:Model>
-              <Resource>models/NormSpecIncdMapSphere.mesh</Resource>
+              <Resource>Models/Test/NormSpecIncdMapSphere.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -308,7 +296,7 @@
             <Entity name="NormalSphere">
               <Components>
                 <c:Model>
-                  <Resource>Models/NormalMapSphere.mesh</Resource>
+                  <Resource>Models/Test/NormalMapSphere.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="1.82700014" Y="0" Z="-0.166000009"/>
@@ -319,7 +307,7 @@
             <Entity name="SpecularSphere">
               <Components>
                 <c:Model>
-                  <Resource>Models/SpecularMapSphere.mesh</Resource>
+                  <Resource>Models/Test/SpecularMapSphere.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-1.06487739" Y="0" Z="1.52336037"/>
@@ -361,7 +349,7 @@
             <Entity name="GlowMap">
               <Components>
                 <c:Model>
-                  <Resource>Models/IncandescenceMapSphere.mesh</Resource>
+                  <Resource>Models/Test/IncandescenceMapSphere.mesh</Resource>
                 </c:Model>
                 <c:Transform>
                   <Position X="-1.10000002" Y="0" Z="-1.80000007"/>
@@ -422,7 +410,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -435,7 +423,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -448,7 +436,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -461,7 +449,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="0" G="0" R="1"/>
                 </c:Model>
                 <c:Transform>
@@ -493,7 +481,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -506,7 +494,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -519,7 +507,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -532,7 +520,7 @@
               <Components>
                 <c:SpawnPoint/>
                 <c:Model>
-                  <Resource>Models/Assault.mesh</Resource>
+                  <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                   <Color A="1" B="1" G="0" R="0"/>
                 </c:Model>
                 <c:Transform>
@@ -608,7 +596,7 @@
         <Entity name="Assault">
           <Components>
             <c:Model>
-              <Resource>Models/Assault.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
               <Color A="0.572549045" B="1" G="1" R="0"/>
               <Transparent>true</Transparent>
             </c:Model>
@@ -683,14 +671,14 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1217.61243" Z="0"/>
+                  <Orientation X="0" Y="316.505432" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/AssaultWeaponBlue.mesh</Resource>
+                      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -730,14 +718,14 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1217.61243" Z="0"/>
+                  <Orientation X="0" Y="316.505432" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/AssaultWeaponRed.mesh</Resource>
+                      <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -790,14 +778,14 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1217.61243" Z="0"/>
+                  <Orientation X="0" Y="316.505432" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/SecondaryWeapon.mesh</Resource>
+                      <Resource>Models/Weapons/SecondaryWeapon.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -837,14 +825,14 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1217.61243" Z="0"/>
+                  <Orientation X="0" Y="316.505432" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/AssualtSoft.mesh</Resource>
+                      <Resource>Models/Test/AssaultTPoseSoftEdge.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -883,14 +871,14 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1217.61243" Z="0"/>
+                  <Orientation X="0" Y="316.505432" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/DefenderGunBlue.mesh</Resource>
+                      <Resource>Models/Weapons/Blue/DefenderGunBlue.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -930,14 +918,14 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1217.61243" Z="0"/>
+                  <Orientation X="0" Y="316.505432" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/DefenderGunRed.mesh</Resource>
+                      <Resource>Models/Weapons/Red/DefenderGunRed.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="1" Z="0"/>
@@ -977,14 +965,14 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1217.61243" Z="0"/>
+                  <Orientation X="0" Y="316.505432" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
                     <c:Model>
-                      <Resource>Models/Assualt.mesh</Resource>
+                      <Resource>Models/Test/AssaultTPoseHardEdge.mesh</Resource>
                     </c:Model>
                     <c:Transform>
                       <Position X="0" Y="0.5" Z="0"/>
@@ -1021,7 +1009,7 @@
         <Entity name="RedTeamHomeCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-30"/>
@@ -1035,6 +1023,7 @@
                   <HomePointForTeam>
                     <Red/>
                   </HomePointForTeam>
+                  <CaptureTimer>15</CaptureTimer>
                 </c:CapturePoint>
                 <c:Model>
                   <Resource>Models/Core/UnitCube.mesh</Resource>
@@ -1073,7 +1062,7 @@
         <Entity name="RedMiddleCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-15"/>
@@ -1119,7 +1108,7 @@
         <Entity name="MiddleCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -1163,7 +1152,7 @@
         <Entity name="BlueMiddleCaapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="15"/>
@@ -1174,7 +1163,6 @@
               <Components>
                 <c:AABB/>
                 <c:CapturePoint>
-                  <CaptureTimer>-12.033302729641917</CaptureTimer>
                   <CapturePointNumber>3</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Model>
@@ -1210,7 +1198,7 @@
         <Entity name="BlueTeamHomeCapturePoint">
           <Components>
             <c:Model>
-              <Resource>Models/CapturePoint.mesh</Resource>
+              <Resource>Models/Props/CapturePoint.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="30"/>
@@ -1224,6 +1212,7 @@
                   <HomePointForTeam>
                     <Blue/>
                   </HomePointForTeam>
+                  <CaptureTimer>-15</CaptureTimer>
                   <CapturePointNumber>4</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Model>
@@ -1390,7 +1379,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1750.85376" Z="0"/>
+                  <Orientation X="0" Y="850.207886" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1399,13 +1388,13 @@
                     <c:ExplosionEffect>
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                      <TimeSinceDeath>1.3671759474185377</TimeSinceDeath>
+                      <TimeSinceDeath>0.75205058136495551</TimeSinceDeath>
                       <ExplosionDuration>3.7999999523162842</ExplosionDuration>
                       <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
                       <Randomness>true</Randomness>
                     </c:ExplosionEffect>
                     <c:Model>
-                      <Resource>Models/AssaultWeaponBlue.mesh</Resource>
+                      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                       <Transparent>true</Transparent>
                     </c:Model>
                     <c:Transform>
@@ -1446,7 +1435,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1750.85376" Z="0"/>
+                  <Orientation X="0" Y="850.207886" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1455,10 +1444,10 @@
                     <c:ExplosionEffect>
                       <Velocity X="0.5" Y="1" Z="0"/>
                       <ExplosionOrigin X="0" Y="0.900000036" Z="0"/>
-                      <TimeSinceDeath>0.31711568080172703</TimeSinceDeath>
+                      <TimeSinceDeath>1.2019563319790627</TimeSinceDeath>
                     </c:ExplosionEffect>
                     <c:Model>
-                      <Resource>Models/Assault.mesh</Resource>
+                      <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
                       <Transparent>true</Transparent>
                     </c:Model>
                     <c:Transform>
@@ -1498,27 +1487,23 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1750.85376" Z="0"/>
+                  <Orientation X="0" Y="850.207886" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
                 <Entity name="Asset">
                   <Components>
-                    <c:Animation>
-                      <Name>Walk</Name>
-                      <Time>0.74121802989810703</Time>
-                      <Speed>1</Speed>
-                    </c:Animation>
+                    <c:Animation/>
                     <c:ExplosionEffect>
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.300000012" Y="2" Z="0"/>
                       <ExplosionOrigin X="0" Y="1.30000007" Z="-0.200000003"/>
-                      <TimeSinceDeath>0.31711568080172703</TimeSinceDeath>
+                      <TimeSinceDeath>0.68540211563899389</TimeSinceDeath>
                       <EndColor A="0" B="0.333333343" G="0.933333337" R="3.92156863"/>
                       <Randomness>true</Randomness>
                     </c:ExplosionEffect>
                     <c:Model>
-                      <Resource>Models/AssaultAnimated.mesh</Resource>
+                      <Resource>Models/Characters/Assault/AssaultAnimated.mesh</Resource>
                       <Transparent>true</Transparent>
                     </c:Model>
                     <c:Transform>
@@ -1558,7 +1543,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="857.983765" Z="0"/>
+                  <Orientation X="0" Y="857.984314" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1568,7 +1553,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0" Y="0.699999988" Z="0"/>
                       <ExplosionOrigin X="0" Y="-1.10000002" Z="0"/>
-                      <TimeSinceDeath>0.95047462600732735</TimeSinceDeath>
+                      <TimeSinceDeath>0.95150063648635763</TimeSinceDeath>
                       <ExplosionDuration>10</ExplosionDuration>
                       <EndColor A="1" B="0" G="0" R="1"/>
                       <RandomnessScalar>3</RandomnessScalar>
@@ -1616,7 +1601,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="456.13559" Z="0"/>
+                  <Orientation X="0" Y="456.136078" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1626,7 +1611,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="6" Y="0.100000001" Z="0"/>
                       <ExplosionOrigin X="0" Y="-10" Z="0"/>
-                      <TimeSinceDeath>1.350502887383392</TimeSinceDeath>
+                      <TimeSinceDeath>1.3515288978624223</TimeSinceDeath>
                       <ExponentialAccelaration>true</ExponentialAccelaration>
                       <ExplosionDuration>5</ExplosionDuration>
                       <Randomness>true</Randomness>
@@ -1807,7 +1792,7 @@
                         <c:ExplosionEffect>
                           <ColorByDistance>true</ColorByDistance>
                           <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                          <TimeSinceDeath>1.3671759474185377</TimeSinceDeath>
+                          <TimeSinceDeath>1.3682019578975679</TimeSinceDeath>
                           <ExplosionDuration>3.7999999523162842</ExplosionDuration>
                           <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
                           <Randomness>true</Randomness>
@@ -1850,11 +1835,7 @@
             </Entity>
             <Entity name="PlayerModel">
               <Components>
-                <c:Animation>
-                  <Name>Hold Pos</Name>
-                  <Time>0.39573681725672838</Time>
-                  <Speed>1</Speed>
-                </c:Animation>
+                <c:Animation/>
                 <c:HiddenForLocalPlayer/>
                 <c:Model>
                   <Resource>Models/AssaultAnimated.mesh</Resource>
@@ -1916,7 +1897,8 @@
             <Entity name="Bush">
               <Components>
                 <c:Model>
-                  <Resource>Models/BushAlive.mesh</Resource>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
                   <Position X="-4.95900011" Y="0" Z="1.29897511"/>
@@ -1937,6 +1919,226 @@
             <c:Transform>
               <Position X="0" Y="4.20000029" Z="0"/>
               <Orientation X="0" Y="2.15300012" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="SpriteOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-24.0121765" Y="1" Z="0"/>
+          <Orientation X="0" Y="1.45400012" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Sprite1">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Props/FoliageDiff.png</DiffuseTexture>
+            </c:Sprite>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Sprite2">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Props/FoliageDiff.png</DiffuseTexture>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="-0.177861199" Y="0" Z="-1.04673338"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="HudOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-24.3529072" Y="0" Z="6.95243597"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="BackgroundHexagon">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <Color A="0.300000012" B="1" G="1" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0" Y="0.919596612" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="ProgressionHexagon">
+              <Components>
+                <c:CapturePointHUD>
+                  <CapturePointNumber>2</CapturePointNumber>
+                </c:CapturePointHUD>
+                <c:Fill>
+                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                </c:Fill>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.00999999978"/>
+                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="BackgroundHexagon">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <Color A="0.300000012" B="1" G="1" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="ProgressionHexagon">
+              <Components>
+                <c:CapturePointHUD>
+                  <CapturePointNumber>3</CapturePointNumber>
+                </c:CapturePointHUD>
+                <c:Fill>
+                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                </c:Fill>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.00999999978"/>
+                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="BackgroundHexagon">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="1.62788737" Y="0.919596612" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="ProgressionHexagon">
+              <Components>
+                <c:CapturePointHUD>
+                  <CapturePointNumber>4</CapturePointNumber>
+                </c:CapturePointHUD>
+                <c:Fill>
+                  <Percentage>1</Percentage>
+                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                </c:Fill>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.00999999978"/>
+                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="BackgroundHexagon">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <Color A="0.300000012" B="1" G="1" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="-0.820431828" Y="0.441878349" Z="-0.100000001"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="ProgressionHexagon">
+              <Components>
+                <c:CapturePointHUD>
+                  <CapturePointNumber>1</CapturePointNumber>
+                </c:CapturePointHUD>
+                <c:Fill>
+                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                </c:Fill>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.00999999978"/>
+                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="BackgroundHexagon">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="-1.58304751" Y="0.919596612" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="ProgressionHexagon">
+              <Components>
+                <c:CapturePointHUD/>
+                <c:Fill>
+                  <Percentage>1</Percentage>
+                  <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
+                </c:Fill>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.00999999978"/>
+                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                  <Orientation X="0" Y="0" Z="4.71238899"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="CameraHUDOrigin">
+      <Components>
+        <c:Transform>
+          <Position X="-24.1716995" Y="1.20387542" Z="-6.66293383"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Camera">
+          <Components>
+            <c:Camera/>
+            <c:Model>
+              <Resource>Models/Widgets/Camera.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="1.32321239" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>

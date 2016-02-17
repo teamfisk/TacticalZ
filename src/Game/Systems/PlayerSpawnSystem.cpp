@@ -1,20 +1,39 @@
 #include "Systems/PlayerSpawnSystem.h"
 
-PlayerSpawnSystem::PlayerSpawnSystem(World* m_World, EventBroker* eventBroker) 
-    : System(m_World, eventBroker)
+//This should be set by the config anyway.
+float PlayerSpawnSystem::m_RespawnTime = 15.0f;
+
+PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params) 
+    : System(params)
+    , m_Timer(0.f)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerSpawnerd, &PlayerSpawnSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerSpawnSystem::OnPlayerDeath);
     m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }
 
 void PlayerSpawnSystem::Update(double dt)
 {
+    //Increase timer.
+    m_Timer += dt;
+    if (m_Timer < m_RespawnTime) {
+        return;
+    }
+    //If respawn time has passed, we spawn all players that have requested to be spawned.
+    m_Timer = 0.f;
+
+    //If there are no spawn requests, return immediately, if we are client the SpawnRequests should always be empty.
+    if (m_SpawnRequests.size() == 0) {
+        return;
+    }
+
     auto playerSpawns = m_World->GetComponents("PlayerSpawn");
     if (playerSpawns == nullptr) {
         return;
     }
 
+    int numSpawnedPlayers = 0;
     for (auto& req : m_SpawnRequests) {
         for (auto& cPlayerSpawn : *playerSpawns) {
             EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
@@ -40,29 +59,61 @@ void PlayerSpawnSystem::Update(double dt)
             e.Player = player;
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
-
+            ++numSpawnedPlayers;
+            break;
         }
+    }
+    if (numSpawnedPlayers != (int)m_SpawnRequests.size()) {
+        LOG_DEBUG("%i players were supposed to be spawned, but %i was spawned.", (int)m_SpawnRequests.size(), numSpawnedPlayers);
+    } else {
+        LOG_DEBUG("%i players were spawned.", numSpawnedPlayers);
     }
     m_SpawnRequests.clear();
 }
 
-bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
+bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
 {
     if (e.Command != "PickTeam") {
         return false;
     }
 
     // Team picks should be processed ONLY server-side!
-    // Don't make a spawn request if PlayerID is -1, i.e. we're the client.
-    if (e.PlayerID == -1 && m_NetworkEnabled) {
+    // Don't make a spawn request if we're the client.
+    if (!IsServer && m_NetworkEnabled) {
         return false;
     }
 
-    if (e.Value != 0) {
+    if (e.Value == 0) {
+        return false;
+    }
+
+    //TODO: Spectating?
+    //Right now, return if someone picks spectator.
+    //1 signifies spectator here, could not get Playerteam component since it may be invalid or without team comp.
+    if ((ComponentInfo::EnumType)e.Value == 1) {
+        return false;
+    }
+
+    //Check if the player already requested spawn.
+    auto iter = m_SpawnRequests.begin();
+    for (; iter != m_SpawnRequests.end(); ++iter) {
+        if (iter->PlayerID == e.PlayerID) {
+            break;
+        }
+    }
+
+    if (iter != m_SpawnRequests.end()) {
+        //If player is in queue to spawn, then change their team affiliation in the request.
+        iter->Team = (ComponentInfo::EnumType)e.Value;
+    } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
+        //If player is not in queue to spawn, then create a spawn request, 
+        //but only if they are spectating and/or just connected.
         SpawnRequest req;
         req.PlayerID = e.PlayerID;
         req.Team = (ComponentInfo::EnumType)e.Value;
         m_SpawnRequests.push_back(req);
+    } else {
+        return false;
     }
 
     return true;
@@ -70,22 +121,27 @@ bool PlayerSpawnSystem::OnInputCommand(const Events::InputCommand& e)
 
 bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
-    // When a player is actually spawned (since the actual spawning is handled on the server)
-
-    // Check if a player already exists
-    if (m_PlayerEntities.count(e.PlayerID) != 0) {
-        // TODO: Disallow infinite respawning here
-        if (m_PlayerEntities[e.PlayerID].Valid()) {
-            m_World->DeleteEntity(m_PlayerEntities[e.PlayerID].ID);
-        }
-    }
-
     // Store the player for future reference
     m_PlayerEntities[e.PlayerID] = e.Player;
+    m_PlayerIDs[e.Player.ID] = e.PlayerID;
+
+    // When a player is actually spawned (since the actual spawning is handled on the server)
+    // Hack should be moved.
+
+    // TODO: Set the player name to whatever
+    EntityWrapper playerName = e.Player.FirstChildByName("PlayerName");
+    if (playerName.Valid()) {
+        playerName["Text"]["Content"] = e.PlayerName;
+    }
+
+    if (!IsClient) {
+        return false;
+    }
 
     // Set the camera to the correct entity
     EntityWrapper cameraEntity = e.Player.FirstChildByName("Camera");
-    if (cameraEntity.Valid()) {
+    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    if (cameraEntity.Valid() && !outOfBodyExperience) {
         Events::SetCamera e;
         e.CameraEntity = cameraEntity;
         m_EventBroker->Publish(e);
@@ -103,11 +159,32 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         }
     }
 
-    // TODO: Set the player name to whatever
-    EntityWrapper playerName = e.Player.FirstChildByName("PlayerName");
-    if (playerName.Valid()) {
-        playerName["Text"]["Content"] = e.PlayerName;
+    return true;
+}
+
+bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
+{
+    //Only spawn request if network is disabled or we are server.
+    if (!IsServer && m_NetworkEnabled) {
+        return false;
     }
+    if (!e.Player.HasComponent("Team")) {
+        return false;
+    }
+    ComponentWrapper cTeam = e.Player["Team"];
+    //A spectator can't die anyway
+    if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Spectator")) {
+        return false;
+    }
+
+    if (m_PlayerIDs.count(e.Player.ID) == 0) {
+        return false;
+    }
+
+    SpawnRequest req;
+    req.PlayerID = m_PlayerIDs.at(e.Player.ID);
+    req.Team = cTeam["Team"];
+    m_SpawnRequests.push_back(req);
 
     return true;
 }

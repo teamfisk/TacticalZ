@@ -7,6 +7,7 @@
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
+#include "Util/CommonFunctions.h"
 #include "Texture.h"
 
 class DrawFinalPass
@@ -35,6 +36,7 @@ private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
     void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
 
+    void DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene);
     void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
@@ -43,13 +45,14 @@ private:
     void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
 
-    void BindExplosionTextures(std::shared_ptr<ExplosionEffectJob>& job);
-    void BindModelTextures(std::shared_ptr<ModelJob>& job);
+    void BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job);
+    void BindModelTextures(GLuint shaderHandle, std::shared_ptr<ModelJob>& job);
 
     Texture* m_WhiteTexture;
     Texture* m_BlackTexture;
     Texture* m_NeutralNormalTexture;
     Texture* m_GreyTexture;
+    Texture* m_ErrorTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
     FrameBuffer m_FinalPassFrameBufferLowRes;
@@ -68,8 +71,19 @@ private:
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;
+	ShaderProgram* m_ExplosionEffectSplatMapProgram;
+    ShaderProgram* m_SpriteProgram;
+	ShaderProgram* m_ForwardPlusSplatMapProgram;
     ShaderProgram* m_ShieldToStencilProgram;
     ShaderProgram* m_FillDepthBufferProgram;
+
+
+	ShaderProgram* m_ForwardPlusSkinnedProgram;
+	ShaderProgram* m_ExplosionEffectSkinnedProgram;
+	ShaderProgram* m_ExplosionEffectSplatMapSkinnedProgram;
+	ShaderProgram* m_ForwardPlusSplatMapSkinnedProgram;
+    ShaderProgram* m_ShieldToStencilSkinnedProgram;
+    ShaderProgram* m_FillDepthBufferSkinnedProgram;
 };
 
 #endif 
