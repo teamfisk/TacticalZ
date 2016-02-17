@@ -84,7 +84,6 @@ void Server::Update()
     if (isReadingData) {
         Network::Update();
     }
-
 }
 
 void Server::parseMessageType(Packet& packet)
