@@ -43,6 +43,8 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_Enabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.EditorEnabled", false);
     if (m_Enabled) {
         Enable();
+    } else {
+        Disable();
     }
 }
 
