@@ -9,14 +9,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="MaxDistance" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>After this distance between the camera and the sprite, the sprite will not get any smaller on the screen</xs:documentation></xs:annotation>
-				</xs:element>
-				<xs:element name="MinDistance" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>Smaller distance between the camera and the sprite, the sprite will not get any bigger on the screen</xs:documentation></xs:annotation>
-				</xs:element>
 				<xs:element name="MinScale" type="t:double" minOccurs="0"/>
-				<xs:element name="MaxScale" type="t:double" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

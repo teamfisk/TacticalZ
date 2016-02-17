@@ -349,7 +349,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.30516549779527224</Time1>
+              <Time1>1.9902125899398158</Time1>
               <Speed1>1</Speed1>
             </c:Animation>
             <c:Model>
@@ -370,8 +370,8 @@
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.120430455" Y="-0.232123077" Z="-0.181454748"/>
-                  <Orientation X="0.010404747" Y="-0.00268168887" Z="0.0428438447"/>
+                  <Position X="0.120430678" Y="-0.228444964" Z="-0.181454539"/>
+                  <Orientation X="0.0104046883" Y="-0.00268161646" Z="0.0428441353"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -477,7 +477,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.9204144556290004</Time1>
+          <Time1>1.7887947062665859</Time1>
           <Speed1>1</Speed1>
         </c:Animation>
         <c:AnimationOffset>
@@ -501,8 +501,8 @@
               <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0.157390118" Y="1.03132391" Z="-0.215858489"/>
-              <Orientation X="-0.0626512468" Y="-0.0318936296" Z="0.120511964"/>
+              <Position X="0.158748239" Y="1.02847004" Z="-0.215365171"/>
+              <Orientation X="-0.0626733601" Y="-0.0367665328" Z="0.120039687"/>
             </c:Transform>
           </Components>
           <Children>
@@ -575,7 +575,7 @@
     <Entity name="Indicator">
       <Components>
         <c:Indicator>
-          <MaxDistance>30</MaxDistance>
+          <MinScale>80</MinScale>
         </c:Indicator>
         <c:Sprite>
           <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
@@ -585,7 +585,7 @@
         <c:HiddenForLocalPlayer/>
         <c:Transform>
           <Position X="0" Y="1.69509101" Z="0"/>
-          <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+          <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
         </c:Transform>
       </Components>
       <Children/>

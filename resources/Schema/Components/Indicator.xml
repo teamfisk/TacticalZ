@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <Indicator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Indicator.xsd">
-	<MaxDistance>10</MaxDistance>
-	<MinDistance>10</MinDistance>
-	<MinDistance>1</MinDistance>
-	<MaxDistance>1</MaxDistance>
+	<MinScale>10</MinScale>
 </Indicator>
