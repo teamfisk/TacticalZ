@@ -19,6 +19,7 @@ enum class MessageType
     EntityDeleted,
     ComponentDeleted,
     PlayerTransform,
+    Heartbeat,
     Invalid
 };
 

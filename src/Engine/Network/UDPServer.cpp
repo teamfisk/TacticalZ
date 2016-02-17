@@ -5,6 +5,11 @@ UDPServer::UDPServer()
     m_Socket = std::unique_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 27666)));
 }
 
+UDPServer::UDPServer(int port)
+{
+    m_Socket = std::unique_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)));
+}
+
 UDPServer::~UDPServer()
 { }
 
@@ -30,6 +35,8 @@ void UDPServer::Send(Packet & packet)
         m_ReceiverEndpoint,
         0);
 }
+
+
 
 void UDPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {

@@ -8,6 +8,7 @@ class UDPServer : public NetworkServer
 {
 public:
     UDPServer();
+    UDPServer(int port);
     ~UDPServer();
     void AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers);
     void Receive(Packet & packet, PlayerDefinition & playerDefinition);

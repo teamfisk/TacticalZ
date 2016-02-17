@@ -14,6 +14,7 @@
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
 #include "Network/UDPClient.h"
+#include "Network/UDPServer.h" //LOL
 #include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
@@ -82,6 +83,7 @@ public:
     void parseTCPConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
+    void parseHeartbeat(Packet& packet);
     void parseKick();
     void parsePlayersSpawned(Packet& packet);
     void parseEntityDeletion(Packet& packet);
@@ -112,6 +114,7 @@ public:
     void parsePlayerDamage(Packet& packet);
 private:
     UDPClient m_Unreliable;
+    UDPServer m_Heartbeat;
     TCPClient m_Reliable;
 };
 

@@ -1,7 +1,7 @@
 #include "Network/TCPServer.h"
 using namespace boost::asio::ip;
 
-TCPServer::TCPServer()
+TCPServer::TCPServer() 
 {
     acceptor = std::unique_ptr<tcp::acceptor>(new tcp::acceptor(m_IOService, tcp::endpoint(tcp::v4(), 27666)));
 }

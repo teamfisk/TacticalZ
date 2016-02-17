@@ -8,6 +8,7 @@
 
 #include "Network/TCPServer.h"
 #include "Network/UDPServer.h"
+#include "Network/UDPClient.h" //LOL
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
@@ -32,6 +33,7 @@ private:
     // Network channels
     TCPServer m_Reliable;
     UDPServer m_Unreliable;
+    UDPClient m_Heartbeat;
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
     int m_Port = 27666;
@@ -44,11 +46,13 @@ private:
     // time for previouse message
     std::clock_t previousePingMessage = std::clock();
     std::clock_t previousSnapshotMessage = std::clock();
+    std::clock_t previousHeartbeat = std::clock();
     std::clock_t timOutTimer = std::clock();
 
     // How often we send messages (milliseconds)
     float pingIntervalMs;
     float snapshotInterval;
+    float heartbeatInterval = 5000;
     int checkTimeOutInterval = 100;
     int m_NextPlayerID = 0;
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
@@ -67,6 +71,7 @@ private:
     void addChildrenToPacket(Packet& packet, EntityID entityID);
     void addInputCommandsToPacket(Packet& packet);
     void sendPing();
+    void sendHeartBeat();
     void checkForTimeOuts();
     void disconnect(PlayerID playerID);
     void parseMessageType(Packet& packet);

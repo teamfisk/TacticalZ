@@ -1,6 +1,6 @@
 #include "Network/Server.h"
 
-Server::Server(World* world, EventBroker* eventBroker, int port) 
+Server::Server(World* world, EventBroker* eventBroker, int port)
     : Network(world, eventBroker)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
@@ -13,12 +13,13 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Server::OnPlayerDamage);
 
-    // Bind
+    // BindWW
     if (port == 0) {
         port = config->Get<float>("Networking.Port", 27666);
     }
     m_Port = port;
     LOG_INFO("Server initialized and bound to port %i", port);
+    m_Heartbeat.Connect("Server", "127.0.0.1", 13);
 }
 
 Server::~Server()
@@ -58,6 +59,7 @@ void Server::Update()
             parseMessageType(packet);
         }
     }
+
     // Check if players have disconnected
     for (int i = 0; i < m_PlayersToDisconnect.size(); i++) {
         disconnect(m_PlayersToDisconnect.at(i));
@@ -74,6 +76,11 @@ void Server::Update()
     if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
         sendPing();
         previousePingMessage = currentTime;
+    }
+    // Server heartbeat (display server list on clients)
+    if (heartbeatInterval < (1000 * (currentTime - previousHeartbeat) / (double)CLOCKS_PER_SEC)) {
+        sendHeartBeat();
+        previousHeartbeat = currentTime;
     }
     // Time out logic
     if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
@@ -228,6 +235,15 @@ void Server::sendPing()
     m_StartPingTime = std::clock();
     // Send message
     reliableBroadcast(packet);
+}
+
+
+void Server::sendHeartBeat()
+{
+    Packet packet(MessageType::Heartbeat);
+    packet.WriteString("This is a servername"); // server name
+    packet.WritePrimitive<int>(m_ConnectedPlayers.size());
+    m_Heartbeat.Send(packet);
 }
 
 void Server::checkForTimeOuts()

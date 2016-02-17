@@ -3,6 +3,7 @@ using namespace boost::asio::ip;
 
 Client::Client(World* world, EventBroker* eventBroker) 
     : Network(world, eventBroker)
+    , m_Heartbeat(13)
 {
     // Asumes root node is EntityID_Invalid
     insertIntoServerClientMaps(EntityID_Invalid, EntityID_Invalid);
@@ -65,7 +66,15 @@ void Client::Update()
         }
 
     }
-
+    while (m_Heartbeat.IsSocketAvailable()) {
+        Packet packet(MessageType::Invalid);
+        PlayerDefinition localArea;
+        localArea.Endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string("127.0.0.1"), 13);
+        m_Heartbeat.Receive(packet, localArea);
+        if(packet.GetMessageType() == MessageType::Heartbeat) {
+            parseHeartbeat(packet);
+        }
+    }
     if (m_IsConnected) {
         // Don't send 1 input in 1 packet, bunch em up.
         if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
@@ -119,6 +128,9 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::ComponentDeleted:
         parseComponentDeletion(packet);
         break;
+    case MessageType::Heartbeat:
+        parseHeartbeat(packet);
+        break;
     case MessageType::OnPlayerDamage:
         parsePlayerDamage(packet);
         break;
@@ -171,6 +183,18 @@ void Client::parsePing()
     Packet packet(MessageType::Ping, m_SendPacketID);
     packet.WriteString("Ping recieved");
     m_Reliable.Send(packet);
+}
+
+
+void Client::parseHeartbeat(Packet& packet)
+{
+    // Pop size, message type, and ID
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    std::string serverName = packet.ReadString();
+    int playersConnected = packet.ReadPrimitive<int>();
+    LOG_INFO("Serverlist\nName\tPlayers\n%s\t%i\n", serverName.c_str(), playersConnected);
 }
 
 void Client::parseKick()
