@@ -4783,41 +4783,7 @@
                 </c:Transform>
                 <c:Trigger/>
               </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Transform>
-                      <Position X="-1.69271767" Y="0" Z="1.05151343"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Indicator/>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Test/aM4ME4GR.png</DiffuseTexture>
-                          <DepthSort>false</DepthSort>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Orientation X="0" Y="3.1420002" Z="0"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity>
-                      <Components>
-                        <c:Indicator/>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Test/SmallDiff.png</DiffuseTexture>
-                          <DepthSort>false</DepthSort>
-                        </c:Sprite>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -4952,41 +4918,7 @@
                 </c:Transform>
                 <c:Trigger/>
               </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Transform>
-                      <Position X="1.41462243" Y="0" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Indicator/>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Test/aM4ME4GR.png</DiffuseTexture>
-                          <DepthSort>false</DepthSort>
-                        </c:Sprite>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity>
-                      <Components>
-                        <c:Indicator/>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Test/SmallDiff.png</DiffuseTexture>
-                          <DepthSort>false</DepthSort>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Orientation X="0" Y="3.1420002" Z="0"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -5149,7 +5081,7 @@
       <Components>
         <c:PlayerSpawn/>
         <c:Spawner>
-          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+          <EntityFile>Schema/Entities/TestPlayerIndicator.xml</EntityFile>
         </c:Spawner>
         <c:Team>
           <Team>
@@ -5233,7 +5165,7 @@
             <c:Transform>
               <Position X="48.9189453" Y="7.06223536" Z="-78.9347992"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="86.34478" Z="0"/>
+              <Orientation X="0" Y="107.077187" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5252,7 +5184,7 @@
             <c:Transform>
               <Position X="-59.3499641" Y="7.46932745" Z="-20.6276321"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="82.9991226" Z="0"/>
+              <Orientation X="0" Y="103.731529" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5271,7 +5203,7 @@
             <c:Transform>
               <Position X="-1.13644195" Y="1.38919806" Z="38.9768829"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="80.6071548" Z="0"/>
+              <Orientation X="0" Y="101.339561" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5290,7 +5222,7 @@
             <c:Transform>
               <Position X="54.7225227" Y="6.51863909" Z="29.0052128"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="80.9210892" Z="0"/>
+              <Orientation X="0" Y="101.653496" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5309,7 +5241,7 @@
             <c:Transform>
               <Position X="-51.6792374" Y="8.44526482" Z="32.5153465"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="80.3698044" Z="0"/>
+              <Orientation X="0" Y="101.102211" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5328,7 +5260,7 @@
             <c:Transform>
               <Position X="-42.3974304" Y="7.28327894" Z="81.9305344"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="78.4990311" Z="0"/>
+              <Orientation X="0" Y="99.2314377" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5347,7 +5279,7 @@
             <c:Transform>
               <Position X="-9.85184956" Y="8.25567532" Z="39.6119232"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="77.547905" Z="0"/>
+              <Orientation X="0" Y="98.2803116" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>
@@ -5366,7 +5298,7 @@
             <c:Transform>
               <Position X="49.2257118" Y="7.39368248" Z="-31.1810112"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="0" Y="74.7590256" Z="0"/>
+              <Orientation X="0" Y="95.4914322" Z="0"/>
             </c:Transform>
             <c:Trigger/>
           </Components>

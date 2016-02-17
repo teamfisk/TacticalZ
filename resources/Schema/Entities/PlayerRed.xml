@@ -349,7 +349,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>1.6050530664521858</Time1>
+              <Time1>0.73262309029003347</Time1>
               <Speed1>1</Speed1>
             </c:Animation>
             <c:Model>
@@ -370,8 +370,8 @@
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.12043035" Y="-0.234149337" Z="-0.181454644"/>
-                  <Orientation X="0.0104045281" Y="-0.00268131681" Z="0.0428438708"/>
+                  <Position X="0.120430365" Y="-0.24209328" Z="-0.181454867"/>
+                  <Orientation X="0.0104046632" Y="-0.0026818295" Z="0.0428442396"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -477,7 +477,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.620305457513453</Time1>
+          <Time1>0.031207590802594609</Time1>
           <Speed1>1</Speed1>
         </c:Animation>
         <c:AnimationOffset>
@@ -501,8 +501,8 @@
               <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0.160351232" Y="1.02591991" Z="-0.215102971"/>
-              <Orientation X="-0.0627480298" Y="-0.0432248674" Z="0.119431816"/>
+              <Position X="0.157017991" Y="1.03271544" Z="-0.216204733"/>
+              <Orientation X="-0.0626475811" Y="-0.0306777786" Z="0.120614327"/>
             </c:Transform>
           </Components>
           <Children>
@@ -568,6 +568,23 @@
           <Position X="0.100000001" Y="1.50199997" Z="-0.248000011"/>
           <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
           <Orientation X="0" Y="3.14199996" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Indicator">
+      <Components>
+        <c:Indicator>
+          <MaxDistance>30</MaxDistance>
+        </c:Indicator>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
+          <Color A="1" B="0" G="0" R="1"/>
+        </c:Sprite>
+        <c:HiddenForLocalPlayer/>
+        <c:Transform>
+          <Position X="0" Y="1.69500005" Z="0"/>
+          <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
         </c:Transform>
       </Components>
       <Children/>

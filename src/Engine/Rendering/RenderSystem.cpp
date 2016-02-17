@@ -67,13 +67,53 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
-		glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, world);
-
+		glm::mat4 modelMatrix = glm::mat4(1);
+		
 		bool isIndicator = false;
 		if (world->HasComponent(entity.ID, "Indicator") || entity.FirstParentWithComponent("Indicator").Valid())
 		{
 			isIndicator = true;
-			modelMatrix = modelMatrix * m_Camera->BillboardMatrix();
+			glm::vec3 pos = Transform::AbsolutePosition(entity);
+
+
+			// Code for shcneking if sprite is inside or outside of screen
+			//glm::vec4 projectedPos = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * glm::vec4(pos, 1.0f);
+			//projectedPos /= projectedPos.w;
+			//// Check if inside of outside of screen.
+			//if (projectedPos.x < -1.0f || projectedPos.x > 1.0f || projectedPos.y < -1.0f || projectedPos.y > 1.0f) {
+			//	// is outside of screen
+			//} else {
+			//	// is inside of screen
+			//}
+
+
+			glm::vec3 zAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+			glm::vec3 normal = pos - m_Camera->Position();
+			normal.y = 0;
+			normal = glm::normalize(normal);
+			glm::vec3 right = glm::cross(normal, zAxis);
+			glm::vec3 up = glm::cross(right, normal);
+
+			modelMatrix[0][0] = right.x;
+			modelMatrix[0][1] = right.y;
+			modelMatrix[0][2] = right.z;
+
+			modelMatrix[1][0] = zAxis.x;
+			modelMatrix[1][1] = zAxis.y;
+			modelMatrix[1][2] = zAxis.z;
+
+			modelMatrix[2][0] = normal.x;
+			modelMatrix[2][1] = normal.y;
+			modelMatrix[2][2] = normal.z;
+
+			modelMatrix[3][0] = pos.x;
+			modelMatrix[3][1] = pos.y;
+			modelMatrix[3][2] = pos.z;
+
+			modelMatrix = modelMatrix * glm::scale(Transform::AbsoluteScale(entity));
+			
+		} else {
+			modelMatrix = Transform::ModelMatrix(entity.ID, world);
 		}
 
         std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted, isIndicator));
@@ -101,8 +141,8 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
 
 	// If a sprite is an Indicator, it's not local on player and object is in the same team, then dispaly it	
 	if (
-		(entity.HasComponent("Indicator"))
-		&& (entity != m_LocalPlayer || !entity.IsChildOf(m_LocalPlayer))
+		entity.HasComponent("Indicator")
+		&& !entity.IsChildOf(m_LocalPlayer)
 		&& (entity.HasComponent("Team") || entity.FirstParentWithComponent("Team").Valid())
 		&& entity.HasComponent("Sprite")
 		&& m_LocalPlayer.World != nullptr
@@ -110,8 +150,7 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
 		EntityWrapper entityTeam;
 		if (!entity.HasComponent("Team")) {
 			entityTeam = entity.FirstParentWithComponent("Team");
-		}
-		else {
+		} else {
 			entityTeam = entity;
 		}
 		ComponentWrapper& entityTeamComponent = entityTeam["Team"];
