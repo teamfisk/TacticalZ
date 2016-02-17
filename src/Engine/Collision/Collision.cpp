@@ -693,8 +693,9 @@ boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<Enti
         if (!entityBox.Entity.HasComponent("Model")) {
             continue;
         }
-        std::string res = entityBox.Entity["Model"]["Resource"];
-        if (res.empty()) {
+        auto& cModel = entityBox.Entity["Model"];
+        std::string res = cModel["Resource"];
+        if (res.empty() || (bool)cModel["Transparent"] || !((bool)cModel["Visible"])) {
             continue;
         }
         Model* model;
