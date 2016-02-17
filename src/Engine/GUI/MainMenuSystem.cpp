@@ -17,20 +17,27 @@ void MainMenuSystem::Update(double dt)
 
 bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
 {
-    printf("\nClicked: %s", e.EntityName);
+    if(e.EntityName == "Play") {
+        //Run play code
+    } else if(e.EntityName == "Connect") {
+        //Run connect code
+    } else if(e.EntityName == "Host") {
+        //Run host code
+    } else if(e.EntityName == "Quit") {
+        printf("No, you stay");
+    }
+
     return true;
 }
 
 bool MainMenuSystem::OnButtonRelease(const Events::ButtonReleased& e)
 {
-    printf("\nReleased");
 
     return true;
 }
 
 bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 {
-    printf("\nPressed: %s", e.EntityName);
 
     return true;
 }
