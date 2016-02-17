@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Weapon">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="MagSize" type="t:int" minOccurs="0"/>
+				<xs:element name="MaxAmmo" type="t:int" minOccurs="0"/>
+				<xs:element name="CurrentAmmoInMag" type="t:int" minOccurs="0"/>
+				<xs:element name="CurrentAmmo" type="t:int" minOccurs="0"/>
+				<xs:element name="RPM" type="t:double" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

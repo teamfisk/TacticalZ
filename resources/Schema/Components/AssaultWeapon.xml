@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<AssaultWeapon xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="AssaultWeapon.xsd">
+	<MagazineAmmo>32</MagazineAmmo>
+	<MagazineSize>32</MagazineSize>
+	<Ammo>360</Ammo>
+	<MaxAmmo>360</MaxAmmo>
+	<BaseDamage>5</BaseDamage>
+	<RPM>120</RPM>
+	<ViewPunch>0.01</ViewPunch>
+	<ReloadTime>2</ReloadTime>
+</AssaultWeapon>

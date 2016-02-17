@@ -5,9 +5,8 @@
 
 #include "../Common.h"
 #include "AABB.h"
-
-//Fwd declarations.
-class Ray;
+#include "Frustum.h"
+#include "Ray.h"
 
 namespace OctSpace
 {
@@ -40,6 +39,10 @@ public:
     //The type Box must be AABB, or inherit from AABB.
     template<typename Box>
     void ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects);
+    //Get the objects that are inside the frustum, the objects are put in outObjects.
+    void ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects);
+    //Get objects, which AABB the input ray intersects, the objects are put in outObjects.
+    void ObjectsPossiblyHitByRay(const Ray& ray, std::vector<T>& outObjects);
     //Empty the tree of all objects, static and dynamic.
     void ClearObjects();
     //Empty the tree of all dynamic objects. Static objects remain in the tree.
@@ -97,6 +100,10 @@ struct Child
     void AddStaticObject(const AABB& box);
     template<typename T, typename Box>
     void ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects) const;
+    template<typename T>
+    void ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects, bool takeAllDontTest) const;
+    template<typename T>
+    void ObjectsPossiblyHitByRay(const Ray& ray, std::vector<T>& outObjects) const;
     void ClearObjects();
     void ClearDynamicObjects();
     bool RayCollides(const Ray& ray, Output& data) const;
@@ -115,6 +122,15 @@ struct Child
     int childIndexContainingPoint(const glm::vec3& point) const;
     std::vector<int> childIndicesContainingBox(const AABB& box) const;
 };
+
+//To be able to sort child nodes and contained objects based on distance to ray origin.
+struct RaySorterInfo
+{
+    int Index;
+    float Distance;
+};
+
+bool isFirstLower(const RaySorterInfo& first, const RaySorterInfo& second);
 
 }
 
@@ -152,6 +168,20 @@ void Octree<T>::ObjectsInSameRegion(const Box& box, std::vector<T>& outObjects)
     static_assert(std::is_base_of<AABB, Box>::value, "template argument type Box in Octree<T>::ObjectsInSameRegion must be a subclass of AABB.");
     falsifyObjectChecks();
     m_Root->ObjectsInSameRegion(box, outObjects);
+}
+
+template<typename T>
+void Octree<T>::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects)
+{
+    falsifyObjectChecks();
+    m_Root->ObjectsInFrustum(frustum, outObjects, false);
+}
+
+template<typename T>
+void Octree<T>::ObjectsPossiblyHitByRay(const Ray& ray, std::vector<T>& outObjects)
+{
+    falsifyObjectChecks();
+    m_Root->ObjectsPossiblyHitByRay(ray, outObjects);
 }
 
 template<typename T>
@@ -229,5 +259,102 @@ void OctSpace::Child::ObjectsInSameRegion(const Box& box, std::vector<T>& outObj
         }
     }
 }
+
+template<typename T>
+void OctSpace::Child::ObjectsInFrustum(const Frustum& frustum, std::vector<T>& outObjects, bool takeAllDontTest) const
+{
+    if (hasChildren()) {
+        for (const Child* c : m_Children) {
+            Frustum::Output out = Frustum::Output::Inside;
+            if (!takeAllDontTest) {
+                out = frustum.VsAABB(c->m_Box);
+                if (out == Frustum::Output::Outside) {
+                    continue;
+                }
+            }
+            c->ObjectsInFrustum(frustum, outObjects, out == Frustum::Output::Inside);
+        }
+    } else {
+        size_t startIndex = outObjects.size();
+        int numDuplicates = 0;
+        outObjects.resize(outObjects.size() + m_StaticObjIndices.size() + m_DynamicObjIndices.size());
+        for (size_t i = 0; i < m_StaticObjIndices.size(); ++i) {
+            ContainedObject& obj = m_StaticObjectsRef[m_StaticObjIndices[i]];
+            if (obj.Checked || frustum.VsAABB(*obj.Box) == Frustum::Output::Outside) {
+                ++numDuplicates;
+            } else {
+                obj.Checked = true;
+                outObjects[startIndex + i - numDuplicates] = *static_cast<T*>(obj.Box.get());
+            }
+        }
+        for (size_t i = 0; i < m_DynamicObjIndices.size(); ++i) {
+            ContainedObject& obj = m_DynamicObjectsRef[m_DynamicObjIndices[i]];
+            if (obj.Checked || frustum.VsAABB(*obj.Box) == Frustum::Output::Outside) {
+                ++numDuplicates;
+            } else {
+                obj.Checked = true;
+                outObjects[startIndex + i - numDuplicates] = *static_cast<T*>(obj.Box.get());
+            }
+        }
+        for (size_t i = 0; i < numDuplicates; ++i) {
+            outObjects.pop_back();
+        }
+    }
+}
+
+template<typename T>
+void OctSpace::Child::ObjectsPossiblyHitByRay(const Ray& ray, std::vector<T>& outObjects) const
+{
+    //If the node AABB is missed, everything it contains is missed.
+    if (Collision::RayAABBIntr(ray, m_Box)) {
+        //If the ray shoots the tree, and it is a parent.
+        if (hasChildren()) {
+            //Sort children according to their distance from the ray origin.
+            std::vector<RaySorterInfo> childInfos;
+            childInfos.resize(8);
+            for (int i = 0; i < 8; ++i) {
+                childInfos[i] = { i, glm::distance(ray.Origin(), m_Children[i]->m_Box.Origin()) };
+            }
+            std::sort(childInfos.begin(), childInfos.end(), isFirstLower);
+            //Loop through the children, starting with the one closest to the ray origin. I.e the first to be hit.
+            for (const RaySorterInfo& info : childInfos) {
+                m_Children[info.Index]->ObjectsPossiblyHitByRay(ray, outObjects);
+            }
+        } else {
+            //Check against boxes in the node.
+            bool intersected = false;
+            float dist;
+            //Sort all contained objects according to the distance from the ray origin to 
+            //the intersection, if they are intersecting.
+            std::vector<RaySorterInfo> objectHitInfos;
+            objectHitInfos.reserve(m_StaticObjIndices.size() + m_DynamicObjIndices.size());
+            for (int i : m_StaticObjIndices) {
+                //If we haven't tested against this object before, and the ray hits.
+                if (!m_StaticObjectsRef[i].Checked &&
+                        Collision::RayVsAABB(ray, *m_StaticObjectsRef[i].Box, dist)) {
+                    objectHitInfos.push_back({ i, dist });
+                }
+                m_StaticObjectsRef[i].Checked = true;
+            }
+            for (int i : m_DynamicObjIndices) {
+                //If we haven't tested against this object before, and the ray hits.
+                if (!m_DynamicObjectsRef[i].Checked &&
+                        Collision::RayVsAABB(ray, *m_DynamicObjectsRef[i].Box, dist)) {
+                    objectHitInfos.push_back({ i + (int)m_StaticObjIndices.size(), dist });
+                }
+                m_DynamicObjectsRef[i].Checked = true;
+            }
+            std::sort(objectHitInfos.begin(), objectHitInfos.end(), isFirstLower);
+            int startSize = (int)outObjects.size();
+            outObjects.resize(startSize + objectHitInfos.size());
+            for (int i = 0; i < objectHitInfos.size(); ++i) {
+                outObjects[startSize + i] = (objectHitInfos[i].Index < m_StaticObjIndices.size()) ?
+                    *static_cast<T*>(m_StaticObjectsRef[objectHitInfos[i].Index].Box.get()) :
+                    *static_cast<T*>(m_DynamicObjectsRef[objectHitInfos[i].Index - m_StaticObjIndices.size()].Box.get());
+            }
+        }
+    }
+}
+
 
 #endif

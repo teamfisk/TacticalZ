@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="WeaponModel" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>2</Lifetime>
+    </c:Lifetime>
+    <c:ExplosionEffect>
+      <ColorByDistance>true</ColorByDistance>
+      <Velocity X="1.63300014" Y="0.0320000015" Z="0"/>
+      <ExplosionOrigin X="0" Y="0.0790000036" Z="-0.329000026"/>
+      <ExponentialAccelaration>true</ExponentialAccelaration>
+      <EndColor A="0" B="1" G="1" R="19.6078434"/>
+      <Randomness>true</Randomness>
+    </c:ExplosionEffect>
+    <c:Model>
+      <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+      <Transparent>true</Transparent>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children/>
+
+</Entity>

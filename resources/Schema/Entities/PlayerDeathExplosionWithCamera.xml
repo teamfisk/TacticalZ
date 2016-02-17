@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Explosion" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Animation/>
+    <c:Lifetime>
+      <Lifetime>2.5</Lifetime>
+    </c:Lifetime>
+    <c:ExplosionEffect>
+      <ColorByDistance>true</ColorByDistance>
+      <Velocity X="0" Y="7.76300049" Z="0"/>
+      <ExplosionOrigin X="0" Y="0.67900002" Z="0"/>
+      <ExponentialAccelaration>true</ExponentialAccelaration>
+      <ExplosionDuration>3</ExplosionDuration>
+      <EndColor A="0" B="0" G="0" R="1"/>
+      <Randomness>true</Randomness>
+    </c:ExplosionEffect>
+    <c:Model>
+      <Resource>Models/AssaultAnimated.mesh</Resource>
+      <Color A="1" B="0" G="0" R="1"/>
+      <Transparent>true</Transparent>
+    </c:Model>
+    <c:Transform>
+      <Position X="0" Y="0" Z="3.46966481"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Camera">
+      <Components>
+        <c:Camera/>
+        <c:Transform>
+          <Position X="0" Y="2.49700022" Z="4.31700039"/>
+          <Orientation X="5.95600033" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

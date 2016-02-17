@@ -1,10 +1,12 @@
 #include "Rendering/RenderSystem.h"
+#include "Collision/Collision.h"
+#include "Core/Frustum.h"
 
-RenderSystem::RenderSystem(World* world, EventBroker* eventBroker, const IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(world, eventBroker)
+RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, RenderFrame* renderFrame, Octree<EntityAABB>* frustumCullOctree)
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
-    , m_World(world)
+    , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
@@ -31,6 +33,70 @@ bool RenderSystem::OnSetCamera(Events::SetCamera& e)
     return true;
 }
 
+
+void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
+{
+    auto sprites = world->GetComponents("Sprite");
+    if (sprites == nullptr) {
+        return;
+    }
+
+    for (auto& cSprite : *sprites) {
+        bool visible = cSprite["Visible"];
+        if (!visible) {
+            continue;
+        }
+       
+        EntityWrapper entity(world, cSprite.EntityID);
+        if (!isEntityVisible(entity)) {
+            continue;
+        }
+
+        std::string diffuseResource = cSprite["DiffuseTexture"];
+        std::string glowResource = cSprite["GlowMap"];
+        bool depthSorted = cSprite["DepthSort"];
+        if (diffuseResource.empty() && glowResource.empty()) {
+            continue;
+        }
+
+        float fillPercentage = 0.f;
+        glm::vec4 fillColor = glm::vec4(0);
+        if (world->HasComponent(entity.ID, "Fill")) {
+            auto fillComponent = world->GetComponent(entity.ID, "Fill");
+            fillPercentage = (float)(double)fillComponent["Percentage"];
+            fillColor = (glm::vec4)fillComponent["Color"];
+        }
+
+        glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, world);
+        //modelMatrix *= m_Camera->BillboardMatrix();
+
+
+        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted));
+        
+        jobs.push_back(spriteJob);
+    }
+}
+
+bool RenderSystem::isEntityVisible(EntityWrapper& entity)
+{
+    // Only render children of a camera if that camera is currently active
+    if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
+        return false;
+    }
+
+    // Hide things parented to local player if they have the HiddenFromLocalPlayer component
+    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    if (
+        (entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) 
+        && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) 
+        && !outOfBodyExperience
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
 bool RenderSystem::isChildOfACamera(EntityWrapper entity)
 {
     return entity.FirstParentWithComponent("Camera").Valid();
@@ -40,14 +106,15 @@ bool RenderSystem::isChildOfCurrentCamera(EntityWrapper entity)
     return entity == m_CurrentCamera || entity.IsChildOf(m_CurrentCamera);
 }
 
-void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs, std::list<std::shared_ptr<RenderJob>>& transparentJobs)
+void RenderSystem::fillModels(RenderScene::Queues &Jobs)
 {
-    auto models = m_World->GetComponents("Model");
-    if (models == nullptr) {
-        return;
-    }
+    Frustum frustum(m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix());
+    std::vector<EntityAABB> seenEntities;
+    m_Octree->ObjectsInFrustum(frustum, seenEntities);
 
-    for (auto& cModel : *models) {
+    for (auto& seenEntity : seenEntities) {
+        EntityWrapper entity = seenEntity.Entity;
+        ComponentWrapper cModel = entity["Model"];
         bool visible = cModel["Visible"];
         if (!visible) {
             continue;
@@ -57,15 +124,7 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
             continue;
         }
 
-        EntityWrapper entity(m_World, cModel.EntityID);
-
-        // Only render children of a camera if that camera is currently active
-        if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
-            continue;
-        }
-
-        // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-        if (entity.HasComponent("HiddenForLocalPlayer") && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer))) {
+        if (!isEntityVisible(entity)) {
             continue;
         }
 
@@ -92,7 +151,9 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
         }
 
         glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
+        //Loop through all materialgroups of a model
         for (auto matGroup : model->MaterialGroups()) {
+            //If the model has an explosioneffect component, we will add an explosioneffectjob
             if (m_World->HasComponent(cModel.EntityID, "ExplosionEffect")) {
                 auto explosionEffectComponent = m_World->GetComponent(cModel.EntityID, "ExplosionEffect");
                 std::shared_ptr<ExplosionEffectJob> explosionEffectJob = std::shared_ptr<ExplosionEffectJob>(new ExplosionEffectJob(
@@ -106,14 +167,33 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     fillColor, 
                     fillPercentage
                 ));
-                if(explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
-                    cModel["Transparent"] = true;
-                }
+                if (m_World->HasComponent(cModel.EntityID, "Shield")){
+                    explosionEffectJob->CalculateHash();
+                    Jobs.ShieldObjects.push_back(explosionEffectJob);
+                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
+                    || m_World->HasComponent(cModel.EntityID, "Player")) {
 
-                if (cModel["Transparent"]) {
-                    transparentJobs.push_back(explosionEffectJob);
+                    if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
+                    } else {
+					    explosionEffectJob->CalculateHash();
+                        Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
+                    }
                 } else {
-                    opaqueJobs.push_back(explosionEffectJob);
+                    if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentObjects.push_back(explosionEffectJob);
+                    } else {
+                        explosionEffectJob->CalculateHash();
+                        Jobs.OpaqueObjects.push_back(explosionEffectJob);
+                    }
                 }
             } else {
                 std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
@@ -126,13 +206,33 @@ void RenderSystem::fillModels(std::list<std::shared_ptr<RenderJob>>& opaqueJobs,
                     fillColor, 
                     fillPercentage
                 ));
-                if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
-                    cModel["Transparent"] = true;
-                }
-                if (cModel["Transparent"]) {
-                    transparentJobs.push_back(modelJob);
+                if (m_World->HasComponent(cModel.EntityID, "Shield")) {
+                    modelJob->CalculateHash();
+                    Jobs.ShieldObjects.push_back(modelJob);
+                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
+                    || m_World->HasComponent(cModel.EntityID, "Player")) {
+
+                    if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentShieldedObjects.push_back(modelJob);
+                    } else {
+					    modelJob->CalculateHash();
+                        Jobs.OpaqueShieldedObjects.push_back(modelJob);
+                    }
                 } else {
-                    opaqueJobs.push_back(modelJob);
+                    if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
+                        cModel["Transparent"] = true;
+                    }
+
+                    if (cModel["Transparent"]) {
+                        Jobs.TransparentObjects.push_back(modelJob);
+                    } else {
+                        modelJob->CalculateHash();
+                        Jobs.OpaqueObjects.push_back(modelJob);
+                    }
                 }
             }
         }
@@ -167,7 +267,6 @@ void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, 
     }
 }
 
-
 void RenderSystem::fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
 {
     auto directionalLights = world->GetComponents("DirectionalLight");
@@ -189,14 +288,13 @@ void RenderSystem::fillDirectionalLights(std::list<std::shared_ptr<RenderJob>>& 
     }
 }
 
-
 void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* world)
 {
     auto texts = world->GetComponents("Text");
     if (texts == nullptr) {
         return;
     }
-
+	
     for (auto& textComponent : *texts) {
         bool visible = textComponent["Visible"];
         if (!visible) {
@@ -204,6 +302,11 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
         }
         std::string resource = textComponent["Resource"];
         if (resource.empty()) {
+            continue;
+        }
+
+        EntityWrapper entity(world, textComponent.EntityID);
+        if (!isEntityVisible(entity)) {
             continue;
         }
 
@@ -251,10 +354,13 @@ void RenderSystem::Update(double dt)
         scene.AmbientColor = (glm::vec4)(*cSceneLight->begin())["AmbientColor"];
     }
 
-    fillModels(scene.OpaqueObjects, scene.TransparentObjects);
-    fillPointLights(scene.PointLightJobs, m_World);
-    fillDirectionalLights(scene.DirectionalLightJobs, m_World);
-    fillText(scene.TextJobs, m_World);
+    fillModels(scene.Jobs);
+    fillPointLights(scene.Jobs.PointLight, m_World);
+    //TODO: Make sure all objects needed are also sorted.
+	scene.Jobs.OpaqueObjects.sort();
+    fillSprites(scene.Jobs.SpriteJob, m_World);
+    fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
+    fillText(scene.Jobs.Text, m_World);
     m_RenderFrame->Add(scene);
    
 }

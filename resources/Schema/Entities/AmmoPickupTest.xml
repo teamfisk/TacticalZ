@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Scenemesh">
+      <Components>
+        <c:Model>
+          <Resource>Models/LevelBase/MapVersion1.mesh</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="DirectionalLight">
+      <Components>
+        <c:DirectionalLight>
+          <Intensity>2</Intensity>
+        </c:DirectionalLight>
+        <c:Model>
+          <Resource>Models/DirectionalLightWidget.mesh</Resource>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="61.9050903" Z="0"/>
+          <Scale X="50" Y="50" Z="50"/>
+          <Orientation X="4.42700005" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PointLight">
+      <Components>
+        <c:PointLight>
+          <Radius>8</Radius>
+          <Intensity>2.7999999523162842</Intensity>
+        </c:PointLight>
+        <c:Transform>
+          <Position X="0.370978802" Y="1.88588905" Z="-0.55370003"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PointLight">
+      <Components>
+        <c:PointLight>
+          <Radius>8</Radius>
+          <Intensity>2.7999999523162842</Intensity>
+        </c:PointLight>
+        <c:Transform>
+          <Position X="38.0347443" Y="1.88588905" Z="62.7340622"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-0.904668212" Y="0" Z="8.48177528"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-4.61666441" Y="0" Z="-8.51156044"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="-7.56803513" Y="-0.0658408776" Z="0.59418112"/>
+          <Scale X="1.20000005" Y="0.900000036" Z="1.30000007"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="10.460474" Y="0" Z="-3.92580295"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="1.09146011" Y="-0.315138876" Z="-0.333906144"/>
+          <Scale X="150" Y="1" Z="180"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="BluSpawn">
+      <Components>
+        <c:PlayerSpawn/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="57.7363472" Y="1.18853188" Z="79.5"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Transform>
+              <Position X="-2.05988312" Y="0" Z="2.79573512"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="1.85022807" Y="0" Z="-2.08909845"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="2.98651481" Y="0" Z="-4.67667246"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="-5.16323137" Y="0" Z="3.62892342"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="RedSpawn">
+      <Components>
+        <c:PlayerSpawn/>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-60.2567062" Y="1.60000002" Z="-78.1000061"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0" Z="2.24403"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="2.20245028" Y="0" Z="-1.97843659"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Transform>
+              <Position X="4.79769945" Y="0" Z="-5.2088728"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:AmmoPickup>
+          <RespawnTimer>1</RespawnTimer>
+          <AmmoGain>22</AmmoGain>
+        </c:AmmoPickup>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="60" Y="1" Z="75"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:AmmoPickup>
+          <RespawnTimer>1</RespawnTimer>
+          <AmmoGain>22</AmmoGain>
+        </c:AmmoPickup>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="60" Y="1" Z="77"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:AABB/>
+        <c:AmmoPickup>
+          <RespawnTimer>4</RespawnTimer>
+          <AmmoGain>44</AmmoGain>
+        </c:AmmoPickup>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="60" Y="1" Z="79"/>
+        </c:Transform>
+        <c:Trigger/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

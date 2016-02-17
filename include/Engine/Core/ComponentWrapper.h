@@ -1,6 +1,7 @@
 #ifndef ComponentWrapper_h__
 #define ComponentWrapper_h__
 
+#include <boost/shared_array.hpp>
 #include "../Common.h"
 #include "Entity.h"
 #include "ComponentInfo.h"
@@ -43,6 +44,11 @@ struct ComponentWrapper
     // Specialization for string literals
     template <std::size_t N>
     void SetField(std::string name, const char(&value)[N]) { Field<std::string>(name) = std::string(value); }
+
+    void Copy(ComponentWrapper& destination)
+    {
+        memcpy(destination.Data, this->Data, Info.Stride);
+    }
     
     struct SubscriptProxy
     {
@@ -74,6 +80,18 @@ struct ComponentWrapper
         void operator=(const char(&val)[N]) { m_Component->SetField<N>(m_PropertyName, val); }
     };
     SubscriptProxy operator[](std::string propertyName) { return SubscriptProxy(this, propertyName); }
+};
+
+// A component wrapper that "owns" its data through a shared pointer
+struct SharedComponentWrapper : ComponentWrapper
+{
+    SharedComponentWrapper(const ComponentInfo& componentInfo, boost::shared_array<char> data)
+        : ComponentWrapper(componentInfo, data.get())
+        , m_DataReference(data)
+    { }
+
+private:
+    boost::shared_array<char> m_DataReference;
 };
 
 // TODO: Move this to Tests once entity importing is finished
