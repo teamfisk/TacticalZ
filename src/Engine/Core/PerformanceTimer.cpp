@@ -1,11 +1,8 @@
 #include "Core/PerformanceTimer.h"
-#include <iostream>
 #include <ctime>
 #include <fstream>
-#include <Windows.h>
 
 cpu_timer PerformanceTimer::m_Timer;
-double PerformanceTimer::m_TimeElapsed;
 std::map<std::string, cpu_timer> PerformanceTimer::timers;
 std::string PerformanceTimer::currentTimerRunning = "";
 
@@ -50,16 +47,13 @@ void PerformanceTimer::ResetAllTimers()
 
 void PerformanceTimer::CreateExcelData()
 {
-    //get path,time
-    char	Dump_Path[MAX_PATH];
-    GetModuleFileName(NULL, Dump_Path, sizeof(Dump_Path));	//path of current process
+    //get time
     std::time_t t = std::time(NULL);
     char tStr[16];
     std::strftime(tStr, 32, " %a %H-%M-%S", std::localtime(&t));
     std::string time(tStr);
-    std::string path(Dump_Path);
-    path = path.substr(0, path.length() - 4);
-    path += time + ".xls";
+    std::string path("TacticalZ");
+    path += time + ".csv";
     std::ofstream someFileStream;
     someFileStream.open(path, std::ofstream::out);
     someFileStream << "classname" << ',' << "walltime" << ',' << "userTime" << ',' << "systemTime" << '\n';
