@@ -9,7 +9,7 @@ Network::Network(World* world, EventBroker* eventBroker)
     m_TimeoutMs = config->Get<int>("Networking.TimeoutMs", 20000);
 }
 
-void Network::Update()
+void Network::Update(double dt)
 { 
     updateNetworkData();
 }

@@ -26,7 +26,7 @@ public:
     Server(World* world, EventBroker* eventBroker, int port);
     ~Server();
 
-    void Update() override;
+    void Update(double dt) override;
 
 private:
     // Network channels

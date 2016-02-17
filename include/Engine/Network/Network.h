@@ -22,11 +22,13 @@ public:
     Network(World* world, EventBroker* eventBroker);
     virtual ~Network() { };
 
-    virtual void Update() = 0;
+    virtual void Update(double dt) = 0;
 
 protected:
     World* m_World;
     EventBroker* m_EventBroker;
+    // for network
+    double m_TimeStamp = 0;
 
     // For Debug 
     bool isReadingData = false;

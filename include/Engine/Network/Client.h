@@ -33,8 +33,8 @@ public:
     ~Client();
 
     void Connect(std::string address, int port);
-    void Update() override;
-
+    void Update(double dt) override;
+private:
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();
     // Save for children
@@ -56,13 +56,13 @@ public:
     bool m_IsConnected = false;
     EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
     // Server Client Lookup map
-    // Assumes that root node for client and server is EntityID 0.
-
     // Don't Add items to these two maps with insert, use insertIntoServerClientMaps(EntityID, EntityID)!!!!
     std::unordered_map<EntityID, EntityID> m_ServerIDToClientID;
     std::unordered_map<EntityID, EntityID> m_ClientIDToServerID;
 
     // Network logic
+    UDPClient m_Unreliable;
+    TCPClient m_Reliable;
     PlayerDefinition m_PlayerDefinitions[8];
     SnapshotDefinitions m_NextSnapshot;
     double m_DurationOfPingTime;
@@ -70,9 +70,9 @@ public:
     std::clock_t m_TimeSinceSentInputs;
     unsigned int m_SendInputIntervalMs;
     std::vector<Events::InputCommand> m_InputCommandBuffer;
+    std::vector<Events::InputCommand> m_ReceivedInputCommands;
 
     // Private member functions
-    size_t  receive(char* data);
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
@@ -88,6 +88,8 @@ public:
     void parseComponentDeletion(Packet& packet);
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
+    void parseOnInputCommand(Packet& packet);
+    void publishInputCommands(double dt);
     void identifyPacketLoss();
     void hasServerTimedOut();
     EntityID createPlayer();
@@ -110,9 +112,6 @@ public:
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
     void parsePlayerDamage(Packet& packet);
-private:
-    UDPClient m_Unreliable;
-    TCPClient m_Reliable;
 };
 
 #endif

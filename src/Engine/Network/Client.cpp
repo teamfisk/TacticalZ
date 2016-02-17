@@ -41,9 +41,11 @@ void Client::Connect(std::string address, int port)
     }
 }
 
-void Client::Update()
+void Client::Update(double dt)
 {
     m_EventBroker->Process<Client>();
+    m_TimeStamp += dt;
+    publishInputCommands(dt);
     while (m_Unreliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -121,6 +123,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::OnPlayerDamage:
         parsePlayerDamage(packet);
+        break;
+    case MessageType::OnInputCommand:
+        //parsePlayerDamage(packet);
         break;
     default:
         break;
@@ -284,21 +289,23 @@ void Client::ignoreFields(Packet& packet, const ComponentInfo& componentInfo)
 
 void Client::parseSnapshot(Packet& packet)
 {
-    // Read input commands
-    std::size_t numInputCommands = packet.ReadPrimitive<std::size_t>();
-    for (std::size_t i = 0; i < numInputCommands; ++i) {
-        Events::InputCommand e;
-        e.PlayerID = packet.ReadPrimitive<EntityID>();
-        EntityID player = packet.ReadPrimitive<EntityID>();
-        std::string command = packet.ReadString();
-        float value = packet.ReadPrimitive<float>();
-        if (m_ServerIDToClientID.find(player) != m_ServerIDToClientID.end()) {
-            e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(player));
-            e.Command = command;
-            e.Value = value;
-            m_EventBroker->Publish(e);
-        }
-    }
+    //// Read input commands
+    //std::size_t numInputCommands = packet.ReadPrimitive<std::size_t>();
+    //for (std::size_t i = 0; i < numInputCommands; ++i) {
+    //    Events::InputCommand e;
+    //    e.PlayerID = packet.ReadPrimitive<EntityID>();
+    //    EntityID player = packet.ReadPrimitive<EntityID>();
+    //    std::string command = packet.ReadString();
+    //    float value = packet.ReadPrimitive<float>();
+    //    double timestamp = packet.ReadPrimitive<double>();
+    //    if (m_ServerIDToClientID.find(player) != m_ServerIDToClientID.end()) {
+    //        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(player));
+    //        e.Command = command;
+    //        e.Value = value;
+    //        e.TimeStamp = timestamp;
+    //        m_EventBroker->Publish(e);
+    //    }
+    //}
 
     // Read world state
     while (packet.DataReadSize() < packet.Size()) {
@@ -359,6 +366,36 @@ void Client::parseSnapshot(Packet& packet)
     parseSpawnEvents();
 }
 
+
+void Client::parseOnInputCommand(Packet & packet)
+{ 
+    while (packet.DataReadSize() < packet.Size()) {
+        Events::InputCommand e;
+        e.PlayerID = packet.ReadPrimitive<int>();
+        e.Player = EntityWrapper(m_World, packet.ReadPrimitive<int>());
+        e.Command = packet.ReadString();
+        e.Value = packet.ReadPrimitive<float>();
+        e.TimeStamp = packet.ReadPrimitive<double>();
+        m_EventBroker->Publish(e);
+        m_ReceivedInputCommands.push_back(e);
+        //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
+    }
+}
+
+void Client::publishInputCommands(double dt)
+{ 
+    std::vector<Events::InputCommand> notPublishedEvents;
+    for (int i = 0; i < m_ReceivedInputCommands.size(); i++) {
+        if (m_ReceivedInputCommands.at(i).TimeStamp < m_TimeStamp) {
+            m_EventBroker->Publish(m_ReceivedInputCommands.at(i).TimeStamp);
+        }
+        else { 
+            notPublishedEvents.push_back(m_ReceivedInputCommands.at(i));
+        }
+    }
+    m_ReceivedInputCommands = notPublishedEvents;
+}
+
 void Client::disconnect()
 {
     m_IsConnected = false;
@@ -402,7 +439,9 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
         }
     } else {
         if (m_IsConnected) {
-            m_InputCommandBuffer.push_back(e);
+            Events::InputCommand setTimestamp = e;
+            setTimestamp.TimeStamp = m_TimeStamp;
+            m_InputCommandBuffer.push_back(setTimestamp);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -516,6 +555,7 @@ void Client::sendInputCommands()
         for (int i = 0; i < m_InputCommandBuffer.size(); i++) {
             packet.WriteString(m_InputCommandBuffer[i].Command);
             packet.WritePrimitive(m_InputCommandBuffer[i].Value);
+            packet.WritePrimitive(m_InputCommandBuffer[i].TimeStamp);
         }
         m_Reliable.Send(packet);
         m_InputCommandBuffer.clear();

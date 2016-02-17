@@ -26,10 +26,11 @@ Server::~Server()
 
 }
 
-void Server::Update()
+void Server::Update(double dt)
 {
+    m_EventBroker->Process<Server>();
+    m_TimeStamp += dt;
     PlayerDefinition pd;
-
     m_Reliable.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
     for (auto& kv : m_ConnectedPlayers) {
         while (kv.second.TCPSocket->available()) {
@@ -80,9 +81,8 @@ void Server::Update()
         checkForTimeOuts();
         timOutTimer = currentTime;
     }
-    m_EventBroker->Process<Server>();
     if (isReadingData) {
-        Network::Update();
+        Network::Update(dt);
     }
 }
 
@@ -145,7 +145,7 @@ void Server::unreliableBroadcast(Packet& packet)
 void Server::sendSnapshot()
 {
     Packet packet(MessageType::Snapshot);
-    addInputCommandsToPacket(packet);
+    //addInputCommandsToPacket(packet);
     addChildrenToPacket(packet, EntityID_Invalid);
     unreliableBroadcast(packet);
 }
@@ -159,6 +159,7 @@ void Server::addInputCommandsToPacket(Packet& packet)
         packet.WritePrimitive(m_ConnectedPlayers.at(command.PlayerID).EntityID);
         packet.WriteString(command.Command);
         packet.WritePrimitive(command.Value);
+        packet.WritePrimitive(command.TimeStamp);
     }
     m_InputCommandsToBroadcast.clear();
 }
@@ -465,7 +466,9 @@ void Server::parseOnInputCommand(Packet& packet)
             e.PlayerID = player; // Set correct player id
             e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
-            m_EventBroker->Publish(e);
+            e.TimeStamp = packet.ReadPrimitive<double>();
+           /* m_EventBroker->Publish(e);*/
+
             if (e.Command == "PrimaryFire" || e.Command == "Reload") {
                 m_InputCommandsToBroadcast.push_back(e);
             }

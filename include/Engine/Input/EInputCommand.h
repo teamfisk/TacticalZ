@@ -16,6 +16,8 @@ struct InputCommand : Event
 	std::string Command;
 	/** The value of the command. */
 	float Value = 0;
+    /** Timestamp of the command. */
+    double TimeStamp = 0;
 };
 
 }
