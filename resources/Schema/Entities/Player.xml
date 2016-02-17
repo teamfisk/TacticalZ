@@ -575,7 +575,7 @@
     <Entity name="Indicator">
       <Components>
         <c:Indicator>
-          <MinScale>80</MinScale>
+          <MinScale>60</MinScale>
         </c:Indicator>
         <c:Sprite>
           <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
