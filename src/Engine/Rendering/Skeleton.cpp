@@ -274,26 +274,18 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
     }
 
 
-    glm::mat4 offset = GetOffsetTransform(bone, animationOffset);
-
     if (JointTransforms.size() == 0) {
         if (bone->Parent) {
-            if (offset != glm::mat4(1)) {
-                boneMatrix = parentMatrix * offset;// *((glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix));
-            } else {
-                boneMatrix = parentMatrix  *((glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix));
-
-            }
+             boneMatrix = parentMatrix  * (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
             boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
         } else {
-            boneMatrix = offset * glm::inverse(bone->OffsetMatrix);
+            boneMatrix = glm::inverse(bone->OffsetMatrix);
             boneMatrices[bone->ID] = parentMatrix;
         }
     } else {
 
-        glm::vec3 finalPosInterp;
-        glm::quat finalRotInterp;
-        glm::vec3 finalScaleInterp;
+        JointFrameTransform jointFinalTransform;
+        
         float totalWeight = 0;
 
         for (JointFrameTransform jointTransform : JointTransforms) {
@@ -303,26 +295,23 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
 
         for (JointFrameTransform jointTransform : JointTransforms) {
             if (jointTransform.Weight == 1.0f) {
-                finalPosInterp = jointTransform.PositionInterp;
-                finalRotInterp = jointTransform.RotationInterp;
-                finalScaleInterp = jointTransform.ScaleInterp;
+                jointFinalTransform.PositionInterp = jointTransform.PositionInterp;
+                jointFinalTransform.RotationInterp = jointTransform.RotationInterp;
+                jointFinalTransform.ScaleInterp = jointTransform.ScaleInterp;
                 break;
             } else {
-                finalPosInterp += jointTransform.PositionInterp * (jointTransform.Weight/totalWeight);
-                finalRotInterp *= glm::slerp(glm::quat(), jointTransform.RotationInterp, (jointTransform.Weight/totalWeight));
-                finalScaleInterp += jointTransform.ScaleInterp * (jointTransform.Weight/totalWeight);
+                jointFinalTransform.PositionInterp += jointTransform.PositionInterp * (jointTransform.Weight/totalWeight);
+                jointFinalTransform.RotationInterp *= glm::slerp(glm::quat(), jointTransform.RotationInterp, (jointTransform.Weight/totalWeight));
+                jointFinalTransform.ScaleInterp += jointTransform.ScaleInterp * (jointTransform.Weight/totalWeight);
             }
 
         }
 
 
+        JointFrameTransform offsetTransform = GetOffsetTransform(bone, animationOffset);
+        glm::mat4 boneTransform = AdditiveBlend(offsetTransform, jointFinalTransform);
 
-        if (offset != glm::mat4(1)) {
-            boneMatrix = parentMatrix * ((glm::translate(finalPosInterp) * glm::toMat4(finalRotInterp) * glm::scale(finalScaleInterp)) + offset);
-        } else {
-            boneMatrix = parentMatrix * (glm::translate(finalPosInterp) * glm::toMat4(finalRotInterp) * glm::scale(finalScaleInterp));
-        }
-
+        boneMatrix = parentMatrix * boneTransform;
         boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
     }
 
@@ -331,7 +320,20 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
     }
 }
 
-glm::mat4 Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset)
+
+glm::mat4 Skeleton::AdditiveBlend(JointFrameTransform addTransform, JointFrameTransform transform)
+{
+    addTransform.RotationInterp = glm::normalize(addTransform.RotationInterp);
+    transform.RotationInterp = glm::normalize(transform.RotationInterp);
+
+    glm::vec3 finalPos = addTransform.PositionInterp + (addTransform.PositionInterp - transform.PositionInterp);
+    glm::quat finalRot = addTransform.RotationInterp * addTransform.RotationInterp * glm::inverse(transform.RotationInterp); // Quaternions man...Who the fuck knows?
+    glm::vec3 finalScale = addTransform.ScaleInterp + (addTransform.ScaleInterp - transform.ScaleInterp);
+
+    return (glm::translate(finalPos) * glm::toMat4(finalRot) * glm::scale(finalScale));
+}
+
+Skeleton::JointFrameTransform Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset)
 {
     const Animation* animation = animationOffset.animation;
     float time = animationOffset.time;
@@ -383,7 +385,13 @@ glm::mat4 Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animati
         }
     }
 
-    return (glm::translate(position) * glm::toMat4(rotation) * glm::scale(scale));
+
+    JointFrameTransform jointTransform;
+    jointTransform.PositionInterp = position;
+    jointTransform.RotationInterp = rotation;
+    jointTransform.ScaleInterp = scale;
+
+    return jointTransform;
 }
 
 
@@ -452,7 +460,7 @@ glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation* animatio
 glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, AnimationOffset animationOffset, glm::mat4 childMatrix)
 {
     glm::mat4 boneMatrix;
-
+    /*
     std::vector<JointFrameTransform> JointTransforms;
 
     for (const AnimationData animationData : animations) {
@@ -569,9 +577,9 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
 
     if (bone->Parent != nullptr) {
         return GetBoneTransform(noRootMotion, bone->Parent, animations, animationOffset, boneMatrix);
-    } else {
+    } else {*/
         return boneMatrix;
-    }
+  //  }
 }
 
 

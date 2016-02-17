@@ -108,6 +108,8 @@ public:
     void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
     void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, AnimationOffset animationOffset, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
 
+    glm::mat4 AdditiveBlend(JointFrameTransform addTransform, JointFrameTransform transform);
+
     void PrintSkeleton();
 	void PrintSkeleton(const Bone* parent, int depthCount);
 	std::map<std::string, Animation> Animations;
@@ -118,8 +120,7 @@ public:
     int GetKeyframe(const Animation& animation, double time);
 
 private:
-
-    glm::mat4 GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset);
+    JointFrameTransform GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset);
 
 	std::map<std::string, Bone*> m_BonesByName;
     
