@@ -60,7 +60,7 @@ void Renderer::InitializeWindow()
 	}
 
     int windowSize[2];
-    glfwGetWindowSize(m_Window, &windowSize[0], &windowSize[1]);
+    glfwGetFramebufferSize(m_Window, &windowSize[0], &windowSize[1]);
     m_ViewportSize = Rectangle(windowSize[0], windowSize[1]);
 }
 
