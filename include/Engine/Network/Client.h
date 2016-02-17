@@ -83,7 +83,7 @@ public:
     void parseTCPConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
-    void parseHeartbeat(Packet& packet);
+    void parseHeartbeat(Packet& packet, PlayerDefinition);
     void parseKick();
     void parsePlayersSpawned(Packet& packet);
     void parseEntityDeletion(Packet& packet);

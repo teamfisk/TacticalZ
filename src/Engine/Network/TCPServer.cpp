@@ -74,7 +74,16 @@ void TCPServer::Send(Packet & packet)
 
 void TCPServer::Disconnect()
 { 
+}
 
+
+std::string TCPServer::Address()
+{
+    boost::asio::ip::tcp::resolver resolver(m_IOService);
+    boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), boost::asio::ip::host_name(), "");
+    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    boost::asio::ip::tcp::endpoint endpoint = *it;
+    return endpoint.address().to_string().c_str();
 }
 
 void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)

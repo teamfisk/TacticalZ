@@ -16,6 +16,8 @@ public:
     void Send(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet);
     void Disconnect();
+    int Port() { return acceptor->local_endpoint().port(); }
+    std::string Address();
 private:
     // TCP logic
     boost::asio::io_service m_IOService;

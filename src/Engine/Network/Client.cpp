@@ -72,7 +72,7 @@ void Client::Update()
         localArea.Endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string("127.0.0.1"), 13);
         m_Heartbeat.Receive(packet, localArea);
         if(packet.GetMessageType() == MessageType::Heartbeat) {
-            parseHeartbeat(packet);
+            parseHeartbeat(packet, localArea);
         }
     }
     if (m_IsConnected) {
@@ -127,9 +127,6 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::ComponentDeleted:
         parseComponentDeletion(packet);
-        break;
-    case MessageType::Heartbeat:
-        parseHeartbeat(packet);
         break;
     case MessageType::OnPlayerDamage:
         parsePlayerDamage(packet);
@@ -186,7 +183,7 @@ void Client::parsePing()
 }
 
 
-void Client::parseHeartbeat(Packet& packet)
+void Client::parseHeartbeat(Packet& packet, PlayerDefinition pd)
 {
     // Pop size, message type, and ID
     packet.ReadPrimitive<int>();
@@ -194,7 +191,12 @@ void Client::parseHeartbeat(Packet& packet)
     packet.ReadPrimitive<int>();
     std::string serverName = packet.ReadString();
     int playersConnected = packet.ReadPrimitive<int>();
-    LOG_INFO("Serverlist\nName\tPlayers\n%s\t%i\n", serverName.c_str(), playersConnected);
+    std::string address = packet.ReadString();
+    int port = packet.ReadPrimitive<int>();
+    //TODO: save these to some kind of list which can be represented to the player
+    //TODO: This should not happen when a client is connected to a server
+    
+    LOG_INFO("Serverlist\nName\tPlayers\tIP\t\tPort\n%s\t%i\t%s\t%i\n", serverName.c_str(), playersConnected, address, port);
 }
 
 void Client::parseKick()

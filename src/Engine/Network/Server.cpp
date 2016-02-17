@@ -241,8 +241,10 @@ void Server::sendPing()
 void Server::sendHeartBeat()
 {
     Packet packet(MessageType::Heartbeat);
-    packet.WriteString("This is a servername"); // server name
+    packet.WriteString("Bob"); // server name
     packet.WritePrimitive<int>(m_ConnectedPlayers.size());
+    packet.WriteString(m_Reliable.Address());
+    packet.WritePrimitive<int>(m_Reliable.Port());
     m_Heartbeat.Send(packet);
 }
 
