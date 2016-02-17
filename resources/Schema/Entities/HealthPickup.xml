@@ -7,6 +7,10 @@
     <c:Model>
       <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
     </c:Model>
+    <c:RaptorCopter>
+      <Speed>0.1</Speed>
+      <Axis X="0" Y="1" Z="0"/>
+    </c:RaptorCopter>
     <c:Transform>
       <Position X="0" Y="1" Z="0"/>
       <Scale X="0.3" Y="0.3" Z="0.3"/>
