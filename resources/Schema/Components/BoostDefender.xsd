@@ -12,6 +12,9 @@
 				<xs:element name="StrengthOfEffect" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>This is the strength of the boost effect</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="LifeTimeOfEffect" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>How long the effect lasts</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

@@ -109,7 +109,6 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 //if doubleTapped do Assault Dash - but only boost maximum 50.0f
                 float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
                 accelerationSpeed = glm::min(doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed), 50.0f);
-                accelerationSpeed = doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed);
                 //if player has Boost from an Assault class, accelerate the player faster
                 if (player.HasComponent("BoostAssault")) {
                     accelerationSpeed *= (double)player["BoostAssault"]["StrengthOfEffect"];
