@@ -202,7 +202,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     }
 
     //dashing with shift
-    if (m_ShiftDashing && m_AssaultDashCoolDownTimer <= 0.0f && !isJumping) {
+    if (m_ShiftDashing && m_AssaultDashCoolDownTimer <= 0.0f) {
         //player is dashing with shift
         //the wanted-direction is set in playermovement already so we dont need to check what direction we want to dash in!
         m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
@@ -227,7 +227,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     }
     m_ValidDoubleTap = false;
 
-    if (!(m_AssaultDashCoolDownTimer <= 0.0f && !isJumping)) {
+    if (!(m_AssaultDashCoolDownTimer <= 0.0f)) {
         //if we cant dash at the moment, then just reset the tap-sensitivity-timer
         m_AssaultDashDoubleTapDeltaTime = 0.f;
         return;
