@@ -108,7 +108,7 @@ public:
     void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
     void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, AnimationOffset animationOffset, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
 
-    glm::mat4 AdditiveBlend(glm::mat4 differencePose, glm::mat4 targetPose);
+    glm::mat4 AdditiveBlend(const Bone* bone, AnimationOffset animationOffset, glm::mat4 targetPose);
 
     void PrintSkeleton();
 	void PrintSkeleton(const Bone* parent, int depthCount);
