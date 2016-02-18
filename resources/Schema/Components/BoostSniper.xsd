@@ -5,7 +5,7 @@
 	
 	<xs:element name="BoostSniper">
 		<xs:annotation>
-			<xs:documentation>This is the defender's class boost component</xs:documentation>
+			<xs:documentation>This is the sniper's class boost component</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>

@@ -385,7 +385,7 @@ bool AssaultWeaponBehaviour::shoot(double damage)
     }
 
 
-    // BoostUpdate: If friendly fire - reduce damage to 0
+    // If friendly fire - reduce damage to 0 (needed to make Boosts, Ammosharing work)
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)m_Player["Team"]["Team"]) {
         damage = 0;
     }

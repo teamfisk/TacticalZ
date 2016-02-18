@@ -5,12 +5,12 @@
 
 	<xs:element name="SprintAbility">
 		<xs:annotation>
-			<xs:documentation>A dash component for one of the classes</xs:documentation>
+			<xs:documentation>A sprint component for one of the classes</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="CoolDownMaxTimer" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>This is the cooldown on dash</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>This is the cooldown on sprint</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>
