@@ -9,10 +9,17 @@
 #include "ShadowPassState.h"
 #include "imgui/imgui.h"
 
+#define MAX_SPLITS 5
+
 //#include "ShadowPassState.h" // not created yet
 
 enum NearFar { Near = 0, Far = 1 };
 enum LRBT { Left = 0, Right = 1, Bottom = 2, Top = 3 };
+
+struct ShadowCamera{
+	Camera* camera;
+	std::array<glm::vec3, 8> frustumCorners;
+};
 
 class ShadowPass
 {
@@ -37,7 +44,10 @@ public:
 
 private:
 
-   
+	void CalculateFrustum(RenderScene & scene, std::shared_ptr<DirectionalLightJob> directionalLightJob);
+	glm::vec3 LightDirectionToPoint(glm::vec4 direction);
+	std::array<glm::vec3, 8> UpdateFrustumPoints(Camera* cam, glm::vec3 center, glm::vec3 view_dir);
+	void UpdateSplitDist(std::array<ShadowCamera, MAX_SPLITS> shadow_cams, float far_distance, float near_distance);
 
     EventBroker* m_EventBroker;
 
@@ -52,7 +62,8 @@ private:
     GLuint m_DepthFBO;
 
     GLfloat m_NearFarPlane[2] = { -34.f, 27.f };
-    GLfloat m_LRBT[4] = { -77.f, 75.f, -89.f, 89.f };
+    //GLfloat m_LRBT[4] = { -77.f, 75.f, -89.f, 89.f };
+	GLfloat m_LRBT[4] = { -10.f, 10.f, -10.f, 10.f };
 
     glm::mat4 m_LightProjection;
     glm::mat4 m_LightView;
@@ -62,6 +73,11 @@ private:
     GLuint resolutionSizeHeigth = 1024 * 8;
 
     bool m_ShadowOn = true;
+
+	int m_CurrentNrOfSplits = 3;
+	float m_SplitWeight = 0.75f;
+
+	std::array<ShadowCamera, MAX_SPLITS> shadCams;
 };
 
 #endif

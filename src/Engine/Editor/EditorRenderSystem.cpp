@@ -7,7 +7,7 @@ EditorRenderSystem::EditorRenderSystem(World* m_World, EventBroker* eventBroker,
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &EditorRenderSystem::OnSetCamera);
     auto resolution = Rectangle::Rectangle(1280, 720);
-    m_EditorCamera = new Camera((float)resolution.Width / resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_EditorCamera = new Camera((float)resolution.Width / resolution.Height, glm::radians(45.f), 0.01f, 500.f);
 }
 
 void EditorRenderSystem::Update(double dt)

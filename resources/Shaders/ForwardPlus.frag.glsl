@@ -228,8 +228,10 @@ void main()
 		totalLighting.Specular += light_result.Specular; 
 	}
 
-	totalLighting.Diffuse *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0); 
-	totalLighting.Specular *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0);
+	//totalLighting.Diffuse *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0); 
+	//totalLighting.Specular *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0);
+	totalLighting.Diffuse *= (1.0 + vec4(AmbientColor.rgb, 1.0)) + vec4(vec3(shadowFactor, shadowFactor, 0.0), 0.0); 
+	totalLighting.Specular *= (1.0 + vec4(AmbientColor.rgb, 1.0)) + vec4(vec3(shadowFactor, shadowFactor, 0.0), 0.0);
 	
 	//LightResult getInformation;
 	
