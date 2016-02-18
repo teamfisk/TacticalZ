@@ -55,18 +55,13 @@ GameHealthSystemTest::GameHealthSystemTest()
     //create entity which has transform,player,model,health in it. i.e. is a player
     EntityID playerID = m_World->CreateEntity();
     ComponentWrapper player = m_World->AttachComponent(playerID, "Player");
-    ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
-    healthsID = playerID;
+    ComponentWrapper& health = m_World->AttachComponent(playerID, "Health");
+    health["Health"] = 100.0;
+    m_PlayersID = playerID;
 
     EntityID playerID2 = m_World->CreateEntity();
     ComponentWrapper player2 = m_World->AttachComponent(playerID2, "Player");
     ComponentWrapper health2 = m_World->AttachComponent(playerID2, "Health");
-
-    //heal player with 40
-    Events::PlayerHealthPickup e3;
-    e3.HealthAmount = 40.0f;
-    e3.Player = EntityWrapper(m_World, player.EntityID);
-    m_EventBroker->Publish(e3);
 
     //damage player with 50
     Events::PlayerDamage e;
@@ -103,9 +98,18 @@ void GameHealthSystemTest::Tick()
 
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-
-    //if health reaches 90 then we know the test has succeeded (start with 100hp, remove 50hp, add 40hp)
-    double currentHealth = (double)m_World->GetComponent(healthsID, "Health")["Health"];
-    if (currentHealth == 90)
+    
+    double currentHealth = (double)m_World->GetComponent(m_PlayersID, "Health")["Health"];
+    //if players health reach 50 means he got damaged by 50
+    if (currentHealth == 50.0) {
+        m_TestStage1Success = true;
+        //heal player with 40
+        Events::PlayerHealthPickup e3;
+        e3.HealthAmount = 40.0f;
+        e3.Player = EntityWrapper(m_World, m_PlayersID);
+        m_EventBroker->Publish(e3);
+    }
+    if (m_TestStage1Success && currentHealth == 90.0f) {
         TestSucceeded = true;
+    }
 }
