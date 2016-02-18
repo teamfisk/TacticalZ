@@ -110,6 +110,13 @@ void LightCullingPass::FillLightList(RenderScene& scene)
     }
 }
 
+
+void LightCullingPass::OnWindowResize()
+{
+    SetSSBOSizes();
+    InitializeSSBOs();
+}
+
 void LightCullingPass::InitializeSSBOs()
 {
     glGenBuffers(1, &m_FrustumSSBO);

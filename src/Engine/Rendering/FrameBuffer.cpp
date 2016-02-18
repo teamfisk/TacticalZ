@@ -72,9 +72,7 @@ void FrameBuffer::Generate()
 
     GLenum* bufferTextures = &attachments[0];
     glDrawBuffers(attachments.size(), bufferTextures);
-    if(GLERROR("4")) {
-        printf("hello");
-    }
+    GLERROR("GLBufferAttachement error");
 
     if (GLenum frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         GLERROR("Framebuffer incomplete");

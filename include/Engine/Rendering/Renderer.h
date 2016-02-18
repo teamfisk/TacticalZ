@@ -26,6 +26,8 @@
 
 class Renderer : public IRenderer
 {
+    static void glfwFrameBufferCallback(GLFWwindow* window, int width, int height);
+
 public:
     Renderer(EventBroker* eventBroker) 
         : m_EventBroker(eventBroker)
@@ -37,8 +39,12 @@ public:
 
     virtual PickData Pick(glm::vec2 screenCoord) override;
 
+
 private:
     //----------------------Variables----------------------//
+
+    static std::unordered_map <GLFWwindow*, Renderer*> m_WindowToRenderer;
+
     EventBroker* m_EventBroker;
     TextPass* m_TextPass;
 
@@ -50,6 +56,7 @@ private:
     Model* m_UnitSphere;
 
     int m_DebugTextureToDraw = 0;
+    bool m_ResizeWindow = false;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;

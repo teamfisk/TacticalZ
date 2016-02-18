@@ -274,6 +274,12 @@ void DrawFinalPass::ClearBuffer()
     m_FinalPassFrameBuffer.Unbind();
 }
 
+
+void DrawFinalPass::OnWindowResize()
+{
+    InitializeFrameBuffers();
+}
+
 void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
 {
     glGenTextures(1, texture);
@@ -702,7 +708,7 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
 	GLERROR("Bind 4 uniform");
 
-    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 	GLERROR("Bind 5 uniform");
 
     glUniform3fv(glGetUniformLocation(shaderHandle, "ExplosionOrigin"), 1, glm::value_ptr(job->ExplosionOrigin));
@@ -754,7 +760,7 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 	GLERROR("Bind 4 uniform");
 
 	GLint Location_ScreenDimensions = glGetUniformLocation(shaderHandle, "ScreenDimensions");
-	glUniform2f(Location_ScreenDimensions, m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
+	glUniform2f(Location_ScreenDimensions, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 	GLERROR("Bind 5 uniform");
 
 	GLint Location_FillPercentage = glGetUniformLocation(shaderHandle, "FillPercentage");

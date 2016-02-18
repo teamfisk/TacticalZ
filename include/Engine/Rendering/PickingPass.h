@@ -22,6 +22,8 @@ public:
     void Draw(RenderScene& scene);
     void ClearPicking();
 
+    void OnWindowResize();
+
     //Getters
     const ShaderProgram& PickingProgram() const { return *m_PickingProgram; }
     //const std::unordered_map<glm::ivec2, EntityID>& PickingColorsToEntity() const { return m_PickingColorsToEntity; }

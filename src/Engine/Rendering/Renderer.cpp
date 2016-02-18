@@ -1,5 +1,7 @@
 #include "Rendering/Renderer.h"
 
+std::unordered_map<GLFWwindow*, Renderer*> Renderer::m_WindowToRenderer;
+
 void Renderer::Initialize()
 {
 	InitializeWindow();
@@ -12,12 +14,21 @@ void Renderer::Initialize()
     m_TextPass = new TextPass();
     m_TextPass->Initialize();
 
-
    /* m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");*/
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
+}
+
+void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    Renderer* currentRenderer = m_WindowToRenderer[window];
+    currentRenderer->m_ViewportSize = Rectangle(width, height);
+    currentRenderer->m_DrawFinalPass->OnWindowResize();
+    currentRenderer->m_LightCullingPass->OnWindowResize();
+    currentRenderer->m_PickingPass->OnWindowResize();
 }
 
 void Renderer::InitializeWindow()
@@ -39,6 +50,7 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLFW: Failed to create window");
 		exit(EXIT_FAILURE);
 	}
+    glfwSetFramebufferSizeCallback(m_Window, &glfwFrameBufferCallback);
 	glfwMakeContextCurrent(m_Window);
 
 	// GL version info
@@ -58,6 +70,8 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLEW: Initialization failed");
 		exit(EXIT_FAILURE);
 	}
+
+    m_WindowToRenderer[m_Window] = this;
 
     int windowSize[2];
     glfwGetFramebufferSize(m_Window, &windowSize[0], &windowSize[1]);
