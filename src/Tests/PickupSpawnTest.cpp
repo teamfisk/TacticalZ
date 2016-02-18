@@ -39,7 +39,7 @@ PickupSpawnTest::PickupSpawnTest(int runTestNumber)
     m_World = new World();
 
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker, false, false);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(1);
 
