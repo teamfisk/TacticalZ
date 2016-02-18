@@ -244,7 +244,6 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
     glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
 
     //Shadow
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightSpaceMatrix()));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightP()));
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightV()));
     //GLfloat m_NearFarPlane[2] = { -40.f, 30.f };

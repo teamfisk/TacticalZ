@@ -3,7 +3,6 @@
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-uniform mat4 lightSpaceMatrix; // Shadow map PV
 uniform mat4 LightV;
 uniform mat4 LightP;
 uniform mat4 Bones[100];
@@ -61,5 +60,5 @@ void main()
 	Output.ExplosionPercentageElapsed = 0.0;
 	
 	//Output.PositionLightSpace = lightPos; // N
-	Output.PositionLightSpace = lightSpaceMatrix * M * vec4(Position, 1.0);
+	Output.PositionLightSpace = LightP * LightV * M * vec4(Position, 1.0);
 }

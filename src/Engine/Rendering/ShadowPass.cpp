@@ -4,7 +4,6 @@ ShadowPass::ShadowPass(IRenderer * renderer)
 {
     m_Renderer = renderer;
 
-    //InitializeTextures();
     InitializeFrameBuffers();
     InitializeShaderPrograms();
 }
@@ -63,6 +62,7 @@ void ShadowPass::UpdateSplitDist(std::array<ShadowCamera, MAX_SPLITS> shadow_cam
 	shadow_cams[m_CurrentNrOfSplits - 1].camera->SetFarClip(far_distance);
 }
 
+// Create a new light frustum based on the 8 corner points of a view frustum segment
 glm::mat4 ShadowPass::FindNewFrustum(ShadowCamera shadow_cam)
 {
 	float maxX = -1000.0f;
@@ -72,124 +72,33 @@ glm::mat4 ShadowPass::FindNewFrustum(ShadowCamera shadow_cam)
 	float minY = 1000.0f;
 	float minZ;
 
-	glm::vec4 transf = glm::vec4(shadow_cam.frustumCorners[0], 1.f);
-
-	//if (transf.x > maxX) maxX = transf.x;
-	//if (transf.x < minX) minX = transf.x;
-	//if (transf.y > maxY) maxY = transf.y;
-	//if (transf.y < minY) minY = transf.y;
+	glm::vec4 transf;
 
 	for (int i = 0; i < 8; i++)
 	{
 		transf = glm::vec4(shadow_cam.frustumCorners[i], 1.f);
 
-		transf.x /= transf.w;
-		transf.y /= transf.w;
-
 		if (transf.x > maxX) maxX = transf.x;
 		if (transf.x < minX) minX = transf.x;
 		if (transf.y > maxY) maxY = transf.y;
 		if (transf.y < minY) minY = transf.y;
 	}
+
+	//float scaleX = 2.0f / (maxX - minX);
+	//float scaleY = 2.0f / (maxY - minY);
+	//float offsetX = -0.5f * (maxX + minX) * scaleX;
+	//float offsetY = -0.5f * (maxY + minY) * scaleY;
+	//
+	//glm::mat4 nv_mvp = glm::mat4();
+	//nv_mvp[0][0] = scaleX;
+	//nv_mvp[1][1] = scaleY;
+	//nv_mvp[0][3] = offsetX;
+	//nv_mvp[1][3] = offsetY;
+	//glm::transpose(nv_mvp);
 
 	glm::mat4 p = glm::ortho(minX, maxX, minY, maxY, m_NearFarPlane[Near], m_NearFarPlane[Far]);
 
 	return p;
-}
-
-glm::mat4 ShadowPass::ApplyCropMatrix(ShadowCamera& shadow_cam, glm::mat4 m, glm::mat4 v)
-{
-	glm::mat4 shad_modelview;
-	glm::mat4 shad_proj;
-	glm::mat4 shad_crop;
-	glm::mat4 shad_mvp;
-	float maxX = -1000.0f;
-	float maxY = -1000.0f;
-	float maxZ;
-	float minX = 1000.0f;
-	float minY = 1000.0f;
-	float minZ;
-
-	glm::mat4 nv_mvp;
-	glm::vec4 transf;
-
-	shad_modelview = m * v;
-	nv_mvp = shad_modelview;
-
-	transf = nv_mvp * glm::vec4(shadow_cam.frustumCorners[0], 1.f);
-	minZ = transf.z;
-	maxZ = transf.z;
-
-	for (int i = 1; i < 8; i++) {
-		transf = nv_mvp * glm::vec4(shadow_cam.frustumCorners[i], 1.f);
-		if (transf.z > maxZ) {
-			maxZ = transf.z;
-		}
-		if (transf.z < minZ) {
-			minZ = transf.z;
-		}
-	}
-
-	// make sure all relevant shadow casters are included here
-
-	shad_proj = glm::ortho(-1.f, 1.f, -1.f, 1.f, m_NearFarPlane[0], m_NearFarPlane[1]);
-
-	//return shad_proj;
-	
-	shad_mvp = shad_proj * shad_modelview;
-	
-	nv_mvp = shad_mvp;
-
-	for (int i = 0; i < 8; i++)
-	{
-		transf = nv_mvp * glm::vec4(shadow_cam.frustumCorners[i], 1.0f);
-
-		transf.x /= transf.w;
-		transf.y /= transf.w;
-
-		if (transf.x > maxX) maxX = transf.x;
-		if (transf.x < minX) minX = transf.x;
-		if (transf.y > maxY) maxY = transf.y;
-		if (transf.y < minY) minY = transf.y;
-	}
-
-	float scaleX = 2.0f / (maxX - minX);
-	float scaleY = 2.0f / (maxY - minY);
-	float offsetX = -0.5f*(maxX + minX)*scaleX;
-	float offsetY = -0.5f*(maxY + minY)*scaleY;
-
-	nv_mvp = glm::mat4();
-	nv_mvp[0][0] = scaleX;
-	nv_mvp[1][1] = scaleY;
-	nv_mvp[0][3] = offsetX;
-	nv_mvp[1][3] = offsetY;
-	glm::transpose(nv_mvp);
-
-	shad_crop = nv_mvp;
-	shad_crop *= shad_proj;
-
-	//return nv_mvp;
-	//return shad_crop;
-	return glm::mat4();
-}
-
-void MakeShadowMap(glm::mat4 m, glm::mat4 v, glm::mat4 p, glm::vec3 light_dir)
-{
-	//float shad_modelview[16];
-
-	glDisable(GL_TEXTURE_2D);
-
-	glm::mat4 viewMatrix = glm::lookAt(glm::vec3(0.f), light_dir, glm::vec3(-1.f, 0.f, 0.f));
-
-
-
-
-
-
-
-
-
-	glEnable(GL_TEXTURE_2D);
 }
 
 glm::mat4 ShadowPass::CalculateFrustum(RenderScene & scene, std::shared_ptr<DirectionalLightJob> directionalLightJob, glm::mat4& p, glm::mat4& v, ShadowCamera shad_cam)
@@ -232,14 +141,6 @@ void ShadowPass::InitializeShaderPrograms()
     m_ShadowProgram->Compile();
     m_ShadowProgram->BindFragDataLocation(0, "ShadowMap");
     m_ShadowProgram->Link();
-}
-
-void ShadowPass::InitializeLightCameras()
-{
-	//for (int i = 0; i < MAX_SPLITS; i++) {
-	//	m_shadCams[i].camera = new Camera(1.f, );
-	//	Camera.
-	//}
 }
 
 void ShadowPass::ClearBuffer()
@@ -287,11 +188,11 @@ void ShadowPass::Draw(RenderScene & scene)
 				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
 				if (directionalLightJob) {
-					m_LightSpaceMatrix = CalculateFrustum(scene, directionalLightJob, m_LightProjection, m_LightView, m_shadCams[i]);
-					m_LightProjection = FindNewFrustum(m_shadCams[i]);
+					CalculateFrustum(scene, directionalLightJob, m_LightProjection[i], m_LightView[i], m_shadCams[i]);
+					m_LightProjection[i] = FindNewFrustum(m_shadCams[i]);
 
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection));
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView));
+					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
+					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
 
 					GLERROR("ShadowLight ERROR");
 
@@ -321,5 +222,6 @@ void ShadowPass::Draw(RenderScene & scene)
 		glCullFace(GL_BACK);
 
 		m_ShadowProgram->Unbind();
+
 	}
 }
