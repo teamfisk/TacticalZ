@@ -68,18 +68,26 @@ public:
         std::map<int, std::vector<Keyframe>> JointAnimations;
 	};
 
+    enum class BlendType
+    {
+        Additive,
+        Blend,
+        Override,
+    };
     struct AnimationData
     {
         const Animation* animation;
+        BlendType blendType;
         float time;
+        int level;
         float weight;
     };
 
-    struct JointFrameTransform {
-        glm::vec3 Position = glm::vec3(0);
-        glm::quat Rotation = glm::quat();
-        glm::vec3 Scale = glm::vec3(0);
-        float Weight;
+    struct JointFramePose {
+        BlendType Type;
+        int Level = 0;
+        glm::mat4 Pose = glm::mat4(0);
+        float Weight = 0.0f;
     };
 
     struct AnimationOffset {
@@ -119,8 +127,10 @@ public:
     glm::mat4 GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, glm::mat4 childMatrix);
     int GetKeyframe(const Animation& animation, double time);
 
+
 private:
-    JointFrameTransform GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset);
+    glm::mat4 GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset);
+    glm::mat4 GetBonePose(const Bone* bone, const Animation* animation, double time, bool noRootMotion);
 
 	std::map<std::string, Bone*> m_BonesByName;
     

@@ -133,7 +133,16 @@ struct ModelJob : RenderJob
                         }
                         animationData.time = (double)animationComponent["Time" + std::to_string(i)];
                         animationData.weight = (double)animationComponent["Weight" + std::to_string(i)];
+                        
+                        if((int)animationComponent["BlendType" + std::to_string(i)].Enum("Additive") == (int)animationComponent["BlendType" + std::to_string(i)]) {
+                            animationData.blendType = Skeleton::BlendType::Additive;
+                        } else if ((int)animationComponent["BlendType" + std::to_string(i)].Enum("Blend") == (int)animationComponent["BlendType" + std::to_string(i)]) {
+                            animationData.blendType = Skeleton::BlendType::Blend;
+                        } else if ((int)animationComponent["BlendType" + std::to_string(i)].Enum("Override") == (int)animationComponent["BlendType" + std::to_string(i)]) {
+                            animationData.blendType = Skeleton::BlendType::Override;
+                        }
 
+                        animationData.level = (int)animationComponent["Level" + std::to_string(i)];
                         Animations.push_back(animationData);
                     }
                 }

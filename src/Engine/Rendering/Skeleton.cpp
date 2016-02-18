@@ -66,7 +66,7 @@ std::vector<glm::mat4> Skeleton::GetFrameBones(std::vector<AnimationData> animat
     if (animations.size() <= 0 || animationOffset.animation == nullptr) {
         std::vector<glm::mat4> finalMatrices;
         for (auto& b : Bones) {
-            finalMatrices.push_back(glm::mat4(1));//b.second->OffsetMatrix);
+            finalMatrices.push_back(glm::mat4(1));
         }
         return finalMatrices;
     }
@@ -85,14 +85,15 @@ std::vector<glm::mat4> Skeleton::GetFrameBones(std::vector<AnimationData> animat
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
 {
     glm::mat4 boneMatrix;
-    std::vector<JointFrameTransform> JointTransforms;
+
+    std::vector<JointFramePose> JointPoses;
 
     for (const AnimationData animationData : animations) {
         const Animation* animation = animationData.animation;
         const float time = animationData.time;
 
-        JointFrameTransform jointTransform;
-        jointTransform.Weight = animationData.weight;;
+        JointFramePose jointPose;
+        jointPose.Weight = animationData.weight;;
 
         if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
             std::vector<Animation::Keyframe> boneKeyFrames = animation->JointAnimations.at(bone->ID);
@@ -121,31 +122,28 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
 
 
                 if (progress > 1.0f || progress < 0.0f) {
-                    LOG_INFO("Progress: %f", progress);
                     progress = glm::clamp(progress, 0.0f, 1.0f);
                 }
                 Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
                 Animation::Keyframe::BoneProperty nextBoneProperty = nextFrame.BoneProperties;
 
-                jointTransform.Position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
-                jointTransform.Rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
-                jointTransform.Scale = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
+                glm::vec3 position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
+                glm::quat rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
+                glm::vec3 scale = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
 
                 // Flag for no root motion
                 if (bone == RootBone && noRootMotion) {
-                    jointTransform.Position.x = 0;
-                    jointTransform.Position.z = 0;
+                    position.x = 0;
+                    position.z = 0;
                 }
 
-                JointTransforms.push_back(jointTransform);
+                jointPose.Pose = (glm::translate(position) * glm::toMat4(rotation) * glm::scale(scale));
+                JointPoses.push_back(jointPose);
 
             } else { // 1 keyframes for the current bone
                 currentFrame = boneKeyFrames.at(0);
-                jointTransform.Position = currentFrame.BoneProperties.Position;
-                jointTransform.Rotation = currentFrame.BoneProperties.Rotation;
-                jointTransform.Scale = currentFrame.BoneProperties.Scale;
-                JointTransforms.push_back(jointTransform);
-
+                jointPose.Pose = (glm::translate(currentFrame.BoneProperties.Position) * glm::toMat4(currentFrame.BoneProperties.Rotation) * glm::scale(currentFrame.BoneProperties.Scale));
+                JointPoses.push_back(jointPose);
             }
         } else { // 0 keyframes for the current bone
 
@@ -153,48 +151,40 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
 
     }
 
-    if (JointTransforms.size() <= 0) {
+
+    if (JointPoses.size() == 0) {
         if (bone->Parent) {
-            boneMatrix = parentMatrix * glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix;
+
+            glm::mat4 jointPose = (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
+
+            boneMatrix = parentMatrix  * jointPose;
             boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
         } else {
             boneMatrix = glm::inverse(bone->OffsetMatrix);
             boneMatrices[bone->ID] = parentMatrix;
         }
-    } else if (JointTransforms.size() == 1) {
-        boneMatrix = parentMatrix *(glm::translate(JointTransforms.at(0).Position) * glm::toMat4(JointTransforms.at(0).Rotation) * glm::scale(JointTransforms.at(0).Scale));
-        boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
     } else {
 
-        glm::vec3 finalPosInterp;
-        glm::quat finalRotInterp;
-        glm::vec3 finalScaleInterp;
         float totalWeight = 0;
 
-        for (JointFrameTransform jointTransform : JointTransforms) {
-            totalWeight += jointTransform.Weight;
+        for (JointFramePose jointFramePose : JointPoses) {
+            totalWeight += jointFramePose.Weight;
         }
 
+        glm::mat4 finalBlend = glm::mat4(0);
 
-        for (JointFrameTransform jointTransform : JointTransforms) {
-            if (jointTransform.Weight == 1.0f) {
-                finalPosInterp = jointTransform.Position;
-                finalRotInterp = jointTransform.Rotation;
-                finalScaleInterp = jointTransform.Scale;
-                break;
+        for (JointFramePose jointFramePose : JointPoses) {
+            if (jointFramePose.Weight == 1.0f) {
+                finalBlend = jointFramePose.Pose;
             } else {
-                finalPosInterp += jointTransform.Position * (jointTransform.Weight/totalWeight);
-                finalRotInterp *= glm::slerp(glm::quat(), jointTransform.Rotation, (jointTransform.Weight/totalWeight));
-                finalScaleInterp += jointTransform.Scale * (jointTransform.Weight/totalWeight);
+                finalBlend += jointFramePose.Pose * (jointFramePose.Weight / totalWeight);
             }
-
         }
 
-        boneMatrix = parentMatrix *(glm::translate(finalPosInterp) * glm::toMat4(finalRotInterp) * glm::scale(finalScaleInterp));
+
+        boneMatrix = parentMatrix * finalBlend;
         boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
     }
-
-
 
     for (auto &child : bone->Children) {
         AccumulateBoneTransforms(noRootMotion, animations, boneMatrices, child, boneMatrix);
@@ -204,83 +194,25 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, AnimationOffset animationOffset, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
 {
     glm::mat4 boneMatrix;
-
-    std::vector<JointFrameTransform> JointTransforms;
+    std::vector<JointFramePose> JointPoses;
 
     for (const AnimationData animationData : animations) {
-        const Animation* animation = animationData.animation;
-        const float time = animationData.time;
-
-        JointFrameTransform jointTransform;
-        jointTransform.Weight = animationData.weight;;
-
-        if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
-            std::vector<Animation::Keyframe> boneKeyFrames = animation->JointAnimations.at(bone->ID);
-
-            Animation::Keyframe currentFrame;
-            Animation::Keyframe nextFrame;
-
-            if (boneKeyFrames.size() > 1) { // 2+ keyframes for the current bone
-                for (int index = boneKeyFrames.size()-1; index >= 0; index--) { // find the bone keyframes that surrounds the current frame
-                    if (time >= boneKeyFrames.at(index).Time) {
-                        currentFrame = boneKeyFrames.at(index);
-                        nextFrame = boneKeyFrames.at((index + 1) % boneKeyFrames.size());
-                        break;
-                    }
-                }
-
-                float progress;
-
-                if (nextFrame.Index == 0) {
-                    nextFrame = currentFrame;
-                    progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
-                } else {
-                    progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
-
-                }
-
-
-                if (progress > 1.0f || progress < 0.0f) {
-                    LOG_INFO("Progress: %f", progress);
-                    progress = glm::clamp(progress, 0.0f, 1.0f);
-                }
-                Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
-                Animation::Keyframe::BoneProperty nextBoneProperty = nextFrame.BoneProperties;
-
-                jointTransform.Position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
-                jointTransform.Rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
-                jointTransform.Scale = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
-
-                // Flag for no root motion
-                if (bone == RootBone && noRootMotion) {
-                    jointTransform.Position.x = 0;
-                    jointTransform.Position.z = 0;
-                }
-
-                JointTransforms.push_back(jointTransform);
-
-            } else { // 1 keyframes for the current bone
-                currentFrame = boneKeyFrames.at(0);
-                jointTransform.Position = currentFrame.BoneProperties.Position;
-                jointTransform.Rotation = currentFrame.BoneProperties.Rotation;
-                jointTransform.Scale = currentFrame.BoneProperties.Scale;
-                JointTransforms.push_back(jointTransform);
-
-            }
-        } else { // 0 keyframes for the current bone
-
-        }
-
+        if (animationData.animation->JointAnimations.find(bone->ID) != animationData.animation->JointAnimations.end()) { // Does the bone have any keyframes in this animation?
+            JointFramePose jointPose;
+            jointPose.Weight = animationData.weight;
+            jointPose.Type = animationData.blendType;
+            jointPose.Level = animationData.level;
+            jointPose.Pose = GetBonePose(bone, animationData.animation, animationData.time, noRootMotion);
+            JointPoses.push_back(jointPose);
+        }    
     }
 
 
-    if (JointTransforms.size() == 0) {
+    if (JointPoses.size() == 0) { // No keyframes for the current bone
         if (bone->Parent) {
-
             glm::mat4 jointPose = (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
             glm::mat4 boneTransform = AdditiveBlend(bone, animationOffset, jointPose);
-
-             boneMatrix = parentMatrix  * boneTransform;
+             boneMatrix = parentMatrix * boneTransform;
             boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
         } else {
             boneMatrix = glm::inverse(bone->OffsetMatrix);
@@ -288,33 +220,31 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, std::vector<Animation
         }
     } else {
 
-        JointFrameTransform jointFinalTransform;
         
-        float totalWeight = 0;
+        glm::mat4 finalBlend = glm::mat4(0);
+        glm::mat4 finalOverride = glm::mat4(0);
 
-        for (JointFrameTransform jointTransform : JointTransforms) {
-            totalWeight += jointTransform.Weight;
+        int maxLevel = 0;
+        for (JointFramePose jointPose : JointPoses) {
+            maxLevel = jointPose.Level > maxLevel ? jointPose.Level : maxLevel;
         }
 
 
-        for (JointFrameTransform jointTransform : JointTransforms) {
-            if (jointTransform.Weight == 1.0f) {
-                jointFinalTransform.Position = jointTransform.Position;
-                jointFinalTransform.Rotation = jointTransform.Rotation;
-                jointFinalTransform.Scale = jointTransform.Scale;
-                break;
-            } else {
-                jointFinalTransform.Position += jointTransform.Position * (jointTransform.Weight/totalWeight);
-                jointFinalTransform.Rotation *= glm::slerp(glm::quat(), jointTransform.Rotation, (jointTransform.Weight/totalWeight));
-                jointFinalTransform.Scale += jointTransform.Scale * (jointTransform.Weight/totalWeight);
+        for (JointFramePose jointPose : JointPoses) {
+            if (jointPose.Type == BlendType::Override) {
+                finalOverride += jointPose.Pose * jointPose.Weight; //Blend Overrides then apply to final blend
+            } else if(jointPose.Type == BlendType::Blend) {
+                finalBlend += jointPose.Pose * jointPose.Weight;
+            } else if (jointPose.Type == BlendType::Additive) {
+                //Soon
             }
-
         }
 
+        if(finalOverride != glm::mat4(0)) {
+            finalBlend = finalOverride;
+        }
 
-        glm::mat4 jointPose = (glm::translate(jointFinalTransform.Position) * glm::toMat4(jointFinalTransform.Rotation) * glm::scale(jointFinalTransform.Scale));
-        glm::mat4 boneTransform = AdditiveBlend(bone, animationOffset, jointPose);
-
+        glm::mat4 boneTransform = AdditiveBlend(bone, animationOffset, finalBlend);
         boneMatrix = parentMatrix * boneTransform;
         boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
     }
@@ -329,18 +259,14 @@ glm::mat4 Skeleton::AdditiveBlend(const Bone* bone, AnimationOffset animationOff
 {
     AnimationOffset refOffset = animationOffset;
     refOffset.time = 0.5f; // reference pose is at 0.5s for now
-    JointFrameTransform refOffsetTransform = GetOffsetTransform(bone, refOffset);
-    JointFrameTransform srcOffsetTransform = GetOffsetTransform(bone, animationOffset);
-
-    glm::mat4 srcPose = (glm::translate(srcOffsetTransform.Position) * glm::toMat4(srcOffsetTransform.Rotation) * glm::scale(srcOffsetTransform.Scale));
-    glm::mat4 refPose = (glm::translate(refOffsetTransform.Position) * glm::toMat4(refOffsetTransform.Rotation) * glm::scale(refOffsetTransform.Scale));
-
+    glm::mat4 refPose = GetOffsetTransform(bone, refOffset);
+    glm::mat4 srcPose = GetOffsetTransform(bone, animationOffset);
     glm::mat4 differencePose = srcPose * glm::inverse(refPose);
     glm::mat4 finalPose = differencePose * targetPose;
      return finalPose;
 }
 
-Skeleton::JointFrameTransform Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset)
+glm::mat4 Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset)
 {
     const Animation* animation = animationOffset.animation;
     float time = animationOffset.time;
@@ -371,7 +297,6 @@ Skeleton::JointFrameTransform Skeleton::GetOffsetTransform(const Bone* bone, Ani
                 progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
             } else {
                 progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
-
             }
 
             progress = glm::clamp(progress, 0.0f, 1.0f);
@@ -392,13 +317,70 @@ Skeleton::JointFrameTransform Skeleton::GetOffsetTransform(const Bone* bone, Ani
         }
     }
 
+    return (glm::translate(position) * glm::toMat4(rotation) * glm::scale(scale));;
+}
 
-    JointFrameTransform jointTransform;
-    jointTransform.Position = position;
-    jointTransform.Rotation = rotation;
-    jointTransform.Scale = scale;
 
-    return jointTransform;
+glm::mat4 Skeleton::GetBonePose(const Bone* bone, const Animation* animation, double time, bool noRootMotion)
+{
+    glm::mat4 boneMatrix;
+
+    std::vector<JointFramePose> JointPoses;
+
+
+    if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
+        std::vector<Animation::Keyframe> boneKeyFrames = animation->JointAnimations.at(bone->ID);
+
+        Animation::Keyframe currentFrame;
+        Animation::Keyframe nextFrame;
+
+        if (boneKeyFrames.size() > 1) { // 2+ keyframes for the current bone
+            for (int index = boneKeyFrames.size()-1; index >= 0; index--) { // find the bone keyframes that surrounds the current frame
+                if (time >= boneKeyFrames.at(index).Time) {
+                    currentFrame = boneKeyFrames.at(index);
+                    nextFrame = boneKeyFrames.at((index + 1) % boneKeyFrames.size());
+                    break;
+                }
+            }
+
+            float progress;
+
+            if (nextFrame.Index == 0) {
+                nextFrame = currentFrame;
+                progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
+            } else {
+                progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
+
+            }
+
+
+            if (progress > 1.0f || progress < 0.0f) {
+                progress = glm::clamp(progress, 0.0f, 1.0f);
+            }
+            Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
+            Animation::Keyframe::BoneProperty nextBoneProperty = nextFrame.BoneProperties;
+
+            glm::vec3 position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
+            glm::quat rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
+            glm::vec3 scale = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
+
+            // Flag for no root motion
+            if (bone == RootBone && noRootMotion) {
+                position.x = 0;
+                position.z = 0;
+            }
+
+            boneMatrix = (glm::translate(position) * glm::toMat4(rotation) * glm::scale(scale));
+
+        } else { // 1 keyframes for the current bone
+            currentFrame = boneKeyFrames.at(0);
+            boneMatrix = (glm::translate(currentFrame.BoneProperties.Position) * glm::toMat4(currentFrame.BoneProperties.Rotation) * glm::scale(currentFrame.BoneProperties.Scale));
+        }
+    } //else { // 0 keyframes for the current bone
+
+   // }
+
+    return boneMatrix;
 }
 
 glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 childMatrix)
@@ -467,14 +449,14 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
 {
     glm::mat4 boneMatrix;
 
-    std::vector<JointFrameTransform> JointTransforms;
+    std::vector<JointFramePose> JointPoses;
 
     for (const AnimationData animationData : animations) {
         const Animation* animation = animationData.animation;
         const float time = animationData.time;
 
-        JointFrameTransform jointTransform;
-        jointTransform.Weight = animationData.weight;;
+        JointFramePose jointPose;
+        jointPose.Weight = animationData.weight;;
 
         if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
             std::vector<Animation::Keyframe> boneKeyFrames = animation->JointAnimations.at(bone->ID);
@@ -503,31 +485,28 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
 
 
                 if (progress > 1.0f || progress < 0.0f) {
-                    LOG_INFO("Progress: %f", progress);
                     progress = glm::clamp(progress, 0.0f, 1.0f);
                 }
                 Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
                 Animation::Keyframe::BoneProperty nextBoneProperty = nextFrame.BoneProperties;
 
-                jointTransform.Position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
-                jointTransform.Rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
-                jointTransform.Scale = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
+                glm::vec3 position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
+                glm::quat rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
+                glm::vec3 scale = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
 
                 // Flag for no root motion
                 if (bone == RootBone && noRootMotion) {
-                    jointTransform.Position.x = 0;
-                    jointTransform.Position.z = 0;
+                    position.x = 0;
+                    position.z = 0;
                 }
 
-                JointTransforms.push_back(jointTransform);
+                jointPose.Pose = (glm::translate(position) * glm::toMat4(rotation) * glm::scale(scale));
+                JointPoses.push_back(jointPose);
 
             } else { // 1 keyframes for the current bone
                 currentFrame = boneKeyFrames.at(0);
-                jointTransform.Position = currentFrame.BoneProperties.Position;
-                jointTransform.Rotation = currentFrame.BoneProperties.Rotation;
-                jointTransform.Scale = currentFrame.BoneProperties.Scale;
-                JointTransforms.push_back(jointTransform);
-
+                jointPose.Pose = (glm::translate(currentFrame.BoneProperties.Position) * glm::toMat4(currentFrame.BoneProperties.Rotation) * glm::scale(currentFrame.BoneProperties.Scale));
+                JointPoses.push_back(jointPose);
             }
         } else { // 0 keyframes for the current bone
 
@@ -536,7 +515,7 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
     }
 
 
-    if (JointTransforms.size() == 0) {
+    if (JointPoses.size() == 0) {
         if (bone->Parent) {
 
             glm::mat4 jointPose = (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
@@ -548,33 +527,24 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
         }
     } else {
 
-        JointFrameTransform jointFinalTransform;
-
         float totalWeight = 0;
 
-        for (JointFrameTransform jointTransform : JointTransforms) {
-            totalWeight += jointTransform.Weight;
+        for (JointFramePose jointFramePose : JointPoses) {
+            totalWeight += jointFramePose.Weight;
         }
 
+        glm::mat4 finalBlend = glm::mat4(0);
 
-        for (JointFrameTransform jointTransform : JointTransforms) {
-            if (jointTransform.Weight == 1.0f) {
-                jointFinalTransform.Position = jointTransform.Position;
-                jointFinalTransform.Rotation = jointTransform.Rotation;
-                jointFinalTransform.Scale = jointTransform.Scale;
-                break;
+        for (JointFramePose jointFramePose : JointPoses) {
+            if (jointFramePose.Weight == 1.0f) {
+                finalBlend = jointFramePose.Pose;
             } else {
-                jointFinalTransform.Position += jointTransform.Position * (jointTransform.Weight/totalWeight);
-                jointFinalTransform.Rotation *= glm::slerp(glm::quat(), jointTransform.Rotation, (jointTransform.Weight/totalWeight));
-                jointFinalTransform.Scale += jointTransform.Scale * (jointTransform.Weight/totalWeight);
+                finalBlend += jointFramePose.Pose * (jointFramePose.Weight / totalWeight);
             }
-
         }
 
 
-        glm::mat4 jointPose = (glm::translate(jointFinalTransform.Position) * glm::toMat4(jointFinalTransform.Rotation) * glm::scale(jointFinalTransform.Scale));
-        glm::mat4 boneTransform = AdditiveBlend(bone, animationOffset, jointPose);
-
+        glm::mat4 boneTransform = AdditiveBlend(bone, animationOffset, finalBlend);
         boneMatrix = boneTransform * childMatrix;
     }
 
@@ -589,7 +559,7 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
 glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, glm::mat4 childMatrix)
 {
     glm::mat4 boneMatrix;
-    std::vector<JointFrameTransform> JointTransforms;
+   /* std::vector<JointFrameTransform> JointTransforms;
 
     for (const AnimationData animationData : animations) {
         const Animation* animation = animationData.animation;
@@ -625,7 +595,6 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
 
 
                 if (progress > 1.0f || progress < 0.0f) {
-                    LOG_INFO("Progress: %f", progress);
                     progress = glm::clamp(progress, 0.0f, 1.0f);
                 }
                 Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
@@ -688,18 +657,20 @@ glm::mat4 Skeleton::GetBoneTransform(bool noRootMotion, const Bone* bone, std::v
                 finalRotInterp *= glm::slerp(glm::quat(), jointTransform.Rotation, (jointTransform.Weight/totalWeight));
                 finalScaleInterp += jointTransform.Scale * (jointTransform.Weight/totalWeight);
             }
+
         }
 
         boneMatrix = (glm::translate(finalPosInterp) * glm::toMat4(finalRotInterp) * glm::scale(finalScaleInterp)) * childMatrix;
     }
 
 
-
     if (bone->Parent != nullptr) {
         return GetBoneTransform(noRootMotion, bone->Parent, animations, boneMatrix);
     } else {
         return boneMatrix;
-    }
+    }*/
+
+return boneMatrix;
 }
 
 int Skeleton::GetBoneID(std::string name)

@@ -54,13 +54,19 @@ void AnimationSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& a
                     e.Entity = entity;
                     e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
                     m_EventBroker->Publish(e);
-                    nextTime -= animation->Duration;
+
+                    while(nextTime > animation->Duration) {
+                        nextTime -= animation->Duration;
+                    }
                 } else if (nextTime < 0) {
                     Events::AnimationComplete e;
                     e.Entity = entity;
                     e.Name = (std::string)animationComponent["AnimationName" + std::to_string(i)];
                     m_EventBroker->Publish(e);
-                    nextTime += animation->Duration;
+
+                    while (nextTime < 0) {
+                        nextTime += animation->Duration;
+                    }
                 }
             }
 

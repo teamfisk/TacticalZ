@@ -29,11 +29,14 @@
         <Entity name="Running">
           <Components>
             <c:Animation>
-              <AnimationName1>Idle</AnimationName1>
-              <Time1>1.1429797894322036</Time1>
+              <AnimationName1>Run</AnimationName1>
               <Speed1>1</Speed1>
+              <AnimationName2>StrafeRight</AnimationName2>
+              <Weight1>0.5</Weight1>
+              <Time1>0.98334510030765165</Time1>
+              <Weight2>0.5</Weight2>
+              <Time2>0.97153983043137671</Time2>
               <Speed2>1</Speed2>
-              <Time2>0.032904333143131348</Time2>
               <Time3>0.093923612201312068</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
@@ -44,7 +47,20 @@
               <Position X="-1" Y="0" Z="0"/>
             </c:Transform>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>
@@ -75,6 +91,7 @@
           <Components>
             <c:Model>
               <Resource>Models/Core/UnitPlane.mesh</Resource>
+              <Color A="1" B="0.137254909" G="0.121568628" R="0.160784319"/>
             </c:Model>
             <c:Transform>
               <Scale X="10" Y="1" Z="10"/>
@@ -85,42 +102,80 @@
         <Entity>
           <Components>
             <c:Animation>
-              <AnimationName1>Idle</AnimationName1>
-              <Time1>1.1429797894322036</Time1>
+              <AnimationName1>Run</AnimationName1>
               <Speed1>1</Speed1>
-              <Speed2>0.10000000149011612</Speed2>
-              <AnimationName2>StrafeRigh</AnimationName2>
+              <AnimationName2>StrafeRight</AnimationName2>
+              <Weight1>0.5</Weight1>
+              <Time1>0.98334510030765165</Time1>
               <Weight2>0.5</Weight2>
-              <Time2>0.67154243305829331</Time2>
-              <Weight3>0.5</Weight3>
-              <Time3>0.32167823998061529</Time3>
+              <Time2>0.89665639003541542</Time2>
+              <Speed2>1</Speed2>
+              <AnimationName3>ShootFastRifle</AnimationName3>
+              <BlendType3>
+                <Override/>
+              </BlendType3>
+              <Time3>0.099759525382621339</Time3>
               <Speed3>1</Speed3>
             </c:Animation>
             <c:AnimationOffset>
               <AnimationName>AimRifle</AnimationName>
-              <Time>0.15999999642372131</Time>
+              <Time>0.68999981880187988</Time>
             </c:AnimationOffset>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
             </c:Model>
             <c:Transform/>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0.146727413" Y="1.15066242" Z="-0.195905238"/>
+                  <Scale X="1.00000012" Y="1" Z="1.00000012"/>
+                  <Orientation X="0.38856402" Y="0.017387826" Z="0.0776973143"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
         <Entity>
           <Components>
             <c:Animation>
               <AnimationName1>AimRifle</AnimationName1>
-              <Time1>0.5</Time1>
+              <Speed1>0.5</Speed1>
+              <AnimationName2>Ru</AnimationName2>
+              <Time1>0.57926159055711501</Time1>
             </c:Animation>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
+              <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
               <Position X="1" Y="0" Z="0"/>
             </c:Transform>
           </Components>
-          <Children/>
+          <Children>
+            <Entity>
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>

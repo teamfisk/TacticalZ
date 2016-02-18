@@ -3,20 +3,41 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
+	<xs:complexType name="BlendEnum" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="t:enum">
+				<xs:choice>
+					<xs:element name="Additive" type="xs:integer" fixed="0" minOccurs="0"/>
+					<xs:element name="Blend" type="xs:integer" fixed="1" minOccurs="0"/>
+					<xs:element name="Override" type="xs:integer" fixed="2" minOccurs="0"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
 	<xs:element name="Animation">
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="AnimationName1" type="t:string" minOccurs="0"/>
+				<xs:element name="BlendType1" type="BlendEnum" minOccurs="0"/>
+				<xs:element name="Level1" type="t:int" minOccurs="0"/>
 				<xs:element name="Weight1" type="t:double" minOccurs="0"/>
 				<xs:element name="Time1" type="t:double" minOccurs="0"/>
 				<xs:element name="Speed1" type="t:double" minOccurs="0"/>
 				<xs:element name="Loop1" type="t:bool" minOccurs="0"/>
+
 				<xs:element name="AnimationName2" type="t:string" minOccurs="0"/>
+				<xs:element name="BlendType2" type="BlendEnum" minOccurs="0"/>
+				<xs:element name="Level2" type="t:int" minOccurs="0"/>
 				<xs:element name="Weight2" type="t:double" minOccurs="0"/>
 				<xs:element name="Time2" type="t:double" minOccurs="0"/>
 				<xs:element name="Speed2" type="t:double" minOccurs="0"/>
 				<xs:element name="Loop2" type="t:bool" minOccurs="0"/>
+
 				<xs:element name="AnimationName3" type="t:string" minOccurs="0"/>
+				<xs:element name="BlendType3" type="BlendEnum" minOccurs="0"/>
+				<xs:element name="Level3" type="t:int" minOccurs="0"/>
 				<xs:element name="Weight3" type="t:double" minOccurs="0"/>
 				<xs:element name="Time3" type="t:double" minOccurs="0"/>
 				<xs:element name="Speed3" type="t:double" minOccurs="0"/>
