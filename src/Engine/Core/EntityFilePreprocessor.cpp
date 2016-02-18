@@ -185,6 +185,9 @@ void EntityFilePreprocessor::parseComponentInfo()
             field.Offset = fieldOffset;
             field.Stride = stride;
             compInfo.FieldsInOrder.push_back(name);
+            if (field.Type == "string") {
+                compInfo.StringFields.push_back(name);
+            }
             fieldOffset += stride;
         }
 

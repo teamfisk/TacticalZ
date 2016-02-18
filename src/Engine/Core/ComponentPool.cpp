@@ -1,7 +1,5 @@
 #include "Core/ComponentPool.h"
 
-
-
 ComponentWrapper ComponentPoolForwardIterator::operator*() const
 {
     char* data = &(*m_MemoryPoolIterator);
@@ -32,6 +30,28 @@ ComponentPoolForwardIterator& ComponentPoolForwardIterator::operator++()
     return *this;
 }
 
+ComponentPool::ComponentPool(const ComponentPool& other)
+    : m_ComponentInfo(other.m_ComponentInfo)
+    , m_Pool(other.m_Pool) 
+{
+    // Duplicate strings
+    for (auto& name : m_ComponentInfo.StringFields) {
+        for (auto& c : *this) {
+            ComponentWrapper::SolidifyStrings(c);
+        }
+    }
+}
+
+ComponentPool::~ComponentPool()
+{
+    // Call std::string destructors
+    for (auto& name : m_ComponentInfo.StringFields) {
+        for (auto& c : *this) {
+            c.Field<std::string>(name).~basic_string();
+        }
+    }
+}
+
 //const ::ComponentInfo& ComponentPool::ComponentInfo() const
 //{
 //    return m_ComponentInfo;
@@ -39,10 +59,19 @@ ComponentPoolForwardIterator& ComponentPoolForwardIterator::operator++()
 
 ComponentWrapper ComponentPool::Allocate(EntityID entity)
 {
+    // Allocate pool data
     char* data = m_Pool.Allocate();
+    // Copy EntityID
     memcpy(data, &entity, sizeof(EntityID));
+
     m_EntityToComponent[entity] = data;
-    return ComponentWrapper(m_ComponentInfo, data);
+    ComponentWrapper component(m_ComponentInfo, data);
+
+    // Copy defaults
+    memcpy(component.Data, m_ComponentInfo.Defaults.get(), m_ComponentInfo.Stride);
+    ComponentWrapper::SolidifyStrings(component);
+
+    return component;
 }
 
 ComponentWrapper ComponentPool::GetByEntity(EntityID ent)

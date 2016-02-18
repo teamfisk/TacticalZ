@@ -7,6 +7,23 @@
 #include "ComponentInfo.h"
 #include "Util/Any.h"
 
+template <typename T, typename Enable = void>
+struct ComponentField { };
+
+template <typename T>
+struct ComponentField<T, typename std::enable_if<std::is_trivially_copyable<T>::value>::type>
+{
+    static T& Get(const ComponentInfo::Field_t& info, char* data) { return *reinterpret_cast<T*>(data); }
+    static void Set(const ComponentInfo::Field_t& info, char* data, const T& value) { Get(data) = value; }
+};
+
+template <>
+struct ComponentField<std::string, void>
+{
+    static std::string& Get(const ComponentInfo::Field_t& info, char* data) { return **reinterpret_cast<std::string**>(data); }
+    static void Set(const ComponentInfo::Field_t& info, char* data, const std::string& value) { Get(info, data) = value; }
+};
+
 struct ComponentWrapper
 {
     ComponentWrapper(const ComponentInfo& componentInfo, char* data)
@@ -47,7 +64,20 @@ struct ComponentWrapper
 
     void Copy(ComponentWrapper& destination)
     {
-        memcpy(destination.Data, this->Data, Info.Stride);
+        // Copy trivial data
+        memcpy(destination.Data, Data, Info.Stride);
+        // Duplicate strings
+        SolidifyStrings(destination);
+    }
+
+    // When component data has been copied, strings need to be reconstructed or they'll refer to the same data!
+    static void SolidifyStrings(ComponentWrapper& component)
+    {
+        for (auto& name : component.Info.StringFields) {
+            std::size_t offset = component.Info.Fields.at(name).Offset;
+            auto& value = *reinterpret_cast<const std::string*>(component.Data + offset);
+            new (component.Data + offset) std::string(value);
+        }
     }
     
     struct SubscriptProxy
@@ -92,46 +122,6 @@ struct SharedComponentWrapper : ComponentWrapper
 
 private:
     boost::shared_array<char> m_DataReference;
-};
-
-// TODO: Move this to Tests once entity importing is finished
-class ComponentWrapperFactory
-{
-public:
-    ComponentWrapperFactory() = default;
-    ComponentWrapperFactory(std::string componentTypeName, unsigned int allocation = 0)
-    {
-        m_ComponentInfo.Name = componentTypeName;
-        m_ComponentInfo.Meta->Allocation = allocation;
-    }
-
-    template <typename T>
-    void AddProperty(std::string fieldName, T defaultValue)
-    {
-        m_DefaultValues.push_back(defaultValue);
-        m_ComponentInfo.Fields[fieldName].Type = typeid(T).name();
-        m_ComponentInfo.Fields[fieldName].Offset = m_ComponentInfo.Stride;
-        m_ComponentInfo.Fields[fieldName].Stride = sizeof(T);
-        m_ComponentInfo.Stride += sizeof(T);
-    }
-    
-    ComponentInfo& Finalize()
-    {
-        m_ComponentInfo.Defaults = std::shared_ptr<char>(new char[m_ComponentInfo.Stride]);
-        std::size_t offset = 0;
-        for (auto& val : m_DefaultValues) {
-            memcpy(m_ComponentInfo.Defaults.get() + offset, val.Data.get(), val.Size);
-            offset += val.Size;
-        }
-
-        return m_ComponentInfo;
-    }
-
-    operator ComponentInfo&() { return Finalize(); }
-
-private:
-    ComponentInfo m_ComponentInfo;
-    std::vector<Any> m_DefaultValues;
 };
 
 #endif
