@@ -14,30 +14,30 @@ bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
     if (!e.Victim.Valid() && e.Victim != LocalPlayer && !e.Victim.IsChildOf(LocalPlayer)) {
         return false;
     }
-
     if (!e.Inflictor.Valid() || !e.Victim.Valid()) {
         return false;
     }
 
-    auto teamInflictor = m_World->GetComponent(e.Inflictor.ID, "Team");
-    auto teamVictim = m_World->GetComponent(e.Victim.ID, "Team");
-    if ((int)teamInflictor["Team"] != (int)teamVictim["Team"]) {
+    //if its not friendly fire, return
+    if ((int)m_World->GetComponent(e.Inflictor.ID, "Team")["Team"] != (int)m_World->GetComponent(e.Victim.ID, "Team")["Team"]) {
         return false;
     }
 
+    //determine the inflictors class
     auto className = DetermineClass(e.Inflictor);
     if (className == "") {
         return false;
     }
-    //"Schema/Entities/Boost-.xml"
+
+    //get the XML file, example: "Schema/Entities/BoostclassName.xml"
     std::string classXML = "Schema/Entities/" + className + ".xml";
 
-    //check if player already has the component
+    //check if player already has a child with the component, if so delete that child
     auto playerBoostAssaultEntity = e.Victim.FirstChildByName(className);
     if (playerBoostAssaultEntity.Valid()) {
         m_World->DeleteEntity(playerBoostAssaultEntity.ID);
     }
-    //load & set the BoostAssault Component
+    //load boost XML file, set it entity parented with the victim player
     auto entityFile = ResourceManager::Load<EntityFile>(classXML);
     EntityFileParser parser(entityFile);
     EntityID boostAssaultEntity = parser.MergeEntities(m_World);

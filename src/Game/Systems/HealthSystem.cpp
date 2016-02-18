@@ -30,6 +30,7 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 
     ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
+    //if player has the boost from a defender, subtract the damage taken by StrengthOfEffect amount
     auto playerBoostDefenderEntity = e.Victim.FirstChildByName("BoostDefender");
     if (playerBoostDefenderEntity.Valid()) {
         e.Damage -= (double)playerBoostDefenderEntity["BoostDefender"]["StrengthOfEffect"];
