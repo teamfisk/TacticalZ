@@ -15,6 +15,7 @@ public:
         : m_EventBroker(eventBroker)
     { }
     ~World();
+    World(const World& other);
 
     // Create empty entity
     EntityID CreateEntity(EntityID parent = 0);

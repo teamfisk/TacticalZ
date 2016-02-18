@@ -9,6 +9,15 @@ World::~World()
     }
 }
 
+World::World(const World& other)
+    : m_EventBroker(other.m_EventBroker)
+{
+    // Deep copy component pools
+    for (auto& kv : m_ComponentPools) {
+        m_ComponentPools[kv.first] = new ComponentPool(*kv.second);
+    }
+}
+
 EntityID World::CreateEntity(EntityID parent /*= 0*/)
 {
     EntityID newEntity = generateEntityID();
