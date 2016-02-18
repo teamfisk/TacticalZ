@@ -28,6 +28,7 @@ public:
     virtual void Reset();
 
     void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer);
+    bool SniperSprintingCheck();
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
 
@@ -241,4 +242,12 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     m_EventBroker->Publish(e);
 }
 
+template <typename EventContext>
+bool FirstPersonInputController<EventContext>::SniperSprintingCheck() {
+    if (m_SpecialAbilityKeyDown) {
+        return true;
+    } else {
+        return false;
+    }
+}
 #endif
