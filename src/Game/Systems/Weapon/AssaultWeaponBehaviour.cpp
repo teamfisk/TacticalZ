@@ -385,11 +385,10 @@ bool AssaultWeaponBehaviour::shoot(double damage)
     }
 
 
-    // Do Not Check for friendly fire
-    //// Check for friendly fire
-    //if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)m_Player["Team"]["Team"]) {
-    //    return false;
-    //}
+    // BoostUpdate: If friendly fire - reduce damage to 0
+    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)m_Player["Team"]["Team"]) {
+        damage = 0;
+    }
 
     // Deal damage! 
     Events::PlayerDamage ePlayerDamage;

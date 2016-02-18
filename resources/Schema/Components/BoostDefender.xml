@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <BoostDefender xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BoostDefender.xsd">
   <StrengthOfEffect>10</StrengthOfEffect>
-  <LifeTimeOfEffect>5</LifeTimeOfEffect>
 </BoostDefender>

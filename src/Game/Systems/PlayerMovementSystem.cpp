@@ -53,9 +53,10 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         float playerMovementSpeed = player["Player"]["MovementSpeed"];
         float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
         glm::vec3& wishDirection = player["Player"]["CurrentWishDirection"];
-        if (player.HasComponent("BoostAssault")) {
-            playerMovementSpeed *= (double)player["BoostAssault"]["StrengthOfEffect"];
-            playerCrouchSpeed *= (double)player["BoostAssault"]["StrengthOfEffect"];
+        auto playerBoostAssaultEntity = player.FirstChildByName("BoostAssault");
+        if (playerBoostAssaultEntity.Valid()) {
+            playerMovementSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+            playerCrouchSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
         }
 
 
@@ -110,8 +111,8 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
                 accelerationSpeed = glm::min(doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed), 50.0f);
                 //if player has Boost from an Assault class, accelerate the player faster
-                if (player.HasComponent("BoostAssault")) {
-                    accelerationSpeed *= (double)player["BoostAssault"]["StrengthOfEffect"];
+                if (playerBoostAssaultEntity.Valid()) {
+                    accelerationSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
                 }
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));

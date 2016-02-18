@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <BoostAssault xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BoostAssault.xsd">
   <StrengthOfEffect>2</StrengthOfEffect>
-  <LifeTimeOfEffect>5</LifeTimeOfEffect>
 </BoostAssault>

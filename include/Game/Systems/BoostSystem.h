@@ -20,6 +20,6 @@ private:
     EventRelay<BoostSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool OnPlayerDamage(Events::PlayerDamage& e);
 
-    std::string determineClass(EntityWrapper player);
+    std::string DetermineClass(EntityWrapper player);
 };
 #endif

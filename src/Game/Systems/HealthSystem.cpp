@@ -30,8 +30,9 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 
     ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
-    if (e.Victim.HasComponent("BoostDefender")) {
-        e.Damage -= (double)e.Victim["BoostDefender"]["StrengthOfEffect"];
+    auto playerBoostDefenderEntity = e.Victim.FirstChildByName("BoostDefender");
+    if (playerBoostDefenderEntity.Valid()) {
+        e.Damage -= (double)playerBoostDefenderEntity["BoostDefender"]["StrengthOfEffect"];
     }
     health -= e.Damage;
 

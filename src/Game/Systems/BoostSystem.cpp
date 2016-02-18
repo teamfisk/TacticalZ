@@ -25,35 +25,38 @@ bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
         return false;
     }
 
-    //friendly fire
-
-    auto className = determineClass(e.Inflictor);
+    auto className = DetermineClass(e.Inflictor);
     if (className == "") {
         return false;
     }
-    //"Schema/Entities/BoostAssault.xml"
+    //"Schema/Entities/Boost-.xml"
     std::string classXML = "Schema/Entities/" + className + ".xml";
 
-    //class
-
+    //check if player already has the component
+    auto playerBoostAssaultEntity = e.Victim.FirstChildByName(className);
+    if (playerBoostAssaultEntity.Valid()) {
+        m_World->DeleteEntity(playerBoostAssaultEntity.ID);
+    }
     //load & set the BoostAssault Component
     auto entityFile = ResourceManager::Load<EntityFile>(classXML);
     EntityFileParser parser(entityFile);
     EntityID boostAssaultEntity = parser.MergeEntities(m_World);
+    m_World->SetName(boostAssaultEntity, className);
     m_World->SetParent(boostAssaultEntity, e.Victim.ID);
 
     return true;
 }
 
-std::string BoostSystem::determineClass(EntityWrapper player)
+std::string BoostSystem::DetermineClass(EntityWrapper inflictorPlayer)
 {
-    if (m_World->HasComponent(player.ID, "DashAbility")) {
+    //determine the class based on what component the inflictor-player has
+    if (m_World->HasComponent(inflictorPlayer.ID, "DashAbility")) {
         return "BoostAssault";
     }
-    if (m_World->HasComponent(player.ID, "DefenderShield")) {
+    if (m_World->HasComponent(inflictorPlayer.ID, "ShieldAbility")) {
         return "BoostDefender";
     }
-    if (m_World->HasComponent(player.ID, "SniperSprint")) {
+    if (m_World->HasComponent(inflictorPlayer.ID, "SprintAbility")) {
         return "BoostSniper";
     }
     return "";
