@@ -17,7 +17,9 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorCamera = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/Empty.xml");
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
-    m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
+	auto cCamera = m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
+	(double&)cCamera["FarClip"] = 30.0;
+
     m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1);
 
     m_EditorGUI = new EditorGUI(m_World, m_EventBroker);

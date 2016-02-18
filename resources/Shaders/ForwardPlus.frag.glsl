@@ -143,9 +143,9 @@ float random(vec3 seed, int i)
 float CalcShadowValue(vec4 positionLightSpace, vec3 normal, vec3 lightDir, sampler2DShadow depthTexture)
 {
 	
-	float bias = 0.005;
+	//float bias = 0.005;
 	//float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-	//float bias = 0.005 * tan(acos(clamp(dot(normal, -lightDir), 0.0, 1.0)));
+	float bias = 0.005 * tan(acos(clamp(dot(normal, -lightDir), 0.0, 1.0)));
 	
     vec3 projCoords = vec3(positionLightSpace.xy, positionLightSpace.z + bias) / positionLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
