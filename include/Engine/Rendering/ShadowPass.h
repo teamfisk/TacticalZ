@@ -36,7 +36,7 @@ public:
     glm::mat4 lightV() const { return m_LightView[m_ShadowLevel]; }
 private:
 
-	glm::mat4 CalculateFrustum(RenderScene & scene, std::shared_ptr<DirectionalLightJob> directionalLightJob, glm::mat4& p, glm::mat4& v, ShadowCamera shad_cam);
+	glm::mat4 CalculateFrustum(RenderScene & scene, std::shared_ptr<DirectionalLightJob> directionalLightJob, ShadowCamera shad_cam);
 	std::array<glm::vec3, 8> UpdateFrustumPoints(Camera* cam, glm::vec3 center, glm::vec3 view_dir);
 	void UpdateSplitDist(std::array<ShadowCamera, MAX_SPLITS> shadow_cams, float far_distance, float near_distance);
 	glm::mat4 FindNewFrustum(ShadowCamera shadow_cam);

@@ -19,8 +19,10 @@ std::array<glm::vec3, 8> ShadowPass::UpdateFrustumPoints(Camera* cam, glm::vec3 
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 	glm::vec3 right = glm::normalize(glm::cross(view_dir, up));
 
-	glm::vec3 farCenter = center + view_dir * cam->FarClip();
-	glm::vec3 nearCenter = center + view_dir * cam->NearClip();
+	//glm::vec3 farCenter = center + view_dir * cam->FarClip();
+	//glm::vec3 nearCenter = center + view_dir * cam->NearClip();
+	glm::vec3 farCenter = view_dir * cam->FarClip();
+	glm::vec3 nearCenter = view_dir * cam->NearClip();
 
 	up = glm::normalize(glm::cross(right, view_dir));
 
@@ -101,12 +103,11 @@ glm::mat4 ShadowPass::FindNewFrustum(ShadowCamera shadow_cam)
 	return p;
 }
 
-glm::mat4 ShadowPass::CalculateFrustum(RenderScene & scene, std::shared_ptr<DirectionalLightJob> directionalLightJob, glm::mat4& p, glm::mat4& v, ShadowCamera shad_cam)
+glm::mat4 ShadowPass::CalculateFrustum(RenderScene & scene, std::shared_ptr<DirectionalLightJob> directionalLightJob, ShadowCamera shad_cam)
 {
-	p = glm::ortho(m_LRBT[Left], m_LRBT[Right], m_LRBT[Bottom], m_LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
-	v = glm::lookAt(glm::vec3(0.f) + shad_cam.camera->Position(), glm::vec3(directionalLightJob->Direction) + shad_cam.camera->Position(), glm::vec3(-1.f, 0.f, 0.f));
+	glm::vec3 middle = shad_cam.camera->Position() + (shad_cam.camera->Forward() * shad_cam.camera->FarClip() * 0.5f);
 
-	return p * v;
+	return glm::lookAt(glm::vec3(0.f) + middle, glm::vec3(directionalLightJob->Direction) + middle, glm::vec3(-1.f, 0.f, 0.f));
 }
 
 void ShadowPass::InitializeFrameBuffers()
@@ -180,15 +181,13 @@ void ShadowPass::Draw(RenderScene & scene)
 		glCullFace(GL_FRONT);
 		//state->Disable(GL_CULL_FACE);
 
-		//m_LightProjection = FindNewFrustum(m_shadCams[0], m_LightProjection, m_LightProjection);
-
 		if (m_ShadowOn == true)
 		{
 			for (auto &job : scene.DirectionalLightJobs) {
 				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
 				if (directionalLightJob) {
-					CalculateFrustum(scene, directionalLightJob, m_LightProjection[i], m_LightView[i], m_shadCams[i]);
+					m_LightView[i] = CalculateFrustum(scene, directionalLightJob, m_shadCams[i]);
 					m_LightProjection[i] = FindNewFrustum(m_shadCams[i]);
 
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
@@ -200,9 +199,6 @@ void ShadowPass::Draw(RenderScene & scene)
 						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
 						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-
-						//glm::mat4 proj_mat = ApplyCropMatrix(m_shadCams[0], modelJob->Matrix, m_LightView);
-						//glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(proj_mat));
 
 						glBindVertexArray(modelJob->Model->VAO);
 						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
