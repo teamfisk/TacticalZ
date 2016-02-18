@@ -35,6 +35,9 @@
 #include "Sound/SoundManager.h"
 #include "Systems/SoundSystem.h"
 
+//Performance 
+#include "Core/PerformanceTimer.h"
+
 class Game
 {
 public:
