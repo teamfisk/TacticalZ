@@ -48,7 +48,7 @@ GameHealthSystemTest::GameHealthSystemTest()
     fp.MergeEntities(m_World);
 
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker, false, false);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
 
     //The Test
