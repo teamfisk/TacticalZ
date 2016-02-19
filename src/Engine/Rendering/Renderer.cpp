@@ -29,7 +29,7 @@ void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height
     currentRenderer->m_DrawFinalPass->OnWindowResize();
     currentRenderer->m_LightCullingPass->OnWindowResize();
     currentRenderer->m_PickingPass->OnWindowResize();
-    currentRenderer->m_DrawBloomPass->OnWindowRezise();
+    currentRenderer->m_DrawBloomPass->OnWindowResize();
 }
 
 void Renderer::InitializeWindow()

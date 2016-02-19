@@ -73,7 +73,7 @@ struct LightResult {
 };
 
 float CalcAttenuation(float radius, float dist, float falloff) {
-	return 1.0 - smoothstep(radius * 0.3, radius, dist);
+	return 1.0 - smoothstep(radius * falloff, radius, dist);
 }
 
 vec4 CalcSpecular(vec4 lightColor, vec4 viewVec,  vec4 lightVec, vec4 normal) {
