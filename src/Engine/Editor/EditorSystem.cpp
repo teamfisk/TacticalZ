@@ -225,6 +225,12 @@ bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
             Enable();
         }
     }
+    if (e.Command == "PerformanceTimingResetAllTimers" && e.Value > 0) {
+        PerformanceTimer::ResetAllTimers();
+    }
+    if (e.Command == "PerformanceTimingCreateExcelData" && e.Value > 0) {
+        PerformanceTimer::CreateExcelData();
+    }
     return true;
 }
 

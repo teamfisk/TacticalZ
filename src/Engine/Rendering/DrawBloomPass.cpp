@@ -121,6 +121,15 @@ void DrawBloomPass::Draw(GLuint texture)
     GLERROR("DrawBloomPass::Draw: END");
 }
 
+
+void DrawBloomPass::OnWindowResize()
+{
+    GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    m_GaussianFrameBuffer_vert.Generate();
+    GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    m_GaussianFrameBuffer_horiz.Generate();
+}
+
 void DrawBloomPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
 {
     glGenTextures(1, texture);
