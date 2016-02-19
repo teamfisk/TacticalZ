@@ -16,8 +16,9 @@ public:
     void Send(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet);
     void Disconnect();
-    int Port() { return acceptor->local_endpoint().port(); }
-    std::string Address();
+    int Port() { return m_Port; }
+    std::string Address() { return m_Address; }
+
 private:
     // TCP logic
     boost::asio::io_service m_IOService;
@@ -28,6 +29,10 @@ private:
         int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers,
         const boost::system::error_code& error);
     int readBuffer(char* data, PlayerDefinition& playerDefinition);
+    int GetPort();
+    std::string GetAddress();
+    int m_Port = 0;
+    std::string m_Address = "";
 };
 
 #endif

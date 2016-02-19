@@ -1,9 +1,8 @@
 #include "Network/Client.h"
 using namespace boost::asio::ip;
 
-Client::Client(World* world, EventBroker* eventBroker) 
+Client::Client(World* world, EventBroker* eventBroker)
     : Network(world, eventBroker)
-    , m_Heartbeat(13)
 {
     // Asumes root node is EntityID_Invalid
     insertIntoServerClientMaps(EntityID_Invalid, EntityID_Invalid);
@@ -14,6 +13,8 @@ Client::Client(World* world, EventBroker* eventBroker)
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
     m_SendInputIntervalMs = config->Get<int>("Networking.SendInputIntervalMs", 33);
     LOG_INFO("Client initialized");
+
+    m_ServerlistRequest.Connect(m_PlayerName, "192.168.1.51", 32554);
 }
 
 Client::Client(World* world, EventBroker* eventBroker, std::unique_ptr<SnapshotFilter> snapshotFilter)
@@ -31,6 +32,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
     if (address.empty()) {
@@ -66,15 +68,22 @@ void Client::Update()
         }
 
     }
-    while (m_Heartbeat.IsSocketAvailable()) {
+
+    while (m_ServerlistRequest.IsSocketAvailable()) {
         Packet packet(MessageType::Invalid);
-        PlayerDefinition localArea;
-        localArea.Endpoint = boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string("127.0.0.1"), 13);
-        m_Heartbeat.Receive(packet, localArea);
-        if(packet.GetMessageType() == MessageType::Heartbeat) {
-            parseHeartbeat(packet, localArea);
+        m_ServerlistRequest.Receive(packet);
+        if (packet.GetMessageType() == MessageType::ServerlistRequest) {
+            parseServerlist(packet);
         }
     }
+
+    if (m_SearchingForServers) {
+        if (m_SearchingTime < (1000* (std::clock() - m_StartSearchTime) / (double)CLOCKS_PER_SEC)) {
+            m_SearchingForServers = false;
+            displayServerlist();
+        }
+    }
+
     if (m_IsConnected) {
         // Don't send 1 input in 1 packet, bunch em up.
         if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
@@ -183,20 +192,18 @@ void Client::parsePing()
 }
 
 
-void Client::parseHeartbeat(Packet& packet, PlayerDefinition pd)
+void Client::parseServerlist(Packet& packet)
 {
     // Pop size, message type, and ID
     packet.ReadPrimitive<int>();
     packet.ReadPrimitive<int>();
     packet.ReadPrimitive<int>();
-    std::string serverName = packet.ReadString();
-    int playersConnected = packet.ReadPrimitive<int>();
     std::string address = packet.ReadString();
     int port = packet.ReadPrimitive<int>();
-    //TODO: save these to some kind of list which can be represented to the player
+    std::string serverName = packet.ReadString();
+    int playersConnected = packet.ReadPrimitive<int>();
     //TODO: This should not happen when a client is connected to a server
-    
-    LOG_INFO("Serverlist\nName\tPlayers\tIP\t\tPort\n%s\t%i\t%s\t%i\n", serverName.c_str(), playersConnected, address, port);
+    m_Serverlist.push_back({ address, port, serverName, playersConnected });
 }
 
 void Client::parseKick()
@@ -216,12 +223,12 @@ void Client::parseSpawnEvents()
         }
         e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Player.ID));
         //e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Spawner.ID));
-        e.PlayerID = -1; 
+        e.PlayerID = -1;
         e.PlayerName = m_PlayerSpawnEvents.at(i).PlayerName;
         m_EventBroker->Publish(e);
     }
     m_PlayerSpawnEvents = tempSpawn;
-   // m_PlayerSpawnEvents.clear();
+    // m_PlayerSpawnEvents.clear();
 }
 
 void Client::parsePlayersSpawned(Packet& packet)
@@ -338,7 +345,7 @@ void Client::parseSnapshot(Packet& packet)
             if (serverClientMapsHasEntity(serverEntityID)) {
                 EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
                 EntityWrapper localEntity(m_World, localEntityID);
-                
+
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
                     SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
@@ -397,6 +404,12 @@ void Client::disconnect()
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
+    // TEMP
+    if (e.Command == "SearchForServers" && e.Value > 0) {
+        Events::SearchForServers e;
+        m_EventBroker->Publish(e);
+    }
+
     if (e.PlayerID != -1) {
         return false;
     }
@@ -459,12 +472,23 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
     return true;
 }
 
+bool Client::OnSearchForServers(const Events::SearchForServers& e)
+{
+    m_SearchingForServers = true;
+    m_StartSearchTime = std::clock();
+    m_Serverlist.clear();
+    LOG_INFO("Searching for LAN servers...\n");
+    Packet packet(MessageType::ServerlistRequest);
+    m_ServerlistRequest.Broadcast(packet, 13); // TODO: Config
+    return true;
+}
+
 void Client::parsePlayerDamage(Packet& packet)
 {
     Events::PlayerDamage e;
     PlayerID victimID = packet.ReadPrimitive<EntityID>();
     PlayerID inflictorID = packet.ReadPrimitive<EntityID>();
-    if(!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)){
+    if (!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)) {
         return;
     }
     e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(victimID));
@@ -493,7 +517,7 @@ void Client::sendLocalPlayerTransform()
     packet.WritePrimitive(orientation.x);
     packet.WritePrimitive(orientation.y);
     packet.WritePrimitive(orientation.z);
- 
+
     bool hasAssaultWeapon = m_LocalPlayer.HasComponent("AssaultWeapon");
     packet.WritePrimitive(hasAssaultWeapon);
     if (hasAssaultWeapon) {
@@ -501,7 +525,7 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["MagazineAmmo"]);
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
-    
+
     m_Unreliable.Send(packet);
 }
 
@@ -552,6 +576,16 @@ void Client::becomePlayer()
 {
     Packet packet = Packet(MessageType::BecomePlayer, m_SendPacketID);
     m_Reliable.Send(packet);
+}
+
+
+void Client::displayServerlist()
+{
+    LOG_INFO("This is a serverlist:\n");
+    for (int i = 0; i < m_Serverlist.size(); i++) {
+        ServerInfo si = m_Serverlist[i];
+        LOG_INFO("%s:%i\t%s\t%i\n", si.Address, si.Port, si.Name, si.PlayersConnected);
+    }
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

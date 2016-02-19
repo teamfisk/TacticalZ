@@ -36,7 +36,29 @@ void UDPServer::Send(Packet & packet)
         0);
 }
 
+// Broadcasting respond specific logic
+void UDPServer::Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint)
+{
+    m_Socket->send_to(
+        boost::asio::buffer(
+            packet.Data(),
+            packet.Size()),
+        endpoint,
+        0);
+}
 
+// Broadcasting
+void UDPServer::Broadcast(Packet & packet, int port)
+{
+    m_Socket->set_option(boost::asio::socket_base::broadcast(true));
+    m_Socket->send_to(
+        boost::asio::buffer(
+            packet.Data(),
+            packet.Size()),
+        boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4().broadcast(),port),
+        0);
+    m_Socket->set_option(boost::asio::socket_base::broadcast(false));
+}
 
 void UDPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {

@@ -15,9 +15,9 @@ void UDPClient::Connect(std::string playerName, std::string address, int port)
     if (m_Socket) {
         return;
     }
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
+    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address().from_string(address), port);
     m_Socket = boost::shared_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService));
-    m_Socket->connect(m_ReceiverEndpoint);
+    m_Socket->open(boost::asio::ip::udp::v4());
 }
 
 void UDPClient::Disconnect()
@@ -55,6 +55,17 @@ void UDPClient::Send(Packet& packet)
         packet.Data(),
         packet.Size()),
         m_ReceiverEndpoint, 0);
+} 
+
+void UDPClient::Broadcast(Packet& packet, int port)
+{
+    m_Socket->set_option(boost::asio::socket_base::broadcast(true));
+    m_Socket->send_to(boost::asio::buffer(
+        packet.Data(),
+        packet.Size()),
+        udp::endpoint(boost::asio::ip::address_v4().broadcast(), port)
+        , 0);
+    m_Socket->set_option(boost::asio::socket_base::broadcast(false));
 }
 
 bool UDPClient::IsSocketAvailable()
