@@ -26,6 +26,8 @@
 #include "Network/MultiplayerSnapshotFilter.h"
 #include "Game/Systems/AmmunitionHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
+#include "GUI/ButtonSystem.h"
+#include "GUI/MainMenuSystem.h"
 
 
 Game::Game(int argc, char* argv[])
@@ -71,11 +73,6 @@ Game::Game(int argc, char* argv[])
     m_InputProxy->AddHandler<KeyboardInputHandler>();
     m_InputProxy->AddHandler<MouseInputHandler>();
     m_InputProxy->LoadBindings("Input.ini");
-
-    // Create the root level GUI frame
-    m_FrameStack = new GUI::Frame(m_EventBroker);
-    m_FrameStack->Width = m_Renderer->Resolution().Width;
-    m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
     m_World = new World(m_EventBroker);
@@ -132,6 +129,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -168,7 +167,6 @@ Game::~Game()
         delete m_NetworkServer;
     }
     delete m_World;
-    delete m_FrameStack;
     delete m_InputProxy;
     delete m_InputManager;
     delete m_RenderFrame;
