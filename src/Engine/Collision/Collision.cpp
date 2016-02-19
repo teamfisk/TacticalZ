@@ -207,7 +207,7 @@ bool RayVsModel(const Ray& ray,
         glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        float dist = INFINITY;
+        float dist = outDistance;
         float u;
         float v;
         if (RayVsTriangle(ray, v0, v1, v2, dist, u, v)) {
