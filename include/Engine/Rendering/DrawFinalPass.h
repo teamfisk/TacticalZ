@@ -20,6 +20,7 @@ public:
     void InitializeShaderPrograms();
     void Draw(RenderScene& scene);
     void ClearBuffer();
+    void OnWindowResize();
 
     //Return the texture that is used in later stages to apply the bloom effect
     GLuint BloomTexture() const { return m_BloomTexture; }
@@ -30,7 +31,6 @@ public:
     //Return the framebuffer used in the scene rendering stage.
     FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
     FrameBuffer* FinalPassFrameBufferLowRes() { return &m_FinalPassFrameBufferLowRes; }
-
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;

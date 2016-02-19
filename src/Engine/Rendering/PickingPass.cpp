@@ -15,6 +15,8 @@ PickingPass::~PickingPass()
 
 }
 
+
+
 void PickingPass::InitializeTextures()
 {
     GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
@@ -363,6 +365,15 @@ void PickingPass::ClearPicking()
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_PickingBuffer.Unbind();
+}
+
+
+void PickingPass::OnWindowResize()
+{
+    InitializeTextures();
+    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    m_PickingBuffer.Generate();
 }
 
 PickData PickingPass::Pick(glm::vec2 screenCoord)
