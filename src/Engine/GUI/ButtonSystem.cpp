@@ -56,7 +56,8 @@ bool ButtonSystem::OnMouseRelease(const Events::MouseRelease& e)
             EntityWrapper ent = EntityWrapper(m_World, m_PickData.Entity);
 
             Events::ButtonReleased eReleased;
-            eReleased.Entity = ent;
+            eReleased.EntityName = m_PickEntity.Name();
+            eReleased.Entity = m_PickEntity;
             m_EventBroker->Publish(eReleased);
 
             if(m_World->HasComponent(m_PickData.Entity, "Button")) {
