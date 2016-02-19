@@ -122,7 +122,7 @@ void DrawBloomPass::Draw(GLuint texture)
 }
 
 
-void DrawBloomPass::OnWindowRezise()
+void DrawBloomPass::OnWindowResize()
 {
     GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     m_GaussianFrameBuffer_vert.Generate();
