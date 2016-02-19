@@ -19,7 +19,7 @@ enum class MessageType
     EntityDeleted,
     ComponentDeleted,
     PlayerTransform,
-    Heartbeat,
+    ServerlistRequest,
     Invalid
 };
 

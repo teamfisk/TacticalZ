@@ -2,6 +2,7 @@
 
 Server::Server(World* world, EventBroker* eventBroker, int port)
     : Network(world, eventBroker)
+    , m_ServerlistRequest(13)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
@@ -19,7 +20,6 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     }
     m_Port = port;
     LOG_INFO("Server initialized and bound to port %i", port);
-    m_Heartbeat.Connect("Server", "127.0.0.1", 13);
 }
 
 Server::~Server()
@@ -60,8 +60,23 @@ void Server::Update()
         }
     }
 
+    while (m_ServerlistRequest.IsSocketAvailable()) {
+        Packet packet(MessageType::Invalid);
+        PlayerDefinition localArea;
+        localArea.Endpoint = boost::asio::ip::udp::endpoint();
+        m_ServerlistRequest.Receive(packet, localArea);
+        if(packet.GetMessageType() == MessageType::ServerlistRequest) {
+            packet.ReadPrimitive<int>(); // Pop size
+            packet.ReadPrimitive<int>(); // Pop MsgType
+            packet.ReadPrimitive<int>(); // Pop packet ID
+            int port = packet.ReadPrimitive<int>();
+            std::string address = localArea.Endpoint.address().to_string();
+            parseServerlistRequest(boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string(address), port));
+        }
+    }
+
     // Check if players have disconnected
-    for (int i = 0; i < m_PlayersToDisconnect.size(); i++) {
+     for (int i = 0; i < m_PlayersToDisconnect.size(); i++) {
         disconnect(m_PlayersToDisconnect.at(i));
     }
     m_PlayersToDisconnect.clear();
@@ -77,11 +92,7 @@ void Server::Update()
         sendPing();
         previousePingMessage = currentTime;
     }
-    // Server heartbeat (display server list on clients)
-    if (heartbeatInterval < (1000 * (currentTime - previousHeartbeat) / (double)CLOCKS_PER_SEC)) {
-        sendHeartBeat();
-        previousHeartbeat = currentTime;
-    }
+
     // Time out logic
     if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
         checkForTimeOuts();
@@ -238,15 +249,6 @@ void Server::sendPing()
 }
 
 
-void Server::sendHeartBeat()
-{
-    Packet packet(MessageType::Heartbeat);
-    packet.WriteString("Bob"); // server name
-    packet.WritePrimitive<int>(m_ConnectedPlayers.size());
-    packet.WriteString(m_Reliable.Address());
-    packet.WritePrimitive<int>(m_Reliable.Port());
-    m_Heartbeat.Send(packet);
-}
 
 void Server::checkForTimeOuts()
 {
@@ -340,6 +342,20 @@ void Server::parseDisconnect()
     }
 }
 
+
+void Server::parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint)
+{
+    Packet packet(MessageType::ServerlistRequest);
+    packet.WriteString(m_Reliable.Address());
+    packet.WritePrimitive<int>(m_Reliable.Port());
+    packet.WriteString("SERVERNAME");
+    packet.WritePrimitive<int>(m_ConnectedPlayers.size());
+    //PlayerDefinition pDef;
+    //pDef.Endpoint = boost::asio::ip::udp::endpoint(endpoint.address(), 13);
+
+    m_ServerlistRequest.Send(packet/*, endpoint*/);
+}
+
 void Server::disconnect(PlayerID playerID)
 {
     //broadcast("A player disconnected");
@@ -364,6 +380,7 @@ void Server::parseOnPlayerDamage(Packet & packet)
     e.Victim = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
     e.Damage = packet.ReadPrimitive<double>();
     m_EventBroker->Publish(e);
+
     //LOG_DEBUG("Server::parseOnPlayerDamage: Command is %s. Value is %f. PlayerID is %i.", e.DamageAmount, e.PlayerDamagedID, e.TypeOfDamage.c_str());
 }
 

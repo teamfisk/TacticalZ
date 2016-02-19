@@ -14,6 +14,7 @@ public:
     void Disconnect();
     void Receive(Packet& packet);
     void Send(Packet & packet);
+    void Broadcast(Packet& packet, int port);
     bool IsSocketAvailable();
 private:
     // Assio UDP logic

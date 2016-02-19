@@ -13,7 +13,9 @@ public:
     void AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers);
     void Receive(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet, PlayerDefinition & playerDefinition);
-    void Send(Packet & packet);
+    void Send(Packet & packet); 
+    void Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint);
+    void Broadcast(Packet & packet, int port);
     bool IsSocketAvailable();
 private:
     // UDP logic

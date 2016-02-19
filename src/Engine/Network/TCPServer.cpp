@@ -4,6 +4,8 @@ using namespace boost::asio::ip;
 TCPServer::TCPServer() 
 {
     acceptor = std::unique_ptr<tcp::acceptor>(new tcp::acceptor(m_IOService, tcp::endpoint(tcp::v4(), 27666)));
+    m_Port = GetPort();
+    m_Address = GetAddress();
 }
 
 TCPServer::~TCPServer()
@@ -76,8 +78,12 @@ void TCPServer::Disconnect()
 { 
 }
 
+int TCPServer::GetPort()
+{
+    return acceptor->local_endpoint().port();
+}
 
-std::string TCPServer::Address()
+std::string TCPServer::GetAddress()
 {
     boost::asio::ip::tcp::resolver resolver(m_IOService);
     boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), boost::asio::ip::host_name(), "");
