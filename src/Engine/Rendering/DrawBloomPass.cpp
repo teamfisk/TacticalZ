@@ -19,16 +19,20 @@ void DrawBloomPass::InitializeTextures()
 void DrawBloomPass::InitializeShaderPrograms()
 {
     m_GaussianProgram_horiz = ResourceManager::Load<ShaderProgram>("##GaussianProgramHoriz");
-    m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_horiz.vert.glsl")));
-    m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_horiz.frag.glsl")));
-    m_GaussianProgram_horiz->Compile();
-    m_GaussianProgram_horiz->Link();
+	if (m_GaussianProgram_horiz->GetHandle() == 0) {
+		m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_horiz.vert.glsl")));
+		m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_horiz.frag.glsl")));
+		m_GaussianProgram_horiz->Compile();
+		m_GaussianProgram_horiz->Link();
+	}
 
-    m_GaussianProgram_vert = ResourceManager::Load<ShaderProgram>("##GaussianProgramVert");
-    m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_vert.vert.glsl")));
-    m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_vert.frag.glsl")));
-    m_GaussianProgram_vert->Compile();
-    m_GaussianProgram_vert->Link();
+	m_GaussianProgram_vert = ResourceManager::Load<ShaderProgram>("##GaussianProgramVert");
+	if (m_GaussianProgram_vert->GetHandle() == 0) {
+		m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_vert.vert.glsl")));
+		m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_vert.frag.glsl")));
+		m_GaussianProgram_vert->Compile();
+		m_GaussianProgram_vert->Link();
+	}
 }
 
 
@@ -70,16 +74,18 @@ void DrawBloomPass::Draw(GLuint texture)
 
     //Horizontal pass, first use the given texture then save it to the horizontal framebuffer.
     m_GaussianFrameBuffer_horiz.Bind();
+	GLERROR("m_GaussianFrameBuffer_horiz.Bind()");
     m_GaussianProgram_horiz->Bind();
-
+	GLERROR("m_GaussianProgram_horiz->Bind()");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
-
+	GLERROR("glBindTexture");
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
+	GLERROR("GL_ELEMENT_ARRAY_BUFFER");
     glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
         , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
-
+	GLERROR("HEJ");
     //Iterate some times to make it more gaussian.
     for (int i = 1; i < m_iterations; i++) {
         //Vertical pass
@@ -92,7 +98,7 @@ void DrawBloomPass::Draw(GLuint texture)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
-
+		GLERROR("HEJ LOOP");
         //horizontal pass
 
         m_GaussianFrameBuffer_horiz.Bind();
@@ -112,7 +118,7 @@ void DrawBloomPass::Draw(GLuint texture)
     m_GaussianProgram_vert->Bind();
 
     glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
-
+	GLERROR("GL_TEXTURE_2D");
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
     glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1

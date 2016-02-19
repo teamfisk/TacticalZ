@@ -93,7 +93,12 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0SSAO");
+
+	ImGui::SliderFloat("SSAO sample radius", &m_SSAO_Radius, 0.0001f, 1.0f);
+	ImGui::SliderFloat("SSAO bias", &m_SSAO_Bias, 0.0f, 1.0f);
+	ImGui::SliderFloat("SSAO intensity", &m_SSAO_Intensity, 0.0f, 1.0f);
+	m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Intensity);
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -124,8 +129,10 @@ void Renderer::Draw(RenderFrame& frame)
 
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
+	m_SSAOPass->Draw(m_DrawFinalPass->DepthBuffer(), m_DrawFinalPass->DepthBufferCamera());
+
     if (m_DebugTextureToDraw == 0) {
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), m_SSAOPass->SSAOTexture(), frame.Gamma, frame.Exposure);
     }
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
@@ -145,6 +152,9 @@ void Renderer::Draw(RenderFrame& frame)
     if (m_DebugTextureToDraw == 6) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
+	if (m_DebugTextureToDraw == 7) {
+		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
+	}
 
     m_ImGuiRenderPass->Draw();
     GLERROR("Imgui draw");
@@ -191,4 +201,5 @@ void Renderer::InitializeRenderPasses()
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
+	m_SSAOPass = new SSAOPass(this);
 }

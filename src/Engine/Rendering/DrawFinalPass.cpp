@@ -22,10 +22,21 @@ void DrawFinalPass::InitializeTextures()
 
 void DrawFinalPass::InitializeFrameBuffers()
 {
-    glGenRenderbuffers(1, &m_DepthBuffer);
+
+	glGenTextures(1, &m_DepthBuffer);
+
+	glBindTexture(GL_TEXTURE_2D, m_DepthBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, (int)(m_Renderer->GetViewportSize().Width), (int)(m_Renderer->GetViewportSize().Height), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    /*glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-    GLERROR("RenderBuffer generation");
+    GLERROR("RenderBuffer generation");*/
+
 
     GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
@@ -33,7 +44,7 @@ void DrawFinalPass::InitializeFrameBuffers()
     //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
     //GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
 
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
     //m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
@@ -176,10 +187,12 @@ void DrawFinalPass::InitializeShaderPrograms()
 void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("Pre");
-
+	RenderCamera = scene.Camera;
     DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
     if (scene.ClearDepth) {
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
+		state->Disable(GL_DEPTH_TEST);
+		state->DepthMask(GL_FALSE);
     }
     //TODO: Do we need check for this or will it be per scene always?
     glClearStencil(0x00);
@@ -241,7 +254,7 @@ void DrawFinalPass::Draw(RenderScene& scene)
     DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
     GLERROR("StencilPass");
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_DEPTH_BUFFER_BIT);
 
     stateLowRes->Enable(GL_DEPTH_TEST);
     stateLowRes->StencilFunc(GL_LEQUAL, 1, 0xFF);
@@ -743,17 +756,26 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 
 void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene)
 {
-	GLERROR("Bind 1 uniform");
-	GLint Location_M = glGetUniformLocation(shaderHandle, "M");
-	glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
-	GLERROR("Bind 2 uniform");
-	GLint Location_V = glGetUniformLocation(shaderHandle, "V");
-	glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-	GLERROR("Bind 3 uniform");
-	GLint Location_P = glGetUniformLocation(shaderHandle, "P");
-	glUniformMatrix4fv(Location_P, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-	GLERROR("Bind 4 uniform");
-
+	if (1/*job->Model->IsSkinned()*/) {
+		GLERROR("Bind 1 uniform");
+		GLint Location_M = glGetUniformLocation(shaderHandle, "M");
+		glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
+		GLERROR("Bind 2 uniform");
+		GLint Location_V = glGetUniformLocation(shaderHandle, "V");
+		glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+		GLERROR("Bind 3 uniform");
+		GLint Location_P = glGetUniformLocation(shaderHandle, "P");
+		glUniformMatrix4fv(Location_P, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+		GLERROR("Bind 4 uniform");
+	} else {
+		GLERROR("Bind 1 uniform");
+		GLint Location_M = glGetUniformLocation(shaderHandle, "M");
+		glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
+		GLERROR("Bind 2 uniform");
+		GLint Location_V = glGetUniformLocation(shaderHandle, "PV");
+		glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix()));
+		GLERROR("Bind 3 uniform");
+	}
 	GLint Location_ScreenDimensions = glGetUniformLocation(shaderHandle, "ScreenDimensions");
 	glUniform2f(Location_ScreenDimensions, m_Renderer->Resolution().Width, m_Renderer->Resolution().Height);
 	GLERROR("Bind 5 uniform");
