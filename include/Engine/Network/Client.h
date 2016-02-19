@@ -89,7 +89,7 @@ private:
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void parseOnInputCommand(Packet& packet);
-    void publishInputCommands(double dt);
+    void publishInputCommands();
     void identifyPacketLoss();
     void hasServerTimedOut();
     EntityID createPlayer();

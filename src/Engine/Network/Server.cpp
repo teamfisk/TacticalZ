@@ -1,6 +1,6 @@
 #include "Network/Server.h"
 
-Server::Server(World* world, EventBroker* eventBroker, int port) 
+Server::Server(World* world, EventBroker* eventBroker, int port)
     : Network(world, eventBroker)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
@@ -30,6 +30,7 @@ void Server::Update(double dt)
 {
     m_EventBroker->Process<Server>();
     m_TimeStamp += dt;
+    publishInputCommands();
     PlayerDefinition pd;
     m_Reliable.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
     for (auto& kv : m_ConnectedPlayers) {
@@ -118,7 +119,7 @@ void Server::parseMessageType(Packet& packet)
         parseOnPlayerDamage(packet);
         break;
     case MessageType::PlayerTransform:
-//       parsePlayerTransform(packet);
+        parsePlayerTransform(packet);
         break;
     default:
         break;
@@ -146,6 +147,7 @@ void Server::sendSnapshot()
 {
     Packet packet(MessageType::Snapshot);
     //addInputCommandsToPacket(packet);
+    packet.WritePrimitive(m_TimeStamp/*+ somePingvalue + offset*/);
     addChildrenToPacket(packet, EntityID_Invalid);
     unreliableBroadcast(packet);
 }
@@ -280,7 +282,7 @@ void Server::parseTCPConnect(Packet & packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    
+
     LOG_INFO("Parsing connections");
     // Check if player is already connected
     // Ska vara till lagd i TCPServer receive
@@ -333,6 +335,7 @@ void Server::disconnect(PlayerID playerID)
     e.PlayerID = playerID;
     m_EventBroker->Publish(e);
     //m_World->DeleteEntity(m_ConnectedPlayers[playerID].EntityID);
+    // TODO Kolla Anders crashade efter timeout med break point
     m_ConnectedPlayers[playerID].TCPSocket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     m_ConnectedPlayers[playerID].TCPSocket->close();
     m_World->DeleteEntity(m_ConnectedPlayers[playerID].EntityID);
@@ -375,8 +378,7 @@ bool Server::OnInputCommand(const Events::InputCommand & e)
         }
         isReadingData = !isReadingData;
         m_SaveDataTimer = std::clock();
-    }
-    else if (e.Command == "KickPlayer" && e.Value > 0) {
+    } else if (e.Command == "KickPlayer" && e.Value > 0) {
         kick(0);
     }
 
@@ -467,8 +469,8 @@ void Server::parseOnInputCommand(Packet& packet)
             e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
             e.TimeStamp = packet.ReadPrimitive<double>();
-           /* m_EventBroker->Publish(e);*/
-
+            /* m_EventBroker->Publish(e);*/
+            m_InputCommandsToPublish.push_back(e);
             if (e.Command == "PrimaryFire" || e.Command == "Reload") {
                 m_InputCommandsToBroadcast.push_back(e);
             }
@@ -516,6 +518,20 @@ void Server::parsePlayerTransform(Packet& packet)
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
     return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid();
+}
+
+void Server::publishInputCommands()
+{
+    std::vector<Events::InputCommand> notPublishedEvents;
+    for (int i = 0; i < m_InputCommandsToPublish.size(); i++) {
+        if (m_InputCommandsToPublish.at(i).TimeStamp < m_TimeStamp) {
+            m_EventBroker->Publish(m_InputCommandsToPublish.at(i));
+        } else {
+            LOG_INFO("Did not instantly publish command");
+            notPublishedEvents.push_back(m_InputCommandsToPublish.at(i));
+        }
+    }
+    m_InputCommandsToPublish = notPublishedEvents;
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()

@@ -44,8 +44,8 @@ void Client::Connect(std::string address, int port)
 void Client::Update(double dt)
 {
     m_EventBroker->Process<Client>();
-    m_TimeStamp += dt;
-    publishInputCommands(dt);
+    //m_TimeStamp += dt;
+    publishInputCommands();
     while (m_Unreliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -74,8 +74,9 @@ void Client::Update(double dt)
             sendInputCommands();
             m_TimeSinceSentInputs = std::clock();
         }
-        // HACK: Send absolute player positions for now to avoid desync until we have reliable messages
-        //sendLocalPlayerTransform();
+        // HACK: Send absolute player positions for now to avoid desync until we have reliable messages.
+        // Reliable messages and timestamps did not fix it.
+        sendLocalPlayerTransform();
 
         hasServerTimedOut();
     }
@@ -307,6 +308,13 @@ void Client::parseSnapshot(Packet& packet)
     //    }
     //}
 
+    // Read timestamp
+    double remoteTimestamp = packet.ReadPrimitive<double>();
+    //if (abs(remoteTimestamp - m_TimeStamp) > 0.100) {
+    //    m_TimeStamp = remoteTimestamp;
+    //    LOG_INFO("Resynced remote and local timestamp");
+    //}
+
     // Read world state
     while (packet.DataReadSize() < packet.Size()) {
         EntityID serverEntityID = packet.ReadPrimitive<EntityID>();
@@ -382,12 +390,12 @@ void Client::parseOnInputCommand(Packet & packet)
     }
 }
 
-void Client::publishInputCommands(double dt)
+void Client::publishInputCommands()
 { 
     std::vector<Events::InputCommand> notPublishedEvents;
     for (int i = 0; i < m_ReceivedInputCommands.size(); i++) {
         if (m_ReceivedInputCommands.at(i).TimeStamp < m_TimeStamp) {
-            m_EventBroker->Publish(m_ReceivedInputCommands.at(i).TimeStamp);
+            m_EventBroker->Publish(m_ReceivedInputCommands.at(i));
         }
         else { 
             notPublishedEvents.push_back(m_ReceivedInputCommands.at(i));

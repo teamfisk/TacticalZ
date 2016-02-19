@@ -52,6 +52,7 @@ private:
     int checkTimeOutInterval = 100;
     int m_NextPlayerID = 0;
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
+    std::vector<Events::InputCommand> m_InputCommandsToPublish;
     //Timers
     std::clock_t m_StartPingTime;
     
@@ -82,6 +83,7 @@ private:
     void parseTCPConnect(Packet & packet);
     void parseDisconnect();
     bool shouldSendToClient(EntityWrapper childEntity);
+    void publishInputCommands();
 
     // Debug event
     EventRelay<Server, Events::InputCommand> m_EInputCommand;

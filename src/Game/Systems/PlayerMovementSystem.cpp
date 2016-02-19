@@ -16,14 +16,8 @@ PlayerMovementSystem::~PlayerMovementSystem()
 void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
-    if (IsServer) {
-        for (auto& kv : m_PlayerInputControllers) {
-            updateVelocity(kv.first, dt);
-        }
-    } else {
-        if (LocalPlayer.Valid()) {
-            updateVelocity(LocalPlayer, dt);
-        }
+    if (LocalPlayer.Valid()) {
+        updateVelocity(LocalPlayer, dt);
     }
 }
 
