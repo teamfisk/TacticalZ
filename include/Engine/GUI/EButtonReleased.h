@@ -6,7 +6,10 @@
 namespace Events
 {
 
-struct ButtonReleased : public Event { };
+struct ButtonReleased : public Event {
+    std::string EntityName;
+    EntityWrapper Entity;
+};
 
 }
 

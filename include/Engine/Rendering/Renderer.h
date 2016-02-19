@@ -23,6 +23,7 @@
 #include "imgui/imgui.h"
 #include "TextPass.h"
 #include "Util/CommonFunctions.h"
+#include "Core/PerformanceTimer.h"
 
 class Renderer : public IRenderer
 {

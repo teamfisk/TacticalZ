@@ -7,7 +7,8 @@ namespace Events
 {
 
 struct ButtonClicked : public Event {
-    std::string EntityName = "DEFAULT STRING USED";
+    std::string EntityName;
+    EntityWrapper Entity;
 };
 
 }

@@ -185,16 +185,20 @@ void Game::Tick()
     // Handle input in a weird looking but responsive way
     m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
+    PerformanceTimer::StartTimer("InputManager");
     m_InputManager->Update(dt);
     m_EventBroker->Swap();
+    PerformanceTimer::StartTimerAndStopPrevious("InputProxy");
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
+    PerformanceTimer::StartTimerAndStopPrevious("SoundManager");
     m_SoundManager->Update(dt);
 
     // Update network
+    PerformanceTimer::StartTimerAndStopPrevious("Network");
     m_EventBroker->Process<MultiplayerSnapshotFilter>();
     if (m_NetworkClient != nullptr) {
         m_NetworkClient->Update();
@@ -205,10 +209,14 @@ void Game::Tick()
     //m_SoundManager->Update(dt);
 
     // Iterate through systems and update world!
+    PerformanceTimer::StartTimerAndStopPrevious("SystemPipeline");
     m_EventBroker->Process<SystemPipeline>();
     m_SystemPipeline->Update(dt);
+    PerformanceTimer::StartTimerAndStopPrevious("RendererUpdate");
     m_Renderer->Update(dt);
+    PerformanceTimer::StartTimerAndStopPrevious("RendererDraw");
     m_Renderer->Draw(*m_RenderFrame);
+    PerformanceTimer::StopTimer("RendererDraw");
     m_RenderFrame->Clear();
     m_EventBroker->Swap();
     m_EventBroker->Clear();
