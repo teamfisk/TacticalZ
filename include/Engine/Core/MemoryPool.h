@@ -68,12 +68,13 @@ public:
 
     MemoryPool(const MemoryPool<T>& other)
 		: m_StartAddress(new char[other.m_NumSlots*other.m_Stride])
-		, m_SlotIsAllocated(other.m_NumSlots, false)
+		, m_SlotIsAllocated(other.m_SlotIsAllocated)
+        , m_ExtraMemory()
 		, m_NumSlots(other.m_NumSlots)
+		, m_LowestAllocatedSlot(other.m_LowestAllocatedSlot)
+		, m_NumAllocatedSlots(other.m_NumAllocatedSlots)
 		, m_Stride(other.m_Stride)
-		, m_NumAllocatedSlots(0)
-		, m_CurrentAllocSlot(0)
-		, m_LowestAllocatedSlot(m_NumSlots)
+		, m_CurrentAllocSlot(other.m_CurrentAllocSlot)
     {
         // Copy statically allocated pool
         memcpy(m_StartAddress, other.m_StartAddress, m_NumSlots*m_Stride);
@@ -93,8 +94,9 @@ public:
 			delete[] m_StartAddress;
 			m_StartAddress = nullptr;
 		}
-		for (char* addr : m_ExtraMemory)
-			free(addr);
+        for (char* addr : m_ExtraMemory) {
+            free(addr);
+        }
 		m_ExtraMemory.clear();
 	}
 

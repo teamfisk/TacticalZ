@@ -2,6 +2,7 @@
 #define ComponentWrapper_h__
 
 #include <boost/shared_array.hpp>
+#include <boost/any.hpp>
 #include "../Common.h"
 #include "Entity.h"
 #include "ComponentInfo.h"
@@ -75,8 +76,19 @@ struct ComponentWrapper
     {
         for (auto& name : component.Info.StringFields) {
             std::size_t offset = component.Info.Fields.at(name).Offset;
-            auto& value = *reinterpret_cast<const std::string*>(component.Data + offset);
+            std::string value = *reinterpret_cast<const std::string*>(component.Data + offset);
             new (component.Data + offset) std::string(value);
+        }
+    }
+
+    // This needs to be called to properly free component data, because strings.
+    static void Destroy(ComponentInfo info, char* data)
+    {
+        // Call std::string destructors
+        for (auto& name : info.StringFields) {
+            std::size_t offset = info.Fields.at(name).Offset;
+            auto field = reinterpret_cast<std::string*>(data + offset);
+            field->~basic_string();
         }
     }
     
@@ -122,6 +134,58 @@ struct SharedComponentWrapper : ComponentWrapper
 
 private:
     boost::shared_array<char> m_DataReference;
+};
+
+// TODO: Move this to Tests once entity importing is finished
+class ComponentWrapperFactory
+{
+public:
+    ComponentWrapperFactory() = default;
+    ComponentWrapperFactory(std::string componentTypeName, unsigned int allocation = 0)
+    {
+        m_ComponentInfo.Name = componentTypeName;
+        m_ComponentInfo.Meta = std::make_shared<ComponentInfo::Meta_t>();
+        m_ComponentInfo.Meta->Allocation = allocation;
+    }
+
+    template <typename T>
+    void AddProperty(std::string fieldName, T defaultValue)
+    {
+        auto& field = m_ComponentInfo.Fields[fieldName];
+        field.Name = fieldName;
+        field.Type = typeid(T).name();
+        field.Offset = m_ComponentInfo.Stride;
+        field.Stride = sizeof(T);
+        m_ComponentInfo.FieldsInOrder.push_back(field.Name);
+        if (field.Type == typeid(std::string).name()) {
+            field.Type = "string";
+            m_ComponentInfo.StringFields.push_back(field.Name);
+        }
+        m_ComponentInfo.Stride += sizeof(T);
+        m_DefaultValues.push_back(std::make_pair(field, defaultValue));
+    }
+
+    ComponentInfo& Finalize()
+    {
+        m_ComponentInfo.Defaults = boost::shared_array<char>(new char[m_ComponentInfo.Stride]);
+        std::size_t offset = 0;
+        for (auto& pair : m_DefaultValues) {
+            if (pair.first.Type == "string") {
+                new (m_ComponentInfo.Defaults.get() + offset) std::string(*reinterpret_cast<std::string*>(pair.second.Data.get()));
+            } else {
+                memcpy(m_ComponentInfo.Defaults.get() + offset, pair.second.Data.get(), pair.second.Size);
+            }
+            offset += pair.second.Size;
+        }
+
+        return m_ComponentInfo;
+    }
+
+    operator ComponentInfo&() { return Finalize(); }
+
+private:
+    ComponentInfo m_ComponentInfo;
+    std::vector<std::pair<ComponentInfo::Field_t, Any>> m_DefaultValues;
 };
 
 #endif

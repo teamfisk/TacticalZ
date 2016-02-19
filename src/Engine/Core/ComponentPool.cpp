@@ -32,11 +32,19 @@ ComponentPoolForwardIterator& ComponentPoolForwardIterator::operator++()
 
 ComponentPool::ComponentPool(const ComponentPool& other)
     : m_ComponentInfo(other.m_ComponentInfo)
-    , m_Pool(other.m_Pool) 
+    , m_Pool(other.m_Pool)
+    , m_EntityToComponent()
 {
+    // Update EntityToComponent pointers
+    for (char& ptr : m_Pool) {
+        EntityID entity = *reinterpret_cast<EntityID*>(&ptr);
+        m_EntityToComponent[entity] = &ptr;
+    }
+
     // Duplicate strings
     for (auto& name : m_ComponentInfo.StringFields) {
         for (auto& c : *this) {
+            std::string& val = c[name];
             ComponentWrapper::SolidifyStrings(c);
         }
     }
@@ -44,11 +52,9 @@ ComponentPool::ComponentPool(const ComponentPool& other)
 
 ComponentPool::~ComponentPool()
 {
-    // Call std::string destructors
-    for (auto& name : m_ComponentInfo.StringFields) {
-        for (auto& c : *this) {
-            c.Field<std::string>(name).~basic_string();
-        }
+    // Destroy component data
+    for (auto& c : *this) {
+        ComponentWrapper::Destroy(c.Info, c.Data);
     }
 }
 
@@ -86,6 +92,7 @@ bool ComponentPool::KnowsEntity(EntityID ent)
 
 void ComponentPool::Delete(ComponentWrapper& wrapper)
 {
+    ComponentWrapper::Destroy(wrapper.Info, wrapper.Data);
     m_EntityToComponent.erase(wrapper.EntityID);
     m_Pool.Free(wrapper.Data - sizeof(EntityID));
 }

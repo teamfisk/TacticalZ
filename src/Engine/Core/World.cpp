@@ -11,14 +11,18 @@ World::~World()
 
 World::World(const World& other)
     : m_EventBroker(other.m_EventBroker)
+    , m_CurrentEntityID(other.m_CurrentEntityID)
+    , m_EntityParents(other.m_EntityParents)
+    , m_EntityChildren(other.m_EntityChildren)
+    , m_EntityNames(other.m_EntityNames)
 {
     // Deep copy component pools
-    for (auto& kv : m_ComponentPools) {
+    for (auto& kv : other.m_ComponentPools) {
         m_ComponentPools[kv.first] = new ComponentPool(*kv.second);
     }
 }
 
-EntityID World::CreateEntity(EntityID parent /*= 0*/)
+EntityID World::CreateEntity(EntityID parent /*= EntityID_Invalid*/)
 {
     EntityID newEntity = generateEntityID();
     if (newEntity == parent) {
@@ -53,11 +57,8 @@ ComponentWrapper World::AttachComponent(EntityID entity, const std::string& comp
     ComponentPool* pool = m_ComponentPools.at(componentType);
     const ComponentInfo& ci = pool->ComponentInfo();
 
-    // Allocate space for the component
+    // Allocate component with default values
     ComponentWrapper c = pool->Allocate(entity);
-    // Write default values
-    memcpy(c.Data, ci.Defaults.get(), ci.Stride);
-    ComponentWrapper::SolidifyStrings(c);
 
     return c;
 }
