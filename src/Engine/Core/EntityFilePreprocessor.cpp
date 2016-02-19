@@ -185,6 +185,9 @@ void EntityFilePreprocessor::parseComponentInfo()
             field.Offset = fieldOffset;
             field.Stride = stride;
             compInfo.FieldsInOrder.push_back(name);
+            if (field.Type == "string") {
+                compInfo.StringFields.push_back(name);
+            }
             fieldOffset += stride;
         }
 
@@ -201,7 +204,7 @@ void EntityFilePreprocessor::parseDefaults()
 
     for (auto& ci : m_ComponentInfo) {
         // Allocate memory for default values
-        ci.second.Defaults = std::shared_ptr<char>(new char[ci.second.Stride]);
+        ci.second.Defaults = boost::shared_array<char>(new char[ci.second.Stride], std::bind(&ComponentWrapper::Destroy, ci.second, std::placeholders::_1));
         memset(ci.second.Defaults.get(), 0, ci.second.Stride);
 
         std::string componentName = ci.first;
