@@ -24,7 +24,7 @@ public:
 
     void Draw(GLuint texture);
 
-    void OnWindowRezise();
+    void OnWindowResize();
 
     //Getters
     //Return the blurred result of the texture that was sent into draw
