@@ -6,7 +6,9 @@
 namespace Events
 {
 
-struct ButtonReleased : public Event { };
+struct ButtonReleased : public Event {
+    EntityWrapper Entity;
+};
 
 }
 
