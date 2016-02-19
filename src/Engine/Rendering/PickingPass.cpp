@@ -371,7 +371,9 @@ void PickingPass::ClearPicking()
 void PickingPass::OnWindowResize()
 {
     InitializeTextures();
-    InitializeFrameBuffers();
+    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    m_PickingBuffer.Generate();
 }
 
 PickData PickingPass::Pick(glm::vec2 screenCoord)

@@ -277,7 +277,22 @@ void DrawFinalPass::ClearBuffer()
 
 void DrawFinalPass::OnWindowResize()
 {
-    InitializeFrameBuffers();
+    //InitializeFrameBuffers();
+    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+
+    GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    m_FinalPassFrameBuffer.Generate();
+
+
+    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBufferLowRes);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate));
+
+    GenerateTexture(&m_SceneTextureLowRes, GL_CLAMP_TO_EDGE, GL_NEAREST, glm::vec2((int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate)), GL_RGB16F, GL_RGB, GL_FLOAT);
+    GenerateTexture(&m_BloomTextureLowRes, GL_CLAMP_TO_EDGE, GL_NEAREST, glm::vec2((int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate)), GL_RGB16F, GL_RGB, GL_FLOAT);
+    m_FinalPassFrameBufferLowRes.Generate();
+    GLERROR("Error changing texture resolutions");
 }
 
 void DrawFinalPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const

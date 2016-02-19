@@ -24,6 +24,8 @@ public:
 
     void Draw(GLuint texture);
 
+    void OnWindowRezise();
+
     //Getters
     //Return the blurred result of the texture that was sent into draw
     GLuint GaussianTexture() const { return m_GaussianTexture_vert; }
