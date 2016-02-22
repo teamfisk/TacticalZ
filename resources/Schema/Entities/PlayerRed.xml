@@ -365,7 +365,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>1.9065361003781902</Time1>
+              <Time1>1.2667383999985162</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -386,8 +386,8 @@
                   <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.120430663" Y="-0.228841513" Z="-0.181454539"/>
-                  <Orientation X="0.010404693" Y="-0.00268177059" Z="0.0428443737"/>
+                  <Position X="0.120430425" Y="-0.242105931" Z="-0.181454822"/>
+                  <Orientation X="0.010404665" Y="-0.00268179877" Z="0.0428443067"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -494,7 +494,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>0.62178782386743592</Time1>
+          <Time1>0.26532318661337229</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -520,8 +520,8 @@
               <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0.162262663" Y="1.02555525" Z="-0.215705663"/>
-              <Orientation X="-0.0629267767" Y="-0.05206763" Z="0.118655257"/>
+              <Position X="0.159282878" Y="1.0300566" Z="-0.216084003"/>
+              <Orientation X="-0.0626799241" Y="-0.0390551724" Z="0.119761385"/>
             </c:Transform>
           </Components>
           <Children>
@@ -591,31 +591,25 @@
       </Components>
       <Children/>
     </Entity>
-    <Entity name="Indicator">
+    <Entity>
       <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
+          <DepthSort>false</DepthSort>
+          <GlowMap></GlowMap>
+          <Color A="1" B="0" G="0" R="1"/>
+        </c:Sprite>
+        <c:HiddenForLocalPlayer/>
+        <c:SpriteIndicator>
+          <MinScale>50</MinScale>
+          <VisibleForSingleTeamOnly>true</VisibleForSingleTeamOnly>
+        </c:SpriteIndicator>
         <c:Transform>
           <Position X="0" Y="1.84000003" Z="0"/>
+          <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
         </c:Transform>
       </Components>
-      <Children>
-        <Entity>
-          <Components>
-            <c:Sprite>
-              <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
-              <DepthSort>false</DepthSort>
-              <GlowMap></GlowMap>
-              <Color A="1" B="0" G="0" R="1"/>
-            </c:Sprite>
-            <c:HiddenForLocalPlayer/>
-            <c:SpriteIndicator>
-              <MinScale>30</MinScale>
-              <VisibleForSingleTeamOnly>true</VisibleForSingleTeamOnly>
-            </c:SpriteIndicator>
-            <c:Transform/>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
+      <Children/>
     </Entity>
   </Children>
 
