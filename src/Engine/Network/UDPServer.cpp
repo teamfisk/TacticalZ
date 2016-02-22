@@ -15,6 +15,7 @@ UDPServer::~UDPServer()
 
 void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
 {
+    packet.UpdateSize();
     try {
         int bytesSent = m_Socket->send_to(
             boost::asio::buffer(packet.Data(), packet.Size()),
@@ -28,6 +29,7 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
 // Send back to endpoint of received packet
 void UDPServer::Send(Packet & packet)
 {
+    packet.UpdateSize();
     m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
@@ -62,7 +64,7 @@ void UDPServer::Broadcast(Packet & packet, int port)
 
 void UDPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {
-    int bytesRead = readBuffer(m_ReadBuffer);
+    int bytesRead = readBuffer();
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
@@ -74,17 +76,47 @@ bool UDPServer::IsSocketAvailable()
     return m_Socket->available();
 }
 
-int UDPServer::readBuffer(char* data)
+int UDPServer::readBuffer()
 {
-    boost::system::error_code error = boost::asio::error::host_not_found;
-    unsigned int length = m_Socket->receive_from(
-        boost::asio::buffer((void*)data
-            , BUFFERSIZE)
-        , m_ReceiverEndpoint, 0, error);
-    if (error) {
-        LOG_WARNING(error.message().c_str());
+    //boost::system::error_code error = boost::asio::error::host_not_found;
+    //unsigned int length = m_Socket->receive_from(
+    //    boost::asio::buffer((void*)data
+    //        , BUFFERSIZE)
+    //    , m_ReceiverEndpoint, 0, error);
+    //if (error) {
+    //    LOG_WARNING(error.message().c_str());
+    //}
+    //return length;
+    if (!m_Socket) {
+        return 0;
     }
-    return length;
+    boost::system::error_code error;
+    // Read size of packet
+     m_Socket->receive_from(boost
+        ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
+        m_ReceiverEndpoint, boost::asio::ip::udp::socket::message_peek, error);
+    unsigned int sizeOfPacket = 0;
+    memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
+
+    // if the buffer is to small increase the size of it
+    if (sizeOfPacket > m_BufferSize) {
+        delete[] m_ReadBuffer;
+        m_ReadBuffer = new char[sizeOfPacket];
+        m_BufferSize = sizeOfPacket;
+    }
+
+    // Read the rest of the message
+    size_t bytesReceived = m_Socket->receive_from(boost
+        ::asio::buffer((void*)(m_ReadBuffer),
+            sizeOfPacket),
+        m_ReceiverEndpoint, 0, error);
+        if (error) {
+            //LOG_ERROR("receive: %s", error.message().c_str());
+        }
+        if (sizeOfPacket > 1000000)
+            LOG_WARNING("The packets received are bigger than 1MB");
+
+        return bytesReceived;
 }
 
 void UDPServer::AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers)

@@ -28,7 +28,7 @@ private:
     void handle_accept(boost::shared_ptr<boost::asio::ip::tcp::socket> socket,
         int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers,
         const boost::system::error_code& error);
-    int readBuffer(char* data, PlayerDefinition& playerDefinition);
+    int readBuffer(PlayerDefinition& playerDefinition);
     int GetPort();
     std::string GetAddress();
     int m_Port = 0;

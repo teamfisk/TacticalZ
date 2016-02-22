@@ -56,7 +56,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers
     std::clock_t m_StartPingTime;
-    
+
     // Packet loss logic
     PacketID m_PacketID = 0;
     PacketID m_PreviousPacketID = 0;
@@ -66,6 +66,7 @@ private:
     void reliableBroadcast(Packet& packet);
     void unreliableBroadcast(Packet& packet);
     void sendSnapshot();
+    void addPlayersToPacket(Packet& packet, EntityID entityID);
     void addChildrenToPacket(Packet& packet, EntityID entityID);
     void addInputCommandsToPacket(Packet& packet);
     void sendPing();
@@ -79,7 +80,7 @@ private:
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
-    void parsePing();    
+    void parsePing();
     void parseUDPConnect(Packet & packet);
     void parseTCPConnect(Packet & packet);
     void parseDisconnect();

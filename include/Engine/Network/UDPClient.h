@@ -21,7 +21,7 @@ private:
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::shared_ptr<boost::asio::ip::udp::socket> m_Socket;
-    int readBuffer(char* data);
+    int readBuffer();
     PacketID m_SendPacketID = 0;
 };
 

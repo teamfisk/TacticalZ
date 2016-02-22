@@ -9,8 +9,7 @@ TCPServer::TCPServer()
 }
 
 TCPServer::~TCPServer()
-{
-}
+{ }
 
 void TCPServer::AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers)
 {
@@ -33,7 +32,7 @@ PlayerID GetPlayerIDFromEndpoint(const std::map<PlayerID, PlayerDefinition>& con
     return -1;
 }
 
-void TCPServer::handle_accept(boost::shared_ptr<tcp::socket> socket, 
+void TCPServer::handle_accept(boost::shared_ptr<tcp::socket> socket,
     int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers,
     const boost::system::error_code& error)
 {
@@ -53,8 +52,8 @@ void TCPServer::handle_accept(boost::shared_ptr<tcp::socket> socket,
 
 void TCPServer::Send(Packet & packet, PlayerDefinition & playerDefinition)
 {
+    packet.UpdateSize();
     try {
-        packet.UpdateSize();
         int bytesSent = playerDefinition.TCPSocket->send(
             boost::asio::buffer(packet.Data(), packet.Size()),
             0);
@@ -75,7 +74,7 @@ void TCPServer::Send(Packet & packet)
 }
 
 void TCPServer::Disconnect()
-{ 
+{
 }
 
 int TCPServer::GetPort()
@@ -92,34 +91,75 @@ std::string TCPServer::GetAddress()
     return endpoint.address().to_string().c_str();
 }
 
+//void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
+//{
+//    int bytesRead = readBuffer(m_ReadBuffer, playerDefinition);
+//    if (bytesRead > 0) {
+//        packet.ReconstructFromData(m_ReadBuffer, bytesRead);
+//    }
+//    lastReceivedSocket = playerDefinition.TCPSocket;
+//}
+//
+//int TCPServer::readBuffer(char* data, PlayerDefinition & playerDefinition)
+//{
+//    if (!playerDefinition.TCPSocket) {
+//        return 0;
+//    }
+//    boost::system::error_code error;
+//    // Read size of packet
+//    size_t bytesReceived = playerDefinition.TCPSocket->read_some(boost
+//        ::asio::buffer((void*)data, sizeof(int)),
+//        error);
+//    int sizeOfPacket = 0;
+//    memcpy(&sizeOfPacket, data, sizeof(int));
+//
+//    // Read the rest of the message
+//    bytesReceived += playerDefinition.TCPSocket->read_some(boost
+//        ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
+//        error);
+//    if (error) {
+//        //LOG_ERROR("receive: %s", error.message().c_str());
+//    }
+//    return bytesReceived;
+//}
+
 void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {
-    int bytesRead = readBuffer(m_ReadBuffer, playerDefinition);
+    int bytesRead = readBuffer(playerDefinition);
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
     lastReceivedSocket = playerDefinition.TCPSocket;
 }
 
-int TCPServer::readBuffer(char* data, PlayerDefinition & playerDefinition)
+int TCPServer::readBuffer(PlayerDefinition & playerDefinition)
 {
     if (!playerDefinition.TCPSocket) {
         return 0;
     }
     boost::system::error_code error;
     // Read size of packet
-    size_t bytesReceived = playerDefinition.TCPSocket->read_some(boost
-        ::asio::buffer((void*)data, sizeof(int)),
-        error);
-    int sizeOfPacket = 0;
-    memcpy(&sizeOfPacket, data, sizeof(int));
+    playerDefinition.TCPSocket->receive(boost
+        ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
+        boost::asio::ip::tcp::socket::message_peek, error);
+    unsigned int sizeOfPacket = 0;
+    memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
 
+    // if the buffer is to small increase the size of it
+    if (sizeOfPacket > m_BufferSize) {
+        delete[] m_ReadBuffer;
+        m_ReadBuffer = new char[sizeOfPacket];
+        m_BufferSize = sizeOfPacket;
+    }
     // Read the rest of the message
-    bytesReceived += playerDefinition.TCPSocket->read_some(boost
-        ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
+    size_t bytesReceived = playerDefinition.TCPSocket->read_some(boost
+        ::asio::buffer((void*)(m_ReadBuffer), sizeOfPacket),
         error);
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
+    if (sizeOfPacket > 1000000)
+        LOG_WARNING("The packets received are bigger than 1MB");
+
     return bytesReceived;
 }

@@ -56,32 +56,62 @@ void TCPClient::Disconnect()
 
 void TCPClient::Receive(Packet& packet)
 {
-    size_t bytesRead = readBuffer(m_ReadBuffer);
+    size_t bytesRead = readBuffer();
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
 }
 
-size_t TCPClient::readBuffer(char* data)
+size_t TCPClient::readBuffer()
 { 
+    //if (!m_Socket) {
+    //    return 0;
+    //}
+    //boost::system::error_code error;
+    //// Read size of packet
+    //size_t bytesReceived = m_Socket->read_some(boost
+    //    ::asio::buffer((void*)data, sizeof(int)),
+    //    error);
+    //int sizeOfPacket = 0;
+    //memcpy(&sizeOfPacket, data, sizeof(int));
+
+    //// Read the rest of the message
+    //bytesReceived += m_Socket->read_some(boost
+    //    ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
+    //    error);
+    //if (error) {
+    //    //LOG_ERROR("receive: %s", error.message().c_str());
+    //}
+    //return bytesReceived;
+
     if (!m_Socket) {
         return 0;
     }
     boost::system::error_code error;
     // Read size of packet
-    size_t bytesReceived = m_Socket->read_some(boost
-        ::asio::buffer((void*)data, sizeof(int)),
-        error);
-    int sizeOfPacket = 0;
-    memcpy(&sizeOfPacket, data, sizeof(int));
+    m_Socket->receive(boost
+        ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
+        boost::asio::ip::tcp::socket::message_peek, error);
+    unsigned int sizeOfPacket = 0;
+    memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
 
+    // if the buffer is to small increase the size of it
+    // TODO if message is huge 1 time the buffer will not decrease.
+    if (sizeOfPacket > m_BufferSize) {
+        delete[] m_ReadBuffer;
+        m_ReadBuffer = new char[sizeOfPacket];
+        m_BufferSize = sizeOfPacket;
+    }
     // Read the rest of the message
-    bytesReceived += m_Socket->read_some(boost
-        ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
+    size_t bytesReceived = m_Socket->read_some(boost
+        ::asio::buffer((void*)(m_ReadBuffer), sizeOfPacket),
         error);
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
+    if (sizeOfPacket > 1000000)
+        LOG_WARNING("The packets received are bigger than 1MB");
+
     return bytesReceived;
 }
 
