@@ -144,7 +144,7 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="57.7363472" Y="2.38900018" Z="79.5"/>
+          <Position X="57.7363472" Y="4.98900032" Z="79.5"/>
         </c:Transform>
       </Components>
       <Children>
@@ -206,14 +206,16 @@
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="-60.2567062" Y="3.4000001" Z="-78.1000061"/>
+          <Position X="-60.2567062" Y="9.40000057" Z="-78.1000061"/>
         </c:Transform>
       </Components>
       <Children>
         <Entity>
           <Components>
             <c:SpawnPoint/>
-            <c:Transform/>
+            <c:Transform>
+              <Position X="0" Y="2.10000014" Z="0"/>
+            </c:Transform>
           </Components>
           <Children/>
         </Entity>

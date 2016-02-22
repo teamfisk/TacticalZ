@@ -31,7 +31,9 @@ private:
     EventBroker* m_EventBroker;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    int healthsID;
+    int m_PlayersID;
+    bool m_TestStage1Success = false;
+
 };
 
 #endif

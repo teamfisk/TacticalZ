@@ -21,6 +21,7 @@ public:
     void SetSSBOSizes();
     void CullLights(RenderScene& scene);
     void FillLightList(RenderScene& scene);
+    void OnWindowResize();
 
     GLuint FrustumSSBO() const { return m_FrustumSSBO; }
     GLuint LightSSBO() const { return m_LightSSBO; }

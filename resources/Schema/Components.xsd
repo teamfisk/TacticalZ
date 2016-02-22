@@ -41,5 +41,8 @@
 	<xs:include schemaLocation="Components/Shielded.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointHUD.xsd"/>
 	<xs:include schemaLocation="Components/AmmunitionHUD.xsd"/>
+	<xs:include schemaLocation="Components/Menu.xsd"/>
 	<xs:include schemaLocation="Components/KillFeed.xsd"/>
+	<xs:include schemaLocation="Components/Page.xsd"/>
+	<xs:include schemaLocation="Components/Button.xsd"/>
 </xs:schema>

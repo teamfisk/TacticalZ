@@ -1,5 +1,7 @@
 #include "Rendering/Renderer.h"
 
+std::unordered_map<GLFWwindow*, Renderer*> Renderer::m_WindowToRenderer;
+
 void Renderer::Initialize()
 {
 	InitializeWindow();
@@ -12,12 +14,22 @@ void Renderer::Initialize()
     m_TextPass = new TextPass();
     m_TextPass->Initialize();
 
-
    /* m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");*/
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
+}
+
+void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    Renderer* currentRenderer = m_WindowToRenderer[window];
+    currentRenderer->m_ViewportSize = Rectangle(width, height);
+    currentRenderer->m_DrawFinalPass->OnWindowResize();
+    currentRenderer->m_LightCullingPass->OnWindowResize();
+    currentRenderer->m_PickingPass->OnWindowResize();
+    currentRenderer->m_DrawBloomPass->OnWindowResize();
 }
 
 void Renderer::InitializeWindow()
@@ -39,6 +51,7 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLFW: Failed to create window");
 		exit(EXIT_FAILURE);
 	}
+    glfwSetFramebufferSizeCallback(m_Window, &glfwFrameBufferCallback);
 	glfwMakeContextCurrent(m_Window);
 
 	// GL version info
@@ -59,8 +72,10 @@ void Renderer::InitializeWindow()
 		exit(EXIT_FAILURE);
 	}
 
+    m_WindowToRenderer[m_Window] = this;
+
     int windowSize[2];
-    glfwGetWindowSize(m_Window, &windowSize[0], &windowSize[1]);
+    glfwGetFramebufferSize(m_Window, &windowSize[0], &windowSize[1]);
     m_ViewportSize = Rectangle(windowSize[0], windowSize[1]);
 }
 
@@ -99,34 +114,48 @@ void Renderer::Draw(RenderFrame& frame)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Clear other buffers
+    PerformanceTimer::StartTimer("Renderer-ClearBuffers");
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
+    PerformanceTimer::StopTimer("Renderer-ClearBuffers");
 
     for (auto scene : frame.RenderScenes){
         
+        PerformanceTimer::StartTimer("Renderer-Depth");
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Drawing PickingPass");
         m_PickingPass->Draw(*scene);
         GLERROR("Drawing pickingpass");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Generate Frustrums");
         m_LightCullingPass->GenerateNewFrustum(*scene);
         GLERROR("Generate frustums");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Filling Light List");
         m_LightCullingPass->FillLightList(*scene);
         GLERROR("Filling light list");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Light Culling");
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
         m_DrawFinalPass->Draw(*scene);
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Text");
         m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
         GLERROR("Draw Text");
-
+        PerformanceTimer::StopTimer("Renderer-Draw Text");
     }
+    PerformanceTimer::StartTimer("Renderer-Draw Bloom");
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
+    PerformanceTimer::StopTimer("Renderer-Draw Bloom");
     if (m_DebugTextureToDraw == 0) {
+        PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
         m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
+        PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
+    PerformanceTimer::StartTimer("Renderer-Misc Debug Draws");
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
     }
@@ -145,10 +174,13 @@ void Renderer::Draw(RenderFrame& frame)
     if (m_DebugTextureToDraw == 6) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
+    PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
 
+    PerformanceTimer::StartTimer("Renderer-ImGuiRenderPass");
     m_ImGuiRenderPass->Draw();
     GLERROR("Imgui draw");
     glfwSwapBuffers(m_Window);
+    PerformanceTimer::StopTimer("Renderer-ImGuiRenderPass");
 }
 
 PickData Renderer::Pick(glm::vec2 screenCoord)

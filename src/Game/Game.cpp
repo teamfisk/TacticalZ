@@ -26,6 +26,8 @@
 #include "Network/MultiplayerSnapshotFilter.h"
 #include "Game/Systems/AmmunitionHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
+#include "GUI/ButtonSystem.h"
+#include "GUI/MainMenuSystem.h"
 
 
 Game::Game(int argc, char* argv[])
@@ -71,11 +73,6 @@ Game::Game(int argc, char* argv[])
     m_InputProxy->AddHandler<KeyboardInputHandler>();
     m_InputProxy->AddHandler<MouseInputHandler>();
     m_InputProxy->LoadBindings("Input.ini");
-
-    // Create the root level GUI frame
-    m_FrameStack = new GUI::Frame(m_EventBroker);
-    m_FrameStack->Width = m_Renderer->Resolution().Width;
-    m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
     m_World = new World(m_EventBroker);
@@ -132,6 +129,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -168,7 +167,6 @@ Game::~Game()
         delete m_NetworkServer;
     }
     delete m_World;
-    delete m_FrameStack;
     delete m_InputProxy;
     delete m_InputManager;
     delete m_RenderFrame;
@@ -187,16 +185,20 @@ void Game::Tick()
     // Handle input in a weird looking but responsive way
     m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
+    PerformanceTimer::StartTimer("InputManager");
     m_InputManager->Update(dt);
     m_EventBroker->Swap();
+    PerformanceTimer::StartTimerAndStopPrevious("InputProxy");
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
+    PerformanceTimer::StartTimerAndStopPrevious("SoundManager");
     m_SoundManager->Update(dt);
 
     // Update network
+    PerformanceTimer::StartTimerAndStopPrevious("Network");
     m_EventBroker->Process<MultiplayerSnapshotFilter>();
     if (m_NetworkClient != nullptr) {
         m_NetworkClient->Update();
@@ -207,10 +209,14 @@ void Game::Tick()
     //m_SoundManager->Update(dt);
 
     // Iterate through systems and update world!
+    PerformanceTimer::StartTimerAndStopPrevious("SystemPipeline");
     m_EventBroker->Process<SystemPipeline>();
     m_SystemPipeline->Update(dt);
+    PerformanceTimer::StartTimerAndStopPrevious("RendererUpdate");
     m_Renderer->Update(dt);
+    PerformanceTimer::StartTimerAndStopPrevious("RendererDraw");
     m_Renderer->Draw(*m_RenderFrame);
+    PerformanceTimer::StopTimer("RendererDraw");
     m_RenderFrame->Clear();
     m_EventBroker->Swap();
     m_EventBroker->Clear();
