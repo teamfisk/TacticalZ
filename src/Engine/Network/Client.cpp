@@ -488,7 +488,7 @@ void Client::parsePlayerDamage(Packet& packet)
     Events::PlayerDamage e;
     PlayerID victimID = packet.ReadPrimitive<EntityID>();
     PlayerID inflictorID = packet.ReadPrimitive<EntityID>();
-    if (!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)) {
+    if(!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)){
         return;
     }
     e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(victimID));
