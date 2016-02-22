@@ -52,39 +52,38 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
             continue;
         }
 
-        std::string diffuseResource = cSprite["DiffuseTexture"];
-        std::string glowResource = cSprite["GlowMap"];
-        bool depthSorted = cSprite["DepthSort"];
-        if (diffuseResource.empty() && glowResource.empty()) {
-            continue;
-        }
-
-        float fillPercentage = 0.f;
-        glm::vec4 fillColor = glm::vec4(0);
-        if (world->HasComponent(entity.ID, "Fill")) {
-            auto fillComponent = world->GetComponent(entity.ID, "Fill");
-            fillPercentage = (float)(double)fillComponent["Percentage"];
-            fillColor = (glm::vec4)fillComponent["Color"];
-        }
-
 		glm::mat4 modelMatrix;
-		
+
+		// See a sprite is an SpriteIndicator
 		bool isIndicator = false;
-		if (world->HasComponent(entity.ID, "Indicator") || entity.FirstParentWithComponent("Indicator").Valid())
+		if (world->HasComponent(entity.ID, "SpriteIndicator"))
 		{
-			EntityWrapper EntityWithIndicator;
-			if (world->HasComponent(entity.ID, "Indicator")) {
-				EntityWithIndicator = entity;
-			}
-			else {
-				EntityWithIndicator = entity.FirstParentWithComponent("Indicator");
-			}
-			auto indicator = EntityWithIndicator["Indicator"];
+			auto indicator = entity["SpriteIndicator"];
 
 			float minScale = (float)(double)indicator["MinScale"];
+			bool hasTeam = indicator["VisibleForSingleTeamOnly"];
 			isIndicator = true;
 			glm::vec3 pos = Transform::AbsolutePosition(entity);
 
+
+			EntityWrapper entityTeam;
+			if (hasTeam && (entity.HasComponent("Team") || entity.FirstParentWithComponent("Team").Valid()) && m_LocalPlayer.World != nullptr) {
+				if (!entity.HasComponent("Team")) {
+					entityTeam = entity.FirstParentWithComponent("Team");
+				}
+				else {
+					entityTeam = entity;
+				}
+
+				ComponentWrapper& entityTeamComponent = entityTeam["Team"];
+				ComponentWrapper& localComponent = m_LocalPlayer["Team"];
+				int entityTeamInt = entityTeamComponent["Team"];
+				int localComponentInt = localComponent["Team"];
+				int SpectatorInt = localComponent["Team"].Enum("Spectator");
+				if (entityTeamInt != localComponentInt && localComponentInt != SpectatorInt) {
+					continue;
+				}
+			}
 
 			// Code for check if sprite is inside or outside of screen
 			//glm::vec4 projectedPos = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * glm::vec4(pos, 1.0f);
@@ -142,9 +141,26 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 				tranformationMatrix = tranformationMatrix * glm::scale(glm::vec3(minScale / diag, minScale / diag, minScale / diag));
 			}
 			modelMatrix = tranformationMatrix;
-		} else {
+		}
+		else {
 			modelMatrix = Transform::ModelMatrix(entity.ID, world);
 		}
+
+
+        std::string diffuseResource = cSprite["DiffuseTexture"];
+        std::string glowResource = cSprite["GlowMap"];
+        bool depthSorted = cSprite["DepthSort"];
+        if (diffuseResource.empty() && glowResource.empty()) {
+            continue;
+        }
+
+        float fillPercentage = 0.f;
+        glm::vec4 fillColor = glm::vec4(0);
+        if (world->HasComponent(entity.ID, "Fill")) {
+            auto fillComponent = world->GetComponent(entity.ID, "Fill");
+            fillPercentage = (float)(double)fillComponent["Percentage"];
+            fillColor = (glm::vec4)fillComponent["Color"];
+        }
 
         std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted, isIndicator));
         
@@ -168,30 +184,6 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
     ) {
         return false;
     }
-
-	// If a sprite is an Indicator, it's not local on player and object is in the same team, then dispaly it	
-	if (
-		entity.HasComponent("Indicator")
-		&& !entity.IsChildOf(m_LocalPlayer)
-		&& (entity.HasComponent("Team") || entity.FirstParentWithComponent("Team").Valid())
-		&& entity.HasComponent("Sprite")
-		&& m_LocalPlayer.World != nullptr
-	) {
-		EntityWrapper entityTeam;
-		if (!entity.HasComponent("Team")) {
-			entityTeam = entity.FirstParentWithComponent("Team");
-		} else {
-			entityTeam = entity;
-		}
-		ComponentWrapper& entityTeamComponent = entityTeam["Team"];
-		ComponentWrapper& localComponent = m_LocalPlayer["Team"];
-		int entityTeamInt = entityTeamComponent["Team"];
-		int localComponentInt = localComponent["Team"];
-		int SpectatorInt = localComponent["Team"].Enum("Spectator");
-		if (entityTeamInt != localComponentInt && localComponentInt != SpectatorInt) {
-			return false;
-		}
-	}
     return true;
 }
 
