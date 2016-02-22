@@ -6,4 +6,6 @@ NetworkClient::NetworkClient()
 }
 
 NetworkClient::~NetworkClient()
-{ }
+{ 
+    delete[] m_ReadBuffer;
+}

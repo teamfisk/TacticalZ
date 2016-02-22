@@ -50,10 +50,8 @@ void TCPServer::handle_accept(boost::shared_ptr<tcp::socket> socket,
 
 void TCPServer::Send(Packet & packet, PlayerDefinition & playerDefinition)
 {
-    if (!playerDefinition.TCPSocket)
-        return;
+    packet.UpdateSize();
     try {
-        packet.UpdateSize();
         int bytesSent = playerDefinition.TCPSocket->send(
             boost::asio::buffer(packet.Data(), packet.Size()),
             0);

@@ -96,6 +96,7 @@ size_t TCPClient::readBuffer()
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
 
     // if the buffer is to small increase the size of it
+    // TODO if message is huge 1 time the buffer will not decrease.
     if (sizeOfPacket > m_BufferSize) {
         delete[] m_ReadBuffer;
         m_ReadBuffer = new char[sizeOfPacket];

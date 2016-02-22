@@ -6,4 +6,6 @@ NetworkServer::NetworkServer()
 }
 
 NetworkServer::~NetworkServer()
-{ }
+{ 
+    delete[] m_ReadBuffer;
+}
