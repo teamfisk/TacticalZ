@@ -91,7 +91,7 @@ void Client::Update()
             m_TimeSinceSentInputs = std::clock();
         }
         // HACK: Send absolute player positions for now to avoid desync until we have reliable messages
-        //sendLocalPlayerTransform();
+        sendLocalPlayerTransform();
 
         hasServerTimedOut();
     }
@@ -345,16 +345,18 @@ void Client::parseSnapshot(Packet& packet)
             if (serverClientMapsHasEntity(serverEntityID)) {
                 EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
                 EntityWrapper localEntity(m_World, localEntityID);
-
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
+                    if (localEntity.Name() == "CapturePointHUD") {
+                        UpdateLocalCapturePointHUD(localEntity);
+                    }
                     SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
                     bool shouldApply = true;
                     // Apply potential filter function
                     if (m_SnapshotFilter != nullptr) {
                         shouldApply = m_SnapshotFilter->FilterComponent(localEntity, newComponent);
                     }
-                    if (shouldApply) {
+                    if (shouldApply) {                        
                         ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
                         memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
                     }
@@ -390,6 +392,18 @@ void Client::parseSnapshot(Packet& packet)
         }
     }
     parseSpawnEvents();
+}
+
+
+void Client::UpdateLocalCapturePointHUD(EntityWrapper capturePointHUD)
+{
+    //auto children = m_World->GetChildren(capturePointHUD.ID);
+    //for (auto it = children.first; it != children.second; it++) {
+    //    it->first
+    //}
+    //
+    //EntityWrapper& localHUD = m_LocalPlayer.FirstChildByName("HUD").FirstChildByName("CapturePointHUD");
+    //m_World->GetComponentPools()
 }
 
 void Client::disconnect()

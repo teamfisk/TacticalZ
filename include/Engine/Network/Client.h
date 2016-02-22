@@ -103,6 +103,7 @@ public:
     void parseComponentDeletion(Packet& packet);
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
+    void UpdateLocalCapturePointHUD(EntityWrapper capturePointHUD);
     void identifyPacketLoss();
     void hasServerTimedOut();
     EntityID createPlayer();

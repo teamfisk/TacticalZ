@@ -548,9 +548,8 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid() 
-        || childEntity.HasComponent("CapturePointHUD") || childEntity.FirstParentWithComponent("CapturePointHUD").Valid();
-    
+    return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid()
+        || childEntity.HasComponent("CapturePoint") || childEntity.FirstParentWithComponent("CapturePoint").Valid();
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()
