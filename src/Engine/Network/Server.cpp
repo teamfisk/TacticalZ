@@ -446,7 +446,9 @@ void Server::parsePing()
 {
     for (auto& kv : m_ConnectedPlayers) {
         if (kv.second.TCPAddress == m_Address &&
-            kv.second.TCPPort == m_Port) {
+            kv.second.TCPPort == m_Port
+            || (kv.second.Endpoint.address() == m_Address
+                && kv.second.Endpoint.port() == m_Port)) {
             kv.second.StopTime = std::clock();
             break;
         }

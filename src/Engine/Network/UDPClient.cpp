@@ -27,30 +27,62 @@ void UDPClient::Disconnect()
 
 void UDPClient::Receive(Packet& packet)
 {
-    int bytesRead = readBuffer(m_ReadBuffer);
+    int bytesRead = readBuffer();
     if (bytesRead > 0) { 
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
 }
 
-int UDPClient::readBuffer(char* data)
+int UDPClient::readBuffer()
 {
+    //if (!m_Socket) {
+    //    return 0;
+    //}
+    //boost::system::error_code error;
+    //int bytesReceived = m_Socket->receive_from(boost
+    //    ::asio::buffer((void*)data, BUFFERSIZE),
+    //    m_ReceiverEndpoint,
+    //    0, error);
+    //if (error) {
+    //    //LOG_ERROR("receive: %s", error.message().c_str());
+    //}
+    //return bytesReceived;
     if (!m_Socket) {
         return 0;
     }
     boost::system::error_code error;
-    int bytesReceived = m_Socket->receive_from(boost
-        ::asio::buffer((void*)data, BUFFERSIZE),
-        m_ReceiverEndpoint,
-        0, error);
+    // Read size of packet
+     m_Socket->receive(boost
+        ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
+         boost::asio::ip::udp::socket::message_peek, error);
+    int sizeOfPacket = 0;
+    memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
+
+    // if the buffer is to small increase the size of it
+    if (sizeOfPacket > m_BufferSize) {
+        delete[] m_ReadBuffer;
+        m_ReadBuffer = new char[sizeOfPacket];
+        m_BufferSize = sizeOfPacket;
+    }
+
+    size_t availableData = m_Socket->available();
+    // Read the rest of the message
+    size_t bytesReceived = m_Socket->receive_from(boost
+        ::asio::buffer((void*)(m_ReadBuffer),
+            sizeOfPacket),
+        m_ReceiverEndpoint, 0, error);
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
+    if (sizeOfPacket > 1000000)
+        LOG_WARNING("The packets received are bigger than 1MB");
+
     return bytesReceived;
 }
 
 void UDPClient::Send(Packet& packet)
 {
+    packet.UpdateSize();
     m_Socket->send_to(boost::asio::buffer(
         packet.Data(),
         packet.Size()),
