@@ -68,6 +68,7 @@
             <c:Blend>
               <Pose1>BlendOverride</Pose1>
               <Pose2>AimAdditive</Pose2>
+              <Weight>1</Weight>
             </c:Blend>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
@@ -93,7 +94,7 @@
               <Components>
                 <c:Animation>
                   <AnimationName>AimRifle</AnimationName>
-                  <Time>0.1120316470564493</Time>
+                  <Time>0.13031392561420052</Time>
                   <Speed>0.5</Speed>
                   <Additive>true</Additive>
                 </c:Animation>
@@ -106,6 +107,7 @@
                 <c:BlendOverride>
                   <Master>ShootRifleAnimation</Master>
                   <Slave>BlendWalkRun</Slave>
+                  <Weight>0</Weight>
                 </c:BlendOverride>
                 <c:Transform/>
               </Components>
@@ -124,7 +126,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>Run</AnimationName>
-                          <Time>0.22406329411289949</Time>
+                          <Time>0.26062785122840193</Time>
                           <Speed>1</Speed>
                         </c:Animation>
                         <c:Transform/>
@@ -135,7 +137,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>Walk</AnimationName>
-                          <Time>0.22406329411289949</Time>
+                          <Time>0.26101654028221088</Time>
                           <Speed>1</Speed>
                         </c:Animation>
                         <c:Transform/>
@@ -148,7 +150,7 @@
                   <Components>
                     <c:Animation>
                       <AnimationName>ShootFastRifle</AnimationName>
-                      <Time>0.024060340702750871</Time>
+                      <Time>0.061012901418647347</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Transform/>

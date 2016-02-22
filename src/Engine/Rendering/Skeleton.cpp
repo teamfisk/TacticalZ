@@ -591,12 +591,14 @@ std::vector<glm::mat4> Skeleton::OverridePose(std::vector<glm::mat4> overridePos
         return finalPose;
     }
 
-    for (int i = 0; i < overridePose.size(); i++) {
+    for (int i = 0; i < targetPose.size(); i++) {
         if(overridePose[i] != glm::mat4(1)) {
             finalPose.push_back(overridePose[i]);
         } else {
             finalPose.push_back(targetPose[i]);
         }
+
+        //finalPose.push_back(overridePose[i]);
     }
 
     return finalPose;

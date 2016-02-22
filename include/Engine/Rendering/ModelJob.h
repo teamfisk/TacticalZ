@@ -125,7 +125,7 @@ struct ModelJob : RenderJob
             if (Skeleton != nullptr) {
                 
                 EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
-                BlendTree = new ::BlendTree(entityWrapper, Skeleton);
+                BlendTree = std::shared_ptr<::BlendTree>(new ::BlendTree(entityWrapper, Skeleton));
             }
         }
     };
@@ -149,7 +149,7 @@ struct ModelJob : RenderJob
     std::vector<::Skeleton::AnimationData> Animations;
     ::Skeleton::AnimationOffset AnimationOffset;
     
-    ::BlendTree* BlendTree = nullptr;
+    std::shared_ptr<::BlendTree> BlendTree = nullptr;
 
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;

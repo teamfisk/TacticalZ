@@ -53,7 +53,25 @@ BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
 
 BlendTree::~BlendTree()
 {
+    Node* currentNode = m_Root;
 
+    while (currentNode->Child[0] != nullptr) {
+        currentNode = currentNode->Child[0];
+    }
+
+    std::list<Node*> m_NodesToRemove;
+
+    while (currentNode != nullptr) {
+        currentNode = currentNode->Next();
+        m_NodesToRemove.push_back(currentNode);
+    }
+
+    for (auto it = m_NodesToRemove.begin(); it != m_NodesToRemove.end(); it++) {
+        if ((*it) != nullptr) {
+            delete (*it);
+            (*it) = nullptr;
+        }
+    }
 }
 
 void BlendTree::PrintTree()
