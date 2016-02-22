@@ -40,7 +40,9 @@ struct SpriteJob : RenderJob
             Depth = viewpos.z;
         }
         World = world;
+        Pickable = world->HasComponent(cSprite.EntityID, "Button");
 		IsIndicator = isIndicator;
+
         FillColor = fillColor;
         FillPercentage = fillPercentage;
     };
@@ -61,6 +63,7 @@ struct SpriteJob : RenderJob
     unsigned int EndIndex = 0;
     World* World;
 
+    bool Pickable;
 	bool IsIndicator = false;
 
     glm::vec4 FillColor = glm::vec4(0);

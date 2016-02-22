@@ -1,5 +1,7 @@
 #include "Rendering/Renderer.h"
 
+std::unordered_map<GLFWwindow*, Renderer*> Renderer::m_WindowToRenderer;
+
 void Renderer::Initialize()
 {
 	InitializeWindow();
@@ -12,12 +14,22 @@ void Renderer::Initialize()
     m_TextPass = new TextPass();
     m_TextPass->Initialize();
 
-
    /* m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
     m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");*/
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
+}
+
+void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    Renderer* currentRenderer = m_WindowToRenderer[window];
+    currentRenderer->m_ViewportSize = Rectangle(width, height);
+    currentRenderer->m_DrawFinalPass->OnWindowResize();
+    currentRenderer->m_LightCullingPass->OnWindowResize();
+    currentRenderer->m_PickingPass->OnWindowResize();
+    currentRenderer->m_DrawBloomPass->OnWindowResize();
 }
 
 void Renderer::InitializeWindow()
@@ -39,6 +51,7 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLFW: Failed to create window");
 		exit(EXIT_FAILURE);
 	}
+    glfwSetFramebufferSizeCallback(m_Window, &glfwFrameBufferCallback);
 	glfwMakeContextCurrent(m_Window);
 
 	// GL version info
@@ -59,8 +72,10 @@ void Renderer::InitializeWindow()
 		exit(EXIT_FAILURE);
 	}
 
+    m_WindowToRenderer[m_Window] = this;
+
     int windowSize[2];
-    glfwGetWindowSize(m_Window, &windowSize[0], &windowSize[1]);
+    glfwGetFramebufferSize(m_Window, &windowSize[0], &windowSize[1]);
     m_ViewportSize = Rectangle(windowSize[0], windowSize[1]);
 }
 
@@ -93,40 +108,71 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0Ambient Occlusion");
+
+	ImGui::SliderFloat("SSAO sample radius", &m_SSAO_Radius, 0.01f, 5.0f);
+	ImGui::SliderFloat("SSAO bias", &m_SSAO_Bias, 0.0f, 0.1f);
+	ImGui::SliderFloat("SSAO contrast", &m_SSAO_Contrast, 0.0f, 10.0f);
+	ImGui::SliderFloat("SSAO IntensityScale", &m_SSAO_IntensityScale, 0.0f, 10.0f);
+	ImGui::SliderInt("SSAO Number of Samples", &m_SSAO_NumOfSamples, 2, 100);
+	ImGui::SliderInt("SSAO Number of Turns", &m_SSAO_NumOfTurns, 0, 50);
+	m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Contrast, m_SSAO_IntensityScale, m_SSAO_NumOfSamples, m_SSAO_NumOfTurns);
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Clear other buffers
+    PerformanceTimer::StartTimer("Renderer-ClearBuffers");
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
-
+    PerformanceTimer::StopTimer("Renderer-ClearBuffers");
+	for (auto scene : frame.RenderScenes) {
+		PerformanceTimer::StartTimer("Renderer-Depth");
+		m_PickingPass->Draw(*scene);
+		GLERROR("Drawing pickingpass");
+		PerformanceTimer::StopTimer("Renderer-Depth");
+	}
+	PerformanceTimer::StartTimer("AO generation");
+	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
+	GLuint ao = m_SSAOPass->SSAOTexture();
+	PerformanceTimer::StopTimer("AO generation");
     for (auto scene : frame.RenderScenes){
         
+        PerformanceTimer::StartTimer("Renderer-Drawing PickingPass");
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
-        m_PickingPass->Draw(*scene);
-        GLERROR("Drawing pickingpass");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Generate Frustrums");
         m_LightCullingPass->GenerateNewFrustum(*scene);
         GLERROR("Generate frustums");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Filling Light List");
         m_LightCullingPass->FillLightList(*scene);
         GLERROR("Filling light list");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Light Culling");
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
-        m_DrawFinalPass->Draw(*scene);
+		m_DrawFinalPass->Draw(*scene, ao);
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Text");
         m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
         GLERROR("Draw Text");
+        PerformanceTimer::StopTimer("Renderer-Draw Text");
+    }
 
-    }
+    PerformanceTimer::StartTimer("Renderer-Draw Bloom");
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
+    PerformanceTimer::StopTimer("Renderer-Draw Bloom");
+
     if (m_DebugTextureToDraw == 0) {
+        PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
         m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
+        PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
+
+    PerformanceTimer::StartTimer("Renderer-Misc Debug Draws");
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
     }
@@ -145,10 +191,16 @@ void Renderer::Draw(RenderFrame& frame)
     if (m_DebugTextureToDraw == 6) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
+	if (m_DebugTextureToDraw == 7) {
+		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
+	}
+	PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
 
+    PerformanceTimer::StartTimer("Renderer-ImGuiRenderPass");
     m_ImGuiRenderPass->Draw();
     GLERROR("Imgui draw");
     glfwSwapBuffers(m_Window);
+    PerformanceTimer::StopTimer("Renderer-ImGuiRenderPass");
 }
 
 PickData Renderer::Pick(glm::vec2 screenCoord)
@@ -191,4 +243,5 @@ void Renderer::InitializeRenderPasses()
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
+	m_SSAOPass = new SSAOPass(this);
 }

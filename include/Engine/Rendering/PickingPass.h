@@ -22,6 +22,8 @@ public:
     void Draw(RenderScene& scene);
     void ClearPicking();
 
+    void OnWindowResize();
+
     //Getters
     const ShaderProgram& PickingProgram() const { return *m_PickingProgram; }
     //const std::unordered_map<glm::ivec2, EntityID>& PickingColorsToEntity() const { return m_PickingColorsToEntity; }
@@ -40,7 +42,7 @@ private:
     const IRenderer* m_Renderer;
 
     ShaderProgram* m_PickingProgram;
-	ShaderProgram* m_PickingSkinnedProgram;
+    ShaderProgram* m_PickingSkinnedProgram;
     Camera* m_Camera;
 
     struct PickingInfo
