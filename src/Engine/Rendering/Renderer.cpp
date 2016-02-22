@@ -128,17 +128,20 @@ void Renderer::Draw(RenderFrame& frame)
     m_DrawBloomPass->ClearBuffer();
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
 	for (auto scene : frame.RenderScenes) {
+		PerformanceTimer::StartTimer("Renderer-Depth");
 		m_PickingPass->Draw(*scene);
 		GLERROR("Drawing pickingpass");
+		PerformanceTimer::StopTimer("Renderer-Depth");
 	}
+	PerformanceTimer::StartTimer("AO generation");
 	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
 	GLuint ao = m_SSAOPass->SSAOTexture();
+	PerformanceTimer::StopTimer("AO generation");
     for (auto scene : frame.RenderScenes){
         
-        PerformanceTimer::StartTimer("Renderer-Depth");
+        PerformanceTimer::StartTimer("Renderer-Drawing PickingPass");
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
-        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Drawing PickingPass");
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Generate Frustrums");
         m_LightCullingPass->GenerateNewFrustum(*scene);
         GLERROR("Generate frustums");
@@ -158,14 +161,17 @@ void Renderer::Draw(RenderFrame& frame)
         GLERROR("Draw Text");
         PerformanceTimer::StopTimer("Renderer-Draw Text");
     }
+
     PerformanceTimer::StartTimer("Renderer-Draw Bloom");
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
     PerformanceTimer::StopTimer("Renderer-Draw Bloom");
+
     if (m_DebugTextureToDraw == 0) {
         PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
         m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
         PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
+
     PerformanceTimer::StartTimer("Renderer-Misc Debug Draws");
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
@@ -185,10 +191,10 @@ void Renderer::Draw(RenderFrame& frame)
     if (m_DebugTextureToDraw == 6) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
-    PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
 	if (m_DebugTextureToDraw == 7) {
 		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
 	}
+	PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
 
     PerformanceTimer::StartTimer("Renderer-ImGuiRenderPass");
     m_ImGuiRenderPass->Draw();
