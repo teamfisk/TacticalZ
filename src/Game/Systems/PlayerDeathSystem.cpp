@@ -8,18 +8,31 @@ PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
 
 void PlayerDeathSystem::Update(double dt)
 {
+
 }
 
 bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
+    LOG_INFO("<- deathsystem: valid player");
+
     if (!e.Player.Valid()) {
         return false;
     }
+    LOG_INFO("-> deathsystem: valid player");
+
+    LOG_INFO("<- create effect");
 
     createDeathEffect(e.Player);
 
-    // Delete player
-    m_World->DeleteEntity(e.Player.ID);
+    LOG_INFO("-> create effect");
+
+    // Delete player - only the clients will delete themselves.
+    if (IsServer && !e.Player.HasComponent("Lifetime")) {
+        //    m_World->DeleteEntity(e.Player.ID);
+        //m_PlayersToBeDeletedVector.emplace_back(e.Player.ID, 0.25);
+        e.Player.AttachComponent("Lifetime");
+        e.Player["Lifetime"]["Lifetime"] = 0.45;
+    }
 
     return true;
 }
@@ -32,6 +45,8 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     EntityID deathEffectID = parser.MergeEntities(m_World);
     EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
 
+    LOG_INFO("<- effect camera");
+
     //components that we need from player
     auto playerCamera = player.FirstChildByName("Camera");
     auto playerModel = player.FirstChildByName("PlayerModel");
@@ -43,6 +58,7 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     }
     auto playerEntityModel = playerModel["Model"];
     auto playerEntityAnimation = playerModel["Animation"];
+    LOG_INFO("-> effect camera");
 
     //copy the data from player to explisioneffectmodel
     playerEntityModel.Copy(deathEffectEW["Model"]);
@@ -58,11 +74,15 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     //effect,camera is relative to playersPosition
     //deathEffectEW["ExplosionEffect"]["ExplosionOrigin"] = glm::vec3(0, 0, 0);
 
+    LOG_INFO("<- localplayer");
     //camera (with lifetime) behind the player
     if (player == LocalPlayer) {
         auto cam = deathEffectEW.FirstChildByName("Camera");
         Events::SetCamera eSetCamera;
         eSetCamera.CameraEntity = cam;
         m_EventBroker->Publish(eSetCamera);
+        LOG_INFO("in localplayer");
     }
+    LOG_INFO("-> localplayer");
+
 }

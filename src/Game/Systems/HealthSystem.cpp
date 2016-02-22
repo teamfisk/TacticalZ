@@ -13,8 +13,11 @@ HealthSystem::HealthSystem(SystemParams params)
 
 void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHealth, double dt)
 {
+    //LOG_INFO("<- health updatecomponent");
     double& health = cHealth["Health"];
-    if (health <= 0.0) {
+    int healthInt = (int)health;
+    if (healthInt <= 0 && !entity.HasComponent("Lifetime")) {
+        LOG_INFO("-> health <= 0");
         Events::PlayerDeath ePlayerDeath;
         ePlayerDeath.Player = entity;
         m_EventBroker->Publish(ePlayerDeath);
@@ -24,6 +27,7 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHea
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
+    LOG_INFO("<- on player damage");
     if (!IsServer && m_NetworkEnabled || !e.Victim.Valid()) {
         return false;
     }
@@ -31,6 +35,7 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
     ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
     health -= e.Damage;
+    LOG_INFO("-> health onplayerdam");
 
     return true;
 }

@@ -128,10 +128,13 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 
 bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
+    LOG_INFO("<- sound death");
+
     Events::PlaySoundOnEntity ev;
     ev.EmitterID = LocalPlayer.ID;
     ev.FilePath = "Audio/die/die2.wav";
     m_EventBroker->Publish(ev);
+    LOG_INFO("-> sound death");
     return false;
 }
 

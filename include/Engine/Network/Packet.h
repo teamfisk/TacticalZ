@@ -24,7 +24,7 @@ public:
     {
         // Check if we are trying to add more than the package can fit.
         if (m_MaxPacketSize < m_Offset + sizeof(T)) {
-            LOG_WARNING("Packet AddPrimitive(): You are trying to add more than we have allocated for! New size is %i bytes\n", m_MaxPacketSize*2);
+            //LOG_WARNING("Packet AddPrimitive(): You are trying to add more than we have allocated for! New size is %i bytes\n", m_MaxPacketSize*2);
             resizeData();
         }
         memcpy(m_Data + m_Offset, &val, sizeof(T));
@@ -35,7 +35,7 @@ public:
     T ReadPrimitive()
     {
         if (m_Offset < m_ReturnDataOffset + sizeof(T)) {
-            LOG_WARNING("Packet PopFrontPrimitive(): You are trying to remove more than what exists in this packet!");
+            //LOG_WARNING("Packet PopFrontPrimitive(): You are trying to remove more than what exists in this packet!");
             return -1;
         }
         T returnValue;

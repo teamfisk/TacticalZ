@@ -54,9 +54,13 @@ void KillFeedSystem::Update(double dt)
 
 bool KillFeedSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
+    LOG_INFO("<- killfeed death");
+
     KillFeedInfo kfInfo;
 
     if (e.Player.HasComponent("Team")) {
+        LOG_INFO("- killfeed death");
+
         int red = e.Player["Team"].Enum("Team", "Red");
         int blue = e.Player["Team"].Enum("Team", "Blue");
 
@@ -70,6 +74,7 @@ bool KillFeedSystem::OnPlayerDeath(Events::PlayerDeath& e)
             m_DeathQueue.push_back(kfInfo);
         }
     }
+    LOG_INFO("-> killfeed death");
 
 
     if(m_DeathQueue.size() > 3) {

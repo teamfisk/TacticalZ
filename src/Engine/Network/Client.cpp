@@ -165,7 +165,7 @@ void Client::parsePing()
     m_IsConnected = true;
     // Time since last ping was received
     m_DurationOfPingTime = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
-    LOG_INFO("%i: response time with ctime(ms): %f", m_PacketID, m_DurationOfPingTime);
+    //LOG_INFO("%i: response time with ctime(ms): %f", m_PacketID, m_DurationOfPingTime);
     m_StartPingTime = std::clock();
 
     Packet packet(MessageType::Ping, m_SendPacketID);

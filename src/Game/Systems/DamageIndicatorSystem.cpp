@@ -14,6 +14,8 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
 
 bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
 {
+    LOG_INFO("<- damageindicator");
+
     if (m_CurrentCamera == EntityID_Invalid) {
         return false;
     }
@@ -28,6 +30,7 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
     if (!e.Inflictor.Valid() || !e.Victim.Valid()) {
         return false; 
     }
+    LOG_INFO("- damageindicator");
 
     //grab players direction
     auto playerOrientation = glm::quat((glm::vec3)e.Victim["Transform"]["Orientation"]);
@@ -66,6 +69,8 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
     auto spriteWrapper = EntityWrapper(m_World, spriteID);
     //simply set the rotation z-wise to the angleBetweenVectors
     spriteWrapper["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);
+
+    LOG_INFO("-> damageindicator");
 
     return true;
 }

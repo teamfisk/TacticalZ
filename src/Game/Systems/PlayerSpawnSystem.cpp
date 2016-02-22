@@ -164,6 +164,8 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 
 bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
+    LOG_INFO("<- spawnsystem death");
+
     //Only spawn request if network is disabled or we are server.
     if (!IsServer && m_NetworkEnabled) {
         return false;
@@ -171,11 +173,17 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
     if (!e.Player.HasComponent("Team")) {
         return false;
     }
+    if (!e.Player.HasComponent("Lifetime")) {
+        LOG_INFO("<- spawnsystem death FALSE");
+        return false;
+    }
     ComponentWrapper cTeam = e.Player["Team"];
     //A spectator can't die anyway
     if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Spectator")) {
         return false;
     }
+
+    LOG_INFO("- spawnsystem death");
 
     if (m_PlayerIDs.count(e.Player.ID) == 0) {
         return false;
@@ -185,6 +193,7 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
     req.PlayerID = m_PlayerIDs.at(e.Player.ID);
     req.Team = cTeam["Team"];
     m_SpawnRequests.push_back(req);
+    LOG_INFO("-> spawnsystem death");
 
     return true;
 }

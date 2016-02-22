@@ -119,7 +119,7 @@ public:
 			m_ExtraMemory.push_back((char*)malloc(m_Stride));
 			//We should preferably not enter here to avoid performance issues. Set more numMaxElements in constructor instead.
             if (!DisableMemoryPool::Value) {
-			    LOG_DEBUG("Allocated slots exceed Pool size, extra memory allocated dynamically. Pool size: %u, dynamic size: %u.", m_NumSlots, m_ExtraMemory.size());
+			    //LOG_DEBUG("Allocated slots exceed Pool size, extra memory allocated dynamically. Pool size: %u, dynamic size: %u.", m_NumSlots, m_ExtraMemory.size());
             }
 			return m_ExtraMemory.back();
 		}
