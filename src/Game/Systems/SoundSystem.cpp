@@ -90,6 +90,9 @@ bool SoundSystem::drumTimer(double dt)
 
 bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
+    if (!LocalPlayer.Valid()) {
+        return false;
+    }
     int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
     int team = (int)m_World->GetComponent(LocalPlayer.ID, "Team")["Team"];
     Events::PlaySoundOnEntity ev;
