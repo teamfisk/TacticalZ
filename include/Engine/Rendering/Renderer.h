@@ -51,9 +51,12 @@ private:
     Model* m_UnitSphere;
 
     int m_DebugTextureToDraw = 0;
-	float m_SSAO_Radius = 0.2f;
-	float m_SSAO_Bias = 0.012f;
-	float m_SSAO_Intensity = 1.0f;
+	float m_SSAO_Radius = 1.0f;
+	float m_SSAO_Bias = 0.05f;
+	float m_SSAO_Contrast = 1.5f;
+	float m_SSAO_IntensityScale = 1.0f;
+	int m_SSAO_NumOfSamples = 24;
+	int m_SSAO_NumOfTurns = 7;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;

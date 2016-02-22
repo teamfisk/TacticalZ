@@ -93,12 +93,15 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0SSAO");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0Ambient Occlusion");
 
-	ImGui::SliderFloat("SSAO sample radius", &m_SSAO_Radius, 0.0001f, 1.0f);
-	ImGui::SliderFloat("SSAO bias", &m_SSAO_Bias, 0.0f, 1.0f);
-	ImGui::SliderFloat("SSAO intensity", &m_SSAO_Intensity, 0.0f, 1.0f);
-	m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Intensity);
+	ImGui::SliderFloat("SSAO sample radius", &m_SSAO_Radius, 0.01f, 5.0f);
+	ImGui::SliderFloat("SSAO bias", &m_SSAO_Bias, 0.0f, 0.1f);
+	ImGui::SliderFloat("SSAO contrast", &m_SSAO_Contrast, 0.0f, 10.0f);
+	ImGui::SliderFloat("SSAO IntensityScale", &m_SSAO_IntensityScale, 0.0f, 10.0f);
+	ImGui::SliderInt("SSAO Number of Samples", &m_SSAO_NumOfSamples, 2, 100);
+	ImGui::SliderInt("SSAO Number of Turns", &m_SSAO_NumOfTurns, 0, 50);
+	m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Contrast, m_SSAO_IntensityScale, m_SSAO_NumOfSamples, m_SSAO_NumOfTurns);
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -107,20 +110,23 @@ void Renderer::Draw(RenderFrame& frame)
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
-
+	for (auto scene : frame.RenderScenes) {
+		m_PickingPass->Draw(*scene);
+		GLERROR("Drawing pickingpass");
+	}
+	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
+	GLuint ao = m_SSAOPass->SSAOTexture();
     for (auto scene : frame.RenderScenes){
         
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
-        m_PickingPass->Draw(*scene);
-        GLERROR("Drawing pickingpass");
         m_LightCullingPass->GenerateNewFrustum(*scene);
         GLERROR("Generate frustums");
         m_LightCullingPass->FillLightList(*scene);
         GLERROR("Filling light list");
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
-        m_DrawFinalPass->Draw(*scene);
+		m_DrawFinalPass->Draw(*scene, ao);
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
@@ -129,10 +135,9 @@ void Renderer::Draw(RenderFrame& frame)
 
     }
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
-	m_SSAOPass->Draw(m_DrawFinalPass->DepthBuffer(), m_DrawFinalPass->DepthBufferCamera());
 
     if (m_DebugTextureToDraw == 0) {
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), m_SSAOPass->SSAOTexture(), frame.Gamma, frame.Exposure);
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
     }
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());

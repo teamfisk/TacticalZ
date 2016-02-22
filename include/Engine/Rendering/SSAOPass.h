@@ -17,7 +17,7 @@ public:
 	~SSAOPass() { };
 
 	void Draw(GLuint depthBuffer, Camera* camera);
-	void Setting(float radius, float bias, float intensity);
+	void Setting(float radius, float bias, float contrast, float intensityScale, int numOfSamples, int NumOfTurns);
 	void ClearBuffer();
 
 	//Return the SSAO of the texture sent to Draw
@@ -41,7 +41,10 @@ private:
 
 	float m_Radius;
 	float m_Bias;
-	float m_Intensity;
+	float m_Contrast;
+	float m_IntensityScale;
+	int m_NumOfSamples;
+	int m_NumOfTurns;
 
 	GLuint m_SSAOTexture;
 	FrameBuffer m_SSAOFramBuffer;

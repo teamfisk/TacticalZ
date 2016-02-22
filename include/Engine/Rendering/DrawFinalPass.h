@@ -18,7 +18,7 @@ public:
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
-    void Draw(RenderScene& scene);
+    void Draw(RenderScene& scene, GLuint SSAOTexture);
     void ClearBuffer();
 
 	//Return the texture that is used in later stages to apply the bloom effect
@@ -40,7 +40,7 @@ private:
     void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
 
     void DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene);
-    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene, GLuint SSAOTexture);
     void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);

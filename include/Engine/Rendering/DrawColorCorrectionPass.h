@@ -17,7 +17,7 @@ public:
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
 
-    void Draw(GLuint sceneTexture, GLuint bloomTexture, GLuint sceneTextureLowRes, GLuint bloomTextureLowRes, GLuint SSAOTexture, GLfloat gamma, GLfloat exposure);
+    void Draw(GLuint sceneTexture, GLuint bloomTexture, GLuint sceneTextureLowRes, GLuint bloomTextureLowRes, GLfloat gamma, GLfloat exposure);
 private:
     const IRenderer* m_Renderer;
 

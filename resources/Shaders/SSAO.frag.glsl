@@ -1,38 +1,37 @@
 #version 430
 
 //Number of samples per pixel
-#define NUM_SAMPLES (24)
+uniform int           uNumOfSamples;
+//#define NUM_SAMPLES (11)
 
 //Number of turns around the cirle
-#define NUM_TURNS (7)
+uniform int           uNumOfTurns;
+//#define NUM_TURNS (7)
 
-uniform sampler2D ViewSpaceZ;
+layout (binding = 0) uniform sampler2D ViewSpaceZ;
 
-uniform vec4 ProjInfo;
+uniform vec4 uProjInfo;
 
-uniform float           ProjScale;
+uniform float           uProjScale;
 //#define ProjScale 500
 
-uniform float           Radius;
+uniform float           uRadius;
 //#define Radius 1.0f
 
-uniform float           Bias;
+uniform float           uBias;
 //#define Bias 0.012f
 
-uniform float           IntensityDivR6;
+uniform float           uContrast;
 //#define IntensityDivR6 1
 
-out vec4				fragmentColor;
+uniform float           uIntensityScale;
 
-vec3 reconstructVSPosition(vec2 ScreenSpaceCoord, float z){
-	return vec3((ScreenSpaceCoord * ProjInfo.xy + ProjInfo.zw) * z, z);
-}
+out float				AO;
 
-vec3 getPosition(ivec2 ScreenSpaceCoord) {
-	vec3 P;
-    P.z = texelFetch(ViewSpaceZ, ScreenSpaceCoord, 0).r;
+vec3 getVSPosition(ivec2 ScreenSpaceCoord) {
+    float z = texelFetch(ViewSpaceZ, ScreenSpaceCoord, 0).r;
     //Get the xy view space coordinates and add the z value from ViewSpaceZ buffer.
-    return reconstructVSPosition(vec2(ScreenSpaceCoord) + vec2(0.5), P.z);
+    return vec3((uProjInfo[0] + (ScreenSpaceCoord.x * uProjInfo[1])) * z, (uProjInfo[2] + (ScreenSpaceCoord.y * uProjInfo[3])) * z, z);
 }
 
 vec3 getVSFaceNormal(vec3 ViewSpacePosition) {
@@ -44,10 +43,10 @@ vec3 getVSFaceNormal(vec3 ViewSpacePosition) {
 
 vec3 getSampleViewSpacePos(ivec2 ScreenSpaceCoord, int SampleIndex, float RotationAngle, float ScreenSpaceSampleRadius){
 	// Pure Magic...
-	float alpha = float(SampleIndex + 0.5) * (1.0 / NUM_SAMPLES);
+	float alpha = float(SampleIndex) * (1.0 / uNumOfSamples);
 
 	// Angle to where to sample
-    float angle = alpha * (NUM_TURNS * 6.28) + RotationAngle;
+    float angle = alpha * (uNumOfTurns * 6.28) + RotationAngle;
 
 	//Lenght to were to sample
     ScreenSpaceSampleRadius = ScreenSpaceSampleRadius * alpha;
@@ -57,50 +56,59 @@ vec3 getSampleViewSpacePos(ivec2 ScreenSpaceCoord, int SampleIndex, float Rotati
     // Get texel coordinate on where to sample by going screenSpaceSampleOffsetVecor direction in ScreenSpaceSampleRadius units from ScreenSpaceCoord (the point being shaded);
     ivec2 screenSpaceSampleTexel = ivec2(ScreenSpaceSampleRadius * screenSpaceSampleOffsetVecor) + ScreenSpaceCoord;
 
-    return getPosition(screenSpaceSampleTexel);
+    return getVSPosition(screenSpaceSampleTexel);
 }
 
-float Radius2 = Radius * Radius;
 
-float sampleAO(ivec2 ScreenSpaceCoord, vec3 ShadedViewSpacePosition, vec3 ViewSpaceNormal, float ScreenSpaceSampleRadius, int SampleIndex, float RotationAngle) {
+
+float sampleAO(ivec2 ScreenSpaceCoord, vec3 Origin, vec3 OriginNormal, float ScreenSpaceSampleRadius, int SampleIndex, float RotationAngle, float Radius) {
+	float radius2 = Radius * Radius;
 	vec3 sampleViewSpacePosition = getSampleViewSpacePos(ScreenSpaceCoord, SampleIndex, RotationAngle, ScreenSpaceSampleRadius);
 
-	vec3 sampleVector = ShadedViewSpacePosition - sampleViewSpacePosition;
+	vec3 sampleVector = Origin - sampleViewSpacePosition;
 
 	// vv = sampleVectorLenght ^ 2
 	float vv = dot(sampleVector, sampleVector);
 	// vn = angle between sampleVector and Normal
-	float vn = dot(sampleVector, ViewSpaceNormal);
+	float vn = dot(sampleVector, OriginNormal);
 
-	const float epsilon = 0.01f;
+	const float epsilon = 0.0001f;
 
 	// vv < radius2 if the vector is shorter then the radius;
 	// vn - bias, offset the angle to reduse self occlusion. 
 	// epsilon is here to make divison by 0 impossible.
-	return float(vv < Radius2) * max((vn - Bias) / (epsilon + vv), 0.0);
-	//float f = max(Radius2 - vv, 0.0); 
-	//return f * f * f * max((vn - Bias) / (epsilon + vv), 0.0);
+	return float(vv < radius2) * max((vn - uBias) / (epsilon + vv), 0.0);
+	//float f = max(radius2 - vv, 0.0); 
+	//return f * f * f * max((vn - uBias) / (epsilon + vv), 0.0);
 }
 
 
 void main() {
 	ivec2 originScreenCoord = ivec2(gl_FragCoord.xy);
 
-	vec3 origin = getPosition(originScreenCoord);
+	vec3 origin = getVSPosition(originScreenCoord);
 
-	vec3 viewSpaceNormal = getVSFaceNormal(origin);
+	float radius;
+	if(origin.z < uRadius){
+		radius = origin.z;
+	} else {
+		radius = uRadius;
+	}
 
-	float screenSpaceSampleRadius = ProjScale * Radius / origin.z;
 
-	//Offset on what angle to start on so that not evry pixel start sampling in the same direction, AlchemyAO
-	float rotationAngleOffset = (3 * originScreenCoord.x ^ originScreenCoord.y + originScreenCoord.x * originScreenCoord.y) * 10;
+	vec3 originNormal = getVSFaceNormal(origin);
+
+	float screenSpaceSampleRadius = -uProjScale * radius / origin.z;
+
+	float rotationAngleOffset = 30 * originScreenCoord.x ^ originScreenCoord.y + 10 * originScreenCoord.x * originScreenCoord.y;
 
 	float sum = 0.0;
-    for (int i = 0; i < NUM_SAMPLES; i++) {
-        sum += sampleAO(originScreenCoord, origin, viewSpaceNormal, screenSpaceSampleRadius, i, rotationAngleOffset);
+    for (int i = 0; i < uNumOfSamples; i++) {
+        sum += sampleAO(originScreenCoord, origin, originNormal, screenSpaceSampleRadius, i, rotationAngleOffset, radius);
     }
 
-    float A = max(0.0, 1.0 - sum * (2.0f / NUM_SAMPLES));
-	//fragmentColor= vec4(viewSpaceNormal, 1.0f);
-	fragmentColor = vec4(A, A, A, 1.0f);
+    //float A = max(0.0, 1.0 - sum * (2.0f / uNumOfSamples));
+    float A = 1.0 - sum * (2.0f * uIntensityScale / float(uNumOfSamples));
+    AO = clamp(pow(A, uContrast), 0.0f, 1.0f);
+	//AO = vec4(originNormal, 1.0f);
 }
