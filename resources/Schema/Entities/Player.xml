@@ -349,13 +349,12 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>1.6050530664521858</Time1>
+              <Time1>1.8314163732853146</Time1>
               <Speed1>1</Speed1>
             </c:Animation>
             <c:Model>
               <Resource>Models/Characters/Assault/FirstPerson.mesh</Resource>
               <Color A="1" B="1" G="0.309803933" R="0"/>
-              <Transparent>true</Transparent>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -367,11 +366,10 @@
                 </c:BoneAttachment>
                 <c:Model>
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
-                  <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.12043035" Y="-0.234149337" Z="-0.181454644"/>
-                  <Orientation X="0.0104045281" Y="-0.00268131681" Z="0.0428438708"/>
+                  <Position X="0.120430619" Y="-0.229687244" Z="-0.181454629"/>
+                  <Orientation X="0.0104048112" Y="-0.0026817855" Z="0.0428442657"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -477,7 +475,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.620305457513453</Time1>
+          <Time1>0.16333512901638159</Time1>
           <Speed1>1</Speed1>
         </c:Animation>
         <c:AnimationOffset>
@@ -501,8 +499,8 @@
               <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0.160351232" Y="1.02591991" Z="-0.215102971"/>
-              <Orientation X="-0.0627480298" Y="-0.0432248674" Z="0.119431816"/>
+              <Position X="0.158296332" Y="1.03131664" Z="-0.21615544"/>
+              <Orientation X="-0.0626514703" Y="-0.0352048129" Z="0.12013837"/>
             </c:Transform>
           </Components>
           <Children>

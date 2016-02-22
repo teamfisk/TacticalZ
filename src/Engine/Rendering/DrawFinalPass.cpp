@@ -27,6 +27,7 @@ void DrawFinalPass::InitializeFrameBuffers()
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     GLERROR("RenderBuffer generation");
 
+
     GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
     GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
@@ -173,25 +174,25 @@ void DrawFinalPass::InitializeShaderPrograms()
     GLERROR("Creating DepthFill program");
 }
 
-void DrawFinalPass::Draw(RenderScene& scene)
+void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
 {
     GLERROR("Pre");
-
     DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
     if (scene.ClearDepth) {
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
+		state->Disable(GL_DEPTH_TEST);
+		state->DepthMask(GL_FALSE);
     }
     //TODO: Do we need check for this or will it be per scene always?
     glClearStencil(0x00);
     glClear(GL_STENCIL_BUFFER_BIT);
 
     //Fill depth buffer
-
-
+	
     state->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
+    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene, SSAOTexture);
     GLERROR("OpaqueObjects");
-    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
+    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene, SSAOTexture);
     GLERROR("TransparentObjects");
     DrawSprites(scene.Jobs.SpriteJob, scene);
     GLERROR("SpriteJobs");
@@ -206,11 +207,11 @@ void DrawFinalPass::Draw(RenderScene& scene)
     //Draw Opaque shielded objects
     state->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
     state->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueShieldedObjects, scene); //might need changing
+    DrawModelRenderQueues(scene.Jobs.OpaqueShieldedObjects, scene, SSAOTexture); //might need changing
     GLERROR("Shielded Opaque object");
 
     //Draw Transparen Shielded objects
-    DrawModelRenderQueues(scene.Jobs.TransparentShieldedObjects, scene); //might need changing
+    DrawModelRenderQueues(scene.Jobs.TransparentShieldedObjects, scene, SSAOTexture); //might need changing
     GLERROR("Shielded Transparent objects");
 
     GLERROR("END");
@@ -241,14 +242,14 @@ void DrawFinalPass::Draw(RenderScene& scene)
     DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
     GLERROR("StencilPass");
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_DEPTH_BUFFER_BIT);
 
     stateLowRes->Enable(GL_DEPTH_TEST);
     stateLowRes->StencilFunc(GL_LEQUAL, 1, 0xFF);
     stateLowRes->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
+    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene, SSAOTexture);
     GLERROR("OpaqueObjects");
-    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
+    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene, SSAOTexture);
     GLERROR("TransparentObjects");
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
@@ -321,7 +322,7 @@ void DrawFinalPass::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm:
     GLERROR("MipMap Texture initialization failed");
 }
 
-void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
+void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene, GLuint SSAOTexture)
 {
     GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
     GLERROR("forwardHandle");
@@ -343,6 +344,9 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightCullingPass->LightSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, SSAOTexture);
 
     for (auto &job : jobs) {
         auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
@@ -690,14 +694,14 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
             glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(spriteJob->FillColor));
             glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), spriteJob->FillPercentage);
 
-            glActiveTexture(GL_TEXTURE0);
+            glActiveTexture(GL_TEXTURE1);
             if (spriteJob->DiffuseTexture != nullptr) {
                 glBindTexture(GL_TEXTURE_2D, spriteJob->DiffuseTexture->m_Texture);
             } else {
                 glBindTexture(GL_TEXTURE_2D, m_ErrorTexture->m_Texture);
             }
 
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE2);
             if (spriteJob->IncandescenceTexture != nullptr) {
                 glBindTexture(GL_TEXTURE_2D, spriteJob->IncandescenceTexture->m_Texture);
             } else {
@@ -807,7 +811,7 @@ void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<E
 	case RawModel::MaterialType::SingleTextures:
 	case RawModel::MaterialType::Basic:
 	{
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE1);
 		if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0]->Texture != nullptr) {
 			glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->Texture->m_Texture);
 			glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(job->DiffuseTexture[0]->UVRepeat));
@@ -817,7 +821,7 @@ void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<E
 			glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 		}
 
-		glActiveTexture(GL_TEXTURE1);
+		glActiveTexture(GL_TEXTURE2);
 		if (job->NormalTexture.size() > 0 && job->NormalTexture[0]->Texture != nullptr) {
 			glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->Texture->m_Texture);
 			glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(job->NormalTexture[0]->UVRepeat));
@@ -827,7 +831,7 @@ void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<E
 			glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 		}
 
-		glActiveTexture(GL_TEXTURE2);
+		glActiveTexture(GL_TEXTURE3);
 		if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0]->Texture != nullptr) {
 			glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->Texture->m_Texture);
 			glUniform2fv(glGetUniformLocation(shaderHandle, "SpecularUVRepeat"), 1, glm::value_ptr(job->SpecularTexture[0]->UVRepeat));
@@ -837,7 +841,7 @@ void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<E
 			glUniform2fv(glGetUniformLocation(shaderHandle, "SpecularUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 		}
 
-		glActiveTexture(GL_TEXTURE3);
+		glActiveTexture(GL_TEXTURE4);
 		if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0]->Texture != nullptr) {
 			glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->Texture->m_Texture);
 			glUniform2fv(glGetUniformLocation(shaderHandle, "GlowUVRepeat"), 1, glm::value_ptr(job->IncandescenceTexture[0]->UVRepeat));
@@ -850,7 +854,7 @@ void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<E
 	}
 	case RawModel::MaterialType::SplatMapping:
 	{
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, job->SplatMap->Texture->m_Texture);
 
 		int texturePosition = GL_TEXTURE1;
@@ -925,7 +929,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 		case RawModel::MaterialType::SingleTextures:
 		case RawModel::MaterialType::Basic:
 		{
-			glActiveTexture(GL_TEXTURE0);
+			glActiveTexture(GL_TEXTURE1);
 			if (job->DiffuseTexture.size() > 0 && job->DiffuseTexture[0]->Texture != nullptr) {
 				glBindTexture(GL_TEXTURE_2D, job->DiffuseTexture[0]->Texture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(job->DiffuseTexture[0]->UVRepeat));
@@ -935,7 +939,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 				glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
 
-			glActiveTexture(GL_TEXTURE1);
+			glActiveTexture(GL_TEXTURE2);
 			if (job->NormalTexture.size() > 0 && job->NormalTexture[0]->Texture != nullptr) {
 				glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->Texture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(job->NormalTexture[0]->UVRepeat));
@@ -945,7 +949,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 				glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
 
-			glActiveTexture(GL_TEXTURE2);
+			glActiveTexture(GL_TEXTURE3);
 			if (job->SpecularTexture.size() > 0 && job->SpecularTexture[0]->Texture != nullptr) {
 				glBindTexture(GL_TEXTURE_2D, job->SpecularTexture[0]->Texture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, "SpecularUVRepeat"), 1, glm::value_ptr(job->SpecularTexture[0]->UVRepeat));
@@ -955,7 +959,7 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 				glUniform2fv(glGetUniformLocation(shaderHandle, "SpecularUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
 
-			glActiveTexture(GL_TEXTURE3);
+			glActiveTexture(GL_TEXTURE4);
 			if (job->IncandescenceTexture.size() > 0 && job->IncandescenceTexture[0]->Texture != nullptr) {
 				glBindTexture(GL_TEXTURE_2D, job->IncandescenceTexture[0]->Texture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, "GlowUVRepeat"), 1, glm::value_ptr(job->IncandescenceTexture[0]->UVRepeat));
@@ -968,10 +972,10 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 		}
 		case RawModel::MaterialType::SplatMapping:
 		{
-			glActiveTexture(GL_TEXTURE0);
+			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, job->SplatMap->Texture->m_Texture);
 
-			int texturePosition = GL_TEXTURE1;
+			int texturePosition = GL_TEXTURE2;
 		
 			//Bind 5 diffuse textures
 			std::string UniformName = "DiffuseUVRepeat";

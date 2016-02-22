@@ -25,11 +25,20 @@ void PickingPass::InitializeTextures()
 
 void PickingPass::InitializeFrameBuffers()
 {
-    glGenRenderbuffers(1, &m_DepthBuffer);
+   /* glGenRenderbuffers(1, &m_DepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);*/
 
-    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
+	glGenTextures(1, &m_DepthBuffer);
+
+	glBindTexture(GL_TEXTURE_2D, m_DepthBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, (int)(m_Renderer->GetViewportSize().Width), (int)(m_Renderer->GetViewportSize().Height), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
     m_PickingBuffer.Generate();
 }
@@ -63,7 +72,9 @@ void PickingPass::Draw(RenderScene& scene)
     m_PickingProgram->Bind();
 
     if (scene.ClearDepth) {
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
+		state->Disable(GL_DEPTH_TEST);
+		state->DepthMask(GL_FALSE);
     }
     m_Camera = scene.Camera;
 
