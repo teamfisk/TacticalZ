@@ -69,3 +69,47 @@ BOOST_AUTO_TEST_CASE(WorldTestMultipleAllocations, * utf::tolerance(0.00001))
         i++;
     }
 }
+
+BOOST_AUTO_TEST_CASE(WorldCopy, *utf::tolerance(0.00001))
+{
+    World w1;
+
+    // Create a test component
+    auto testComponent = ComponentWrapperFactory("Test", 2);
+    testComponent.AddProperty("TestInteger", 1337);
+    testComponent.AddProperty("TestDouble", 13.37);
+    testComponent.AddProperty("TestString", std::string("DefaultString"));
+    testComponent.AddProperty("TestVec3", glm::vec3(1.f, 2.f, 3.f));
+    w1.RegisterComponent(testComponent);
+
+    // Create a test entity
+    EntityID w1_e1 = w1.CreateEntity();
+    auto w1_c1 = w1.AttachComponent(w1_e1, "Test");
+
+    // Create a child
+    EntityID w1_e2 = w1.CreateEntity(w1_e1);
+    auto w1_c2 = w1.AttachComponent(w1_e2, "Test");
+    w1_c2["TestString"] = "NonDefaultString";
+
+    // Copy the world!
+    World w2 = w1;
+
+    // Fetch the components
+    auto w2_c1 = w2.GetComponent(w1_e1, "Test");
+    auto w2_c2 = w2.GetComponent(w1_e2, "Test");
+
+    // Check that built-in types are copied but don't reside in the same memory
+    BOOST_CHECK((int)w1_c1["TestInteger"] == (int)w2_c1["TestInteger"]);
+    BOOST_CHECK(&(int&)w1_c1["TestInteger"] != &(int&)w2_c1["TestInteger"]);
+    BOOST_CHECK((double)w1_c1["TestDouble"] == (double)w2_c1["TestDouble"]);
+    BOOST_CHECK(&(int&)w1_c1["TestDouble"] != &(int&)w2_c1["TestDouble"]);
+    BOOST_CHECK((int)w1_c2["TestInteger"] == (int)w2_c2["TestInteger"]);
+    BOOST_CHECK(&(int&)w1_c2["TestInteger"] != &(int&)w2_c2["TestInteger"]);
+    BOOST_CHECK((double)w1_c2["TestDouble"] == (double)w2_c2["TestDouble"]);
+    BOOST_CHECK(&(int&)w1_c2["TestDouble"] != &(int&)w2_c2["TestDouble"]);
+    // Check that specially handled strings are fine
+    BOOST_CHECK((std::string)w1_c1["TestString"] == (std::string)w2_c1["TestString"]);
+    BOOST_CHECK(&(std::string&)w1_c1["TestString"] != &(std::string&)w2_c1["TestString"]);
+    BOOST_CHECK((std::string)w1_c2["TestString"] == (std::string)w2_c2["TestString"]);
+    BOOST_CHECK(&(std::string&)w1_c2["TestString"] != &(std::string&)w2_c2["TestString"]);
+}

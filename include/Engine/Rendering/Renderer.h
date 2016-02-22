@@ -24,9 +24,12 @@
 #include "imgui/imgui.h"
 #include "TextPass.h"
 #include "Util/CommonFunctions.h"
+#include "Core/PerformanceTimer.h"
 
 class Renderer : public IRenderer
 {
+    static void glfwFrameBufferCallback(GLFWwindow* window, int width, int height);
+
 public:
     Renderer(EventBroker* eventBroker) 
         : m_EventBroker(eventBroker)
@@ -38,8 +41,12 @@ public:
 
     virtual PickData Pick(glm::vec2 screenCoord) override;
 
+
 private:
     //----------------------Variables----------------------//
+
+    static std::unordered_map <GLFWwindow*, Renderer*> m_WindowToRenderer;
+
     EventBroker* m_EventBroker;
     TextPass* m_TextPass;
 
@@ -51,6 +58,7 @@ private:
     Model* m_UnitSphere;
 
     int m_DebugTextureToDraw = 0;
+    bool m_ResizeWindow = false;
 	float m_SSAO_Radius = 1.0f;
 	float m_SSAO_Bias = 0.05f;
 	float m_SSAO_Contrast = 1.5f;

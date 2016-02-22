@@ -3,7 +3,7 @@
 //This should be set by the config anyway.
 float PlayerSpawnSystem::m_RespawnTime = 15.0f;
 
-PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params) 
+PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params)
     : System(params)
     , m_Timer(0.f)
 {
@@ -49,7 +49,7 @@ void PlayerSpawnSystem::Update(double dt)
             }
 
             // Spawn the player!
-            EntityWrapper player = SpawnerSystem::Spawn(spawner);
+            EntityWrapper player = SpawnerSystem::Spawn(spawner, EntityWrapper::Invalid, "Player");
             // Set the player team affiliation
             player["Team"]["Team"] = req.Team;
 

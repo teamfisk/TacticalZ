@@ -15,11 +15,11 @@ class CollisionSystem : public PureSystem
 public:
     CollisionSystem(SystemParams params, Octree<EntityAABB>* octree)
         : System(params)
-        , PureSystem("Collidable")
+        , PureSystem("Physics")
         , m_Octree(octree)
     { }
 
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPhysics, double dt) override;
 
 private:
     Octree<EntityAABB>* m_Octree;
