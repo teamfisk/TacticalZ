@@ -43,6 +43,9 @@
 							<xs:element ref="c:Shield" minOccurs="0"/>
 							<xs:element ref="c:Shielded" minOccurs="0"/>
 							<xs:element ref="c:CapturePointHUD" minOccurs="0"/>
+							<xs:element ref="c:BlendOverride" minOccurs="0"/>
+							<xs:element ref="c:Blend" minOccurs="0"/>
+							<xs:element ref="c:BlendAdditive" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

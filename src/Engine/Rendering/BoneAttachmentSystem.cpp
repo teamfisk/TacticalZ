@@ -40,15 +40,10 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     glm::mat4 boneTransform;
 
     if (parent.HasComponent("Animation")) {
-        for (int i = 1; i <= 3; i++) {
-            ::Skeleton::AnimationData animationData;
-            animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(parent["Animation"]["AnimationName" + std::to_string(i)]);
-            if (animationData.animation == nullptr) {
-                continue;
-            }
-            animationData.time = (double)parent["Animation"]["Time" + std::to_string(i)];
-            animationData.weight = (double)parent["Animation"]["Weight" + std::to_string(i)];
-
+        ::Skeleton::AnimationData animationData;
+        animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(parent["Animation"]["AnimationName"]);
+        if (animationData.animation != nullptr) {
+            animationData.time = (double)parent["Animation"]["Time"];
             Animations.push_back(animationData);
         }
     }

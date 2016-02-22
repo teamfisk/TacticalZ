@@ -39,4 +39,7 @@
 	<xs:include schemaLocation="Components/Sprite.xsd"/>
 	<xs:include schemaLocation="Components/Shielded.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointHUD.xsd"/>
+	<xs:include schemaLocation="Components/BlendOverride.xsd"/>
+	<xs:include schemaLocation="Components/Blend.xsd"/>
+	<xs:include schemaLocation="Components/BlendAdditive.xsd"/>
 </xs:schema>

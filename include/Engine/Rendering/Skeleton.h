@@ -74,6 +74,7 @@ public:
         Blend,
         Override,
     };
+
     struct AnimationData
     {
         const Animation* animation;
@@ -108,25 +109,23 @@ public:
 
 	int GetBoneID(std::string name);
 
-    std::vector<glm::mat4>  GetFrameBones(std::vector<AnimationData> animations, AnimationOffset animationOffset, bool noRootMotion = false);
-    std::vector<glm::mat4>  GetFrameBones(std::vector<AnimationData> animations, bool noRootMotion = false);
+    std::vector<glm::mat4>  GetFrameBones();
+
+    std::vector<glm::mat4> GetFrameBones(const Animation* animation, double time, bool additive, bool noRootMotion = false);
+    void AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, bool additive, const Bone* bone, glm::mat4 parentMatrix);
 
     const Animation* GetAnimation(std::string name);
-
-    void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
-    void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, AnimationOffset animationOffset, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
-
     glm::mat4 AdditiveBlend(const Bone* bone, AnimationOffset animationOffset, glm::mat4 targetPose);
 
-    void PrintSkeleton();
-	void PrintSkeleton(const Bone* parent, int depthCount);
 	std::map<std::string, Animation> Animations;
 
     glm::mat4 GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 childMatrix);
     glm::mat4 GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, AnimationOffset animationOffset, glm::mat4 childMatrix);
     glm::mat4 GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, glm::mat4 childMatrix);
-    int GetKeyframe(const Animation& animation, double time);
 
+
+    std::vector<glm::mat4> BlendPoses(std::vector<glm::mat4> pose1, std::vector<glm::mat4> pose2, float weight);
+    std::vector<glm::mat4> OverridePose(std::vector<glm::mat4> overridePose, std::vector<glm::mat4> targetPose);
 
 private:
     glm::mat4 GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset);

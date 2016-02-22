@@ -15,6 +15,7 @@
 #include "../Core/Transform.h"
 #include "Skeleton.h"
 #include "ShaderProgram.h"
+#include "BlendTree.h"
 
 struct ModelJob : RenderJob
 {
@@ -122,41 +123,11 @@ struct ModelJob : RenderJob
             Skeleton = Model->m_RawModel->m_Skeleton;
 
             if (Skeleton != nullptr) {
-                if (world->HasComponent(Entity, "Animation")) {
-                    auto animationComponent = world->GetComponent(Entity, "Animation");
-
-                    for (int i = 1; i <= 3; i++) {
-                        ::Skeleton::AnimationData animationData;
-                        animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationComponent["AnimationName" + std::to_string(i)]);
-                        if (animationData.animation == nullptr) {
-                            continue;
-                        }
-                        animationData.time = (double)animationComponent["Time" + std::to_string(i)];
-                        animationData.weight = (double)animationComponent["Weight" + std::to_string(i)];
-                        
-                        if((int)animationComponent["BlendType" + std::to_string(i)].Enum("Additive") == (int)animationComponent["BlendType" + std::to_string(i)]) {
-                            animationData.blendType = Skeleton::BlendType::Additive;
-                        } else if ((int)animationComponent["BlendType" + std::to_string(i)].Enum("Blend") == (int)animationComponent["BlendType" + std::to_string(i)]) {
-                            animationData.blendType = Skeleton::BlendType::Blend;
-                        } else if ((int)animationComponent["BlendType" + std::to_string(i)].Enum("Override") == (int)animationComponent["BlendType" + std::to_string(i)]) {
-                            animationData.blendType = Skeleton::BlendType::Override;
-                        }
-
-                        animationData.level = (int)animationComponent["Level" + std::to_string(i)];
-                        Animations.push_back(animationData);
-                    }
-                }
-
-                if (world->HasComponent(Entity, "AnimationOffset")) {
-                    auto animationOffsetComponent = world->GetComponent(Entity, "AnimationOffset");
-                    AnimationOffset.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationOffsetComponent["AnimationName"]);
-                    AnimationOffset.time = (double)animationOffsetComponent["Time"];
-                } else {
-                    AnimationOffset.animation = nullptr;
-                }
+                
+                EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
+                BlendTree = new ::BlendTree(entityWrapper, Skeleton);
             }
         }
-            
     };
 
     unsigned int TextureID;
@@ -178,7 +149,7 @@ struct ModelJob : RenderJob
     std::vector<::Skeleton::AnimationData> Animations;
     ::Skeleton::AnimationOffset AnimationOffset;
     
-
+    ::BlendTree* BlendTree = nullptr;
 
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;
