@@ -189,6 +189,7 @@ void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
     for (auto it = itPair.first; it != itPair.second; it++) {
         EntityID childEntityID = it->second;
         // HACK: Only sync players for now, since the map turned out to be TOO LARGE to send in one snapshot and Simon's computer shits itself
+        // HACK: Also checked CapturePointHUD for now. (this would get out of sync);
         EntityWrapper childEntity(m_World, childEntityID);
         if (!shouldSendToClient(childEntity)) {
             continue;
@@ -547,7 +548,8 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid();
+    return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid() 
+        || childEntity.HasComponent("CapturePointHUD");
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()
