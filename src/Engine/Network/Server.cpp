@@ -136,7 +136,7 @@ void Server::parseMessageType(Packet& packet)
         parseOnPlayerDamage(packet);
         break;
     case MessageType::PlayerTransform:
-//       parsePlayerTransform(packet);
+       parsePlayerTransform(packet);
         break;
     default:
         break;
@@ -549,7 +549,8 @@ void Server::parsePlayerTransform(Packet& packet)
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
     return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid() 
-        || childEntity.HasComponent("CapturePointHUD");
+        || childEntity.HasComponent("CapturePointHUD") || childEntity.FirstParentWithComponent("CapturePointHUD").Valid();
+    
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()
