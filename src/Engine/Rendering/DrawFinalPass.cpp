@@ -177,7 +177,6 @@ void DrawFinalPass::InitializeShaderPrograms()
 void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
 {
     GLERROR("Pre");
-	RenderCamera = scene.Camera;
     DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
     if (scene.ClearDepth) {
         //glClear(GL_DEPTH_BUFFER_BIT);
@@ -768,26 +767,17 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 
 void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene)
 {
-	if (1/*job->Model->IsSkinned()*/) {
-		GLERROR("Bind 1 uniform");
-		GLint Location_M = glGetUniformLocation(shaderHandle, "M");
-		glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
-		GLERROR("Bind 2 uniform");
-		GLint Location_V = glGetUniformLocation(shaderHandle, "V");
-		glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-		GLERROR("Bind 3 uniform");
-		GLint Location_P = glGetUniformLocation(shaderHandle, "P");
-		glUniformMatrix4fv(Location_P, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-		GLERROR("Bind 4 uniform");
-	} else {
-		GLERROR("Bind 1 uniform");
-		GLint Location_M = glGetUniformLocation(shaderHandle, "M");
-		glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
-		GLERROR("Bind 2 uniform");
-		GLint Location_V = glGetUniformLocation(shaderHandle, "PV");
-		glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix()));
-		GLERROR("Bind 3 uniform");
-	}
+	GLERROR("Bind 1 uniform");
+	GLint Location_M = glGetUniformLocation(shaderHandle, "M");
+	glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
+	GLERROR("Bind 2 uniform");
+	GLint Location_V = glGetUniformLocation(shaderHandle, "V");
+	glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+	GLERROR("Bind 3 uniform");
+	GLint Location_P = glGetUniformLocation(shaderHandle, "P");
+	glUniformMatrix4fv(Location_P, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+	GLERROR("Bind 4 uniform");
+
 	GLint Location_ScreenDimensions = glGetUniformLocation(shaderHandle, "ScreenDimensions");
 	glUniform2f(Location_ScreenDimensions, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 	GLERROR("Bind 5 uniform");

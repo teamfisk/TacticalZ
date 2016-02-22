@@ -22,9 +22,6 @@ public:
     void ClearBuffer();
     void OnWindowResize();
 
-	//Return the texture that is used in later stages to apply the bloom effect
-	GLuint DepthBuffer() const { return m_DepthBuffer; }
-	Camera* DepthBufferCamera() const { return RenderCamera; }
     //Return the texture that is used in later stages to apply the bloom effect
     GLuint BloomTexture() const { return m_BloomTexture; }
     GLuint BloomTextureLowRes() const { return m_BloomTextureLowRes; }
@@ -65,7 +62,6 @@ private:
     GLuint m_SceneTextureLowRes;
     GLuint m_DepthBuffer;
     GLuint m_DepthBufferLowRes;
-	Camera* RenderCamera;
 
     //maqke this component based i guess?
     GLuint m_ShieldPixelRate = 16;
