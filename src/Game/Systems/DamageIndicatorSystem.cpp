@@ -14,6 +14,44 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
 
 bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
 {
+    //TEST
+    auto currentPos = (glm::vec3)e.Victim["Transform"]["Position"];
+    auto nextPos = glm::vec3(currentPos.x + 2.0f, currentPos.y, currentPos.z);
+    e.Inflictor["Transform"]["Position"] = nextPos;
+       
+    //SPAWN
+    //load the explosioneffect XML
+    auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
+    EntityFileParser parser2(deathEffect);
+    EntityID deathEffectID = parser2.MergeEntities(m_World);
+    EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
+
+    LOG_INFO("<- effect camera");
+
+    //components that we need from player
+    auto playerCamera = e.Victim.FirstChildByName("Camera");
+    auto playerModel = e.Victim.FirstChildByName("PlayerModel");
+    auto playerEntityModel = playerModel["Model"];
+    auto playerEntityAnimation = playerModel["Animation"];
+    LOG_INFO("-> effect camera");
+
+    //copy the data from player to explisioneffectmodel
+    playerEntityModel.Copy(deathEffectEW["Model"]);
+    playerEntityAnimation.Copy(deathEffectEW["Animation"]);
+    //freeze the animation
+    deathEffectEW["Animation"]["Speed1"] = 0.0;
+    deathEffectEW["Animation"]["Speed2"] = 0.0;
+    deathEffectEW["Animation"]["Speed3"] = 0.0;
+
+    //copy the models position,orientation
+    deathEffectEW["Transform"]["Position"] = (glm::vec3)e.Inflictor["Transform"]["Position"];
+    deathEffectEW["Transform"]["Orientation"] = (glm::vec3)e.Victim["Transform"]["Orientation"];
+
+
+
+    //TEST END
+
+
     LOG_INFO("<- damageindicator");
 
     if (m_CurrentCamera == EntityID_Invalid) {

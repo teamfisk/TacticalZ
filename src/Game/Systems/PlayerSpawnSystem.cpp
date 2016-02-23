@@ -134,7 +134,7 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         playerName["Text"]["Content"] = e.PlayerName;
     }
 
-    if (!IsClient) {
+    if (m_NetworkEnabled && !IsClient) {
         return false;
     }
 
