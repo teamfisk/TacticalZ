@@ -41,6 +41,7 @@ void UDPServer::Send(Packet & packet)
 // Broadcasting respond specific logic
 void UDPServer::Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint)
 {
+    packet.UpdateSize();
     m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
@@ -52,6 +53,7 @@ void UDPServer::Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint)
 // Broadcasting
 void UDPServer::Broadcast(Packet & packet, int port)
 {
+    packet.UpdateSize();
     m_Socket->set_option(boost::asio::socket_base::broadcast(true));
     m_Socket->send_to(
         boost::asio::buffer(
@@ -68,6 +70,7 @@ void UDPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
+    LOG_INFO("Received server list msg");
     playerDefinition.Endpoint = m_ReceiverEndpoint;
 }
 
@@ -90,6 +93,7 @@ int UDPServer::readBuffer()
     if (!m_Socket) {
         return 0;
     }
+    int addasdasd = m_Socket->available();
     boost::system::error_code error;
     // Read size of packet
      m_Socket->receive_from(boost

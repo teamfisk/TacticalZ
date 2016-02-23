@@ -203,6 +203,8 @@ void Client::parseServerlist(Packet& packet)
     std::string serverName = packet.ReadString();
     int playersConnected = packet.ReadPrimitive<int>();
     //TODO: This should not happen when a client is connected to a server
+    LOG_INFO("Parsing a server list!");
+
     m_Serverlist.push_back({ address, port, serverName, playersConnected });
 }
 

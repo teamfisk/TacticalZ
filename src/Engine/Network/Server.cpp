@@ -401,7 +401,7 @@ void Server::parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint)
     packet.WritePrimitive<int>(m_ConnectedPlayers.size());
     //PlayerDefinition pDef;
     //pDef.Endpoint = boost::asio::ip::udp::endpoint(endpoint.address(), 13);
-
+    LOG_INFO("Parsing a server list request!");
     m_ServerlistRequest.Send(packet/*, endpoint*/);
 }
 

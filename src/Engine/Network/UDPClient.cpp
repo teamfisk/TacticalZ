@@ -91,6 +91,7 @@ void UDPClient::Send(Packet& packet)
 
 void UDPClient::Broadcast(Packet& packet, int port)
 {
+    packet.UpdateSize();
     m_Socket->set_option(boost::asio::socket_base::broadcast(true));
     m_Socket->send_to(boost::asio::buffer(
         packet.Data(),
