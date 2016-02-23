@@ -2,6 +2,7 @@
 <Physics xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Physics.xsd">
 	<Velocity X="0" Y="0" Z="0"/>
 	<Gravity>true</Gravity>
+	<PrevOrigin X="-9876.5" Y="-9876.5" Z="-9876.5"/>
 	<IsOnGround>false</IsOnGround>
 	<VerticalStepHeight>0.33</VerticalStepHeight>
 </Physics>
