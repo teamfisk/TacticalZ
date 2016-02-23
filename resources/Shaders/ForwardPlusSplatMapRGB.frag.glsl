@@ -1,5 +1,7 @@
 #version 430
 
+#define MIN_AMBIENT_LIGHT 0.3
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -23,19 +25,20 @@ uniform vec2 SpecularUVRepeat3;
 uniform vec2 GlowUVRepeat1;
 uniform vec2 GlowUVRepeat2;
 uniform vec2 GlowUVRepeat3;
-layout (binding = 0) uniform sampler2D SplatMapTexture;
-layout (binding = 1) uniform sampler2D DiffuseTexture1;
-layout (binding = 2) uniform sampler2D DiffuseTexture2;
-layout (binding = 3) uniform sampler2D DiffuseTexture3;
-layout (binding = 4) uniform sampler2D NormalMapTexture1;
-layout (binding = 5) uniform sampler2D NormalMapTexture2;
-layout (binding = 6) uniform sampler2D NormalMapTexture3;
-layout (binding = 7) uniform sampler2D SpecularMapTexture1;
-layout (binding = 8) uniform sampler2D SpecularMapTexture2;
-layout (binding = 9) uniform sampler2D SpecularMapTexture3;
-layout (binding = 10) uniform sampler2D GlowMapTexture1;
-layout (binding = 11) uniform sampler2D GlowMapTexture2;
-layout (binding = 12) uniform sampler2D GlowMapTexture3;
+layout (binding = 0) uniform sampler2D AOTexture;
+layout (binding = 1) uniform sampler2D SplatMapTexture;
+layout (binding = 2) uniform sampler2D DiffuseTexture1;
+layout (binding = 3) uniform sampler2D DiffuseTexture2;
+layout (binding = 4) uniform sampler2D DiffuseTexture3;
+layout (binding = 5) uniform sampler2D NormalMapTexture1;
+layout (binding = 6) uniform sampler2D NormalMapTexture2;
+layout (binding = 7) uniform sampler2D NormalMapTexture3;
+layout (binding = 8) uniform sampler2D SpecularMapTexture1;
+layout (binding = 9) uniform sampler2D SpecularMapTexture2;
+layout (binding = 10) uniform sampler2D SpecularMapTexture3;
+layout (binding = 11) uniform sampler2D GlowMapTexture1;
+layout (binding = 12) uniform sampler2D GlowMapTexture2;
+layout (binding = 13) uniform sampler2D GlowMapTexture3;
 
 #define TILE_SIZE 16
 
@@ -174,6 +177,9 @@ vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
 
 void main()
 {
+	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy), 0).r;
+	ao = (clamp(1.0 - (1.0 - ao), 0.0, 1.0) + MIN_AMBIENT_LIGHT) /  (1.0 + MIN_AMBIENT_LIGHT);
+
 	vec4 splatTexel = texture2D(SplatMapTexture, Input.TextureCoordinate);
 
 	vec4 diffuseTexel = CalcBlendedTexel(splatTexel, DiffuseTexture1, DiffuseTexture2, DiffuseTexture3,
@@ -195,7 +201,7 @@ void main()
 	tilePos.y = int(gl_FragCoord.y/TILE_SIZE);
 
 	LightResult totalLighting;
-	totalLighting.Diffuse = vec4(AmbientColor.rgb, 1.0);
+	totalLighting.Diffuse = vec4(AmbientColor.rgb * ao, 1.0);
 	int currentTile = int(floor(gl_FragCoord.x/TILE_SIZE) + (floor(gl_FragCoord.y/TILE_SIZE) * int(ScreenDimensions.x/TILE_SIZE)));
 
 	int start = int(LightGrids.Data[currentTile].Start);
@@ -213,8 +219,8 @@ void main()
 		} else if (light.Type == 2) { //Directional
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 		}
-		totalLighting.Diffuse += light_result.Diffuse;
-		totalLighting.Specular += light_result.Specular;
+		totalLighting.Diffuse += vec4(light_result.Diffuse.rgb * ao, light_result.Diffuse.a);
+		totalLighting.Specular += vec4(light_result.Specular.rgb * ao, light_result.Specular.a);
 	}
 
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
