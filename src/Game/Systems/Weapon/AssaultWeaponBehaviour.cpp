@@ -386,7 +386,7 @@ bool AssaultWeaponBehaviour::shoot(double damage)
 
     // Check for friendly fire
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)m_Player["Team"]["Team"]) {
-        return false;
+        damage = 1;
     }
 
     // Deal damage! 

@@ -147,12 +147,12 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     int currentTeam = 0;
     bool canCapture = false;
     if (redTeamPlayersStandingInside > 0 && blueTeamPlayersStandingInside == 0) {
-        timerDeltaChange = redTeamPlayersStandingInside*dt;
+        timerDeltaChange = 3*redTeamPlayersStandingInside*dt;
         currentTeam = redTeam;
         canCapture = nextPossibleCapturePoint["Red"] == capturePointNumber;
     }
     if (redTeamPlayersStandingInside == 0 && blueTeamPlayersStandingInside > 0) {
-        timerDeltaChange = -blueTeamPlayersStandingInside*dt;
+        timerDeltaChange = -3*blueTeamPlayersStandingInside*dt;
         currentTeam = blueTeam;
         canCapture = nextPossibleCapturePoint["Blue"] == capturePointNumber;
     }
@@ -170,8 +170,8 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //if capturePoint is owned by the team, and the other team has been trying to take it, then increase/decrease the timer towards 0.0
-        if ((ownedBy == currentTeam && currentTeam == redTeam && (double)cCapturePoint["CaptureTimer"] < 0.0) ||
-            (ownedBy == currentTeam && currentTeam == blueTeam && (double)cCapturePoint["CaptureTimer"] > 0.0)) {
+        if ((ownedBy == currentTeam && currentTeam == redTeam && (double)cCapturePoint["CaptureTimer"] < captureTimeToTakeOver) ||
+            (ownedBy == currentTeam && currentTeam == blueTeam && (double)cCapturePoint["CaptureTimer"] > -captureTimeToTakeOver)) {
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //check if captureTimer > captureTimeToTakeOver and if so change owner and publish the eCaptured event
