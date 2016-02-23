@@ -5,7 +5,8 @@
 #include "../Rendering/IRenderer.h"
 #include "../Core/ResourceManager.h"
 #include "../Core/Event.h"
-
+#include "../Network/ESearchForServers.h"
+#include "../Network/EDisplayServerlist.h"
 
 #include "EButtonClicked.h"
 #include "EButtonPressed.h"
@@ -27,6 +28,8 @@ private:
     bool OnButtonRelease(const Events::ButtonReleased& e);
     EventRelay<MainMenuSystem, Events::ButtonPressed> m_EPressed;
     bool OnButtonPress(const Events::ButtonPressed& e);
+    EventRelay<MainMenuSystem, Events::DisplayServerlist> m_EDisplayServerlist;
+    bool OnDisplayServerlist(const Events::DisplayServerlist& e);
 
 };
 

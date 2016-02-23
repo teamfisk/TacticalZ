@@ -8,6 +8,7 @@ MainMenuSystem::MainMenuSystem(SystemParams params, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EPressed, &MainMenuSystem::OnButtonPress);
     EVENT_SUBSCRIBE_MEMBER(m_EReleased, &MainMenuSystem::OnButtonRelease);
     EVENT_SUBSCRIBE_MEMBER(m_EClicked, &MainMenuSystem::OnButtonClick);
+    EVENT_SUBSCRIBE_MEMBER(m_EDisplayServerlist, &MainMenuSystem::OnDisplayServerlist);
 }
 
 void MainMenuSystem::Update(double dt)
@@ -19,8 +20,9 @@ bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
 {
     if(e.EntityName == "Play") {
         //Run play code
-    } else if(e.EntityName == "Connect") {
-        //Run connect code
+    } else if(e.EntityName == "Connecting") {
+        LOG_INFO("Searching for LAN servers...");
+        m_EventBroker->Publish(Events::SearchForServers());
     } else if(e.EntityName == "Host") {
         //Run host code
     } else if(e.EntityName == "Quit") {
@@ -52,6 +54,20 @@ bool MainMenuSystem::OnButtonRelease(const Events::ButtonReleased& e)
 bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 {
 
+    return true;
+}
+
+bool MainMenuSystem::OnDisplayServerlist(const Events::DisplayServerlist& e)
+{
+    LOG_INFO("This is a serverlist V2!");
+    for (int i = 0; i < e.Serverlist.size(); i++) {
+        LOG_INFO("%s:%i\t%s\t%i/8"
+            , e.Serverlist[i].Address
+            , e.Serverlist[i].Port
+            , e.Serverlist[i].Name
+            , e.Serverlist[i].PlayersConnected
+        );
+    }
     return true;
 }
 

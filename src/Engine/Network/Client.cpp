@@ -80,7 +80,10 @@ void Client::Update()
     if (m_SearchingForServers) {
         if (m_SearchingTime < (1000* (std::clock() - m_StartSearchTime) / (double)CLOCKS_PER_SEC)) {
             m_SearchingForServers = false;
-            displayServerlist();
+            //displayServerlist();
+            Events::DisplayServerlist e;
+            e.Serverlist = m_Serverlist;
+            m_EventBroker->Publish(e);
         }
     }
 
@@ -419,12 +422,6 @@ void Client::disconnect()
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    // TEMP
-    if (e.Command == "SearchForServers" && e.Value > 0) {
-        Events::SearchForServers e;
-        m_EventBroker->Publish(e);
-    }
-
     if (e.PlayerID != -1) {
         return false;
     }
@@ -492,7 +489,6 @@ bool Client::OnSearchForServers(const Events::SearchForServers& e)
     m_SearchingForServers = true;
     m_StartSearchTime = std::clock();
     m_Serverlist.clear();
-    LOG_INFO("Searching for LAN servers...\n");
     Packet packet(MessageType::ServerlistRequest);
     m_ServerlistRequest.Broadcast(packet, 13); // TODO: Config
     return true;

@@ -25,18 +25,7 @@
 #include "Network/SnapshotFilter.h"
 #include "Core/EPlayerSpawned.h"
 #include "Network/ESearchForServers.h"
-
-struct ServerInfo
-{
-    ServerInfo(std::string a, int b, std::string c, int d)
-    {
-        Address = a; Port = b; Name = c; PlayersConnected = d;
-    }
-    std::string Address = "";
-    int Port = 0;
-    std::string Name = "";
-    int PlayersConnected = 0;
-};
+#include "Network/EDisplayServerlist.h"
 
 class Client : public Network
 {
