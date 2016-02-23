@@ -31,15 +31,17 @@ private:
     EntityID m_CurrentCamera = -1;
     struct DamageIndicatorStruct {
         EntityWrapper spriteEntity;
-        //double timeLeft;
         glm::vec3 enemyPosition;
         DamageIndicatorStruct(EntityWrapper entity, glm::vec3 pos)
             : spriteEntity(entity)
-            //, timeLeft(time)
             , enemyPosition(pos) {}
     };
     std::vector<DamageIndicatorStruct> updateDamageIndicatorVector;
     float CalculateAngle(EntityWrapper player, glm::vec3 enemyPos);
+    glm::vec3 DamageIndicatorTest(EntityWrapper player);
+
+    //for tests
     int m_TestVar = 0;
+    bool m_Testing = true;
 };
 #endif
