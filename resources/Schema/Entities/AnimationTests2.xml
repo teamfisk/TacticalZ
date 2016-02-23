@@ -65,11 +65,10 @@
         </Entity>
         <Entity name="Assault">
           <Components>
-            <c:Blend>
-              <Pose1>BlendOverride</Pose1>
-              <Pose2>AimAdditive</Pose2>
-              <Weight>1</Weight>
-            </c:Blend>
+            <c:BlendAdditive>
+              <Adder>AimAdditive</Adder>
+              <Receiver>BlendOverride</Receiver>
+            </c:BlendAdditive>
             <c:Model>
               <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
             </c:Model>
@@ -93,9 +92,8 @@
             <Entity name="AimAdditive">
               <Components>
                 <c:Animation>
-                  <AnimationName>AimRifle</AnimationName>
-                  <Time>0.13031392561420052</Time>
-                  <Speed>0.5</Speed>
+                  <AnimationName>AimRifleA</AnimationName>
+                  <Time>1</Time>
                   <Additive>true</Additive>
                 </c:Animation>
                 <c:Transform/>
@@ -106,56 +104,78 @@
               <Components>
                 <c:BlendOverride>
                   <Master>ShootRifleAnimation</Master>
-                  <Slave>BlendWalkRun</Slave>
-                  <Weight>0</Weight>
+                  <Slave>MovementBlend</Slave>
                 </c:BlendOverride>
                 <c:Transform/>
               </Components>
               <Children>
-                <Entity name="BlendWalkRun">
-                  <Components>
-                    <c:Blend>
-                      <Pose1>RunAnimtaion</Pose1>
-                      <Pose2>WalkAnimation</Pose2>
-                      <Weight>1</Weight>
-                    </c:Blend>
-                    <c:Transform/>
-                  </Components>
-                  <Children>
-                    <Entity name="RunAnimtaion">
-                      <Components>
-                        <c:Animation>
-                          <AnimationName>Run</AnimationName>
-                          <Time>0.26062785122840193</Time>
-                          <Speed>1</Speed>
-                        </c:Animation>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="WalkAnimation">
-                      <Components>
-                        <c:Animation>
-                          <AnimationName>Walk</AnimationName>
-                          <Time>0.26101654028221088</Time>
-                          <Speed>1</Speed>
-                        </c:Animation>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
                 <Entity name="ShootRifleAnimation">
                   <Components>
                     <c:Animation>
-                      <AnimationName>ShootFastRifle</AnimationName>
-                      <Time>0.061012901418647347</Time>
+                      <AnimationName>ShootFastRifleU</AnimationName>
+                      <Time>0.10655260153188972</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Transform/>
                   </Components>
                   <Children/>
+                </Entity>
+                <Entity name="MovementBlend">
+                  <Components>
+                    <c:Blend>
+                      <Pose1>BlendWalkRun</Pose1>
+                      <Pose2>StrafeAnimation</Pose2>
+                      <Weight>1</Weight>
+                    </c:Blend>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity name="StrafeAnimation">
+                      <Components>
+                        <c:Animation>
+                          <AnimationName>StrafeRightF</AnimationName>
+                          <Time>0.16490204151743337</Time>
+                          <Speed>1</Speed>
+                        </c:Animation>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="BlendWalkRun">
+                      <Components>
+                        <c:Blend>
+                          <Pose1>RunAnimtaion</Pose1>
+                          <Pose2>WalkAnimation</Pose2>
+                          <Weight>0.43000054359436035</Weight>
+                        </c:Blend>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="RunAnimtaion">
+                          <Components>
+                            <c:Animation>
+                              <AnimationName>RunF</AnimationName>
+                              <Time>0.9239205116676299</Time>
+                              <Speed>1</Speed>
+                            </c:Animation>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="WalkAnimation">
+                          <Components>
+                            <c:Animation>
+                              <AnimationName>WalkF</AnimationName>
+                              <Time>0.15333325334317904</Time>
+                              <Speed>1</Speed>
+                            </c:Animation>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
                 </Entity>
               </Children>
             </Entity>

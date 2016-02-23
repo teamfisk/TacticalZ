@@ -2,5 +2,4 @@
 <BlendOverride xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BlendOverride.xsd">
 	<Master></Master>
 	<Slave></Slave>
-	<Weight>1.0</Weight>
 </BlendOverride>

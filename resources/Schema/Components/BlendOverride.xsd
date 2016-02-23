@@ -7,7 +7,6 @@
 			<xs:all>
 				<xs:element name="Master" type="t:string" minOccurs="0"/>
 				<xs:element name="Slave" type="t:string" minOccurs="0"/>
-				<xs:element name="Weight" type="t:double" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

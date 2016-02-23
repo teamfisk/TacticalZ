@@ -130,6 +130,7 @@ void BlendTree::FillTree(Node* parentNode, EntityWrapper parentEntity, Skeleton*
             node->Name = childEntity.Name();
             node->Parent = parentNode;
             node->Type = NodeType::Blend;
+            (double&)childEntity["Blend"]["Weight"] = glm::clamp((float)(double)childEntity["Blend"]["Weight"], 0.f, 1.f);
             node->Weight = (double)childEntity["Blend"]["Weight"];
             parentNode->Child[childIndex] = node;
             childIndex++;
@@ -183,6 +184,7 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         node->Name = childEntity.Name();
         node->Parent = parentNode;
         node->Type = NodeType::Blend;
+        (double&)childEntity["Blend"]["Weight"] = glm::clamp((float)(double)childEntity["Blend"]["Weight"], 0.f, 1.f);
         node->Weight = (double)childEntity["Blend"]["Weight"];
         node->Child[0] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose1"], childEntity, skeleton);
         node->Child[1] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose2"], childEntity, skeleton);
@@ -208,7 +210,7 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
     return nullptr;
 }
 
-void BlendTree::Blend(Skeleton* skeleton, std::vector<glm::mat4>& pose)
+void BlendTree::Blend(Skeleton* skeleton, std::map<int, glm::mat4>& pose)
 {
     Node* currentNode;
     Node* start = m_Root;
@@ -220,29 +222,36 @@ void BlendTree::Blend(Skeleton* skeleton, std::vector<glm::mat4>& pose)
     LOG_INFO("\n\n");
     while (m_Root->Pose.size() == 0) {
         if(currentNode->Pose.size() == 0) {
-            if(currentNode->Child[0]->Pose.size() != 0 && currentNode->Child[1]->Pose.size() != 0) {
+            if (currentNode->Child[0] != nullptr && currentNode->Child[1] != nullptr) {
+                if (currentNode->Child[0]->Pose.size() != 0 && currentNode->Child[1]->Pose.size() != 0) {
 
-                switch (currentNode->Type) {
-                case BlendTree::NodeType::Additive:
-                    currentNode->Pose = skeleton->BlendPoses(currentNode->Child[0]->Pose, currentNode->Child[1]->Pose, currentNode->Weight);
-                    break;
-                case BlendTree::NodeType::Blend:
-                    currentNode->Pose = skeleton->BlendPoses(currentNode->Child[0]->Pose, currentNode->Child[1]->Pose, currentNode->Weight);
-                    break;
-                case BlendTree::NodeType::Override:
-                    currentNode->Pose = skeleton->OverridePose(currentNode->Child[0]->Pose, currentNode->Child[1]->Pose);
-                    break;
-                case BlendTree::NodeType::Animation:
-                    // do nothing
-                    break;
+                    switch (currentNode->Type) {
+                    case BlendTree::NodeType::Additive:
+                        currentNode->Pose = skeleton->BlendPoseAdditive(currentNode->Child[0]->Pose, currentNode->Child[1]->Pose);
+                        break;
+                    case BlendTree::NodeType::Blend:
+                        currentNode->Pose = skeleton->BlendPoses(currentNode->Child[0]->Pose, currentNode->Child[1]->Pose, currentNode->Weight);
+                        break;
+                    case BlendTree::NodeType::Override:
+                        currentNode->Pose = skeleton->OverridePose(currentNode->Child[0]->Pose, currentNode->Child[1]->Pose);
+                        break;
+                    case BlendTree::NodeType::Animation:
+                        // do nothing
+                        break;
+                    } 
+
+                    LOG_INFO("Blending %s and %s", currentNode->Child[0]->Name.c_str(), currentNode->Child[1]->Name.c_str());
+                } 
+            } else if (currentNode->Child[0] != nullptr) {
+                if (currentNode->Child[0]->Pose.size() != 0) {
+                    currentNode->Pose = currentNode->Child[0]->Pose;
                 }
-
-
-                LOG_INFO("Blending %s and %s", currentNode->Child[0]->Name.c_str(), currentNode->Child[1]->Name.c_str());
+            } else if (currentNode->Child[1] != nullptr) {
+                if (currentNode->Child[1]->Pose.size() != 0) {
+                    currentNode->Pose = currentNode->Child[1]->Pose;
+                }
             }
         } 
-
-
 
         currentNode = currentNode->Next();
 
@@ -257,17 +266,20 @@ void BlendTree::Blend(Skeleton* skeleton, std::vector<glm::mat4>& pose)
 
 std::vector<glm::mat4> BlendTree::GetBoneTransforms(Skeleton* skeleton)
 {
+    std::vector<glm::mat4> finalPose;
     if (skeleton == nullptr || m_Root == nullptr) {
-        std::vector<glm::mat4> pose;
-        for (auto& b : skeleton->Bones) {
-            pose.push_back(glm::mat4(1));
+        
+        for (int i = 0; i < skeleton->Bones.size(); i++) {
+            finalPose.push_back(glm::mat4(1));
         }
-        return pose;
+        return finalPose;
     }
 
-    std::vector<glm::mat4> pose;
+    std::map<int, glm::mat4> pose;
     Blend(skeleton, pose);
 
-    return pose;
+    finalPose = skeleton->GetFinalPose(pose);
+
+    return finalPose;
 }
 

@@ -26,7 +26,8 @@ public:
         Node* Parent = nullptr;
         Node* Child[2] = { nullptr, nullptr };
         NodeType Type;
-        std::vector<glm::mat4> Pose;
+        std::map<int, glm::mat4> Pose;
+        //std::vector<glm::mat4> Pose;
         float Weight = 0.f;
 
         Node* Next() {
@@ -69,7 +70,7 @@ private:
     void FillTree(Node* parentNode, EntityWrapper parentEntity, Skeleton* skeleton);
     BlendTree::Node* FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity, Skeleton* skeleton);
 
-    void Blend(Skeleton* skeleton, std::vector<glm::mat4>& pose);
+    void Blend(Skeleton* skeleton, std::map<int, glm::mat4>& pose);
 };
 
 #endif

@@ -49,25 +49,26 @@ std::vector<glm::mat4> Skeleton::GetFrameBones()
     }
     return finalMatrices;
 }
-std::vector<glm::mat4> Skeleton::GetFrameBones(const Animation* animation, const double time, bool additive, bool noRootMotion /*= false*/)
+std::map<int, glm::mat4> Skeleton::GetFrameBones(const Animation* animation, const double time, bool additive, bool noRootMotion /*= false*/)
 {
     if (animation == nullptr) {
-        std::vector<glm::mat4> finalMatrices;
+        std::map<int, glm::mat4> finalMatrices;
         for (auto& b : Bones) {
-            finalMatrices.push_back(glm::mat4(1));
+            finalMatrices[b.second->ID] = glm::mat4(1);
         }
         return finalMatrices;
     }
 
 
     std::map<int, glm::mat4> frameBones;
-    AccumulateBoneTransforms(true, animation, time, frameBones, additive, RootBone, glm::mat4(1));
 
-    std::vector<glm::mat4> finalMatrices;
-    for (auto &kv : frameBones) {
-        finalMatrices.push_back(kv.second);
+    if(!additive) {
+        AccumulateBoneTransforms(true, animation, time, frameBones, additive, RootBone, glm::mat4(1));
+    } else {
+        AdditiveBoneTransforms(animation, time, frameBones, RootBone);
     }
-    return finalMatrices;
+
+    return frameBones;
 }
 
 void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, bool additive, const Bone* bone, glm::mat4 parentMatrix)
@@ -77,7 +78,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
     }
 
     glm::mat4 boneMatrix;
-
+    
 
     if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
         std::vector<Animation::Keyframe> boneKeyFrames = animation->JointAnimations.at(bone->ID);
@@ -118,21 +119,21 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
                 position.z = 0;
             }
 
-            boneMatrix = parentMatrix * (glm::translate(position) * glm::toMat4(rotation) * glm::scale(scale));
-            boneMatrices[bone->ID] = boneMatrix *bone->OffsetMatrix;
+            boneMatrix = (glm::translate(position) * glm::toMat4(rotation) * glm::scale(scale));
+            boneMatrices[bone->ID] = boneMatrix;// *bone->OffsetMatrix;
 
         } else { // 1 keyframes for the current bone
             currentFrame = boneKeyFrames.at(0);
-            boneMatrix = parentMatrix * (glm::translate(currentFrame.BoneProperties.Position) * glm::toMat4(currentFrame.BoneProperties.Rotation) * glm::scale(currentFrame.BoneProperties.Scale));
-            boneMatrices[bone->ID] = boneMatrix *bone->OffsetMatrix;
+            boneMatrix =  (glm::translate(currentFrame.BoneProperties.Position) * glm::toMat4(currentFrame.BoneProperties.Rotation) * glm::scale(currentFrame.BoneProperties.Scale));
+            boneMatrices[bone->ID] = boneMatrix;// *bone->OffsetMatrix;
         }
     } else { // 0 keyframes for the current bone
         if (bone->Parent) {
-            boneMatrix = parentMatrix * (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
-            boneMatrices[bone->ID] = boneMatrix *bone->OffsetMatrix;
+            //boneMatrix = parentMatrix * (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
+            //boneMatrices[bone->ID] = boneMatrix *bone->OffsetMatrix;
         } else {
-            boneMatrix = glm::inverse(bone->OffsetMatrix);
-            boneMatrices[bone->ID] = parentMatrix;
+            //boneMatrix = glm::inverse(bone->OffsetMatrix);
+            //boneMatrices[bone->ID] = parentMatrix;
         }
     }
 
@@ -142,22 +143,36 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
 }
 
 
-glm::mat4 Skeleton::AdditiveBlend(const Bone* bone, AnimationOffset animationOffset, glm::mat4 targetPose)
+void Skeleton::AdditiveBoneTransforms(const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone)
 {
-    AnimationOffset refOffset = animationOffset;
-    refOffset.time = 0.5f; // reference pose is at 0.5s for now
-    glm::mat4 refPose = GetOffsetTransform(bone, refOffset);
-    glm::mat4 srcPose = GetOffsetTransform(bone, animationOffset);
-    glm::mat4 differencePose = srcPose * glm::inverse(refPose);
-    glm::mat4 finalPose = differencePose * targetPose;
-     return finalPose;
+    if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
+        glm::mat4 refPose = GetAdditiveBonePose(bone, animation, 0.0);
+        glm::mat4 srcPose = GetAdditiveBonePose(bone, animation, time);
+        glm::mat4 boneMatrix = srcPose * glm::inverse(refPose);
+        boneMatrices[bone->ID] = boneMatrix;
+    }
+
+    for (auto &child : bone->Children) {
+        AdditiveBoneTransforms(animation, time, boneMatrices, child);
+    }
 }
 
-glm::mat4 Skeleton::GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset)
-{
-    const Animation* animation = animationOffset.animation;
-    float time = animationOffset.time;
 
+
+glm::mat4 Skeleton::AdditiveBlend(const Bone* bone, AnimationOffset animationOffset, glm::mat4 targetPose)
+{
+/*
+    AnimationOffset refOffset = animationOffset;
+    refOffset.time = 0.5f; // reference pose is at 0.5s for now
+    glm::mat4 refPose = GetAdditiveBonePose(bone, refOffset);
+    glm::mat4 srcPose = GetAdditiveBonePose(bone, animationOffset);
+    glm::mat4 differencePose = srcPose * glm::inverse(refPose);
+    glm::mat4 finalPose = differencePose * targetPose;*/
+     return glm::mat4();
+}
+
+glm::mat4 Skeleton::GetAdditiveBonePose(const Bone* bone, const Animation* animation, double time)
+{
     glm::vec3 position = glm::vec3(0);
     glm::quat rotation = glm::quat();
     glm::vec3 scale = glm::vec3(1);
@@ -559,49 +574,105 @@ return boneMatrix;
 }
 
 
-std::vector<glm::mat4> Skeleton::BlendPoses(std::vector<glm::mat4> pose1, std::vector<glm::mat4> pose2, float weight)
+std::map<int, glm::mat4> Skeleton::BlendPoses(std::map<int, glm::mat4> pose1, std::map<int, glm::mat4> pose2, float weight)
 {
-    std::vector<glm::mat4> finalPose;
+    std::map<int, glm::mat4> finalPose;
 
-    if(pose1.size() != pose2.size()) {
-        LOG_ERROR("Number of bones does not match");
-        return finalPose;
-    }
-
-    for (int i = 0; i < pose1.size(); i++) {
+    for (auto& b : Bones) {
+        int boneID = b.second->ID;
         glm::mat4 blendedPose = glm::mat4(0);
 
-        blendedPose += pose1[i] * weight;
-
-        blendedPose += pose2[i] * (1.f - weight);
-
-        finalPose.push_back(blendedPose);
+        if(pose1.find(boneID) != pose1.end() && pose2.find(boneID) != pose2.end()) {
+            blendedPose += pose1.at(boneID) * weight;
+            blendedPose += pose2.at(boneID) * (1.f - weight);
+            finalPose[boneID] = blendedPose;
+        } else if(pose1.find(boneID) != pose1.end()) {
+            finalPose[boneID] = pose1.at(boneID);
+        } else if (pose2.find(boneID) != pose2.end()) {
+            finalPose[boneID] = pose2.at(boneID);
+        }
     }
 
     return finalPose;
 }
 
 
-std::vector<glm::mat4> Skeleton::OverridePose(std::vector<glm::mat4> overridePose, std::vector<glm::mat4> targetPose)
+std::map<int, glm::mat4> Skeleton::OverridePose(std::map<int, glm::mat4> overridePose, std::map<int, glm::mat4> targetPose)
 {
-    std::vector<glm::mat4> finalPose;
+    std::map<int, glm::mat4> finalPose;
 
-    if (overridePose.size() != targetPose.size()) {
-        LOG_ERROR("Number of bones does not match");
-        return finalPose;
-    }
-
-    for (int i = 0; i < targetPose.size(); i++) {
-        if(overridePose[i] != glm::mat4(1)) {
-            finalPose.push_back(overridePose[i]);
-        } else {
-            finalPose.push_back(targetPose[i]);
+    for (auto& b : Bones) {
+        int boneID = b.second->ID;
+        if (overridePose.find(boneID) != overridePose.end()) {
+            finalPose[boneID] = overridePose.at(boneID);
+        } else if (targetPose.find(boneID) != targetPose.end()) {
+            finalPose[boneID] = targetPose.at(boneID);
         }
+    }
+    return finalPose;
+}
 
-        //finalPose.push_back(overridePose[i]);
+
+std::map<int, glm::mat4> Skeleton::BlendPoseAdditive(std::map<int, glm::mat4> additivePose, std::map<int, glm::mat4> targetPose)
+{
+    std::map<int, glm::mat4> finalPose;
+
+    for (auto& b : Bones) {
+        int boneID = b.second->ID;
+        glm::mat4 blendedPose = glm::mat4(1);
+
+        if (additivePose.find(boneID) != additivePose.end() && targetPose.find(boneID) != targetPose.end()) {
+            blendedPose = additivePose.at(boneID) * targetPose.at(boneID);
+            finalPose[boneID] = blendedPose;
+
+        } else if (additivePose.find(boneID) != additivePose.end()) {
+            finalPose[boneID] = additivePose.at(boneID);
+        } else if (targetPose.find(boneID) != targetPose.end()) {
+            finalPose[boneID] = targetPose.at(boneID);
+        }
     }
 
     return finalPose;
+}
+
+std::vector<glm::mat4> Skeleton::GetFinalPose(std::map<int, glm::mat4>& boneMatrices)
+{
+    std::vector<glm::mat4> finalPose;
+
+    AccumulateFinalPose(boneMatrices, RootBone, glm::mat4(1));
+
+
+    for(auto& b : boneMatrices) {
+        finalPose.push_back(b.second);
+    }
+
+    return finalPose;
+}
+
+void Skeleton::AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
+{
+
+    glm::mat4 boneMatrix;
+
+
+    if (boneMatrices.find(bone->ID) != boneMatrices.end()) {
+
+        boneMatrix = parentMatrix * boneMatrices.at(bone->ID);
+        boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
+
+    } else {
+        if (bone->Parent) {
+            boneMatrix = parentMatrix * (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
+            boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
+        } else {
+            boneMatrix = glm::inverse(bone->OffsetMatrix);
+            boneMatrices[bone->ID] = parentMatrix;
+        }
+    }
+
+    for (auto &child : bone->Children) {
+        AccumulateFinalPose(boneMatrices, child, boneMatrix);
+    }
 }
 
 int Skeleton::GetBoneID(std::string name)
