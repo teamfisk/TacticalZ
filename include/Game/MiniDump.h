@@ -3,6 +3,6 @@
 
 #include <Windows.h>
 
-void WINAPI Create_Dump(PEXCEPTION_POINTERS pException, BOOL File_Flag, BOOL Show_Flag);
+void WINAPI Create_Dump(PEXCEPTION_POINTERS pException);
 
 #endif

@@ -9,6 +9,7 @@
 #include <ctime>
 
 #include <windows.h>
+#include <comdef.h>
 #include <tlhelp32.h>
 //#include "dbghelp.h"
 
@@ -28,9 +29,24 @@ typedef struct _MINIDUMP_EXCEPTION_INFORMATION {
 	BOOL	ClientPointers;
 } MINIDUMP_EXCEPTION_INFORMATION, *PMINIDUMP_EXCEPTION_INFORMATION;
 
-typedef enum _MINIDUMP_TYPE {
-	MiniDumpNormal =			0x00000000,
-	MiniDumpWithDataSegs =		0x00000001,
+typedef enum _MINIDUMP_TYPE
+{
+    MiniDumpNormal = 0x00000000,
+    MiniDumpWithDataSegs = 0x00000001,
+    MiniDumpWithFullMemory = 0x00000002,
+    MiniDumpWithHandleData = 0x00000004,
+    MiniDumpFilterMemory = 0x00000008,
+    MiniDumpScanMemory = 0x00000010,
+    MiniDumpWithUnloadedModules = 0x00000020,
+    MiniDumpWithIndirectlyReferencedMemory = 0x00000040,
+    MiniDumpFilterModulePaths = 0x00000080,
+    MiniDumpWithProcessThreadData = 0x00000100,
+    MiniDumpWithPrivateReadWriteMemory = 0x00000200,
+    MiniDumpWithoutOptionalData = 0x00000400,
+    MiniDumpWithFullMemoryInfo = 0x00000800,
+    MiniDumpWithThreadInfo = 0x00001000,
+    MiniDumpWithCodeSegs = 0x00002000,
+    MiniDumpWithoutManagedState = 0x00004000,
 } MINIDUMP_TYPE;
 
 typedef	BOOL (WINAPI * MINIDUMP_WRITE_DUMP)(
@@ -63,48 +79,64 @@ MINIDUMP_WRITE_DUMP	MiniDumpWriteDump_;
 typedef	HANDLE (WINAPI * CREATE_TOOL_HELP32_SNAPSHOT)(DWORD dwFlags, DWORD th32ProcessID);
 
 //*************************************************************************************
-void WINAPI Create_Dump(PEXCEPTION_POINTERS pException, BOOL File_Flag, BOOL Show_Flag)
+void WINAPI Create_Dump(PEXCEPTION_POINTERS pException)
 //*************************************************************************************
 // Create dump. 
 // pException can be either GetExceptionInformation() or NULL.
-// If File_Flag = TRUE - write dump files (.dmz and .dmp) with the name of the current process.
-// If Show_Flag = TRUE - show message with Get_Exception_Info() dump.
 {
     // Try to get MiniDumpWriteDump() address.
     hDbgHelp = LoadLibrary("DBGHELP.DLL");
     MiniDumpWriteDump_ = (MINIDUMP_WRITE_DUMP)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
 
-	// If MiniDumpWriteDump() of DbgHelp.dll available.
-	if (MiniDumpWriteDump_)
-	{
-	    HANDLE	hDump_File;
-	    CHAR	Dump_Path[MAX_PATH];
+    // If MiniDumpWriteDump() of DbgHelp.dll available.
+    if (MiniDumpWriteDump_)
+    {
+        //get absolute path of current process: C:/ ... /name.exe
+        CHAR Dump_Path[MAX_PATH];
+        GetModuleFileName(NULL, Dump_Path, sizeof(Dump_Path));
+        std::string path(Dump_Path);
 
-	    GetModuleFileName(NULL, Dump_Path, sizeof(Dump_Path));	//path of current process
+        //Get current time in a string.
         std::time_t t = std::time(NULL);
         char tStr[16];
-        std::strftime(tStr, 32, " %a %H-%M-%S", std::localtime(&t));
+        std::strftime(tStr, ARRAYSIZE(tStr), " %a %H-%M-%S", std::localtime(&t));
         std::string time(tStr);
-        std::string path(Dump_Path);
+        // Remove the .exe from path
         path = path.substr(0, path.length() - 4);
+        // Add the current time and .dmp
         path += time + ".dmp";
 
-		MINIDUMP_EXCEPTION_INFORMATION	M;
-		M.ThreadId = GetCurrentThreadId();
-		M.ExceptionPointers = pException;
-		M.ClientPointers = 0;
+        MINIDUMP_EXCEPTION_INFORMATION M;
+        M.ThreadId = GetCurrentThreadId();
+        M.ExceptionPointers = pException;
+        M.ClientPointers = TRUE;
 
-		hDump_File = CreateFile(path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        HANDLE hDump_File = CreateFile(path.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        
+        DWORD curProId = GetCurrentProcessId();
+        //HANDLE curPro = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_DUP_HANDLE, FALSE, curProId);
+        HANDLE curPro = GetCurrentProcess();
 
-		MiniDumpWriteDump_(GetCurrentProcess(), GetCurrentProcessId(), hDump_File,
-			MiniDumpNormal, (pException) ? &M : NULL, NULL, NULL);
+        BOOL result = MiniDumpWriteDump_(curPro, curProId, hDump_File,
+            MiniDumpNormal, (pException) ? &M : NULL, NULL, NULL);
+        HRESULT error = (HRESULT)GetLastError();
 
-		CloseHandle(hDump_File);
-
-        std::cout << "Memory dumped to: \"" << path.c_str() << "\"";
-        MessageBox(NULL, ("Application crashed, memory dumped to: " + path).c_str(), "MiniDump", MB_ICONHAND | MB_OK);
+        CloseHandle(hDump_File);
+        if (!result) {
+            _com_error cErr(error);
+            HRESULT actualErrorCode = error & 0xFFFF;
+            char eBuf[16];
+            std::sprintf(eBuf, "0x%x", actualErrorCode);
+            std::cout << "Bad memory dump at: \"" << path.c_str() << "\"" << std::endl
+                << "because MiniDumpWriteDump failed with error #" << actualErrorCode << " (" << eBuf << "): \"" << cErr.ErrorMessage() << "\"" << std::endl;
+            MessageBox(NULL, "Application crashed, memory dump failed, but file was created.", "MiniDump", MB_ICONHAND | MB_OK);
+        } else {
+            std::cout << "Memory dumped to: \"" << path.c_str() << "\"";
+            MessageBox(NULL, ("Application crashed, memory dumped to: " + path).c_str(), "MiniDump", MB_ICONHAND | MB_OK);
+        }
     } else {
-        MessageBox(NULL, "Application crashed, memory dump failed.", "MiniDump", MB_ICONHAND | MB_OK);
+        std::cout << "Memory dump failed because MiniDumpWriteDump is not available.";
+        MessageBox(NULL, "Application crashed, could not create a memory dump.", "MiniDump", MB_ICONHAND | MB_OK);
     }
 }
 
