@@ -1,6 +1,6 @@
 #include "Network/Server.h"
 
-Server::Server(World* world, EventBroker* eventBroker, int port) 
+Server::Server(World* world, EventBroker* eventBroker, int port)
     : Network(world, eventBroker)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
@@ -119,6 +119,9 @@ void Server::parseMessageType(Packet& packet)
         break;
     case MessageType::PlayerTransform:
         parsePlayerTransform(packet);
+        break;
+    case MessageType::OnDoubleJump:
+        parseDoubleJump(packet);
         break;
     default:
         break;
@@ -279,7 +282,7 @@ void Server::parseTCPConnect(Packet & packet)
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    
+
     LOG_INFO("Parsing connections");
     // Check if player is already connected
     // Ska vara till lagd i TCPServer receive
@@ -426,7 +429,7 @@ bool Server::OnPlayerDamage(const Events::PlayerDamage& e)
     packet.WritePrimitive(e.Damage);
     reliableBroadcast(packet);
 
-    return false;
+    return true;
 }
 
 void Server::parseClientPing()
@@ -451,6 +454,12 @@ void Server::parsePing()
             break;
         }
     }
+}
+
+bool Server::parseDoubleJump(Packet & packet)
+{
+    reliableBroadcast(packet);
+    return true;
 }
 
 void Server::parseOnInputCommand(Packet& packet)

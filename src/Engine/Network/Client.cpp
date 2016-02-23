@@ -30,6 +30,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EPDoubleJump, &Client::OnDoubleJump);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
     if (address.empty()) {
@@ -121,6 +122,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::OnPlayerDamage:
         parsePlayerDamage(packet);
+        break;
+    case MessageType::OnDoubleJump:
+        parseDoubleJump(packet);
         break;
     default:
         break;
@@ -235,6 +239,20 @@ void Client::parseComponentDeletion(Packet & packet)
     std::string componentType = packet.ReadString();
     if (m_World->HasComponent(entity, componentType)) {
         m_World->DeleteComponent(m_ServerIDToClientID.at(entity), componentType);
+    }
+}
+
+void Client::parseDoubleJump(Packet & packet)
+{ 
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
+    }
+    Events::DoubleJump e;
+    e.entityID = m_ServerIDToClientID.at(serverID);
+    // If player is local player to publish to prevent infinite feedback loop
+    if (e.entityID != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
     }
 }
 
@@ -415,6 +433,11 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
     if (e.Inflictor != m_LocalPlayer) {
         return false;
     }
+    // Could this happen?
+    //if (!clientServerMapsHasEntity(e.Inflictor.ID) 
+    //    || !clientServerMapsHasEntity(e.Victim.ID)) {
+    //    return;
+    //}
 
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Inflictor.ID));
@@ -448,6 +471,17 @@ void Client::parsePlayerDamage(Packet& packet)
     if (e.Inflictor != m_LocalPlayer) {
         m_EventBroker->Publish(e);
     }
+}
+
+bool Client::OnDoubleJump(Events::DoubleJump & e)
+{
+    if (!clientServerMapsHasEntity(e.entityID) || e.entityID != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDoubleJump);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.entityID));
+    m_Reliable.Send(packet);
+    return true;
 }
 
 void Client::sendLocalPlayerTransform()

@@ -17,6 +17,7 @@
 #include "Core/EPlayerDamage.h"
 #include "Network/EPlayerDisconnected.h"
 #include "Core/EPlayerSpawned.h"
+#include "../Game/Events/EDoubleJump.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
 
@@ -54,7 +55,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers
     std::clock_t m_StartPingTime;
-    
+
     // Packet loss logic
     PacketID m_PacketID = 0;
     PacketID m_PreviousPacketID = 0;
@@ -77,9 +78,10 @@ private:
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
-    void parsePing();    
-    void parseUDPConnect(Packet & packet);
-    void parseTCPConnect(Packet & packet);
+    void parsePing();
+    bool parseDoubleJump(Packet& packet);
+    void parseUDPConnect(Packet& packet);
+    void parseTCPConnect(Packet& packet);
     void parseDisconnect();
     bool shouldSendToClient(EntityWrapper childEntity);
 
