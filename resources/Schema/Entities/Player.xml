@@ -291,8 +291,7 @@
                   </Children>
                 </Entity>
               </Children>
-            </Entity>
-            <Entity name="KillFeed">
+            </Entity>            <Entity name="KillFeed">
               <Components>
                 <c:KillFeed/>
                 <c:Transform>
