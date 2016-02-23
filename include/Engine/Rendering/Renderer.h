@@ -17,6 +17,7 @@
 #include "DrawBloomPass.h"
 #include "DrawColorCorrectionPass.h"
 #include "SSAOPass.h"
+#include "CubeMapPass.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
@@ -74,6 +75,7 @@ private:
     DrawBloomPass* m_DrawBloomPass;
     DrawColorCorrectionPass* m_DrawColorCorrectionPass;
 	SSAOPass* m_SSAOPass;
+    CubeMapPass* m_CubeMapPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();

@@ -22,6 +22,7 @@ layout (binding = 1) uniform sampler2D DiffuseTexture;
 layout (binding = 2) uniform sampler2D NormalMapTexture;
 layout (binding = 3) uniform sampler2D SpecularMapTexture;
 layout (binding = 4) uniform sampler2D GlowMapTexture;
+layout (binding = 5) uniform samplerCube CubeMap;
 
 #define TILE_SIZE 16
 
@@ -132,7 +133,9 @@ void main()
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
-	vec4 viewVec = normalize(-position); 
+	vec4 viewVec = normalize(-position);
+	vec3 R = reflect(-viewVec.xyz, normal.xyz);
+	vec4 reflectionColor = texture(CubeMap, R);
 
 	vec2 tilePos;
 	tilePos.x = int(gl_FragCoord.x/TILE_SIZE);
@@ -171,7 +174,8 @@ void main()
 	if(pos <= FillPercentage) {
 		color_result += FillColor;
 	}
-	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
+	//sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
+	sceneColor = vec4(reflectionColor.xyz, 1);
 	color_result += glowTexel*GlowIntensity;
 
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), clamp(color_result.a, 0, 1));
