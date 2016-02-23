@@ -25,6 +25,13 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     const int capturePointNumber = cCapturePoint["CapturePointNumber"];
     const bool hasTeamComponent = capturePointEntity.HasComponent("Team");
 
+    if (m_NumberOfCapturePoints != 0) {
+        if (!m_CapturePointNumberToEntityMap[0].HasComponent("CapturePoint")) {
+            //if map has changed, the capturepoints has changed, now have to redo them
+            m_NumberOfCapturePoints = 0;
+            m_CapturePointNumberToEntityMap.clear();
+        }
+    }
     //if point doesnt have a teamComponent yet, add one. since:
     //what if capture point has no team -> we cant get/use the team enum from it...
     if (!hasTeamComponent) {
