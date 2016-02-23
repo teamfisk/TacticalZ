@@ -70,7 +70,6 @@ void UDPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
-    LOG_INFO("Received server list msg");
     playerDefinition.Endpoint = m_ReceiverEndpoint;
 }
 
@@ -81,15 +80,6 @@ bool UDPServer::IsSocketAvailable()
 
 int UDPServer::readBuffer()
 {
-    //boost::system::error_code error = boost::asio::error::host_not_found;
-    //unsigned int length = m_Socket->receive_from(
-    //    boost::asio::buffer((void*)data
-    //        , BUFFERSIZE)
-    //    , m_ReceiverEndpoint, 0, error);
-    //if (error) {
-    //    LOG_WARNING(error.message().c_str());
-    //}
-    //return length;
     if (!m_Socket) {
         return 0;
     }
