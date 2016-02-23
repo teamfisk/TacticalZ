@@ -134,7 +134,8 @@ void main()
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position);
-	vec3 R = reflect(-viewVec.xyz, normal.xyz);
+	vec3 R = reflect(viewVec.xyz, normal.xyz);
+	R = vec3(P * vec4(R, 1.0));
 	vec4 reflectionColor = texture(CubeMap, R);
 
 	vec2 tilePos;
@@ -166,6 +167,8 @@ void main()
 
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
+	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
+	color_result = color_result * clamp(1/specularTexel, 0, 1) + reflectionColor * clamp(specularTexel, 0, 1);
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
@@ -174,8 +177,8 @@ void main()
 	if(pos <= FillPercentage) {
 		color_result += FillColor;
 	}
-	//sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
-	sceneColor = vec4(reflectionColor.xyz, 1);
+	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
+	//sceneColor = vec4(reflectionColor.xyz, 1);
 	color_result += glowTexel*GlowIntensity;
 
 	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), clamp(color_result.a, 0, 1));
