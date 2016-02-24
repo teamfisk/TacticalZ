@@ -76,7 +76,7 @@ struct LightResult {
 };
 
 float CalcAttenuation(float radius, float dist, float falloff) {
-	return 1.0 - smoothstep(radius * 0.3, radius, dist);
+	return 1.0 - smoothstep(radius * falloff, radius, dist);
 }
 
 vec4 CalcSpecular(vec4 lightColor, vec4 viewVec,  vec4 lightVec, vec4 normal) {
@@ -174,7 +174,7 @@ void main()
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 	color_result += glowTexel*GlowIntensity;
 
-	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
+	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), clamp(color_result.a, 0, 1));
 
 	//Tiled Debug Code
 	/*

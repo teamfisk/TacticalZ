@@ -192,8 +192,10 @@ void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
     state->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene, SSAOTexture);
     GLERROR("OpaqueObjects");
+    state->BlendFunc(GL_ONE, GL_ONE);
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene, SSAOTexture);
     GLERROR("TransparentObjects");
+    state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     DrawSprites(scene.Jobs.SpriteJob, scene);
     GLERROR("SpriteJobs");
 
