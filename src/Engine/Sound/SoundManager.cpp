@@ -56,13 +56,10 @@ void SoundManager::stopEmitters()
 void SoundManager::Update(double dt)
 {
     m_EventBroker->Process<SoundManager>();
-    deleteInactiveEmitters(); // can be optimized with "EEntityDeleted"
+    deleteInactiveEmitters();
     updateEmitters(dt);
     updateListener(dt);
-
-    // Editor debug info
-    ImGui::SliderFloat("BGM", &m_BGMVolumeChannel, 0.0f, 1.0f, "%.3f", 1.0f);
-    ImGui::SliderFloat("SFX", &m_SFXVolumeChannel, 0.0f, 1.0f, "%.3f", 1.0f);
+    mainMenuLoop();
 }
 
 void SoundManager::deleteInactiveEmitters()
@@ -166,7 +163,18 @@ Source* SoundManager::createSource(std::string filePath)
     Source* source = new Source();
     source->ALsource = alSource;
     source->SoundResource = ResourceManager::Load<Sound>(filePath);
+    source->Duration = getDurationSeconds(source);
     return source;
+}
+
+
+void SoundManager::mainMenuLoop()
+{
+    float time = getTimeOffsetSeconds(m_CurrentBGM);
+    if (m_CurrentBGM->Duration - time <= 5) { // 5 is hard coded value that Petter recommended
+        m_CurrentBGM = createSource("Audio/crosscounter.wav");
+        playSound(m_CurrentBGM);
+    }
 }
 
 void SoundManager::playSound(Source* source)
@@ -338,10 +346,30 @@ void SoundManager::setSoundProperties(Source* source, ComponentWrapper* soundCom
     float gain = (source->Type == SoundType::SFX) ? m_SFXVolumeChannel : m_BGMVolumeChannel;
     alSourcef(source->ALsource, AL_GAIN, (float)(double)(*soundComponent)["Gain"] * gain);
     alSourcef(source->ALsource, AL_PITCH, (float)(double)(*soundComponent)["Pitch"]);
-    alSourcei(source->ALsource, AL_LOOPING, (int)(bool)(*soundComponent)["Loop"]); // YOLO
+    alSourcei(source->ALsource, AL_LOOPING, (int)(bool)(*soundComponent)["Loop"]);
     alSourcef(source->ALsource, AL_MAX_DISTANCE, (float)(double)(*soundComponent)["MaxDistance"]);
     alSourcef(source->ALsource, AL_ROLLOFF_FACTOR, (float)(double)(*soundComponent)["RollOffFactor"]);
     alSourcef(source->ALsource, AL_REFERENCE_DISTANCE, (float)(double)(*soundComponent)["ReferenceDistance"]);
+}
+
+float SoundManager::getDurationSeconds(Source* source)
+{
+    ALuint buffer = source->SoundResource->Buffer();
+    ALint sizeBytes, channels, bits, frequenzy;
+    alGetBufferi(buffer, AL_SIZE, &sizeBytes);
+    alGetBufferi(buffer, AL_CHANNELS, &channels);
+    alGetBufferi(buffer, AL_BITS, &bits);
+    alGetBufferi(buffer, AL_FREQUENCY, &frequenzy);
+    float sampleLength = (float)sizeBytes * 8 / (channels * bits);
+    return (sampleLength / frequenzy);
+}
+
+
+float SoundManager::getTimeOffsetSeconds(Source* source)
+{
+    float time;
+    alGetSourcef(source->ALsource, AL_SEC_OFFSET, &time);
+    return time;
 }
 
 void SoundManager::initOpenAL()

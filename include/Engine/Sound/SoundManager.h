@@ -9,25 +9,23 @@
 #include "OpenAL/al.h"
 #include "OpenAL/alc.h"
 
-#include "imgui/imgui.h"
-
-#include "Core/World.h"
-#include "Core/EventBroker.h"
+#include "../Engine/Core/World.h"
+#include "../Engine/Core/EventBroker.h"
 #include "../Engine/Core/ResourceManager.h"
 #include "../Engine/Core/ConfigFile.h"
-#include "Core/Transform.h" // Absolute transform
-#include "Sound/Sound.h"
+#include "../Engine/Core/Transform.h"
+#include "../Engine/Sound/Sound.h"
 #include "../Engine/Sound/EPlayQueueOnEntity.h"
-#include "Sound/EPlaySoundOnEntity.h"
-#include "Sound/EPlaySoundOnPosition.h"
-#include "Sound/EPlayBackgroundMusic.h"
-#include "Sound/EPauseSound.h"
-#include "Sound/EContinueSound.h"
-#include "Sound/EStopSound.h"
-#include "Sound/ESetBGMGain.h"
-#include "Sound/ESetSFXGain.h"
-#include "Core/EPause.h"
-#include "Core/EComponentAttached.h"
+#include "../Engine/Sound/EPlaySoundOnEntity.h"
+#include "../Engine/Sound/EPlaySoundOnPosition.h"
+#include "../Engine/Sound/EPlayBackgroundMusic.h"
+#include "../Engine/Sound/EPauseSound.h"
+#include "../Engine/Sound/EContinueSound.h"
+#include "../Engine/Sound/EStopSound.h"
+#include "../Engine/Sound/ESetBGMGain.h"
+#include "../Engine/Sound/ESetSFXGain.h"
+#include "../Engine/Core/EPause.h"
+#include "../Engine/Core/EComponentAttached.h"
 #include "../Core/EPlayerSpawned.h"
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
@@ -43,6 +41,7 @@ struct Source
     Sound* SoundResource = nullptr;
     ALuint ALsource;
     SoundType Type;
+    float Duration;
 };
 
 class SoundManager
@@ -74,14 +73,18 @@ private:
     ALenum getSourceState(ALuint source);
     void setGain(Source* source, float gain);
     void setSoundProperties(Source* source, ComponentWrapper* soundComponent);
+    float getDurationSeconds(Source* source);
+    float getTimeOffsetSeconds(Source* source);
 
     // Specific logic
     void playSound(Source* source);
-    // Need to be the same format (sample rate etc)
+    // Needs to be the same format (sample rate etc)
     void playQueue(QueuedBuffers qb);
     void stopSound(Source* source);
     Source* createSource(std::string filePath);
     std::unordered_map<EntityID, Source*> m_Sources;
+    void mainMenuLoop();
+    Source* m_CurrentBGM;
 
     // Logic
     World* m_World = nullptr;
