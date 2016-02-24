@@ -14,11 +14,13 @@
 #include <glm/gtx/vector_angle.hpp>
 
 #include "Rendering/Util/CommonFunctions.h"
+//#define INDICATOR_TEST
 
-class DamageIndicatorSystem : public System
+class DamageIndicatorSystem : public ImpureSystem
 {
 public:
     DamageIndicatorSystem(SystemParams params);
+    virtual void Update(double dt) override;
 
 private:
     EventRelay<DamageIndicatorSystem, Events::PlayerDamage> m_EPlayerDamage;
@@ -28,6 +30,20 @@ private:
     bool OnSetCamera(const Events::SetCamera& e);
 
     EntityID m_CurrentCamera = -1;
+    struct DamageIndicatorStruct {
+        EntityWrapper spriteEntity;
+        glm::vec3 enemyPosition;
+        DamageIndicatorStruct(EntityWrapper sprite, glm::vec3 pos)
+            : spriteEntity(sprite)
+            , enemyPosition(pos) {}
+    };
+    std::vector<DamageIndicatorStruct> updateDamageIndicatorVector;
+    float CalculateAngle(EntityWrapper player, glm::vec3 enemyPos);
 
+    //for tests
+#ifdef INDICATOR_TEST
+    glm::vec3 DamageIndicatorTest(EntityWrapper player);
+    int m_TestVar = 0;
+#endif
 };
 #endif
