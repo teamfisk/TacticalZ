@@ -8,7 +8,6 @@
 #include "Core/System.h"
 #include "Engine/Collision/ETrigger.h"
 #include "Events/ECaptured.h"
-#include "Events/EWin.h"
 
 #include <tuple>
 #include <vector>

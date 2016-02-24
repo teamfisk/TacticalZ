@@ -12,18 +12,16 @@
 #include "Input/InputProxy.h"
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
-#include "Core/EKeyDown.h"
 #include "Core/EntityFilePreprocessor.h"
-#include "Core/SystemPipeline.h"
+#include "Core/EntitySystem.h"
 #include "Systems/ExplosionEffectSystem.h"
 #include "Editor/EditorSystem.h"
 #include "Core/EntityFile.h"
-#include "Rendering/RenderSystem.h"
 #include "Core/EntityFileParser.h"
 #include "Core/Octree.h"
 #include "Rendering/Font.h"
-#include "Systems/InterpolationSystem.h"
 #include "Collision/EntityAABB.h"
+
 // Network
 #include <boost/thread.hpp>
 #include "Network/Network.h"
@@ -55,11 +53,7 @@ private:
 	IRenderer* m_Renderer;
 	InputManager* m_InputManager;
     InputProxy* m_InputProxy;
-    World* m_World;
-    Octree<EntityAABB>* m_OctreeCollision;
-    Octree<EntityAABB>* m_OctreeTrigger;
-    Octree<EntityAABB>* m_OctreeFrustrumCulling;
-    SystemPipeline* m_SystemPipeline;
+    EntitySystem<World>* m_EntitySystem;
     RenderFrame* m_RenderFrame;
     Client* m_NetworkClient = nullptr;
     Server* m_NetworkServer = nullptr;

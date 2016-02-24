@@ -1,34 +1,8 @@
 #include "Game.h"
-#include "Collision/FillOctreeSystem.h"
-#include "Collision/FillFrustumOctreeSystem.h"
-#include "Collision/EntityAABB.h"
-#include "Collision/TriggerSystem.h"
-#include "Collision/CollisionSystem.h"
-#include "Systems/RaptorCopterSystem.h"
-#include "Systems/HealthSystem.h"
-#include "Systems/PlayerMovementSystem.h"
-#include "Systems/SpawnerSystem.h"
-#include "Systems/PlayerSpawnSystem.h"
-#include "Systems/PlayerDeathSystem.h"
 #include "Core/EntityFileWriter.h"
-#include "Game/Systems/CapturePointSystem.h"
-#include "Game/Systems/CapturePointHUDSystem.h"
-#include "Game/Systems/PickupSpawnSystem.h"
-#include "Game/Systems/AmmoPickupSystem.h"
-#include "Game/Systems/DamageIndicatorSystem.h"
-#include "Game/Systems/Weapon/WeaponSystem.h"
-#include "Rendering/AnimationSystem.h"
-#include "Game/Systems/HealthHUDSystem.h"
-#include "Rendering/BoneAttachmentSystem.h"
-#include "Game/Systems/LifetimeSystem.h"
-#include "../Engine/Core/UniformScaleSystem.h"
-#include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
-#include "Game/Systems/AmmunitionHUDSystem.h"
-#include "Game/Systems/KillFeedSystem.h"
-#include "GUI/ButtonSystem.h"
-#include "GUI/MainMenuSystem.h"
-
+#include "Systems/PlayerSpawnSystem.h"
+#include "CapturePointsEntitySystem.h"
 
 Game::Game(int argc, char* argv[])
 {
@@ -48,6 +22,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
+    // HACK: This shouldn't be a config variable
     PlayerSpawnSystem::SetRespawnTime(m_Config->Get<float>("Debug.RespawnTime", 15.0f));
 
     // Create the core event broker
@@ -74,91 +49,30 @@ Game::Game(int argc, char* argv[])
     m_InputProxy->AddHandler<MouseInputHandler>();
     m_InputProxy->LoadBindings("Input.ini");
 
-    // Create a world
-    m_World = new World(m_EventBroker);
-    std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
-    if (!mapToLoad.empty()) {
-        auto file = ResourceManager::Load<EntityFile>(mapToLoad);
-        EntityFilePreprocessor fpp(file);
-        fpp.RegisterComponents(m_World);
-        EntityFileParser fp(file);
-        fp.MergeEntities(m_World);
-    }
-
     // Create the sound manager
-    m_SoundManager = new SoundManager(m_World, m_EventBroker);
+    //m_SoundManager = new SoundManager(m_World, m_EventBroker);
+
+    // Create an entity system
+    m_EntitySystem = new CapturePointsEntitySystem(m_EventBroker, m_IsClient, m_IsServer, m_Renderer, m_RenderFrame);
 
     // Initialize network
     if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
         if (m_IsServer) {
-            m_NetworkServer = new Server(m_World, m_EventBroker, m_NetworkPort);
+            m_NetworkServer = new Server(m_EntitySystem, m_EventBroker, m_NetworkPort);
             m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " SERVER");
         } else if (m_IsClient) {
-            m_NetworkClient = new Client(m_World, m_EventBroker, std::make_unique<MultiplayerSnapshotFilter>(m_EventBroker));
+            m_NetworkClient = new Client(m_EntitySystem, m_EventBroker, std::make_unique<MultiplayerSnapshotFilter>(m_EventBroker));
             m_NetworkClient->Connect(m_NetworkAddress, m_NetworkPort);
             m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " CLIENT");
         }
     }
-
-    // Create Octrees
-    // TODO: Perhaps the world bounds should be set in some non-arbitrary way instead of this.
-    AABB boxContainingTheWorld(glm::vec3(-300), glm::vec3(300));
-    m_OctreeCollision = new Octree<EntityAABB>(boxContainingTheWorld, 4);
-    m_OctreeTrigger = new Octree<EntityAABB>(boxContainingTheWorld, 4);
-    m_OctreeFrustrumCulling = new Octree<EntityAABB>(boxContainingTheWorld, 4);
-    // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker, m_IsClient, m_IsServer);
-
-    // All systems with orderlevel 0 will be updated first.
-    unsigned int updateOrderLevel = 0;
-    m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
-    ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer, m_OctreeCollision);
-    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
-    m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
-    // Populate Octree with collidables
-    ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
-    m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
-    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
-    m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<HealthHUDSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PlayerDeathSystem>(updateOrderLevel);
-    // Collision and TriggerSystem should update after player.
-    ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
-    m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeTrigger);
-    ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame, m_OctreeFrustrumCulling);
-    ++updateOrderLevel;
-    m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     m_LastTime = glfwGetTime();
 }
 
 Game::~Game()
 {
-    delete m_SystemPipeline;
-    delete m_OctreeFrustrumCulling;
-    delete m_OctreeCollision;
-    delete m_OctreeTrigger;
+    delete m_EntitySystem;
     delete m_SoundManager;
     if (m_NetworkClient != nullptr) {
         delete m_NetworkClient;
@@ -166,7 +80,6 @@ Game::~Game()
     if (m_NetworkServer != nullptr) {
         delete m_NetworkServer;
     }
-    delete m_World;
     delete m_InputProxy;
     delete m_InputManager;
     delete m_RenderFrame;
@@ -195,7 +108,7 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     PerformanceTimer::StartTimerAndStopPrevious("SoundManager");
-    m_SoundManager->Update(dt);
+    //m_SoundManager->Update(dt);
 
     // Update network
     PerformanceTimer::StartTimerAndStopPrevious("Network");
@@ -209,9 +122,9 @@ void Game::Tick()
     //m_SoundManager->Update(dt);
 
     // Iterate through systems and update world!
-    PerformanceTimer::StartTimerAndStopPrevious("SystemPipeline");
+    PerformanceTimer::StartTimerAndStopPrevious("EntitySystem");
     m_EventBroker->Process<SystemPipeline>();
-    m_SystemPipeline->Update(dt);
+    m_EntitySystem->Update(dt);
     PerformanceTimer::StartTimerAndStopPrevious("RendererUpdate");
     m_Renderer->Update(dt);
     PerformanceTimer::StartTimerAndStopPrevious("RendererDraw");

@@ -50,6 +50,7 @@
 							<xs:element ref="c:Menu" minOccurs="0"/>
 							<xs:element ref="c:Page" minOccurs="0"/>
 							<xs:element ref="c:Button" minOccurs="0"/>
+							<xs:element ref="c:Gamemode" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

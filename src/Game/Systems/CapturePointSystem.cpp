@@ -192,27 +192,6 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             //NextPossibleCapturePoint will be calculated in the next update...
         }
     }
-
-    //check for possible winCondition = check if the homebase is owned by the other team
-    bool checkForWinner = false;
-    if (capturePointNumber == m_RedTeamHomeCapturePoint && ownedBy != redTeam)
-    {
-        checkForWinner = true;
-    }
-    if (capturePointNumber == m_BlueTeamHomeCapturePoint && ownedBy != blueTeam)
-    {
-        checkForWinner = true;
-    }
-
-    if (checkForWinner && !m_WinnerWasFound)
-    {
-        //publish Win event
-        Events::Win e;
-        e.TeamThatWon = ownedBy;
-        m_EventBroker->Publish(e);
-        m_WinnerWasFound = true;
-    }
-
 }
 
 bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e)

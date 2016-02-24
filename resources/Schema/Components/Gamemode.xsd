@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:complexType name="GamemodeEnum" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="t:enum">
+				<xs:choice>
+					<xs:element name="CapturePoints" type="t:int" fixed="1" minOccurs="0"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	
+	<xs:element name="Gamemode">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Gamemode" type="GamemodeEnum" minOccurs="0"/>
+				<xs:element name="RoundTime" type="t:double" minOccurs="0"/>
+				<xs:element name="Running" type="t:bool" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

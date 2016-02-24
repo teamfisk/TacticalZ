@@ -10,8 +10,8 @@ namespace Events
 //triggers when a team has captured all capturePoints
 struct Win : Event
 {
-    //can be 0 = none, 1,2
-    int TeamThatWon;
+    // The winning team corresponding to TeamEnum
+    ComponentInfo::EnumType Team;
 };
 
 }

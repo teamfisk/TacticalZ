@@ -33,10 +33,16 @@ file(GLOB SOURCE_FILES_Network
 	"Network/*.cpp"
 )
 source_group(Network FILES ${SOURCE_FILES_Network})
+
+file(GLOB SOURCE_FILES
+    "${INCLUDE_PATH}/*.h"
+    "*.cpp"
+)
+list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/main.cpp")
+source_group(Game FILES ${SOURCE_FILES})
+
 set(SOURCE_FILES
     ${SOURCE_FILES}
-    "Game.cpp"
-	"MiniDump.cpp"
     ${SOURCE_FILES_Systems}
     ${SOURCE_FILES_Systems_Weapon}
     ${SOURCE_FILES_Events}
