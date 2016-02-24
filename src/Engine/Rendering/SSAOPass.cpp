@@ -31,12 +31,28 @@ void SSAOPass::InitializeShaderProgram()
 
 void SSAOPass::InitializeBuffer()
 {
-	GenerateTexture(&m_SSAOTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_R8, GL_RED, GL_FLOAT);
+	glGenTextures(1, &m_SSAOTexture);
+	glBindTexture(GL_TEXTURE_2D, m_SSAOTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_RED, GL_FLOAT, nullptr);
 
 	m_SSAOFramBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SSAOTexture, GL_COLOR_ATTACHMENT0)));
 	m_SSAOFramBuffer.Generate();
 
-	GenerateTexture(&m_SSAOViewSpaceZTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_R32F, GL_RED, GL_FLOAT);
+	glGenTextures(1, &m_SSAOViewSpaceZTexture);
+	glBindTexture(GL_TEXTURE_2D, m_SSAOViewSpaceZTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_RED, GL_FLOAT, nullptr);
+	//glTexStorage2D(GL_TEXTURE_2D, MAX_MIP_LEVEL, GL_R32F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);;
+	//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, GL_RED, GL_FLOAT, nullptr);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
 
 	m_SSAOViewSpaceZFramBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SSAOViewSpaceZTexture, GL_COLOR_ATTACHMENT0)));
 	m_SSAOViewSpaceZFramBuffer.Generate();
@@ -45,12 +61,12 @@ void SSAOPass::InitializeBuffer()
 void SSAOPass::ClearBuffer()
 {
 	m_SSAOFramBuffer.Bind();
-	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_SSAOFramBuffer.Unbind();
 
 	m_SSAOViewSpaceZFramBuffer.Bind();
-	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_SSAOViewSpaceZFramBuffer.Unbind();
 }
@@ -64,17 +80,6 @@ void SSAOPass::Setting(float radius, float bias, float contrast, float intensity
 	m_NumOfTurns = NumOfTurns;
 }
 
-void SSAOPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
-{
-	glGenTextures(1, texture);
-	glBindTexture(GL_TEXTURE_2D, *texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);
-	GLERROR("Texture initialization failed");
-}
 
 void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 {
@@ -111,6 +116,11 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 		(-2.0 / (m_Renderer->GetViewportSize().Height * camera->ProjectionMatrix()[1][1]))
 		);
 
+	m_SSAOViewSpaceZFramBuffer.Unbind();
+
+	//glBindTexture(GL_TEXTURE_2D, m_SSAOViewSpaceZTexture);
+	//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, GL_RED, GL_FLOAT, &m_SSAOViewSpaceZTexture);
+	//glGenerateMipmap(GL_TEXTURE_2D); 
 
 	m_SSAOFramBuffer.Bind();
 	m_SSAOProgram->Bind();
@@ -119,7 +129,7 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 	glBindTexture(GL_TEXTURE_2D, m_SSAOViewSpaceZTexture);
 
 	// How many pixel there are in a 1m long object 1m away from the camera
-	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uProjScale"), m_Renderer->GetViewportSize().Height / (-2.0f * glm::tan(camera->FOV() * 0.5f)));
+	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uProjScale"), m_Renderer->GetViewportSize().Height / (2.0f * glm::tan(glm::radians(camera->FOV() * 0.5f))));
 
 	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uRadius"), m_Radius);
 	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uBias"), m_Bias);

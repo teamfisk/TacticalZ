@@ -29,8 +29,6 @@ private:
 	void InitializeShaderProgram();
 	void InitializeBuffer();
 
-	void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
-
 	void ComputeAO(GLuint depthBuffer, Camera* camera);
 	//void blurHorizontal(GLuint depthBuffer);
 	//void blurVertical(GLuint depthBuffer);
@@ -38,7 +36,7 @@ private:
 	Model* m_ScreenQuad;
 
 	const IRenderer* m_Renderer;
-
+	static const GLint MAX_MIP_LEVEL = 5;
 	float m_Radius;
 	float m_Bias;
 	float m_Contrast;

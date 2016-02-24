@@ -31,7 +31,7 @@ uniform float           uIntensityScale;
 
 out float				AO;
 
-vec3 getVSPosition(ivec2 ScreenSpaceCoord) {
+vec3 getVSPosition(ivec2 ScreenSpaceCoord, int mipmaplevel) {
     float z = texelFetch(ViewSpaceZ, ScreenSpaceCoord, 0).r;
     //Get the xy view space coordinates and add the z value from ViewSpaceZ buffer.
     return vec3((uProjInfo[0] + (ScreenSpaceCoord.x * uProjInfo[1])) * z, (uProjInfo[2] + (ScreenSpaceCoord.y * uProjInfo[3])) * z, z);
@@ -56,12 +56,12 @@ vec3 getSampleViewSpacePos(ivec2 ScreenSpaceCoord, int SampleIndex, float Rotati
 
     vec2 screenSpaceSampleOffsetVecor = vec2(cos(angle), sin(angle));
 
-    //int mipmapLevel = clamp(int(floor(log2(-ScreenSpaceSampleRadius))) - MAX_PIXEL_BEFOR_LOWER_MIP_LEVEL, 0, MIP_MAPS_LEVELS);
+    int mipmapLevel = clamp(int(floor(log2(-ScreenSpaceSampleRadius))) - MAX_PIXEL_BEFOR_LOWER_MIP_LEVEL, 0, MIP_MAPS_LEVELS);
 
     // Get texel coordinate on where to sample by going screenSpaceSampleOffsetVecor direction in ScreenSpaceSampleRadius units from ScreenSpaceCoord (the point being shaded);
-    ivec2 screenSpaceSampleTexel = (ivec2(ScreenSpaceSampleRadius * screenSpaceSampleOffsetVecor) + ScreenSpaceCoord);// >> mipmapLevel;
+    ivec2 screenSpaceSampleTexel = (ivec2(ScreenSpaceSampleRadius * screenSpaceSampleOffsetVecor) + ScreenSpaceCoord) >> mipmapLevel;
 
-    return getVSPosition(screenSpaceSampleTexel);
+    return getVSPosition(screenSpaceSampleTexel, mipmapLevel);
 }
 
 
@@ -89,7 +89,7 @@ void main() {
 	ivec2 originScreenCoord = ivec2(gl_FragCoord.xy);
 
 	// We always get the Orginin from the level 0 of the mipmaps
-	vec3 origin = getVSPosition(originScreenCoord);
+	vec3 origin = getVSPosition(originScreenCoord, 0);
 
 	float radius;
 
