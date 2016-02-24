@@ -30,6 +30,7 @@ void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height
     currentRenderer->m_LightCullingPass->OnWindowResize();
     currentRenderer->m_PickingPass->OnWindowResize();
     currentRenderer->m_DrawBloomPass->OnWindowResize();
+	currentRenderer->m_SSAOPass->OnWindowResize();
 }
 
 void Renderer::InitializeWindow()
@@ -126,6 +127,7 @@ void Renderer::Draw(RenderFrame& frame)
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
+	m_SSAOPass->ClearBuffer();
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
 	for (auto scene : frame.RenderScenes) {
 		PerformanceTimer::StartTimer("Renderer-Depth");
