@@ -54,6 +54,7 @@ void PickingPass::InitializeShaderPrograms()
 
 void PickingPass::Draw(RenderScene& scene)
 {
+    GLERROR("PRE");
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
     //TODO: Render: Add code for more jobs than modeljobs.
@@ -357,6 +358,7 @@ void PickingPass::Draw(RenderScene& scene)
 
 void PickingPass::ClearPicking()
 {
+    GLERROR("PRE");
     m_PickingColorsToEntity.clear();
     m_EntityColors.clear();
     m_ColorCounter[0] = 0;
@@ -366,6 +368,7 @@ void PickingPass::ClearPicking()
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_PickingBuffer.Unbind();
+    GLERROR("END");
 }
 
 

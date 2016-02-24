@@ -4,6 +4,7 @@
 #include "IRenderer.h"
 #include "DrawFinalPassState.h"
 #include "LightCullingPass.h"
+#include "CubeMapPass.h"
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
@@ -13,7 +14,7 @@
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass);
     ~DrawFinalPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -62,12 +63,14 @@ private:
     GLuint m_SceneTextureLowRes;
     GLuint m_DepthBuffer;
     GLuint m_DepthBufferLowRes;
+    GLuint m_CubeMapTexture;
 
     //maqke this component based i guess?
     GLuint m_ShieldPixelRate = 16;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
+    const CubeMapPass* m_CubeMapPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;
