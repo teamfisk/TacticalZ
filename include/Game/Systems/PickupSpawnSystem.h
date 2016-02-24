@@ -27,6 +27,7 @@ private:
         double HealthGain;
         double RespawnTimer;
         double DecreaseThisRespawnTimer;
+        EntityID parentID;
     };
     std::vector<NewHealthPickup> m_ETriggerTouchVector;
 };
