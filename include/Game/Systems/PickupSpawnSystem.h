@@ -5,8 +5,8 @@
 #include "Core/Transform.h"
 #include "Core/ResourceManager.h"
 #include "Core/EntityFileParser.h"
-#include "Core/EPickupSpawned.h"
-#include "Core/EPlayerHealthPickup.h"
+#include "Events/EPickupSpawned.h"
+#include "Events/EPlayerHealthPickup.h"
 #include "Engine/Collision/ETrigger.h"
 #include "Common.h"
 #include <tuple>

@@ -14,6 +14,7 @@ SoundSystem::SoundSystem(SystemParams params)
         EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
         EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
+        EVENT_SUBSCRIBE_MEMBER(m_EPlayerHealthPickup, &SoundSystem::OnPlayerHealthPickup);
     }
 }
 

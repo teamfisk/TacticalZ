@@ -7,8 +7,8 @@
 #include "Common.h"
 #include "Core/System.h"
 #include "Engine/Collision/ETrigger.h"
-#include "Core/ECaptured.h"
-#include "Core/EWin.h"
+#include "Events/ECaptured.h"
+#include "Events/EWin.h"
 
 #include <tuple>
 #include <vector>

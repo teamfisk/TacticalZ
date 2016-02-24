@@ -7,8 +7,8 @@
 #include "Common.h"
 #include "Core/System.h"
 #include "Core/EPlayerDamage.h"
-#include "Core/EPlayerHealthPickup.h"
 #include "Core/EPlayerDeath.h"
+#include "Events/EPlayerHealthPickup.h"
 #include "Core/ConfigFile.h"
 #include "Input/EInputCommand.h"
 
