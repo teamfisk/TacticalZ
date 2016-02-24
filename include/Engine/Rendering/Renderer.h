@@ -59,6 +59,7 @@ private:
     Model* m_UnitSphere;
 
     int m_DebugTextureToDraw = 0;
+    int m_CubeMapTexture = 0;
     bool m_ResizeWindow = false;
 	float m_SSAO_Radius = 1.0f;
 	float m_SSAO_Bias = 0.05f;

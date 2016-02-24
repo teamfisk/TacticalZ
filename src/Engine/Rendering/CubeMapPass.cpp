@@ -4,7 +4,6 @@ CubeMapPass::CubeMapPass(IRenderer* renderer)
     :m_Renderer(renderer)
 {
     LoadTextures("Nevada");
-    GenerateCubeMapTexture();
 }
 
 void CubeMapPass::LoadTextures(std::string input)
@@ -17,12 +16,15 @@ void CubeMapPass::LoadTextures(std::string input)
             Texture* img = ResourceManager::Load<Texture>(str);
             m_CubeMapTextures.push_back(img);
         }
+        GenerateCubeMapTexture();
     }
 }
 
 void CubeMapPass::GenerateCubeMapTexture()
 {
-    glGenTextures(1, &m_CubeMapTexture);
+    if (m_CubeMapTexture == -1) {
+        glGenTextures(1, &m_CubeMapTexture);
+    }
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapTexture);
 
     for (int i = 0; i < 6; i++) {

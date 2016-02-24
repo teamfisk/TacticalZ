@@ -108,6 +108,12 @@ void Renderer::Draw(RenderFrame& frame)
 {
     GLERROR("PRE");
     ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0Ambient Occlusion");
+    ImGui::Combo("CubeMap", &m_CubeMapTexture, "Nevada(512)\0Sky(1024)");
+    if(m_CubeMapTexture == 0) {
+        m_CubeMapPass->LoadTextures("Nevada");
+    } else if (m_CubeMapTexture == 1) {
+        m_CubeMapPass->LoadTextures("Sky");
+    }
 
 	ImGui::SliderFloat("SSAO sample radius", &m_SSAO_Radius, 0.01f, 5.0f);
 	ImGui::SliderFloat("SSAO bias", &m_SSAO_Bias, 0.0f, 0.1f);
