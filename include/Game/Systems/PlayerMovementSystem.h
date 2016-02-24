@@ -39,5 +39,5 @@ private:
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
 
     void updateMovementControllers(double dt);
-    void updateVelocity(double dt);
+    void updateVelocity(EntityWrapper player, double dt);
 };
