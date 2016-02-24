@@ -184,7 +184,7 @@ struct ModelJob : RenderJob
 
     void CalculateHash() override
     {
-        Hash = TextureID + ModelID << 10 + ShaderID << 20;
+        Hash = ShaderID << 20 + ModelID << 10 + TextureID;
     }
 };
 
