@@ -26,9 +26,9 @@ void main()
 	mat4 TIM = transpose(inverse(M));
 	Output.Position = Position;
 	Output.TextureCoordinate = TextureCoords;
-	Output.Normal = vec3(TIM) * Normal;
-	Output.Tangent = vec3(TIM) * Tangent;
- 	Output.BiTangent = vec3(TIM) * BiTangent;
+	Output.Normal = vec3(TIM * vec4(Normal, 0.0));
+	Output.Tangent = vec3(TIM * vec4(Tangent, 0.0));
+ 	Output.BiTangent = vec3(TIM * vec4(BiTangent, 0.0));
 	Output.ExplosionColor = vec4(1.0);
 	Output.ExplosionPercentageElapsed = 0.0;
 }
