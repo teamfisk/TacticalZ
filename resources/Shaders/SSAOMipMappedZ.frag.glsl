@@ -1,8 +1,8 @@
 #version 430
 
-#define MIP_MAPS_LEVELS (3)
+#define MIP_MAPS_LEVELS (5)
 
-#define MAX_PIXEL_BEFOR_LOWER_MIP_LEVEL (3)
+#define LOWER_MIP_LEVEL (2)
 //Number of samples per pixel
 uniform int           uNumOfSamples;
 //#define uNumOfSamples (11)
@@ -32,7 +32,7 @@ uniform float           uIntensityScale;
 out float				AO;
 
 vec3 getVSPosition(ivec2 ScreenSpaceCoord, int mipmaplevel) {
-    float z = texelFetch(ViewSpaceZ, ScreenSpaceCoord, 0).r;
+    float z = texelFetch(ViewSpaceZ, ScreenSpaceCoord, mipmaplevel).r;
     //Get the xy view space coordinates and add the z value from ViewSpaceZ buffer.
     return vec3((uProjInfo[0] + (ScreenSpaceCoord.x * uProjInfo[1])) * z, (uProjInfo[2] + (ScreenSpaceCoord.y * uProjInfo[3])) * z, z);
 }
@@ -56,8 +56,7 @@ vec3 getSampleViewSpacePos(ivec2 ScreenSpaceCoord, int SampleIndex, float Rotati
 
     vec2 screenSpaceSampleOffsetVecor = vec2(cos(angle), sin(angle));
 
-    int mipmapLevel = clamp(int(floor(log2(-ScreenSpaceSampleRadius))) - MAX_PIXEL_BEFOR_LOWER_MIP_LEVEL, 0, MIP_MAPS_LEVELS);
-
+    int mipmapLevel = clamp(int(floor(log2(-ScreenSpaceSampleRadius))) - LOWER_MIP_LEVEL, 0, MIP_MAPS_LEVELS);
     // Get texel coordinate on where to sample by going screenSpaceSampleOffsetVecor direction in ScreenSpaceSampleRadius units from ScreenSpaceCoord (the point being shaded);
     ivec2 screenSpaceSampleTexel = (ivec2(ScreenSpaceSampleRadius * screenSpaceSampleOffsetVecor) + ScreenSpaceCoord) >> mipmapLevel;
 
@@ -80,8 +79,6 @@ float sampleAO(ivec2 ScreenSpaceCoord, vec3 Origin, vec3 OriginNormal, float Scr
 	// vn - bias, offset the angle to reduse self occlusion. 
 	// epsilon is here to make divison by 0 impossible.
 	return float(vv < Radius2) * max((vn - uBias) / (epsilon + vv), 0.0);
-	//float f = max(radius2 - vv, 0.0); 
-	//return f * f * f * max((vn - uBias) / (epsilon + vv), 0.0);
 }
 
 
@@ -102,9 +99,15 @@ void main() {
 	float radius2 = radius * radius;
 
 	vec3 originNormal = getVSFaceNormal(origin);
+	//AO = originNormal;
+	//return;
 
 	//screenSpaceSampleRadius is in pixels
-	float screenSpaceSampleRadius = uProjScale * radius / origin.z;
+	float screenSpaceSampleRadius = -uProjScale * radius / origin.z;
+
+	//screenSpaceSampleRadius = clamp(screenSpaceSampleRadius, 0.0f, pow(2, MIP_MAPS_LEVELS * LOWER_MIP_LEVEL + 1));
+	//AO = clamp(int(floor(log2(screenSpaceSampleRadius))) - LOWER_MIP_LEVEL, 0, MIP_MAPS_LEVELS);
+	//return;
 
 	float rotationAngleOffset = 30 * originScreenCoord.x ^ originScreenCoord.y + 10 * originScreenCoord.x * originScreenCoord.y;
 

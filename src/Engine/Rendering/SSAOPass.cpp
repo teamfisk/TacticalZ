@@ -38,6 +38,8 @@ void SSAOPass::InitializeBuffer()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_RED, GL_FLOAT, nullptr);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_RED_INTEGER, GL_INT, nullptr);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height, 0, GL_RGB, GL_FLOAT, nullptr);
 
 	m_SSAOFramBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SSAOTexture, GL_COLOR_ATTACHMENT0)));
 	m_SSAOFramBuffer.Generate();
@@ -129,7 +131,7 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 	glBindTexture(GL_TEXTURE_2D, m_SSAOViewSpaceZTexture);
 
 	// How many pixel there are in a 1m long object 1m away from the camera
-	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uProjScale"), m_Renderer->GetViewportSize().Height / (2.0f * glm::tan(glm::radians(camera->FOV() * 0.5f))));
+	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uProjScale"), m_Renderer->GetViewportSize().Height / (-2.0f * glm::tan(glm::radians(camera->FOV()) * 0.5f)));
 
 	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uRadius"), m_Radius);
 	glUniform1f(glGetUniformLocation(SSAOShaderHandle, "uBias"), m_Bias);
@@ -144,8 +146,4 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 
 	m_DrawBloomPass->ClearBuffer();
 	m_DrawBloomPass->Draw(m_SSAOTexture);
-}
-
-void ComputeAO(GLuint depthBuffer, Camera* camera) {
-
 }

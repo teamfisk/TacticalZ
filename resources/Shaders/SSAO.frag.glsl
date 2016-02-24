@@ -99,12 +99,14 @@ void main() {
 		radius = uRadius;
 	}
 
+
 	float radius2 = radius * radius;
 
 	vec3 originNormal = getVSFaceNormal(origin);
 
 	//screenSpaceSampleRadius is in pixels
-	float screenSpaceSampleRadius = uProjScale * radius / origin.z;
+	float screenSpaceSampleRadius = -uProjScale * radius / origin.z;
+	//screenSpaceSampleRadius = clamp(screenSpaceSampleRadius, 0.0f, -uProjScale * radius);
 
 	float rotationAngleOffset = 30 * originScreenCoord.x ^ originScreenCoord.y + 10 * originScreenCoord.x * originScreenCoord.y;
 
@@ -116,5 +118,6 @@ void main() {
     //float A = max(0.0, 1.0 - sum * (2.0f / uNumOfSamples));
     float A = 1.0f - sum * (2.0f * uIntensityScale / float(uNumOfSamples));
     AO = clamp(pow(A, uContrast), 0.0f, 1.0f);
+    //AO = screenSpaceSampleRadius;
 	//AO = vec4(originNormal, 1.0f);
 }
