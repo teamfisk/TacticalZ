@@ -14,6 +14,7 @@
 #include <glm/gtx/vector_angle.hpp>
 
 #include "Rendering/Util/CommonFunctions.h"
+//#define INDICATOR_TEST
 
 class DamageIndicatorSystem : public ImpureSystem
 {
@@ -40,8 +41,9 @@ private:
     float CalculateAngle(EntityWrapper player, glm::vec3 enemyPos);
 
     //for tests
-    int m_TestVar = 0;
-    bool m_Testing = false;
+#ifdef INDICATOR_TEST
     glm::vec3 DamageIndicatorTest(EntityWrapper player);
+    int m_TestVar = 0;
+#endif
 };
 #endif

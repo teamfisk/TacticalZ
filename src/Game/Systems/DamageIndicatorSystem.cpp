@@ -42,9 +42,9 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
 
     glm::vec3 inflictorPos = e.Inflictor["Transform"]["Position"];
     //if testing
-    if (m_Testing) {
+#ifdef INDICATOR_TEST
         inflictorPos = DamageIndicatorTest(e.Victim);
-    }
+#endif
 
     float angleBetweenVectors = CalculateAngle(e.Victim, inflictorPos);
 
@@ -100,6 +100,7 @@ float DamageIndicatorSystem::CalculateAngle(EntityWrapper player, glm::vec3 enem
 
     return angleBetweenVectors;
 }
+#ifdef INDICATOR_TEST
 glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
     auto currentPos = (glm::vec3)player["Transform"]["Position"];
 
@@ -145,3 +146,4 @@ glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
     deathEffectEW["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
     return inflictorPos;
 }
+#endif
