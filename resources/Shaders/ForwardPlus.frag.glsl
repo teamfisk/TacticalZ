@@ -12,6 +12,7 @@ uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
 uniform float GlowIntensity = 10;
+uniform vec3 CameraPosition;
 
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
@@ -134,8 +135,9 @@ void main()
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position);
-	vec3 R = reflect(viewVec.xyz, normal.xyz);
-	R = vec3(P * vec4(R, 1.0));
+	vec3 I = normalize(vec3(M * vec4(Input.Position, 1.0)) - CameraPosition);
+	vec3 R = reflect(I, Input.Normal);
+	//R = vec3(P * vec4(R, 1.0));
 	vec4 reflectionColor = texture(CubeMap, R);
 
 	vec2 tilePos;
@@ -168,7 +170,7 @@ void main()
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
-	color_result = color_result * clamp(1/specularTexel, 0, 1) + reflectionColor * clamp(specularTexel, 0, 1);
+	//color_result = color_result * clamp(1/specularTexel, 0, 1) + reflectionColor * clamp(specularTexel, 0, 1);
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 

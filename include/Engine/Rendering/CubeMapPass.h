@@ -10,7 +10,7 @@ public:
     CubeMapPass(IRenderer* renderer);
     ~CubeMapPass() { }
 
-    void LoadTextures();
+    void LoadTextures(std::string input);
     void FillCubeMap(glm::vec3 originPosition);
     void GenerateCubeMapTexture();
 
@@ -19,8 +19,9 @@ public:
 
 private:
     IRenderer* m_Renderer;
+    std::string m_PreviusCubeMapTexture;
 
-    std::vector<Texture*> m_CubeMapTestTextures;
+    std::vector<Texture*> m_CubeMapTextures;
 };
 
 #endif 

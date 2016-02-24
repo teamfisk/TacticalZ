@@ -383,6 +383,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
                     glActiveTexture(GL_TEXTURE5);
                     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
                     std::vector<glm::mat4> frameBones;
                     if (explosionEffectJob->AnimationOffset.animation != nullptr) {
                         frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
@@ -399,6 +401,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionHandle, explosionEffectJob);
                     glActiveTexture(GL_TEXTURE5);
                     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
                 }
                 break;
             }
@@ -459,6 +463,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelTextures(forwardSkinnedHandle, modelJob);
                             glActiveTexture(GL_TEXTURE5);
                             glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                            glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
                             std::vector<glm::mat4> frameBones;
                             if (modelJob->AnimationOffset.animation != nullptr) {
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
@@ -476,6 +482,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelTextures(forwardHandle, modelJob);
                             glActiveTexture(GL_TEXTURE5);
                             glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                            glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
                         }
                         break;
                     }
