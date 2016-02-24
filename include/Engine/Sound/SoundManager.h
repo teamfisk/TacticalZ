@@ -19,11 +19,13 @@
 #include "../Engine/Sound/EPlaySoundOnEntity.h"
 #include "../Engine/Sound/EPlaySoundOnPosition.h"
 #include "../Engine/Sound/EPlayBackgroundMusic.h"
+#include "../Engine/Sound/EPlayAnnouncerVoice.h"
 #include "../Engine/Sound/EPauseSound.h"
 #include "../Engine/Sound/EContinueSound.h"
 #include "../Engine/Sound/EStopSound.h"
 #include "../Engine/Sound/ESetBGMGain.h"
 #include "../Engine/Sound/ESetSFXGain.h"
+#include "../Engine/Sound/ESetAnnouncerGain.h"
 #include "../Engine/Sound/EChangeBGM.h"
 #include "../Engine/Core/EPause.h"
 #include "../Engine/Core/EComponentAttached.h"
@@ -34,7 +36,8 @@ typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
 
 enum class SoundType {
     SFX,
-    BGM
+    BGM,
+    Announcer
 };
 
 struct Source
@@ -98,6 +101,7 @@ private:
 
     float m_BGMVolumeChannel = 1.0f;
     float m_SFXVolumeChannel = 1.0f;
+    float m_AnnouncerVolumeChannel = 1.0f;
     EntityWrapper m_LocalPlayer = EntityWrapper();
     
     // Events
@@ -107,6 +111,8 @@ private:
     bool OnPlaySoundOnPosition(const Events::PlaySoundOnPosition &e);
     EventRelay<SoundManager, Events::PlayBackgroundMusic> m_EPlayBackgroundMusic;
     bool OnPlayBackgroundMusic(const Events::PlayBackgroundMusic &e);
+    EventRelay<SoundManager, Events::PlayAnonuncerVoice> m_EPlayAnnouncerVoice;
+    bool OnPlayAnnouncerVoice(const Events::PlayAnonuncerVoice& e);
     EventRelay<SoundManager, Events::PauseSound> m_EPauseSound;
     bool OnPauseSound(const Events::PauseSound &e);
     EventRelay<SoundManager, Events::StopSound> m_EStopSound;
@@ -117,6 +123,8 @@ private:
     bool OnSetBGMGain(const Events::SetBGMGain &e);
     EventRelay<SoundManager, Events::SetSFXGain> m_ESetSFXGain; 
     bool OnSetSFXGain(const Events::SetSFXGain &e);
+    EventRelay<SoundManager, Events::SetAnnouncerGain> m_ESetAnnouncerGain;
+    bool OnSetAnnouncerGain(const Events::SetAnnouncerGain& e);
     EventRelay<SoundManager, Events::ComponentAttached> m_EComponentAttached;
     bool OnComponentAttached(const Events::ComponentAttached &e);
     EventRelay<SoundManager, Events::Pause> m_EPause;

@@ -20,6 +20,7 @@
 #include "../Engine/Collision/ETrigger.h"
 #include "../Engine/Sound/EPlaySoundOnEntity.h"
 #include "../Engine/Sound/EPlayBackgroundMusic.h"
+#include "../Engine/Sound/EPlayAnnouncerVoice.h"
 #include "../Game/Events/EDoubleJump.h"
 #include "../Game/Events/EDashAbility.h"
 

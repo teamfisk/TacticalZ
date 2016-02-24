@@ -7,6 +7,7 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     m_World = world;
     m_BGMVolumeChannel = config->Get<float>("Sound.BGMVolume", 1.f);
     m_SFXVolumeChannel = config->Get<float>("Sound.SFXVolume", 1.f);
+    m_AnnouncerVolumeChannel = config->Get<float>("Sound.AnnouncerVolume", 1.f);
 
     initOpenAL();
     alSpeedOfSound(340.29f);
@@ -19,16 +20,19 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnEntity, &SoundManager::OnPlaySoundOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnPosition, &SoundManager::OnPlaySoundOnPosition);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayBackgroundMusic, &SoundManager::OnPlayBackgroundMusic);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayAnnouncerVoice, &SoundManager::OnPlayAnnouncerVoice);
     EVENT_SUBSCRIBE_MEMBER(m_EStopSound, &SoundManager::OnStopSound);
     EVENT_SUBSCRIBE_MEMBER(m_EPauseSound, &SoundManager::OnPauseSound);
     EVENT_SUBSCRIBE_MEMBER(m_EContinueSound, &SoundManager::OnContinueSound);
     EVENT_SUBSCRIBE_MEMBER(m_ESetBGMGain, &SoundManager::OnSetBGMGain);
     EVENT_SUBSCRIBE_MEMBER(m_ESetSFXGain, &SoundManager::OnSetSFXGain);
+    EVENT_SUBSCRIBE_MEMBER(m_ESetAnnouncerGain, &SoundManager::OnSetAnnouncerGain);
     EVENT_SUBSCRIBE_MEMBER(m_EPause, &SoundManager::OnPause);
     EVENT_SUBSCRIBE_MEMBER(m_EResume, &SoundManager::OnResume);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentAttached, &SoundManager::OnComponentAttached);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundManager::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayQueueOnEntity, &SoundManager::OnPlayQueueOnEntity);
+    EVENT_SUBSCRIBE_MEMBER(m_EChangeBGM, &SoundManager::OnChangeBGM);
 }
 
 SoundManager::~SoundManager()
@@ -272,6 +276,28 @@ bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
     return true;
 }
 
+
+bool SoundManager::OnPlayAnnouncerVoice(const Events::PlayAnonuncerVoice& e)
+{
+    auto listenerComponents = m_World->GetComponents("Listener");
+    for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
+        if ((*it).EntityID != m_LocalPlayer.ID) {
+            break;
+        }
+        auto emitterChild = m_World->CreateEntity((*it).EntityID);
+        auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
+        (bool&)emitter["Loop"] = false;
+        (std::string&)emitter["FilePath"] = e.FilePath;
+        m_World->AttachComponent(emitterChild, "Transform");
+        Source* source = createSource(e.FilePath);
+        source->Type = SoundType::Announcer;
+        setSoundProperties(source, &emitter);
+        m_Sources[emitterChild] = source;
+        playSound(source);
+    }
+    return true;
+}
+
 bool SoundManager::OnSetBGMGain(const Events::SetBGMGain & e)
 {
     m_BGMVolumeChannel = e.Gain;
@@ -281,6 +307,13 @@ bool SoundManager::OnSetBGMGain(const Events::SetBGMGain & e)
 bool SoundManager::OnSetSFXGain(const Events::SetSFXGain & e)
 {
     m_SFXVolumeChannel = e.Gain;
+    return true;
+}
+
+
+bool SoundManager::OnSetAnnouncerGain(const Events::SetAnnouncerGain& e)
+{
+    m_AnnouncerVolumeChannel = e.Gain;
     return true;
 }
 
@@ -361,7 +394,13 @@ void SoundManager::setGain(Source * source, float gain)
 
 void SoundManager::setSoundProperties(Source* source, ComponentWrapper* soundComponent)
 {
-    float gain = (source->Type == SoundType::SFX) ? m_SFXVolumeChannel : m_BGMVolumeChannel;
+    float gain;
+    switch (source->Type) {
+        case SoundType::SFX: gain = m_SFXVolumeChannel; break;
+        case SoundType::BGM: gain = m_BGMVolumeChannel; break;
+        case SoundType::Announcer: gain = m_AnnouncerVolumeChannel; break;
+        default: gain = 1.f; break;
+    }
     alSourcef(source->ALsource, AL_GAIN, (float)(double)(*soundComponent)["Gain"] * gain);
     alSourcef(source->ALsource, AL_PITCH, (float)(double)(*soundComponent)["Pitch"]);
     alSourcei(source->ALsource, AL_LOOPING, (int)(bool)(*soundComponent)["Loop"]);

@@ -36,8 +36,7 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
     if (e.PlayerID == -1) { // Local player
         m_World->AttachComponent(e.Player.ID, "Listener");
-        Events::PlaySoundOnEntity go;
-        go.EmitterID = LocalPlayer.ID;
+        Events::PlayAnonuncerVoice go;
         go.FilePath = "Audio/announcer/" + m_Announcer + "/go.wav";
         m_EventBroker->Publish(go);
         // TEMP: starts bgm
@@ -92,13 +91,12 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
     int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
     int team = (int)m_World->GetComponent(LocalPlayer.ID, "Team")["Team"];
-    Events::PlaySoundOnEntity ev;
+    Events::PlayAnonuncerVoice ev;
     if (team == homeTeam) {
         ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_achieved.wav";
     } else {
         ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_failed.wav"; // have not been tested
     }
-    ev.EmitterID = LocalPlayer.ID;
     m_EventBroker->Publish(ev);
     // Temp for play test.
     m_DrumsIsPlaying = false;
