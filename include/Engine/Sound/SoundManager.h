@@ -24,9 +24,11 @@
 #include "../Engine/Sound/EStopSound.h"
 #include "../Engine/Sound/ESetBGMGain.h"
 #include "../Engine/Sound/ESetSFXGain.h"
+#include "../Engine/Sound/EChangeBGM.h"
 #include "../Engine/Core/EPause.h"
 #include "../Engine/Core/EComponentAttached.h"
 #include "../Core/EPlayerSpawned.h"
+
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
 
@@ -125,6 +127,8 @@ private:
     bool OnPlayerSpawned(const Events::PlayerSpawned &e);
     EventRelay<SoundManager, Events::PlayQueueOnEntity> m_EPlayQueueOnEntity;
     bool OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e);
+    EventRelay<SoundManager, Events::ChangeBGM> m_EChangeBGM;
+    bool OnChangeBGM(const Events::ChangeBGM &e);
 
 
 };

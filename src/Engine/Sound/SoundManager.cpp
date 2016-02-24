@@ -13,6 +13,9 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     alDistanceModel(AL_LINEAR_DISTANCE);
     alDopplerFactor(1);
 
+    //m_CurrentBGM = createSource("Audio/lalala.wav");
+    //playSound(m_CurrentBGM);
+
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnEntity, &SoundManager::OnPlaySoundOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnPosition, &SoundManager::OnPlaySoundOnPosition);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayBackgroundMusic, &SoundManager::OnPlayBackgroundMusic);
@@ -59,7 +62,8 @@ void SoundManager::Update(double dt)
     deleteInactiveEmitters();
     updateEmitters(dt);
     updateListener(dt);
-    mainMenuLoop();
+    if(false)
+        mainMenuLoop();
 }
 
 void SoundManager::deleteInactiveEmitters()
@@ -171,8 +175,10 @@ Source* SoundManager::createSource(std::string filePath)
 void SoundManager::mainMenuLoop()
 {
     float time = getTimeOffsetSeconds(m_CurrentBGM);
+    //LOG_INFO("%f/%f", time, m_CurrentBGM->Duration);
+    // TODO: config?
     if (m_CurrentBGM->Duration - time <= 5) { // 5 is hard coded value that Petter recommended
-        m_CurrentBGM = createSource("Audio/crosscounter.wav");
+        m_CurrentBGM = createSource("Audio/lalala.wav");
         playSound(m_CurrentBGM);
     }
 }
@@ -326,6 +332,18 @@ bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
         buffers.push_back(ResourceManager::Load<Sound>(*it)->Buffer());
     }
     playQueue(QueuedBuffers(source->ALsource, buffers));
+    return true;
+}
+
+
+bool SoundManager::OnChangeBGM(const Events::ChangeBGM &e)
+{
+    if (m_CurrentBGM == nullptr) {
+        return false;
+    }
+    stopSound(m_CurrentBGM);
+    m_CurrentBGM = createSource(e.FilePath);
+    playSound(m_CurrentBGM);
     return true;
 }
 

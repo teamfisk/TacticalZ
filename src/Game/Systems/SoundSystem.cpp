@@ -114,11 +114,6 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     std::vector<std::string> paths;
     paths.push_back("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
 
-    //     // Breathe
-    //     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
-    //     for (int i = 0; i < ammountOfbreaths; i++) {
-    //         paths.push_back("Audio/exhausted/breath.wav");
-    //     }
     Events::PlayQueueOnEntity ev;
     ev.Emitter = LocalPlayer;
     ev.FilePaths = paths;
