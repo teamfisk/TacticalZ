@@ -42,6 +42,6 @@ private:
 
     //for tests
     int m_TestVar = 0;
-    bool m_Testing = true;
+    bool m_Testing = false;
 };
 #endif

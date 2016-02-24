@@ -26,12 +26,8 @@ bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
 
     LOG_INFO("-> create effect");
 
-    // Delete player - only the clients will delete themselves.
-    if (IsServer && !e.Player.HasComponent("Lifetime")) {
-        //    m_World->DeleteEntity(e.Player.ID);
-        //m_PlayersToBeDeletedVector.emplace_back(e.Player.ID, 0.25);
-        e.Player.AttachComponent("Lifetime");
-        e.Player["Lifetime"]["Lifetime"] = 0.45;
+    if (!IsClient || !ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false)) {
+        m_World->DeleteEntity(e.Player.ID);
     }
 
     return true;

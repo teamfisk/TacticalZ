@@ -13,14 +13,29 @@ HealthSystem::HealthSystem(SystemParams params)
 
 void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHealth, double dt)
 {
-    //LOG_INFO("<- health updatecomponent");
     double& health = cHealth["Health"];
     int healthInt = (int)health;
-    if (healthInt <= 0 && !entity.HasComponent("Lifetime")) {
+    //update struct
+    for (auto& iter = m_DeadPlayers.begin(); iter < m_DeadPlayers.end(); iter++)
+    {
+        iter->timeSinceDeath += dt;
+        if (iter->timeSinceDeath > 2.0f || !iter->playerEntity.Valid()) {
+            m_DeadPlayers.erase(iter);
+            break;
+        }
+    }
+    if (healthInt <= 0) {
+        for (auto deadPlayer : m_DeadPlayers)
+        {
+            if (deadPlayer.playerEntity.ID == entity.ID) {
+                return;
+            }
+        }
         LOG_INFO("-> health <= 0");
         Events::PlayerDeath ePlayerDeath;
         ePlayerDeath.Player = entity;
         m_EventBroker->Publish(ePlayerDeath);
+        m_DeadPlayers.emplace_back(entity);
         //Note: we will delete the entity in PlayerDeathSystem
     }
 }

@@ -15,6 +15,11 @@ PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params)
 
 void PlayerSpawnSystem::Update(double dt)
 {
+    CheckForLatePlayers(dt);
+    for (auto& spawnReqs : m_SpawnRequests)
+    {
+        spawnReqs.timeSinceDeath += dt;
+    }
     //Increase timer.
     m_Timer += dt;
     if (m_Timer < m_RespawnTime) {
@@ -35,6 +40,10 @@ void PlayerSpawnSystem::Update(double dt)
 
     int numSpawnedPlayers = 0;
     for (auto& req : m_SpawnRequests) {
+        if (req.timeSinceDeath < 2.5f) {
+            m_LatePlayersVector.push_back(req);
+            continue;
+        }
         for (auto& cPlayerSpawn : *playerSpawns) {
             EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
             if (!spawner.HasComponent("Spawner")) {
@@ -111,6 +120,8 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         SpawnRequest req;
         req.PlayerID = e.PlayerID;
         req.Team = (ComponentInfo::EnumType)e.Value;
+        //set timeSinceDeath > 2.5f since we are force-spawning
+        req.timeSinceDeath = 3.0f;
         m_SpawnRequests.push_back(req);
     } else {
         return false;
@@ -173,10 +184,6 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
     if (!e.Player.HasComponent("Team")) {
         return false;
     }
-    if (!e.Player.HasComponent("Lifetime")) {
-        LOG_INFO("<- spawnsystem death FALSE");
-        return false;
-    }
     ComponentWrapper cTeam = e.Player["Team"];
     //A spectator can't die anyway
     if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Spectator")) {
@@ -192,8 +199,52 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
     SpawnRequest req;
     req.PlayerID = m_PlayerIDs.at(e.Player.ID);
     req.Team = cTeam["Team"];
+    req.timeSinceDeath = 0.0f;
     m_SpawnRequests.push_back(req);
     LOG_INFO("-> spawnsystem death");
 
     return true;
+}
+void PlayerSpawnSystem::CheckForLatePlayers(double dt) {
+    for (size_t i = 0; i < m_LatePlayersVector.size(); i++)
+    {
+        auto& req = m_SpawnRequests[i];
+        req.timeSinceDeath += dt;
+        if (req.timeSinceDeath > 2.5f) {
+            //good but, this will only spawn them in the next cycle - i.e. not immediately
+            //m_SpawnRequests.push_back(spawnReq);
+            
+            //insta spawn
+            auto playerSpawns = m_World->GetComponents("PlayerSpawn");
+            for (auto& cPlayerSpawn : *playerSpawns) {
+                EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
+                if (!spawner.HasComponent("Spawner")) {
+                    continue;
+                }
+
+                // If the spawner has a team affiliation, check it
+                if (spawner.HasComponent("Team")) {
+                    if ((int)spawner["Team"]["Team"] != req.Team) {
+                        continue;
+                    }
+                }
+
+                // Spawn the player!
+                EntityWrapper player = SpawnerSystem::Spawn(spawner, EntityWrapper::Invalid, "Player");
+                // Set the player team affiliation
+                player["Team"]["Team"] = req.Team;
+
+                // Publish a PlayerSpawned event
+                Events::PlayerSpawned e;
+                e.PlayerID = req.PlayerID;
+                e.Player = player;
+                e.Spawner = spawner;
+                m_EventBroker->Publish(e);
+                break;
+            }
+            //end insta spawn
+            m_LatePlayersVector.erase(m_LatePlayersVector.begin() + i);
+            break;
+        }
+    }
 }

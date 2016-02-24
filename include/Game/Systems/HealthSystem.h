@@ -27,7 +27,7 @@ public:
 private:
     bool m_NetworkEnabled;
 
-   // methods which will take care of specific events
+    // methods which will take care of specific events
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
@@ -37,6 +37,16 @@ private:
 
     //vector which will keep track of health changes
     std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;
+    struct DeadPlayers {
+        EntityWrapper playerEntity;
+        double timeSinceDeath;
+        DeadPlayers(EntityWrapper entity) : playerEntity(entity) {
+            timeSinceDeath = 0.0;
+        }
+    };
+    std::vector<DeadPlayers> m_DeadPlayers;
+
+
 };
 
 #endif

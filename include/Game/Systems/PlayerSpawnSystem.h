@@ -21,6 +21,7 @@ private:
     {
         int PlayerID;
         ComponentInfo::EnumType Team;
+        double timeSinceDeath;
     };
 
     bool m_NetworkEnabled = false;
@@ -40,4 +41,7 @@ private:
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
     EventRelay<PlayerSpawnSystem, Events::PlayerDeath> m_OnPlayerDeath;
     bool OnPlayerDeath(Events::PlayerDeath& e);
+
+    std::vector<SpawnRequest> m_LatePlayersVector;
+    void CheckForLatePlayers(double dt);
 };
