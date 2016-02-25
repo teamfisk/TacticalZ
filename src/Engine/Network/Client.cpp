@@ -367,9 +367,6 @@ void Client::parseSnapshot(Packet& packet)
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
                     // TODO Fix memory leak here
-                    if (localEntity.Name() == "CapturePointHUD") {
-                        UpdateLocalCapturePointHUD(localEntity);
-                    }
                     SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
                     bool shouldApply = true;
                     // Apply potential filter function
@@ -397,7 +394,11 @@ void Client::parseSnapshot(Packet& packet)
                 if (serverParentID == EntityID_Invalid) {
                     newLocalEntityID = m_World->CreateEntity(EntityID_Invalid);
                 } else {
-                    newLocalEntityID = m_World->CreateEntity(m_ServerIDToClientID.at(serverParentID));
+                    if (serverClientMapsHasEntity(serverParentID)) {
+                        newLocalEntityID = m_World->CreateEntity(m_ServerIDToClientID.at(serverParentID));
+                    } else {
+                        newLocalEntityID = m_World->CreateEntity(EntityID_Invalid);
+                    }
                 }
                 m_World->SetName(newLocalEntityID, serverEntityName);
                 insertIntoServerClientMaps(serverEntityID, newLocalEntityID);
@@ -407,7 +408,7 @@ void Client::parseSnapshot(Packet& packet)
         }
         // Parent logic
         // This should be enough beacause we know that the entities arives in pre-order (there will always be a parent)
-        if (serverParentID != EntityID_Invalid) {
+        if (serverParentID != EntityID_Invalid && serverClientMapsHasEntity(serverParentID)) {
             EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
             if (m_World->GetParent(localEntityID) != m_ServerIDToClientID.at(serverParentID)) {
                 m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
@@ -415,18 +416,6 @@ void Client::parseSnapshot(Packet& packet)
         }
     }
     parseSpawnEvents();
-}
-
-
-void Client::UpdateLocalCapturePointHUD(EntityWrapper capturePointHUD)
-{
-    //auto children = m_World->GetChildren(capturePointHUD.ID);
-    //for (auto it = children.first; it != children.second; it++) {
-    //    it->first
-    //}
-    //
-    //EntityWrapper& localHUD = m_LocalPlayer.FirstChildByName("HUD").FirstChildByName("CapturePointHUD");
-    //m_World->GetComponentPools()
 }
 
 void Client::disconnect()
