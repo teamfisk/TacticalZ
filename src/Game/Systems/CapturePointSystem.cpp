@@ -6,9 +6,11 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
     , PureSystem("CapturePoint")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
-    EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
-    EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
-    EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
+    if (!IsClient) {
+        EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
+        EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
+        EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
+    }
 
 }
 
@@ -16,6 +18,9 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
 void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, ComponentWrapper& cCapturePoint, double dt)
 {
+    if (IsClient) {
+        return;
+    }
     if (m_WinnerWasFound) {
         return;
     }
