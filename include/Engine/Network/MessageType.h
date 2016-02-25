@@ -20,6 +20,7 @@ enum class MessageType
     ComponentDeleted,
     PlayerTransform,
     OnDoubleJump,
+    ServerlistRequest,
     Invalid
 };
 

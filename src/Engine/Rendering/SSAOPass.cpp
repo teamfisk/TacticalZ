@@ -6,6 +6,7 @@ SSAOPass::SSAOPass(IRenderer* renderer)
 
 	m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh");
 
+	InitializeTexture();
 	InitializeBuffer();
 	InitializeShaderProgram();
 	Setting(0.1f, 0.012f, 1.0f, 1.0f, 13, 7);
@@ -28,15 +29,15 @@ void SSAOPass::InitializeShaderProgram()
 	m_SSAOViewSpaceZProgram->Link();
 }
 
+void SSAOPass::InitializeTexture() {
+	GenerateTexture(&m_SSAOTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_R8, GL_RED, GL_FLOAT);
+	GenerateTexture(&m_SSAOViewSpaceZTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_R32F, GL_RED, GL_FLOAT);
+}
 
 void SSAOPass::InitializeBuffer()
 {
-	GenerateTexture(&m_SSAOTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_R8, GL_RED, GL_FLOAT);
-
 	m_SSAOFramBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SSAOTexture, GL_COLOR_ATTACHMENT0)));
 	m_SSAOFramBuffer.Generate();
-
-	GenerateTexture(&m_SSAOViewSpaceZTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_R32F, GL_RED, GL_FLOAT);
 
 	m_SSAOViewSpaceZFramBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SSAOViewSpaceZTexture, GL_COLOR_ATTACHMENT0)));
 	m_SSAOViewSpaceZFramBuffer.Generate();
@@ -45,12 +46,12 @@ void SSAOPass::InitializeBuffer()
 void SSAOPass::ClearBuffer()
 {
 	m_SSAOFramBuffer.Bind();
-	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_SSAOFramBuffer.Unbind();
 
 	m_SSAOViewSpaceZFramBuffer.Bind();
-	glClearColor(0.f, 0.f, 0.f, 0.f);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	m_SSAOViewSpaceZFramBuffer.Unbind();
 }
@@ -136,6 +137,9 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 	m_DrawBloomPass->Draw(m_SSAOTexture);
 }
 
-void ComputeAO(GLuint depthBuffer, Camera* camera) {
-
+void SSAOPass::OnWindowResize() {
+	m_DrawBloomPass->OnWindowResize();
+	InitializeTexture();
+	m_SSAOFramBuffer.Generate();
+	m_SSAOViewSpaceZFramBuffer.Generate();
 }

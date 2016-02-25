@@ -1,11 +1,13 @@
 #include "Network/TCPServer.h"
 using namespace boost::asio::ip;
 
-TCPServer::TCPServer()
+TCPServer::TCPServer() 
 {
     acceptor = std::unique_ptr<tcp::acceptor>(new tcp::acceptor(m_IOService, tcp::endpoint(tcp::v4(), 27666)));
     // Make the acceptor non-blocking so we wont get stuck in AcceptNewConnections().
     acceptor->non_blocking(true);
+    m_Port = GetPort();
+    m_Address = GetAddress();
 }
 
 TCPServer::~TCPServer()
@@ -44,8 +46,8 @@ PlayerID TCPServer::getPlayerIDFromEndpoint(const std::map<PlayerID, PlayerDefin
 
 void TCPServer::Send(Packet & packet, PlayerDefinition & playerDefinition)
 {
+    packet.UpdateSize();
     try {
-        packet.UpdateSize();
         int bytesSent = playerDefinition.TCPSocket->send(
             boost::asio::buffer(packet.Data(), packet.Size()),
             0);
@@ -67,37 +69,59 @@ void TCPServer::Send(Packet & packet)
 
 void TCPServer::Disconnect()
 {
+}
 
+int TCPServer::GetPort()
+{
+    return acceptor->local_endpoint().port();
+}
+
+std::string TCPServer::GetAddress()
+{
+    boost::asio::ip::tcp::resolver resolver(m_IOService);
+    boost::asio::ip::tcp::resolver::query query(boost::asio::ip::tcp::v4(), boost::asio::ip::host_name(), "");
+    boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+    boost::asio::ip::tcp::endpoint endpoint = *it;
+    return endpoint.address().to_string().c_str();
 }
 
 void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {
-    int bytesRead = readBuffer(m_ReadBuffer, playerDefinition);
+    int bytesRead = readBuffer(playerDefinition);
     if (bytesRead > 0) {
         packet.ReconstructFromData(m_ReadBuffer, bytesRead);
     }
     lastReceivedSocket = playerDefinition.TCPSocket;
 }
 
-int TCPServer::readBuffer(char* data, PlayerDefinition & playerDefinition)
+int TCPServer::readBuffer(PlayerDefinition & playerDefinition)
 {
     if (!playerDefinition.TCPSocket) {
         return 0;
     }
     boost::system::error_code error;
     // Read size of packet
-    size_t bytesReceived = playerDefinition.TCPSocket->read_some(boost
-        ::asio::buffer((void*)data, sizeof(int)),
-        error);
-    int sizeOfPacket = 0;
-    memcpy(&sizeOfPacket, data, sizeof(int));
+    playerDefinition.TCPSocket->receive(boost
+        ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
+        boost::asio::ip::tcp::socket::message_peek, error);
+    unsigned int sizeOfPacket = 0;
+    memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
 
+    // if the buffer is to small increase the size of it
+    if (sizeOfPacket > m_BufferSize) {
+        delete[] m_ReadBuffer;
+        m_ReadBuffer = new char[sizeOfPacket];
+        m_BufferSize = sizeOfPacket;
+    }
     // Read the rest of the message
-    bytesReceived += playerDefinition.TCPSocket->read_some(boost
-        ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
+    size_t bytesReceived = playerDefinition.TCPSocket->read_some(boost
+        ::asio::buffer((void*)(m_ReadBuffer), sizeOfPacket),
         error);
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
+    if (sizeOfPacket > 1000000)
+        LOG_WARNING("The packets received are bigger than 1MB");
+
     return bytesReceived;
 }

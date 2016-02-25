@@ -43,5 +43,5 @@ private:
     bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e);
 
     void updateMovementControllers(double dt);
-    void updateVelocity(double dt);
+    void updateVelocity(EntityWrapper player, double dt);
 };
