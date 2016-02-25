@@ -150,6 +150,10 @@ bool RayVsModel(const Ray& ray,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix)
 {
+	if (!modelVertices) {
+		return false;
+	}
+
     for (int i = 0; i < modelIndices.size();) {
         glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
@@ -201,6 +205,10 @@ bool RayVsModel(const Ray& ray,
     float& outUCoord,
     float& outVCoord)
 {
+	if (!modelVertices) {
+		return false;
+	}
+
     outDistance = INFINITY;
     bool hit = false;
     for (int i = 0; i < modelIndices.size();) {
@@ -226,6 +234,10 @@ bool RayVsModel(const Ray& ray,
     const glm::mat4& modelMatrix,
     glm::vec3& outHitPosition)
 {
+	if (!modelVertices) {
+		return false;
+	}
+
     float u;
     float v;
     float dist;
@@ -546,6 +558,10 @@ bool AABBvsTriangles(const AABB& box,
     glm::vec3& outResolutionVector,
     bool resolveCollision)
 {
+	if (!modelVertices) {
+		return false;
+	}
+
     bool hit = false;
 
     bool everHitTheGround = false;
@@ -705,7 +721,7 @@ boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<Enti
             continue;
         }
         float u, v;
-        if (RayVsModel(ray, model->Vertices(), model->m_RawModel->m_Indices, Transform::ModelMatrix(entityBox.Entity), outDistance, u, v)) {
+        if (RayVsModel(ray, model->CollisionVertices(), model->CollisionIndices(), Transform::ModelMatrix(entityBox.Entity), outDistance, u, v)) {
             outIntersectPos = ray.Origin() + outDistance * ray.Direction();
             return entityBox;
         }

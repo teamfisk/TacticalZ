@@ -109,8 +109,8 @@ bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, Entity
 
             if (model != nullptr && Collision::AABBvsTriangles(
                     spawnedBox,
-                    model->Vertices(),
-                    model->m_Indices,
+                    model->CollisionVertices(),
+                    model->CollisionIndices(),
                     Transform::ModelMatrix(otherEntity))) {
                 return true;
             }
