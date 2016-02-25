@@ -131,7 +131,7 @@ private:
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
     EventRelay< Client, Events::SearchForServers> m_ESearchForServers;
-    EventRelay<Client, Events::DoubleJump> m_EPDoubleJump;
+    EventRelay<Client, Events::DoubleJump> m_EDoubleJump;
     bool OnDoubleJump(Events::DoubleJump & e);
     bool OnSearchForServers(const Events::SearchForServers& e);
     UDPClient m_ServerlistRequest;

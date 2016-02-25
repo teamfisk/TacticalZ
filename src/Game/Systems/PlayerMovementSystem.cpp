@@ -4,7 +4,7 @@ PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
-    EVENT_SUBSCRIBE_MEMBER(m_EPDoubleJump, &PlayerMovementSystem::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
 }
 
 PlayerMovementSystem::~PlayerMovementSystem()

@@ -39,7 +39,7 @@ private:
 
     EventRelay<PlayerMovementSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
-    EventRelay<PlayerMovementSystem, Events::DoubleJump> m_EPDoubleJump;
+    EventRelay<PlayerMovementSystem, Events::DoubleJump> m_EDoubleJump;
     bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e);
 
     void updateMovementControllers(double dt);
