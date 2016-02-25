@@ -383,7 +383,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
                     glActiveTexture(GL_TEXTURE5);
                     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+                    glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
                     std::vector<glm::mat4> frameBones;
                     if (explosionEffectJob->AnimationOffset.animation != nullptr) {
@@ -401,7 +401,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionHandle, explosionEffectJob);
                     glActiveTexture(GL_TEXTURE5);
                     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+                    glUniform3fv(glGetUniformLocation(explosionHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
                 }
                 break;
@@ -459,12 +459,16 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             GLERROR("Bind ForwardPlusSkinnedProgram");
                             //bind uniforms
                             BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
+							GLERROR("Basic/SingleTextures BindModelUniforms");
                             //bind textures
                             BindModelTextures(forwardSkinnedHandle, modelJob);
+							GLERROR("Basic/SingleTextures BindModelTextures");
                             glActiveTexture(GL_TEXTURE5);
-                            glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-                            glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
+							GLERROR("Basic/SingleTextures CameraPosition1");
+							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+							GLERROR("Basic/SingleTextures CameraPosition2");
+							glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+							GLERROR("Basic/SingleTextures CameraPosition3");
                             std::vector<glm::mat4> frameBones;
                             if (modelJob->AnimationOffset.animation != nullptr) {
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
@@ -472,7 +476,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
                             }
                             glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
+							GLERROR("Basic/SingleTextures skinned end");
                         } else {
                             m_ForwardPlusProgram->Bind();
                             GLERROR("Bind ForwardPlusProgram");
@@ -483,6 +487,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             glActiveTexture(GL_TEXTURE5);
                             glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
                             glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+							GLERROR("Basic/SingleTextures end");
                         }
                         break;
                     }
@@ -495,7 +500,6 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelUniforms(forwardSplatMapSkinnedHandle, modelJob, scene);
                             //bind textures
                             BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
-                            GLERROR("asdasd");
                             std::vector<glm::mat4> frameBones;
                             if (modelJob->AnimationOffset.animation != nullptr) {
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
@@ -503,7 +507,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
                             }
                             glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
+							GLERROR("SplatMapping skinned end");
                         } else {
                             m_ForwardPlusSplatMapProgram->Bind();
                             GLERROR("Bind SplatMap program");
@@ -511,7 +515,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelUniforms(forwardSplatHandle, modelJob, scene);
                             //bind textures
                             BindModelTextures(forwardSplatHandle, modelJob);
-                            GLERROR("asdasd");
+							GLERROR("SplatMapping end");
                         }
                         break;
                     }
