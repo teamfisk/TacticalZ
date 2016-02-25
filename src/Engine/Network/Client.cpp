@@ -32,6 +32,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
@@ -139,6 +140,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::OnPlayerDamage:
         parsePlayerDamage(packet);
+        break;
+    case MessageType::OnDoubleJump:
+        parseDoubleJump(packet);
         break;
     default:
         break;
@@ -272,6 +276,20 @@ void Client::parseComponentDeletion(Packet & packet)
     }
 }
 
+void Client::parseDoubleJump(Packet & packet)
+{
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
+    }
+    Events::DoubleJump e;
+    e.entityID = m_ServerIDToClientID.at(serverID);
+    // If player is local player do not publish to prevent infinite feedback loop
+    if (e.entityID != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
+    }
+}
+
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)
 {
     for (auto field : componentInfo.FieldsInOrder) {
@@ -348,7 +366,7 @@ void Client::parseSnapshot(Packet& packet)
                 EntityWrapper localEntity(m_World, localEntityID);
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
-
+                    // TODO Fix memory leak here
                     SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
                     bool shouldApply = true;
                     // Apply potential filter function
@@ -392,7 +410,9 @@ void Client::parseSnapshot(Packet& packet)
         // This should be enough beacause we know that the entities arives in pre-order (there will always be a parent)
         if (serverParentID != EntityID_Invalid && serverClientMapsHasEntity(serverParentID)) {
             EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
-            m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            if (m_World->GetParent(localEntityID) != m_ServerIDToClientID.at(serverParentID)) {
+                m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            }
         }
     }
     parseSpawnEvents();
@@ -460,6 +480,11 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
     if (e.Inflictor != m_LocalPlayer) {
         return false;
     }
+    // Could this happen?
+    //if (!clientServerMapsHasEntity(e.Inflictor.ID) 
+    //    || !clientServerMapsHasEntity(e.Victim.ID)) {
+    //    return;
+    //}
 
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Inflictor.ID));
@@ -494,7 +519,7 @@ void Client::parsePlayerDamage(Packet& packet)
     Events::PlayerDamage e;
     PlayerID victimID = packet.ReadPrimitive<EntityID>();
     PlayerID inflictorID = packet.ReadPrimitive<EntityID>();
-    if(!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)){
+    if (!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)) {
         return;
     }
     e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(victimID));
@@ -504,6 +529,17 @@ void Client::parsePlayerDamage(Packet& packet)
     if (e.Inflictor != m_LocalPlayer) {
         m_EventBroker->Publish(e);
     }
+}
+
+bool Client::OnDoubleJump(Events::DoubleJump & e)
+{
+    if (!clientServerMapsHasEntity(e.entityID) || e.entityID != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDoubleJump);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.entityID));
+    m_Reliable.Send(packet);
+    return true;
 }
 
 void Client::sendLocalPlayerTransform()

@@ -29,9 +29,8 @@ Server::~Server()
 
 void Server::Update()
 {
-    PlayerDefinition pd;
-
     m_Reliable.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
+
     for (auto& kv : m_ConnectedPlayers) {
         while (kv.second.TCPSocket->available()) {
             // Packet will get real data in receive
@@ -47,6 +46,7 @@ void Server::Update()
         }
     }
 
+    PlayerDefinition pd;
     while (m_Unreliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -137,6 +137,9 @@ void Server::parseMessageType(Packet& packet)
         break;
     case MessageType::PlayerTransform:
         parsePlayerTransform(packet);
+        break;
+    case MessageType::OnDoubleJump:
+        parseDoubleJump(packet);
         break;
     default:
         break;
@@ -504,7 +507,7 @@ bool Server::OnPlayerDamage(const Events::PlayerDamage& e)
     packet.WritePrimitive(e.Damage);
     reliableBroadcast(packet);
 
-    return false;
+    return true;
 }
 
 void Server::parseClientPing()
@@ -531,6 +534,12 @@ void Server::parsePing()
             break;
         }
     }
+}
+
+bool Server::parseDoubleJump(Packet & packet)
+{
+    reliableBroadcast(packet);
+    return true;
 }
 
 void Server::parseOnInputCommand(Packet& packet)
