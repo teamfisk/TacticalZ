@@ -1,5 +1,7 @@
 #version 430
 
+#define MAX_SPLITS 3
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -22,7 +24,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
-	vec4 PositionLightSpace;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input[];
 
 out VertexData{
@@ -33,7 +35,7 @@ out VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
-	vec4 PositionLightSpace;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Output;
 
 layout(triangles) in;

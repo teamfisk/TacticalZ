@@ -1,5 +1,7 @@
 #version 430
 
+#define MAX_SPLITS 3
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -9,11 +11,15 @@ uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
+uniform float FarDistance[MAX_SPLITS];
+
 layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
 layout (binding = 2) uniform sampler2D SpecularMapTexture;
 layout (binding = 3) uniform sampler2D GlowMapTexture;
-layout (binding = 4) uniform sampler2DShadow DepthMap;
+layout (binding = 4) uniform sampler2DShadow DepthMap0;
+layout (binding = 5) uniform sampler2DShadow DepthMap1;
+layout (binding = 6) uniform sampler2DShadow DepthMap2;
 
 #define TILE_SIZE 16
 
@@ -57,7 +63,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
-	vec4 PositionLightSpace;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;
@@ -186,8 +192,52 @@ float CalcShadowValue(vec4 positionLightSpace, vec3 normal, vec3 lightDir, sampl
 	
 } 
 
+int getShadowIndex(float far_distance[MAX_SPLITS])
+{
+	int index = 2;
+	if( gl_FragCoord.z < far_distance[0] )
+	{
+		index = 0;
+	}
+	else if( gl_FragCoord.z < far_distance[1] && gl_FragCoord.z > far_distance[0] )
+	{
+		index = 1;
+	}
+
+	return index;
+}
+
+//sampler2DShadow whichDepthMap( int DepthMapIndex )
+//{
+//	if( DepthMapIndex == 0 )
+//	{
+//		return DepthMap0;
+//	}
+//	else if( DepthMapIndex == 1 )
+//	{
+//		return DepthMap1;
+//	}
+//	else 
+//	{
+//		return DepthMap2;
+//	}
+//	
+//}
+
 void main()
 {
+	//sampler2DShadow DepthMaps[3] = { sampler2DShadow(DepthMap0), sampler2DShadow(DepthMap1), sampler2DShadow(DepthMap2) };
+	//sampler2DShadow DepthMaps[3] = { DepthMap0, DepthMap1, DepthMap2 };
+	//sampler2DShadow DepthMaps[3] = sampler2DShadow[]( DepthMap0, DepthMap1, DepthMap2 );
+	//sampler2DShadow DepthMaps[3] = sampler2DShadow[3]( DepthMap0, DepthMap1, DepthMap2 );
+	//sampler2DShadow DepthMaps[3];
+	
+	//sampler2DShadow DepthMapOne = DepthMap0;
+	
+	//DepthMaps[0] = DepthMap0;
+	//DepthMaps[1] = DepthMap1;
+	//DepthMaps[2] = DepthMap2;
+	
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate);
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate);
@@ -220,18 +270,32 @@ void main()
 		if(light.Type == 1) { // point
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
+			int DepthMapIndex = getShadowIndex(FarDistance);
+			//sampler2DShadow WhichDepthMap = whichDepthMap(DepthMapIndex);
+			
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
-			shadowFactor = CalcShadowValue(Input.PositionLightSpace, Input.Normal, vec3(light.Direction), DepthMap);
+			
+			shadowFactor = CalcShadowValue(Input.PositionLightSpace[0], Input.Normal, vec3(light.Direction), DepthMap0);
+			//if( DepthMapIndex == 0 )
+			//{
+			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap0);
+			//}
+			//else if( DepthMapIndex == 1 )
+			//{
+			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap1);
+			//}
+			//else 
+			//{
+			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap2);
+			//}
 		}
 	
 		totalLighting.Diffuse += light_result.Diffuse;
-		totalLighting.Specular += light_result.Specular; 
+		totalLighting.Specular += light_result.Specular;
 	}
 
-	//totalLighting.Diffuse *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0); 
-	//totalLighting.Specular *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0);
-	totalLighting.Diffuse *= (1.0 + vec4(AmbientColor.rgb, 1.0)) + vec4(vec3(shadowFactor, shadowFactor, 0.0), 0.0); 
-	totalLighting.Specular *= (1.0 + vec4(AmbientColor.rgb, 1.0)) + vec4(vec3(shadowFactor, shadowFactor, 0.0), 0.0);
+	totalLighting.Diffuse *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0); 
+	totalLighting.Specular *= (1.5 + vec4(AmbientColor.rgb, 1.0)) - vec4(vec3(shadowFactor), 0.0);
 	
 	//LightResult getInformation;
 	

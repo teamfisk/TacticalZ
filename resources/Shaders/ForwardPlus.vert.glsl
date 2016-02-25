@@ -1,10 +1,12 @@
 #version 430
 
+#define MAX_SPLITS 3
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-uniform mat4 LightV;
-uniform mat4 LightP;
+uniform mat4 LightV[MAX_SPLITS];
+uniform mat4 LightP[MAX_SPLITS];
 uniform mat4 Bones[100];
 
 layout(location = 0) in vec3 Position;
@@ -23,7 +25,7 @@ out VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
-	vec4 PositionLightSpace;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Output;
 
 // N
@@ -60,5 +62,8 @@ void main()
 	Output.ExplosionPercentageElapsed = 0.0;
 	
 	//Output.PositionLightSpace = lightPos; // N
-	Output.PositionLightSpace = LightP * LightV * M * vec4(Position, 1.0);
+	for(int i = 0; i < MAX_SPLITS; i++)
+	{
+		Output.PositionLightSpace[i] = LightP[i] * LightV[i] * M * vec4(Position, 1.0);
+	}
 }

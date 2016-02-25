@@ -1,11 +1,12 @@
 #include "Rendering/ShadowPass.h"
 
+
 ShadowPass::ShadowPass(IRenderer * renderer)
 {
-    m_Renderer = renderer;
+	m_Renderer = renderer;
 
-    InitializeFrameBuffers();
-    InitializeShaderPrograms();
+	InitializeFrameBuffers();
+	InitializeShaderPrograms();
 }
 
 ShadowPass::~ShadowPass()
@@ -13,101 +14,94 @@ ShadowPass::~ShadowPass()
 	// m_shadCams
 }
 
-// Compute the 8 corner points of the current view frustum
-std::array<glm::vec3, 8> ShadowPass::UpdateFrustumPoints(Camera* cam, glm::vec3 center, glm::vec3 view_dir)
+void ShadowPass::InitializeCameras(RenderScene & scene)
 {
-	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
-	glm::vec3 right = glm::normalize(glm::cross(view_dir, up));
-
-	//glm::vec3 farCenter = center + view_dir * cam->FarClip();
-	//glm::vec3 nearCenter = center + view_dir * cam->NearClip();
-	glm::vec3 farCenter = view_dir * cam->FarClip();
-	glm::vec3 nearCenter = view_dir * cam->NearClip();
-
-	up = glm::normalize(glm::cross(right, view_dir));
-
-	float near_height = tan(cam->FOV() / 2.f) * cam->NearClip();
-	float near_width = near_height * cam->AspectRatio();
-	float far_height = tan(cam->FOV() / 2.f) * cam->FarClip();
-	float far_width = far_height * cam->AspectRatio();
-
-	std::array<glm::vec3, 8> frustumPoints;
-	frustumPoints[0] = nearCenter - up * near_height - right * near_width;
-	frustumPoints[1] = nearCenter + up * near_height - right * near_width;
-	frustumPoints[2] = nearCenter + up * near_height + right * near_width;
-	frustumPoints[3] = nearCenter - up * near_height + right * near_width;
-
-	frustumPoints[4] = farCenter - up * far_height - right * far_width;
-	frustumPoints[5] = farCenter + up * far_height - right * far_width;
-	frustumPoints[6] = farCenter + up * far_height + right * far_width;
-	frustumPoints[7] = farCenter - up * far_height + right * far_width;
-
-	return frustumPoints;
+	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
+		m_shadFrusta[i].AspectRatio = scene.Camera->AspectRatio();
+		m_shadFrusta[i].FOV = scene.Camera->FOV();
+	}
 }
 
 // UpdateSplitDist computes the near and far distances for every frustum slice
 // in camera eye space - that is, at what distance does a slice start and end
-void ShadowPass::UpdateSplitDist(std::array<ShadowCamera, MAX_SPLITS> shadow_cams, float near_distance, float far_distance)
+void ShadowPass::UpdateSplitDist(std::array<Frustum, MAX_SPLITS>& frusta, float near_distance, float far_distance)
 {
 	float lambda = m_SplitWeight;
 	float ratio = far_distance / near_distance;
 
-	shadow_cams[0].camera->SetNearClip(near_distance);
+	frusta[0].NearClip = near_distance;
 
 	for (int i = 1; i < m_CurrentNrOfSplits; i++) {
 		float si = i / static_cast<float>(m_CurrentNrOfSplits);
 
-		shadow_cams[i].camera->SetNearClip(lambda * (near_distance * powf(ratio, si)) + (1 - lambda) * (near_distance + (far_distance - near_distance) * si));
-		shadow_cams[i - 1].camera->SetFarClip(shadow_cams[i].camera->NearClip() * 1.005f);
+		frusta[i].NearClip = lambda * (near_distance * powf(ratio, si)) + (1 - lambda) * (near_distance + (far_distance - near_distance) * si);
+		frusta[i - 1].FarClip = frusta[i].NearClip * 1.005f;
 	}
 
-	shadow_cams[m_CurrentNrOfSplits - 1].camera->SetFarClip(far_distance);
+	frusta[m_CurrentNrOfSplits - 1].FarClip = far_distance;
 }
 
-// Create a new light frustum based on the 8 corner points of a view frustum segment
-glm::mat4 ShadowPass::FindNewFrustum(ShadowCamera shadow_cam)
+// Compute the 8 corner points of the current view frustum in world space
+void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position, glm::vec3 view_dir, glm::mat4 p, glm::mat4 v)
 {
-	float maxX = -1000.0f;
-	float maxY = -1000.0f;
-	float maxZ;
-	float minX = 1000.0f;
-	float minY = 1000.0f;
-	float minZ;
+	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
+	glm::vec3 right = glm::normalize(glm::cross(view_dir, up));
 
-	glm::vec4 transf;
+	glm::vec3 far_center = camera_position + glm::normalize(view_dir) * frustum.FarClip;
+	glm::vec3 near_center = camera_position + glm::normalize(view_dir) * frustum.NearClip;
+	frustum.MiddlePoint = near_center + (far_center - near_center) * 0.5f;
 
-	for (int i = 0; i < 8; i++)
-	{
-		transf = glm::vec4(shadow_cam.frustumCorners[i], 1.f);
+ 	up = glm::normalize(glm::cross(right, view_dir));
 
-		if (transf.x > maxX) maxX = transf.x;
-		if (transf.x < minX) minX = transf.x;
-		if (transf.y > maxY) maxY = transf.y;
-		if (transf.y < minY) minY = transf.y;
+	// these heights and widths are half the heights and widths of the near and far plane rectangles.
+	float near_height = tan(frustum.FOV / 2.f) * frustum.NearClip;
+	float near_width = near_height * frustum.AspectRatio;
+	float far_height = tan(frustum.FOV / 2.f) * frustum.FarClip;
+	float far_width = far_height * frustum.AspectRatio;
+
+	frustum.CornerPoint[0] = near_center - up * near_height - right * near_width;
+	frustum.CornerPoint[1] = near_center + up * near_height - right * near_width;
+	frustum.CornerPoint[2] = near_center + up * near_height + right * near_width;
+	frustum.CornerPoint[3] = near_center - up * near_height + right * near_width;
+
+	frustum.CornerPoint[4] = far_center - up * far_height - right * far_width;
+	frustum.CornerPoint[5] = far_center + up * far_height - right * far_width;
+	frustum.CornerPoint[6] = far_center + up * far_height + right * far_width;
+	frustum.CornerPoint[7] = far_center - up * far_height + right * far_width;
+
+	// Alternative way
+	//std::array<glm::vec4, 8> CornerPoint = { 
+	//	glm::vec4(-1.f, -1.f,	-1.f,	1.f),
+	//	glm::vec4(-1.f, 1.f,	-1.f,	1.f),
+	//	glm::vec4(1.f,	1.f,	-1.f,	1.f),
+	//	glm::vec4(1.f,	-1.f,	-1.f,	1.f),
+	//	glm::vec4(-1.f,	-1.f,	1.f,	1.f),
+	//	glm::vec4(-1.f,	1.f,	1.f,	1.f),
+	//	glm::vec4(1.f,	1.f,	1.f,	1.f),
+	//	glm::vec4(1.f,	-1.f,	1.f,	1.f) };
+
+	//std::array<glm::vec3, 8> final;
+
+	//for (int i = 0; i < 8; i++) {
+	//	glm::vec4 anus = glm::inverse(p) * CornerPoint[i];
+	//	anus = anus / anus.w;
+	//	final[i] = glm::vec3(glm::inverse(v) * anus);
+	//}
+}
+
+float ShadowPass::FindRadius(Frustum& frustum)
+{
+	float radius = 0.f;
+
+	for (int i = 0; i < 8; i++) {
+		float distance = glm::distance(frustum.MiddlePoint, frustum.CornerPoint[i]);
+		if (distance > radius) {
+			radius = distance;
+		}
 	}
 
-	//float scaleX = 2.0f / (maxX - minX);
-	//float scaleY = 2.0f / (maxY - minY);
-	//float offsetX = -0.5f * (maxX + minX) * scaleX;
-	//float offsetY = -0.5f * (maxY + minY) * scaleY;
-	//
-	//glm::mat4 nv_mvp = glm::mat4();
-	//nv_mvp[0][0] = scaleX;
-	//nv_mvp[1][1] = scaleY;
-	//nv_mvp[0][3] = offsetX;
-	//nv_mvp[1][3] = offsetY;
-	//glm::transpose(nv_mvp);
-
-	glm::mat4 p = glm::ortho(minX, maxX, minY, maxY, m_NearFarPlane[Near], m_NearFarPlane[Far]);
-
-	return p;
-}
-
-glm::mat4 ShadowPass::CalculateFrustum(RenderScene & scene, std::shared_ptr<DirectionalLightJob> directionalLightJob, ShadowCamera shad_cam)
-{
-	glm::vec3 middle = shad_cam.camera->Position() + (shad_cam.camera->Forward() * shad_cam.camera->FarClip() * 0.5f);
-
-	return glm::lookAt(glm::vec3(0.f) + middle, glm::vec3(directionalLightJob->Direction) + middle, glm::vec3(-1.f, 0.f, 0.f));
+	frustum.Radius = radius;
+	return radius;
 }
 
 void ShadowPass::InitializeFrameBuffers()
@@ -154,6 +148,36 @@ void ShadowPass::ClearBuffer()
 	}
 }
 
+void ShadowPass::PointsToLightspace(Frustum& frustum, glm::mat4 v)
+{
+	float left = INFINITY;
+	float right = -INFINITY;
+	float bottom = INFINITY;
+	float top = -INFINITY;
+
+	for (int i = 0; i < 8; i++)
+	{
+		glm::vec3 tempPoint = glm::vec3(v * glm::vec4(frustum.CornerPoint[i], 1.f));
+
+		if (tempPoint.x < left) { left = tempPoint.x; }
+		if (tempPoint.x > right) { right = tempPoint.x; }
+		if (tempPoint.y < bottom) { bottom = tempPoint.y; }
+		if (tempPoint.y > top) { top = tempPoint.y; }
+	}
+
+	frustum.LRTB = { left, right, bottom, top };
+}
+
+void ShadowPass::RadiusToLightspace(Frustum& frustum, glm::mat4 v)
+{
+	float left = -frustum.Radius;
+	float right = frustum.Radius;
+	float bottom = -frustum.Radius;
+	float top =frustum.Radius;
+
+	frustum.LRTB = { left, right, bottom, top };
+}
+
 void ShadowPass::Draw(RenderScene & scene)
 {
 	ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
@@ -161,15 +185,12 @@ void ShadowPass::Draw(RenderScene & scene)
 	ImGui::Checkbox("EnableShadow", &m_ShadowOn);
 	ImGui::DragInt("ShadowLevel", &m_ShadowLevel, 0.05f, 0, m_CurrentNrOfSplits - 1);
 
-	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		m_shadCams[i].camera = new Camera(*scene.Camera);
-		//m_shadCams[i].frustumCorners = tempPoints;
-	}
-
-	UpdateSplitDist(m_shadCams, scene.Camera->NearClip(), scene.Camera->FarClip());
+	InitializeCameras(scene);
+	UpdateSplitDist(m_shadFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
 	
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		m_shadCams[i].frustumCorners = UpdateFrustumPoints(m_shadCams[i].camera, m_shadCams[i].camera->Position(), m_shadCams[i].camera->Forward());
+		UpdateFrustumPoints(m_shadFrusta[i], scene.Camera->Position(), scene.Camera->Forward(), scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
+		//float test = FindRadius(m_shadFrusta[i]);
 
 		ShadowPassState* state = new ShadowPassState(m_DepthBuffer[i].GetHandle());
 
@@ -187,8 +208,11 @@ void ShadowPass::Draw(RenderScene & scene)
 				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
 				if (directionalLightJob) {
-					m_LightView[i] = CalculateFrustum(scene, directionalLightJob, m_shadCams[i]);
-					m_LightProjection[i] = FindNewFrustum(m_shadCams[i]);
+					m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadFrusta[i].MiddlePoint, m_shadFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
+					
+					PointsToLightspace(m_shadFrusta[i], m_LightView[i]);
+					m_LightProjection[i] = glm::ortho(m_shadFrusta[i].LRTB[Left], m_shadFrusta[i].LRTB[Right], m_shadFrusta[i].LRTB[Bottom], m_shadFrusta[i].LRTB[Top], -30.f, 30.f);
+					//m_LightProjection[i] = glm::ortho(m_shadFrusta[i].LRTB[Left], m_shadFrusta[i].LRTB[Right], m_shadFrusta[i].LRTB[Bottom], m_shadFrusta[i].LRTB[Top], -0.f, 300.f);
 
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
@@ -197,7 +221,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
 					for (auto &objectJob : scene.OpaqueObjects) {
 						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
-
+						
 						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 
 						glBindVertexArray(modelJob->Model->VAO);

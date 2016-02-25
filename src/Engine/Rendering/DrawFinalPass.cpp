@@ -244,8 +244,11 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
     glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
 
     //Shadow
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightP()));
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), 1, GL_FALSE, glm::value_ptr(m_ShadowPass->lightV()));
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->lightP().data()));
+    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->lightV().data()));
+	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->farDistance().data());
+
+
     //GLfloat m_NearFarPlane[2] = { -40.f, 30.f };
     //GLfloat m_LRBT[4] = { -40.f, 100.f, -50.f, 50.f };
     //glm::mat4 m_LightProjection = glm::ortho(m_LRBT[Left], m_LRBT[Right], m_LRBT[Bottom], m_LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
@@ -317,11 +320,16 @@ void DrawFinalPass::BindModelTextures(std::shared_ptr<ModelJob>& job)
         glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
     }
 
-    glActiveTexture(GL_TEXTURE4);
-    if (m_ShadowPass->DepthMap() != NULL) {
-        glBindTexture(GL_TEXTURE_2D, m_ShadowPass->DepthMap());
-    } else {
-        glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-    }
+	for (int i = 0; i < m_ShadowPass->CurrentNrOfSplits(); i++)
+	{ 
+		glActiveTexture(GL_TEXTURE4 + i);
+		if (m_ShadowPass->DepthMap(i) != NULL) {
+		    glBindTexture(GL_TEXTURE_2D, m_ShadowPass->DepthMap(i));
+		} else {
+		    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+		}
+	}
+
+
 }
 
