@@ -91,38 +91,6 @@ std::string TCPServer::GetAddress()
     return endpoint.address().to_string().c_str();
 }
 
-//void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
-//{
-//    int bytesRead = readBuffer(m_ReadBuffer, playerDefinition);
-//    if (bytesRead > 0) {
-//        packet.ReconstructFromData(m_ReadBuffer, bytesRead);
-//    }
-//    lastReceivedSocket = playerDefinition.TCPSocket;
-//}
-//
-//int TCPServer::readBuffer(char* data, PlayerDefinition & playerDefinition)
-//{
-//    if (!playerDefinition.TCPSocket) {
-//        return 0;
-//    }
-//    boost::system::error_code error;
-//    // Read size of packet
-//    size_t bytesReceived = playerDefinition.TCPSocket->read_some(boost
-//        ::asio::buffer((void*)data, sizeof(int)),
-//        error);
-//    int sizeOfPacket = 0;
-//    memcpy(&sizeOfPacket, data, sizeof(int));
-//
-//    // Read the rest of the message
-//    bytesReceived += playerDefinition.TCPSocket->read_some(boost
-//        ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
-//        error);
-//    if (error) {
-//        //LOG_ERROR("receive: %s", error.message().c_str());
-//    }
-//    return bytesReceived;
-//}
-
 void TCPServer::Receive(Packet & packet, PlayerDefinition & playerDefinition)
 {
     int bytesRead = readBuffer(playerDefinition);

@@ -42,9 +42,9 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
 
     glm::vec3 inflictorPos = e.Inflictor["Transform"]["Position"];
     //if testing
-    if (m_Testing) {
+#ifdef INDICATOR_TEST
         inflictorPos = DamageIndicatorTest(e.Victim);
-    }
+#endif
 
     float angleBetweenVectors = CalculateAngle(e.Victim, inflictorPos);
 
@@ -100,6 +100,7 @@ float DamageIndicatorSystem::CalculateAngle(EntityWrapper player, glm::vec3 enem
 
     return angleBetweenVectors;
 }
+#ifdef INDICATOR_TEST
 glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
     auto currentPos = (glm::vec3)player["Transform"]["Position"];
 
@@ -123,7 +124,7 @@ glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
     }
     m_TestVar++;
 
-    auto inflictorPos = glm::vec3(currentPos.x + testVar*6.0f, currentPos.y, currentPos.z + testVar2*6.0f);
+     auto inflictorPos = glm::vec3(currentPos.x + testVar*6.0f, currentPos.y, currentPos.z + testVar2*6.0f);
 
     //load the explosioneffect XML
     auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
@@ -143,7 +144,6 @@ glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
     //copy the models position,orientation
     deathEffectEW["Transform"]["Position"] = inflictorPos;
     deathEffectEW["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
-    deathEffectEW["Lifetime"]["Lifetime"] = 8.0f;
-    deathEffectEW["ExplosionEffect"]["ExplosionDuration"] = 8.0f;
     return inflictorPos;
 }
+#endif

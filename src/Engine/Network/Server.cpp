@@ -399,10 +399,7 @@ void Server::parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint)
     packet.WritePrimitive<int>(m_Reliable.Port());
     packet.WriteString("SERVERNAME");
     packet.WritePrimitive<int>(m_ConnectedPlayers.size());
-    //PlayerDefinition pDef;
-    //pDef.Endpoint = boost::asio::ip::udp::endpoint(endpoint.address(), 13);
-
-    m_ServerlistRequest.Send(packet/*, endpoint*/);
+    m_ServerlistRequest.Send(packet);
 }
 
 void Server::disconnect(PlayerID playerID)

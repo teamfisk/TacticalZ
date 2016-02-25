@@ -44,9 +44,8 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     LOG_INFO("<- effect camera");
 
     //components that we need from player
-    auto playerCamera = player.FirstChildByName("Camera");
     auto playerModel = player.FirstChildByName("PlayerModel");
-    if (!playerCamera.Valid() || !playerModel.Valid()) {
+    if (!playerModel.Valid()) {
         return;
     }
     if (!playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
@@ -56,7 +55,7 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     auto playerEntityAnimation = playerModel["Animation"];
     LOG_INFO("-> effect camera");
 
-    //copy the data from player to explisioneffectmodel
+    //copy the data from player to explosioneffectmodel
     playerEntityModel.Copy(deathEffectEW["Model"]);
     playerEntityAnimation.Copy(deathEffectEW["Animation"]);
     //freeze the animation

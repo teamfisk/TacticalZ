@@ -16,6 +16,8 @@
 #include "DrawScreenQuadPass.h"
 #include "DrawBloomPass.h"
 #include "DrawColorCorrectionPass.h"
+#include "SSAOPass.h"
+#include "CubeMapPass.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
@@ -57,7 +59,14 @@ private:
     Model* m_UnitSphere;
 
     int m_DebugTextureToDraw = 0;
+    int m_CubeMapTexture = 0;
     bool m_ResizeWindow = false;
+	float m_SSAO_Radius = 1.0f;
+	float m_SSAO_Bias = 0.05f;
+	float m_SSAO_Contrast = 1.5f;
+	float m_SSAO_IntensityScale = 1.0f;
+	int m_SSAO_NumOfSamples = 24;
+	int m_SSAO_NumOfTurns = 7;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
@@ -66,6 +75,8 @@ private:
     DrawScreenQuadPass* m_DrawScreenQuadPass;
     DrawBloomPass* m_DrawBloomPass;
     DrawColorCorrectionPass* m_DrawColorCorrectionPass;
+	SSAOPass* m_SSAOPass;
+    CubeMapPass* m_CubeMapPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();

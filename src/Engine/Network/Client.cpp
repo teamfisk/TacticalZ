@@ -203,6 +203,7 @@ void Client::parseServerlist(Packet& packet)
     std::string serverName = packet.ReadString();
     int playersConnected = packet.ReadPrimitive<int>();
     //TODO: This should not happen when a client is connected to a server
+
     m_Serverlist.push_back({ address, port, serverName, playersConnected });
 }
 
@@ -598,7 +599,7 @@ void Client::displayServerlist()
     LOG_INFO("This is a serverlist:\n");
     for (int i = 0; i < m_Serverlist.size(); i++) {
         ServerInfo si = m_Serverlist[i];
-        LOG_INFO("%s:%i\t%s\t%i\n", si.Address, si.Port, si.Name, si.PlayersConnected);
+        LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
 }
 

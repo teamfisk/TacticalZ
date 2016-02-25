@@ -19,6 +19,8 @@ void main()
 	vec4 bloomColor = texture(BloomTexture, Input.TextureCoordinate);
 	vec4 hdrColorLowRes = texture(SceneTextureLowRes, Input.TextureCoordinate);
 	vec4 bloomColorLowRes = texture(BloomTextureLowRes, Input.TextureCoordinate);
+
+	//hdrColor = hdrColor * SSAO;
 	hdrColor += bloomColor;
 	hdrColorLowRes;
 
@@ -33,7 +35,6 @@ void main()
 
 	//gamme correction
 	result = pow(result, vec3(1.0 / Gamma));
-
 	fragmentColor = vec4(result, 1.0);
 	//fragmentColor = hdrColor;
 	//fragmentColor = bloomColor;

@@ -16,9 +16,6 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
 void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, ComponentWrapper& cCapturePoint, double dt)
 {
-    //if (!IsClient) {
-    //    return;
-    //}
     if (m_WinnerWasFound) {
         return;
     }

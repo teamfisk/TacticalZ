@@ -30,6 +30,7 @@ void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height
     currentRenderer->m_LightCullingPass->OnWindowResize();
     currentRenderer->m_PickingPass->OnWindowResize();
     currentRenderer->m_DrawBloomPass->OnWindowResize();
+	currentRenderer->m_SSAOPass->OnWindowResize();
 }
 
 void Renderer::InitializeWindow()
@@ -88,9 +89,6 @@ void Renderer::InitializeShaders()
     //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ExplosionEffect.frag.glsl")));
     //m_ExplosionEffectProgram->Compile();
     //m_ExplosionEffectProgram->Link();
-
-
-
 }
 
 void Renderer::InputUpdate(double dt)
@@ -108,7 +106,23 @@ void Renderer::Update(double dt)
 
 void Renderer::Draw(RenderFrame& frame)
 {
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking");
+    GLERROR("PRE");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0Ambient Occlusion");
+    ImGui::Combo("CubeMap", &m_CubeMapTexture, "Nevada(512)\0Sky(1024)");
+    if(m_CubeMapTexture == 0) {
+        m_CubeMapPass->LoadTextures("Nevada");
+    } else if (m_CubeMapTexture == 1) {
+        m_CubeMapPass->LoadTextures("Sky");
+    }
+
+	ImGui::SliderFloat("SSAO sample radius", &m_SSAO_Radius, 0.01f, 5.0f);
+	ImGui::SliderFloat("SSAO bias", &m_SSAO_Bias, 0.0f, 0.1f);
+	ImGui::SliderFloat("SSAO contrast", &m_SSAO_Contrast, 0.0f, 10.0f);
+	ImGui::SliderFloat("SSAO IntensityScale", &m_SSAO_IntensityScale, 0.0f, 10.0f);
+	ImGui::SliderInt("SSAO Number of Samples", &m_SSAO_NumOfSamples, 2, 100);
+	ImGui::SliderInt("SSAO Number of Turns", &m_SSAO_NumOfTurns, 0, 50);
+	m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Contrast, m_SSAO_IntensityScale, m_SSAO_NumOfSamples, m_SSAO_NumOfTurns);
+    GLERROR("SSAO Settings");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -118,16 +132,24 @@ void Renderer::Draw(RenderFrame& frame)
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
+	m_SSAOPass->ClearBuffer();
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
-
+    GLERROR("ClearBuffers");
+	for (auto scene : frame.RenderScenes) {
+		PerformanceTimer::StartTimer("Renderer-Depth");
+		m_PickingPass->Draw(*scene);
+		GLERROR("Drawing pickingpass");
+		PerformanceTimer::StopTimer("Renderer-Depth");
+	}
+	PerformanceTimer::StartTimer("AO generation");
+	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
+	GLuint ao = m_SSAOPass->SSAOTexture();
+	PerformanceTimer::StopTimer("AO generation");
     for (auto scene : frame.RenderScenes){
         
-        PerformanceTimer::StartTimer("Renderer-Depth");
+        PerformanceTimer::StartTimer("Renderer-Drawing PickingPass");
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
-        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Drawing PickingPass");
-        m_PickingPass->Draw(*scene);
-        GLERROR("Drawing pickingpass");
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Generate Frustrums");
         m_LightCullingPass->GenerateNewFrustum(*scene);
         GLERROR("Generate frustums");
@@ -137,8 +159,8 @@ void Renderer::Draw(RenderFrame& frame)
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Light Culling");
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
+		m_DrawFinalPass->Draw(*scene, ao);
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
-        m_DrawFinalPass->Draw(*scene);
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
@@ -147,14 +169,17 @@ void Renderer::Draw(RenderFrame& frame)
         GLERROR("Draw Text");
         PerformanceTimer::StopTimer("Renderer-Draw Text");
     }
+
     PerformanceTimer::StartTimer("Renderer-Draw Bloom");
     m_DrawBloomPass->Draw(m_DrawFinalPass->BloomTexture());
     PerformanceTimer::StopTimer("Renderer-Draw Bloom");
+
     if (m_DebugTextureToDraw == 0) {
         PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
         m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
         PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
+
     PerformanceTimer::StartTimer("Renderer-Misc Debug Draws");
     if (m_DebugTextureToDraw == 1) {
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTexture());
@@ -174,7 +199,10 @@ void Renderer::Draw(RenderFrame& frame)
     if (m_DebugTextureToDraw == 6) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
-    PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
+	if (m_DebugTextureToDraw == 7) {
+		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
+	}
+	PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
 
     PerformanceTimer::StartTimer("Renderer-ImGuiRenderPass");
     m_ImGuiRenderPass->Draw();
@@ -219,8 +247,10 @@ void Renderer::InitializeRenderPasses()
 {
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass);
+    m_CubeMapPass = new CubeMapPass(this);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
+    m_SSAOPass = new SSAOPass(this);
 }

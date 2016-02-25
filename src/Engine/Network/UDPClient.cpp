@@ -35,18 +35,6 @@ void UDPClient::Receive(Packet& packet)
 
 int UDPClient::readBuffer()
 {
-    //if (!m_Socket) {
-    //    return 0;
-    //}
-    //boost::system::error_code error;
-    //int bytesReceived = m_Socket->receive_from(boost
-    //    ::asio::buffer((void*)data, BUFFERSIZE),
-    //    m_ReceiverEndpoint,
-    //    0, error);
-    //if (error) {
-    //    //LOG_ERROR("receive: %s", error.message().c_str());
-    //}
-    //return bytesReceived;
     if (!m_Socket) {
         return 0;
     }
@@ -91,6 +79,7 @@ void UDPClient::Send(Packet& packet)
 
 void UDPClient::Broadcast(Packet& packet, int port)
 {
+    packet.UpdateSize();
     m_Socket->set_option(boost::asio::socket_base::broadcast(true));
     m_Socket->send_to(boost::asio::buffer(
         packet.Data(),

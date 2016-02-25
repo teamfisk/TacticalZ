@@ -41,6 +41,7 @@ void UDPServer::Send(Packet & packet)
 // Broadcasting respond specific logic
 void UDPServer::Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint)
 {
+    packet.UpdateSize();
     m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
@@ -52,6 +53,7 @@ void UDPServer::Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint)
 // Broadcasting
 void UDPServer::Broadcast(Packet & packet, int port)
 {
+    packet.UpdateSize();
     m_Socket->set_option(boost::asio::socket_base::broadcast(true));
     m_Socket->send_to(
         boost::asio::buffer(
@@ -78,18 +80,10 @@ bool UDPServer::IsSocketAvailable()
 
 int UDPServer::readBuffer()
 {
-    //boost::system::error_code error = boost::asio::error::host_not_found;
-    //unsigned int length = m_Socket->receive_from(
-    //    boost::asio::buffer((void*)data
-    //        , BUFFERSIZE)
-    //    , m_ReceiverEndpoint, 0, error);
-    //if (error) {
-    //    LOG_WARNING(error.message().c_str());
-    //}
-    //return length;
     if (!m_Socket) {
         return 0;
     }
+    int addasdasd = m_Socket->available();
     boost::system::error_code error;
     // Read size of packet
      m_Socket->receive_from(boost

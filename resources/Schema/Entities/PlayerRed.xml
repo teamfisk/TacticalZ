@@ -13,6 +13,7 @@
     <c:DashAbility/>
     <c:Health/>
     <c:Physics>
+      <PrevOrigin X="0" Y="0.772000015" Z="0"/>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
     </c:Physics>
     <c:Player>
@@ -60,6 +61,7 @@
                 <c:Sprite>
                   <DiffuseTexture>Textures/Weapons/Crosshair/SmallThickHoleDot.png</DiffuseTexture>
                   <DepthSort>false</DepthSort>
+                  <GlowMap></GlowMap>
                 </c:Sprite>
                 <c:Transform>
                   <Position X="0" Y="0" Z="0.200000003"/>
@@ -110,6 +112,7 @@
                     </c:Fill>
                     <c:Sprite>
                       <DiffuseTexture>Textures/HealthHUD3.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
                       <Color A="0.588235319" B="0" G="0" R="0"/>
                     </c:Sprite>
                     <c:HealthHUD/>
@@ -135,6 +138,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -152,6 +156,7 @@
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -167,6 +172,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -185,6 +191,7 @@
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -200,6 +207,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
                       <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                     </c:Sprite>
                     <c:Transform>
@@ -217,6 +225,7 @@
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -232,6 +241,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -249,6 +259,7 @@
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -264,6 +275,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
                       <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -279,6 +291,7 @@
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -304,6 +317,7 @@
                 <Entity name="KillFeed1">
                   <Components>
                     <c:Text>
+                      <Content></Content>
                       <Resource>Fonts/DroidSans.ttf,64</Resource>
                       <Alignment>
                         <Right/>
@@ -316,6 +330,7 @@
                 <Entity name="KillFeed2">
                   <Components>
                     <c:Text>
+                      <Content></Content>
                       <Resource>Fonts/DroidSans.ttf,64</Resource>
                       <Alignment>
                         <Right/>
@@ -330,6 +345,7 @@
                 <Entity name="KillFeed3">
                   <Components>
                     <c:Text>
+                      <Content></Content>
                       <Resource>Fonts/DroidSans.ttf,64</Resource>
                       <Alignment>
                         <Right/>
@@ -349,13 +365,14 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>1.6050530664521858</Time1>
+              <Time1>1.2667383999985162</Time1>
               <Speed1>1</Speed1>
+              <AnimationName2></AnimationName2>
+              <AnimationName3></AnimationName3>
             </c:Animation>
             <c:Model>
               <Resource>Models/Characters/Assault/FirstPerson.mesh</Resource>
               <Color A="1" B="0" G="0" R="1"/>
-              <Transparent>true</Transparent>
             </c:Model>
             <c:Transform/>
           </Components>
@@ -367,11 +384,10 @@
                 </c:BoneAttachment>
                 <c:Model>
                   <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
-                  <Transparent>true</Transparent>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.12043035" Y="-0.234149337" Z="-0.181454644"/>
-                  <Orientation X="0.0104045281" Y="-0.00268131681" Z="0.0428438708"/>
+                  <Position X="0.120430425" Y="-0.242105931" Z="-0.181454822"/>
+                  <Orientation X="0.010404665" Y="-0.00268179877" Z="0.0428443067"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -408,6 +424,7 @@
                       <Components>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
                           <Color A="0.588235319" B="0" G="0" R="0"/>
                         </c:Sprite>
                         <c:Transform>
@@ -477,8 +494,10 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.620305457513453</Time1>
+          <Time1>0.26532318661337229</Time1>
           <Speed1>1</Speed1>
+          <AnimationName2></AnimationName2>
+          <AnimationName3></AnimationName3>
         </c:Animation>
         <c:AnimationOffset>
           <AnimationName>AimRifle</AnimationName>
@@ -501,8 +520,8 @@
               <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0.160351232" Y="1.02591991" Z="-0.215102971"/>
-              <Orientation X="-0.0627480298" Y="-0.0432248674" Z="0.119431816"/>
+              <Position X="0.159282878" Y="1.0300566" Z="-0.216084003"/>
+              <Orientation X="-0.0626799241" Y="-0.0390551724" Z="0.119761385"/>
             </c:Transform>
           </Components>
           <Children>
@@ -568,6 +587,26 @@
           <Position X="0.100000001" Y="1.50199997" Z="-0.248000011"/>
           <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
           <Orientation X="0" Y="3.14199996" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
+          <DepthSort>false</DepthSort>
+          <GlowMap></GlowMap>
+          <Color A="1" B="0" G="0" R="1"/>
+        </c:Sprite>
+        <c:HiddenForLocalPlayer/>
+        <c:SpriteIndicator>
+          <MinScale>50</MinScale>
+          <VisibleForSingleTeamOnly>true</VisibleForSingleTeamOnly>
+        </c:SpriteIndicator>
+        <c:Transform>
+          <Position X="0" Y="1.84000003" Z="0"/>
+          <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
         </c:Transform>
       </Components>
       <Children/>

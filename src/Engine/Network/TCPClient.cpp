@@ -64,26 +64,6 @@ void TCPClient::Receive(Packet& packet)
 
 size_t TCPClient::readBuffer()
 { 
-    //if (!m_Socket) {
-    //    return 0;
-    //}
-    //boost::system::error_code error;
-    //// Read size of packet
-    //size_t bytesReceived = m_Socket->read_some(boost
-    //    ::asio::buffer((void*)data, sizeof(int)),
-    //    error);
-    //int sizeOfPacket = 0;
-    //memcpy(&sizeOfPacket, data, sizeof(int));
-
-    //// Read the rest of the message
-    //bytesReceived += m_Socket->read_some(boost
-    //    ::asio::buffer((void*)(data + bytesReceived), sizeOfPacket - bytesReceived),
-    //    error);
-    //if (error) {
-    //    //LOG_ERROR("receive: %s", error.message().c_str());
-    //}
-    //return bytesReceived;
-
     if (!m_Socket) {
         return 0;
     }
