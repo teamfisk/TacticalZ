@@ -26,6 +26,7 @@ private:
         double AmmoGain;
         double RespawnTimer;
         double DecreaseThisRespawnTimer;
+        EntityID parentID;
     };
     std::vector<NewAmmoPickup> m_ETriggerTouchVector;
 };
