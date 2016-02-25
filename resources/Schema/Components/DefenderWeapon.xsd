@@ -4,7 +4,7 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 	<xs:include schemaLocation="../Types/WeaponSlotEnum.xsd"/>
 
-	<xs:element name="AssaultWeapon">
+	<xs:element name="DefenderWeapon">
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="MagazineAmmo" type="t:int" minOccurs="0">
@@ -19,17 +19,25 @@
 				<xs:element name="MaxAmmo" type="t:int" minOccurs="0">
 									<xs:annotation><xs:documentation>Maximum ammo able to be carried</xs:documentation></xs:annotation>
 				</xs:element>
-				<xs:element name="BaseDamage" type="t:double" minOccurs="0"/>
+				<xs:element name="BaseDamage" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Damage dealt if all shotgun pellets hit</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="SpreadAngle" type="t:float" minOccurs="0">
+					<xs:annotation><xs:documentation>Spread angle in radians</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="NumPellets" type="t:int" minOccurs="0"/>
 				<xs:element name="RPM" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Rate of fire in rounds per minute</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="ViewPunch" type="t:float" minOccurs="0">
-					<xs:annotation><xs:documentation>View punch in radians for each bullet fired</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>View punch in radians for each shell fired</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="ReloadTime" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>Time it takes to reload the weapon in seconds</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>Time it takes to load ONE SHELL into the weapon in seconds</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Slot" type="WeaponSlotEnum" minOccurs="0"/>
+				<xs:element name="IsFiring" type="t:bool" minOccurs="0"/>
+				<xs:element name="TimeSinceLastFire" type="t:double" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>
