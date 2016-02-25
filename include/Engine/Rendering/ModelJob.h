@@ -146,9 +146,6 @@ struct ModelJob : RenderJob
     glm::vec4 Color;
     const ::Model* Model = nullptr;
     ::Skeleton* Skeleton = nullptr;
-    std::vector<::Skeleton::AnimationData> Animations;
-    ::Skeleton::AnimationOffset AnimationOffset;
-    
     std::shared_ptr<::BlendTree> BlendTree = nullptr;
 
     glm::vec4 DiffuseColor;

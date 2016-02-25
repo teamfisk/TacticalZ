@@ -68,34 +68,6 @@ public:
         std::map<int, std::vector<Keyframe>> JointAnimations;
 	};
 
-    enum class BlendType
-    {
-        Additive,
-        Blend,
-        Override,
-    };
-
-    struct AnimationData
-    {
-        const Animation* animation;
-        BlendType blendType;
-        float time;
-        int level;
-        float weight;
-    };
-
-    struct JointFramePose {
-        BlendType Type;
-        int Level = 0;
-        glm::mat4 Pose = glm::mat4(0);
-        float Weight = 0.0f;
-    };
-
-    struct AnimationOffset {
-        const Animation* animation;
-        float time;
-    };
-
 	Skeleton() { }
 	~Skeleton();
 
@@ -106,36 +78,23 @@ public:
 	// Attach a new bone to the skeleton
 	// Returns: New bone index
 	int CreateBone(int ID, int parentID, std::string name, glm::mat4 offsetMatrix);
-
 	int GetBoneID(std::string name);
-
-    std::vector<glm::mat4>  GetFrameBones();
+    const Animation* GetAnimation(std::string name);
 
     std::map<int, glm::mat4> GetFrameBones(const Animation* animation, double time, bool additive, bool noRootMotion = false);
-    void AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, bool additive, const Bone* bone, glm::mat4 parentMatrix);
-
-    const Animation* GetAnimation(std::string name);
-    glm::mat4 AdditiveBlend(const Bone* bone, AnimationOffset animationOffset, glm::mat4 targetPose);
-
-	std::map<std::string, Animation> Animations;
-
     glm::mat4 GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 childMatrix);
-    glm::mat4 GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, AnimationOffset animationOffset, glm::mat4 childMatrix);
-    glm::mat4 GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, glm::mat4 childMatrix);
-
-
-    std::map<int, glm::mat4> BlendPoses(std::map<int, glm::mat4> pose1, std::map<int, glm::mat4> pose2, float weight);
-    std::map<int, glm::mat4> OverridePose(std::map<int, glm::mat4> overridePose, std::map<int, glm::mat4> targetPose);
-    std::map<int, glm::mat4> BlendPoseAdditive(std::map<int, glm::mat4> additivePose, std::map<int, glm::mat4> targetPose);
-
+    std::map<int, glm::mat4> BlendPoses(const std::map<int, glm::mat4>& pose1, const std::map<int, glm::mat4>& pose2, float weight);
+    std::map<int, glm::mat4> OverridePose(const std::map<int, glm::mat4>& overridePose, const std::map<int, glm::mat4>& targetPose);
+    std::map<int, glm::mat4> BlendPoseAdditive(const std::map<int, glm::mat4>& additivePose, const std::map<int, glm::mat4>& targetPose);
     std::vector<glm::mat4> GetFinalPose(std::map<int, glm::mat4>& boneMatrices);
-    void AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
-
-    void AdditiveBoneTransforms(const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone);
-
+    
+    std::map<std::string, Animation> Animations;
 private:
     glm::mat4 GetAdditiveBonePose(const Bone* bone, const Animation* animation, double time);
     glm::mat4 GetBonePose(const Bone* bone, const Animation* animation, double time, bool noRootMotion);
+    void AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+    void AdditiveBoneTransforms(const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone);
+    void AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
 
 	std::map<std::string, Bone*> m_BonesByName;
     

@@ -35,7 +35,7 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
-    std::vector<::Skeleton::AnimationData> Animations;
+   /* std::vector<::Skeleton::AnimationData> Animations;
     ::Skeleton::AnimationOffset AnimationOffset;
     glm::mat4 boneTransform;
 
@@ -72,7 +72,7 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     glm::decompose(boneTransform, scale, rotation, translation, skew, perspective);
 
     glm::vec3 angles = glm::vec3(-glm::pitch(rotation), -glm::yaw(rotation), -glm::roll(rotation));
-/*
+/ *
 
     angles.y = asin(-boneTransform[0][2]);
     if (cos(angles.y) != 0) {
@@ -81,7 +81,7 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     } else {
         angles.x = atan2(-boneTransform[2][0], boneTransform[1][1]);
         angles.z = 0;
-    }*/
+    }* /
 
     if ((bool)entity["BoneAttachment"]["InheritPosition"]) {
         (glm::vec3&)entity["Transform"]["Position"] = translation + (glm::vec3)entity["BoneAttachment"]["PositionOffset"];
@@ -91,5 +91,5 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
     }
     if ((bool)entity["BoneAttachment"]["InheritScale"]) {
         (glm::vec3&)entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];
-    }
+    }*/
 }

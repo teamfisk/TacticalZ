@@ -60,17 +60,22 @@ public:
     BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton);
     ~BlendTree();
 
-    std::vector<glm::mat4> GetBoneTransforms(Skeleton* skeleton);
+
+    std::vector<glm::mat4> GetFinalPose() { return m_FinalPose; }
+
+
 
     void PrintTree();
 
 private:
+    Skeleton* m_Skeleton = nullptr;
     Node* m_Root = nullptr;
 
-    void FillTree(Node* parentNode, EntityWrapper parentEntity, Skeleton* skeleton);
-    BlendTree::Node* FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity, Skeleton* skeleton);
+    std::vector<glm::mat4> m_FinalPose;
+    std::vector<glm::mat4> AccumulateFinalPose();
+    BlendTree::Node* FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity);
 
-    void Blend(Skeleton* skeleton, std::map<int, glm::mat4>& pose);
+    void Blend(std::map<int, glm::mat4>& pose);
 };
 
 #endif
