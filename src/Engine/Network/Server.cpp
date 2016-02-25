@@ -28,9 +28,8 @@ Server::~Server()
 
 void Server::Update()
 {
-    PlayerDefinition pd;
-
     m_Reliable.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
+
     for (auto& kv : m_ConnectedPlayers) {
         while (kv.second.TCPSocket->available()) {
             // Packet will get real data in receive
@@ -46,6 +45,7 @@ void Server::Update()
         }
     }
 
+    PlayerDefinition pd;
     while (m_Unreliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);

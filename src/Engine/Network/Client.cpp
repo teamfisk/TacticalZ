@@ -1,7 +1,7 @@
 #include "Network/Client.h"
 using namespace boost::asio::ip;
 
-Client::Client(World* world, EventBroker* eventBroker) 
+Client::Client(World* world, EventBroker* eventBroker)
     : Network(world, eventBroker)
 {
     // Asumes root node is EntityID_Invalid
@@ -194,12 +194,12 @@ void Client::parseSpawnEvents()
         }
         e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Player.ID));
         //e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Spawner.ID));
-        e.PlayerID = -1; 
+        e.PlayerID = -1;
         e.PlayerName = m_PlayerSpawnEvents.at(i).PlayerName;
         m_EventBroker->Publish(e);
     }
     m_PlayerSpawnEvents = tempSpawn;
-   // m_PlayerSpawnEvents.clear();
+    // m_PlayerSpawnEvents.clear();
 }
 
 void Client::parsePlayersSpawned(Packet& packet)
@@ -243,14 +243,14 @@ void Client::parseComponentDeletion(Packet & packet)
 }
 
 void Client::parseDoubleJump(Packet & packet)
-{ 
+{
     EntityID serverID = packet.ReadPrimitive<EntityID>();
     if (!serverClientMapsHasEntity(serverID)) {
         return;
     }
     Events::DoubleJump e;
     e.entityID = m_ServerIDToClientID.at(serverID);
-    // If player is local player to publish to prevent infinite feedback loop
+    // If player is local player do not publish to prevent infinite feedback loop
     if (e.entityID != m_LocalPlayer.ID) {
         m_EventBroker->Publish(e);
     }
@@ -330,9 +330,10 @@ void Client::parseSnapshot(Packet& packet)
             if (serverClientMapsHasEntity(serverEntityID)) {
                 EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
                 EntityWrapper localEntity(m_World, localEntityID);
-                
+
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
+                    // TODO Fix memory leak here
                     SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
                     bool shouldApply = true;
                     // Apply potential filter function
@@ -343,6 +344,7 @@ void Client::parseSnapshot(Packet& packet)
                         ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
                         memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
                     }
+
                     //if (localEntity != m_LocalPlayer && !localEntity.IsChildOf(m_LocalPlayer)) {
                     //    updateFields(packet, componentInfo, localEntityID);
                     //} else {
@@ -371,7 +373,9 @@ void Client::parseSnapshot(Packet& packet)
         // This should be enough beacause we know that the entities arives in pre-order (there will always be a parent)
         if (serverParentID != EntityID_Invalid) {
             EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
-            m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            if (m_World->GetParent(localEntityID) != m_ServerIDToClientID.at(serverParentID)) {
+                m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            }
         }
     }
     parseSpawnEvents();
@@ -461,7 +465,7 @@ void Client::parsePlayerDamage(Packet& packet)
     Events::PlayerDamage e;
     PlayerID victimID = packet.ReadPrimitive<EntityID>();
     PlayerID inflictorID = packet.ReadPrimitive<EntityID>();
-    if(!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)){
+    if (!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)) {
         return;
     }
     e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(victimID));
@@ -501,7 +505,7 @@ void Client::sendLocalPlayerTransform()
     packet.WritePrimitive(orientation.x);
     packet.WritePrimitive(orientation.y);
     packet.WritePrimitive(orientation.z);
- 
+
     bool hasAssaultWeapon = m_LocalPlayer.HasComponent("AssaultWeapon");
     packet.WritePrimitive(hasAssaultWeapon);
     if (hasAssaultWeapon) {
@@ -509,7 +513,7 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["MagazineAmmo"]);
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
-    
+
     m_Unreliable.Send(packet);
 }
 
