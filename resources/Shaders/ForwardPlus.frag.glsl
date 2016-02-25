@@ -194,12 +194,14 @@ float CalcShadowValue(vec4 positionLightSpace, vec3 normal, vec3 lightDir, sampl
 
 int getShadowIndex(float far_distance[MAX_SPLITS])
 {
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
 	int index = 2;
-	if( gl_FragCoord.z < far_distance[0] )
+	if( depth < far_distance[0] )
 	{
 		index = 0;
 	}
-	else if( gl_FragCoord.z < far_distance[1] && gl_FragCoord.z > far_distance[0] )
+	else if( depth < far_distance[1] && depth > far_distance[0] )
 	{
 		index = 1;
 	}
@@ -207,7 +209,7 @@ int getShadowIndex(float far_distance[MAX_SPLITS])
 	return index;
 }
 
-//sampler2DShadow whichDepthMap( int DepthMapIndex )
+//sampler2DShadow whichDepthMap(int DepthMapIndex)
 //{
 //	if( DepthMapIndex == 0 )
 //	{
@@ -221,7 +223,6 @@ int getShadowIndex(float far_distance[MAX_SPLITS])
 //	{
 //		return DepthMap2;
 //	}
-//	
 //}
 
 void main()
@@ -275,19 +276,19 @@ void main()
 			
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 			
-			shadowFactor = CalcShadowValue(Input.PositionLightSpace[0], Input.Normal, vec3(light.Direction), DepthMap0);
-			//if( DepthMapIndex == 0 )
-			//{
-			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap0);
-			//}
-			//else if( DepthMapIndex == 1 )
-			//{
-			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap1);
-			//}
-			//else 
-			//{
-			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap2);
-			//}
+			//shadowFactor = CalcShadowValue(Input.PositionLightSpace[0], Input.Normal, vec3(light.Direction), DepthMap0);
+			if( DepthMapIndex == 0 )
+			{
+				shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap0);
+			}
+			else if( DepthMapIndex == 1 )
+			{
+				shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap1);
+			}
+			else 
+			{
+				shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap2);
+			}
 		}
 	
 		totalLighting.Diffuse += light_result.Diffuse;

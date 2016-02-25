@@ -111,7 +111,7 @@ void ShadowPass::InitializeFrameBuffers()
 
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
 		glBindTexture(GL_TEXTURE_2D, m_DepthMap[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, resolutionSizeWidth / (1 + i), resolutionSizeHeigth + (1 + i), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, resolutionSizeWidth / (1 /*+ i*/), resolutionSizeHeigth + (1 /*+ i*/), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -197,7 +197,7 @@ void ShadowPass::Draw(RenderScene & scene)
 		GLuint shaderHandle = m_ShadowProgram->GetHandle();
 		m_ShadowProgram->Bind();
 
-		glViewport(0, 0, resolutionSizeWidth / (1 + i), resolutionSizeHeigth);
+		glViewport(0, 0, resolutionSizeWidth / (1/* + i*/), resolutionSizeHeigth);
 		glDisable(GL_TEXTURE_2D);
 		glCullFace(GL_FRONT);
 		//state->Disable(GL_CULL_FACE);
