@@ -183,7 +183,7 @@ void Server::addInputCommandsToPacket(Packet& packet)
 
 void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
 {
-    auto itPair = m_World->GetChildren(entityID);
+    auto itPair = m_World->GetDirectChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
@@ -233,7 +233,7 @@ void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
 {
-    auto itPair = m_World->GetChildren(entityID);
+    auto itPair = m_World->GetDirectChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
