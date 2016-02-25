@@ -16,7 +16,15 @@ PlayerMovementSystem::~PlayerMovementSystem()
 void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
-    updateVelocity(dt);
+    if (IsServer) {
+        for (auto& kv : m_PlayerInputControllers) {
+            updateVelocity(kv.first, dt);
+        }
+    } else {
+        if (LocalPlayer.Valid()) {
+            updateVelocity(LocalPlayer, dt);
+        }
+    }
 }
 
 void PlayerMovementSystem::updateMovementControllers(double dt)
@@ -221,15 +229,11 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
 }
 
 
-void PlayerMovementSystem::updateVelocity(double dt)
+void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
 {
     // Only apply velocity to local player
-    if (!LocalPlayer.Valid()) {
-        return;
-    }
-
-    ComponentWrapper& cTransform = LocalPlayer["Transform"];
-    ComponentWrapper& cPhysics = LocalPlayer["Physics"];
+    ComponentWrapper& cTransform = player["Transform"];
+    ComponentWrapper& cPhysics = player["Physics"];
     glm::vec3& velocity = cPhysics["Velocity"];
     bool isOnGround = (bool)cPhysics["IsOnGround"];
 

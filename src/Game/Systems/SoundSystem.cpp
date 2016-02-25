@@ -14,6 +14,7 @@ SoundSystem::SoundSystem(SystemParams params)
         EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
         EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
+        EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &SoundSystem::OnPlayerDeath);
     }
 }
 
@@ -90,6 +91,9 @@ bool SoundSystem::drumTimer(double dt)
 
 bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
+    if (!LocalPlayer.Valid()) {
+        return false;
+    }
     int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
     int team = (int)m_World->GetComponent(LocalPlayer.ID, "Team")["Team"];
     Events::PlaySoundOnEntity ev;
@@ -108,7 +112,12 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
 // Testing purposes atm...
 bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 {
-    // Should check for only local players here...
+    if (!IsClient) { // Only play for clients
+        return false;
+    }
+    if (LocalPlayer.ID = e.Victim.ID) { // You're local player was the one who took dmg
+        return false;
+    }
     std::uniform_int_distribution<int> dist(1, 12);
     int rand = dist(generator);
     std::vector<std::string> paths;
@@ -128,8 +137,16 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 
 bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
+    if (e.Player.ID != LocalPlayer.ID) {
+        return false;
+    }
+    if (!IsClient) {
+        return false;
+    }
+    // The local player is dead. The local player might be invalid?
+    // Play the sound from the listener.
+    // TODO: We might want to hear other players die.
+    Events::PlayBackgroundMusic ev;
     ev.FilePath = "Audio/die/die2.wav";
     m_EventBroker->Publish(ev);
     return false;

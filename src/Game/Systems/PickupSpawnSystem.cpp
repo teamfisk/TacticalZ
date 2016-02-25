@@ -29,6 +29,7 @@ void PickupSpawnSystem::Update(double dt)
             newHealthPickupEntity["Transform"]["Position"] = healthPickupPosition.Pos;
             newHealthPickupEntity["HealthPickup"]["HealthGain"] = healthPickupPosition.HealthGain;
             newHealthPickupEntity["HealthPickup"]["RespawnTimer"] = healthPickupPosition.RespawnTimer;
+            m_World->SetParent(newHealthPickupEntity.ID, healthPickupPosition.parentID);
 
             //erase the current element (healthPickupPosition)
             m_ETriggerTouchVector.erase(it);
@@ -58,7 +59,7 @@ bool PickupSpawnSystem::OnTriggerTouch(Events::TriggerTouch& e)
     //copy position, healthgain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)
     //we need to copy all values since each value can be different for each healthPickup
     m_ETriggerTouchVector.push_back({ (glm::vec3)e.Trigger["Transform"]["Position"] ,e.Trigger["HealthPickup"]["HealthGain"],
-        e.Trigger["HealthPickup"]["RespawnTimer"],e.Trigger["HealthPickup"]["RespawnTimer"] });
+        e.Trigger["HealthPickup"]["RespawnTimer"],e.Trigger["HealthPickup"]["RespawnTimer"], m_World->GetParent(e.Trigger.ID) });
 
     //delete the healthpickup
     m_World->DeleteEntity(e.Trigger.ID);

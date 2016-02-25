@@ -29,6 +29,7 @@ void AmmoPickupSystem::Update(double dt)
             newAmmoPickupEntity["Transform"]["Position"] = ammoPickupPosition.Pos;
             newAmmoPickupEntity["AmmoPickup"]["AmmoGain"] = ammoPickupPosition.AmmoGain;
             newAmmoPickupEntity["AmmoPickup"]["RespawnTimer"] = ammoPickupPosition.RespawnTimer;
+            m_World->SetParent(newAmmoPickupEntity.ID, ammoPickupPosition.parentID);
 
             //erase the current element (AmmoPickupPosition)
             m_ETriggerTouchVector.erase(it);
@@ -69,8 +70,8 @@ bool AmmoPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
 
     //copy position, ammogain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)
     //we need to copy all values since each value can be different for each ammoPickup
-    m_ETriggerTouchVector.push_back({ (glm::vec3)e.Trigger["Transform"]["Position"] ,e.Trigger["AmmoPickup"]["AmmoGain"],
-        e.Trigger["AmmoPickup"]["RespawnTimer"],e.Trigger["AmmoPickup"]["RespawnTimer"] });
+    m_ETriggerTouchVector.push_back({ e.Trigger["Transform"]["Position"], e.Trigger["AmmoPickup"]["AmmoGain"],
+        e.Trigger["AmmoPickup"]["RespawnTimer"], e.Trigger["AmmoPickup"]["RespawnTimer"], m_World->GetParent(e.Trigger.ID) });
 
     //delete the ammopickup
     m_World->DeleteEntity(e.Trigger.ID);
