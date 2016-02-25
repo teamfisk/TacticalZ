@@ -51,6 +51,13 @@ EntityWrapper EntityWrapper::FirstParentWithComponent(const std::string& compone
     return EntityWrapper::Invalid;
 }
 
+std::vector<EntityWrapper> EntityWrapper::ChildrenWithComponent(const std::string& componentType)
+{
+    std::vector<EntityWrapper> childrenWithComponent;
+    childrenWithComponentRecursive(componentType, *this, childrenWithComponent);
+    return childrenWithComponent;
+}
+
 bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
 {
     EntityWrapper entity = *this;
@@ -129,5 +136,20 @@ EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, 
     }
 
     return EntityWrapper::Invalid;
+}
+
+void EntityWrapper::childrenWithComponentRecursive(const std::string& componentType, EntityWrapper& entity, std::vector<EntityWrapper>& childrenWithComponent)
+{
+    auto itPair = this->World->GetChildren(entity.ID);
+    if (itPair.first == itPair.second) {
+        return;
+    }
+
+    for (auto it = itPair.first; it != itPair.second; ++it) {
+        if (entity.HasComponent(componentType)) {
+            childrenWithComponent.push_back(entity);
+        }
+        childrenWithComponentRecursive(componentType, entity, childrenWithComponent);
+    }
 }
 

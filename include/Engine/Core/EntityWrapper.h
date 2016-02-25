@@ -29,6 +29,7 @@ struct EntityWrapper
     EntityWrapper Parent();
     EntityWrapper FirstChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
+    std::vector<EntityWrapper> ChildrenWithComponent(const std::string& componentType);
     bool IsChildOf(EntityWrapper potentialParent);
     bool Valid() const;
 
@@ -39,6 +40,7 @@ struct EntityWrapper
 
 private:
     EntityWrapper firstChildByNameRecursive(const std::string& name, EntityID parent);
+    void childrenWithComponentRecursive(const std::string& componentType, EntityWrapper& entity, std::vector<EntityWrapper>& childrenWithComponent);
 };
 
 namespace std

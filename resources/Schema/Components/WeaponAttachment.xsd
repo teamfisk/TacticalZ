@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:complexType name="PersonEnum" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="t:enum">
+				<xs:choice>
+					<xs:element name="FirstPerson" type="t:int" fixed="0" minOccurs="0"/>
+					<xs:element name="ThirdPerson" type="t:int" fixed="1" minOccurs="0"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="WeaponSlotEnum" mixed="true">
+		<xs:complexContent>
+			<xs:extension base="t:enum">
+				<xs:choice>
+					<xs:element name="Primary" type="t:int" fixed="1" minOccurs="0"/>
+					<xs:element name="Secondary" type="t:int" fixed="2" minOccurs="0"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name="WeaponAttachment">
+		<xs:annotation><xs:documentation>Combine with a spawner to define a weapon attachment point</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Person" type="PersonEnum" minOccurs="0"/>
+				<xs:element name="Slot" type="WeaponSlotEnum" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

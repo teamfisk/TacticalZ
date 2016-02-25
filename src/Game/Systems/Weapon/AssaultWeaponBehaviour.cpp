@@ -5,7 +5,6 @@ AssaultWeaponBehaviour::AssaultWeaponBehaviour(SystemParams systemParams, IRende
 {
     m_FirstPersonModel = m_Player.FirstChildByName("Hands");
     m_ThirdPersonModel = m_Player.FirstChildByName("PlayerModel");
-    EVENT_SUBSCRIBE_MEMBER(m_EAnimationComplete, &AssaultWeaponBehaviour::OnAnimationComplete);
 }
 
 void AssaultWeaponBehaviour::Fire()
@@ -36,7 +35,7 @@ void AssaultWeaponBehaviour::Reload()
         return;
     }
 
-    // Don't reload if we're completly out of ammo
+    // Don't reload if we're completely out of ammo
     if (ammo == 0) {
         playEmptySound();
         m_TimeSinceLastFire = -0.0f; // HACK: To make empty sound play with interval
@@ -56,14 +55,14 @@ void AssaultWeaponBehaviour::Update(double dt)
 {
     if (m_Reloading) {
         m_ReloadTimer -= dt;
-        // Re-enable glow on reload impersonator half-way through the animation
+        // Re-enable glow on reload impostor half-way through the animation
         if (IsClient) {
             if (m_ReloadTimer <= (double)m_Player["AssaultWeapon"]["ReloadTime"] / 2.0) {
-                if (m_FirstPersonReloadImpersonator.Valid()) {
-                    m_FirstPersonReloadImpersonator["Model"]["GlowMap"] = true;
+                if (m_FirstPersonReloadImpostor.Valid()) {
+                    m_FirstPersonReloadImpostor["Model"]["GlowMap"] = true;
                 }
-                if (m_ThirdPersonReloadImpersonator.Valid()) {
-                    m_ThirdPersonReloadImpersonator["Model"]["GlowMap"] = true;
+                if (m_ThirdPersonReloadImpostor.Valid()) {
+                    m_ThirdPersonReloadImpostor["Model"]["GlowMap"] = true;
                 }
             }
         }
@@ -94,21 +93,6 @@ void AssaultWeaponBehaviour::Update(double dt)
             firstPersonWeaponModel["Model"]["GlowMap"] = hasAmmo();
         }
     }
-}
-
-bool AssaultWeaponBehaviour::OnAnimationComplete(Events::AnimationComplete& e)
-{
-    if (e.Entity != m_FirstPersonModel) {
-        return false;
-    }
-
-    //if (e.Name == "ShootRifle") {
-    //    if (!m_Firing) {
-    //        playIdleAnimation();
-    //    }
-    //}
-
-    return true;
 }
 
 bool AssaultWeaponBehaviour::hasAmmo()
@@ -215,6 +199,12 @@ void AssaultWeaponBehaviour::playEmptySound()
 
 void AssaultWeaponBehaviour::viewPunch()
 {
+    // Since we send absolute client orientations to server, running this server side would
+    // cause aim desync.
+    if (!IsClient) {
+        return;
+    }
+
     EntityWrapper playerCamera = m_Player.FirstChildByName("Camera");
     if (!playerCamera.Valid()) {
         return;
@@ -323,8 +313,8 @@ void AssaultWeaponBehaviour::playReloadAnimation()
         EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
         EntityWrapper reloadSpawner = m_Player.FirstChildByName("FirstPersonReloadSpawner");
         if (IsClient) {
-            m_FirstPersonReloadImpersonator = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
-            firstPersonWeaponModel["Model"].Copy(m_FirstPersonReloadImpersonator["Model"]);
+            m_FirstPersonReloadImpostor = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
+            firstPersonWeaponModel["Model"].Copy(m_FirstPersonReloadImpostor["Model"]);
         }
         firstPersonWeaponModel["Model"]["Visible"] = false;
     }
@@ -332,8 +322,8 @@ void AssaultWeaponBehaviour::playReloadAnimation()
         EntityWrapper thirdPersonWeaponModel = m_Player.FirstChildByName("ThirdPersonWeaponModel");
         EntityWrapper reloadSpawner = m_Player.FirstChildByName("ThirdPersonReloadSpawner");
         if (IsClient) {
-            m_ThirdPersonReloadImpersonator = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
-            thirdPersonWeaponModel["Model"].Copy(m_ThirdPersonReloadImpersonator["Model"]);
+            m_ThirdPersonReloadImpostor = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
+            thirdPersonWeaponModel["Model"].Copy(m_ThirdPersonReloadImpostor["Model"]);
         }
         thirdPersonWeaponModel["Model"]["Visible"] = false;
     }
@@ -371,7 +361,7 @@ bool AssaultWeaponBehaviour::shoot(double damage)
         return false;
     }
 
-    // Don't let us shoot ourselves in the foot
+    // Don't let us shoot ourselves in the foot somehow
     if (victim == LocalPlayer) {
         return false;
     }

@@ -1,12 +1,13 @@
+#ifndef AssaultWeaponBehaviour_h__
+#define AssaultWeaponBehaviour_h__
+
 #include "Sound/EPlaySoundOnEntity.h"
 #include "Collision/Collision.h"
-#include "Rendering/AnimationSystem.h"
 #include "Core/ConfigFile.h"
 #include "WeaponBehaviour.h"
 #include "../SpawnerSystem.h"
 #include "Core/EPlayerDamage.h"
 #include "Core/EShoot.h"
-
 
 class AssaultWeaponBehaviour : public WeaponBehaviour
 {
@@ -22,16 +23,13 @@ public:
 private:
     EntityWrapper m_FirstPersonModel;
     EntityWrapper m_ThirdPersonModel;
+
     // State
     bool m_Firing = false;
     bool m_Reloading = false;
     double m_ReloadTimer = 0.0;
-    EntityWrapper m_FirstPersonReloadImpersonator;
-    EntityWrapper m_ThirdPersonReloadImpersonator;
     double m_TimeSinceLastFire = 0.0;
-
-    EventRelay<WeaponBehaviour, Events::AnimationComplete> m_EAnimationComplete;
-    bool OnAnimationComplete(Events::AnimationComplete& e);
+    EntityWrapper m_FirstPersonReloadImpostor;
 
     bool hasAmmo();
     void fireRound();
@@ -47,3 +45,5 @@ private:
     bool shoot(double damage);
     void showHitMarker();
 };
+
+#endif
