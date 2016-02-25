@@ -11,6 +11,7 @@
     </c:AssaultWeapon>
     <c:Collidable/>
     <c:DashAbility/>
+    <c:DoubleJump/>
     <c:Health/>
     <c:Physics>
       <PrevOrigin X="0" Y="0.772000015" Z="0"/>

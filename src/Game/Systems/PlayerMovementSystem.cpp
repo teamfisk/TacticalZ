@@ -116,12 +116,18 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
 
-            //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
-            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (isOnGround || !controller->DoubleJumping())) {
-                (bool)cPhysics["IsOnGround"] = false;
+            if (isOnGround) {
+                controller->SetDoubleJumping(false);
+            }
+            //If player presses Jump and is not crouching.
+            if (controller->Jumping() && !controller->Crouching()) {
                 if (isOnGround) {
-                    controller->SetDoubleJumping(false);
-                } else {
+                    (bool)cPhysics["IsOnGround"] = false;
+                    velocity.y = player["Player"]["JumpSpeed"];
+                } else if (player.HasComponent("DoubleJump") && !controller->DoubleJumping()) {
+                    //Enter here if player can double jump and is doing so.
+                    (bool)cPhysics["IsOnGround"] = false;
+                    velocity.y = player["DoubleJump"]["DoubleJumpSpeed"];
                     if (IsClient) {
                         //put a hexagon at the players feet
                         auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
@@ -134,7 +140,6 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                         m_EventBroker->Publish(e);
                     }
                 }
-                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
