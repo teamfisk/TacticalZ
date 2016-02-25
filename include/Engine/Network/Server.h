@@ -8,7 +8,6 @@
 
 #include "Network/TCPServer.h"
 #include "Network/UDPServer.h"
-#include "Network/UDPClient.h" //LOL
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
@@ -18,6 +17,7 @@
 #include "Core/EPlayerDamage.h"
 #include "Network/EPlayerDisconnected.h"
 #include "Core/EPlayerSpawned.h"
+#include "../Game/Events/EDoubleJump.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
 
@@ -81,8 +81,9 @@ private:
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
     void parsePing();
-    void parseUDPConnect(Packet & packet);
-    void parseTCPConnect(Packet & packet);
+    bool parseDoubleJump(Packet& packet);
+    void parseUDPConnect(Packet& packet);
+    void parseTCPConnect(Packet& packet);
     void parseDisconnect();
     void parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint);
     bool shouldSendToClient(EntityWrapper childEntity);

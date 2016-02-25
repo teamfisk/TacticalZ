@@ -25,10 +25,9 @@ private:
     std::unique_ptr<boost::asio::ip::tcp::acceptor> acceptor;
     boost::shared_ptr<boost::asio::ip::tcp::socket> lastReceivedSocket;
 
-    void handle_accept(boost::shared_ptr<boost::asio::ip::tcp::socket> socket,
-        int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers,
-        const boost::system::error_code& error);
     int readBuffer(PlayerDefinition& playerDefinition);
+    PlayerID getPlayerIDFromEndpoint(const std::map<PlayerID, PlayerDefinition>& connectedPlayers,
+        boost::asio::ip::address address, unsigned short port);
     int GetPort();
     std::string GetAddress();
     int m_Port = 0;
