@@ -208,12 +208,12 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
 void PlayerSpawnSystem::CheckForLatePlayers(double dt) {
     for (size_t i = 0; i < m_LatePlayersVector.size(); i++)
     {
-        auto& req = m_SpawnRequests[i];
+        auto& req = m_LatePlayersVector[i];
         req.timeSinceDeath += dt;
         if (req.timeSinceDeath > 2.5f) {
             //good but, this will only spawn them in the next cycle - i.e. not immediately
             //m_SpawnRequests.push_back(spawnReq);
-            
+
             //insta spawn
             auto playerSpawns = m_World->GetComponents("PlayerSpawn");
             for (auto& cPlayerSpawn : *playerSpawns) {

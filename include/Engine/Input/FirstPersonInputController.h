@@ -192,6 +192,8 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 
 template <typename EventContext>
 void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer) {
+    ImGui::Text(std::to_string(m_AssaultDashCoolDownTimer).c_str());
+
     m_AssaultDashDoubleTapDeltaTime += dt;
     m_AssaultDashCoolDownTimer -= dt;
     //cooldown = assaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)
