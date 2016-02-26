@@ -36,6 +36,7 @@ private:
     EditorCameraInputController<EditorSystem>* m_EditorCameraInputController;
     EditorGUI* m_EditorGUI;
     EditorStats* m_EditorStats;
+    std::vector<World> m_UndoLevels;
 
     // State
     double m_LastTime = 0.f;
@@ -44,6 +45,7 @@ private:
     EditorGUI::WidgetSpace m_WidgetSpace = EditorGUI::WidgetSpace::Global;
     EntityWrapper m_Widget = EntityWrapper::Invalid;
     EntityWrapper m_CurrentSelection = EntityWrapper::Invalid;
+    bool m_SaveUndoLevel = false; // Only save undo state once per update
 
     // Utility functions
     EntityWrapper importEntity(EntityWrapper parent, boost::filesystem::path filePath);
@@ -60,6 +62,8 @@ private:
     void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
     void OnWidgetSpace(EditorGUI::WidgetSpace widgetSpace);
+    void OnDirty(EntityWrapper entity);
+    void OnUndo();
 
     // Events
     EventRelay<EditorSystem, Events::MousePress> m_EMousePress;

@@ -602,6 +602,15 @@ bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
         m_CopyTarget = m_CurrentSelection;
     }
 
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_Z) {
+        if (m_OnUndo != nullptr) {
+            m_OnUndo();
+            if (!m_CurrentSelection.Valid()) {
+                SelectEntity(EntityWrapper::Invalid);
+            }
+        }
+    }
+
     if (e.ModCtrl && e.KeyCode == GLFW_KEY_V) {
         if (m_OnEntityPaste != nullptr) {
             EntityWrapper copy = m_OnEntityPaste(m_CopyTarget, m_CurrentSelection);
@@ -774,12 +783,12 @@ bool EditorGUI::compareCharArray(const char* c1, const char* c2)
 
 void EditorGUI::SetDirty(EntityWrapper entity)
 {
-    EntityWrapper baseParent = entity;
-    while (baseParent.Parent().Valid()) {
-        baseParent = baseParent.Parent();
-    }
+    EntityWrapper baseParent = entity.BaseParent();
     if (m_EntityFiles.find(baseParent) != m_EntityFiles.end()) {
         m_EntityFiles.at(baseParent).Dirty = true;
+    }
+    if (m_OnDirty != nullptr) {
+        m_OnDirty(entity);
     }
 }
 
@@ -830,6 +839,7 @@ void EditorGUI::entityCreate(World* world, EntityWrapper parent)
             parent.World = world;
         }
         EntityWrapper newEntity = m_OnEntityCreate(parent);
+        SetDirty(newEntity);
         SelectEntity(newEntity);
     }
 }
@@ -845,9 +855,9 @@ void EditorGUI::entityDelete(EntityWrapper entity)
         if (boost::any_cast<EntityWrapper>(m_ModalData[modalName]) == entity) {
             EntityWrapper parent = entity.Parent();
             if (m_OnEntityDelete != nullptr) {
-                SetDirty(entity);
                 m_OnEntityDelete(entity);
                 m_EntityFiles.erase(entity);
+                SetDirty(parent);
             }
             if (!m_CurrentSelection.Valid()) {
                 SelectEntity(parent);
@@ -864,8 +874,8 @@ void EditorGUI::entityChangeParent(EntityWrapper entity, EntityWrapper parent)
     }
 
     if (m_OnEntityChangeParent != nullptr) {
-        SetDirty(entity);
         m_OnEntityChangeParent(entity, parent);
+        SetDirty(entity);
         LOG_DEBUG("Changed parent of %i to %i", entity.ID, parent.ID);
     }
 }

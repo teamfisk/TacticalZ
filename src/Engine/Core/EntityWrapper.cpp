@@ -34,6 +34,15 @@ EntityWrapper EntityWrapper::Parent()
     }
 }
 
+EntityWrapper EntityWrapper::BaseParent()
+{
+    EntityWrapper baseParent = Parent();
+    while (baseParent.Parent().Valid()) {
+        baseParent = baseParent.Parent();
+    }
+    return baseParent;
+}
+
 EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
 {
     return firstChildByNameRecursive(name, this->ID);

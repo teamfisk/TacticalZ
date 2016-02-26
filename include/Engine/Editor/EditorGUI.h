@@ -91,7 +91,13 @@ public:
     // Called when the user selects a widget space.
     typedef std::function<void(WidgetSpace)> OnWidgetSpace_t;
     void SetWidgetSpaceCallback(OnWidgetSpace_t f) { m_OnWidgetSpace = f; }
-
+    // Called when anything is modified making the world dirty
+    // @param EntityWrapper The entity that was changed and marked as dirty
+    typedef std::function<void(EntityWrapper)> OnDirty_t;
+    void SetDirtyCallback(OnDirty_t f) { m_OnDirty = f; }
+    // Called when the user wishes to undo
+    typedef std::function<void()> OnUndo_t;
+    void SetUndoCallback(OnUndo_t f) { m_OnUndo = f; }
 private:
     World* m_World;
     EventBroker* m_EventBroker;
@@ -132,6 +138,8 @@ private:
     OnWidgetMode_t m_OnWidgetMode = nullptr;
     OnWidgetSpace_t m_OnWidgetSpace = nullptr;
     OnEntityPaste_t m_OnEntityPaste = nullptr;
+    OnDirty_t m_OnDirty = nullptr;
+    OnUndo_t m_OnUndo = nullptr;
 
     // Events
     EventRelay<EditorGUI, Events::KeyDown> m_EKeyDown;

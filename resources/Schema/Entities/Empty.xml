@@ -5,6 +5,20 @@
     <c:Transform/>
   </Components>
 
-  <Children/>
+  <Children>
+    <Entity>
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
 
 </Entity>

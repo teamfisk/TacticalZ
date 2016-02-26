@@ -33,6 +33,8 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
     m_EditorGUI->SetWidgetSpaceCallback(std::bind(&EditorSystem::OnWidgetSpace, this, std::placeholders::_1));
+    m_EditorGUI->SetDirtyCallback(std::bind(&EditorSystem::OnDirty, this, std::placeholders::_1));
+    m_EditorGUI->SetUndoCallback(std::bind(&EditorSystem::OnUndo, this));
 
     EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorSystem::OnMousePress);
     EVENT_SUBSCRIBE_MEMBER(m_EWidgetDelta, &EditorSystem::OnWidgetDelta);
@@ -86,6 +88,11 @@ void EditorSystem::Update(double dt)
         ori.y = m_EditorCameraInputController->Rotation().y;
         glm::vec3& pos = cameraTransform["Position"];
         pos += m_EditorCameraInputController->Movement() * glm::inverse(glm::quat(ori)) * (float)actualDelta;
+    }
+
+    if (m_SaveUndoLevel) {
+        m_UndoLevels.push_back(*m_World);
+        m_SaveUndoLevel = false;
     }
 }
 
@@ -183,6 +190,19 @@ void EditorSystem::OnComponentDelete(EntityWrapper entity, const std::string& co
 void EditorSystem::OnWidgetSpace(EditorGUI::WidgetSpace widgetSpace)
 {
     m_WidgetSpace = widgetSpace;
+}
+
+void EditorSystem::OnDirty(EntityWrapper entity)
+{
+    m_SaveUndoLevel = true;
+}
+
+void EditorSystem::OnUndo()
+{
+    // The last "undo level" is always the most recent change
+    if (m_UndoLevels.size() >= 2) {
+        *m_World = m_UndoLevels.at(m_UndoLevels.size() - 2);
+    }
 }
 
 bool EditorSystem::OnMousePress(const Events::MousePress& e)

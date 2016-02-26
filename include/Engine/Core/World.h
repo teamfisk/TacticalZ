@@ -18,7 +18,7 @@ public:
     World(const World& other);
 
     // Create empty entity
-    EntityID CreateEntity(EntityID parent = 0);
+    EntityID CreateEntity(EntityID parent = EntityID_Invalid);
     // Delete entity and all components within
     void DeleteEntity(EntityID entity);
     // Check if an entity exists
