@@ -66,7 +66,9 @@ void SoundManager::Update(double dt)
     deleteInactiveEmitters();
     updateEmitters(dt);
     updateListener(dt);
-    if(false)
+    if (m_TempPleaseDeleteMeASAP)
+        matchBGMLoop();
+    if (false)
         mainMenuLoop();
 }
 
@@ -187,6 +189,30 @@ void SoundManager::mainMenuLoop()
     }
 }
 
+void SoundManager::matchBGMLoop()
+{
+    if (m_CurrentBGMCombo == nullptr)
+        return;
+    auto cCapturePoints = m_World->GetComponents("CapturePoint");
+    for (auto it = cCapturePoints->begin(); it != cCapturePoints->end(); it++) {
+        float timeCaptured = (float)(double)(*it)["CaptureTimer"];
+        float maxTimer = (float)(double)(*it)["CapturePointMaxTimer"];
+        int capturePointIndex = (int)(*it)["CapturePointNumber"];
+
+        if (capturePointIndex == 0) { // Home for red team
+            if (timeCaptured < 0 && glm::abs(timeCaptured) < maxTimer) {
+                float gain = glm::abs(timeCaptured) / maxTimer;
+                setGain(m_CurrentBGMCombo, gain);
+            }
+        } else if (capturePointIndex == 4) { // Home for blue team
+            if (timeCaptured > 0 && timeCaptured < maxTimer) {
+                float gain = timeCaptured / maxTimer;
+                setGain(m_CurrentBGMCombo, gain);
+            }
+        }
+    }
+}
+
 void SoundManager::playSound(Source* source)
 {
     alSourcei(source->ALsource, AL_BUFFER, source->SoundResource->Buffer());
@@ -260,7 +286,7 @@ bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
     auto listenerComponents = m_World->GetComponents("Listener");
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
         if ((*it).EntityID != m_LocalPlayer.ID) {
-            break;
+            continue;;
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
@@ -348,6 +374,15 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
     if (e.PlayerID == -1) { // Local player
         m_LocalPlayer = e.Player;
+        if (m_TempPleaseDeleteMeASAP) {
+            return true;
+        }
+        m_CurrentBGMCombo = createSource("Audio/bgm/nearWin.wav");
+        m_CurrentBGMCombo->Type = SoundType::BGM;
+        alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
+        setGain(m_CurrentBGMCombo, 0);
+        playSound(m_CurrentBGMCombo);
+        m_TempPleaseDeleteMeASAP = true;
         return true;
     }
     return false;
@@ -367,7 +402,6 @@ bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
     playQueue(QueuedBuffers(source->ALsource, buffers));
     return true;
 }
-
 
 bool SoundManager::OnChangeBGM(const Events::ChangeBGM &e)
 {
@@ -396,10 +430,10 @@ void SoundManager::setSoundProperties(Source* source, ComponentWrapper* soundCom
 {
     float gain;
     switch (source->Type) {
-        case SoundType::SFX: gain = m_SFXVolumeChannel; break;
-        case SoundType::BGM: gain = m_BGMVolumeChannel; break;
-        case SoundType::Announcer: gain = m_AnnouncerVolumeChannel; break;
-        default: gain = 1.f; break;
+    case SoundType::SFX: gain = m_SFXVolumeChannel; break;
+    case SoundType::BGM: gain = m_BGMVolumeChannel; break;
+    case SoundType::Announcer: gain = m_AnnouncerVolumeChannel; break;
+    default: gain = 1.f; break;
     }
     alSourcef(source->ALsource, AL_GAIN, (float)(double)(*soundComponent)["Gain"] * gain);
     alSourcef(source->ALsource, AL_PITCH, (float)(double)(*soundComponent)["Pitch"]);

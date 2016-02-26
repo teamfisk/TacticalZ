@@ -89,7 +89,10 @@ private:
     Source* createSource(std::string filePath);
     std::unordered_map<EntityID, Source*> m_Sources;
     void mainMenuLoop();
+    void matchBGMLoop();
     Source* m_CurrentBGM;
+    Source* m_CurrentBGMCombo;
+    bool m_TempPleaseDeleteMeASAP = false;
 
     // Logic
     World* m_World = nullptr;

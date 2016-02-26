@@ -139,18 +139,18 @@ bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 
 bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
 {
-    // Temp for play test.
-    if (m_DrumsIsPlaying) {
-        return false;
-    }
-    if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
-        Events::PlaySoundOnEntity ev; // should be BGM
-        ev.EmitterID = LocalPlayer.ID;
-        ev.FilePath = "Audio/bgm/drumstest.wav";
-        m_EventBroker->Publish(ev);
-        // Temp for play test.
-        m_DrumsIsPlaying = true;
-    }
+    //// Temp for play test.
+    //if (m_DrumsIsPlaying) {
+    //    return false;
+    //}
+    //if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
+    //    Events::PlaySoundOnEntity ev; // should be BGM
+    //    ev.EmitterID = LocalPlayer.ID;
+    //    ev.FilePath = "Audio/bgm/drumstest.wav";
+    //    m_EventBroker->Publish(ev);
+    //    // Temp for play test.
+    //    m_DrumsIsPlaying = true;
+    //}
     return false;
 }
 
