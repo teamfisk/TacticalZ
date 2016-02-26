@@ -64,7 +64,7 @@ private:
 	int m_NumOfTurns;
 	int m_Iterations;
 	int m_TextureQuality;
-	int m_Quality;
+	int m_Quality = 0;
 
 	Texture* m_WhiteTexture;
 

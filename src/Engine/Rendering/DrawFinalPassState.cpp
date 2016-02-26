@@ -9,6 +9,7 @@ DrawFinalPassState::DrawFinalPassState(GLuint frameBuffer)
     BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     Enable(GL_DEPTH_TEST);
     Enable(GL_CULL_FACE);
+	glDepthFunc(GL_LEQUAL);
     Enable(GL_STENCIL_TEST);
     StencilFunc(GL_NOTEQUAL, 1, 0xFF);
     StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);

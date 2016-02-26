@@ -6,13 +6,7 @@ SSAOPass::SSAOPass(IRenderer* renderer, ConfigFile* config)
 {
 	m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
 
-	m_Quality = m_Config->Get<int>("SSAO.Quality", 0);
-	if (m_Quality == 0) {	
-		return;
-	}
-	
-	ChangeQuality(m_Quality);
-
+	ChangeQuality(m_Config->Get<int>("SSAO.Quality", 0));
 }
 
 void SSAOPass::ChangeQuality(int quality)
@@ -127,7 +121,9 @@ void SSAOPass::InitializeBuffer()
 
 void SSAOPass::ClearBuffer()
 {
-	return;
+	if (m_Quality == 0) {
+		return;
+	}
 
 	m_SSAOFramBuffer.Bind();
 	glClearColor(1.f, 1.f, 1.f, 1.f);

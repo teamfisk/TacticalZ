@@ -162,14 +162,14 @@ void DrawFinalPass::InitializeShaderPrograms()
 
     m_FillDepthBufferProgram = ResourceManager::Load<ShaderProgram>("#FillDepthBufferProgram");
     m_FillDepthBufferProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/FillDepthBuffer.vert.glsl")));
-    m_FillDepthBufferProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/FillDepthBuffer.frag.glsl")));
+   // m_FillDepthBufferProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/FillDepthBuffer.frag.glsl")));
     m_FillDepthBufferProgram->Compile();
     m_FillDepthBufferProgram->Link();
     GLERROR("Creating DepthFill program");
 
     m_FillDepthBufferSkinnedProgram = ResourceManager::Load<ShaderProgram>("#FillDepthBufferProgramSkinned");
     m_FillDepthBufferSkinnedProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/FillDepthBufferSkinned.vert.glsl")));
-    m_FillDepthBufferSkinnedProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/FillDepthBuffer.frag.glsl")));
+   // m_FillDepthBufferSkinnedProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/FillDepthBuffer.frag.glsl")));
     m_FillDepthBufferSkinnedProgram->Compile();
     m_FillDepthBufferSkinnedProgram->Link();
     GLERROR("Creating DepthFill program");

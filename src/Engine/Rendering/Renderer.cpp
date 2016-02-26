@@ -4,6 +4,8 @@ std::unordered_map<GLFWwindow*, Renderer*> Renderer::m_WindowToRenderer;
 
 void Renderer::Initialize()
 {
+	m_SSAO_Quality = m_Config->Get<int>("SSAO.Quality", 0);
+	m_GLOW_Quality = m_Config->Get<int>("GLOW.Quality", 0);
 	InitializeWindow();
     
     InitializeRenderPasses();
@@ -107,6 +109,7 @@ void Renderer::Update(double dt)
 void Renderer::Draw(RenderFrame& frame)
 {
     GLERROR("PRE");
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
     ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0Ambient Occlusion");
     ImGui::Combo("CubeMap", &m_CubeMapTexture, "Nevada(512)\0Sky(1024)");
     if(m_CubeMapTexture == 0) {
@@ -115,7 +118,10 @@ void Renderer::Draw(RenderFrame& frame)
         m_CubeMapPass->LoadTextures("Sky");
     }
 
+	ImGui::SliderInt("SSAO Quality", &m_SSAO_Quality, 0, 3);
+	ImGui::SliderInt("Glow Quality", &m_GLOW_Quality, 0, 3);
 	m_SSAOPass->ChangeQuality(m_SSAO_Quality);
+	m_DrawBloomPass->ChangeQuality(m_GLOW_Quality);
     GLERROR("SSAO Settings");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -245,7 +251,7 @@ void Renderer::InitializeRenderPasses()
 	m_SSAOPass = new SSAOPass(this, m_Config);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
-    m_DrawBloomPass = new DrawBloomPass(this);
+    m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
   
 }
