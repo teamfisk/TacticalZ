@@ -23,19 +23,20 @@ private:
     EventRelay<AmmoPickupSystem, Events::TriggerLeave> m_ETriggerLeave;
     bool OnTriggerLeave(Events::TriggerLeave& e);
 
-    struct NewAmmoPickup {
+    struct NewPickup {
         glm::vec3 Pos;
         double AmmoGain;
         double RespawnTimer;
         double DecreaseThisRespawnTimer;
         EntityID parentID;
+        bool isAmmoPickup;
     };
     struct EntityAtMaxValuePickupStruct {
         EntityWrapper player;
         EntityWrapper pickup;
     };
-    std::vector<NewAmmoPickup> m_ETriggerTouchVector;
-    std::vector<EntityAtMaxValuePickupStruct> m_AmmoPickupAtMaxHealthAmmo;
+    std::vector<NewPickup> m_ETriggerTouchVector;
+    std::vector<EntityAtMaxValuePickupStruct> m_PickupAtMaximum;
     
     void DoPickup(EntityWrapper &player, EntityWrapper &trigger);
 };
