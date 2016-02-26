@@ -12,17 +12,20 @@ GLuint Shader::CompileShader(GLenum shaderType, std::string fileName)
 
     std::size_t startPos = 0;
     std::size_t SEofNewFile[2];
-    while((startPos = shaderFile.find("#GLSL", startPos)) != std::string::npos)
+    std::string key = "#include";
+    while((startPos = shaderFile.find(key, startPos)) != std::string::npos)
     {
-        SEofNewFile[0] = shaderFile.find('"', startPos+5)+1;
+        SEofNewFile[0] = shaderFile.find('"', startPos+key.length())+1;
         SEofNewFile[1] = shaderFile.find('"', SEofNewFile[0]);
         if (SEofNewFile[0] == std::string::npos || SEofNewFile[1] == std::string::npos)
-        {
             return 0;
-        }
 
         std::string replacementFileName = shaderFile.substr(SEofNewFile[0], SEofNewFile[1] - SEofNewFile[0]);
         std::string replacementString = ReadFile(replacementFileName);
+        size_t firstof = replacementString.find_first_of((char)0);
+        replacementString.erase(firstof, replacementString.size() - firstof);
+        if (replacementString.length() <= 0)
+            return 0;
         shaderFile.replace(startPos, SEofNewFile[1]+2 - startPos, replacementString + "\n");
         startPos += replacementString.length(); //This might not be wanted.
     }
@@ -59,7 +62,7 @@ std::string Shader::ReadFile(std::string fileName)
     std::ifstream in(fileName, std::ios::in);
     if (!in) {
         LOG_ERROR("Error: Failed to open shader file \"%s\"", fileName.c_str());
-        return 0;
+        return "";
     }
 
     in.seekg(0, std::ios::end);
