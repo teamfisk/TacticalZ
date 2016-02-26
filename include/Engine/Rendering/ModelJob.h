@@ -109,6 +109,7 @@ struct ModelJob : RenderJob
         EndIndex = matGroup->EndIndex;
         Matrix = matrix;
         Color = modelComponent["Color"];
+        GlowIntensity = ((double)modelComponent["GlowIntensity"]);
         Entity = modelComponent.EntityID;
         glm::vec3 abspos = Transform::AbsolutePosition(world, modelComponent.EntityID);
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
@@ -150,7 +151,7 @@ struct ModelJob : RenderJob
     const ::Model* Model = nullptr;
     ::Skeleton* Skeleton = nullptr;
     std::shared_ptr<::BlendTree> BlendTree = nullptr;
-
+    float GlowIntensity = 8.0;
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;
     glm::vec4 IncandescenceColor;
@@ -163,7 +164,7 @@ struct ModelJob : RenderJob
 
     void CalculateHash() override
     {
-        Hash = TextureID + ModelID << 10 + ShaderID << 20;
+        Hash = ShaderID << 20 + ModelID << 10 + TextureID;
     }
 };
 

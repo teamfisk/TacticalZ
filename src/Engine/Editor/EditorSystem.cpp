@@ -40,8 +40,11 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
 
     m_EditorStats = new EditorStats();
 
+    m_Enabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.EditorEnabled", false);
     if (m_Enabled) {
         Enable();
+    } else {
+        Disable();
     }
 }
 
@@ -221,6 +224,12 @@ bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
         } else {
             Enable();
         }
+    }
+    if (e.Command == "PerformanceTimingResetAllTimers" && e.Value > 0) {
+        PerformanceTimer::ResetAllTimers();
+    }
+    if (e.Command == "PerformanceTimingCreateExcelData" && e.Value > 0) {
+        PerformanceTimer::CreateExcelData();
     }
     return true;
 }

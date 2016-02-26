@@ -23,12 +23,12 @@ out VertexData{
 void main()
 {
 	gl_Position = P*V*M * vec4(Position, 1.0);
-	
+	mat4 TIM = transpose(inverse(M));
 	Output.Position = Position;
 	Output.TextureCoordinate = TextureCoords;
-	Output.Normal = vec3(M * vec4(Normal, 0.0));
-	Output.Tangent = vec3(M * vec4(Tangent, 0.0));
- 	Output.BiTangent = vec3(M * vec4(BiTangent, 0.0));
+	Output.Normal = vec3(TIM * vec4(Normal, 0.0));
+	Output.Tangent = vec3(TIM * vec4(Tangent, 0.0));
+ 	Output.BiTangent = vec3(TIM * vec4(BiTangent, 0.0));
 	Output.ExplosionColor = vec4(1.0);
 	Output.ExplosionPercentageElapsed = 0.0;
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:AmmoPickup/>
+    <c:Model>
+      <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+    </c:Model>
+    <c:RaptorCopter>
+      <Speed>8</Speed>
+      <Axis X="0" Y="0.100000001" Z="0"/>
+    </c:RaptorCopter>
+    <c:Transform>
+      <Position X="0" Y="2.36784196" Z="0"/>
+      <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
+      <Orientation X="0" Y="18717.9453" Z="0"/>
+    </c:Transform>
+    <c:Trigger/>
+  </Components>
+
+  <Children/>
+
+</Entity>

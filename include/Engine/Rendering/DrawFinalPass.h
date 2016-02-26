@@ -4,6 +4,7 @@
 #include "IRenderer.h"
 #include "DrawFinalPassState.h"
 #include "LightCullingPass.h"
+#include "CubeMapPass.h"
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
@@ -13,13 +14,14 @@
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass);
     ~DrawFinalPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
-    void Draw(RenderScene& scene);
+    void Draw(RenderScene& scene, GLuint SSAOTexture);
     void ClearBuffer();
+    void OnWindowResize();
 
     //Return the texture that is used in later stages to apply the bloom effect
     GLuint BloomTexture() const { return m_BloomTexture; }
@@ -31,13 +33,12 @@ public:
     FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
     FrameBuffer* FinalPassFrameBufferLowRes() { return &m_FinalPassFrameBufferLowRes; }
 
-
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
     void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
 
     void DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene);
-    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene, GLuint SSAOTexture);
     void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
@@ -62,12 +63,14 @@ private:
     GLuint m_SceneTextureLowRes;
     GLuint m_DepthBuffer;
     GLuint m_DepthBufferLowRes;
+    GLuint m_CubeMapTexture;
 
     //maqke this component based i guess?
     GLuint m_ShieldPixelRate = 16;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
+    const CubeMapPass* m_CubeMapPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;

@@ -6,7 +6,6 @@
 #include "Core/EventBroker.h"
 #include "Rendering/Renderer.h"
 #include "Core/InputManager.h"
-#include "GUI/Frame.h"
 #include "Core/World.h"
 #include "Input/InputProxy.h"
 #include "Input/KeyboardInputHandler.h"
@@ -31,7 +30,9 @@ private:
     EventBroker* m_EventBroker;
     World* m_World;
     SystemPipeline* m_SystemPipeline;
-    int healthsID;
+    int m_PlayersID;
+    bool m_TestStage1Success = false;
+
 };
 
 #endif

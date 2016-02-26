@@ -14,6 +14,21 @@ void Network::Update()
     updateNetworkData();
 }
 
+void Network::logSentData(int bytesSent)
+{ 
+
+}
+
+void Network::logReceivedData(int bytesReceived)
+{ 
+    // Network Debug data
+    if (isReadingData) {
+        m_NetworkData.TotalDataReceived += bytesReceived;
+        m_NetworkData.DataReceivedThisInterval += bytesReceived;
+        m_NetworkData.AmountOfMessagesReceived++;
+    }
+}
+
 void Network::saveToFile()
 {
     std::ofstream outfile;

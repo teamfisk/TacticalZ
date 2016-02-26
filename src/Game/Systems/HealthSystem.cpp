@@ -7,25 +7,43 @@ HealthSystem::HealthSystem(SystemParams params)
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &HealthSystem::OnPlayerDamaged);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerHealthPickup, &HealthSystem::OnPlayerHealthPickup);
+    EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &HealthSystem::OnInputCommand);
+    m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }
 
-void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
+void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHealth, double dt)
 {
+    double& health = cHealth["Health"];
+    if (health <= 0.0) {
+        Events::PlayerDeath ePlayerDeath;
+        ePlayerDeath.Player = entity;
+        m_EventBroker->Publish(ePlayerDeath);
+        //Note: we will delete the entity in PlayerDeathSystem
+    }
 }
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
+    if (!IsServer && m_NetworkEnabled || !e.Victim.Valid()) {
+        return false;
+    }
+
     ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
     health -= e.Damage;
 
-    if (health <= 0.0) {
-        Events::PlayerDeath ePlayerDeath;
-        ePlayerDeath.Player = e.Victim;
-        m_EventBroker->Publish(ePlayerDeath);
-        //Note: we will delete the entity in PlayerDeathSystem
-    }
+    return true;
+}
 
+bool HealthSystem::OnInputCommand(Events::InputCommand& e)
+{
+    if (e.Command == "TakeDamage" && e.Value > 0 && LocalPlayer.Valid()) {
+        Events::PlayerDamage ev;
+        ev.Inflictor = LocalPlayer;
+        ev.Victim = LocalPlayer;
+        ev.Damage = e.Value;
+        m_EventBroker->Publish(ev);
+    }
     return true;
 }
 
