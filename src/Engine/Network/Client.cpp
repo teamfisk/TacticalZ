@@ -261,8 +261,14 @@ void Client::parseEntityDeletion(Packet & packet)
     if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
         EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
         if (m_World->ValidEntity(localEntity)) {
-            m_World->DeleteEntity(localEntity);
-            deleteFromServerClientMaps(entityToDelete, localEntity);
+            if (m_World->HasComponent(localEntity,"Player")) {
+                Events::PlayerDeath e;
+                e.Player = EntityWrapper(m_World, localEntity);
+                m_EventBroker->Publish(e);
+            } else {
+                m_World->DeleteEntity(localEntity);
+                deleteFromServerClientMaps(entityToDelete, localEntity);
+            }
         }
     }
 }

@@ -19,6 +19,7 @@
 #include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
+#include "Core/EPlayerDeath.h"
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
 #include "../Game/Events/EDoubleJump.h"
