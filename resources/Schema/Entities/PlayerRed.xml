@@ -13,7 +13,6 @@
     <c:DashAbility/>
     <c:Health/>
     <c:Physics>
-      <PrevOrigin X="0" Y="0.772000015" Z="0"/>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
     </c:Physics>
     <c:Player>

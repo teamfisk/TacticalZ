@@ -32,6 +32,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
@@ -139,6 +140,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::OnPlayerDamage:
         parsePlayerDamage(packet);
+        break;
+    case MessageType::OnDoubleJump:
+        parseDoubleJump(packet);
         break;
     default:
         break;
@@ -257,8 +261,14 @@ void Client::parseEntityDeletion(Packet & packet)
     if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
         EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
         if (m_World->ValidEntity(localEntity)) {
-            m_World->DeleteEntity(localEntity);
-            deleteFromServerClientMaps(entityToDelete, localEntity);
+            if (m_World->HasComponent(localEntity,"Player")) {
+                Events::PlayerDeath e;
+                e.Player = EntityWrapper(m_World, localEntity);
+                m_EventBroker->Publish(e);
+            } else {
+                m_World->DeleteEntity(localEntity);
+                deleteFromServerClientMaps(entityToDelete, localEntity);
+            }
         }
     }
 }
@@ -269,6 +279,20 @@ void Client::parseComponentDeletion(Packet & packet)
     std::string componentType = packet.ReadString();
     if (m_World->HasComponent(entity, componentType)) {
         m_World->DeleteComponent(m_ServerIDToClientID.at(entity), componentType);
+    }
+}
+
+void Client::parseDoubleJump(Packet & packet)
+{
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
+    }
+    Events::DoubleJump e;
+    e.entityID = m_ServerIDToClientID.at(serverID);
+    // If player is local player do not publish to prevent infinite feedback loop
+    if (e.entityID != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
     }
 }
 
@@ -348,9 +372,7 @@ void Client::parseSnapshot(Packet& packet)
                 EntityWrapper localEntity(m_World, localEntityID);
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
-                    if (localEntity.Name() == "CapturePointHUD") {
-                        UpdateLocalCapturePointHUD(localEntity);
-                    }
+                    // TODO Fix memory leak here
                     SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
                     bool shouldApply = true;
                     // Apply potential filter function
@@ -361,6 +383,7 @@ void Client::parseSnapshot(Packet& packet)
                         ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
                         memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
                     }
+
                     //if (localEntity != m_LocalPlayer && !localEntity.IsChildOf(m_LocalPlayer)) {
                     //    updateFields(packet, componentInfo, localEntityID);
                     //} else {
@@ -377,7 +400,11 @@ void Client::parseSnapshot(Packet& packet)
                 if (serverParentID == EntityID_Invalid) {
                     newLocalEntityID = m_World->CreateEntity(EntityID_Invalid);
                 } else {
-                    newLocalEntityID = m_World->CreateEntity(m_ServerIDToClientID.at(serverParentID));
+                    if (serverClientMapsHasEntity(serverParentID)) {
+                        newLocalEntityID = m_World->CreateEntity(m_ServerIDToClientID.at(serverParentID));
+                    } else {
+                        newLocalEntityID = m_World->CreateEntity(EntityID_Invalid);
+                    }
                 }
                 m_World->SetName(newLocalEntityID, serverEntityName);
                 insertIntoServerClientMaps(serverEntityID, newLocalEntityID);
@@ -387,24 +414,14 @@ void Client::parseSnapshot(Packet& packet)
         }
         // Parent logic
         // This should be enough beacause we know that the entities arives in pre-order (there will always be a parent)
-        if (serverParentID != EntityID_Invalid) {
+        if (serverParentID != EntityID_Invalid && serverClientMapsHasEntity(serverParentID)) {
             EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
-            m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            if (m_World->GetParent(localEntityID) != m_ServerIDToClientID.at(serverParentID)) {
+                m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            }
         }
     }
     parseSpawnEvents();
-}
-
-
-void Client::UpdateLocalCapturePointHUD(EntityWrapper capturePointHUD)
-{
-    //auto children = m_World->GetChildren(capturePointHUD.ID);
-    //for (auto it = children.first; it != children.second; it++) {
-    //    it->first
-    //}
-    //
-    //EntityWrapper& localHUD = m_LocalPlayer.FirstChildByName("HUD").FirstChildByName("CapturePointHUD");
-    //m_World->GetComponentPools()
 }
 
 void Client::disconnect()
@@ -469,6 +486,11 @@ bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
     if (e.Inflictor != m_LocalPlayer) {
         return false;
     }
+    // Could this happen?
+    //if (!clientServerMapsHasEntity(e.Inflictor.ID) 
+    //    || !clientServerMapsHasEntity(e.Victim.ID)) {
+    //    return;
+    //}
 
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Inflictor.ID));
@@ -503,7 +525,7 @@ void Client::parsePlayerDamage(Packet& packet)
     Events::PlayerDamage e;
     PlayerID victimID = packet.ReadPrimitive<EntityID>();
     PlayerID inflictorID = packet.ReadPrimitive<EntityID>();
-    if(!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)){
+    if (!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)) {
         return;
     }
     e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(victimID));
@@ -513,6 +535,17 @@ void Client::parsePlayerDamage(Packet& packet)
     if (e.Inflictor != m_LocalPlayer) {
         m_EventBroker->Publish(e);
     }
+}
+
+bool Client::OnDoubleJump(Events::DoubleJump & e)
+{
+    if (!clientServerMapsHasEntity(e.entityID) || e.entityID != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDoubleJump);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.entityID));
+    m_Reliable.Send(packet);
+    return true;
 }
 
 void Client::sendLocalPlayerTransform()

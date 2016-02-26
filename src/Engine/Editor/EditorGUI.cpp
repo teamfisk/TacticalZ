@@ -598,6 +598,19 @@ bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
         entityImport(m_World);
     }
 
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_C) {
+        m_CopyTarget = m_CurrentSelection;
+    }
+
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_V) {
+        if (m_OnEntityPaste != nullptr) {
+            EntityWrapper copy = m_OnEntityPaste(m_CopyTarget, m_CurrentSelection);
+            if (copy != EntityWrapper::Invalid) {
+                SelectEntity(copy);
+            }
+        }
+    }
+
     if (e.KeyCode == GLFW_KEY_DELETE) {
         if (m_CurrentSelection.Valid()) {
             entityDelete(m_CurrentSelection);
