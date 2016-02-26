@@ -11,10 +11,10 @@ void AmmoPickupSystem::Update(double dt)
 {
     for (auto it = m_ETriggerTouchVector.begin(); it != m_ETriggerTouchVector.end(); ++it)
     {
-        auto& ammoPickupPosition = *it;
+        auto& somePickup = *it;
         //set the double timer value (value 3)
-        ammoPickupPosition.DecreaseThisRespawnTimer -= dt;
-        if (ammoPickupPosition.DecreaseThisRespawnTimer < 0.0) {
+        somePickup.DecreaseThisRespawnTimer -= dt;
+        if (somePickup.DecreaseThisRespawnTimer < 0.0) {
             //spawn and delete the vector item
             auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/AmmoPickup.xml");
             EntityFileParser parser(entityFile);
@@ -27,12 +27,12 @@ void AmmoPickupSystem::Update(double dt)
 
             //set values from the old entity to the new entity
             auto& newAmmoPickupEntity = EntityWrapper(m_World, ammoPickupID);
-            newAmmoPickupEntity["Transform"]["Position"] = ammoPickupPosition.Pos;
-            newAmmoPickupEntity["AmmoPickup"]["AmmoGain"] = ammoPickupPosition.AmmoGain;
-            newAmmoPickupEntity["AmmoPickup"]["RespawnTimer"] = ammoPickupPosition.RespawnTimer;
-            m_World->SetParent(newAmmoPickupEntity.ID, ammoPickupPosition.parentID);
+            newAmmoPickupEntity["Transform"]["Position"] = somePickup.Pos;
+            newAmmoPickupEntity["AmmoPickup"]["AmmoGain"] = somePickup.AmmoGain;
+            newAmmoPickupEntity["AmmoPickup"]["RespawnTimer"] = somePickup.RespawnTimer;
+            m_World->SetParent(newAmmoPickupEntity.ID, somePickup.parentID);
 
-            //erase the current element (AmmoPickupPosition)
+            //erase the current element (somePickup)
             m_ETriggerTouchVector.erase(it);
             break;
         }
@@ -51,9 +51,7 @@ void AmmoPickupSystem::Update(double dt)
 
         }
     }
-
 }
-
 
 bool AmmoPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
 {
@@ -85,7 +83,6 @@ bool AmmoPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
             break;
 
         }
-
     }
     return true;
 }

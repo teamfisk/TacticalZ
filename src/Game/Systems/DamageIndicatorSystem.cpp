@@ -19,6 +19,9 @@ void DamageIndicatorSystem::Update(double dt) {
                 updateDamageIndicatorVector.erase(iter);
                 break;
             }
+            if (!EntityWrapper(m_World,m_World->GetParent(LocalPlayer.ID)).Valid()) {
+                return;
+            }
             auto angleBetweenVectors = CalculateAngle(LocalPlayer, iter->enemyPosition);
             //simply set the rotation z-wise to the angleBetweenVectors
             iter->spriteEntity["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);

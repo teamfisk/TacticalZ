@@ -11,10 +11,10 @@ void HealthPickupSystem::Update(double dt)
 {
     for (auto it = m_ETriggerTouchVector.begin(); it != m_ETriggerTouchVector.end(); ++it)
     {
-        auto& healthPickupPosition = *it;
+        auto& somePickup = *it;
         //set the double timer value (value 3)
-        healthPickupPosition.DecreaseThisRespawnTimer -= dt;
-        if (healthPickupPosition.DecreaseThisRespawnTimer < 0) {
+        somePickup.DecreaseThisRespawnTimer -= dt;
+        if (somePickup.DecreaseThisRespawnTimer < 0) {
             //spawn and delete the vector item
             auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/HealthPickup.xml");
             EntityFileParser parser(entityFile);
@@ -27,12 +27,13 @@ void HealthPickupSystem::Update(double dt)
 
             //set values from the old entity to the new entity
             auto& newHealthPickupEntity = EntityWrapper(m_World, healthPickupID);
-            newHealthPickupEntity["Transform"]["Position"] = healthPickupPosition.Pos;
-            newHealthPickupEntity["HealthPickup"]["HealthGain"] = healthPickupPosition.HealthGain;
-            newHealthPickupEntity["HealthPickup"]["RespawnTimer"] = healthPickupPosition.RespawnTimer;
-            m_World->SetParent(newHealthPickupEntity.ID, healthPickupPosition.parentID);
-
-            //erase the current element (healthPickupPosition)
+            LOG_INFO("healthpickup id %i", healthPickupID);
+            newHealthPickupEntity["Transform"]["Position"] = somePickup.Pos;
+            newHealthPickupEntity["HealthPickup"]["HealthGain"] = somePickup.HealthGain;
+            newHealthPickupEntity["HealthPickup"]["RespawnTimer"] = somePickup.RespawnTimer;
+            m_World->SetParent(newHealthPickupEntity.ID, somePickup.parentID);
+            LOG_INFO("healthpickup parented to %i", somePickup.parentID);
+            //erase the current element (somePickup)
             m_ETriggerTouchVector.erase(it);
             break;
         }
@@ -45,24 +46,27 @@ void HealthPickupSystem::Update(double dt)
 
         }
         if ((double)it->player["Health"]["Health"] < (double)it->player["Health"]["MaxHealth"]) {
+            LOG_INFO("maxhealth found in pickupmax.. yada yada");
             DoPickup(it->player, it->pickup);
             m_PickupAtMaximum.erase(it);
             break;
-
         }
     }
 }
 
 bool HealthPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
 {
+    LOG_INFO("OnTriggerTouch");
     if (!e.Trigger.HasComponent("HealthPickup")) {
         return false;
     }
     //cant pick up healthpacks if you are already at MaxHealth
     if ((double)e.Entity["Health"]["Health"] >= (double)e.Entity["Health"]["MaxHealth"]) {
+        LOG_INFO("trigger enter at maxhealth");
         m_PickupAtMaximum.push_back({ e.Entity, e.Trigger });
         return false;
     }
+    LOG_INFO("touch doing pickup");
 
     DoPickup(e.Entity, e.Trigger);
     return true;
@@ -86,11 +90,13 @@ void HealthPickupSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger)
     ePlayerHealthPickup.HealthAmount = healthGiven;
     ePlayerHealthPickup.Player = player;
     m_EventBroker->Publish(ePlayerHealthPickup);
+    LOG_INFO("event published");
 
     //copy position, healthgain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)
     //we need to copy all values since each value can be different for each healthPickup
     m_ETriggerTouchVector.push_back({ (glm::vec3)trigger["Transform"]["Position"] ,trigger["HealthPickup"]["HealthGain"],
         trigger["HealthPickup"]["RespawnTimer"],trigger["HealthPickup"]["RespawnTimer"], m_World->GetParent(trigger.ID) });
+    LOG_INFO("pickup set id to %i", trigger.ID);
 
     //delete the healthpickup
     m_World->DeleteEntity(trigger.ID);
