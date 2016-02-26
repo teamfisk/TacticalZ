@@ -60,6 +60,9 @@ private:
     Model* m_UnitQuad;
     Model* m_UnitSphere;
 
+    int m_DebugTextureToDraw = 0;
+    int m_CubeMapTexture = 0;
+    bool m_ResizeWindow = false;
 	int m_SSAO_Quality = 0;
 
     PickingPass* m_PickingPass;
