@@ -12,7 +12,7 @@
 class DrawBloomPass
 {
 public:
-    DrawBloomPass(IRenderer* renderer /* ,Texture or finalpass*/ );
+    DrawBloomPass(IRenderer* renderer, ConfigFile* config);
     ~DrawBloomPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -23,23 +23,32 @@ public:
     void FillGaussianBuffer(FrameBuffer* fb);
 
     void Draw(GLuint texture);
+	void ChangeQuality(int quality);
 
     void OnWindowResize();
 
     //Getters
     //Return the blurred result of the texture that was sent into draw
-    GLuint GaussianTexture() const { return m_GaussianTexture_vert; }
+	GLuint GaussianTexture() const { 
+		if (m_Quality == 0) { 
+			return m_BlackTexture->m_Texture;
+		} else { 
+			return m_GaussianTexture_vert;
+		} 
+	}
 
 
 private:
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
 
-    Texture* m_WhiteTexture;
+    Texture* m_BlackTexture;
     Model* m_ScreenQuad;
 
     const IRenderer* m_Renderer;
+	ConfigFile* m_Config;
     //const LightCullingPass* m_LightCullingPass 
-    GLuint m_iterations = 9;
+    int m_Iterations;
+	int m_Quality = 0;
 
     GLuint m_GaussianTexture_horiz;
     GLuint m_GaussianTexture_vert;

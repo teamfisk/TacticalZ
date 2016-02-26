@@ -6,12 +6,7 @@ SSAOPass::SSAOPass(IRenderer* renderer, ConfigFile* config)
 {
 	m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
 
-	m_Quality = m_Config->Get<int>("SSAO.Quality", 0);
-	if (m_Quality == 0) {	
-		return;
-	}
-	
-	ChangeQuality(m_Quality);
+	ChangeQuality(m_Config->Get<int>("SSAO.Quality", 0));
 
 }
 
@@ -102,33 +97,34 @@ void SSAOPass::InitializeBuffer()
 	if (m_SSAOFramBuffer.GetHandle() == 0) {
 		m_SSAOFramBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SSAOTexture, GL_COLOR_ATTACHMENT0)));
 	}
-		m_SSAOFramBuffer.Generate();
+	m_SSAOFramBuffer.Generate();
 
 
 	if (m_SSAOViewSpaceZFramBuffer.GetHandle() == 0) {
 		m_SSAOViewSpaceZFramBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SSAOViewSpaceZTexture, GL_COLOR_ATTACHMENT0)));
 	}
-		m_SSAOViewSpaceZFramBuffer.Generate();
+	m_SSAOViewSpaceZFramBuffer.Generate();
 
 
 
 	if (m_GaussianFrameBuffer_horiz.GetHandle() == 0) {
 		m_GaussianFrameBuffer_horiz.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_horiz, GL_COLOR_ATTACHMENT0)));
 	}
-		m_GaussianFrameBuffer_horiz.Generate();
+	m_GaussianFrameBuffer_horiz.Generate();
 
 
 	if (m_GaussianFrameBuffer_vert.GetHandle() == 0) {
 		m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_vert, GL_COLOR_ATTACHMENT0)));
 	}
-		m_GaussianFrameBuffer_vert.Generate();
+	m_GaussianFrameBuffer_vert.Generate();
 
 }
 
 void SSAOPass::ClearBuffer()
 {
-	return;
-
+	if (m_Quality == 0) {
+		return;
+	}
 	m_SSAOFramBuffer.Bind();
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
