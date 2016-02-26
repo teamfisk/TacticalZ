@@ -121,7 +121,11 @@ void Renderer::Draw(RenderFrame& frame)
 	ImGui::SliderFloat("SSAO IntensityScale", &m_SSAO_IntensityScale, 0.0f, 10.0f);
 	ImGui::SliderInt("SSAO Number of Samples", &m_SSAO_NumOfSamples, 2, 100);
 	ImGui::SliderInt("SSAO Number of Turns", &m_SSAO_NumOfTurns, 0, 50);
-	m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Contrast, m_SSAO_IntensityScale, m_SSAO_NumOfSamples, m_SSAO_NumOfTurns);
+	ImGui::SliderInt("SSAO Blur Iterations", &m_SSAO_iterations, 0, 20);
+	ImGui::SliderInt("SSAO TextureQuality", &m_SSAO_TextureQuality, 0, 4);
+	ImGui::SliderInt("SSAO Quality", &m_SSAO_Quality, 0, 3);
+	//m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Contrast, m_SSAO_IntensityScale, m_SSAO_NumOfSamples, m_SSAO_NumOfTurns, m_SSAO_iterations, m_SSAO_TextureQuality);
+	m_SSAOPass->ChangeQuality(m_SSAO_Quality);
     GLERROR("SSAO Settings");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -159,7 +163,7 @@ void Renderer::Draw(RenderFrame& frame)
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Light Culling");
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
-		m_DrawFinalPass->Draw(*scene, ao);
+		m_DrawFinalPass->Draw(*scene);
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
@@ -248,9 +252,10 @@ void Renderer::InitializeRenderPasses()
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
     m_CubeMapPass = new CubeMapPass(this);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass);
+	m_SSAOPass = new SSAOPass(this, m_Config);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
-    m_SSAOPass = new SSAOPass(this);
+  
 }

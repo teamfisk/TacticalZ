@@ -13,6 +13,7 @@ uniform vec4 AmbientColor;
 uniform float FillPercentage;
 uniform float GlowIntensity = 10;
 uniform vec3 CameraPosition;
+uniform int SSAOQuality;
 
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
@@ -125,7 +126,7 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 
 void main()
 {
-	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy), 0).r;
+	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy) >> int(SSAOQuality), 0).r;
 	ao = (clamp(1.0 - (1.0 - ao), 0.0, 1.0) + MIN_AMBIENT_LIGHT) /  (1.0 + MIN_AMBIENT_LIGHT);
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);

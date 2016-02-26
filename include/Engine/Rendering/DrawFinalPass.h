@@ -5,6 +5,7 @@
 #include "DrawFinalPassState.h"
 #include "LightCullingPass.h"
 #include "CubeMapPass.h"
+#include "SSAOPass.h"
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
@@ -14,12 +15,12 @@
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass);
     ~DrawFinalPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
-    void Draw(RenderScene& scene, GLuint SSAOTexture);
+    void Draw(RenderScene& scene);
     void ClearBuffer();
     void OnWindowResize();
 
@@ -38,7 +39,7 @@ private:
     void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
 
     void DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene);
-    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene, GLuint SSAOTexture);
+    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
@@ -71,6 +72,7 @@ private:
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
     const CubeMapPass* m_CubeMapPass;
+	const SSAOPass* m_SSAOPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;

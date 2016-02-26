@@ -1,9 +1,9 @@
 #include "Rendering/DrawFinalPass.h"
-
-DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass)
-    : m_Renderer(renderer)
-    , m_LightCullingPass(lightCullingPass)
-    , m_CubeMapPass(cubeMapPass)
+DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass)
+	: m_Renderer(renderer)
+	, m_LightCullingPass(lightCullingPass)
+	, m_CubeMapPass(cubeMapPass)
+	, m_SSAOPass(ssaoPass)
 {
     //TODO: Make sure that uniforms are not sent into shader if not needed.
     m_ShieldPixelRate = 8;
@@ -175,7 +175,7 @@ void DrawFinalPass::InitializeShaderPrograms()
     GLERROR("Creating DepthFill program");
 }
 
-void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
+void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("Pre");
     DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
@@ -191,10 +191,10 @@ void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
     //Fill depth buffer
 	
     state->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene, SSAOTexture);
+    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
     state->BlendFunc(GL_ONE, GL_ONE);
-    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene, SSAOTexture);
+    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
     state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     DrawSprites(scene.Jobs.SpriteJob, scene);
@@ -210,11 +210,11 @@ void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
     //Draw Opaque shielded objects
     state->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
     state->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueShieldedObjects, scene, SSAOTexture); //might need changing
+    DrawModelRenderQueues(scene.Jobs.OpaqueShieldedObjects, scene); //might need changing
     GLERROR("Shielded Opaque object");
 
     //Draw Transparen Shielded objects
-    DrawModelRenderQueues(scene.Jobs.TransparentShieldedObjects, scene, SSAOTexture); //might need changing
+    DrawModelRenderQueues(scene.Jobs.TransparentShieldedObjects, scene); //might need changing
     GLERROR("Shielded Transparent objects");
 
     GLERROR("END");
@@ -250,9 +250,9 @@ void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
     stateLowRes->Enable(GL_DEPTH_TEST);
     stateLowRes->StencilFunc(GL_LEQUAL, 1, 0xFF);
     stateLowRes->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene, SSAOTexture);
+    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
-    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene, SSAOTexture);
+    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
@@ -340,7 +340,7 @@ void DrawFinalPass::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm:
     GLERROR("MipMap Texture initialization failed");
 }
 
-void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene, GLuint SSAOTexture)
+void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
 {
     GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
     GLERROR("forwardHandle");
@@ -364,7 +364,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_LightCullingPass->LightIndexSSBO());
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, SSAOTexture);
+	glBindTexture(GL_TEXTURE_2D, m_SSAOPass->SSAOTexture());
 
     for (auto &job : jobs) {
         auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
@@ -383,7 +383,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
                     glActiveTexture(GL_TEXTURE5);
                     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+                    glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
                     std::vector<glm::mat4> frameBones;
                     if (explosionEffectJob->AnimationOffset.animation != nullptr) {
@@ -401,7 +401,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionTextures(explosionHandle, explosionEffectJob);
                     glActiveTexture(GL_TEXTURE5);
                     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+                    glUniform3fv(glGetUniformLocation(explosionHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
                 }
                 break;
@@ -463,7 +463,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelTextures(forwardSkinnedHandle, modelJob);
                             glActiveTexture(GL_TEXTURE5);
                             glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-                            glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+                            glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
                             std::vector<glm::mat4> frameBones;
                             if (modelJob->AnimationOffset.animation != nullptr) {
@@ -753,6 +753,7 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
 {
+	glUniform1i(glGetUniformLocation(shaderHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
 	GLERROR("Bind 1 uniform");
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(job->Matrix));
 	GLERROR("Bind 2 uniform");
@@ -801,6 +802,7 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 
 void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene)
 {
+	glUniform1i(glGetUniformLocation(shaderHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
 	GLERROR("Bind 1 uniform");
 	GLint Location_M = glGetUniformLocation(shaderHandle, "M");
 	glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));

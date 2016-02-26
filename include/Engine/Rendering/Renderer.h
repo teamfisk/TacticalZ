@@ -32,8 +32,9 @@ class Renderer : public IRenderer
     static void glfwFrameBufferCallback(GLFWwindow* window, int width, int height);
 
 public:
-    Renderer(EventBroker* eventBroker) 
-        : m_EventBroker(eventBroker)
+	Renderer(EventBroker* eventBroker, ConfigFile* config)
+		: m_EventBroker(eventBroker)
+		, m_Config(config)
     { }
 
     virtual void Initialize() override;
@@ -47,6 +48,7 @@ private:
     //----------------------Variables----------------------//
 
     static std::unordered_map <GLFWwindow*, Renderer*> m_WindowToRenderer;
+	ConfigFile* m_Config;
 
     EventBroker* m_EventBroker;
     TextPass* m_TextPass;
@@ -67,6 +69,9 @@ private:
 	float m_SSAO_IntensityScale = 1.0f;
 	int m_SSAO_NumOfSamples = 24;
 	int m_SSAO_NumOfTurns = 7;
+	int m_SSAO_iterations = 9;
+	int m_SSAO_TextureQuality = 0;
+	int m_SSAO_Quality = 0;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
