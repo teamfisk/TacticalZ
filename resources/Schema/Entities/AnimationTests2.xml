@@ -9,19 +9,22 @@
     <Entity>
       <Components>
         <c:Transform>
-          <Position X="-0.100000001" Y="-1.11500001" Z="-3.10500026"/>
+          <Position X="0.100000001" Y="-1.5150001" Z="-3.70500016"/>
+          <Orientation X="0" Y="2.41300011" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
         <Entity>
           <Components>
-            <c:DirectionalLight/>
+            <c:DirectionalLight>
+              <Intensity>0.10000047832727432</Intensity>
+            </c:DirectionalLight>
             <c:Model>
               <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="2.42800021" Z="-2.80000019"/>
-              <Orientation X="5.40800047" Y="3.65100026" Z="0"/>
+              <Orientation X="5.60000038" Y="3.14159203" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -30,36 +33,22 @@
           <Components>
             <c:PointLight>
               <Color A="1" B="0.70588237" G="0.70588237" R="1"/>
-              <Radius>10</Radius>
+              <Radius>8</Radius>
+              <Intensity>0.20000000298023224</Intensity>
             </c:PointLight>
             <c:Transform>
-              <Position X="-0.375567257" Y="2.13093901" Z="-0.718547285"/>
+              <Position X="0" Y="1.80280674" Z="-1.53209329"/>
             </c:Transform>
           </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:PointLight>
-                  <Color A="1" B="1" G="0.70588237" R="0.70588237"/>
-                  <Radius>10</Radius>
-                </c:PointLight>
-                <c:Transform>
-                  <Position X="-1.96873236" Y="0" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
+          <Children/>
         </Entity>
         <Entity>
           <Components>
             <c:Model>
               <Resource>Models/Core/UnitPlane.mesh</Resource>
-              <Color A="1" B="0.137254909" G="0.121568628" R="0.160784319"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.565843403" Y="0" Z="0"/>
-              <Scale X="10" Y="1" Z="10"/>
+              <Scale X="10" Y="10" Z="10"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -85,7 +74,9 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
+                  <Position X="0.140207142" Y="0.952379346" Z="-0.0788922161"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
+                  <Orientation X="-1.14481521" Y="0.059967503" Z="-0.176931962"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -94,7 +85,6 @@
               <Components>
                 <c:Animation>
                   <AnimationName>AimRifleA</AnimationName>
-                  <Time>1</Time>
                   <Additive>true</Additive>
                 </c:Animation>
                 <c:Transform/>
@@ -114,7 +104,7 @@
                   <Components>
                     <c:Animation>
                       <AnimationName>ShootFastRifleU</AnimationName>
-                      <Time>0.15443509503129649</Time>
+                      <Time>0.17385384906517576</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Transform/>
@@ -123,62 +113,27 @@
                 </Entity>
                 <Entity name="MovementBlend">
                   <Components>
-                    <c:Blend>
-                      <Pose1>BlendWalkRun</Pose1>
-                      <Pose2>StrafeAnimation</Pose2>
-                      <Weight>1</Weight>
-                    </c:Blend>
+                    <c:Animation>
+                      <AnimationName>RunF</AnimationName>
+                      <Time>0.40542068091002648</Time>
+                      <Speed>1</Speed>
+                    </c:Animation>
                     <c:Transform/>
                   </Components>
-                  <Children>
-                    <Entity name="StrafeAnimation">
-                      <Components>
-                        <c:Animation>
-                          <AnimationName>StrafeRightF</AnimationName>
-                          <Time>0.4127890381477517</Time>
-                          <Speed>1</Speed>
-                        </c:Animation>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="BlendWalkRun">
-                      <Components>
-                        <c:Blend>
-                          <Pose1>RunAnimtaion</Pose1>
-                          <Pose2>WalkAnimation</Pose2>
-                          <Weight>0.43000054359436035</Weight>
-                        </c:Blend>
-                        <c:Transform/>
-                      </Components>
-                      <Children>
-                        <Entity name="RunAnimtaion">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>RunF</AnimationName>
-                              <Time>0.17180750829794933</Time>
-                              <Speed>1</Speed>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="WalkAnimation">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>WalkF</AnimationName>
-                              <Time>0.40122024997349826</Time>
-                              <Speed>1</Speed>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
+                  <Children/>
                 </Entity>
               </Children>
+            </Entity>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight>
+                  <Radius>3</Radius>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0" Y="0.100000001" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -206,7 +161,9 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
+                  <Position X="0.151036888" Y="0.850736618" Z="-0.0970466882"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
+                  <Orientation X="-0.948045969" Y="0.0299621802" Z="-0.0913181901"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -215,7 +172,8 @@
               <Components>
                 <c:Animation>
                   <AnimationName>AimRifleA</AnimationName>
-                  <Time>1</Time>
+                  <Time>0.16089285281973087</Time>
+                  <Speed>0.5</Speed>
                   <Additive>true</Additive>
                 </c:Animation>
                 <c:Transform/>
@@ -235,7 +193,7 @@
                   <Components>
                     <c:Animation>
                       <AnimationName>ShootFastRifleU</AnimationName>
-                      <Time>0.074040246120830933</Time>
+                      <Time>0.093816429893875508</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Transform/>
@@ -247,7 +205,7 @@
                     <c:Blend>
                       <Pose1>BlendWalkRun</Pose1>
                       <Pose2>StrafeAnimation</Pose2>
-                      <Weight>1</Weight>
+                      <Weight>0</Weight>
                     </c:Blend>
                     <c:Transform/>
                   </Components>
@@ -255,8 +213,8 @@
                     <Entity name="StrafeAnimation">
                       <Components>
                         <c:Animation>
-                          <AnimationName>StrafeRightF</AnimationName>
-                          <Time>0.33239292263858555</Time>
+                          <AnimationName>StrafeLeftF</AnimationName>
+                          <Time>0.48873338520059662</Time>
                           <Speed>1</Speed>
                         </c:Animation>
                         <c:Transform/>
@@ -268,7 +226,7 @@
                         <c:Blend>
                           <Pose1>RunAnimtaion</Pose1>
                           <Pose2>WalkAnimation</Pose2>
-                          <Weight>0.43000054359436035</Weight>
+                          <Weight>1</Weight>
                         </c:Blend>
                         <c:Transform/>
                       </Components>
@@ -277,7 +235,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>RunF</AnimationName>
-                              <Time>0.091411392788782297</Time>
+                              <Time>0.71124602785672497</Time>
                               <Speed>1</Speed>
                             </c:Animation>
                             <c:Transform/>
@@ -288,7 +246,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>WalkF</AnimationName>
-                              <Time>0.32082413446433122</Time>
+                              <Time>0.94065876953227434</Time>
                               <Speed>1</Speed>
                             </c:Animation>
                             <c:Transform/>
@@ -300,6 +258,20 @@
                   </Children>
                 </Entity>
               </Children>
+            </Entity>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="0.00392156886" G="0.00392156886" R="1"/>
+                  <Radius>3</Radius>
+                  <Intensity>0.80000001192092896</Intensity>
+                  <Falloff>0.30000001192092896</Falloff>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0" Y="0.100000001" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -327,7 +299,9 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
+                  <Position X="0.1532076" Y="1.02745032" Z="-0.223910496"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
+                  <Orientation X="-0.0956145823" Y="-0.0272450559" Z="0.150499463"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -336,7 +310,7 @@
               <Components>
                 <c:Animation>
                   <AnimationName>AimRifleA</AnimationName>
-                  <Time>1</Time>
+                  <Time>0.46000003814697266</Time>
                   <Additive>true</Additive>
                 </c:Animation>
                 <c:Transform/>
@@ -355,8 +329,8 @@
                 <Entity name="ShootRifleAnimation">
                   <Components>
                     <c:Animation>
-                      <AnimationName>ShootFastRifleU</AnimationName>
-                      <Time>0.14396212913172102</Time>
+                      <AnimationName>ShootRifleU</AnimationName>
+                      <Time>0.041207335792059041</Time>
                       <Speed>1</Speed>
                     </c:Animation>
                     <c:Transform/>
@@ -368,7 +342,7 @@
                     <c:Blend>
                       <Pose1>BlendWalkRun</Pose1>
                       <Pose2>StrafeAnimation</Pose2>
-                      <Weight>1</Weight>
+                      <Weight>0</Weight>
                     </c:Blend>
                     <c:Transform/>
                   </Components>
@@ -377,7 +351,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>StrafeRightF</AnimationName>
-                          <Time>0.40231464173670251</Time>
+                          <Time>0.022149276804645623</Time>
                           <Speed>1</Speed>
                         </c:Animation>
                         <c:Transform/>
@@ -398,7 +372,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>RunF</AnimationName>
-                              <Time>0.16133311188689925</Time>
+                              <Time>0.45204536957978458</Time>
                               <Speed>1</Speed>
                             </c:Animation>
                             <c:Transform/>
@@ -409,7 +383,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>WalkF</AnimationName>
-                              <Time>0.39074585356244818</Time>
+                              <Time>0.010580488630391294</Time>
                               <Speed>1</Speed>
                             </c:Animation>
                             <c:Transform/>
@@ -421,6 +395,19 @@
                   </Children>
                 </Entity>
               </Children>
+            </Entity>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.00392156886" R="0.00392156886"/>
+                  <Radius>3</Radius>
+                  <Falloff>0.30000001192092896</Falloff>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0" Y="0.100000001" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -448,7 +435,9 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
+                  <Position X="0.0926265344" Y="0.837827146" Z="-0.255172133"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
+                  <Orientation X="-0.209567234" Y="0.138206437" Z="0.0942857563"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -457,7 +446,7 @@
               <Components>
                 <c:Animation>
                   <AnimationName>AimRifleA</AnimationName>
-                  <Time>1</Time>
+                  <Time>0.5</Time>
                   <Additive>true</Additive>
                 </c:Animation>
                 <c:Transform/>
@@ -473,17 +462,6 @@
                 <c:Transform/>
               </Components>
               <Children>
-                <Entity name="ShootRifleAnimation">
-                  <Components>
-                    <c:Animation>
-                      <AnimationName>ShootFastRifleU</AnimationName>
-                      <Time>0.032048013485985738</Time>
-                      <Speed>1</Speed>
-                    </c:Animation>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
                 <Entity name="MovementBlend">
                   <Components>
                     <c:Blend>
@@ -498,7 +476,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>StrafeRightF</AnimationName>
-                          <Time>0.090400359197961855</Time>
+                          <Time>0.71023499426590497</Time>
                           <Speed>1</Speed>
                         </c:Animation>
                         <c:Transform/>
@@ -510,7 +488,7 @@
                         <c:Blend>
                           <Pose1>RunAnimtaion</Pose1>
                           <Pose2>WalkAnimation</Pose2>
-                          <Weight>0.43000054359436035</Weight>
+                          <Weight>1</Weight>
                         </c:Blend>
                         <c:Transform/>
                       </Components>
@@ -518,8 +496,8 @@
                         <Entity name="RunAnimtaion">
                           <Components>
                             <c:Animation>
-                              <AnimationName>RunF</AnimationName>
-                              <Time>0.8494188293481586</Time>
+                              <AnimationName>CrouchWalkF</AnimationName>
+                              <Time>0.19404614253737762</Time>
                               <Speed>1</Speed>
                             </c:Animation>
                             <c:Transform/>
@@ -530,7 +508,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>WalkF</AnimationName>
-                              <Time>0.078831571023707525</Time>
+                              <Time>0.69866620609165064</Time>
                               <Speed>1</Speed>
                             </c:Animation>
                             <c:Transform/>
@@ -541,9 +519,49 @@
                     </Entity>
                   </Children>
                 </Entity>
+                <Entity name="ShootRifleAnimation">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>ReloadSwitchU</AnimationName>
+                      <Time>0.25662476445004501</Time>
+                      <Speed>1</Speed>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
               </Children>
             </Entity>
+            <Entity name="Light">
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.00392156886" R="0.196078435"/>
+                  <Radius>3</Radius>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0" Y="0.100000001" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
           </Children>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.mesh</Resource>
+              <Color A="1" B="0.00392156886" G="0.00392156886" R="78.4313736"/>
+            </c:Model>
+            <c:PointLight>
+              <Color A="1" B="0.00392156886" G="0.00392156886" R="1"/>
+              <Radius>3</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="3.07036352" Y="0.463677973" Z="2.48590684"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
         </Entity>
       </Children>
     </Entity>

@@ -94,7 +94,7 @@ void Skeleton::AdditiveBoneTransforms(const Animation* animation, double time, s
 {
     if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
         glm::mat4 refPose = GetAdditiveBonePose(bone, animation, 0.0);
-        glm::mat4 srcPose = GetAdditiveBonePose(bone, animation, time);
+        glm::mat4 srcPose = GetAdditiveBonePose(bone, animation, time + 1.0/60.0);
         glm::mat4 boneMatrix = srcPose * glm::inverse(refPose);
         boneMatrices[bone->ID] = boneMatrix;
     }
@@ -335,21 +335,17 @@ std::map<int, glm::mat4> Skeleton::BlendPoseAdditive(const std::map<int, glm::ma
     return finalPose;
 }
 
-std::vector<glm::mat4> Skeleton::GetFinalPose(std::map<int, glm::mat4>& boneMatrices)
+void Skeleton::GetFinalPose(std::map<int, glm::mat4>& boneMatrices, std::vector<glm::mat4>& finalPose, std::map<int, glm::mat4>& boneTransforms)
 {
-    std::vector<glm::mat4> finalPose;
-
-    AccumulateFinalPose(boneMatrices, RootBone, glm::mat4(1));
-
+    AccumulateFinalPose(boneMatrices, boneTransforms, RootBone, glm::mat4(1));
 
     for(auto& b : boneMatrices) {
         finalPose.push_back(b.second);
     }
 
-    return finalPose;
 }
 
-void Skeleton::AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix)
+void Skeleton::AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, std::map<int, glm::mat4>& boneTransforms, const Bone* bone, glm::mat4 parentMatrix)
 {
 
     glm::mat4 boneMatrix;
@@ -370,8 +366,10 @@ void Skeleton::AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, const
         }
     }
 
+    boneTransforms[bone->ID] = boneMatrix;
+
     for (auto &child : bone->Children) {
-        AccumulateFinalPose(boneMatrices, child, boneMatrix);
+        AccumulateFinalPose(boneMatrices, boneTransforms, child, boneMatrix);
     }
 }
 

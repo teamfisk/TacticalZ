@@ -125,7 +125,10 @@ struct ModelJob : RenderJob
             if (Skeleton != nullptr) {
                 
                 EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
-                BlendTree = std::shared_ptr<::BlendTree>(new ::BlendTree(entityWrapper, Skeleton));
+
+                if(Skeleton->BlendTrees.find(entityWrapper) != Skeleton->BlendTrees.end()) {
+                    BlendTree = Skeleton->BlendTrees.at(entityWrapper);
+                }
             }
         }
     };

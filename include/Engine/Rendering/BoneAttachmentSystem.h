@@ -8,6 +8,7 @@
 #include "Core/ResourceManager.h"
 #include "Rendering/Model.h"
 #include "Rendering/Skeleton.h"
+#include "Rendering/BlendTree.h"
 
 //Needs to be a higher orderlevel than AnimationSystem
 class BoneAttachmentSystem : public PureSystem

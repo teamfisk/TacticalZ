@@ -76,6 +76,17 @@ BlendTree::~BlendTree()
     }
 }
 
+
+glm::mat4 BlendTree::GetBoneTransform(int boneID)
+{
+    if(m_FinalBoneTransforms.find(boneID) != m_FinalBoneTransforms.end()) {
+        return m_FinalBoneTransforms.at(boneID);
+    } else {
+        return glm::mat4(1);
+    }
+    
+}
+
 void BlendTree::PrintTree()
 {
     Node* currentNode = m_Root;
@@ -213,7 +224,7 @@ std::vector<glm::mat4> BlendTree::AccumulateFinalPose()
     std::map<int, glm::mat4> pose;
     Blend(pose);
 
-    finalPose = m_Skeleton->GetFinalPose(pose);
+    m_Skeleton->GetFinalPose(pose, finalPose, m_FinalBoneTransforms);
 
     return finalPose;
 }

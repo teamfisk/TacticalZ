@@ -62,7 +62,7 @@ public:
 
 
     std::vector<glm::mat4> GetFinalPose() { return m_FinalPose; }
-
+    glm::mat4 GetBoneTransform(int boneID);
 
 
     void PrintTree();
@@ -72,6 +72,8 @@ private:
     Node* m_Root = nullptr;
 
     std::vector<glm::mat4> m_FinalPose;
+    std::map<int, glm::mat4> m_FinalBoneTransforms;
+
     std::vector<glm::mat4> AccumulateFinalPose();
     BlendTree::Node* FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity);
 
