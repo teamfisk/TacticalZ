@@ -41,7 +41,7 @@ PickupSpawnTest::PickupSpawnTest(int runTestNumber)
     // Create system pipeline
     m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker, false, false);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
-    m_SystemPipeline->AddSystem<PickupSpawnSystem>(1);
+    m_SystemPipeline->AddSystem<HealthPickupSystem>(1);
 
     //must register components (Components.xsd), else you cant create entities. Easiest done by loading a test xsd file
     auto file = ResourceManager::Load<EntityFile>("Schema/Entities/HealthPickup.xml");

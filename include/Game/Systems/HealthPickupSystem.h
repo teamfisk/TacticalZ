@@ -1,5 +1,5 @@
-#ifndef PickupSpawnSystem_h__
-#define PickupSpawnSystem_h__
+#ifndef HealthPickupSystem_h__
+#define HealthPickupSystem_h__
 
 #include "Core/System.h"
 #include "Core/Transform.h"
@@ -11,16 +11,18 @@
 #include "Common.h"
 #include <tuple>
 
-class PickupSpawnSystem : public ImpureSystem
+class HealthPickupSystem : public ImpureSystem
 {
 public:
-    PickupSpawnSystem(SystemParams params);
+    HealthPickupSystem(SystemParams params);
 
     virtual void Update(double dt) override;
 
 private:
-    EventRelay<PickupSpawnSystem, Events::TriggerTouch> m_ETriggerTouch;
+    EventRelay<HealthPickupSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(Events::TriggerTouch& e);
+    EventRelay<HealthPickupSystem, Events::TriggerLeave> m_ETriggerLeave;
+    bool OnTriggerLeave(Events::TriggerLeave& e);
 
     struct NewHealthPickup {
         glm::vec3 Pos;
@@ -30,5 +32,11 @@ private:
         EntityID parentID;
     };
     std::vector<NewHealthPickup> m_ETriggerTouchVector;
+    struct EntityAtMaxValuePickupStruct {
+        EntityWrapper player;
+        EntityWrapper pickup;
+    };
+    std::vector<EntityAtMaxValuePickupStruct> m_PickupAtMaximum;
+    void DoPickup(EntityWrapper &player, EntityWrapper &trigger);
 };
 #endif

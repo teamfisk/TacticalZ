@@ -4,6 +4,7 @@ AmmoPickupSystem::AmmoPickupSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &AmmoPickupSystem::OnTriggerTouch);
+    EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &AmmoPickupSystem::OnTriggerLeave);
 }
 
 void AmmoPickupSystem::Update(double dt)
@@ -36,6 +37,21 @@ void AmmoPickupSystem::Update(double dt)
             break;
         }
     }
+    //still touching AmmoPickupAtMaxHealthAmmo?
+    for (auto& it = m_PickupAtMaximum.begin(); it != m_PickupAtMaximum.end(); ++it) {
+        if (!it->player.Valid() || !it->pickup.Valid()) {
+            m_PickupAtMaximum.erase(it);
+            break;
+
+        }
+        if ((int)it->player["AssaultWeapon"]["Ammo"] < (int)it->player["AssaultWeapon"]["MaxAmmo"]) {
+            DoPickup(it->player, it->pickup);
+            m_PickupAtMaximum.erase(it);
+            break;
+
+        }
+    }
+
 }
 
 
@@ -51,29 +67,47 @@ bool AmmoPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
     if (!e.Trigger.HasComponent("AmmoPickup")) {
         return false;
     }
-    int maxWeaponAmmo = (int)e.Entity["AssaultWeapon"]["MaxAmmo"];
-    int& currentAmmo = (int)e.Entity["AssaultWeapon"]["Ammo"];
 
-    int ammoGiven = 0.01*(double)e.Trigger["AmmoPickup"]["AmmoGain"] * maxWeaponAmmo;
     //cant pick up ammopacks if you are already at MaxAmmo
-    if (currentAmmo >= maxWeaponAmmo) {
+    if ((int)e.Entity["AssaultWeapon"]["Ammo"] >= (int)e.Entity["AssaultWeapon"]["MaxAmmo"]) {
+        m_PickupAtMaximum.push_back({ e.Entity, e.Trigger });
         return false;
     }
+    DoPickup(e.Entity, e.Trigger);
+
+    return true;
+}
+bool AmmoPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
+    //triggerleave erases possible AmmoPickupAtMaxHealthAmmo
+    for (auto& it = m_PickupAtMaximum.begin(); it != m_PickupAtMaximum.end(); ++it) {
+        if (it->pickup.ID == e.Trigger.ID && it->player.ID == e.Entity.ID) {
+            m_PickupAtMaximum.erase(it);
+            break;
+
+        }
+
+    }
+    return true;
+}
+void AmmoPickupSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger) {
+    int maxWeaponAmmo = (int)player["AssaultWeapon"]["MaxAmmo"];
+    int& currentAmmo = (int)player["AssaultWeapon"]["Ammo"];
+    int ammoGiven = 0.01*(double)trigger["AmmoPickup"]["AmmoGain"] * maxWeaponAmmo;
 
     //personEntered = e.Entity, thingEntered = e.Trigger
     Events::AmmoPickup ePlayerAmmoPickup;
     ePlayerAmmoPickup.AmmoGain = ammoGiven;
-    ePlayerAmmoPickup.Player = e.Entity;
+    ePlayerAmmoPickup.Player = player;
     m_EventBroker->Publish(ePlayerAmmoPickup);
+
     //immediately give the player the ammo
     currentAmmo = std::min(currentAmmo + ammoGiven, maxWeaponAmmo);
 
     //copy position, ammogain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)
     //we need to copy all values since each value can be different for each ammoPickup
-    m_ETriggerTouchVector.push_back({ e.Trigger["Transform"]["Position"], e.Trigger["AmmoPickup"]["AmmoGain"],
-        e.Trigger["AmmoPickup"]["RespawnTimer"], e.Trigger["AmmoPickup"]["RespawnTimer"], m_World->GetParent(e.Trigger.ID) });
+    m_ETriggerTouchVector.push_back({ trigger["Transform"]["Position"], trigger["AmmoPickup"]["AmmoGain"],
+        trigger["AmmoPickup"]["RespawnTimer"], trigger["AmmoPickup"]["RespawnTimer"], m_World->GetParent(trigger.ID) });
 
     //delete the ammopickup
-    m_World->DeleteEntity(e.Trigger.ID);
-    return true;
+    m_World->DeleteEntity(trigger.ID);
 }

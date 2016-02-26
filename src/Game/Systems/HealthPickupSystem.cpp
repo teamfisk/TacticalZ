@@ -1,12 +1,13 @@
-#include "Systems/PickupSpawnSystem.h"
+#include "Systems/HealthPickupSystem.h"
 
-PickupSpawnSystem::PickupSpawnSystem(SystemParams params)
+HealthPickupSystem::HealthPickupSystem(SystemParams params)
     : System(params)
 {
-    EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &PickupSpawnSystem::OnTriggerTouch);
+    EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &HealthPickupSystem::OnTriggerTouch);
+    EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &HealthPickupSystem::OnTriggerLeave);
 }
 
-void PickupSpawnSystem::Update(double dt)
+void HealthPickupSystem::Update(double dt)
 {
     for (auto it = m_ETriggerTouchVector.begin(); it != m_ETriggerTouchVector.end(); ++it)
     {
@@ -36,32 +37,62 @@ void PickupSpawnSystem::Update(double dt)
             break;
         }
     }
+    //still touching AmmoPickupAtMaxHealthAmmo?
+    for (auto& it = m_PickupAtMaximum.begin(); it != m_PickupAtMaximum.end(); ++it) {
+        if (!it->player.Valid() || !it->pickup.Valid()) {
+            m_PickupAtMaximum.erase(it);
+            break;
+
+        }
+        if ((int)it->player["Health"]["Health"] < (int)it->player["Health"]["MaxHealth"]) {
+            DoPickup(it->player, it->pickup);
+            m_PickupAtMaximum.erase(it);
+            break;
+
+        }
+    }
 }
 
 
-bool PickupSpawnSystem::OnTriggerTouch(Events::TriggerTouch& e)
+bool HealthPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
 {
     if (!e.Trigger.HasComponent("HealthPickup")) {
         return false;
     }
-    double healthGiven = 0.01*(double)e.Trigger["HealthPickup"]["HealthGain"] * (double)e.Entity["Health"]["MaxHealth"];
     //cant pick up healthpacks if you are already at MaxHealth
     if ((double)e.Entity["Health"]["Health"] >= (double)e.Entity["Health"]["MaxHealth"]) {
+        m_PickupAtMaximum.push_back({ e.Entity, e.Trigger });
         return false;
     }
+
+    DoPickup(e.Entity, e.Trigger);
+    return true;
+}
+bool HealthPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
+    //triggerleave erases possible AmmoPickupAtMaxHealthAmmo
+    for (auto& it = m_PickupAtMaximum.begin(); it != m_PickupAtMaximum.end(); ++it) {
+        if (it->pickup.ID == e.Trigger.ID && it->player.ID == e.Entity.ID) {
+            m_PickupAtMaximum.erase(it);
+            break;
+        }
+    }
+    return true;
+}
+void HealthPickupSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger) {
+    double healthGiven = 0.01*(double)trigger["HealthPickup"]["HealthGain"] * (double)player["Health"]["MaxHealth"];
 
     //personEntered = e.Entity, thingEntered = e.Trigger
     Events::PlayerHealthPickup ePlayerHealthPickup;
     ePlayerHealthPickup.HealthAmount = healthGiven;
-    ePlayerHealthPickup.Player = e.Entity;
+    ePlayerHealthPickup.Player = player;
     m_EventBroker->Publish(ePlayerHealthPickup);
 
     //copy position, healthgain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)
     //we need to copy all values since each value can be different for each healthPickup
-    m_ETriggerTouchVector.push_back({ (glm::vec3)e.Trigger["Transform"]["Position"] ,e.Trigger["HealthPickup"]["HealthGain"],
-        e.Trigger["HealthPickup"]["RespawnTimer"],e.Trigger["HealthPickup"]["RespawnTimer"], m_World->GetParent(e.Trigger.ID) });
+    m_ETriggerTouchVector.push_back({ (glm::vec3)trigger["Transform"]["Position"] ,trigger["HealthPickup"]["HealthGain"],
+        trigger["HealthPickup"]["RespawnTimer"],trigger["HealthPickup"]["RespawnTimer"], m_World->GetParent(trigger.ID) });
 
     //delete the healthpickup
-    m_World->DeleteEntity(e.Trigger.ID);
-    return true;
+    m_World->DeleteEntity(trigger.ID);
 }
+

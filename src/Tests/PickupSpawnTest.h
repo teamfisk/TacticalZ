@@ -31,7 +31,7 @@
 #include "Collision/CollisionSystem.h"
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/HealthSystem.h"
-#include "Game/Systems/PickupSpawnSystem.h"
+#include "Game/Systems/HealthPickupSystem.h"
 
 #include "Core/ResourceManager.h"
 
@@ -56,9 +56,9 @@ private:
     EntityID m_PlayerID, m_HealthPickupID;
     int m_RunTestNumber;
 
-    EventRelay<PickupSpawnSystem, Events::PlayerHealthPickup> m_HP;
+    EventRelay<HealthPickupSystem, Events::PlayerHealthPickup> m_HP;
     bool OnHealthPickup(Events::PlayerHealthPickup& e);
-    EventRelay<PickupSpawnSystem, Events::PickupSpawned> m_PS;
+    EventRelay<HealthPickupSystem, Events::PickupSpawned> m_PS;
     bool OnPickupSpawned(Events::PickupSpawned& e);
 
     bool m_TestStage1Success = false;
