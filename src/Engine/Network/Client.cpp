@@ -101,8 +101,7 @@ void Client::Update()
 
 void Client::parseMessageType(Packet& packet)
 {
-    // Pop packetSize which is used by TCP Client to
-    // create a packet of the correct size
+    // Pop packetSize
     packet.ReadPrimitive<int>();
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
@@ -233,7 +232,6 @@ void Client::parseSpawnEvents()
         m_EventBroker->Publish(e);
     }
     m_PlayerSpawnEvents = tempSpawn;
-    // m_PlayerSpawnEvents.clear();
 }
 
 void Client::parsePlayersSpawned(Packet& packet)
