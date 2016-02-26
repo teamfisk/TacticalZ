@@ -11,14 +11,14 @@ ShadowPass::ShadowPass(IRenderer * renderer)
 
 ShadowPass::~ShadowPass()
 {
-	// m_shadCams
+
 }
 
 void ShadowPass::InitializeCameras(RenderScene & scene)
 {
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		m_shadFrusta[i].AspectRatio = scene.Camera->AspectRatio();
-		m_shadFrusta[i].FOV = scene.Camera->FOV();
+		m_shadowFrusta[i].AspectRatio = scene.Camera->AspectRatio();
+		m_shadowFrusta[i].FOV = scene.Camera->FOV();
 	}
 }
 
@@ -69,7 +69,7 @@ void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position
 	frustum.CornerPoint[6] = far_center + up * far_height + right * far_width;
 	frustum.CornerPoint[7] = far_center - up * far_height + right * far_width;
 
-	// Alternative way
+	// Alternative way.
 	//std::array<glm::vec4, 8> CornerPoint = { 
 	//	glm::vec4(-1.f, -1.f,	-1.f,	1.f),
 	//	glm::vec4(-1.f, 1.f,	-1.f,	1.f),
@@ -80,12 +80,12 @@ void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position
 	//	glm::vec4(1.f,	1.f,	1.f,	1.f),
 	//	glm::vec4(1.f,	-1.f,	1.f,	1.f) };
 
-	//std::array<glm::vec3, 8> final;
+	//std::array<glm::vec3, 8> FinalPoints;
 
 	//for (int i = 0; i < 8; i++) {
-	//	glm::vec4 anus = glm::inverse(p) * CornerPoint[i];
-	//	anus = anus / anus.w;
-	//	final[i] = glm::vec3(glm::inverse(v) * anus);
+	//	glm::vec4 NDC = glm::inverse(p) * CornerPoint[i];
+	//	NDC = NDC / NDC.w;
+	//	FinalPoints[i] = glm::vec3(glm::inverse(v) * NDC);
 	//}
 }
 
@@ -111,7 +111,7 @@ void ShadowPass::InitializeFrameBuffers()
 
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
 		glBindTexture(GL_TEXTURE_2D, m_DepthMap[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, resolutionSizeWidth / (1 /*+ i*/), resolutionSizeHeigth + (1 /*+ i*/), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth / (1 /*+ i*/), m_ResolutionSizeHeigth + (1 /*+ i*/), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -165,7 +165,7 @@ void ShadowPass::PointsToLightspace(Frustum& frustum, glm::mat4 v)
 		if (tempPoint.y > top) { top = tempPoint.y; }
 	}
 
-	frustum.LRTB = { left, right, bottom, top };
+	frustum.LRBT = { left, right, bottom, top };
 }
 
 void ShadowPass::RadiusToLightspace(Frustum& frustum, glm::mat4 v)
@@ -175,7 +175,7 @@ void ShadowPass::RadiusToLightspace(Frustum& frustum, glm::mat4 v)
 	float bottom = -frustum.Radius;
 	float top =frustum.Radius;
 
-	frustum.LRTB = { left, right, bottom, top };
+	frustum.LRBT = { left, right, bottom, top };
 }
 
 void ShadowPass::Draw(RenderScene & scene)
@@ -186,10 +186,10 @@ void ShadowPass::Draw(RenderScene & scene)
 	ImGui::DragInt("ShadowLevel", &m_ShadowLevel, 0.05f, 0, m_CurrentNrOfSplits - 1);
 
 	InitializeCameras(scene);
-	UpdateSplitDist(m_shadFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
+	UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
 	
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		UpdateFrustumPoints(m_shadFrusta[i], scene.Camera->Position(), scene.Camera->Forward(), scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
+		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward(), scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
 		//float test = FindRadius(m_shadFrusta[i]);
 
 		ShadowPassState* state = new ShadowPassState(m_DepthBuffer[i].GetHandle());
@@ -197,7 +197,7 @@ void ShadowPass::Draw(RenderScene & scene)
 		GLuint shaderHandle = m_ShadowProgram->GetHandle();
 		m_ShadowProgram->Bind();
 
-		glViewport(0, 0, resolutionSizeWidth / (1/* + i*/), resolutionSizeHeigth);
+		glViewport(0, 0, m_ResolutionSizeWidth / (1/* + i*/), m_ResolutionSizeHeigth);
 		glDisable(GL_TEXTURE_2D);
 		glCullFace(GL_FRONT);
 		//state->Disable(GL_CULL_FACE);
@@ -208,11 +208,10 @@ void ShadowPass::Draw(RenderScene & scene)
 				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
 				if (directionalLightJob) {
-					m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadFrusta[i].MiddlePoint, m_shadFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
+					m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
 					
-					PointsToLightspace(m_shadFrusta[i], m_LightView[i]);
-					m_LightProjection[i] = glm::ortho(m_shadFrusta[i].LRTB[Left], m_shadFrusta[i].LRTB[Right], m_shadFrusta[i].LRTB[Bottom], m_shadFrusta[i].LRTB[Top], -30.f, 30.f);
-					//m_LightProjection[i] = glm::ortho(m_shadFrusta[i].LRTB[Left], m_shadFrusta[i].LRTB[Right], m_shadFrusta[i].LRTB[Bottom], m_shadFrusta[i].LRTB[Top], -0.f, 300.f);
+					PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
+					m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[Left], m_shadowFrusta[i].LRBT[Right], m_shadowFrusta[i].LRBT[Bottom], m_shadowFrusta[i].LRBT[Top], -30.f, 30.f);
 
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
