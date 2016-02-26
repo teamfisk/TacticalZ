@@ -115,23 +115,13 @@ void Renderer::Draw(RenderFrame& frame)
         m_CubeMapPass->LoadTextures("Sky");
     }
 
-	ImGui::SliderFloat("SSAO sample radius", &m_SSAO_Radius, 0.01f, 5.0f);
-	ImGui::SliderFloat("SSAO bias", &m_SSAO_Bias, 0.0f, 0.1f);
-	ImGui::SliderFloat("SSAO contrast", &m_SSAO_Contrast, 0.0f, 10.0f);
-	ImGui::SliderFloat("SSAO IntensityScale", &m_SSAO_IntensityScale, 0.0f, 10.0f);
-	ImGui::SliderInt("SSAO Number of Samples", &m_SSAO_NumOfSamples, 2, 100);
-	ImGui::SliderInt("SSAO Number of Turns", &m_SSAO_NumOfTurns, 0, 50);
-	ImGui::SliderInt("SSAO Blur Iterations", &m_SSAO_iterations, 0, 20);
-	ImGui::SliderInt("SSAO TextureQuality", &m_SSAO_TextureQuality, 0, 4);
-	ImGui::SliderInt("SSAO Quality", &m_SSAO_Quality, 0, 3);
-	//m_SSAOPass->Setting(m_SSAO_Radius, m_SSAO_Bias, m_SSAO_Contrast, m_SSAO_IntensityScale, m_SSAO_NumOfSamples, m_SSAO_NumOfTurns, m_SSAO_iterations, m_SSAO_TextureQuality);
 	m_SSAOPass->ChangeQuality(m_SSAO_Quality);
     GLERROR("SSAO Settings");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //Clear other buffers
+    //Clear other buffers 
     PerformanceTimer::StartTimer("Renderer-ClearBuffers");
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
@@ -145,10 +135,10 @@ void Renderer::Draw(RenderFrame& frame)
 		GLERROR("Drawing pickingpass");
 		PerformanceTimer::StopTimer("Renderer-Depth");
 	}
-	PerformanceTimer::StartTimer("AO generation");
+	PerformanceTimer::StartTimer("Renderer-AO generation");
 	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
 	GLuint ao = m_SSAOPass->SSAOTexture();
-	PerformanceTimer::StopTimer("AO generation");
+	PerformanceTimer::StopTimer("Renderer-AO generation");
     for (auto scene : frame.RenderScenes){
         
         PerformanceTimer::StartTimer("Renderer-Drawing PickingPass");
