@@ -4,21 +4,28 @@ GLuint Shader::CompileShader(GLenum shaderType, std::string fileName)
 {
 	LOG_INFO("Compiling shader \"%s\"", fileName.c_str());
 
-	std::string shaderFile;
-	std::ifstream in(fileName, std::ios::in);
-	if (!in) {
-		LOG_ERROR("Error: Failed to open shader file \"%s\"", fileName.c_str());
-		return 0;
-	}
-	in.seekg(0, std::ios::end);
-	shaderFile.resize((int)in.tellg());
-	in.seekg(0, std::ios::beg);
-	in.read(&shaderFile[0], shaderFile.size());
-	in.close();
+    std::string shaderFile = ReadFile(fileName);
 
 	GLuint shader = glCreateShader(shaderType);
 	if (GLERROR("glCreateShader"))
 		return 0;
+
+    std::size_t startPos = 0;
+    std::size_t SEofNewFile[2];
+    while((startPos = shaderFile.find("#GLSL", startPos)) != std::string::npos)
+    {
+        SEofNewFile[0] = shaderFile.find('"', startPos+5)+1;
+        SEofNewFile[1] = shaderFile.find('"', SEofNewFile[0]);
+        if (SEofNewFile[0] == std::string::npos || SEofNewFile[1] == std::string::npos)
+        {
+            return 0;
+        }
+
+        std::string replacementFileName = shaderFile.substr(SEofNewFile[0], SEofNewFile[1] - SEofNewFile[0]);
+        std::string replacementString = ReadFile(replacementFileName);
+        shaderFile.replace(startPos, SEofNewFile[1]+2 - startPos, replacementString + "\n");
+        startPos += replacementString.length(); //This might not be wanted.
+    }
 
 	const GLchar* shaderFiles = shaderFile.c_str();
 	const GLint length = static_cast<GLint>(shaderFile.length());
@@ -45,6 +52,24 @@ GLuint Shader::CompileShader(GLenum shaderType, std::string fileName)
 
 	return shader;
 }
+
+std::string Shader::ReadFile(std::string fileName)
+{
+    std::string shaderFile;
+    std::ifstream in(fileName, std::ios::in);
+    if (!in) {
+        LOG_ERROR("Error: Failed to open shader file \"%s\"", fileName.c_str());
+        return 0;
+    }
+
+    in.seekg(0, std::ios::end);
+    shaderFile.resize((int)in.tellg());
+    in.seekg(0, std::ios::beg);
+    in.read(&shaderFile[0], shaderFile.size());
+    in.close();
+    return shaderFile;
+}
+
 
 Shader::Shader(GLenum shaderType, std::string fileName) : m_ShaderType(shaderType), m_FileName(fileName)
 {

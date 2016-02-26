@@ -2,6 +2,8 @@
 
 #define MIN_AMBIENT_LIGHT 0.3
 
+#GLSL "Shaders/Util/CommonUniforms.glsl"
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -180,6 +182,7 @@ void main()
 		color_result += FillColor;
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
+	//sceneColor = CommonUniforms.testColour;
 	//sceneColor = vec4(reflectionColor.xyz, 1);
 	color_result += glowTexel*GlowIntensity;
 
