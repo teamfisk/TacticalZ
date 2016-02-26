@@ -2,7 +2,7 @@
 using boost::unit_test_framework::test_suite;
 using boost::unit_test_framework::test_case;
 
-#include "PickupSpawnTest.h"
+#include "HealthPickupTest.h"
 
 BOOST_AUTO_TEST_SUITE(PickupSpawnTestSuite)
 

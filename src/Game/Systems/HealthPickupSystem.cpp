@@ -44,7 +44,7 @@ void HealthPickupSystem::Update(double dt)
             break;
 
         }
-        if ((int)it->player["Health"]["Health"] < (int)it->player["Health"]["MaxHealth"]) {
+        if ((double)it->player["Health"]["Health"] < (double)it->player["Health"]["MaxHealth"]) {
             DoPickup(it->player, it->pickup);
             m_PickupAtMaximum.erase(it);
             break;
@@ -52,7 +52,6 @@ void HealthPickupSystem::Update(double dt)
         }
     }
 }
-
 
 bool HealthPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
 {
@@ -69,7 +68,7 @@ bool HealthPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
     return true;
 }
 bool HealthPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
-    //triggerleave erases possible AmmoPickupAtMaxHealthAmmo
+    //triggerleave erases possible m_PickupAtMaximum
     for (auto& it = m_PickupAtMaximum.begin(); it != m_PickupAtMaximum.end(); ++it) {
         if (it->pickup.ID == e.Trigger.ID && it->player.ID == e.Entity.ID) {
             m_PickupAtMaximum.erase(it);
@@ -78,6 +77,7 @@ bool HealthPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
     }
     return true;
 }
+
 void HealthPickupSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger) {
     double healthGiven = 0.01*(double)trigger["HealthPickup"]["HealthGain"] * (double)player["Health"]["MaxHealth"];
 
