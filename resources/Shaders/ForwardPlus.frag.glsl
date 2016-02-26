@@ -1,6 +1,6 @@
 #version 430
 
-#define MAX_SPLITS 3
+#define MAX_SPLITS 4
 
 uniform mat4 M;
 uniform mat4 V;
@@ -17,9 +17,8 @@ layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
 layout (binding = 2) uniform sampler2D SpecularMapTexture;
 layout (binding = 3) uniform sampler2D GlowMapTexture;
-layout (binding = 4) uniform sampler2DShadow DepthMap0;
-layout (binding = 5) uniform sampler2DShadow DepthMap1;
-layout (binding = 6) uniform sampler2DShadow DepthMap2;
+layout (binding = 4) uniform sampler2DShadow DepthMap[MAX_SPLITS];
+
 
 #define TILE_SIZE 16
 
@@ -209,36 +208,8 @@ int getShadowIndex(float far_distance[MAX_SPLITS])
 	return index;
 }
 
-//sampler2DShadow whichDepthMap(int DepthMapIndex)
-//{
-//	if( DepthMapIndex == 0 )
-//	{
-//		return DepthMap0;
-//	}
-//	else if( DepthMapIndex == 1 )
-//	{
-//		return DepthMap1;
-//	}
-//	else 
-//	{
-//		return DepthMap2;
-//	}
-//}
-
 void main()
 {
-	//sampler2DShadow DepthMaps[3] = { sampler2DShadow(DepthMap0), sampler2DShadow(DepthMap1), sampler2DShadow(DepthMap2) };
-	//sampler2DShadow DepthMaps[3] = { DepthMap0, DepthMap1, DepthMap2 };
-	//sampler2DShadow DepthMaps[3] = sampler2DShadow[]( DepthMap0, DepthMap1, DepthMap2 );
-	//sampler2DShadow DepthMaps[3] = sampler2DShadow[3]( DepthMap0, DepthMap1, DepthMap2 );
-	//sampler2DShadow DepthMaps[3];
-	
-	//sampler2DShadow DepthMapOne = DepthMap0;
-	
-	//DepthMaps[0] = DepthMap0;
-	//DepthMaps[1] = DepthMap1;
-	//DepthMaps[2] = DepthMap2;
-	
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate);
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate);
@@ -271,24 +242,22 @@ void main()
 		if(light.Type == 1) { // point
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
-			int DepthMapIndex = getShadowIndex(FarDistance);
-			//sampler2DShadow WhichDepthMap = whichDepthMap(DepthMapIndex);
+			//int DepthMapIndex = getShadowIndex(FarDistance);
 			
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 			
-			//shadowFactor = CalcShadowValue(Input.PositionLightSpace[0], Input.Normal, vec3(light.Direction), DepthMap0);
-			if( DepthMapIndex == 0 )
-			{
-				shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap0);
-			}
-			else if( DepthMapIndex == 1 )
-			{
-				shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap1);
-			}
-			else 
-			{
-				shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap2);
-			}
+			//if( DepthMapIndex == 0 )
+			//{
+				shadowFactor = CalcShadowValue(Input.PositionLightSpace[0], Input.Normal, vec3(light.Direction), DepthMap[0]);
+			//}
+			//else if( DepthMapIndex == 1 )
+			//{
+			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap1);
+			//}
+			//else 
+			//{
+			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap2);
+			//}
 		}
 	
 		totalLighting.Diffuse += light_result.Diffuse;

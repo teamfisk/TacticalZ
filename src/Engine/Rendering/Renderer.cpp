@@ -136,9 +136,9 @@ void Renderer::Draw(RenderFrame& frame)
     if (m_DebugTextureToDraw == 4) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     } 
-    if (m_DebugTextureToDraw == 5) {
-        m_DrawScreenQuadPass->Draw(m_ShadowPass->DepthMap(0));
-    }
+    //if (m_DebugTextureToDraw == 5) {
+    //    m_DrawScreenQuadPass->Draw(m_ShadowPass->DepthMap());
+    //}
 
     m_ImGuiRenderPass->Draw();
 	glfwSwapBuffers(m_Window);

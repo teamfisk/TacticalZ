@@ -320,15 +320,15 @@ void DrawFinalPass::BindModelTextures(std::shared_ptr<ModelJob>& job)
         glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
     }
 
-	for (int i = 0; i < m_ShadowPass->CurrentNrOfSplits(); i++)
-	{ 
-		glActiveTexture(GL_TEXTURE4 + i);
-		if (m_ShadowPass->DepthMap(i) != NULL) {
-		    glBindTexture(GL_TEXTURE_2D, m_ShadowPass->DepthMap(i));
+	//for (int i = 0; i < m_ShadowPass->CurrentNrOfSplits(); i++)
+	//{ 
+		glActiveTexture(GL_TEXTURE4);
+		if (m_ShadowPass->DepthMap() != NULL) {
+		    glBindTexture(GL_TEXTURE_2D_ARRAY, m_ShadowPass->DepthMap());
 		} else {
-		    glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+		    glBindTexture(GL_TEXTURE_2D_ARRAY, m_WhiteTexture->m_Texture);
 		}
-	}
+	//}
 
 
 }

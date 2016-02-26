@@ -106,26 +106,37 @@ float ShadowPass::FindRadius(Frustum& frustum)
 
 void ShadowPass::InitializeFrameBuffers()
 {
-    // Depth texture
-    glGenTextures(m_CurrentNrOfSplits, m_DepthMap.data());
+	GLERROR("depthMap failed PRE");
+	// Depth texture
+    glGenTextures(1, &m_DepthMap);
 
-	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		glBindTexture(GL_TEXTURE_2D, m_DepthMap[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth / (1 /*+ i*/), m_ResolutionSizeHeigth + (1 /*+ i*/), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::vec4(1.f).data);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-		//glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+	GLERROR("depthMap failed1");
+	glBindTexture(GL_TEXTURE_2D_ARRAY, m_DepthMap);
+	GLERROR("depthMap failed2");
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth, m_ResolutionSizeHeigth, m_CurrentNrOfSplits);
+	GLERROR("depthMap failed3");
 
-		m_DepthBuffer[i].AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap[i], GL_DEPTH_ATTACHMENT)));
-		m_DepthBuffer[i].Generate();
-	}
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeigth, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+	GLERROR("depthMap failed4");
 
-    GLERROR("depthMap failed");
+	//for (int i = 0; i < m_CurrentNrOfSplits; i++) {
+	//	glBindTexture(GL_TEXTURE_2D, m_DepthMap[i]);
+	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth / (1 /*+ i*/), m_ResolutionSizeHeigth + (1 /*+ i*/), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, glm::vec4(1.f).data);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	//glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+	GLERROR("depthMap failed5");
+
+	m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2DArray(&m_DepthMap, GL_DEPTH_ATTACHMENT, m_CurrentNrOfSplits)));
+	m_DepthBuffer.Generate();
+	//}
+
+    GLERROR("depthMap failed END");
 }
 
 void ShadowPass::InitializeShaderPrograms()
@@ -141,10 +152,10 @@ void ShadowPass::InitializeShaderPrograms()
 void ShadowPass::ClearBuffer()
 {
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		m_DepthBuffer[i].Bind();
+		m_DepthBuffer.Bind();
 		glClearColor(0.f, 0.f, 0.f, 0.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		m_DepthBuffer[i].Unbind();
+		m_DepthBuffer.Unbind();
 	}
 }
 
@@ -192,7 +203,7 @@ void ShadowPass::Draw(RenderScene & scene)
 		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward(), scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
 		//float test = FindRadius(m_shadFrusta[i]);
 
-		ShadowPassState* state = new ShadowPassState(m_DepthBuffer[i].GetHandle());
+		ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
 
 		GLuint shaderHandle = m_ShadowProgram->GetHandle();
 		m_ShadowProgram->Bind();
@@ -230,7 +241,7 @@ void ShadowPass::Draw(RenderScene & scene)
 						GLERROR("Shadow Draw ERROR");
 					}
 				}
-				m_DepthBuffer[i].Unbind();
+				m_DepthBuffer.Unbind();
 
 				delete state;
 			}

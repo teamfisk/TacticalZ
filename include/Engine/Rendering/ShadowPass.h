@@ -39,7 +39,8 @@ public:
     void ClearBuffer();
     void Draw(RenderScene& scene);
 
-    GLuint DepthMap(int level) const { return m_DepthMap[level]; }
+    //GLuint DepthMap(int level) const { return m_DepthMap[level]; }
+	GLuint DepthMap() const { return m_DepthMap; }
 	std::array<glm::mat4, MAX_SPLITS> LightP() const { return m_LightProjection; }
 	std::array<glm::mat4, MAX_SPLITS> LightV() const { return m_LightView; }
 	std::array<float, MAX_SPLITS> FarDistance() const { return { m_shadowFrusta[0].FarClip, m_shadowFrusta[1].FarClip, m_shadowFrusta[2].FarClip, m_shadowFrusta[3].FarClip }; }
@@ -55,8 +56,10 @@ private:
 	EventBroker* m_EventBroker;
 	const IRenderer* m_Renderer;
 
-	std::array<GLuint, MAX_SPLITS> m_DepthMap;
-	std::array<FrameBuffer, MAX_SPLITS> m_DepthBuffer;
+	//std::array<GLuint, MAX_SPLITS> m_DepthMap;
+	//std::array<FrameBuffer, MAX_SPLITS> m_DepthBuffer;
+	GLuint m_DepthMap;
+	FrameBuffer m_DepthBuffer;
 
 	std::array<glm::mat4, MAX_SPLITS> m_LightProjection;
 	std::array<glm::mat4, MAX_SPLITS> m_LightView;

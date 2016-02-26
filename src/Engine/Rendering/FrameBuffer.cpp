@@ -9,6 +9,14 @@ BufferResource::BufferResource(GLuint* resourceHandle, GLenum resourceType, GLen
     m_Attachment = attachment;
 }
 
+BufferResource::BufferResource(GLuint* resourceHandle, GLenum resourceType, GLenum attachment, GLuint layers)
+{
+	m_ResourceHandle = resourceHandle;
+	m_ResourceType = resourceType;
+	m_Attachment = attachment;
+	m_Layers = layers;
+}
+
 Texture2D::~Texture2D()
 {
     if (m_ResourceHandle != 0) {
@@ -16,6 +24,12 @@ Texture2D::~Texture2D()
     }
 }
 
+Texture2DArray::~Texture2DArray()
+{
+	if (m_ResourceHandle != 0) {
+		glDeleteTextures(1, m_ResourceHandle);
+	}
+}
 
 RenderBuffer::~RenderBuffer()
 {
@@ -48,18 +62,22 @@ void FrameBuffer::Generate()
         switch ((*it)->m_ResourceType) {
         case GL_TEXTURE_2D:
             glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
+			attachments.push_back((*it)->m_Attachment);
             GLERROR("FrameBuffer generate: glFramebufferTexture2D");
             break;
         case GL_RENDERBUFFER:
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
             GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
             break;
+		case GL_TEXTURE_2D_ARRAY:
+			glFramebufferTexture(GL_FRAMEBUFFER, (*it)->m_Attachment, *(*it)->m_ResourceHandle, 0);
+			attachments.push_back((*it)->m_Attachment);
+			GLERROR("FrameBuffer generate: GL_TEXTURE_2D_ARRAY");
+
+			break;
         }
         
 
-        if ((*it)->m_ResourceType == GL_TEXTURE_2D) {
-            attachments.push_back((*it)->m_Attachment);
-        }
     }
         
     GLenum* bufferTextures = &attachments[0];

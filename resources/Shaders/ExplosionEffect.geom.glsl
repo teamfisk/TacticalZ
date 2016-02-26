@@ -1,6 +1,6 @@
 #version 430
 
-#define MAX_SPLITS 3
+#define MAX_SPLITS 4
 
 uniform mat4 M;
 uniform mat4 V;
