@@ -601,7 +601,7 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    auto children = m_World->GetChildren(childEntity.ID);
+    auto children = m_World->GetDirectChildren(childEntity.ID);
     for (auto it = children.first; it != children.second; it++) {
         EntityWrapper child(m_World, it->second);
         if(child.HasComponent("CapturePoint")) {
