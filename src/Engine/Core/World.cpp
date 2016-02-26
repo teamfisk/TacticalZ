@@ -151,6 +151,17 @@ std::string World::GetName(EntityID entity) const
     }
 }
 
+std::size_t World::MemoryUsage() const
+{
+    std::size_t mem = 0;
+
+    for (auto& kv : m_ComponentPools) {
+        mem += kv.second->MemoryUsage();
+    }
+
+    return mem;
+}
+
 EntityID World::generateEntityID()
 {
     // TODO: Make EntityID generation smarter

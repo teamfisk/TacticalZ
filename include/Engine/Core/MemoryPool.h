@@ -194,6 +194,11 @@ public:
 		return m_ExtraMemory.size();
 	}
 
+    std::size_t MemoryUsage() const
+    {
+        return size() * m_Stride;
+    }
+
 	//Dumps information about what the pool memory looks like right now 
 	//into an output stream (e.g. file/std::cout, anything that has an operator<<)
 	//Interpret the data in the memory as InterpretType.

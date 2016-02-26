@@ -112,6 +112,11 @@ size_t ComponentPool::size() const
     return m_Pool.size();
 }
 
+std::size_t ComponentPool::MemoryUsage() const
+{
+    return m_Pool.MemoryUsage();
+}
+
 template <typename InterpretType /*= char*/>
 void ComponentPool::Dump() const
 {

@@ -50,6 +50,9 @@ public:
     // Get the textual name of an entity
     std::string GetName(EntityID entity) const;
 
+    // Get an approximate number for component pool memory usage
+    std::size_t MemoryUsage() const;
+
 private:
     EventBroker* m_EventBroker = nullptr;
     EntityID m_CurrentEntityID = 0;

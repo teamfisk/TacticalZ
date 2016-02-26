@@ -65,6 +65,8 @@ public:
 	iterator end() const;
     size_t size() const;
 
+    std::size_t MemoryUsage() const;
+
 	//Dumps information about what the pool memory looks like right now 
 	//into an output stream (e.g. file/std::cout, anything that has an operator<<)
 	//Interpret the data in the memory as InterpretType.
