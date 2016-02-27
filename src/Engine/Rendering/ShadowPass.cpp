@@ -1,6 +1,16 @@
 #include "Rendering/ShadowPass.h"
 
 
+ShadowPass::ShadowPass(IRenderer * renderer, int shadow_res_x, int shadow_res_y)
+{
+	m_Renderer = renderer;
+	m_ResolutionSizeWidth = shadow_res_x;
+	m_ResolutionSizeHeight = shadow_res_y;
+
+	InitializeFrameBuffers();
+	InitializeShaderPrograms();
+}
+
 ShadowPass::ShadowPass(IRenderer * renderer)
 {
 	m_Renderer = renderer;
@@ -41,8 +51,28 @@ void ShadowPass::UpdateSplitDist(std::array<Frustum, MAX_SPLITS>& frusta, float 
 	frusta[m_CurrentNrOfSplits - 1].FarClip = far_distance;
 }
 
+void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::mat4 p, glm::mat4 v)
+{
+	std::array<glm::vec4, 8> CornerPoint = { 
+		glm::vec4(-1.f, -1.f,	-1.f,	1.f),
+		glm::vec4(-1.f, 1.f,	-1.f,	1.f),
+		glm::vec4(1.f,	1.f,	-1.f,	1.f),
+		glm::vec4(1.f,	-1.f,	-1.f,	1.f),
+		glm::vec4(-1.f,	-1.f,	1.f,	1.f),
+		glm::vec4(-1.f,	1.f,	1.f,	1.f),
+		glm::vec4(1.f,	1.f,	1.f,	1.f),
+		glm::vec4(1.f,	-1.f,	1.f,	1.f)
+	};
+
+	for (int i = 0; i < 8; i++) {
+		glm::vec4 NDC = glm::inverse(p) * CornerPoint[i];
+		NDC = NDC / NDC.w;
+		frustum.CornerPoint[i] = glm::vec3(glm::inverse(v) * NDC);
+	}
+}
+
 // Compute the 8 corner points of the current view frustum in world space
-void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position, glm::vec3 view_dir, glm::mat4 p, glm::mat4 v)
+void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position, glm::vec3 view_dir)
 {
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 	glm::vec3 right = glm::normalize(glm::cross(view_dir, up));
@@ -68,25 +98,6 @@ void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position
 	frustum.CornerPoint[5] = far_center + up * far_height - right * far_width;
 	frustum.CornerPoint[6] = far_center + up * far_height + right * far_width;
 	frustum.CornerPoint[7] = far_center - up * far_height + right * far_width;
-
-	// Alternative way.
-	//std::array<glm::vec4, 8> CornerPoint = { 
-	//	glm::vec4(-1.f, -1.f,	-1.f,	1.f),
-	//	glm::vec4(-1.f, 1.f,	-1.f,	1.f),
-	//	glm::vec4(1.f,	1.f,	-1.f,	1.f),
-	//	glm::vec4(1.f,	-1.f,	-1.f,	1.f),
-	//	glm::vec4(-1.f,	-1.f,	1.f,	1.f),
-	//	glm::vec4(-1.f,	1.f,	1.f,	1.f),
-	//	glm::vec4(1.f,	1.f,	1.f,	1.f),
-	//	glm::vec4(1.f,	-1.f,	1.f,	1.f) };
-
-	//std::array<glm::vec3, 8> FinalPoints;
-
-	//for (int i = 0; i < 8; i++) {
-	//	glm::vec4 NDC = glm::inverse(p) * CornerPoint[i];
-	//	NDC = NDC / NDC.w;
-	//	FinalPoints[i] = glm::vec3(glm::inverse(v) * NDC);
-	//}
 }
 
 float ShadowPass::FindRadius(Frustum& frustum)
@@ -106,18 +117,13 @@ float ShadowPass::FindRadius(Frustum& frustum)
 
 void ShadowPass::InitializeFrameBuffers()
 {
-	GLERROR("depthMap failed PRE");
 	// Depth texture
     glGenTextures(1, &m_DepthMap);
 
-	GLERROR("depthMap failed1");
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_DepthMap);
-	GLERROR("depthMap failed2");
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth, m_ResolutionSizeHeigth, m_CurrentNrOfSplits);
-	GLERROR("depthMap failed3");
+	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits);
 
-	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeigth, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
-	GLERROR("depthMap failed4");
+	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -126,11 +132,9 @@ void ShadowPass::InitializeFrameBuffers()
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, glm::vec4(1.f).data);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	GLERROR("depthMap failed5");
 
 	m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2DArray(&m_DepthMap, GL_DEPTH_ATTACHMENT, m_CurrentNrOfSplits)));
 	m_DepthBuffer.Generate();
-	//}
 
     GLERROR("depthMap failed END");
 }
@@ -178,7 +182,7 @@ void ShadowPass::PointsToLightspace(Frustum& frustum, glm::mat4 v)
 	frustum.LRBT = { left, right, bottom, top };
 }
 
-void ShadowPass::RadiusToLightspace(Frustum& frustum, glm::mat4 v)
+void ShadowPass::RadiusToLightspace(Frustum& frustum)
 {
 	float left = -frustum.Radius;
 	float right = frustum.Radius;
@@ -190,10 +194,7 @@ void ShadowPass::RadiusToLightspace(Frustum& frustum, glm::mat4 v)
 
 void ShadowPass::Draw(RenderScene & scene)
 {
-//	ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
 	ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
-	ImGui::Checkbox("EnableShadow", &m_ShadowOn);
-	//ImGui::DragInt("ShadowLevel", &m_ShadowLevel, 0.05f, 0, m_CurrentNrOfSplits - 1);
 
 	InitializeCameras(scene);
 	UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
@@ -201,19 +202,14 @@ void ShadowPass::Draw(RenderScene & scene)
 	ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
 
 	m_ShadowProgram->Bind();
+	GLuint shaderHandle = m_ShadowProgram->GetHandle();
+	glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight);
 
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward(), scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
-		//float test = FindRadius(m_shadFrusta[i]);
-
-		GLuint shaderHandle = m_ShadowProgram->GetHandle();
+		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward());
 		
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
-
-		glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeigth);
 		
-		//state->Disable(GL_CULL_FACE);
-
 		for (auto &job : scene.DirectionalLightJobs) {
 			auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
@@ -221,7 +217,7 @@ void ShadowPass::Draw(RenderScene & scene)
 				m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
 
 				PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
-				m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[Left], m_shadowFrusta[i].LRBT[Right], m_shadowFrusta[i].LRBT[Bottom], m_shadowFrusta[i].LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
+				m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[LEFT], m_shadowFrusta[i].LRBT[RIGHT], m_shadowFrusta[i].LRBT[BOTTOM], m_shadowFrusta[i].LRBT[TOP], m_NearFarPlane[NEAR], m_NearFarPlane[FAR]);
 
 				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
 				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
@@ -240,14 +236,10 @@ void ShadowPass::Draw(RenderScene & scene)
 					GLERROR("Shadow Draw ERROR");
 				}
 			}
-
 		}
-
-		glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-
-		m_ShadowProgram->Unbind();
-
 	}
+	m_ShadowProgram->Unbind();
+	glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 	m_DepthBuffer.Unbind();
 	delete state;
 }

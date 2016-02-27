@@ -18,7 +18,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
 	auto cCamera = m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
-	(double&)cCamera["FarClip"] = 60.0;
+	(double&)cCamera["FarClip"] = 300.0;
 
     m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1);
 

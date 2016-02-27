@@ -1,7 +1,6 @@
 #version 430
 
 #define MAX_SPLITS 4
-#define SPLIT_WEIGHT 0.7
 
 uniform mat4 M;
 uniform mat4 V;
@@ -139,6 +138,7 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
+// Returns a "random" value.
 float Random(vec3 seed, int i)
 {
 	vec4 seed4 = vec4(seed, i);
@@ -162,7 +162,7 @@ float PoissonShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_co
     for (int i = 0; i < taps; i++)
 	{
 		loop = i;
-		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * SPLIT_WEIGHT * (1.0 + layer_index));
+		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * (1.0 + layer_index));
 		shadowMapDepth += multiplier * texture(depth_texture_array, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
 	}
 	
@@ -179,7 +179,7 @@ float PoissonDotShadow(sampler2DArrayShadow depth_texture_array, vec3 projection
     for (int i = 0; i < taps; i++)
 	{
 		loop = int(16.0 * Random(gl_FragCoord.xyy, i)) % 16;
-		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * SPLIT_WEIGHT * (1.0 + layer_index));
+		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * (1.0 + layer_index));
 		shadowMapDepth += multiplier * texture(depth_texture_array, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
 	}
 	
@@ -196,7 +196,7 @@ float SoftwarePCF(sampler2DArrayShadow depth_texture_array, vec3 projection_coor
 	{
 		for(int y = -1; y <= 1; y++)
 		{
-			shadow += texture(depth_texture_array, vec4(projection_coords.xy + vec2(x, y) * texelSize.xy, layer_index, projection_coords.z)); 
+			shadow += texture(depth_texture_array, vec4(projection_coords.xy + vec2(x, y) * texelSize.xy / (1.0 + layer_index), layer_index, projection_coords.z)); 
 		}    
 	}
 	
@@ -206,42 +206,79 @@ float SoftwarePCF(sampler2DArrayShadow depth_texture_array, vec3 projection_coor
 float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler2DArrayShadow depth_texture_array, int layer_index)
 {
 	float shadowMapDepth;
-	float bias;
+	float bias = 0.005;
 	
 	// Various bias methods.
 	
-	//bias = 0.005;
-	//bias = max(0.05 * (1.0 - dot(normal, light_dir)), 0.005);
-	bias = 0.005 * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
+	bias = max(0.05 * (1.0 - dot(normal, light_dir)), bias);
+	//bias = bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
 	
-	// Calculate coordinates in projection space
+	// Calculate coordinates in projection space.
+	
     vec3 projCoords = vec3(light_space_pos.xy, light_space_pos.z + bias) / light_space_pos.w;
     projCoords = projCoords * 0.5 + 0.5;
 	
 	// Various methods for shadow calculation in fastest to slowest order.
 	
 	shadowMapDepth = PCFShadow(depth_texture_array, projCoords, layer_index);
-	//shadowMapDepth = PoissonShadow(depth_texture_array, projCoords, layer_index, 4, 1500.0);
-	//shadowMapDepth = PoissonDotShadow(depth_texture_array, projCoords, layer_index, 4, 1500.0);
+	//shadowMapDepth = PoissonShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS - 1]);
+	//shadowMapDepth = PoissonDotShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS]);
 	//shadowMapDepth = SoftwarePCF(depth_texture_array, projCoords, layer_index, bias);
-	
-	float shadow = 1.0 - shadowMapDepth;
 
-    return shadow;
+    return 1.0 - shadowMapDepth;
 } 
 
-int getShadowIndex(float far_distance[MAX_SPLITS])
+int getShadowIndex(float far_distance[1])
+{
+	return 0;
+}
+
+int getShadowIndex(float far_distance[2])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 1;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+
+	return index;
+}
+
+int getShadowIndex(float far_distance[3])
 {
 	float depth = gl_FragCoord.z / gl_FragCoord.w;
 	
 	int index = 2;
-	if( depth < far_distance[0] )
+	if ( depth < far_distance[0] )
 	{
 		index = 0;
 	}
-	else if( depth < far_distance[1] && depth > far_distance[0] )
+	else if ( depth < far_distance[1] && depth > far_distance[0] )
 	{
 		index = 1;
+	}
+
+	return index;
+}
+
+int getShadowIndex(float far_distance[4])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 3;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+	else if ( depth < far_distance[1] && depth > far_distance[0] )
+	{
+		index = 1;
+	}
+	else if ( depth < far_distance[2] && depth > far_distance[1] )
+	{
+		index = 2;
 	}
 
 	return index;
@@ -282,9 +319,7 @@ void main()
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
 			int DepthMapIndex = getShadowIndex(FarDistance);
-			
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
-			
 			shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap, DepthMapIndex);
 		}
 	
@@ -298,19 +333,7 @@ void main()
 	//LightResult getInformation;
 	
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
-	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
-	
-	//color_result = (totalLighting.Diffuse + (1.0 - shadowFactor) * (getInformation.Diffuse + (getInformation.Specular * specularTexel))) * color_result;
-	
-
-	
-	
-
-	
-	
-	
-	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
-	
+	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
 
