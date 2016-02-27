@@ -119,9 +119,6 @@ void ShadowPass::InitializeFrameBuffers()
 	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeigth, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 	GLERROR("depthMap failed4");
 
-	//for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-	//	glBindTexture(GL_TEXTURE_2D, m_DepthMap[i]);
-	//	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth / (1 /*+ i*/), m_ResolutionSizeHeigth + (1 /*+ i*/), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
@@ -129,7 +126,6 @@ void ShadowPass::InitializeFrameBuffers()
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, glm::vec4(1.f).data);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-	//glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 	GLERROR("depthMap failed5");
 
 	m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2DArray(&m_DepthMap, GL_DEPTH_ATTACHMENT, m_CurrentNrOfSplits)));
@@ -151,12 +147,15 @@ void ShadowPass::InitializeShaderPrograms()
 
 void ShadowPass::ClearBuffer()
 {
+	m_DepthBuffer.Bind();
+
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		m_DepthBuffer.Bind();
-		glClearColor(0.f, 0.f, 0.f, 0.f);
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		m_DepthBuffer.Unbind();
 	}
+
+	m_DepthBuffer.Unbind();
 }
 
 void ShadowPass::PointsToLightspace(Frustum& frustum, glm::mat4 v)
@@ -191,67 +190,64 @@ void ShadowPass::RadiusToLightspace(Frustum& frustum, glm::mat4 v)
 
 void ShadowPass::Draw(RenderScene & scene)
 {
-	ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
+//	ImGui::DragFloat4("ShadowMapCam", m_LRBT, 1.f, -1000.f, 1000.f);
 	ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
 	ImGui::Checkbox("EnableShadow", &m_ShadowOn);
-	ImGui::DragInt("ShadowLevel", &m_ShadowLevel, 0.05f, 0, m_CurrentNrOfSplits - 1);
+	//ImGui::DragInt("ShadowLevel", &m_ShadowLevel, 0.05f, 0, m_CurrentNrOfSplits - 1);
 
 	InitializeCameras(scene);
 	UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
 	
+	ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
+
+	m_ShadowProgram->Bind();
+
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
 		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward(), scene.Camera->ProjectionMatrix(), scene.Camera->ViewMatrix());
 		//float test = FindRadius(m_shadFrusta[i]);
 
-		ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
-
 		GLuint shaderHandle = m_ShadowProgram->GetHandle();
-		m_ShadowProgram->Bind();
+		
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
 
-		glViewport(0, 0, m_ResolutionSizeWidth / (1/* + i*/), m_ResolutionSizeHeigth);
-		glDisable(GL_TEXTURE_2D);
-		glCullFace(GL_FRONT);
+		glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeigth);
+		
 		//state->Disable(GL_CULL_FACE);
 
-		if (m_ShadowOn == true)
-		{
-			for (auto &job : scene.DirectionalLightJobs) {
-				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
+		for (auto &job : scene.DirectionalLightJobs) {
+			auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
-				if (directionalLightJob) {
-					m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
-					
-					PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
-					m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[Left], m_shadowFrusta[i].LRBT[Right], m_shadowFrusta[i].LRBT[Bottom], m_shadowFrusta[i].LRBT[Top], -30.f, 30.f);
+			if (directionalLightJob) {
+				m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
 
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
+				PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
+				m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[Left], m_shadowFrusta[i].LRBT[Right], m_shadowFrusta[i].LRBT[Bottom], m_shadowFrusta[i].LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
 
-					GLERROR("ShadowLight ERROR");
+				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
+				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
 
-					for (auto &objectJob : scene.OpaqueObjects) {
-						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
-						
-						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+				GLERROR("ShadowLight ERROR");
 
-						glBindVertexArray(modelJob->Model->VAO);
-						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-						glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+				for (auto &objectJob : scene.OpaqueObjects) {
+					auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
-						GLERROR("Shadow Draw ERROR");
-					}
+					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+
+					glBindVertexArray(modelJob->Model->VAO);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+					glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+
+					GLERROR("Shadow Draw ERROR");
 				}
-				m_DepthBuffer.Unbind();
-
-				delete state;
 			}
+
 		}
 
 		glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-		glEnable(GL_TEXTURE_2D);
-		glCullFace(GL_BACK);
 
 		m_ShadowProgram->Unbind();
 
 	}
+	m_DepthBuffer.Unbind();
+	delete state;
 }

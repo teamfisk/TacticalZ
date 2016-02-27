@@ -17,7 +17,7 @@ layout (binding = 0) uniform sampler2D DiffuseTexture;
 layout (binding = 1) uniform sampler2D NormalMapTexture;
 layout (binding = 2) uniform sampler2D SpecularMapTexture;
 layout (binding = 3) uniform sampler2D GlowMapTexture;
-layout (binding = 4) uniform sampler2DShadow DepthMap[MAX_SPLITS];
+layout (binding = 4) uniform sampler2DArrayShadow DepthMap;
 
 
 #define TILE_SIZE 16
@@ -138,32 +138,59 @@ vec2 poissonDisk[16] = vec2[](
    vec2( 0.14383161, -0.14100790 ) 
 );
 
-float random(vec3 seed, int i)
+float Random(vec3 seed, int i)
 {
 	vec4 seed4 = vec4(seed, i);
 	float dot_product = dot(seed4, vec4(12.9898, 78.233, 45.164, 94.673));
 	return fract(sin(dot_product) * 43758.5453);
 }
 
-float CalcShadowValue(vec4 positionLightSpace, vec3 normal, vec3 lightDir, sampler2DShadow depthTexture)
+// Standard hardware-calculated PCF method
+float PCFShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index)
 {
-	
-	//float bias = 0.005;
-	//float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-	float bias = 0.005 * tan(acos(clamp(dot(normal, -lightDir), 0.0, 1.0)));
-	
-    vec3 projCoords = vec3(positionLightSpace.xy, positionLightSpace.z + bias) / positionLightSpace.w;
-    projCoords = projCoords * 0.5 + 0.5;
-    //float shadowMapDepth = texture(depthTexture, projCoords.xy).r; 
+	return texture(depth_texture_array, vec4(projection_coords.xy, layer_index, projection_coords.z));
+}
+
+float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler2DArrayShadow depth_texture_array, int layer_index)
+{
 	float shadowMapDepth;
+	float bias;
+	
+	// Various bias methods.
+	
+	//bias = 0.005;
+	//bias = max(0.05 * (1.0 - dot(normal, light_dir)), 0.005);
+	bias = 0.005 * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
+	
+	// Calculate coordinates in projection space
+    vec3 projCoords = vec3(light_space_pos.xy, light_space_pos.z + bias) / light_space_pos.w;
+    projCoords = projCoords * 0.5 + 0.5;
+	
+	// Various methods for shadow calculation in fastest to slowest order.
+	
+	shadowMapDepth = PCFShadow(depth_texture_array, projCoords, layer_index);
+		
+	// PCF + Four-tap Poisson model method
+	//float SplitWeight = 0.7;
     //for (int i = 0; i < 4; i++)
 	//{
-	//	int index = i;
-	//	//int index = int(16.0 * random(gl_FragCoord.xyy, i)) % 16;
-	//	shadowMapDepth += 0.25 * texture(depthTexture, projCoords + vec3(poissonDisk[index], 0.0) / 700.0); 
+	//	int loop = i;
+	//	vec3 newProjCoords = projCoords + vec3(poissonDisk[loop], 0.0) / (1500.0 * SplitWeight * (1.0 + layer_index));
+	//	shadowMapDepth += 0.25 * texture(depthTexture, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
 	//}
-	
-	shadowMapDepth = texture(depthTexture, projCoords);
+	//
+	//// PCF + Four-tap Poisson model method
+	//float SplitWeight = 0.7;
+    //for (int i = 0; i < 4; i++)
+	//{
+	//	int loop = i;
+	//	vec3 newProjCoords = projCoords + vec3(poissonDisk[loop], 0.0) / (1500.0 * SplitWeight * (1.0 + layer_index));
+	//	//int loop = int(16.0 * Random(gl_FragCoord.xyy, i)) % 16;
+	//	shadowMapDepth += 0.25 * texture(depthTexture, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
+	//}
+		
+
+
 	
 	//float geometryDepth = projCoords.z;
 	//float shadow = geometryDepth - bias > shadowMapDepth ? 1.0 : 0.0;
@@ -242,22 +269,11 @@ void main()
 		if(light.Type == 1) { // point
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
-			//int DepthMapIndex = getShadowIndex(FarDistance);
+			int DepthMapIndex = getShadowIndex(FarDistance);
 			
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 			
-			//if( DepthMapIndex == 0 )
-			//{
-				shadowFactor = CalcShadowValue(Input.PositionLightSpace[0], Input.Normal, vec3(light.Direction), DepthMap[0]);
-			//}
-			//else if( DepthMapIndex == 1 )
-			//{
-			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap1);
-			//}
-			//else 
-			//{
-			//	shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap2);
-			//}
+			shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap, DepthMapIndex);
 		}
 	
 		totalLighting.Diffuse += light_result.Diffuse;

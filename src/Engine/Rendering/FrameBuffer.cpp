@@ -73,7 +73,6 @@ void FrameBuffer::Generate()
 			glFramebufferTexture(GL_FRAMEBUFFER, (*it)->m_Attachment, *(*it)->m_ResourceHandle, 0);
 			attachments.push_back((*it)->m_Attachment);
 			GLERROR("FrameBuffer generate: GL_TEXTURE_2D_ARRAY");
-
 			break;
         }
         

@@ -68,7 +68,7 @@ private:
 	GLuint m_DepthFBO;
 
     GLfloat m_NearFarPlane[2] = { -34.f, 27.f };
-	GLfloat m_LRBT[4] = { -10.f, 10.f, -10.f, 10.f };
+	//GLfloat m_LRBT[4] = { -10.f, 10.f, -10.f, 10.f };
 
     GLuint m_ResolutionSizeWidth = 1024 * 2;
     GLuint m_ResolutionSizeHeigth = 1024 * 2;
@@ -77,7 +77,7 @@ private:
 	int m_ShadowLevel = 0;
 
 	int m_CurrentNrOfSplits = 3;
-	float m_SplitWeight = 0.75f;
+	float m_SplitWeight = 0.7f;
 
 	std::array<Frustum, MAX_SPLITS> m_shadowFrusta;
 };
