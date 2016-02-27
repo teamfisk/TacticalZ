@@ -226,6 +226,12 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
     glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(job->FillColor));
     glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), job->FillPercentage);
     glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+
+	//Shadow
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
+	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
+
     GLERROR("END");
 }
 
@@ -248,13 +254,6 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
 	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
 
-
-    //GLfloat m_NearFarPlane[2] = { -40.f, 30.f };
-    //GLfloat m_LRBT[4] = { -40.f, 100.f, -50.f, 50.f };
-    //glm::mat4 m_LightProjection = glm::ortho(m_LRBT[Left], m_LRBT[Right], m_LRBT[Bottom], m_LRBT[Top], m_NearFarPlane[Near], m_NearFarPlane[Far]);
-    //glm::mat4 m_LightView = glm::lookAt(glm::vec3(-20.0f, 20.0f, -20.0f), glm::vec3(0.0f), glm::vec3(1.0));
-    //glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), 1, GL_FALSE, glm::value_ptr(m_LightProjection));
-    //glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), 1, GL_FALSE, glm::value_ptr(m_LightView));
     GLERROR("END");
 }
 

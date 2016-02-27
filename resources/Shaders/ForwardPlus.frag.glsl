@@ -210,8 +210,8 @@ float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler
 	
 	// Various bias methods.
 	
-	bias = max(0.05 * (1.0 - dot(normal, light_dir)), bias);
-	//bias = bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
+	//bias = max(0.05 * (1.0 - dot(normal, light_dir)), bias);
+	bias = bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
 	
 	// Calculate coordinates in projection space.
 	

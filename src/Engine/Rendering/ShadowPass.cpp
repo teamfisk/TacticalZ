@@ -53,7 +53,7 @@ void ShadowPass::UpdateSplitDist(std::array<Frustum, MAX_SPLITS>& frusta, float 
 
 void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::mat4 p, glm::mat4 v)
 {
-	std::array<glm::vec4, 8> CornerPoint = { 
+	std::array<glm::vec4, 8> CornerPoint = {
 		glm::vec4(-1.f, -1.f,	-1.f,	1.f),
 		glm::vec4(-1.f, 1.f,	-1.f,	1.f),
 		glm::vec4(1.f,	1.f,	-1.f,	1.f),
@@ -81,7 +81,7 @@ void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position
 	glm::vec3 near_center = camera_position + glm::normalize(view_dir) * frustum.NearClip;
 	frustum.MiddlePoint = near_center + (far_center - near_center) * 0.5f;
 
- 	up = glm::normalize(glm::cross(right, view_dir));
+	up = glm::normalize(glm::cross(right, view_dir));
 
 	// these heights and widths are half the heights and widths of the near and far plane rectangles.
 	float near_height = tan(frustum.FOV / 2.f) * frustum.NearClip;
@@ -118,7 +118,7 @@ float ShadowPass::FindRadius(Frustum& frustum)
 void ShadowPass::InitializeFrameBuffers()
 {
 	// Depth texture
-    glGenTextures(1, &m_DepthMap);
+	glGenTextures(1, &m_DepthMap);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_DepthMap);
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits);
@@ -136,17 +136,17 @@ void ShadowPass::InitializeFrameBuffers()
 	m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2DArray(&m_DepthMap, GL_DEPTH_ATTACHMENT, m_CurrentNrOfSplits)));
 	m_DepthBuffer.Generate();
 
-    GLERROR("depthMap failed END");
+	GLERROR("depthMap failed END");
 }
 
 void ShadowPass::InitializeShaderPrograms()
 {
-    m_ShadowProgram = ResourceManager::Load<ShaderProgram>("#ShadowProgram");
-    m_ShadowProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Shadow.vert.glsl")));
-    m_ShadowProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Shadow.frag.glsl")));
-    m_ShadowProgram->Compile();
-    m_ShadowProgram->BindFragDataLocation(0, "ShadowMap");
-    m_ShadowProgram->Link();
+	m_ShadowProgram = ResourceManager::Load<ShaderProgram>("#ShadowProgram");
+	m_ShadowProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Shadow.vert.glsl")));
+	m_ShadowProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Shadow.frag.glsl")));
+	m_ShadowProgram->Compile();
+	m_ShadowProgram->BindFragDataLocation(0, "ShadowMap");
+	m_ShadowProgram->Link();
 }
 
 void ShadowPass::ClearBuffer()
@@ -155,7 +155,7 @@ void ShadowPass::ClearBuffer()
 
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
-		
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
@@ -187,7 +187,7 @@ void ShadowPass::RadiusToLightspace(Frustum& frustum)
 	float left = -frustum.Radius;
 	float right = frustum.Radius;
 	float bottom = -frustum.Radius;
-	float top =frustum.Radius;
+	float top = frustum.Radius;
 
 	frustum.LRBT = { left, right, bottom, top };
 }
@@ -198,7 +198,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
 	InitializeCameras(scene);
 	UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
-	
+
 	ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
 
 	m_ShadowProgram->Bind();
@@ -207,9 +207,9 @@ void ShadowPass::Draw(RenderScene & scene)
 
 	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
 		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward());
-		
+
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
-		
+
 		for (auto &job : scene.DirectionalLightJobs) {
 			auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
@@ -235,6 +235,20 @@ void ShadowPass::Draw(RenderScene & scene)
 
 					GLERROR("Shadow Draw ERROR");
 				}
+
+				state->CullFace(GL_BACK);
+				for (auto &objectJob : scene.TransparentObjects) {
+					auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
+
+					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+
+					glBindVertexArray(modelJob->Model->VAO);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+					glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+
+					GLERROR("Shadow Draw ERROR");
+				}
+				state->CullFace(GL_FRONT);
 			}
 		}
 	}

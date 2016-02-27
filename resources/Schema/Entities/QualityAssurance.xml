@@ -569,7 +569,7 @@
           <Components>
             <c:Model>
               <Resource>Models/Core/UnitCube.mesh</Resource>
-              <Color A="0.505882382" B="0" G="1" R="0"/>
+              <Color A="0.2" B="0" G="1" R="0"/>
               <Transparent>true</Transparent>
             </c:Model>
             <c:Transform>
