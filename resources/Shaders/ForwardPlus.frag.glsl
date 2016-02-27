@@ -1,6 +1,7 @@
 #version 430
 
 #define MAX_SPLITS 4
+#define SPLIT_WEIGHT 0.7
 
 uniform mat4 M;
 uniform mat4 V;
@@ -73,6 +74,25 @@ struct LightResult {
 	vec4 Specular;
 };
 
+vec2 poissonDisk[16] = vec2[]( 
+	vec2( -0.94201624, -0.39906216 ), 
+	vec2( 0.94558609, -0.76890725 ), 
+	vec2( -0.094184101, -0.92938870 ), 
+	vec2( 0.34495938, 0.29387760 ), 
+	vec2( -0.91588581, 0.45771432 ), 
+	vec2( -0.81544232, -0.87912464 ), 
+	vec2( -0.38277543, 0.27676845 ), 
+	vec2( 0.97484398, 0.75648379 ), 
+	vec2( 0.44323325, -0.97511554 ), 
+	vec2( 0.53742981, -0.47373420 ), 
+	vec2( -0.26496911, -0.41893023 ), 
+	vec2( 0.79197514, 0.19090188 ), 
+	vec2( -0.24188840, 0.99706507 ), 
+	vec2( -0.81409955, 0.91437590 ), 
+	vec2( 0.19984126, 0.78641367 ), 
+	vec2( 0.14383161, -0.14100790 ) 
+	);
+
 float CalcAttenuation(float radius, float dist, float falloff) {
 	return 1.0 - smoothstep(radius * 0.3, radius, dist);
 }
@@ -119,25 +139,6 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
-vec2 poissonDisk[16] = vec2[]( 
-   vec2( -0.94201624, -0.39906216 ), 
-   vec2( 0.94558609, -0.76890725 ), 
-   vec2( -0.094184101, -0.92938870 ), 
-   vec2( 0.34495938, 0.29387760 ), 
-   vec2( -0.91588581, 0.45771432 ), 
-   vec2( -0.81544232, -0.87912464 ), 
-   vec2( -0.38277543, 0.27676845 ), 
-   vec2( 0.97484398, 0.75648379 ), 
-   vec2( 0.44323325, -0.97511554 ), 
-   vec2( 0.53742981, -0.47373420 ), 
-   vec2( -0.26496911, -0.41893023 ), 
-   vec2( 0.79197514, 0.19090188 ), 
-   vec2( -0.24188840, 0.99706507 ), 
-   vec2( -0.81409955, 0.91437590 ), 
-   vec2( 0.19984126, 0.78641367 ), 
-   vec2( 0.14383161, -0.14100790 ) 
-);
-
 float Random(vec3 seed, int i)
 {
 	vec4 seed4 = vec4(seed, i);
@@ -149,6 +150,57 @@ float Random(vec3 seed, int i)
 float PCFShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index)
 {
 	return texture(depth_texture_array, vec4(projection_coords.xy, layer_index, projection_coords.z));
+}
+
+// PCF + Poisson model method
+float PoissonShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index, int taps, float spread)
+{
+	int loop;
+	float multiplier = 1.0 / float(taps);
+	float shadowMapDepth;
+	
+    for (int i = 0; i < taps; i++)
+	{
+		loop = i;
+		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * SPLIT_WEIGHT * (1.0 + layer_index));
+		shadowMapDepth += multiplier * texture(depth_texture_array, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
+	}
+	
+	return shadowMapDepth;
+}
+
+// PCF + Poisson + RandomSample model method
+float PoissonDotShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index, int taps, float spread)
+{
+	int loop;
+	float multiplier = 1.0 / float(taps);
+	float shadowMapDepth;
+	
+    for (int i = 0; i < taps; i++)
+	{
+		loop = int(16.0 * Random(gl_FragCoord.xyy, i)) % 16;
+		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * SPLIT_WEIGHT * (1.0 + layer_index));
+		shadowMapDepth += multiplier * texture(depth_texture_array, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
+	}
+	
+	return shadowMapDepth;
+}
+
+// Hardware PCF + Additional software PCF method
+float SoftwarePCF(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index, float bias)
+{
+	float shadow = 0.0;
+	
+	vec3 texelSize = 1.0 / textureSize(depth_texture_array, 0);
+	for(int x = -1; x <= 1; x++)
+	{
+		for(int y = -1; y <= 1; y++)
+		{
+			shadow += texture(depth_texture_array, vec4(projection_coords.xy + vec2(x, y) * texelSize.xy, layer_index, projection_coords.z)); 
+		}    
+	}
+	
+	return shadow / 9.0;
 }
 
 float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler2DArrayShadow depth_texture_array, int layer_index)
@@ -169,53 +221,13 @@ float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler
 	// Various methods for shadow calculation in fastest to slowest order.
 	
 	shadowMapDepth = PCFShadow(depth_texture_array, projCoords, layer_index);
-		
-	// PCF + Four-tap Poisson model method
-	//float SplitWeight = 0.7;
-    //for (int i = 0; i < 4; i++)
-	//{
-	//	int loop = i;
-	//	vec3 newProjCoords = projCoords + vec3(poissonDisk[loop], 0.0) / (1500.0 * SplitWeight * (1.0 + layer_index));
-	//	shadowMapDepth += 0.25 * texture(depthTexture, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
-	//}
-	//
-	//// PCF + Four-tap Poisson model method
-	//float SplitWeight = 0.7;
-    //for (int i = 0; i < 4; i++)
-	//{
-	//	int loop = i;
-	//	vec3 newProjCoords = projCoords + vec3(poissonDisk[loop], 0.0) / (1500.0 * SplitWeight * (1.0 + layer_index));
-	//	//int loop = int(16.0 * Random(gl_FragCoord.xyy, i)) % 16;
-	//	shadowMapDepth += 0.25 * texture(depthTexture, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
-	//}
-		
-
-
-	
-	//float geometryDepth = projCoords.z;
-	//float shadow = geometryDepth - bias > shadowMapDepth ? 1.0 : 0.0;
-	//float shadow = 1.0 - bias > shadowMapDepth ? 0.0 : 1.0;
+	//shadowMapDepth = PoissonShadow(depth_texture_array, projCoords, layer_index, 4, 1500.0);
+	//shadowMapDepth = PoissonDotShadow(depth_texture_array, projCoords, layer_index, 4, 1500.0);
+	//shadowMapDepth = SoftwarePCF(depth_texture_array, projCoords, layer_index, bias);
 	
 	float shadow = 1.0 - shadowMapDepth;
-	
-	//vec2 texelSize = 1.0 / textureSize(depthTexture, 0);
-	//for(int x = -1; x <= 1; x++)
-	//{
-	//	for(int y = -1; y <= 1; y++)
-	//	{
-	//		float pcfDepth = texture(depthTexture, projCoords.xy + vec2(x, y) * texelSize).r; 
-	//		shadow += geometryDepth - bias > pcfDepth ? 1.0 : 0.0;
-	//	}    
-	//}
-	//shadow /= 9.0;
-	
-	//if(projCoords.z > 1.0)
-	//{
-	//	shadow = 0.0;
-	//}
 
     return shadow;
-	
 } 
 
 int getShadowIndex(float far_distance[MAX_SPLITS])
