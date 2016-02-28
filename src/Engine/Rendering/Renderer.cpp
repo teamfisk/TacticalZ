@@ -143,7 +143,6 @@ void Renderer::Draw(RenderFrame& frame)
 	}
 	PerformanceTimer::StartTimer("Renderer-AO generation");
 	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
-	GLuint ao = m_SSAOPass->SSAOTexture();
 	PerformanceTimer::StopTimer("Renderer-AO generation");
     for (auto scene : frame.RenderScenes){
         
@@ -159,8 +158,8 @@ void Renderer::Draw(RenderFrame& frame)
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Light Culling");
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
+		PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
 		m_DrawFinalPass->Draw(*scene);
-        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 

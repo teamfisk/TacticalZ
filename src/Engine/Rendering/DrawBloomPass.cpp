@@ -9,6 +9,11 @@ DrawBloomPass::DrawBloomPass(IRenderer* renderer, ConfigFile* config)
 	ChangeQuality(m_Config->Get<int>("GLOW.Quality", 2));
 }
 
+void DrawBloomPass::InitializeTextures()
+{
+    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+}
+
 void DrawBloomPass::ChangeQuality(int quality)
 {
 	if (m_Quality == quality) {
@@ -21,19 +26,16 @@ void DrawBloomPass::ChangeQuality(int quality)
 	if (m_Quality == 0) {
 		glDeleteTextures(1, &m_GaussianTexture_horiz);
 		glDeleteTextures(1, &m_GaussianTexture_vert);
+		m_GaussianTexture_horiz = 0;
+		m_GaussianTexture_vert = 0;
 		return;
 	}
-
-	std::string qStr = std::to_string(m_Quality);
-	m_Iterations = m_Config->Get<float>("GLOW" + qStr + ".NumIterations", 0);
+	InitializeTextures();
 
 	InitializeBuffers();
 	InitializeShaderPrograms();
-}
-
-void DrawBloomPass::InitializeTextures()
-{
-    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+	std::string qStr = std::to_string(m_Quality);
+	m_Iterations = m_Config->Get<float>("GLOW" + qStr + ".NumIterations", 0);
 }
 
 void DrawBloomPass::InitializeShaderPrograms()
@@ -55,7 +57,6 @@ void DrawBloomPass::InitializeShaderPrograms()
 	}
 }
 
-
 void DrawBloomPass::InitializeBuffers()
 {
     GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
@@ -63,13 +64,13 @@ void DrawBloomPass::InitializeBuffers()
 	if (m_GaussianFrameBuffer_horiz.GetHandle() == 0) {
 		m_GaussianFrameBuffer_horiz.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_horiz, GL_COLOR_ATTACHMENT0)));
 	}
-    m_GaussianFrameBuffer_horiz.Generate();
+	m_GaussianFrameBuffer_horiz.Generate();
 
     GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
 	if (m_GaussianFrameBuffer_vert.GetHandle() == 0) {
 		m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_vert, GL_COLOR_ATTACHMENT0)));
 	}
-    m_GaussianFrameBuffer_vert.Generate();
+	m_GaussianFrameBuffer_vert.Generate();
 }
 
 
@@ -118,6 +119,7 @@ void DrawBloomPass::Draw(GLuint texture)
         m_GaussianFrameBuffer_vert.Bind();
         m_GaussianProgram_vert->Bind();
 
+		glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
 
         glBindVertexArray(m_ScreenQuad->VAO);
@@ -125,16 +127,19 @@ void DrawBloomPass::Draw(GLuint texture)
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
         //horizontal pass
+		m_GaussianFrameBuffer_vert.Unbind();
 
         m_GaussianFrameBuffer_horiz.Bind();
         m_GaussianProgram_horiz->Bind();
 
+		glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_vert);
 
         glBindVertexArray(m_ScreenQuad->VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
+		m_GaussianFrameBuffer_horiz.Unbind();
     }
 
     //final vertical gaussian after the iterations are done
@@ -142,6 +147,7 @@ void DrawBloomPass::Draw(GLuint texture)
     m_GaussianFrameBuffer_vert.Bind();
     m_GaussianProgram_vert->Bind();
 
+	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
@@ -163,7 +169,7 @@ void DrawBloomPass::OnWindowResize()
     m_GaussianFrameBuffer_horiz.Generate();
 }
 
-void DrawBloomPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
+void DrawBloomPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
 {
 	glDeleteTextures(1, texture);
     glGenTextures(1, texture);

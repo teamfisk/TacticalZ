@@ -28,7 +28,7 @@ public:
 		if (m_Quality == 0) {
 			return m_WhiteTexture->m_Texture;
 		} else {
-			return m_GaussianTexture_vert;
+			return m_Gaussian_vert;
 		}
 	}
 
@@ -46,7 +46,7 @@ private:
 	void InitializeShaderProgram();
 	void InitializeBuffer();
 
-	void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
+	void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 
 	//void blurHorizontal(GLuint depthBuffer);
 	//void blurVertical(GLuint depthBuffer);
@@ -68,14 +68,14 @@ private:
 
 	Texture* m_WhiteTexture;
 
-	GLuint m_SSAOTexture;
+	GLuint m_SSAOTexture = 0;
 	FrameBuffer m_SSAOFramBuffer;
 
-	GLuint m_SSAOViewSpaceZTexture;
+	GLuint m_SSAOViewSpaceZTexture = 0;
 	FrameBuffer m_SSAOViewSpaceZFramBuffer;
 
-	GLuint m_GaussianTexture_horiz;
-	GLuint m_GaussianTexture_vert;
+	GLuint m_Gaussian_horiz = 0;
+	GLuint m_Gaussian_vert = 0;
 
 	FrameBuffer m_GaussianFrameBuffer_horiz;
 	FrameBuffer m_GaussianFrameBuffer_vert;

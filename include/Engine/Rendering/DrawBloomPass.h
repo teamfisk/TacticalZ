@@ -39,7 +39,7 @@ public:
 
 
 private:
-    void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
+    void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
 
     Texture* m_BlackTexture;
     Model* m_ScreenQuad;
@@ -50,8 +50,8 @@ private:
     int m_Iterations;
 	int m_Quality = 0;
 
-    GLuint m_GaussianTexture_horiz;
-    GLuint m_GaussianTexture_vert;
+    GLuint m_GaussianTexture_horiz = 0;
+    GLuint m_GaussianTexture_vert = 0;
 
     FrameBuffer m_GaussianFrameBuffer_horiz;
     FrameBuffer m_GaussianFrameBuffer_vert;
