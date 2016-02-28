@@ -46,8 +46,6 @@ private:
 	void InitializeShaderProgram();
 	void InitializeBuffer();
 
-	void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
-
 	//void blurHorizontal(GLuint depthBuffer);
 	//void blurVertical(GLuint depthBuffer);
 

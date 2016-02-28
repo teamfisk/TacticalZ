@@ -11,6 +11,7 @@
 #include "RenderQueue.h"
 #include "Model.h"
 #include "../Core/World.h" //So temp
+#include "Util/CommonFunctions.h"
 
 
 struct PickData

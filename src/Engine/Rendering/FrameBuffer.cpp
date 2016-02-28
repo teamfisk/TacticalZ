@@ -16,6 +16,12 @@ Texture2D::~Texture2D()
     }
 }
 
+Texture2DMultiSample::~Texture2DMultiSample()
+{
+	if (m_ResourceHandle != 0) {
+		glDeleteTextures(1, m_ResourceHandle);
+	}
+}
 
 RenderBuffer::~RenderBuffer()
 {

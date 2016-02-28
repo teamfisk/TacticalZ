@@ -39,8 +39,6 @@ public:
 
 
 private:
-    void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
-
     Texture* m_BlackTexture;
     Model* m_ScreenQuad;
 

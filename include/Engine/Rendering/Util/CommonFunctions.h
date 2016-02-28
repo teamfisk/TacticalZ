@@ -9,6 +9,9 @@
 namespace CommonFunctions
 { 
 Texture* LoadTexture(std::string path, bool threaded);
+void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
+void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps);
+void DeleteTexture(GLuint* texture);
 };
 
 #endif

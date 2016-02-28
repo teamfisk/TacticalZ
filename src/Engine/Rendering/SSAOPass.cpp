@@ -19,14 +19,10 @@ void SSAOPass::ChangeQuality(int quality)
 	m_Quality = quality;
 
 	if (m_Quality == 0) {	
-		glDeleteTextures(1, &m_SSAOTexture);
-		glDeleteTextures(1, &m_SSAOViewSpaceZTexture);
-		glDeleteTextures(1, &m_Gaussian_horiz);
-		glDeleteTextures(1, &m_Gaussian_vert);
-		m_SSAOTexture = 0;
-		m_SSAOViewSpaceZTexture = 0;
-		m_Gaussian_horiz = 0;
-		m_Gaussian_vert = 0;
+		CommonFunctions::DeleteTexture(&m_SSAOTexture);
+		CommonFunctions::DeleteTexture(&m_SSAOViewSpaceZTexture);
+		CommonFunctions::DeleteTexture(&m_Gaussian_horiz);
+		CommonFunctions::DeleteTexture(&m_Gaussian_vert);
 		return;
 	}
 
@@ -89,11 +85,11 @@ void SSAOPass::InitializeShaderProgram()
 }
 
 void SSAOPass::InitializeTexture() {
-	GenerateTexture(&m_SSAOTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RED, GL_FLOAT);
-	GenerateTexture(&m_SSAOViewSpaceZTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R32F, GL_RED, GL_FLOAT);
+	CommonFunctions::GenerateTexture(&m_SSAOTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RED, GL_FLOAT);
+	CommonFunctions::GenerateTexture(&m_SSAOViewSpaceZTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R32F, GL_RED, GL_FLOAT);
 
-	GenerateTexture(&m_Gaussian_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RGB, GL_FLOAT);
-	GenerateTexture(&m_Gaussian_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RGB, GL_FLOAT);
+	CommonFunctions::GenerateTexture(&m_Gaussian_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RGB, GL_FLOAT);
+	CommonFunctions::GenerateTexture(&m_Gaussian_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RGB, GL_FLOAT);
 }
 
 void SSAOPass::InitializeBuffer()
@@ -159,19 +155,6 @@ void SSAOPass::Setting(float radius, float bias, float contrast, float intensity
 	m_NumOfTurns = numOfTurns;
 	m_Iterations = iterations;
 	m_TextureQuality = quality;
-}
-
-void SSAOPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type)
-{
-	glDeleteTextures(1, texture);
-	glGenTextures(1, texture);
-	glBindTexture(GL_TEXTURE_2D, *texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);
-	GLERROR("Texture initialization failed");
 }
 
 void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
