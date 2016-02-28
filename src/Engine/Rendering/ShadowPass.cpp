@@ -147,6 +147,8 @@ void ShadowPass::InitializeShaderPrograms()
 	m_ShadowProgram->Compile();
 	m_ShadowProgram->BindFragDataLocation(0, "ShadowMap");
 	m_ShadowProgram->Link();
+
+
 }
 
 void ShadowPass::ClearBuffer()
@@ -241,6 +243,15 @@ void ShadowPass::Draw(RenderScene & scene)
 					auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+					glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
+					
+					glActiveTexture(GL_TEXTURE12);
+					if (modelJob->DiffuseTexture != nullptr) {
+						glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
+					}
+					else {
+						glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+					}
 
 					glBindVertexArray(modelJob->Model->VAO);
 					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);

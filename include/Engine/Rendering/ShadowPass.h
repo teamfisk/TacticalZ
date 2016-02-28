@@ -62,6 +62,7 @@ private:
 	GLuint m_DepthMap;
 	FrameBuffer m_DepthBuffer;
 	ShaderProgram* m_ShadowProgram;
+	//ShaderProgram* m_TransparentShadowProgram;
 
 	std::array<glm::mat4, MAX_SPLITS> m_LightProjection;
 	std::array<glm::mat4, MAX_SPLITS> m_LightView;
@@ -74,6 +75,8 @@ private:
 	float m_SplitWeight = 0.91f;
 
 	std::array<Frustum, MAX_SPLITS> m_shadowFrusta;
+
+	Texture* m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
 };
 
 #endif
