@@ -186,6 +186,8 @@ void ShadowPass::PointsToLightspace(Frustum& frustum, glm::mat4 v)
 
 void ShadowPass::RadiusToLightspace(Frustum& frustum)
 {
+	float quantizationStep = 1.0f / m_ResolutionSizeHeight;
+
 	float left = -frustum.Radius;
 	float right = frustum.Radius;
 	float bottom = -frustum.Radius;
@@ -219,6 +221,8 @@ void ShadowPass::Draw(RenderScene & scene)
 				m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
 
 				PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
+				//FindRadius(m_shadowFrusta[i]);
+				//RadiusToLightspace(m_shadowFrusta[i]);
 				m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[LEFT], m_shadowFrusta[i].LRBT[RIGHT], m_shadowFrusta[i].LRBT[BOTTOM], m_shadowFrusta[i].LRBT[TOP], m_NearFarPlane[NEAR], m_NearFarPlane[FAR]);
 
 				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
@@ -227,37 +231,43 @@ void ShadowPass::Draw(RenderScene & scene)
 				GLERROR("ShadowLight ERROR");
 
 				for (auto &objectJob : scene.OpaqueObjects) {
-					auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
+					if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob))
+					{
+						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 
-					glBindVertexArray(modelJob->Model->VAO);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-					glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+						glBindVertexArray(modelJob->Model->VAO);
+						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+						glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
 
-					GLERROR("Shadow Draw ERROR");
+						GLERROR("Shadow Draw ERROR");
+					}
 				}
 
 				state->CullFace(GL_BACK);
 				for (auto &objectJob : scene.TransparentObjects) {
-					auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
+					if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob))
+					{
+						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-					glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
-					
-					glActiveTexture(GL_TEXTURE12);
-					if (modelJob->DiffuseTexture != nullptr) {
-						glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
+						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+						glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
+
+						glActiveTexture(GL_TEXTURE24);
+						if (modelJob->DiffuseTexture != nullptr) {
+							glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
+						}
+						else {
+							glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+						}
+
+						glBindVertexArray(modelJob->Model->VAO);
+						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+						glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+
+						GLERROR("Shadow Draw ERROR");
 					}
-					else {
-						glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-					}
-
-					glBindVertexArray(modelJob->Model->VAO);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-					glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
-
-					GLERROR("Shadow Draw ERROR");
 				}
 				state->CullFace(GL_FRONT);
 			}

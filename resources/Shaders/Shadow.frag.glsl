@@ -2,7 +2,7 @@
 
 #define ALPHA_CUTOFF 0.3
 
-layout (binding = 12) uniform sampler2D DiffuseTexture;
+layout (binding = 24) uniform sampler2D DiffuseTexture;
 uniform float Alpha;
 
 in VertexData{

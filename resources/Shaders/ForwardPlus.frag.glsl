@@ -211,19 +211,21 @@ float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler
 	// Various bias methods.
 	
 	//bias = max(0.05 * (1.0 - dot(normal, light_dir)), bias);
-	bias = bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
+	//bias = bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
+	bias = bias + bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
 	
 	// Calculate coordinates in projection space.
 	
     vec3 projCoords = vec3(light_space_pos.xy, light_space_pos.z + bias) / light_space_pos.w;
     projCoords = projCoords * 0.5 + 0.5;
+	//projCoords = (floor(projCoords * 255.0)) / 255.0;
 	
 	// Various methods for shadow calculation in fastest to slowest order.
 	
-	shadowMapDepth = PCFShadow(depth_texture_array, projCoords, layer_index);
+	//shadowMapDepth = PCFShadow(depth_texture_array, projCoords, layer_index);
 	//shadowMapDepth = PoissonShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS - 1]);
-	//shadowMapDepth = PoissonDotShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS]);
-	//shadowMapDepth = SoftwarePCF(depth_texture_array, projCoords, layer_index, bias);
+	//shadowMapDepth = PoissonDotShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS - 1]);
+	shadowMapDepth = SoftwarePCF(depth_texture_array, projCoords, layer_index, bias);
 
     return 1.0 - shadowMapDepth;
 } 
@@ -327,8 +329,8 @@ void main()
 		totalLighting.Specular += light_result.Specular;
 	}
 
-	totalLighting.Diffuse *= (1.0 + vec4(AmbientColor.rgba)) - vec4(vec3(shadowFactor), 0.0); 
-	totalLighting.Specular *= (1.0 + vec4(AmbientColor.rgba)) - vec4(vec3(shadowFactor), 0.0);
+	totalLighting.Diffuse *= (1.5 + vec4(AmbientColor.rgba)) - vec4(vec3(shadowFactor), 0.0); 
+	totalLighting.Specular *= (1.5 + vec4(AmbientColor.rgba)) - vec4(vec3(shadowFactor), 0.0);
 	
 	//LightResult getInformation;
 	
