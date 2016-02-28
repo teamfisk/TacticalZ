@@ -23,7 +23,9 @@
         <Red/>
       </Team>
     </c:Team>
-    <c:Transform/>
+    <c:Transform>
+      <Position X="0" Y="0.259000003" Z="0"/>
+    </c:Transform>
   </Components>
 
   <Children>
@@ -111,6 +113,7 @@
                     </c:Fill>
                     <c:Sprite>
                       <DiffuseTexture>Textures/HealthHUD3.png</DiffuseTexture>
+                      <DepthSort>false</DepthSort>
                       <GlowMap></GlowMap>
                       <Color A="0.588235319" B="0" G="0" R="0"/>
                     </c:Sprite>
@@ -121,7 +124,55 @@
                       <Orientation X="5.87300014" Y="0" Z="4.71200037"/>
                     </c:Transform>
                   </Components>
-                  <Children/>
+                  <Children>
+                    <Entity name="Ability">
+                      <Components>
+                        <c:AbilityCooldownHUD/>
+                        <c:Fill>
+                          <Percentage>1</Percentage>
+                          <Color A="1" B="0.196078435" G="0.196078435" R="0.196078435"/>
+                        </c:Fill>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                          <DepthSort>false</DepthSort>
+                          <GlowMap></GlowMap>
+                          <Color A="1" B="1" G="0" R="0"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0.200000003" Y="0.100000001" Z="0"/>
+                          <Scale X="0.300000012" Y="0.300000012" Z="1"/>
+                          <Orientation X="0" Y="0" Z="1.55100012"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Cooldown">
+                          <Components>
+                            <c:Text>
+                              <Content>2.0</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="0" G="0" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-0.200000003" Z="0.0500000007"/>
+                              <Scale X="0.5" Y="0.699999988" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="Icon">
+                          <Components>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Props/FoliageDiff.png</DiffuseTexture>
+                              <DepthSort>false</DepthSort>
+                              <GlowMap></GlowMap>
+                            </c:Sprite>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
                 </Entity>
               </Children>
             </Entity>
@@ -137,6 +188,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <DepthSort>false</DepthSort>
                       <GlowMap></GlowMap>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
@@ -155,6 +207,7 @@
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <DepthSort>false</DepthSort>
                           <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
@@ -171,6 +224,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <DepthSort>false</DepthSort>
                       <GlowMap></GlowMap>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
@@ -185,11 +239,11 @@
                           <CapturePointNumber>3</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Fill>
-                          <Percentage>0.80222018197612788</Percentage>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <DepthSort>false</DepthSort>
                           <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
@@ -206,6 +260,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <DepthSort>false</DepthSort>
                       <GlowMap></GlowMap>
                       <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                     </c:Sprite>
@@ -220,10 +275,12 @@
                           <CapturePointNumber>4</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Fill>
+                          <Percentage>1</Percentage>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <DepthSort>false</DepthSort>
                           <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
@@ -240,6 +297,7 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <DepthSort>false</DepthSort>
                       <GlowMap></GlowMap>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
@@ -258,6 +316,7 @@
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <DepthSort>false</DepthSort>
                           <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
@@ -274,8 +333,9 @@
                   <Components>
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <DepthSort>false</DepthSort>
                       <GlowMap></GlowMap>
-                      <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
+                      <Color A="0.699999988" B="0" G="0" R="1"/>
                     </c:Sprite>
                     <c:Transform>
                       <Position X="-1.58304751" Y="0.919596612" Z="0"/>
@@ -286,16 +346,18 @@
                       <Components>
                         <c:CapturePointHUD/>
                         <c:Fill>
-                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                          <Percentage>1</Percentage>
+                          <Color A="0.699999988" B="0" G="0" R="1"/>
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <DepthSort>false</DepthSort>
                           <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
                           <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                          <Orientation X="0" Y="0" Z="1.57079637"/>
+                          <Orientation X="0" Y="0" Z="4.71238899"/>
                         </c:Transform>
                       </Components>
                       <Children/>
@@ -364,7 +426,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>1.2667383999985162</Time1>
+              <Time1>1.2417589624457968</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -385,8 +447,8 @@
                   <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.120430425" Y="-0.242105931" Z="-0.181454822"/>
-                  <Orientation X="0.010404665" Y="-0.00268179877" Z="0.0428443067"/>
+                  <Position X="0.120430306" Y="-0.242575362" Z="-0.181454912"/>
+                  <Orientation X="0.0104048597" Y="-0.0026815543" Z="0.0428441055"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -492,10 +554,13 @@
     <Entity name="PlayerModel">
       <Components>
         <c:Animation>
-          <AnimationName1>Idle</AnimationName1>
-          <Time1>0.26532318661337229</Time1>
+          <AnimationName1>Run</AnimationName1>
+          <Time1>0.012377234178668317</Time1>
           <Speed1>1</Speed1>
+          <Speed2>1</Speed2>
           <AnimationName2></AnimationName2>
+          <Weight2>0.5</Weight2>
+          <Time2>1.8342275085993549</Time2>
           <AnimationName3></AnimationName3>
         </c:Animation>
         <c:AnimationOffset>
@@ -519,8 +584,8 @@
               <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0.159282878" Y="1.0300566" Z="-0.216084003"/>
-              <Orientation X="-0.0626799241" Y="-0.0390551724" Z="0.119761385"/>
+              <Position X="0.150616527" Y="1.06315053" Z="-0.228538662"/>
+              <Orientation X="-0.0768393874" Y="-0.0767763406" Z="0.179495439"/>
             </c:Transform>
           </Components>
           <Children>
