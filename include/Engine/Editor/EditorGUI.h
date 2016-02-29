@@ -73,6 +73,12 @@ public:
     // Called when the user means to rename an entity.
     typedef std::function<void(EntityWrapper, const std::string&)> OnEntityChangeName_t;
     void SetEntityChangeNameCallback(OnEntityChangeName_t f) { m_OnEntityChangeName = f; }
+    // Called when the user pastes an entity previously "copied"
+    // @param EntityWrapper The entity to copy
+    // @param EntityWrapper The entity to parent the new copy to
+    // @return The new copy of the entity
+    typedef std::function<EntityWrapper(EntityWrapper, EntityWrapper)> OnEntityPaste_t;
+    void SetEntityPasteCallback(OnEntityPaste_t f) { m_OnEntityPaste = f; }
     // Called when the user means to attach a new component to an entity.
     typedef std::function<void(EntityWrapper, const std::string&)> OnComponentAttach_t;
     void SetComponentAttachCallback(OnComponentAttach_t f) { m_OnComponentAttach = f; }
@@ -111,6 +117,7 @@ private:
     std::string m_DroppedFile = "";
     bool m_Paused = false;
     bool m_MouseLocked = false;
+    EntityWrapper m_CopyTarget = EntityWrapper::Invalid;
 
     // Callbacks
     OnEntitySelectedCallback_t m_OnEntitySelected = nullptr;
@@ -124,6 +131,7 @@ private:
     OnComponentDelete_t m_OnComponentDelete = nullptr;
     OnWidgetMode_t m_OnWidgetMode = nullptr;
     OnWidgetSpace_t m_OnWidgetSpace = nullptr;
+    OnEntityPaste_t m_OnEntityPaste = nullptr;
 
     // Events
     EventRelay<EditorGUI, Events::KeyDown> m_EKeyDown;

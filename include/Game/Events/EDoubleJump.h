@@ -8,7 +8,7 @@ namespace Events
 
 struct DoubleJump : public Event
 {
-
+    EntityID entityID;
 };
 
 }

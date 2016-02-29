@@ -14,11 +14,14 @@ class SSAOPass
 {
 public:
 	SSAOPass(IRenderer* rendere);
-	~SSAOPass() { };
+	~SSAOPass() { 
+		delete m_DrawBloomPass;
+	};
 
 	void Draw(GLuint depthBuffer, Camera* camera);
 	void Setting(float radius, float bias, float contrast, float intensityScale, int numOfSamples, int NumOfTurns);
 	void ClearBuffer();
+	void OnWindowResize();
 
 	//Return the SSAO of the texture sent to Draw
 	GLuint SSAOTexture() const { return m_DrawBloomPass->GaussianTexture(); }
@@ -31,7 +34,6 @@ private:
 
 	void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
 
-	void ComputeAO(GLuint depthBuffer, Camera* camera);
 	//void blurHorizontal(GLuint depthBuffer);
 	//void blurVertical(GLuint depthBuffer);
 

@@ -5,6 +5,6 @@
 	<Pitch>1.0</Pitch>
 	<Loop>false</Loop>
 	<MaxDistance>220.0</MaxDistance>
-	<RollOffFactor>1.0</RollOffFactor>
+	<RollOffFactor>5.0</RollOffFactor>
 	<ReferenceDistance>1.0</ReferenceDistance>
 </SoundEmitter>
