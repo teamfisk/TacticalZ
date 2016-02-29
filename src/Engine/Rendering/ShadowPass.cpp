@@ -254,28 +254,31 @@ void ShadowPass::Draw(RenderScene & scene)
 						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 						glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
 
-						/*switch (modelJob->Type) {
-						case RawModel::MaterialType::SingleTextures:
-						case RawModel::MaterialType::Basic:
-						{
-							glActiveTexture(GL_TEXTURE24);
-							if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
-								glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
-								glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+						if (directionalLightJob->TextureAlphaShadows) {
+							switch (modelJob->Type) {
+							case RawModel::MaterialType::SingleTextures:
+							case RawModel::MaterialType::Basic:
+							{
+								glActiveTexture(GL_TEXTURE24);
+								if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+									glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+									glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+								}
+								else {
+									glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+									glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+								}
+								break;
 							}
-							else {
+							case RawModel::MaterialType::SplatMapping:
+							{
+								glActiveTexture(GL_TEXTURE24);
 								glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
 								glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+								break;
 							}
-							break;
+							}
 						}
-						case RawModel::MaterialType::SplatMapping:
-						{
-							glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-							glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
-							break;
-						}
-						}*/
 
 						glBindVertexArray(modelJob->Model->VAO);
 						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
@@ -288,7 +291,8 @@ void ShadowPass::Draw(RenderScene & scene)
 			}
 		}
 	}
-	m_ShadowProgram->Unbind();
+	glActiveTexture(GL_TEXTURE24);
+	glDisable(GL_TEXTURE_2D);
 	glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 	m_DepthBuffer.Unbind();
 	delete state;

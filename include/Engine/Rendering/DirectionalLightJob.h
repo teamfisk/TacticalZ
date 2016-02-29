@@ -19,12 +19,14 @@ struct DirectionalLightJob : RenderJob
         Direction = glm::vec4(0,0,-1,0) * glm::inverse(Orientation);
         Color = (glm::vec4)directionalLightComponent["Color"];
         Intensity = (double)directionalLightComponent["Intensity"];
+		//TextureAlphaShadows = (bool)directionalLightComponent["TextureAlphaShadows"];
     };
 
     glm::quat Orientation;
     glm::vec4 Direction;
     glm::vec4 Color;
     float Intensity;
+	bool TextureAlphaShadows = false;
 
     void CalculateHash() override
     {

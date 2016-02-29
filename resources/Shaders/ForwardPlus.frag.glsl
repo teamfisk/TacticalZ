@@ -2,7 +2,6 @@
 
 #define MAX_SPLITS 4
 #define MIN_AMBIENT_LIGHT 0.3
-#define SHADOW_STRENGTH 0.3 //Should be ambient
 
 uniform mat4 M;
 uniform mat4 V;
