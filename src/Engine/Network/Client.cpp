@@ -1,84 +1,118 @@
 #include "Network/Client.h"
-
 using namespace boost::asio::ip;
 
-
-Client::Client(ConfigFile* config) : m_Socket(m_IOService)
+Client::Client(World* world, EventBroker* eventBroker)
+    : Network(world, eventBroker)
 {
-    Network::initialize();
-
     // Asumes root node is EntityID_Invalid
     insertIntoServerClientMaps(EntityID_Invalid, EntityID_Invalid);
     // Init timer
     m_TimeSinceSentInputs = std::clock();
-    // Default is local host
-    std::string address = config->Get<std::string>("Networking.Address", "127.0.0.1");
-    int port = config->Get<int>("Networking.Port", 27666);
-    m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address::from_string(address), port);
-    // Set up network stream
+
+    auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
     m_SendInputIntervalMs = config->Get<int>("Networking.SendInputIntervalMs", 33);
+    LOG_INFO("Client initialized");
 
+    m_ServerlistRequest.Connect(m_PlayerName, "192.168.1.255", 32554);
+}
+
+Client::Client(World* world, EventBroker* eventBroker, std::unique_ptr<SnapshotFilter> snapshotFilter)
+    : Client(world, eventBroker)
+{
+    m_SnapshotFilter = std::move(snapshotFilter);
 }
 
 Client::~Client()
 { }
-
-void Client::Start(World* world, EventBroker* eventBroker)
+// Need to call connect at start
+void Client::Connect(std::string address, int port)
 {
-    m_EventBroker = eventBroker;
-    m_World = world;
-
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Client::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
-
-    m_Socket.connect(m_ReceiverEndpoint);
-    LOG_INFO("I am client. BIP BOP");
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
+    auto config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_Address = address;
+    if (address.empty()) {
+        m_Address = config->Get<std::string>("Networking.Address", "127.0.0.1");
+    }
+    m_Port = port;
+    if (port == 0) {
+        m_Port = config->Get<int>("Networking.Port", 27666);
+    }
 }
 
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    readFromServer();
+    while (m_Unreliable.IsSocketAvailable()) {
+        // Packet will get real data in receive
+        Packet packet(MessageType::Invalid);
+        m_Unreliable.Receive(packet);
+        if (packet.GetMessageType() == MessageType::Connect) {
+            parseUDPConnect(packet);
+        } else {
+            parseMessageType(packet);
+        }
+    }
+    while (m_Reliable.IsSocketAvailable()) {
+        // Packet will get real data in receive
+        Packet packet(MessageType::Invalid);
+        m_Reliable.Receive(packet);
+        if (packet.GetMessageType() == MessageType::Connect) {
+            parseTCPConnect(packet);
+        } else {
+            parseMessageType(packet);
+        }
+
+    }
+
+    while (m_ServerlistRequest.IsSocketAvailable()) {
+        Packet packet(MessageType::Invalid);
+        m_ServerlistRequest.Receive(packet);
+        if (packet.GetMessageType() == MessageType::ServerlistRequest) {
+            parseServerlist(packet);
+        }
+    }
+
+    if (m_SearchingForServers) {
+        if (m_SearchingTime < (1000* (std::clock() - m_StartSearchTime) / (double)CLOCKS_PER_SEC)) {
+            m_SearchingForServers = false;
+            displayServerlist();
+        }
+    }
+
     if (m_IsConnected) {
-        hasServerTimedOut();
-        // Don't sent 1 input in 1 packet, bunch em up.
+        // Don't send 1 input in 1 packet, bunch em up.
         if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
             sendInputCommands();
             m_TimeSinceSentInputs = std::clock();
         }
+        // HACK: Send absolute player positions for now to avoid desync until we have reliable messages
         sendLocalPlayerTransform();
-    }
-    Network::Update();
-}
 
-void Client::readFromServer()
-{
-    while (m_Socket.available()) {
-        bytesRead = receive(readBuf);
-        if (bytesRead > 0) {
-            Packet packet(readBuf, bytesRead);
-            parseMessageType(packet);
-        }
+        hasServerTimedOut();
     }
+    //Network::Update();
 }
 
 void Client::parseMessageType(Packet& packet)
 {
+    // Pop packetSize which is used by TCP Client to
+    // create a packet of the correct size
+    packet.ReadPrimitive<int>();
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
         return;
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    identifyPacketLoss();
+    //identifyPacketLoss();
 
     switch (static_cast<MessageType>(messageType)) {
-    case MessageType::Connect:
-        parseConnect(packet);
-        break;
     case MessageType::Ping:
         parsePing();
         break;
@@ -104,15 +138,41 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::ComponentDeleted:
         parseComponentDeletion(packet);
         break;
+    case MessageType::OnPlayerDamage:
+        parsePlayerDamage(packet);
+        break;
+    case MessageType::OnDoubleJump:
+        parseDoubleJump(packet);
+        break;
     default:
         break;
     }
 }
 
-void Client::parseConnect(Packet& packet)
+void Client::parseUDPConnect(Packet& packet)
 {
     // Map ServerEntityID and your PlayerID
     LOG_INFO("I be connected PogChamp");
+}
+
+void Client::parseTCPConnect(Packet& packet)
+{
+    LOG_INFO("Received TCP connect from server");
+    // Pop size of message int
+    packet.ReadPrimitive<int>();
+    int messageType = packet.ReadPrimitive<int>();
+    // Read packet ID 
+    m_PreviousPacketID = m_PacketID;    // Set previous packet id
+    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+    // parse player id and other stuff
+    m_PlayerID = packet.ReadPrimitive<int>();
+    m_PlayerID = packet.ReadPrimitive<int>();
+    LOG_INFO("A Player connected");
+    Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
+    // Add player id and other stuff
+    packet.WritePrimitive(m_PlayerID);
+    m_Unreliable.Send(packet);
+    LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -132,7 +192,23 @@ void Client::parsePing()
 
     Packet packet(MessageType::Ping, m_SendPacketID);
     packet.WriteString("Ping recieved");
-    send(packet);
+    m_Reliable.Send(packet);
+}
+
+
+void Client::parseServerlist(Packet& packet)
+{
+    // Pop size, message type, and ID
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    std::string address = packet.ReadString();
+    int port = packet.ReadPrimitive<int>();
+    std::string serverName = packet.ReadString();
+    int playersConnected = packet.ReadPrimitive<int>();
+    //TODO: This should not happen when a client is connected to a server
+
+    m_Serverlist.push_back({ address, port, serverName, playersConnected });
 }
 
 void Client::parseKick()
@@ -141,14 +217,41 @@ void Client::parseKick()
     m_IsConnected = false;
 }
 
+void Client::parseSpawnEvents()
+{
+    std::vector<Events::PlayerSpawned> tempSpawn;
+    for (int i = 0; i < m_PlayerSpawnEvents.size(); i++) {
+        Events::PlayerSpawned e;
+        if (!serverClientMapsHasEntity(m_PlayerSpawnEvents.at(i).Player.ID)) {
+            tempSpawn.push_back(m_PlayerSpawnEvents.at(i));
+            continue;
+        }
+        e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Player.ID));
+        //e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID.at(m_PlayerSpawnEvents.at(i).Spawner.ID));
+        e.PlayerID = -1;
+        e.PlayerName = m_PlayerSpawnEvents.at(i).PlayerName;
+        m_EventBroker->Publish(e);
+    }
+    m_PlayerSpawnEvents = tempSpawn;
+    // m_PlayerSpawnEvents.clear();
+}
+
 void Client::parsePlayersSpawned(Packet& packet)
 {
+    //Events::PlayerSpawned e;
+    //e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    //e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    //e.PlayerID = -1;
+    //e.PlayerName = packet.ReadString();
+    //m_EventBroker->Publish(e);
+
     Events::PlayerSpawned e;
-    e.Player = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
-    e.Spawner = EntityWrapper(m_World, m_ServerIDToClientID[packet.ReadPrimitive<EntityID>()]);
+    e.Player = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
+    e.Spawner = EntityWrapper(m_World, packet.ReadPrimitive<EntityID>());
     e.PlayerID = -1;
     e.PlayerName = packet.ReadString();
-    m_EventBroker->Publish(e);
+    m_PlayerSpawnEvents.push_back(e);
+    parseSpawnEvents();
 }
 
 void Client::parseEntityDeletion(Packet & packet)
@@ -158,8 +261,14 @@ void Client::parseEntityDeletion(Packet & packet)
     if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
         EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
         if (m_World->ValidEntity(localEntity)) {
-            m_World->DeleteEntity(localEntity);
-            deleteFromServerClientMaps(entityToDelete, localEntity);
+            if (m_World->HasComponent(localEntity,"Player")) {
+                Events::PlayerDeath e;
+                e.Player = EntityWrapper(m_World, localEntity);
+                m_EventBroker->Publish(e);
+            } else {
+                m_World->DeleteEntity(localEntity);
+                deleteFromServerClientMaps(entityToDelete, localEntity);
+            }
         }
     }
 }
@@ -173,40 +282,83 @@ void Client::parseComponentDeletion(Packet & packet)
     }
 }
 
-// Fields with strings will not work right now
-void Client::InterpolateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
+void Client::parseDoubleJump(Packet & packet)
 {
-    int sizeOfFields = 0;
-    for (auto field : componentInfo.FieldsInOrder) {
-        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
-        sizeOfFields += fieldInfo.Stride;
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
     }
-    // Is the size correct?
-    boost::shared_array<char> eventData(new char[componentInfo.Stride]);
-    memcpy(eventData.get(), packet.ReadData(componentInfo.Stride), componentInfo.Stride);
-    //Send event to interpolat system
-    Events::Interpolate e;
-    e.Entity = entityID;
-    e.DataArray = eventData;
-    m_EventBroker->Publish(e);
-
+    Events::DoubleJump e;
+    e.entityID = m_ServerIDToClientID.at(serverID);
+    // If player is local player do not publish to prevent infinite feedback loop
+    if (e.entityID != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
+    }
 }
 
-void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID, const std::string& componentType)
+void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)
 {
     for (auto field : componentInfo.FieldsInOrder) {
         ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
         if (fieldInfo.Type == "string") {
             std::string& value = packet.ReadString();
-            m_World->GetComponent(entityID, componentType)[fieldInfo.Name] = value;
+            m_World->GetComponent(entityID, componentInfo.Name)[fieldInfo.Name] = value;
         } else {
-            memcpy(m_World->GetComponent(entityID, componentType).Data + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+            memcpy(m_World->GetComponent(entityID, componentInfo.Name).Data + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+        }
+    }
+}
+
+SharedComponentWrapper Client::createSharedComponent(Packet& packet, EntityID entityID, const ComponentInfo& componentInfo)
+{
+    // Create shared allocation
+    char* data = new char[sizeof(EntityID) + componentInfo.Stride];
+    // Copy entity ID to start of data buffer
+    memcpy(data, &entityID, sizeof(EntityID));
+    // Read and copy fields
+    for (auto& field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        if (fieldInfo.Type == "string") {
+            new (data + sizeof(EntityID) + fieldInfo.Offset) std::string(packet.ReadString());
+        } else {
+            memcpy(data + sizeof(EntityID) + fieldInfo.Offset, packet.ReadData(fieldInfo.Stride), fieldInfo.Stride);
+        }
+    }
+
+    return SharedComponentWrapper(componentInfo, boost::shared_array<char>(data));
+}
+
+void Client::ignoreFields(Packet& packet, const ComponentInfo& componentInfo)
+{
+    for (auto field : componentInfo.FieldsInOrder) {
+        ComponentInfo::Field_t fieldInfo = componentInfo.Fields.at(field);
+        if (fieldInfo.Type == "string") {
+            packet.ReadString();
+        } else {
+            packet.ReadData(fieldInfo.Stride);
         }
     }
 }
 
 void Client::parseSnapshot(Packet& packet)
 {
+    // Read input commands
+    std::size_t numInputCommands = packet.ReadPrimitive<std::size_t>();
+    for (std::size_t i = 0; i < numInputCommands; ++i) {
+        Events::InputCommand e;
+        e.PlayerID = packet.ReadPrimitive<EntityID>();
+        EntityID player = packet.ReadPrimitive<EntityID>();
+        std::string command = packet.ReadString();
+        float value = packet.ReadPrimitive<float>();
+        if (m_ServerIDToClientID.find(player) != m_ServerIDToClientID.end()) {
+            e.Player = EntityWrapper(m_World, m_ServerIDToClientID.at(player));
+            e.Command = command;
+            e.Value = value;
+            m_EventBroker->Publish(e);
+        }
+    }
+
+    // Read world state
     while (packet.DataReadSize() < packet.Size()) {
         EntityID serverEntityID = packet.ReadPrimitive<EntityID>();
         EntityID serverParentID = packet.ReadPrimitive<EntityID>();
@@ -214,26 +366,33 @@ void Client::parseSnapshot(Packet& packet)
         int ammountOfComponents = packet.ReadPrimitive<int>();
         for (int i = 0; i < ammountOfComponents; i++) {
             std::string componentType = packet.ReadString();
-            ComponentInfo componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
+            const ComponentInfo& componentInfo = m_World->GetComponents(componentType)->ComponentInfo();
             if (serverClientMapsHasEntity(serverEntityID)) {
                 EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
+                EntityWrapper localEntity(m_World, localEntityID);
                 // Update entity
                 if (m_World->HasComponent(localEntityID, componentType)) {
-                    // Update component
-                    if (componentType == "Transform") {
-                        // Interpolate only transform components
-                        InterpolateFields(packet, componentInfo, localEntityID, componentType);
-                    } else if (componentType == "Physics" && m_World->HasComponent(localEntityID, "Player")) {
-                        // HACK: Ignore velocity of physics
-                        packet.ReadData(componentInfo.Stride);
-                    } else {
-                        // Set component values
-                        updateFields(packet, componentInfo, localEntityID, componentType);
+                    // TODO Fix memory leak here
+                    SharedComponentWrapper newComponent = createSharedComponent(packet, localEntityID, componentInfo);
+                    bool shouldApply = true;
+                    // Apply potential filter function
+                    if (m_SnapshotFilter != nullptr) {
+                        shouldApply = m_SnapshotFilter->FilterComponent(localEntity, newComponent);
                     }
+                    if (shouldApply) {                        
+                        ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
+                        memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
+                    }
+
+                    //if (localEntity != m_LocalPlayer && !localEntity.IsChildOf(m_LocalPlayer)) {
+                    //    updateFields(packet, componentInfo, localEntityID);
+                    //} else {
+                    //    ignoreFields(packet, componentInfo);
+                    //}
                 } else {
                     // Has entity but no component
                     m_World->AttachComponent(localEntityID, componentType);
-                    updateFields(packet, componentInfo, localEntityID, componentType);
+                    updateFields(packet, componentInfo, localEntityID);
                 }
             } else {
                 // Create Entity and component
@@ -241,78 +400,56 @@ void Client::parseSnapshot(Packet& packet)
                 if (serverParentID == EntityID_Invalid) {
                     newLocalEntityID = m_World->CreateEntity(EntityID_Invalid);
                 } else {
-                    newLocalEntityID = m_World->CreateEntity(m_ServerIDToClientID.at(serverParentID));
+                    if (serverClientMapsHasEntity(serverParentID)) {
+                        newLocalEntityID = m_World->CreateEntity(m_ServerIDToClientID.at(serverParentID));
+                    } else {
+                        newLocalEntityID = m_World->CreateEntity(EntityID_Invalid);
+                    }
                 }
                 m_World->SetName(newLocalEntityID, serverEntityName);
                 insertIntoServerClientMaps(serverEntityID, newLocalEntityID);
                 m_World->AttachComponent(newLocalEntityID, componentType);
-                updateFields(packet, componentInfo, newLocalEntityID, componentType);
+                updateFields(packet, componentInfo, newLocalEntityID);
             }
         }
         // Parent logic
         // This should be enough beacause we know that the entities arives in pre-order (there will always be a parent)
-        if (serverParentID != EntityID_Invalid) {
+        if (serverParentID != EntityID_Invalid && serverClientMapsHasEntity(serverParentID)) {
             EntityID localEntityID = m_ServerIDToClientID.at(serverEntityID);
-            m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            if (m_World->GetParent(localEntityID) != m_ServerIDToClientID.at(serverParentID)) {
+                m_World->SetParent(localEntityID, m_ServerIDToClientID.at(serverParentID));
+            }
         }
     }
-}
-
-size_t Client::receive(char* data)
-{
-    boost::system::error_code error;
-
-    size_t bytesReceived = m_Socket.receive_from(boost
-        ::asio::buffer((void*)data, INPUTSIZE),
-        m_ReceiverEndpoint,
-        0, error);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataReceived += bytesReceived;
-        m_NetworkData.DataReceivedThisInterval += bytesReceived;
-        m_NetworkData.AmountOfMessagesReceived++;
-    }
-    if (error) {
-        //LOG_ERROR("receive: %s", error.message().c_str());
-    }
-    return bytesReceived;
-}
-
-void Client::send(Packet& packet)
-{
-    m_Socket.send_to(boost::asio::buffer(
-        packet.Data(),
-        packet.Size()),
-        m_ReceiverEndpoint, 0);
-    // Network Debug data
-    if (isReadingData) {
-        m_NetworkData.TotalDataSent += packet.Size();
-        m_NetworkData.DataSentThisInterval += packet.Size();
-        m_NetworkData.AmountOfMessagesSent++;
-    }
-}
-
-void Client::connect()
-{
-    Packet packet(MessageType::Connect, m_SendPacketID);
-    packet.WriteString(m_PlayerName);
-    m_StartPingTime = std::clock();
-    send(packet);
+    parseSpawnEvents();
 }
 
 void Client::disconnect()
 {
+    m_IsConnected = false;
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
-    send(packet);
+    m_Reliable.Send(packet);
+    m_Reliable.Disconnect();
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
+    // TEMP
+    if (e.Command == "SearchForServers" && e.Value > 0) {
+        Events::SearchForServers e;
+        m_EventBroker->Publish(e);
+    }
+
+    if (e.PlayerID != -1) {
+        return false;
+    }
+
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            connect();
+            m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
+            m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -335,7 +472,9 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
             m_SaveDataTimer = std::clock();
         }
     } else {
-        m_InputCommandBuffer.push_back(e);
+        if (m_IsConnected) {
+            m_InputCommandBuffer.push_back(e);
+        }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
     }
@@ -344,11 +483,22 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 
 bool Client::OnPlayerDamage(const Events::PlayerDamage & e)
 {
+    if (e.Inflictor != m_LocalPlayer) {
+        return false;
+    }
+    // Could this happen?
+    //if (!clientServerMapsHasEntity(e.Inflictor.ID) 
+    //    || !clientServerMapsHasEntity(e.Victim.ID)) {
+    //    return;
+    //}
+
     Packet packet(MessageType::OnPlayerDamage, m_SendPacketID);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Inflictor.ID));
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Victim.ID));
     packet.WritePrimitive(e.Damage);
-    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player.ID));
-    send(packet);
-    return false;
+    m_Reliable.Send(packet);
+
+    return true;
 }
 
 bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
@@ -359,23 +509,72 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
     return true;
 }
 
+bool Client::OnSearchForServers(const Events::SearchForServers& e)
+{
+    m_SearchingForServers = true;
+    m_StartSearchTime = std::clock();
+    m_Serverlist.clear();
+    LOG_INFO("Searching for LAN servers...\n");
+    Packet packet(MessageType::ServerlistRequest);
+    m_ServerlistRequest.Broadcast(packet, 13); // TODO: Config
+    return true;
+}
+
+void Client::parsePlayerDamage(Packet& packet)
+{
+    Events::PlayerDamage e;
+    PlayerID victimID = packet.ReadPrimitive<EntityID>();
+    PlayerID inflictorID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(victimID) || !serverClientMapsHasEntity(inflictorID)) {
+        return;
+    }
+    e.Inflictor = EntityWrapper(m_World, m_ServerIDToClientID.at(victimID));
+    e.Victim = EntityWrapper(m_World, m_ServerIDToClientID.at(inflictorID));
+    e.Damage = packet.ReadPrimitive<double>();
+    // Don't rebroadcast our own player damage events or we'll have an infinite loop!
+    if (e.Inflictor != m_LocalPlayer) {
+        m_EventBroker->Publish(e);
+    }
+}
+
+bool Client::OnDoubleJump(Events::DoubleJump & e)
+{
+    if (!clientServerMapsHasEntity(e.entityID) || e.entityID != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDoubleJump);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.entityID));
+    m_Reliable.Send(packet);
+    return true;
+}
+
 void Client::sendLocalPlayerTransform()
 {
     if (!m_LocalPlayer.Valid()) {
         return;
     }
 
+    Packet packet(MessageType::PlayerTransform, m_SendPacketID);
+
     ComponentWrapper cTransform = m_LocalPlayer["Transform"];
     glm::vec3& position = cTransform["Position"];
     glm::vec3& orientation = cTransform["Orientation"];
-    Packet packet(MessageType::PlayerTransform, m_SendPacketID);
     packet.WritePrimitive(position.x);
     packet.WritePrimitive(position.y);
     packet.WritePrimitive(position.z);
     packet.WritePrimitive(orientation.x);
     packet.WritePrimitive(orientation.y);
     packet.WritePrimitive(orientation.z);
-    send(packet);
+
+    bool hasAssaultWeapon = m_LocalPlayer.HasComponent("AssaultWeapon");
+    packet.WritePrimitive(hasAssaultWeapon);
+    if (hasAssaultWeapon) {
+        ComponentWrapper cAssaultWeapon = m_LocalPlayer["AssaultWeapon"];
+        packet.WritePrimitive((int)cAssaultWeapon["MagazineAmmo"]);
+        packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
+    }
+
+    m_Unreliable.Send(packet);
 }
 
 void Client::identifyPacketLoss()
@@ -387,17 +586,15 @@ void Client::identifyPacketLoss()
     }
 }
 
-bool Client::hasServerTimedOut()
+void Client::hasServerTimedOut()
 {
     // Time in ms
     double timeSincePing = 1000 * (std::clock() - m_StartPingTime) / static_cast<double>(CLOCKS_PER_SEC);
     if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
-        m_IsConnected = false;
-        return true;
+        disconnect();
     }
-    return false;
 }
 
 EntityID Client::createPlayer()
@@ -418,7 +615,7 @@ void Client::sendInputCommands()
             packet.WriteString(m_InputCommandBuffer[i].Command);
             packet.WritePrimitive(m_InputCommandBuffer[i].Value);
         }
-        send(packet);
+        m_Reliable.Send(packet);
         m_InputCommandBuffer.clear();
     }
 }
@@ -426,7 +623,17 @@ void Client::sendInputCommands()
 void Client::becomePlayer()
 {
     Packet packet = Packet(MessageType::BecomePlayer, m_SendPacketID);
-    send(packet);
+    m_Reliable.Send(packet);
+}
+
+
+void Client::displayServerlist()
+{
+    LOG_INFO("This is a serverlist:\n");
+    for (int i = 0; i < m_Serverlist.size(); i++) {
+        ServerInfo si = m_Serverlist[i];
+        LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
+    }
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)
@@ -457,7 +664,6 @@ void Client::insertIntoServerClientMaps(EntityID serverEntityID, EntityID client
 {
     m_ServerIDToClientID.insert(std::make_pair(serverEntityID, clientEntityID));
     m_ClientIDToServerID.insert(std::make_pair(clientEntityID, serverEntityID));
-
 }
 
 void Client::deleteFromServerClientMaps(EntityID serverEntityID, EntityID clientEntityID)

@@ -48,42 +48,33 @@ GameHealthSystemTest::GameHealthSystemTest()
     fp.MergeEntities(m_World);
 
     // Create system pipeline
-    m_SystemPipeline = new SystemPipeline(m_World,m_EventBroker);
+    m_SystemPipeline = new SystemPipeline(m_World, m_EventBroker, false, false);
     m_SystemPipeline->AddSystem<HealthSystem>(0);
 
     //The Test
     //create entity which has transform,player,model,health in it. i.e. is a player
     EntityID playerID = m_World->CreateEntity();
-    ComponentWrapper transform = m_World->AttachComponent(playerID, "Transform");
-    ComponentWrapper model = m_World->AttachComponent(playerID, "Model");
-    model["Resource"] = "Models/Core/UnitSphere.mesh"; // 360NoScope UnitSphere
     ComponentWrapper player = m_World->AttachComponent(playerID, "Player");
-    ComponentWrapper health = m_World->AttachComponent(playerID, "Health");
-    healthsID = playerID;
-    double currentHealth = (double)m_World->GetComponent(healthsID, "Health")["Health"];
+    ComponentWrapper& health = m_World->AttachComponent(playerID, "Health");
+    health["Health"] = 100.0;
+    m_PlayersID = playerID;
 
-    //heal player with 40
-    Events::PlayerHealthPickup e3;
-    e3.HealthAmount = 40.0f;
-    e3.PlayerHealedID = healthsID;
-    m_EventBroker->Publish(e3);
+    EntityID playerID2 = m_World->CreateEntity();
+    ComponentWrapper player2 = m_World->AttachComponent(playerID2, "Player");
+    ComponentWrapper health2 = m_World->AttachComponent(playerID2, "Health");
+
     //damage player with 50
     Events::PlayerDamage e;
-    e.DamageAmount = 50.0f;
-    e.PlayerDamagedID = healthsID;
+    e.Damage = 50.0f;
+    e.Victim = EntityWrapper(m_World, player.EntityID);
     m_EventBroker->Publish(e);
+
     //heal some other player with 40
     Events::PlayerHealthPickup e2;
     e2.HealthAmount = 40.0f;
-    e2.PlayerHealedID = healthsID + 1;
+    e2.Player = EntityWrapper(m_World, player2.EntityID);
     m_EventBroker->Publish(e2);
 
-    EntityID playerID2 = m_World->CreateEntity();
-    ComponentWrapper transform2 = m_World->AttachComponent(playerID2, "Transform");
-    ComponentWrapper model2 = m_World->AttachComponent(playerID2, "Model");
-    model2["Resource"] = "Models/Core/UnitSphere.mesh"; // 360NoScope UnitSphere
-    ComponentWrapper player2 = m_World->AttachComponent(playerID2, "Player");
-    ComponentWrapper health2 = m_World->AttachComponent(playerID2, "Health");
     //END TEST
 }
 
@@ -107,9 +98,18 @@ void GameHealthSystemTest::Tick()
 
     m_EventBroker->Swap();
     m_EventBroker->Clear();
-
-    //if health reaches 90 then we know the test has succeeded (start with 100hp, remove 50hp, add 40hp)
-    double currentHealth = (double)m_World->GetComponent(healthsID, "Health")["Health"];
-    if (currentHealth == 90)
+    
+    double currentHealth = (double)m_World->GetComponent(m_PlayersID, "Health")["Health"];
+    //if players health reach 50 means he got damaged by 50
+    if (currentHealth == 50.0) {
+        m_TestStage1Success = true;
+        //heal player with 40
+        Events::PlayerHealthPickup e3;
+        e3.HealthAmount = 40.0f;
+        e3.Player = EntityWrapper(m_World, m_PlayersID);
+        m_EventBroker->Publish(e3);
+    }
+    if (m_TestStage1Success && currentHealth == 90.0f) {
         TestSucceeded = true;
+    }
 }

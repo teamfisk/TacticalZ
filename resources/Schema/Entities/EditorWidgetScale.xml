@@ -3,7 +3,7 @@
 
   <Components>
     <c:Model>
-      <Resource>Models/ScaleWidgetOrigin.mesh</Resource>
+      <Resource>Models/Widgets/Scale/ScalingWidgetOrigin.mesh</Resource>
     </c:Model>
     <c:Transform/>
     <c:UniformScale>
@@ -20,7 +20,7 @@
           </Type>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/ScaleWidgetX.mesh</Resource>
+          <Resource>Models/Widgets/Scale/ScalingWidgetX.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -34,7 +34,7 @@
           </Type>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/ScaleWidgetY.mesh</Resource>
+          <Resource>Models/Widgets/Scale/ScalingWidgetY.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -48,7 +48,7 @@
           </Type>
         </c:EditorWidget>
         <c:Model>
-          <Resource>Models/ScaleWidgetZ.mesh</Resource>
+          <Resource>Models/Widgets/Scale/ScalingWidgetZ.mesh</Resource>
         </c:Model>
         <c:Transform/>
       </Components>

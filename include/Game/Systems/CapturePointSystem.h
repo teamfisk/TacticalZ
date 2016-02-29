@@ -17,7 +17,7 @@ class CapturePointSystem : public PureSystem
 {
 public:
     //WARNING: on new map, destroy all info in the vectors, as well as reset all variables (just make new?)
-    CapturePointSystem(World* world, EventBroker* eventBroker);
+    CapturePointSystem(SystemParams params);
 
     //updatecomponent
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt) override;
@@ -44,7 +44,6 @@ private:
 
     //std::vector<ComponentWrapper>
 
-    const double m_CaptureTimeToTakeOver = 15.0;
     bool m_ResetTimers = false;
 
     //vectors which will keep track of enter/leave changes

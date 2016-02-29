@@ -9,7 +9,8 @@ namespace Events
 
 struct PlayerDamage : Event
 {
-    EntityWrapper Player;
+    EntityWrapper Inflictor;
+    EntityWrapper Victim;
     double Damage;
 };
 

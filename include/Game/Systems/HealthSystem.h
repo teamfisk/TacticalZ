@@ -9,28 +9,34 @@
 #include "Core/EPlayerDamage.h"
 #include "Core/EPlayerHealthPickup.h"
 #include "Core/EPlayerDeath.h"
+#include "Core/ConfigFile.h"
+#include "Input/EInputCommand.h"
 
 #include <tuple>
 #include <vector>
+#include <algorithm>
 
 class HealthSystem : public PureSystem
 {
 public:
-    HealthSystem(World* world, EventBroker* eventBroker);
+    HealthSystem(SystemParams params);
 
     //updatecomponent
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
-    //methods which will take care of specific events
+    bool m_NetworkEnabled;
+
+   // methods which will take care of specific events
     EventRelay<HealthSystem, Events::PlayerDamage> m_EPlayerDamage;
     bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e);
     EventRelay<HealthSystem, Events::PlayerHealthPickup> m_EPlayerHealthPickup;
-    bool HealthSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup& e);
+    bool HealthSystem::OnPlayerHealthPickup(Events::PlayerHealthPickup& e);
+    EventRelay<HealthSystem, Events::InputCommand> m_InputCommand;
+    bool HealthSystem::OnInputCommand(Events::InputCommand& e);
 
     //vector which will keep track of health changes
     std::vector<std::tuple<EntityID, double>> m_DeltaHealthVector;
-   
 };
 
 #endif

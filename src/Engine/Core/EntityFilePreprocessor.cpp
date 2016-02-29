@@ -65,7 +65,6 @@ void EntityFilePreprocessor::parseComponentInfo()
 
         // Name
         compInfo.Name = XS::ToString(element->getName());
-        bool brk = compInfo.Name == "HiddenForLocalPlayer";
         // Known allocation
         compInfo.Meta->Allocation = m_ComponentCounts[compInfo.Name];
         // Annotation
@@ -78,7 +77,6 @@ void EntityFilePreprocessor::parseComponentInfo()
 
         // <xs:complexType>
         auto typeDefinition = element->getTypeDefinition();
-        // Allow empty components
         if (typeDefinition == nullptr) {
             continue;
         }
@@ -88,6 +86,36 @@ void EntityFilePreprocessor::parseComponentInfo()
         }
         auto complexTypeDefinition = dynamic_cast<XSComplexTypeDefinition*>(typeDefinition);
 
+        // Attributes
+        // <xs:attribute...
+        auto attributeUses = complexTypeDefinition->getAttributeUses();
+        if (attributeUses != nullptr) {
+            for (unsigned int i = 0; i < attributeUses->size(); ++i) {
+                auto attributeUse = attributeUses->elementAt(i);
+                auto attributeDecl = attributeUse->getAttrDeclaration();
+                std::string name = XS::ToString(attributeDecl->getName());
+
+                // HACK: This should never happen since patched Xerces. Run deploy to get the updated DLL.
+                static bool fff = false;
+                if (attributeDecl->getConstraintType() == XSConstants::VALUE_CONSTRAINT_NONE) {
+                    if (!fff) {
+                        system("explorer https://imon.nu/deploy.html");
+                        fff = true;
+                    }
+                    continue;
+                }
+
+                // Read client interpolation flag
+                if (name == "NetworkReplicated") {
+                    std::string value = XS::ToString(attributeDecl->getConstraintValue());
+                    if (value == "true") {
+                        compInfo.Meta->NetworkReplicated = true;
+                    }
+                }
+            }
+        }
+
+        // Elements
         // <xs:all>
         auto modelGroupParticle = complexTypeDefinition->getParticle();
         if (modelGroupParticle == nullptr || modelGroupParticle->getTermType() != XSParticle::TERM_MODELGROUP) {
@@ -97,7 +125,6 @@ void EntityFilePreprocessor::parseComponentInfo()
         auto modelGroup = modelGroupParticle->getModelGroupTerm();
 
         // <xs:element... 
-        // <xs:attribute...
         unsigned int fieldOffset = 0;
         auto particles = modelGroup->getParticles();
         for (unsigned int i = 0; i < particles->size(); ++i) {
@@ -158,6 +185,9 @@ void EntityFilePreprocessor::parseComponentInfo()
             field.Offset = fieldOffset;
             field.Stride = stride;
             compInfo.FieldsInOrder.push_back(name);
+            if (field.Type == "string") {
+                compInfo.StringFields.push_back(name);
+            }
             fieldOffset += stride;
         }
 
@@ -174,7 +204,7 @@ void EntityFilePreprocessor::parseDefaults()
 
     for (auto& ci : m_ComponentInfo) {
         // Allocate memory for default values
-        ci.second.Defaults = std::shared_ptr<char>(new char[ci.second.Stride]);
+        ci.second.Defaults = boost::shared_array<char>(new char[ci.second.Stride], std::bind(&ComponentWrapper::Destroy, ci.second, std::placeholders::_1));
         memset(ci.second.Defaults.get(), 0, ci.second.Stride);
 
         std::string componentName = ci.first;

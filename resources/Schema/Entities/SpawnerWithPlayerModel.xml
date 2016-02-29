@@ -4,7 +4,7 @@
   <Components>
     <c:SpawnPoint/>
     <c:Model>
-      <Resource>Models/Assault.mesh</Resource>
+      <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
     </c:Model>
     <c:Transform>
       <Position X="1.31625879" Y="0" Z="0"/>

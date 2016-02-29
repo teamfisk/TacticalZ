@@ -4,5 +4,8 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 
 	<xs:element name="Collidable">
+		<xs:annotation>
+			<xs:documentation>Needs a Model or AABB component to work, uses AABB if both are attached.</xs:documentation>
+		</xs:annotation>
 	</xs:element>
 </xs:schema>

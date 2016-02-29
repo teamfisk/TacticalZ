@@ -16,6 +16,15 @@ bool EntityWrapper::HasComponent(const std::string& componentName)
     return World->HasComponent(ID, componentName);
 }
 
+void EntityWrapper::AttachComponent(const char* componentName)
+{
+    if (!Valid()) {
+        LOG_WARNING("Could not attach \"%s\" component to #%i, entity is not valid.", componentName, ID);
+        return;
+    }
+    World->AttachComponent(ID, componentName);
+}
+
 EntityWrapper EntityWrapper::Parent()
 {
     if (this->World == nullptr || this->ID == EntityID_Invalid) {
@@ -42,6 +51,17 @@ EntityWrapper EntityWrapper::FirstParentWithComponent(const std::string& compone
     return EntityWrapper::Invalid;
 }
 
+EntityWrapper EntityWrapper::Clone(EntityWrapper parent /*= Invalid*/)
+{
+    if (!Valid()) {
+        return EntityWrapper::Invalid;
+    }
+
+    EntityWrapper clone = cloneRecursive(*this, EntityWrapper::Invalid);
+    this->World->SetParent(clone.ID, parent.ID);
+    return clone;
+}
+
 bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
 {
     EntityWrapper entity = *this;
@@ -54,7 +74,7 @@ bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
     return false;
 }
 
-bool EntityWrapper::Valid()
+bool EntityWrapper::Valid() const
 {
     if (this->World == nullptr) {
         return false;
@@ -65,7 +85,6 @@ bool EntityWrapper::Valid()
     }
 
     if (!this->World->ValidEntity(this->ID)) {
-        this->ID = EntityID_Invalid;
         return false;
     }
 
@@ -103,7 +122,7 @@ EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, 
         return EntityWrapper::Invalid;
     }
 
-    auto itPair = this->World->GetChildren(parent);
+    auto itPair = this->World->GetDirectChildren(parent);
     if (itPair.first == itPair.second) {
         return EntityWrapper::Invalid;
     }
@@ -121,5 +140,29 @@ EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, 
     }
 
     return EntityWrapper::Invalid;
+}
+
+EntityWrapper EntityWrapper::cloneRecursive(EntityWrapper entity, EntityWrapper parent)
+{
+    EntityWrapper clone = EntityWrapper(entity.World, entity.World->CreateEntity(parent.ID));
+    entity.World->SetName(clone.ID, entity.Name());
+
+    // Clone components
+    for (auto& kv : entity.World->GetComponentPools()) {
+        if (kv.second->KnowsEntity(entity.ID)) {
+            ComponentWrapper c1 = kv.second->GetByEntity(entity.ID);
+            ComponentWrapper c2 = entity.World->AttachComponent(clone.ID, kv.first);
+            c1.Copy(c2);
+        }
+    }
+
+    // Clone children
+    auto children = entity.World->GetDirectChildren(entity.ID);
+    for (auto it = children.first; it != children.second; ++it) {
+        EntityWrapper child(entity.World, it->second);
+        cloneRecursive(child, clone);
+    }
+      
+    return clone;
 }
 

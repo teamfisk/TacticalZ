@@ -1,6 +1,9 @@
 #ifndef Sound_h__
 #define Sound_h__
 
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+
 #include "Core/ResourceManager.h"
 
 class Sound : public Resource

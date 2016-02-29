@@ -5,22 +5,6 @@
 #include "Core/Octree.h"
 #include "Collision/Collision.h"
 
-namespace
-{
-//To be able to sort nodes based on distance to ray origin.
-struct ChildInfo
-{
-    int Index;
-    float Distance;
-};
-
-bool isFirstLower(const ChildInfo& first, const ChildInfo& second)
-{
-    return first.Distance < second.Distance;
-}
-
-}
-
 namespace OctSpace
 {
 
@@ -123,14 +107,14 @@ bool Child::RayCollides(const Ray& ray, OctSpace::Output& data) const
         //If the ray shoots the tree, and it is a parent to 8 children :o
         if (hasChildren()) {
             //Sort children according to their distance from the ray origin.
-            std::vector<ChildInfo> childInfos;
+            std::vector<RaySorterInfo> childInfos;
             childInfos.reserve(8);
             for (int i = 0; i < 8; ++i) {
                 childInfos.push_back({ i, glm::distance(ray.Origin(), m_Children[i]->m_Box.Origin()) });
             }
             std::sort(childInfos.begin(), childInfos.end(), isFirstLower);
             //Loop through the children, starting with the one closest to the ray origin. I.e the first to be hit.
-            for (const ChildInfo& info : childInfos) {
+            for (const RaySorterInfo& info : childInfos) {
                 if (m_Children[info.Index]->RayCollides(ray, data)) {
                     return true;
                 }
@@ -275,9 +259,9 @@ std::vector<int> Child::childIndicesContainingBox(const AABB& box) const
     }
 }
 
-bool Child::hasChildren() const
+bool isFirstLower(const RaySorterInfo& first, const RaySorterInfo& second)
 {
-    return m_Children[0] != nullptr;
+    return first.Distance < second.Distance;
 }
 
 }

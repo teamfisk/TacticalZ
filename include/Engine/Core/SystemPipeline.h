@@ -6,13 +6,16 @@
 #include "System.h"
 #include "World.h"
 #include "EPause.h"
+#include "PerformanceTimer.h"
 
 class SystemPipeline
 {
 public:
-    SystemPipeline(World* world, EventBroker* eventBroker)
+    SystemPipeline(World* world, EventBroker* eventBroker, bool isClient, bool isServer)
         : m_World(world)
         , m_EventBroker(eventBroker)
+        , m_IsClient(isClient)
+        , m_IsServer(isServer)
     {
         EVENT_SUBSCRIBE_MEMBER(m_EPause, &SystemPipeline::OnPause);
         EVENT_SUBSCRIBE_MEMBER(m_EResume, &SystemPipeline::OnResume);
@@ -35,7 +38,7 @@ public:
             m_OrderedSystemGroups.resize(updateOrderLevel + 1);
         }
         UnorderedSystems& group = m_OrderedSystemGroups[updateOrderLevel];
-        System* system = new T(m_World, m_EventBroker, args...);
+        System* system = new T(SystemParams(m_World, m_EventBroker, m_IsClient, m_IsServer), args...);
         group.Systems[typeid(T).name()] = system;
 
         PureSystem* pureSystem = dynamic_cast<PureSystem*>(system);
@@ -59,6 +62,9 @@ public:
             dt = 0.0;
         }
 
+        // Process utility events for the System base class
+        m_EventBroker->Process<System>();
+
         for (UnorderedSystems& group : m_OrderedSystemGroups) {
             // Process events
             for (auto& pair : group.Systems) {
@@ -67,7 +73,10 @@ public:
 
             // Update
             for (auto& system : group.ImpureSystems) {
+                auto className = (std::string)typeid(*system).name();
+                PerformanceTimer::StartTimer(className);
                 system->Update(dt);
+                PerformanceTimer::StopTimer(className);
             }
             for (auto& pair : group.PureSystems) {
                 const std::string& componentName = pair.first;
@@ -78,7 +87,10 @@ public:
                 }
                 for (auto& component : *pool) {
                     for (auto& system : systems) {
+                        auto className = (std::string)typeid(*system).name();
+                        PerformanceTimer::StartTimer(className);
                         system->UpdateComponent(EntityWrapper(m_World, component.EntityID), component, dt);
+                        PerformanceTimer::StopTimer(className);
                     }
                 }
             }
@@ -88,6 +100,8 @@ public:
 private:
     World* m_World;
     EventBroker* m_EventBroker;
+    bool m_IsClient = false;
+    bool m_IsServer = false;
     bool m_Paused = false;
 
     struct UnorderedSystems
@@ -99,9 +113,9 @@ private:
     std::vector<UnorderedSystems> m_OrderedSystemGroups;
 
     EventRelay<SystemPipeline, Events::Pause> m_EPause;
-    bool OnPause(const Events::Pause& e) { 
-        if (e.World == m_World) { 
-            m_Paused = true; 
+    bool OnPause(const Events::Pause& e) {
+        if (e.World == m_World) {
+            m_Paused = true;
         }
         return true;
     }

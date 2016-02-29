@@ -62,6 +62,13 @@ void Camera::SetViewMatrix(glm::mat4 val)
     m_ViewMatrix = val;
 }
 
+
+glm::mat4 Camera::BillboardMatrix()
+{
+    glm::mat4 matrix = glm::toMat4(m_Orientation);
+    return matrix; 
+}
+
 //void Camera::Pitch(float val)
 //{
 //	m_Pitch = val;

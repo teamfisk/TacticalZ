@@ -3,13 +3,13 @@
 #include "Editor/EditorRenderSystem.h"
 #include "Editor/EditorWidgetSystem.h"
 
-EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame) 
-    : System(world, eventBroker)
+EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {
     m_EditorWorld = new World();
-    m_EditorWorldSystemPipeline = new SystemPipeline(m_EditorWorld, eventBroker);
+    m_EditorWorldSystemPipeline = new SystemPipeline(m_EditorWorld, m_EventBroker, IsClient, IsServer);
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
     m_EditorWorldSystemPipeline->AddSystem<EditorWidgetSystem>(0, m_Renderer);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
@@ -30,6 +30,7 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
     m_EditorGUI->SetEntityDeleteCallback(std::bind(&EditorSystem::OnEntityDelete, this, std::placeholders::_1));
     m_EditorGUI->SetEntityChangeParentCallback(std::bind(&EditorSystem::OnEntityChangeParent, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetEntityChangeNameCallback(std::bind(&EditorSystem::OnEntityChangeName, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetEntityPasteCallback(std::bind(&EditorSystem::OnEntityPaste, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
@@ -42,8 +43,11 @@ EditorSystem::EditorSystem(World* world, EventBroker* eventBroker, IRenderer* re
 
     m_EditorStats = new EditorStats();
 
+    m_Enabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.EditorEnabled", false);
     if (m_Enabled) {
         Enable();
+    } else {
+        Disable();
     }
 }
 
@@ -102,9 +106,9 @@ void EditorSystem::Enable()
     }
 
     // Pause the world we're editing
-    Events::Pause ePause;
-    ePause.World = m_World;
-    m_EventBroker->Publish(ePause);
+    //Events::Pause ePause;
+    //ePause.World = m_World;
+    //m_EventBroker->Publish(ePause);
 
     m_Enabled = true;
 }
@@ -157,6 +161,11 @@ void EditorSystem::OnEntityChangeName(EntityWrapper entity, const std::string& n
     if (entity.Valid()) {
         entity.World->SetName(entity.ID, name);
     }
+}
+
+EntityWrapper EditorSystem::OnEntityPaste(EntityWrapper entityToCopy, EntityWrapper parent)
+{
+    return entityToCopy.Clone(parent);
 }
 
 void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& componentType)
@@ -223,6 +232,12 @@ bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
         } else {
             Enable();
         }
+    }
+    if (e.Command == "PerformanceTimingResetAllTimers" && e.Value > 0) {
+        PerformanceTimer::ResetAllTimers();
+    }
+    if (e.Command == "PerformanceTimingCreateExcelData" && e.Value > 0) {
+        PerformanceTimer::CreateExcelData();
     }
     return true;
 }

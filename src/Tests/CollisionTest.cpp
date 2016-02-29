@@ -29,14 +29,14 @@ void RayTest(std::string fileName) {
     Ray ray(glm::vec3(-50, 0, 0), glm::vec3(1, 0, 0));
     //using a 
     
-    here, else we have to init the renderingsystem
+    //here, else we have to init the renderingsystem
     ResourceManager::RegisterType<RawModel>("RawModel");
     auto unitBox = ResourceManager::Load<RawModel>(fileName);
     BOOST_REQUIRE(unitBox != nullptr);
-    bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+    bool hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices, glm::mat4(1));
     BOOST_CHECK(hit);
     ray.SetDirection(glm::vec3(-1, 0, 0));
-    hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+    hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices, glm::mat4(1));
     BOOST_CHECK(!hit);
 }
 
@@ -146,12 +146,12 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
         z = Collision::RayVsAABB(ray, someAABB);
         if (z) {
             //hit
-            bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+            bool hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices,glm::mat4(1));
             if (!hit) {
                 //if rayvsaabb hit but rayvvmodel didnt hit, we get to here
-                glm::vec3 outtttttttt;
-                hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices, outtttttttt);
-                hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+                glm::mat4 outtttttttt;
+                hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices, glm::mat4(1));
+                hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices, glm::mat4(1));
             }
             else {
                 hit = hit;
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
         //    z = z;
         //}
         //
-        bool hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+        bool hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices, glm::mat4(1));
         ////breakpoint test
         //if (!hit) {
         //    hit = hit;
@@ -175,8 +175,8 @@ BOOST_AUTO_TEST_CASE(rayVsModelTest2)
                 //if rayvsmodel hit but rayvsaabb didnt hit then we get to here
                 z = Collision::RayVsAABB(ray, someAABB);
                 glm::vec3 outtttttttt;
-                hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices, outtttttttt);
-                hit = Collision::RayVsModel(ray, unitBox->m_Vertices, unitBox->m_Indices);
+                hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices, glm::mat4(1));
+                hit = Collision::RayVsModel(ray, unitBox->Vertices(), unitBox->m_Indices, glm::mat4(1));
             }
             else {
                 z = z;

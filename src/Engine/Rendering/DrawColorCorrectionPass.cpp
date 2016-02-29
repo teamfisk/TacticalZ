@@ -6,8 +6,6 @@ DrawColorCorrectionPass::DrawColorCorrectionPass(IRenderer* renderer)
 
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh");
 
-    //m_Exposure = 0.4; //TODO: Renderer: Fixa så att denna går att ändra på genom komponent eller setting.
-
     InitializeShaderPrograms();
 }
 
@@ -20,14 +18,14 @@ void DrawColorCorrectionPass::InitializeShaderPrograms()
     m_ColorCorrectionProgram->Link();
 }
 
-void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture, GLfloat gamma, GLfloat exposure)
+void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture, GLuint sceneTextureLowRes, GLuint bloomTextureLowRes, GLfloat gamma, GLfloat exposure)
 {
     //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     GLERROR("DrawScreenQuadPass::Draw: Pre");
 
     DrawScreenQuadPassState state = DrawScreenQuadPassState();
     m_ColorCorrectionProgram->Bind();
-    //glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Exposure"), exposure);
     glUniform1f(glGetUniformLocation(m_ColorCorrectionProgram->GetHandle(), "Gamma"), gamma);
 
@@ -35,9 +33,13 @@ void DrawColorCorrectionPass::Draw(GLuint sceneTexture, GLuint bloomTexture, GLf
     glBindTexture(GL_TEXTURE_2D, sceneTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, bloomTexture);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, sceneTextureLowRes);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, bloomTextureLowRes);
 
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
-    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].EndIndex - m_ScreenQuad->MaterialGroups()[0].StartIndex +1
-        , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].StartIndex);
+    glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
+        , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 }

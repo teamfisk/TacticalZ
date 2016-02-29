@@ -66,9 +66,25 @@ public:
 		, m_LowestAllocatedSlot(m_NumSlots)
 	{ }
 
-	//We may get problems with memory being released 
-	//prematurely, etc. if we allow copies.
-	MemoryPool(const MemoryPool<T>& other) = delete;
+    MemoryPool(const MemoryPool<T>& other)
+		: m_StartAddress(new char[other.m_NumSlots*other.m_Stride])
+		, m_SlotIsAllocated(other.m_SlotIsAllocated)
+        , m_ExtraMemory()
+		, m_NumSlots(other.m_NumSlots)
+		, m_LowestAllocatedSlot(other.m_LowestAllocatedSlot)
+		, m_NumAllocatedSlots(other.m_NumAllocatedSlots)
+		, m_Stride(other.m_Stride)
+		, m_CurrentAllocSlot(other.m_CurrentAllocSlot)
+    {
+        // Copy statically allocated pool
+        memcpy(m_StartAddress, other.m_StartAddress, m_NumSlots*m_Stride);
+        // Copy dynamically allocated memory
+        for (char* otherAddr : other.m_ExtraMemory) {
+            char* addr = (char*)malloc(m_Stride);
+            memcpy(addr, otherAddr, m_Stride);
+            m_ExtraMemory.push_back(addr);
+        }
+    }
 	MemoryPool(const MemoryPool<T>&& other) = delete;
 
 	//Free all memory that has been allocated.
@@ -78,8 +94,9 @@ public:
 			delete[] m_StartAddress;
 			m_StartAddress = nullptr;
 		}
-		for (char* addr : m_ExtraMemory)
-			free(addr);
+        for (char* addr : m_ExtraMemory) {
+            free(addr);
+        }
 		m_ExtraMemory.clear();
 	}
 
@@ -102,7 +119,7 @@ public:
 			m_ExtraMemory.push_back((char*)malloc(m_Stride));
 			//We should preferably not enter here to avoid performance issues. Set more numMaxElements in constructor instead.
             if (!DisableMemoryPool::Value) {
-			    LOG_WARNING("Allocated slots exceed Pool size, extra memory allocated dynamically. Pool size: %u, dynamic size: %u.", m_NumSlots, m_ExtraMemory.size());
+			    LOG_DEBUG("Allocated slots exceed Pool size, extra memory allocated dynamically. Pool size: %u, dynamic size: %u.", m_NumSlots, m_ExtraMemory.size());
             }
 			return m_ExtraMemory.back();
 		}

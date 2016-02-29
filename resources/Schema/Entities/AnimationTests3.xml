@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="AnimationTests" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Transform>
+          <Position X="-0.100000001" Y="-1.11500001" Z="-3.10500026"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:DirectionalLight/>
+            <c:Model>
+              <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="2.42800021" Z="-2.80000019"/>
+              <Orientation X="5.40800047" Y="3.65100026" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Running">
+          <Components>
+            <c:Animation>
+              <AnimationName1>Run</AnimationName1>
+              <Weight1>0.5</Weight1>
+              <Time1>0.14873348341666759</Time1>
+              <Speed1>-1</Speed1>
+              <Speed2>1</Speed2>
+              <AnimationName2></AnimationName2>
+              <Weight2>0.5</Weight2>
+              <Time2>0.96957233017255007</Time2>
+              <AnimationName3></AnimationName3>
+              <Time3>0.093923612201312068</Time3>
+              <Speed3>1</Speed3>
+            </c:Animation>
+            <c:AnimationOffset>
+              <AnimationName>AimRifle</AnimationName>
+            </c:AnimationOffset>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.690088332" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="R_Arm_Weapon_Joint">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                  <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0.106085993" Y="1.24281573" Z="-0.198514819"/>
+                  <Orientation X="0.466044426" Y="0.284358948" Z="-0.0190349482"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:PointLight>
+              <Radius>10</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="0" Y="1.0823108" Z="0.738871336"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitPlane.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Scale X="10" Y="1" Z="10"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Animation>
+              <AnimationName1>ShootFastRifle</AnimationName1>
+              <Time1>0.11093210511546658</Time1>
+              <Speed1>1</Speed1>
+            </c:Animation>
+            <c:AnimationOffset>
+              <AnimationName>AimRifle</AnimationName>
+              <Time>1</Time>
+            </c:AnimationOffset>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0.106085993" Y="1.24281573" Z="-0.198514819"/>
+                  <Orientation X="0.466044426" Y="0.284358948" Z="-0.0190349482"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

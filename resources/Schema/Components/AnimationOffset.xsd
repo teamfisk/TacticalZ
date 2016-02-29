@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="AnimationOffset">
+	<xs:annotation>
+		<xs:documentation>Aim animation offset for the skeleton</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="AnimationName" type="t:string" minOccurs="0"/>
+				<xs:element name="Time" type="t:double" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
