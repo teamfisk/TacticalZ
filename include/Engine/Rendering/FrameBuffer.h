@@ -33,15 +33,6 @@ public:
     ~Texture2D();
 };
 
-class Texture2DMultiSample : public ResourceType<GL_TEXTURE_2D_MULTISAMPLE>
-{
-public:
-	Texture2DMultiSample(GLuint* resourceHandle, GLenum attachment)
-		: ResourceType(resourceHandle, attachment) { };
-
-	~Texture2DMultiSample();
-};
-
 class RenderBuffer : public ResourceType<GL_RENDERBUFFER>
 {
 public:

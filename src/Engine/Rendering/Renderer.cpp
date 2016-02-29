@@ -28,9 +28,9 @@ void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height
     glViewport(0, 0, width, height);
     Renderer* currentRenderer = m_WindowToRenderer[window];
     currentRenderer->m_ViewportSize = Rectangle(width, height);
+	currentRenderer->m_PickingPass->OnWindowResize();
     currentRenderer->m_DrawFinalPass->OnWindowResize();
     currentRenderer->m_LightCullingPass->OnWindowResize();
-    currentRenderer->m_PickingPass->OnWindowResize();
     currentRenderer->m_DrawBloomPass->OnWindowResize();
 	currentRenderer->m_SSAOPass->OnWindowResize();
 }
@@ -136,17 +136,16 @@ void Renderer::Draw(RenderFrame& frame)
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
     GLERROR("ClearBuffers");
 	for (auto scene : frame.RenderScenes) {
-		PerformanceTimer::StartTimer("Renderer-Depth");
+		PerformanceTimer::StartTimer("Renderer-PickingPass");
 		m_PickingPass->Draw(*scene);
 		GLERROR("Drawing pickingpass");
-		PerformanceTimer::StopTimer("Renderer-Depth");
+		PerformanceTimer::StopTimer("Renderer-PickingPass");
 	}
 	PerformanceTimer::StartTimer("Renderer-AO generation");
-	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
+	m_SSAOPass->Draw(*m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
 	PerformanceTimer::StopTimer("Renderer-AO generation");
     for (auto scene : frame.RenderScenes){
-        
-        PerformanceTimer::StartTimer("Renderer-Drawing PickingPass");
+        PerformanceTimer::StartTimer("Renderer-Depth");
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Generate Frustrums");
@@ -206,8 +205,11 @@ void Renderer::Draw(RenderFrame& frame)
     PerformanceTimer::StartTimer("Renderer-ImGuiRenderPass");
     m_ImGuiRenderPass->Draw();
     GLERROR("Imgui draw");
+	PerformanceTimer::StopTimer("Renderer-ImGuiRenderPass");
+
+	PerformanceTimer::StartTimer("Renderer-SwapBuffer");
     glfwSwapBuffers(m_Window);
-    PerformanceTimer::StopTimer("Renderer-ImGuiRenderPass");
+	PerformanceTimer::StopTimer("Renderer-SwapBuffer");
 }
 
 PickData Renderer::Pick(glm::vec2 screenCoord)
@@ -248,7 +250,7 @@ void Renderer::InitializeRenderPasses()
     m_LightCullingPass = new LightCullingPass(this);
     m_CubeMapPass = new CubeMapPass(this);
 	m_SSAOPass = new SSAOPass(this, m_Config);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_PickingPass->DepthBuffer());
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);

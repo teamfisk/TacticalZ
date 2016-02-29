@@ -15,7 +15,7 @@
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, GLuint* depthBuffer);
     ~DrawFinalPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -59,7 +59,7 @@ private:
     GLuint m_SceneTexture;
     GLuint m_BloomTextureLowRes;
     GLuint m_SceneTextureLowRes;
-    GLuint m_DepthBuffer;
+    GLuint* m_DepthBuffer;
     GLuint m_DepthBufferLowRes;
     GLuint m_CubeMapTexture;
 

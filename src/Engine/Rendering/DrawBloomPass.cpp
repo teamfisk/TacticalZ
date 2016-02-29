@@ -82,11 +82,11 @@ void DrawBloomPass::ClearBuffer()
     GLERROR("PRE");
     m_GaussianFrameBuffer_horiz.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     m_GaussianFrameBuffer_horiz.Unbind();
     m_GaussianFrameBuffer_vert.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     m_GaussianFrameBuffer_vert.Unbind();
     GLERROR("END");
 }

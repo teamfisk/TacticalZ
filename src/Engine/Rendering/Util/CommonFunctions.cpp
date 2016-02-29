@@ -31,6 +31,16 @@ void CommonFunctions::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum f
 	GLERROR("Texture initialization failed");
 }
 
+void CommonFunctions::GenerateMultiSampleTexture(GLuint* texture, int numSamples, glm::vec2 dimensions, GLint internalFormat)
+{
+	glDeleteTextures(1, texture);
+	glGenTextures(1, texture);
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, *texture);
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, numSamples, internalFormat, dimensions.x, dimensions.y, false);
+	GLERROR("Texture initialization failed");
+}
+
+
 void CommonFunctions::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps)
 {
 	glGenTextures(1, texture);

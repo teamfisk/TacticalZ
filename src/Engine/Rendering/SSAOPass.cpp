@@ -88,8 +88,8 @@ void SSAOPass::InitializeTexture() {
 	CommonFunctions::GenerateTexture(&m_SSAOTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RED, GL_FLOAT);
 	CommonFunctions::GenerateTexture(&m_SSAOViewSpaceZTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R32F, GL_RED, GL_FLOAT);
 
-	CommonFunctions::GenerateTexture(&m_Gaussian_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RGB, GL_FLOAT);
-	CommonFunctions::GenerateTexture(&m_Gaussian_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RGB, GL_FLOAT);
+	CommonFunctions::GenerateTexture(&m_Gaussian_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RED, GL_FLOAT);
+	CommonFunctions::GenerateTexture(&m_Gaussian_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width >> m_TextureQuality, m_Renderer->GetViewportSize().Height >> m_TextureQuality), GL_R8, GL_RED, GL_FLOAT);
 }
 
 void SSAOPass::InitializeBuffer()
@@ -127,22 +127,22 @@ void SSAOPass::ClearBuffer()
 	}
 	m_SSAOFramBuffer.Bind();
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	m_SSAOFramBuffer.Unbind();
 
 	m_SSAOViewSpaceZFramBuffer.Bind();
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	m_SSAOViewSpaceZFramBuffer.Unbind();
 
 	m_GaussianFrameBuffer_horiz.Bind();
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	m_GaussianFrameBuffer_horiz.Unbind();
 
 	m_GaussianFrameBuffer_vert.Bind();
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	m_GaussianFrameBuffer_vert.Unbind();
 }
 
@@ -284,4 +284,5 @@ void SSAOPass::OnWindowResize() {
 	}
 
 	InitializeTexture();
+	InitializeBuffer();
 }

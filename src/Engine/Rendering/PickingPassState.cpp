@@ -14,6 +14,7 @@ PickingPassState::PickingPassState(GLuint frameBuffer)
     //ClearColor(clearColor);
     //Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GLERROR("END");
+	
 }
 
 PickingPassState::~PickingPassState()
