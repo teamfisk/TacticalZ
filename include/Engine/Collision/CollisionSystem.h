@@ -24,6 +24,7 @@ public:
 private:
     Octree<EntityAABB>* m_Octree;
     std::vector<EntityAABB> m_OctreeResult;
+    std::unordered_map<EntityWrapper, glm::vec3> m_PrevPositions;
 };
 
 #endif

@@ -186,7 +186,7 @@ void Server::addInputCommandsToPacket(Packet& packet)
 
 void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
 {
-    auto itPair = m_World->GetChildren(entityID);
+    auto itPair = m_World->GetDirectChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
@@ -234,7 +234,7 @@ void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
 {
-    auto itPair = m_World->GetChildren(entityID);
+    auto itPair = m_World->GetDirectChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
@@ -601,7 +601,7 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    auto children = m_World->GetChildren(childEntity.ID);
+    auto children = m_World->GetDirectChildren(childEntity.ID);
     for (auto it = children.first; it != children.second; it++) {
         EntityWrapper child(m_World, it->second);
         if(child.HasComponent("CapturePoint")) {
