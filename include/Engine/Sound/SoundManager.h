@@ -88,7 +88,6 @@ private:
     void stopSound(Source* source);
     Source* createSource(std::string filePath);
     std::unordered_map<EntityID, Source*> m_Sources;
-    void mainMenuLoop();
     void matchBGMLoop();
     Source* m_CurrentBGM;
     Source* m_CurrentBGMCombo;

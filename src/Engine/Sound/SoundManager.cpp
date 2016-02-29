@@ -68,8 +68,6 @@ void SoundManager::Update(double dt)
     updateListener(dt);
     if (m_TempPleaseDeleteMeASAP)
         matchBGMLoop();
-    if (false)
-        mainMenuLoop();
 }
 
 void SoundManager::deleteInactiveEmitters()
@@ -175,18 +173,6 @@ Source* SoundManager::createSource(std::string filePath)
     source->SoundResource = ResourceManager::Load<Sound>(filePath);
     source->Duration = getDurationSeconds(source);
     return source;
-}
-
-
-void SoundManager::mainMenuLoop()
-{
-    float time = getTimeOffsetSeconds(m_CurrentBGM);
-    //LOG_INFO("%f/%f", time, m_CurrentBGM->Duration);
-    // TODO: config?
-    if (m_CurrentBGM->Duration - time <= 5) { // 5 is hard coded value that Petter recommended
-        m_CurrentBGM = createSource("Audio/lalala.wav");
-        playSound(m_CurrentBGM);
-    }
 }
 
 void SoundManager::matchBGMLoop()
@@ -377,7 +363,7 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
         if (m_TempPleaseDeleteMeASAP) {
             return true;
         }
-        m_CurrentBGMCombo = createSource("Audio/bgm/nearWin.wav");
+        m_CurrentBGMCombo = createSource("Audio/bgm/layer2.wav");
         m_CurrentBGMCombo->Type = SoundType::BGM;
         alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
         setGain(m_CurrentBGMCombo, 0);

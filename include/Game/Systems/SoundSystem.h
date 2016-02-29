@@ -35,11 +35,6 @@ private:
     std::string m_Announcer = "";
     // Logic for playing a sound when a player jumps
     void playerJumps();
-    
-    // Temporary solution for play test.
-    bool m_DrumsIsPlaying = false;
-    double m_DrumTimer = 0.0;
-    bool drumTimer(double dt);
 
     std::default_random_engine generator;
 

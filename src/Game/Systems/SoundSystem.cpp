@@ -25,11 +25,6 @@ void SoundSystem::Update(double dt)
     if (!IsClient) {
         return;
     }
-
-    // Temp for play test.
-    if (m_DrumsIsPlaying) {
-        m_DrumsIsPlaying = !drumTimer(dt);
-    }
 }
 
 bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
@@ -42,7 +37,7 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
         // TEMP: starts bgm
         {
             Events::PlayBackgroundMusic ev;
-            ev.FilePath = "Audio/bgm/ambient.wav";
+            ev.FilePath = "Audio/bgm/layer1.wav";
             m_EventBroker->Publish(ev);
         }
     }
@@ -76,17 +71,6 @@ void SoundSystem::playerJumps()
     }
 }
 
-bool SoundSystem::drumTimer(double dt)
-{
-    m_DrumTimer += dt;
-    if (m_DrumTimer > 15) {
-        m_DrumTimer = 0.0;
-        return true;
-    } else {
-        return false;
-    }
-}
-
 bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
     int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
@@ -98,8 +82,6 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
         ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_failed.wav"; // have not been tested
     }
     m_EventBroker->Publish(ev);
-    // Temp for play test.
-    m_DrumsIsPlaying = false;
     return false;
 }
 
