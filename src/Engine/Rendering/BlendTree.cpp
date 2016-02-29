@@ -6,11 +6,6 @@ BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
     m_Skeleton = skeleton;
 
 
-    auto itPair = ModelEntity.World->GetChildren(ModelEntity.ID);
-    if (itPair.first == itPair.second) {
-        return;
-    }
-
 
     if (ModelEntity.HasComponent("Animation")) {
         const Skeleton::Animation* animation = skeleton->GetAnimation(ModelEntity["Animation"]["AnimationName"]);
@@ -59,20 +54,21 @@ BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
 BlendTree::~BlendTree()
 {
     Node* currentNode = m_Root;
+    if (currentNode != nullptr) {
+        while (currentNode->Child[0] != nullptr) {
+            currentNode = currentNode->Child[0];
+        }
 
-    while (currentNode->Child[0] != nullptr) {
-        currentNode = currentNode->Child[0];
-    }
+        std::list<Node*> m_NodesToRemove;
 
-    std::list<Node*> m_NodesToRemove;
+        while (currentNode != nullptr) {
+            m_NodesToRemove.push_back(currentNode);
+            currentNode = currentNode->Next();
+        }
 
-    while (currentNode != nullptr) {
-        m_NodesToRemove.push_back(currentNode);
-        currentNode = currentNode->Next();
-    }
-
-    for (auto it = m_NodesToRemove.begin(); it != m_NodesToRemove.end(); it++) {
-        delete (*it);
+        for (auto it = m_NodesToRemove.begin(); it != m_NodesToRemove.end(); it++) {
+            delete (*it);
+        }
     }
 }
 
@@ -107,7 +103,7 @@ void BlendTree::PrintTree()
 
 BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity)
 {
-    EntityWrapper childEntity = parentEntity.FirstChildByName(name); // Make first level child by name
+    EntityWrapper childEntity = parentEntity.FirstLevelChildByName(name); // Make first level child by name
 
     if (!childEntity.Valid()) {
         return nullptr;
@@ -133,8 +129,16 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         node->Type = NodeType::Blend;
         (double&)childEntity["Blend"]["Weight"] = glm::clamp((float)(double)childEntity["Blend"]["Weight"], 0.f, 1.f);
         node->Weight = (double)childEntity["Blend"]["Weight"];
-        node->Child[0] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose1"], childEntity);
-        node->Child[1] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose2"], childEntity);
+        if (node->Weight < 1.f && node->Weight > 0.f) {
+            node->Child[0] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose1"], childEntity);
+            node->Child[1] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose2"], childEntity);
+        } else if (node->Weight == 1.f) {
+            node->Child[0] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose1"], childEntity);
+        } else if (node->Weight == 0.f) {
+            node->Child[1] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose2"], childEntity);
+        }
+
+
         return node;
     } else if (childEntity.HasComponent("BlendOverride")) {
         Node* node = new Node();
@@ -213,7 +217,7 @@ void BlendTree::Blend(std::map<int, glm::mat4>& pose)
 std::vector<glm::mat4> BlendTree::AccumulateFinalPose()
 {
     std::vector<glm::mat4> finalPose;
-    if (m_Skeleton == nullptr || m_Root == nullptr) {
+    if (m_Skeleton == nullptr || m_Root == nullptr || (m_Root->Child[0] == nullptr && m_Root->Child[1] == nullptr)) {
         
         for (int i = 0; i < m_Skeleton->Bones.size(); i++) {
             finalPose.push_back(glm::mat4(1));

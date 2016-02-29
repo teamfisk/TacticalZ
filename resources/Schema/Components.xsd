@@ -33,7 +33,6 @@
 	<xs:include schemaLocation="Components/HiddenForLocalPlayer.xsd"/>
 	<xs:include schemaLocation="Components/HealthPickup.xsd"/>
 	<xs:include schemaLocation="Components/AmmoPickup.xsd"/>
-	<xs:include schemaLocation="Components/AnimationOffset.xsd"/>
 	<xs:include schemaLocation="Components/DashAbility.xsd"/>
 	<xs:include schemaLocation="Components/AssaultWeapon.xsd"/>
 	<xs:include schemaLocation="Components/Shield.xsd"/>

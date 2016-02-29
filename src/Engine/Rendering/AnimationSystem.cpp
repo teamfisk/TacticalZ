@@ -34,7 +34,16 @@ void AnimationSystem::CreateBlendTrees()
             continue;
         }
 
-        skeleton->BlendTrees[entity] = std::shared_ptr<BlendTree>(new BlendTree(entity, skeleton));
+        if (entity.HasComponent("Blend") || entity.HasComponent("BlendOverride") ||
+            entity.HasComponent("BlendAdditive") || entity.HasComponent("Animation"))
+        {
+            std::shared_ptr<BlendTree> blendTree = std::shared_ptr<BlendTree>(new BlendTree(entity, skeleton));
+
+            if(blendTree->IsValid()) {
+                skeleton->BlendTrees[entity] = blendTree;
+            }
+            
+        }
     }
 }
 
@@ -47,11 +56,16 @@ void AnimationSystem::UpdateAnimations(double dt)
 
     for (auto& animationC : *animationComponents) {
         EntityWrapper entity = EntityWrapper(m_World, animationC.EntityID);
-        EntityWrapper parent = entity.FirstParentWithComponent("Model");
+        EntityWrapper modelEntity;
+        if(!entity.HasComponent("Model")) {
+            modelEntity = entity.FirstParentWithComponent("Model");
+        } else {
+            modelEntity = entity;
+        }
 
         Model* model;
         try {
-            model = ResourceManager::Load<::Model, true>(parent["Model"]["Resource"]);
+            model = ResourceManager::Load<::Model, true>(modelEntity["Model"]["Resource"]);
         } catch (const std::exception&) {
             return;
         }

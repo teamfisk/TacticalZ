@@ -28,6 +28,7 @@ struct EntityWrapper
     void AttachComponent(const char* componentName);
     EntityWrapper Parent();
     EntityWrapper FirstChildByName(const std::string& name);
+    EntityWrapper FirstLevelChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
     bool IsChildOf(EntityWrapper potentialParent);
     bool Valid() const;

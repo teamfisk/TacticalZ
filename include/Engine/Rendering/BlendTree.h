@@ -63,7 +63,7 @@ public:
 
     std::vector<glm::mat4> GetFinalPose() { return m_FinalPose; }
     glm::mat4 GetBoneTransform(int boneID);
-
+    bool IsValid() { return  (m_Root == nullptr ? false : true); }
 
     void PrintTree();
 

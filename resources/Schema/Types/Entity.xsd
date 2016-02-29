@@ -49,7 +49,6 @@
 							<xs:element ref="c:AmmunitionHUD" minOccurs="0"/>
 							<xs:element ref="c:KillFeed" minOccurs="0"/>
 							<xs:element ref="c:Sprite" minOccurs="0"/>
-							<xs:element ref="c:AnimationOffset" minOccurs="0"/>
 							<xs:element ref="c:Menu" minOccurs="0"/>
 							<xs:element ref="c:Page" minOccurs="0"/>
 							<xs:element ref="c:Button" minOccurs="0"/>
