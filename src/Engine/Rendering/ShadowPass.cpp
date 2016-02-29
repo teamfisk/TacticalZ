@@ -34,7 +34,7 @@ void ShadowPass::InitializeCameras(RenderScene & scene)
 
 // UpdateSplitDist computes the near and far distances for every frustum slice
 // in camera eye space - that is, at what distance does a slice start and end
-void ShadowPass::UpdateSplitDist(std::array<Frustum, MAX_SPLITS>& frusta, float near_distance, float far_distance)
+void ShadowPass::UpdateSplitDist(std::array<ShadowFrustum, MAX_SPLITS>& frusta, float near_distance, float far_distance)
 {
 	float lambda = m_SplitWeight;
 	float ratio = far_distance / near_distance;
@@ -51,7 +51,7 @@ void ShadowPass::UpdateSplitDist(std::array<Frustum, MAX_SPLITS>& frusta, float 
 	frusta[m_CurrentNrOfSplits - 1].FarClip = far_distance;
 }
 
-void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::mat4 p, glm::mat4 v)
+void ShadowPass::UpdateFrustumPoints(ShadowFrustum& frustum, glm::mat4 p, glm::mat4 v)
 {
 	std::array<glm::vec4, 8> CornerPoint = {
 		glm::vec4(-1.f, -1.f,	-1.f,	1.f),
@@ -72,7 +72,7 @@ void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::mat4 p, glm::mat4 v)
 }
 
 // Compute the 8 corner points of the current view frustum in world space
-void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position, glm::vec3 view_dir)
+void ShadowPass::UpdateFrustumPoints(ShadowFrustum& frustum, glm::vec3 camera_position, glm::vec3 view_dir)
 {
 	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
 	glm::vec3 right = glm::normalize(glm::cross(view_dir, up));
@@ -100,7 +100,7 @@ void ShadowPass::UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position
 	frustum.CornerPoint[7] = far_center - up * far_height + right * far_width;
 }
 
-float ShadowPass::FindRadius(Frustum& frustum)
+float ShadowPass::FindRadius(ShadowFrustum& frustum)
 {
 	float radius = 0.f;
 
@@ -164,7 +164,7 @@ void ShadowPass::ClearBuffer()
 	m_DepthBuffer.Unbind();
 }
 
-void ShadowPass::PointsToLightspace(Frustum& frustum, glm::mat4 v)
+void ShadowPass::PointsToLightspace(ShadowFrustum& frustum, glm::mat4 v)
 {
 	float left = INFINITY;
 	float right = -INFINITY;
@@ -184,7 +184,7 @@ void ShadowPass::PointsToLightspace(Frustum& frustum, glm::mat4 v)
 	frustum.LRBT = { left, right, bottom, top };
 }
 
-void ShadowPass::RadiusToLightspace(Frustum& frustum)
+void ShadowPass::RadiusToLightspace(ShadowFrustum& frustum)
 {
 	float quantizationStep = 1.0f / m_ResolutionSizeHeight;
 
@@ -214,7 +214,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
 		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
 
-		for (auto &job : scene.DirectionalLightJobs) {
+		for (auto &job : scene.Jobs.DirectionalLight) {
 			auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
 			if (directionalLightJob) {
@@ -230,7 +230,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
 				GLERROR("ShadowLight ERROR");
 
-				for (auto &objectJob : scene.OpaqueObjects) {
+				for (auto &objectJob : scene.Jobs.OpaqueObjects) {
 					if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob))
 					{
 						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
@@ -246,20 +246,35 @@ void ShadowPass::Draw(RenderScene & scene)
 				}
 
 				state->CullFace(GL_BACK);
-				for (auto &objectJob : scene.TransparentObjects) {
+				for (auto &objectJob : scene.Jobs.TransparentObjects) {
 					if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob))
 					{
 						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
 						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 						glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
-
-						glActiveTexture(GL_TEXTURE24);
-						if (modelJob->DiffuseTexture != nullptr) {
-							glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture->m_Texture);
+						
+						switch (modelJob->Type) {
+						case RawModel::MaterialType::SingleTextures:
+						case RawModel::MaterialType::Basic:
+						{
+							glActiveTexture(GL_TEXTURE24);
+							if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+								glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+								glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+							}
+							else {
+								glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+								glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+							}
+							break;
 						}
-						else {
+						case RawModel::MaterialType::SplatMapping:
+						{
 							glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+							glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+							break;
+						}
 						}
 
 						glBindVertexArray(modelJob->Model->VAO);

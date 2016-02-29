@@ -82,6 +82,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;

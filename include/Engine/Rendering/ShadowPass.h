@@ -14,7 +14,7 @@
 enum NearFar { NEAR = 0, FAR = 1 };
 enum LRBT { LEFT = 0, RIGHT = 1, BOTTOM = 2, TOP = 3 };
 
-struct Frustum
+struct ShadowFrustum
 {
 	float NearClip;
 	float FarClip;
@@ -47,14 +47,14 @@ public:
 	void SetSplitWeight(float split_weight) { m_SplitWeight = split_weight; };
 private:
 	void InitializeCameras(RenderScene & scene);
-	void UpdateSplitDist(std::array<Frustum, MAX_SPLITS>& frusta, float near_distance, float far_distance);
-	void UpdateFrustumPoints(Frustum& frustum, glm::vec3 camera_position, glm::vec3 view_dir);
-	void UpdateFrustumPoints(Frustum& frustum, glm::mat4 p, glm::mat4 v);
+	void UpdateSplitDist(std::array<ShadowFrustum, MAX_SPLITS>& frusta, float near_distance, float far_distance);
+	void UpdateFrustumPoints(ShadowFrustum& frustum, glm::vec3 camera_position, glm::vec3 view_dir);
+	void UpdateFrustumPoints(ShadowFrustum& frustum, glm::mat4 p, glm::mat4 v);
 
-	void PointsToLightspace(Frustum& frustum, glm::mat4 v);
+	void PointsToLightspace(ShadowFrustum& frustum, glm::mat4 v);
 
-	float FindRadius(Frustum& frustum);
-	void RadiusToLightspace(Frustum& frustum);
+	float FindRadius(ShadowFrustum& frustum);
+	void RadiusToLightspace(ShadowFrustum& frustum);
 
 	EventBroker* m_EventBroker;
 	const IRenderer* m_Renderer;
@@ -74,7 +74,7 @@ private:
 	int m_CurrentNrOfSplits = 4;
 	float m_SplitWeight = 0.91f;
 
-	std::array<Frustum, MAX_SPLITS> m_shadowFrusta;
+	std::array<ShadowFrustum, MAX_SPLITS> m_shadowFrusta;
 
 	Texture* m_WhiteTexture = ResourceManager::Load<Texture>("Textures/Core/White.png");
 };

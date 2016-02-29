@@ -21,6 +21,7 @@ out VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Output;
 
 void main()
@@ -43,4 +44,5 @@ void main()
  	Output.BiTangent = vec3(M * vec4(BiTangent, 0.0));
 	Output.ExplosionColor = vec4(1.0);
 	Output.ExplosionPercentageElapsed = 0.0;
+	Output.PositionLightSpace = boneTransform * vec4(Position, 1.0);
 }

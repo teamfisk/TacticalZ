@@ -61,45 +61,45 @@ void FrameBuffer::Generate()
     glBindFramebuffer(GL_FRAMEBUFFER, m_BufferHandle);
     GLERROR("1");
 
-    for (auto it = m_Resources.begin(); it != m_Resources.end(); it++) {
-        switch ((*it)->m_ResourceType) {
-        case GL_TEXTURE_2D:
-            glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
+	for (auto it = m_Resources.begin(); it != m_Resources.end(); it++) {
+		switch ((*it)->m_ResourceType) {
+		case GL_TEXTURE_2D:
+			glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
 			attachments.push_back((*it)->m_Attachment);
-            GLERROR("FrameBuffer generate: glFramebufferTexture2D");
-            break;
-        case GL_RENDERBUFFER:
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
-            GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
-            break;
+			GLERROR("FrameBuffer generate: glFramebufferTexture2D");
+			break;
+		case GL_RENDERBUFFER:
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
+			GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
+			break;
 		case GL_TEXTURE_2D_ARRAY:
 			glFramebufferTexture(GL_FRAMEBUFFER, (*it)->m_Attachment, *(*it)->m_ResourceHandle, 0);
 			attachments.push_back((*it)->m_Attachment);
 			GLERROR("FrameBuffer generate: GL_TEXTURE_2D_ARRAY");
 			break;
-        }
-        GLERROR("2");
+		}
+		GLERROR("2");
 
-        if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT && (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
-        GLERROR("Attachment");
+		if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT && (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
+			GLERROR("Attachment");
 
-    }
-    GLERROR("3");
+		}
+		GLERROR("3");
 
 
-    GLenum* bufferTextures = &attachments[0];
-    glDrawBuffers(attachments.size(), bufferTextures);
-    if (GLERROR("GLBufferAttachement error")) {
-        printf(": AttachmentSize %i", attachments.size());
-    }
+		GLenum* bufferTextures = &attachments[0];
+		glDrawBuffers(attachments.size(), bufferTextures);
+		if (GLERROR("GLBufferAttachement error")) {
+			printf(": AttachmentSize %i", attachments.size());
+		}
 
-    if (GLenum frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        GLERROR("Framebuffer incomplete");
-        //LOG_ERROR("FrameBuffer incomplete: 0x%x\n", frameBufferStatus);
-        exit(EXIT_FAILURE);
-    }
-    GLERROR("END");
-
+		if (GLenum frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			GLERROR("Framebuffer incomplete");
+			//LOG_ERROR("FrameBuffer incomplete: 0x%x\n", frameBufferStatus);
+			exit(EXIT_FAILURE);
+		}
+		GLERROR("END");
+	}
 }
 
 void FrameBuffer::Bind()
