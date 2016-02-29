@@ -12,7 +12,6 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     if (!boundingBox) {
         return;
     }
-    std::cout << "---->>>--Start Update--------" << std::endl;
     ComponentWrapper& cTransform = entity["Transform"];
     EntityAABB& boxA = *boundingBox;
     bool everHitTheGround = false;
@@ -116,5 +115,4 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     }
 
     m_PrevPositions[entity] = boxA.Origin();
-    std::cout << "--------End Update---->>>--" << std::endl;
 }

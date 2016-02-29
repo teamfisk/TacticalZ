@@ -380,11 +380,11 @@ bool AABBvsTriangle(const AABB& box,
 
     enum BoxTriResolveCase
     {
-        EResolveDimX,
-        EResolveDimY,
-        EResolveDimZ,
-        ELine,       //Box edge colliding with triangle line.
-        ECorner      //Box corner colliding with the triangle face.
+        ResolveDimX,
+        ResolveDimY,
+        ResolveDimZ,
+        Line,       //Box edge colliding with triangle line.
+        Corner      //Box corner colliding with the triangle face.
     };
     struct Resolution
     {
@@ -396,55 +396,10 @@ bool AABBvsTriangle(const AABB& box,
         float DistanceSq;
         glm::vec3 Vector;
     };
-    struct CaseResolutions
-    {
-        Resolution Vertex;
-        Resolution Line;
-        Resolution Corner;
-        Resolution* Shortest = &Vertex;
-
-        void AddResolution(BoxTriResolveCase resCase, float distanceSq, const glm::vec3& resVec)
-        {
-            switch (resCase) {
-            case EResolveDimY:
-            case EResolveDimX:
-            case EResolveDimZ:
-                if (distanceSq < Vertex.DistanceSq) {
-                    Vertex.Vector = resVec;
-                    Vertex.DistanceSq = distanceSq;
-                    Vertex.Case = resCase;
-                    if (distanceSq < Line.DistanceSq) {
-                        Shortest = &Vertex;
-                    }
-                }
-                break;
-            case ELine:
-                if (distanceSq < Vertex.DistanceSq && distanceSq < Line.DistanceSq) {
-                    Line.Vector = resVec;
-                    Line.DistanceSq = distanceSq;
-                    Line.Case = resCase;
-                    Shortest = &Line;
-                }
-                break;
-            case ECorner:
-                //NOTE: It is assumed that the Corner is less than the 
-                //added resolution, since only one corner should be added per triangle.
-                if (distanceSq < Vertex.DistanceSq && distanceSq < Line.DistanceSq) {
-                    Corner.Vector = resVec;
-                    Corner.DistanceSq = distanceSq;
-                    Corner.Case = resCase;
-                    Shortest = &Corner;
-                }
-                break;
-            default:
-                break;
-            }
-        }
-    };
     //The smallest resolution that solves the collision.
-    CaseResolutions resolveShortest;
+    Resolution resolveShortest;
     //The smallest resolution that solves the collision, that resolves upwards.
-    CaseResolutions resolveUpwards;
+    Resolution resolveUpwards;
     //If player stands on the ground and collides with a ground triangle, 
     //we might step up onto it if the step is small enough.
     bool canStairStepUp = isOnGround && FaceIsGround(triNormal.y);
@@ -466,27 +421,34 @@ bool AABBvsTriangle(const AABB& box,
         //Project box.
         glm::vec2 boxMin(min[dim.first], min[dim.second]);
         glm::vec2 boxMax(max[dim.first], max[dim.second]);
-        glm::vec2 resolutionVector2D;
-        float resolutionDistSq;
+        glm::vec2 resolutionVector;
+        float resolutionDist;
         bool pushedFromTriangleLine;
         //if projections don't overlap, return false.
-        if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector2D, resolutionDistSq, pushedFromTriangleLine)) {
+        if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector, resolutionDist, pushedFromTriangleLine)) {
             return false;
         } else if (resolveCollision) {
-            glm::vec3 resolve3D = glm::vec3(0.f);
-            resolve3D[dim.first] = resolutionVector2D.x;
-            resolve3D[dim.second] = resolutionVector2D.y;
-            //If we pushed away from triangle line (edge), or if we 
-            //move the player along one coordinate axis (pick the dimension that isn't zero).
-            BoxTriResolveCase resCase = pushedFromTriangleLine ? ELine : static_cast<BoxTriResolveCase>((abs(resolve3D[dim.first]) < 0.0001f) ? dim.second : dim.first);
             //Overwrite the smallest resolution if this is smaller.
-            resolveShortest.AddResolution(resCase, resolutionDistSq, resolve3D);
-
+            if (resolutionDist < resolveShortest.DistanceSq) {
+                resolveShortest.Vector = glm::vec3(0.f);
+                resolveShortest.Vector[dim.first] = resolutionVector.x;
+                resolveShortest.Vector[dim.second] = resolutionVector.y;
+                resolveShortest.DistanceSq = resolutionDist;
+                //If we pushed away from triangle line (edge), or if we 
+                //move the player along one coordinate axis (pick the dimension that isn't zero).
+                resolveShortest.Case = pushedFromTriangleLine ? Line : static_cast<BoxTriResolveCase>((abs(resolveShortest.Vector[dim.first]) < 0.0001f) ? dim.second : dim.first);
+            }
             //Overwrite the smallest upward resolution if this is smaller, and resolves upwards.
             constexpr int yAxis = 1;
-            bool resIsUpwardsIn3D = dim.first == yAxis && resolutionVector2D.x > 0 || dim.second == yAxis && resolutionVector2D.y > 0;
-            if (canStairStepUp && resIsUpwardsIn3D) {
-                resolveUpwards.AddResolution(resCase, resolutionDistSq, resolve3D);
+            bool resIsUpwardsIn3D = dim.first == yAxis && resolutionVector.x > 0 || dim.second == yAxis && resolutionVector.y > 0;
+            if (canStairStepUp && resIsUpwardsIn3D && resolutionDist < resolveUpwards.DistanceSq) {
+                resolveUpwards.Vector = glm::vec3(0.f);
+                resolveUpwards.Vector[dim.first] = resolutionVector.x;
+                resolveUpwards.Vector[dim.second] = resolutionVector.y;
+                resolveUpwards.DistanceSq = resolutionDist;
+                //If we pushed away from triangle line (edge), or if we 
+                //move the player along one coordinate axis (pick the dimension that isn't zero).
+                resolveUpwards.Case = pushedFromTriangleLine ? Line : static_cast<BoxTriResolveCase>((abs(resolveUpwards.Vector[dim.first]) < 0.0001f) ? dim.second : dim.first);
             }
         }
     }
@@ -510,40 +472,37 @@ bool AABBvsTriangle(const AABB& box,
     glm::vec3 cornerResolution = (1+t) * diagonal;
     //Overwrite the smallest resolution if cornerResolution is smaller.
     float lenSq = glm::length2(cornerResolution);
-    resolveShortest.AddResolution(ECorner, lenSq, cornerResolution);
-    if (canStairStepUp && cornerResolution.y > 0) {
-        resolveUpwards.AddResolution(ECorner, lenSq, cornerResolution);
+    if (lenSq < resolveShortest.DistanceSq) {
+        resolveShortest.Vector = cornerResolution;
+        resolveShortest.Case = Corner;
+    }
+    if (canStairStepUp && cornerResolution.y > 0 && lenSq < resolveUpwards.DistanceSq) {
+        resolveUpwards.Vector = cornerResolution;
+        resolveUpwards.Case = Corner;
+        resolveUpwards.DistanceSq = lenSq;
     }
 
     //Force the resolution upwards if it is smaller than the threshold verticalStepHeight.
     //Else take the shortest resolution.
-    bool takeUp = resolveUpwards.Shortest->Vector.y > 0 && resolveUpwards.Shortest->Vector.y < verticalStepHeight;
-    CaseResolutions& bestResolve = takeUp ? resolveUpwards : resolveShortest;
-    outResolution = bestResolve.Shortest->Vector;
+    bool takeUp = resolveUpwards.Vector.y > 0 && resolveUpwards.Vector.y < verticalStepHeight;
+    Resolution& bestResolve = takeUp ? resolveUpwards : resolveShortest;
+    outResolution = bestResolve.Vector;
 
-    std::string dbgString = "";
     glm::vec3 projNorm;
-    switch (bestResolve.Shortest->Case) {
-    case EResolveDimY:
+    switch (bestResolve.Case) {
+    case ResolveDimY:
         boxVelocity.y = 0.f;
         if (outResolution.y > 0)
             isOnGround = true;
-    case EResolveDimX:
-    case EResolveDimZ:
+    case ResolveDimX:
+    case ResolveDimZ:
         //If we get here, the resolution is along one coordinate axis.
         //set velocity to 0 in y if it is along y-axis.
-        dbgString = "Vertex Collision";
-        dbgString += isOnGround ? " Ground" : " Air";
-        dbgString += takeUp ? " Force up" : " Normal";
-        std::cout << (dbgString.c_str()) << std::endl;
-        ImGui::Text(dbgString.c_str());
         return true;
-    case ELine:
-        dbgString = "Line Collision";
+    case Line:
         projNorm = glm::normalize(outResolution);
         break;
-    case ECorner:
-        dbgString = "Corner Collision";
+    case Corner:
         projNorm = triNormal;
         break;
     default:
@@ -560,23 +519,6 @@ bool AABBvsTriangle(const AABB& box,
             outResolution.y = len / glm::sin(ang);
             outResolution.z = 0;
         }
-        float y;
-        if (bestResolve.Shortest->Case == ECorner) {
-            len = glm::length(bestResolve.Line.Vector);
-            ang = glm::half_pi<float>() - glm::acos(bestResolve.Line.Vector.y / len);
-            if (len > 0.0000001f && ang > 0.0000001f) {
-                y = len / glm::sin(ang);
-                if (y < outResolution.y) {
-                    outResolution.x = 0;
-                    outResolution.y = y;
-                    outResolution.z = 0;
-                }
-            }
-        }
-        y = bestResolve.Vertex.Vector.y;
-        if (bestResolve.Vertex.Case == EResolveDimY && y < outResolution.y) {
-            outResolution.y = y;
-        }
         //Also zero the vertical velocity, if it is positive, else project it onto the normal.
         //Project the velocity onto the normal of the hit line/face.
         //w = v - <v,n>*n, |n|==1.
@@ -591,10 +533,6 @@ bool AABBvsTriangle(const AABB& box,
             boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
         }
     }
-    dbgString += isOnGround ? " Ground" : " Air";
-    dbgString += takeUp ? " Force up" : " Normal";
-    std::cout << (dbgString.c_str()) << std::endl;
-    ImGui::Text(dbgString.c_str());
     return true;
 }
 
@@ -608,7 +546,6 @@ bool AABBvsTriangles(const AABB& box,
     glm::vec3& outResolutionVector,
     bool resolveCollision)
 {
-    std::cout << ("---->>>--AABBvsTriangles--------") << std::endl;
     bool hit = false;
 
     bool everHitTheGround = false;
@@ -636,9 +573,6 @@ bool AABBvsTriangles(const AABB& box,
     if (!everHitTheGround) {
         isOnGround = false;
     }
-    std::cout << (isOnGround ? "Hit Ground" : "In Air") << std::endl;
-    ImGui::Text(isOnGround ? "Hit Ground" : "In Air");
-    std::cout << ("--------AABBvsTriangles---->>>--") << std::endl;
     return hit;
 }
 
