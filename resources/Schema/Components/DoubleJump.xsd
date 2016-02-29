@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="DoubleJump">
+		<xs:annotation><xs:documentation>Enables a Player to double jump.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="DoubleJumpSpeed" type="t:float" minOccurs="0">
+					<xs:annotation><xs:documentation>Vertical velocity set on double jump.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

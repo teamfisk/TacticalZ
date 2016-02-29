@@ -15,6 +15,7 @@
     <c:DefenderWeapon>
       <TimeSinceLastFire>1.6944730461160304</TimeSinceLastFire>
     </c:DefenderWeapon>
+    <c:DoubleJump/>
     <c:Health/>
     <c:Physics>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>

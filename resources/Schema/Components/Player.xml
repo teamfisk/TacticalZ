@@ -2,6 +2,7 @@
 <Player xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Player.xsd">
 	<MovementSpeed>3</MovementSpeed>
 	<CrouchSpeed>1.5</CrouchSpeed>
+	<JumpSpeed>4.0</JumpSpeed>
 	<CurrentWishDirection X="0" Y="0" Z="0"/>
 	<CurrentWeapon></CurrentWeapon>
 </Player>
