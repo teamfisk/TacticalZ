@@ -291,8 +291,6 @@ void ShadowPass::Draw(RenderScene & scene)
 			}
 		}
 	}
-	glActiveTexture(GL_TEXTURE24);
-	glDisable(GL_TEXTURE_2D);
 	glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 	m_DepthBuffer.Unbind();
 	delete state;
