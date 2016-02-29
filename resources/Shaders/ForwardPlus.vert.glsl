@@ -25,14 +25,6 @@ out VertexData{
 	vec4 PositionLightSpace[MAX_SPLITS];
 }Output;
 
-// N
-mat4 biasMatrix = mat4(
-vec4(0.5, 0.0, 0.0, 0.0),
-vec4(0.0, 0.5, 0.0, 0.0),
-vec4(0.0, 0.0, 0.5, 0.0),
-vec4(0.5, 0.5, 0.5, 1.0)
-);
-
 void main()
 {
 	gl_Position = P*V*M * vec4(Position, 1.0);

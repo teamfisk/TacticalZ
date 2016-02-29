@@ -1014,6 +1014,14 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 				glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, "GlowUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
+
+			glActiveTexture(GL_TEXTURE6);
+			if (m_ShadowPass->DepthMap() != NULL) {
+				glBindTexture(GL_TEXTURE_2D_ARRAY, m_ShadowPass->DepthMap());
+			}
+			else {
+				glBindTexture(GL_TEXTURE_2D_ARRAY, m_WhiteTexture->m_Texture);
+			}
 			break;
 		}
 		case RawModel::MaterialType::SplatMapping:
@@ -1081,15 +1089,5 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 			break;
 		}
 	}
-
-	glActiveTexture(GL_TEXTURE4);
-	if (m_ShadowPass->DepthMap() != NULL) {
-		glBindTexture(GL_TEXTURE_2D_ARRAY, m_ShadowPass->DepthMap());
-	}
-	else {
-		glBindTexture(GL_TEXTURE_2D_ARRAY, m_WhiteTexture->m_Texture);
-	}
-
-
 }
 

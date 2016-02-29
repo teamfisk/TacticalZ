@@ -2,6 +2,7 @@
 
 #define MAX_SPLITS 4
 #define MIN_AMBIENT_LIGHT 0.3
+#define SHADOW_STRENGTH 0.3 //Should be ambient
 
 uniform mat4 M;
 uniform mat4 V;
@@ -235,7 +236,7 @@ float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler
 	//shadowMapDepth = PoissonDotShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS - 1]);
 	shadowMapDepth = SoftwarePCF(depth_texture_array, projCoords, layer_index, bias);
 
-    return 1.0 - shadowMapDepth;
+    return shadowMapDepth;
 } 
 
 int getShadowIndex(float far_distance[1])
@@ -342,8 +343,8 @@ void main()
 		totalLighting.Specular += vec4(light_result.Specular.rgb * ao, light_result.Specular.a);
 	}
 
-	totalLighting.Diffuse *= (1.5 + vec4(AmbientColor.rgba)) - vec4(vec3(shadowFactor), 0.0); 
-	totalLighting.Specular *= (1.5 + vec4(AmbientColor.rgba)) - vec4(vec3(shadowFactor), 0.0);
+	totalLighting.Diffuse *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
+	totalLighting.Specular *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
 	
 	//LightResult getInformation;
 	

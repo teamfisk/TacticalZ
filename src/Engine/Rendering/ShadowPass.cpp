@@ -253,8 +253,8 @@ void ShadowPass::Draw(RenderScene & scene)
 
 						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 						glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
-						
-						switch (modelJob->Type) {
+
+						/*switch (modelJob->Type) {
 						case RawModel::MaterialType::SingleTextures:
 						case RawModel::MaterialType::Basic:
 						{
@@ -275,7 +275,7 @@ void ShadowPass::Draw(RenderScene & scene)
 							glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 							break;
 						}
-						}
+						}*/
 
 						glBindVertexArray(modelJob->Model->VAO);
 						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
