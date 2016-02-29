@@ -47,4 +47,6 @@
 	<xs:include schemaLocation="Components/SpriteIndicator.xsd"/>
 	<xs:include schemaLocation="Components/Button.xsd"/>
 	<xs:include schemaLocation="Components/DoubleJump.xsd"/>
+	<xs:include schemaLocation="Components/WeaponAttachment.xsd"/>
+	<xs:include schemaLocation="Components/DefenderWeapon.xsd"/>
 </xs:schema>

@@ -4,6 +4,7 @@ PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
 }
 
 PlayerMovementSystem::~PlayerMovementSystem()
@@ -36,7 +37,6 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         if (!player.Valid()) {
             continue;
         }
-
         // Aim pitch
         EntityWrapper cameraEntity = player.FirstChildByName("Camera");
         if (cameraEntity.Valid()) {
@@ -128,15 +128,14 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                     //Enter here if player can double jump and is doing so.
                     (bool)cPhysics["IsOnGround"] = false;
                     velocity.y = player["DoubleJump"]["DoubleJumpSpeed"];
+                    // If IsServer and network is off this will not work
                     if (IsClient) {
                         //put a hexagon at the players feet
-                        auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
-                        EntityFileParser parser(hexagonEffect);
-                        EntityID hexagonEffectID = parser.MergeEntities(m_World);
-                        EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
-                        hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                        spawnHexagon(player);
                         controller->SetDoubleJumping(true);
+                        // Publish event for client to listen to
                         Events::DoubleJump e;
+                        e.entityID = player.ID;
                         m_EventBroker->Publish(e);
                     }
                 }
@@ -299,4 +298,27 @@ bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         m_LocalPlayer = e.Player;
     }
     return true;
+}
+
+bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
+{
+    // If entity does not exist, exit
+    if (!EntityWrapper(m_World, e.entityID).Valid()) { 
+        return false;
+    }
+    // If entity IsLocalPlayer, exit
+    if (e.entityID == m_LocalPlayer.ID) { 
+        return false;
+    }
+    spawnHexagon(EntityWrapper(m_World, e.entityID));
+}
+
+void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
+{ 
+    //put a hexagon at the entitys... feet?
+    auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+    EntityFileParser parser(hexagonEffect);
+    EntityID hexagonEffectID = parser.MergeEntities(m_World);
+    EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
+    hexagonEW["Transform"]["Position"] = (glm::vec3)target["Transform"]["Position"];
 }

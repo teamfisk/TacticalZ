@@ -4,4 +4,5 @@
 	<CrouchSpeed>1.5</CrouchSpeed>
 	<JumpSpeed>4.0</JumpSpeed>
 	<CurrentWishDirection X="0" Y="0" Z="0"/>
+	<CurrentWeapon></CurrentWeapon>
 </Player>

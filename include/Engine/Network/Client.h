@@ -19,8 +19,10 @@
 #include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
+#include "Core/EPlayerDeath.h"
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
+#include "../Game/Events/EDoubleJump.h"
 #include "Network/EInterpolate.h"
 #include "Network/SnapshotFilter.h"
 #include "Core/EPlayerSpawned.h"
@@ -47,7 +49,9 @@ public:
 
     void Connect(std::string address, int port);
     void Update() override;
-
+private:
+    UDPClient m_Unreliable;
+    TCPClient m_Reliable;
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();
     // Save for children
@@ -101,9 +105,9 @@ public:
     void parseEntityDeletion(Packet& packet);
     void parsePlayerDamage(Packet& packet);
     void parseComponentDeletion(Packet& packet);
+    void parseDoubleJump(Packet& packet);
     void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
-    void UpdateLocalCapturePointHUD(EntityWrapper capturePointHUD);
     void identifyPacketLoss();
     void hasServerTimedOut();
     EntityID createPlayer();
@@ -127,11 +131,10 @@ public:
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
     EventRelay< Client, Events::SearchForServers> m_ESearchForServers;
+    EventRelay<Client, Events::DoubleJump> m_EDoubleJump;
+    bool OnDoubleJump(Events::DoubleJump & e);
     bool OnSearchForServers(const Events::SearchForServers& e);
-private:
-    UDPClient m_Unreliable;
     UDPClient m_ServerlistRequest;
-    TCPClient m_Reliable;
     std::vector<ServerInfo> m_Serverlist;
     bool m_SearchingForServers = false;
     std::clock_t m_StartSearchTime;

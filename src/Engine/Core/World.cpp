@@ -127,7 +127,7 @@ void World::SetParent(EntityID entity, EntityID parent)
     m_EntityChildren.insert(std::make_pair(parent, entity));
 }
 
-const std::pair<std::unordered_multimap<EntityID, EntityID>::const_iterator, std::unordered_multimap<EntityID, EntityID>::const_iterator> World::GetChildren(EntityID entity)
+const std::pair<std::unordered_multimap<EntityID, EntityID>::const_iterator, std::unordered_multimap<EntityID, EntityID>::const_iterator> World::GetDirectChildren(EntityID entity)
 {
     return m_EntityChildren.equal_range(entity);
 }
