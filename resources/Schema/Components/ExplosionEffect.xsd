@@ -51,6 +51,12 @@
 				<xs:element name="ExponentialAccelaration" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Linear/Exponential accelaration</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Pulsate" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Pulsate the effect</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Reverse" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Reverse the effect</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

@@ -14,4 +14,6 @@
 	<!--<ReverseAnimation>0</ReverseAnimation>-->
 	<!--<Wireframe>0</Wireframe>-->
 	<ExponentialAccelaration>0</ExponentialAccelaration>
+	<Pulsate>0</Pulsate>
+	<Reverse>0</Reverse>
 </ExplosionEffect>
