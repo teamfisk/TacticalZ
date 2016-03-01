@@ -199,6 +199,7 @@ void ShadowPass::RadiusToLightspace(ShadowFrustum& frustum)
 void ShadowPass::Draw(RenderScene & scene)
 {
 	ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
+	ImGui::DragFloat("ShadowClippingWeight", &m_SplitWeight, 0.001f, 0.f, 1.f);
 
 	InitializeCameras(scene);
 	UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
