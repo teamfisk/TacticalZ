@@ -11,7 +11,11 @@
 			<xs:all>
 				<xs:element name="MovementSpeed" type="t:float" minOccurs="0"/>
 				<xs:element name="CrouchSpeed" type="t:float" minOccurs="0"/>
+				<xs:element name="JumpSpeed" type="t:float" minOccurs="0">
+					<xs:annotation><xs:documentation>Vertical velocity set when jumping.</xs:documentation></xs:annotation>
+				</xs:element>
 				<xs:element name="CurrentWishDirection" type="t:Vector" minOccurs="0"/>
+				<xs:element name="CurrentWeapon" type="t:string" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

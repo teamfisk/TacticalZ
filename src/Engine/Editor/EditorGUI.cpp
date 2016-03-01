@@ -580,6 +580,11 @@ void EditorGUI::createWidgetToolButton(WidgetMode mode)
 
 bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
 {
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureKeyboard) {
+        return false;
+    }
+
     if (e.ModCtrl && e.KeyCode == GLFW_KEY_S) {
         if (m_CurrentSelection.Valid()) {
             EntityWrapper baseParent = m_CurrentSelection;
@@ -596,6 +601,19 @@ bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
 
     if (e.ModCtrl && e.KeyCode == GLFW_KEY_O) {
         entityImport(m_World);
+    }
+
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_C) {
+        m_CopyTarget = m_CurrentSelection;
+    }
+
+    if (e.ModCtrl && e.KeyCode == GLFW_KEY_V) {
+        if (m_OnEntityPaste != nullptr) {
+            EntityWrapper copy = m_OnEntityPaste(m_CopyTarget, m_CurrentSelection);
+            if (copy != EntityWrapper::Invalid) {
+                SelectEntity(copy);
+            }
+        }
     }
 
     if (e.KeyCode == GLFW_KEY_DELETE) {

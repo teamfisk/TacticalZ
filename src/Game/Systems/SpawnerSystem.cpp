@@ -36,7 +36,7 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
     }
 
     // Find any SpawnPoints existing as children of spawner
-    auto children = spawner.World->GetChildren(spawner.ID);
+    auto children = spawner.World->GetDirectChildren(spawner.ID);
     std::vector<EntityWrapper> spawnPoints;
     for (auto kv = children.first; kv != children.second; ++kv) {
         const EntityID& child = kv->second;
