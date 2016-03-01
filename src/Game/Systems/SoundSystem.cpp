@@ -6,16 +6,14 @@ SoundSystem::SoundSystem(SystemParams params)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Announcer = ResourceManager::Load<ConfigFile>("Config.ini")->Get<std::string>("Sound.Announcer", "female");
-    if (IsClient) {
-        EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
-        EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &SoundSystem::OnInputCommand);
-        EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
-        EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &SoundSystem::OnDashAbility);
-        EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
-        EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
-        EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
-        EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &SoundSystem::OnPlayerDeath);
-    }
+
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &SoundSystem::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
+    EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &SoundSystem::OnPlayerDeath);
+
 }
 
 void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt)
@@ -52,6 +50,19 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
             playerJumps();
             return true;
         }
+    } 
+    if (e.Command == "SoundTemp" && e.Value > 0) {
+        EntityWrapper entity(m_World, m_World->CreateEntity());
+        auto transform = m_World->AttachComponent(entity.ID, "Transform");
+        (glm::vec3&)transform["Position"] = glm::vec3(0, 10, 0);
+        (glm::vec3&)transform["Scale"] = glm::vec3(10, 10, 10);
+        auto emitter = m_World->AttachComponent(entity.ID, "SoundEmitter");
+        auto model = m_World->AttachComponent(entity.ID, "Model");
+        (std::string&)model["Resource"] = "Models/Core/UnitCube.mesh";
+        Events::PlaySoundOnEntity ev;
+        ev.EmitterID = entity.ID;
+        ev.FilePath = "Audio/crosscounter.wav";
+        m_EventBroker->Publish(ev);
     }
 
     return false;
@@ -136,37 +147,17 @@ bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
     return false;
 }
 
-bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
-{
-    //// Temp for play test.
-    //if (m_DrumsIsPlaying) {
-    //    return false;
-    //}
-    //if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
-    //    Events::PlaySoundOnEntity ev; // should be BGM
-    //    ev.EmitterID = LocalPlayer.ID;
-    //    ev.FilePath = "Audio/bgm/drumstest.wav";
-    //    m_EventBroker->Publish(ev);
-    //    // Temp for play test.
-    //    m_DrumsIsPlaying = true;
-    //}
-    return false;
-}
-
 bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
 {
+    if (!m_World->ValidEntity(e.entityID)) {
+        return false;
+    }
+    if (!IsClient) {
+        return false;
+    }
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
+    ev.EmitterID = e.entityID;
     ev.FilePath = "Audio/jump/jump2.wav";
-    m_EventBroker->Publish(ev);
-    return false;
-}
-
-bool SoundSystem::OnDashAbility(const Events::DashAbility &e)
-{
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
-    ev.FilePath = "Audio/jump/dash1.wav";
     m_EventBroker->Publish(ev);
     return false;
 }

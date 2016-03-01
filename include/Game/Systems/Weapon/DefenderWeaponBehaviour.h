@@ -2,6 +2,7 @@
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
 #include "Rendering/ESetCamera.h"
+#include "Sound/EPlaySoundOnEntity.h"
 
 class DefenderWeaponBehaviour : public WeaponBehaviour<DefenderWeaponBehaviour>
 {

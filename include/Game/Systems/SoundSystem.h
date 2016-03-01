@@ -44,10 +44,6 @@ private:
     bool OnInputCommand(const Events::InputCommand &e);
     EventRelay<SoundSystem, Events::DoubleJump> m_EDoubleJump;
     bool OnDoubleJump(const Events::DoubleJump &e);
-    EventRelay<SoundSystem, Events::DashAbility> m_EDashAbility;
-    bool OnDashAbility(const Events::DashAbility &e);
-    EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
-    bool OnTriggerTouch(const Events::TriggerTouch &e);
     EventRelay<SoundSystem, Events::Captured> m_ECaptured;
     bool OnCaptured(const Events::Captured &e);
     EventRelay<SoundSystem, Events::PlayerDamage> m_EPlayerDamage;

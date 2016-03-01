@@ -122,7 +122,7 @@ void SoundManager::updateEmitters(double dt)
         // Calculate velocity
         glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt;
         setSourcePos(it->second->ALsource, nextPos);
-        setSourceVel(it->second->ALsource, velocity);
+        setSourceVel(it->second->ALsource, glm::vec3(0));  
 
         auto emitter = m_World->GetComponent(it->first, "SoundEmitter");
         setSoundProperties(it->second, &emitter);
