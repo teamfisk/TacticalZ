@@ -9,7 +9,6 @@
 			<xs:all>
 				<xs:element name="Color" type="t:Color" minOccurs="0"/>
 				<xs:element name="Intensity" type="t:double" minOccurs="0"/>
-				<!--<xs:element name="TextureAlphaShadows" type="t:bool" minOccurs="0"/>-->
 				<xs:element name="Visible" type="t:bool" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>

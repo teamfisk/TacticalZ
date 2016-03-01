@@ -9,26 +9,11 @@ BufferResource::BufferResource(GLuint* resourceHandle, GLenum resourceType, GLen
     m_Attachment = attachment;
 }
 
-BufferResource::BufferResource(GLuint* resourceHandle, GLenum resourceType, GLenum attachment, GLuint layers)
-{
-	m_ResourceHandle = resourceHandle;
-	m_ResourceType = resourceType;
-	m_Attachment = attachment;
-	m_Layers = layers;
-}
-
 Texture2D::~Texture2D()
 {
     if (m_ResourceHandle != 0) {
         glDeleteTextures(1, m_ResourceHandle);
     }
-}
-
-Texture2DArray::~Texture2DArray()
-{
-	if (m_ResourceHandle != 0) {
-		glDeleteTextures(1, m_ResourceHandle);
-	}
 }
 
 RenderBuffer::~RenderBuffer()

@@ -41,7 +41,7 @@ public:
 	GLuint DepthMap() const { return m_DepthMap; }
 	std::array<glm::mat4, MAX_SPLITS> LightP() const { return m_LightProjection; }
 	std::array<glm::mat4, MAX_SPLITS> LightV() const { return m_LightView; }
-	std::array<float, MAX_SPLITS> FarDistance() const { return{ m_shadowFrusta[0].FarClip, m_shadowFrusta[1].FarClip, m_shadowFrusta[2].FarClip, m_shadowFrusta[3].FarClip }; }
+	std::array<float, MAX_SPLITS> FarDistance() const { std::array<float, MAX_SPLITS> f; for (int i = 0; i < MAX_SPLITS; i++) f[i] = m_shadowFrusta[i].FarClip; return f; }
 	int CurrentNrOfSplits() const { return m_CurrentNrOfSplits; }
 
 	void SetSplitWeight(float split_weight) { m_SplitWeight = split_weight; };
