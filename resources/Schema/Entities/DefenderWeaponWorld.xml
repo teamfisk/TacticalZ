@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ThirdPersonWeaponModel" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:BoneAttachment>
+      <BoneName>R_Arm_Weapon_Joint</BoneName>
+      <PositionOffset X="0" Y="0.0320000015" Z="-0.165000007"/>
+    </c:BoneAttachment>
+    <c:Model>
+      <Resource>Models/Weapons/Blue/DefenderGunBlue.mesh</Resource>
+    </c:Model>
+    <c:Transform>
+      <Position X="0.162026152" Y="1.05794585" Z="-0.380744517"/>
+      <Orientation X="-0.0628969446" Y="-0.0509683639" Z="0.118739031"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="WeaponMuzzle">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="0.000284185546" Y="0.0318552479" Z="-0.193328083"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ThirdPersonReloadSpawner">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/ReloadEffectWorld.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

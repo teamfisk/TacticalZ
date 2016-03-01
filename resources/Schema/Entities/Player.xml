@@ -7,23 +7,31 @@
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
     <c:AssaultWeapon>
-      <RPM>600</RPM>
+      <Slot>
+        <Secondary/>
+      </Slot>
     </c:AssaultWeapon>
     <c:Collidable/>
-    <c:DashAbility/>
+    <c:DefenderWeapon>
+      <TimeSinceLastFire>1.6944730461160304</TimeSinceLastFire>
+    </c:DefenderWeapon>
+    <c:DoubleJump/>
     <c:Health/>
     <c:Physics>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
     </c:Physics>
     <c:Player>
       <MovementSpeed>5</MovementSpeed>
+      <CurrentWeapon></CurrentWeapon>
     </c:Player>
     <c:Team>
       <Team>
         <Blue/>
       </Team>
     </c:Team>
-    <c:Transform/>
+    <c:Transform>
+      <Position X="-1.42731023" Y="0.0288832653" Z="3.63052702"/>
+    </c:Transform>
   </Components>
 
   <Children>
@@ -303,7 +311,8 @@
                   </Children>
                 </Entity>
               </Children>
-            </Entity>            <Entity name="KillFeed">
+            </Entity>
+            <Entity name="KillFeed">
               <Components>
                 <c:KillFeed/>
                 <c:Transform>
@@ -363,7 +372,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.97725610639912475</Time1>
+              <Time1>0.67172915251515519</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -375,100 +384,29 @@
             <c:Transform/>
           </Components>
           <Children>
-            <Entity name="WeaponModel">
+            <Entity name="PrimaryAttachment">
               <Components>
-                <c:BoneAttachment>
-                  <BoneName>R_Arm_Weapon_Joint</BoneName>
-                </c:BoneAttachment>
-                <c:Model>
-                  <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="0.12043038" Y="-0.244988307" Z="-0.181454808"/>
-                  <Orientation X="0.010404544" Y="-0.00268173823" Z="0.0428441577"/>
-                </c:Transform>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/DefenderWeaponView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+                <c:WeaponAttachment>
+                  <Weapon>DefenderWeapon</Weapon>
+                </c:WeaponAttachment>
               </Components>
-              <Children>
-                <Entity name="WeaponMuzzle">
-                  <Components>
-                    <c:Spawner>
-                      <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
-                    </c:Spawner>
-                    <c:Transform>
-                      <Position X="0.00325386273" Y="0.0970000029" Z="-0.843000054"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity name="FirstPersonReloadSpawner">
-                  <Components>
-                    <c:Spawner>
-                      <EntityFile>Schema/Entities/ReloadEffectView.xml</EntityFile>
-                    </c:Spawner>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity name="AmmunitionHUD">
-                  <Components>
-                    <c:AmmunitionHUD/>
-                    <c:Transform>
-                      <Position X="-0.0430000015" Y="0.131501317" Z="-0.0670000017"/>
-                      <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity name="AmmunitionHUDBackground">
-                      <Components>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
-                          <Color A="0.588235319" B="0" G="0" R="0"/>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Position X="0" Y="0" Z="-0.00200000009"/>
-                          <Scale X="0.119999997" Y="0.119999997" Z="0.119999997"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="AmmunitionText">
-                      <Components>
-                        <c:Transform/>
-                      </Components>
-                      <Children>
-                        <Entity name="MagazineAmmo">
-                          <Components>
-                            <c:Text>
-                              <Content>32</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
-                            </c:Text>
-                            <c:Transform>
-                              <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="Ammo">
-                          <Components>
-                            <c:Text>
-                              <Content>360</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="5.2833886e-05" Y="-0.0407950208" Z="0"/>
-                              <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
+              <Children/>
+            </Entity>
+            <Entity name="SecondaryAttachment">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/AssaultWeaponView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+                <c:WeaponAttachment>
+                  <Weapon>AssaultWeapon</Weapon>
+                </c:WeaponAttachment>
+              </Components>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -492,7 +430,6 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>0.87583812735846323</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -501,6 +438,7 @@
           <AnimationName>AimRifle</AnimationName>
           <Time>0.5</Time>
         </c:AnimationOffset>
+        <c:Shielded/>
         <c:HiddenForLocalPlayer/>
         <c:Model>
           <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
@@ -509,41 +447,35 @@
         <c:Transform/>
       </Components>
       <Children>
-        <Entity name="ThirdPersonWeaponModel">
+        <Entity name="PrimaryAttachment">
           <Components>
-            <c:BoneAttachment>
-              <BoneName>R_Arm_Weapon_Joint</BoneName>
-            </c:BoneAttachment>
-            <c:Model>
-              <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="0.163429111" Y="1.0235405" Z="-0.215489209"/>
-              <Orientation X="-0.0631071255" Y="-0.0576644838" Z="0.118255548"/>
-            </c:Transform>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/DefenderWeaponWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
+            <c:WeaponAttachment>
+              <Weapon>DefenderWeapon</Weapon>
+              <Person>
+                <ThirdPerson/>
+              </Person>
+            </c:WeaponAttachment>
           </Components>
-          <Children>
-            <Entity name="ThirdPersonWeaponMuzzle">
-              <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform>
-                  <Position X="0.00644115033" Y="0.096679531" Z="-0.436609417"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="ThirdPersonReloadSpawner">
-              <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/ReloadEffectWorld.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform/>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
+          <Children/>
+        </Entity>
+        <Entity name="SecondaryAttachment">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
+            <c:WeaponAttachment>
+              <Weapon>AssaultWeapon</Weapon>
+              <Person>
+                <ThirdPerson/>
+              </Person>
+            </c:WeaponAttachment>
+          </Components>
+          <Children/>
         </Entity>
       </Children>
     </Entity>
@@ -605,6 +537,17 @@
         <c:Transform>
           <Position X="0" Y="1.84019077" Z="0"/>
           <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ShieldAttachment">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/DefenderShield.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="0" Y="0.859000027" Z="-0.976999998"/>
         </c:Transform>
       </Components>
       <Children/>

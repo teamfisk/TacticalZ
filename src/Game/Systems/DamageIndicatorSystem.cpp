@@ -13,7 +13,7 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
 }
 
 void DamageIndicatorSystem::Update(double dt) {
-    if (!IsServer) {
+    if (!IsServer && LocalPlayer.Valid()) {
         for (auto& iter = updateDamageIndicatorVector.begin(); iter != updateDamageIndicatorVector.end(); iter++) {
             if (!iter->spriteEntity.Valid()) {
                 updateDamageIndicatorVector.erase(iter);
