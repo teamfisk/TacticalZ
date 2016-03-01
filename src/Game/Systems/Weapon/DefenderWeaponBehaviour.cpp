@@ -47,12 +47,6 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
     return false;
 }
 
-bool DefenderWeaponBehaviour::OnSetCamera(const Events::SetCamera& e)
-{
-    m_CurrentCamera = e.CameraEntity;
-    return true;
-}
-
 void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
     cWeapon["TimeSinceLastFire"] = 0.0;
@@ -152,18 +146,6 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
     ePlayerDamage.Damage = damage;
     m_EventBroker->Publish(ePlayerDamage);
     LOG_DEBUG("Damage: %f", damage);
-}
-
-float DefenderWeaponBehaviour::traceRayDistance(glm::vec3 origin, glm::vec3 direction)
-{
-    float distance;
-    glm::vec3 pos;
-    auto entity = Collision::EntityFirstHitByRay(Ray(origin, direction), m_CollisionOctree, distance, pos);
-    if (entity) {
-        return distance;
-    } else {
-        return 100.f;
-    }
 }
 
 Camera DefenderWeaponBehaviour::cameraFromEntity(EntityWrapper camera)

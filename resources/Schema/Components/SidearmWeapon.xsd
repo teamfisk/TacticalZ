@@ -23,7 +23,7 @@
 					<xs:annotation><xs:documentation>Ammo currently loaded into the magazine</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="MagazineSize" type="t:int" minOccurs="0">
-									<xs:annotation><xs:documentation>Max number of rounds in a magazine</xs:documentation></xs:annotation>
+						<xs:annotation><xs:documentation>Max number of rounds in a magazine</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="BaseDamage" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Damage dealt if all shotgun pellets hit</xs:documentation></xs:annotation>
@@ -31,11 +31,15 @@
 				<xs:element name="RPM" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Rate of fire in rounds per minute</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Automatic" type="t:bool" minOccurs="0"/>
 				<xs:element name="ViewPunch" type="t:float" minOccurs="0">
 					<xs:annotation><xs:documentation>View punch in radians for each shell fired</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="ReloadTime" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Time it takes to load ONE SHELL into the weapon in seconds</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="EquipTime" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Time it takes from selecting the weapon until it's ready to fire</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Slot" type="WeaponSlotEnum" minOccurs="0"/>
 				<xs:element name="TriggerHeld" type="t:bool" minOccurs="0"/>

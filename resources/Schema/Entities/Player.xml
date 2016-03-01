@@ -8,7 +8,7 @@
     </c:AABB>
     <c:Collidable/>
     <c:DefenderWeapon>
-      <TimeSinceLastFire>95.044877438627367</TimeSinceLastFire>
+      <TimeSinceLastFire>102.85760837900634</TimeSinceLastFire>
     </c:DefenderWeapon>
     <c:DoubleJump/>
     <c:SidearmWeapon/>
@@ -368,7 +368,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.022133545026491674</Time1>
+              <Time1>1.8348644854054612</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -392,8 +392,8 @@
                   <EntityFile>Schema/Entities/DefenderWeaponView.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform>
-                  <Position X="0.120430708" Y="-0.228458226" Z="-0.181454539"/>
-                  <Orientation X="0.0104047246" Y="-0.00268179877" Z="0.0428441055"/>
+                  <Position X="0.120430619" Y="-0.229639441" Z="-0.181454554"/>
+                  <Orientation X="0.0104045719" Y="-0.00268170005" Z="0.0428441055"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -410,8 +410,8 @@
                   <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform>
-                  <Position X="0.120430708" Y="-0.228458226" Z="-0.181454539"/>
-                  <Orientation X="0.0104047246" Y="-0.00268179877" Z="0.0428441055"/>
+                  <Position X="0.120430619" Y="-0.229639441" Z="-0.181454554"/>
+                  <Orientation X="0.0104045719" Y="-0.00268170005" Z="0.0428441055"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -438,7 +438,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>0.13373697879978863</Time1>
+          <Time1>0.013134522267137072</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -486,8 +486,8 @@
               <EntityFile>Schema/Entities/SidearmWeaponWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.158007994" Y="1.03165817" Z="-0.216171086"/>
-              <Orientation X="-0.0626474619" Y="-0.03413276" Z="0.120247819"/>
+              <Position X="0.156846598" Y="1.03287792" Z="-0.216207206"/>
+              <Orientation X="-0.0626498386" Y="-0.0301200207" Z="0.12067578"/>
             </c:Transform>
           </Components>
           <Children/>

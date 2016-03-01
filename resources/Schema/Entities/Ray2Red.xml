@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform>
+      <Scale X="0" Y="1" Z="1"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+          <GlowMap></GlowMap>
+          <Color A="1" B="0" G="0" R="1"/>
+        </c:Sprite>
+        <c:Transform>
+          <Position X="0" Y="0" Z="-50"/>
+          <Scale X="100" Y="0.0260000005" Z="0"/>
+          <Orientation X="0" Y="-1.57099998" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+          <GlowMap></GlowMap>
+          <Color A="1" B="0" G="0" R="1"/>
+        </c:Sprite>
+        <c:Transform>
+          <Position X="0" Y="0" Z="-50"/>
+          <Scale X="100" Y="0.0260000005" Z="0"/>
+          <Orientation X="0" Y="-1.57099998" Z="3.1400001"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>
