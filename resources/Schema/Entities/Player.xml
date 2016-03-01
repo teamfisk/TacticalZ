@@ -11,6 +11,7 @@
       <TimeSinceLastFire>52.867678870419283</TimeSinceLastFire>
     </c:DefenderWeapon>
     <c:DoubleJump/>
+    <c:SidearmWeapon/>
     <c:Health/>
     <c:Physics>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
@@ -453,7 +454,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>1.9408570429715581</Time1>
+              <Time1>0.022133545026491674</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -467,26 +468,38 @@
           <Children>
             <Entity name="PrimaryAttachment">
               <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
                 <c:WeaponAttachment>
                   <Weapon>DefenderWeapon</Weapon>
                 </c:WeaponAttachment>
                 <c:Spawner>
                   <EntityFile>Schema/Entities/DefenderWeaponView.xml</EntityFile>
                 </c:Spawner>
-                <c:Transform/>
+                <c:Transform>
+                  <Position X="0.120430708" Y="-0.228458226" Z="-0.181454539"/>
+                  <Orientation X="0.0104047246" Y="-0.00268179877" Z="0.0428441055"/>
+                </c:Transform>
               </Components>
               <Children/>
             </Entity>
             <Entity name="SecondaryAttachment">
               <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
                 <c:WeaponAttachment>
                   <Weapon>AssaultWeapon</Weapon>
                 </c:WeaponAttachment>
+                  <Weapon>SidearmWeapon</Weapon>
                 <c:Spawner>
                   <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
                 </c:Spawner>
-                <c:Transform/>
-                  <Weapon>SidearmWeapon</Weapon>
+                <c:Transform>
+                  <Position X="0.120430708" Y="-0.228458226" Z="-0.181454539"/>
+                  <Orientation X="0.0104047246" Y="-0.00268179877" Z="0.0428441055"/>
+                </c:Transform>
               </Components>
               <Children/>
             </Entity>
@@ -515,7 +528,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.5631122524686134</Time1>
+          <Time1>0.13373697879978863</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -550,14 +563,17 @@
         </Entity>
         <Entity name="SecondaryAttachment">
           <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
             <c:WeaponAttachment>
-              <Weapon>AssaultWeapon</Weapon>
+              <Weapon>SidearmWeapon</Weapon>
               <Person>
                 <ThirdPerson/>
               </Person>
             </c:WeaponAttachment>
             <c:Spawner>
-              <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
+              <EntityFile>Schema/Entities/SidearmWeaponWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform/>
           </Components>

@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Entity name="WeaponModel" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+<Entity name="DefenderWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:BoneAttachment>
-      <BoneName>R_Arm_Weapon_Joint</BoneName>
-      <PositionOffset X="0" Y="0.0480000004" Z="-0.183000013"/>
-    </c:BoneAttachment>
     <c:Model>
       <Resource>Models/Weapons/Blue/DefenderGunBlue.mesh</Resource>
     </c:Model>
     <c:Transform>
-      <Position X="0.120430306" Y="0.775375426" Z="1.36542225"/>
+      <Position X="0" Y="0.0350000001" Z="-0.295000017"/>
     </c:Transform>
   </Components>
 
