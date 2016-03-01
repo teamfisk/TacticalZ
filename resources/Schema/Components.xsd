@@ -50,4 +50,5 @@
 	<xs:include schemaLocation="Components/WeaponAttachment.xsd"/>
 	<xs:include schemaLocation="Components/DefenderWeapon.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointGameMode.xsd"/>
+	<xs:include schemaLocation="Components/CapturePointArrowHUD.xsd"/>
 </xs:schema>
