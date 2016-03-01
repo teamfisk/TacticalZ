@@ -189,6 +189,8 @@ void DrawFinalPass::Draw(RenderScene& scene)
     GLERROR("OpaqueObjects");
     //state->BlendFunc(GL_ONE, GL_ONE);
     state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    //state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
     GLERROR("TransparentObjects");
     //state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
