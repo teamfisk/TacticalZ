@@ -258,16 +258,17 @@ EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem
         return EntityWrapper::Invalid;
     }
 
-    try {
+    //try {
         auto entityFile = ResourceManager::Load<EntityFile>(filePath.string());
         EntityFilePreprocessor fpp(entityFile);
         fpp.RegisterComponents(parent.World);
         EntityFileParser fp(entityFile);
         EntityID newEntity = fp.MergeEntities(parent.World, parent.ID);
         return EntityWrapper(parent.World, newEntity);
-    } catch (const std::exception&) {
+    /*} catch (const std::exception& e) {
+        LOG_ERROR("Failed to import entity \"%s\": \"%s\"", filePath.string().c_str(), e.what());
         return EntityWrapper::Invalid;
-    }
+    }*/
 }
 
 void EditorSystem::setWidgetMode(EditorGUI::WidgetMode mode)
