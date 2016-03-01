@@ -17,6 +17,7 @@
 #include "Game/Systems/AmmoPickupSystem.h"
 #include "Game/Systems/DamageIndicatorSystem.h"
 #include "Game/Systems/Weapon/DefenderWeaponBehaviour.h"
+#include "Game/Systems/Weapon/SidearmWeaponBehaviour.h"
 #include "Rendering/AnimationSystem.h"
 #include "Game/Systems/HealthHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
@@ -124,6 +125,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DefenderWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<SidearmWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);

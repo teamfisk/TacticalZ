@@ -8,9 +8,10 @@
     </c:AABB>
     <c:Collidable/>
     <c:DefenderWeapon>
-      <TimeSinceLastFire>1.6944730461160304</TimeSinceLastFire>
+      <TimeSinceLastFire>95.044877438627367</TimeSinceLastFire>
     </c:DefenderWeapon>
     <c:DoubleJump/>
+    <c:SidearmWeapon/>
     <c:Health/>
     <c:Physics>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
@@ -367,7 +368,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.67172915251515519</Time1>
+              <Time1>0.022133545026491674</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -381,25 +382,37 @@
           <Children>
             <Entity name="PrimaryAttachment">
               <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/DefenderWeaponView.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform/>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
                 <c:WeaponAttachment>
                   <Weapon>DefenderWeapon</Weapon>
                 </c:WeaponAttachment>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/DefenderWeaponView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.120430708" Y="-0.228458226" Z="-0.181454539"/>
+                  <Orientation X="0.0104047246" Y="-0.00268179877" Z="0.0428441055"/>
+                </c:Transform>
               </Components>
               <Children/>
             </Entity>
             <Entity name="SecondaryAttachment">
               <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform/>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
                 <c:WeaponAttachment>
                   <Weapon>SidearmWeapon</Weapon>
                 </c:WeaponAttachment>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.120430708" Y="-0.228458226" Z="-0.181454539"/>
+                  <Orientation X="0.0104047246" Y="-0.00268179877" Z="0.0428441055"/>
+                </c:Transform>
               </Components>
               <Children/>
             </Entity>
@@ -425,6 +438,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
+          <Time1>0.13373697879978863</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -444,31 +458,37 @@
       <Children>
         <Entity name="PrimaryAttachment">
           <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/DefenderWeaponWorld.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
             <c:WeaponAttachment>
               <Weapon>DefenderWeapon</Weapon>
               <Person>
                 <ThirdPerson/>
               </Person>
             </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/DefenderWeaponWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
           </Components>
           <Children/>
         </Entity>
         <Entity name="SecondaryAttachment">
           <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
             <c:WeaponAttachment>
-              <Weapon>AssaultWeapon</Weapon>
+              <Weapon>SidearmWeapon</Weapon>
               <Person>
                 <ThirdPerson/>
               </Person>
             </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/SidearmWeaponWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0.158007994" Y="1.03165817" Z="-0.216171086"/>
+              <Orientation X="-0.0626474619" Y="-0.03413276" Z="0.120247819"/>
+            </c:Transform>
           </Components>
           <Children/>
         </Entity>
