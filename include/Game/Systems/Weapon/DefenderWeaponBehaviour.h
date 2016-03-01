@@ -15,10 +15,10 @@ public:
     }
 
     void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt) override;
-    void UpdateWeapon(WeaponInfo& wi, double dt) override;
-    void OnPrimaryFire(WeaponInfo& wi) override;
-    void OnCeasePrimaryFire(WeaponInfo& wi) override;
-    bool OnInputCommand(WeaponInfo& wi, const Events::InputCommand& e) override;
+    void UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt) override;
+    void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
 
 private:
     std::random_device m_RandomDevice;
@@ -29,8 +29,8 @@ private:
     bool OnSetCamera(const Events::SetCamera& e);
 
     // Weapon functions
-    void fireShell(WeaponInfo& wi);
-    void dealDamage(WeaponInfo& wi, glm::vec3 direction, double damage);
+    void fireShell(ComponentWrapper cWeapon, WeaponInfo& wi);
+    void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage);
 
     // Utility
     float traceRayDistance(glm::vec3 origin, glm::vec3 direction);

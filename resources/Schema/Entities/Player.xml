@@ -6,11 +6,6 @@
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
-    <c:AssaultWeapon>
-      <Slot>
-        <Secondary/>
-      </Slot>
-    </c:AssaultWeapon>
     <c:Collidable/>
     <c:DefenderWeapon>
       <TimeSinceLastFire>52.867678870419283</TimeSinceLastFire>
@@ -488,9 +483,10 @@
                   <Weapon>AssaultWeapon</Weapon>
                 </c:WeaponAttachment>
                 <c:Spawner>
-                  <EntityFile>Schema/Entities/AssaultWeaponView.xml</EntityFile>
+                  <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform/>
+                  <Weapon>SidearmWeapon</Weapon>
               </Components>
               <Children/>
             </Entity>
