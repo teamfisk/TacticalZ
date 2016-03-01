@@ -41,6 +41,8 @@ private:
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
 
+	void MergeLayers();
+
     void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
 
@@ -53,6 +55,9 @@ private:
     Texture* m_GreyTexture;
     Texture* m_ErrorTexture;
 
+	Model* m_ScreenQuad;
+
+	FrameBuffer m_MergeFrameBuffer;
     FrameBuffer m_FinalPassFrameBuffer;
     FrameBuffer m_FinalPassFrameBufferLowRes;
     GLuint m_BloomTexture;
@@ -70,6 +75,8 @@ private:
     const LightCullingPass* m_LightCullingPass;
     const CubeMapPass* m_CubeMapPass;
 	const SSAOPass* m_SSAOPass;
+
+	ShaderProgram* m_MergeProgram;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;

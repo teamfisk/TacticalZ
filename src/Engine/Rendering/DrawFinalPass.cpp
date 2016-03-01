@@ -11,6 +11,7 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
     InitializeTextures();
     InitializeShaderPrograms();
     InitializeFrameBuffers();
+	m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh");
 }
 
 void DrawFinalPass::InitializeTextures()
@@ -36,24 +37,34 @@ void DrawFinalPass::InitializeFrameBuffers()
     m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
     m_FinalPassFrameBuffer.Generate();
     GLERROR("FBO generation");
-
-    glGenRenderbuffers(1, &m_DepthBufferLowRes);
+	
+   /* glGenRenderbuffers(1, &m_DepthBufferLowRes);
     glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBufferLowRes);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate));
-    GLERROR("RenderBufferLowRes generation");
+    GLERROR("RenderBufferLowRes generation");*/
 
+	CommonFunctions::GenerateTexture(&m_DepthBufferLowRes, GL_CLAMP_TO_EDGE, GL_NEAREST, 
+		glm::vec2((int)(m_Renderer->GetViewportSize().Width / m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height / m_ShieldPixelRate)), 
+		GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+	
 	CommonFunctions::GenerateTexture(&m_SceneTextureLowRes, GL_CLAMP_TO_EDGE, GL_NEAREST, glm::vec2((int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate)), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
 	CommonFunctions::GenerateTexture(&m_BloomTextureLowRes, GL_CLAMP_TO_EDGE, GL_NEAREST, glm::vec2((int)(m_Renderer->GetViewportSize().Width/m_ShieldPixelRate), (int)(m_Renderer->GetViewportSize().Height/m_ShieldPixelRate)), GL_RGB16F, GL_RGB, GL_FLOAT);
     //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
     //GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
 
-    m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBufferLowRes, GL_DEPTH_STENCIL_ATTACHMENT)));
+    m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBufferLowRes, GL_DEPTH_STENCIL_ATTACHMENT)));
     //m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
     m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTextureLowRes, GL_COLOR_ATTACHMENT0)));
     m_FinalPassFrameBufferLowRes.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTextureLowRes, GL_COLOR_ATTACHMENT1)));
     m_FinalPassFrameBufferLowRes.Generate();
     GLERROR("FBO2 generation");
+
+	m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+	m_MergeFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
+	m_MergeFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
+	m_MergeFrameBuffer.Generate();
+	GLERROR("FBO3 generation");
 }
 
 void DrawFinalPass::InitializeShaderPrograms()
@@ -168,6 +179,15 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_FillDepthBufferSkinnedProgram->Compile();
     m_FillDepthBufferSkinnedProgram->Link();
     GLERROR("Creating DepthFill program");
+
+	m_MergeProgram = ResourceManager::Load<ShaderProgram>("#MergeProgram");
+	m_MergeProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/DrawScreenQuad.vert.glsl")));
+	m_MergeProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/MergeProgram.frag.glsl")));
+	m_MergeProgram->Compile();
+	m_MergeProgram->BindFragDataLocation(0, "sceneColor");
+	m_MergeProgram->BindFragDataLocation(1, "bloomColor");
+	m_MergeProgram->Link();
+	GLERROR("Creating merge program");
 }
 
 void DrawFinalPass::Draw(RenderScene& scene)
@@ -179,37 +199,39 @@ void DrawFinalPass::Draw(RenderScene& scene)
 		state->Disable(GL_DEPTH_TEST);
     }
     //TODO: Do we need check for this or will it be per scene always?
+	state->Enable(GL_STENCIL_TEST);
     glClearStencil(0x00);
     glClear(GL_STENCIL_BUFFER_BIT);
 
-    //Fill depth buffer
+	//Draw Opaque shielded objects
+	state->Disable(GL_STENCIL_TEST);
+	DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
+	GLERROR("OpaqueObjects");
+	DrawModelRenderQueues(scene.Jobs.OpaqueShieldedObjects, scene); //might need changing
+	GLERROR("Shielded Opaque object");
+
+	//DrawStencilState* stencilState = new DrawStencilState(m_FinalPassFrameBuffer.GetHandle());
+	//Draw shields to stencil pass
+	state->Enable(GL_STENCIL_TEST);
+	state->StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	state->StencilFunc(GL_ALWAYS, 1, 0xFF);
+	state->StencilMask(0xFF);
+	DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
+	GLERROR("StencilPass");
 	
-    state->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
-    GLERROR("OpaqueObjects");
-    state->BlendFunc(GL_ONE, GL_ONE);
-    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
-    GLERROR("TransparentObjects");
-    state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    DrawSprites(scene.Jobs.SpriteJob, scene);
-    GLERROR("SpriteJobs");
+	
 
-    //DrawStencilState* stencilState = new DrawStencilState(m_FinalPassFrameBuffer.GetHandle());
-    //Draw shields to stencil pass
-    state->StencilFunc(GL_ALWAYS, 1, 0xFF);
-    state->StencilMask(0xFF);
-    DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
-    GLERROR("StencilPass");
+	//state->BlendFunc(GL_ONE, GL_ONE);
+	//DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
+	//GLERROR("TransparentObjects");
 
-    //Draw Opaque shielded objects
-    state->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
-    state->StencilMask(0x00);
-    DrawModelRenderQueues(scene.Jobs.OpaqueShieldedObjects, scene); //might need changing
-    GLERROR("Shielded Opaque object");
+	////Draw Transparen Shielded objects
+	//DrawModelRenderQueues(scene.Jobs.TransparentShieldedObjects, scene); //might need changing
+	//GLERROR("Shielded Transparent objects");
 
-    //Draw Transparen Shielded objects
-    DrawModelRenderQueues(scene.Jobs.TransparentShieldedObjects, scene); //might need changing
-    GLERROR("Shielded Transparent objects");
+ //   state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+ //   DrawSprites(scene.Jobs.SpriteJob, scene);
+ //   GLERROR("SpriteJobs");
 
     GLERROR("END");
     delete state;
@@ -219,6 +241,11 @@ void DrawFinalPass::Draw(RenderScene& scene)
     //Draw the lowres texture that will be shown behind the shield.
     stateLowRes->Enable(GL_SCISSOR_TEST);
     stateLowRes->Enable(GL_DEPTH_TEST);
+	stateLowRes->DepthMask(GL_TRUE);
+	stateLowRes->Enable(GL_STENCIL_TEST);
+	stateLowRes->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	stateLowRes->StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	stateLowRes->StencilMask(0xFF);
     //TODO: Viewports and scissor should be in state
     glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_ShieldPixelRate, m_Renderer->GetViewportSize().Height/m_ShieldPixelRate);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
@@ -230,18 +257,20 @@ void DrawFinalPass::Draw(RenderScene& scene)
     stateLowRes->StencilFunc(GL_ALWAYS, 1, 0xFF);
     stateLowRes->StencilMask(0x00);
     DrawToDepthBuffer(scene.Jobs.OpaqueObjects, scene);
-    DrawToDepthBuffer(scene.Jobs.TransparentObjects, scene);
+    //DrawToDepthBuffer(scene.Jobs.TransparentObjects, scene);
 
     //Draw shields to stencil pass
-    stateLowRes->StencilFunc(GL_ALWAYS, 1, 0xFF);
+	stateLowRes->StencilFunc(GL_NOTEQUAL, 1, 0xFF);
     stateLowRes->StencilMask(0xFF);
-    stateLowRes->Enable(GL_DEPTH_TEST);
+	stateLowRes->DepthMask(GL_FALSE);
     DrawShieldToStencilBuffer(scene.Jobs.ShieldObjects, scene);
     GLERROR("StencilPass");
 
     //glClear(GL_DEPTH_BUFFER_BIT);
 
     stateLowRes->Enable(GL_DEPTH_TEST);
+	//stateLowRes->DepthMask(GL_TRUE);
+	stateLowRes->DepthFunc(GL_LEQUAL);
     stateLowRes->StencilFunc(GL_LEQUAL, 1, 0xFF);
     stateLowRes->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
@@ -251,6 +280,34 @@ void DrawFinalPass::Draw(RenderScene& scene)
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     delete stateLowRes;
+	m_FinalPassFrameBuffer.Unbind();
+	m_FinalPassFrameBufferLowRes.Unbind();
+
+	state = new DrawFinalPassState(m_MergeFrameBuffer.GetHandle());
+	state->Disable(GL_DEPTH_TEST);
+	state->Enable(GL_STENCIL_TEST);
+	state->StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	state->StencilFunc(GL_LEQUAL, 1, 0xFF);
+	state->StencilMask(0x00);
+	MergeLayers();
+	delete state;
+
+	state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
+	//Draw Transparancy
+	state->BlendFunc(GL_ONE, GL_ONE);
+	DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
+	GLERROR("TransparentObjects");
+
+	//Draw Transparen Shielded objects
+	DrawModelRenderQueues(scene.Jobs.TransparentShieldedObjects, scene); //might need changing
+	GLERROR("Shielded Transparent objects");
+
+	state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	DrawSprites(scene.Jobs.SpriteJob, scene);
+	GLERROR("SpriteJobs");
+
+	GLERROR("END");
+	delete state;
 }
 
 
@@ -715,6 +772,28 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
         }
     }
    // m_SpriteProgram->Unbind();
+}
+
+void DrawFinalPass::MergeLayers() 
+{
+	GLuint shaderHandle = m_MergeProgram->GetHandle();
+
+	m_MergeProgram->Bind();
+	GLERROR("MergeLayers 1");
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, m_DepthBufferLowRes);
+	GLERROR("MergeLayers 2");
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, m_SceneTextureLowRes);
+	GLERROR("MergeLayers 3");
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, m_BloomTextureLowRes);
+	GLERROR("MergeLayers 4");
+	glBindVertexArray(m_ScreenQuad->VAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
+	glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex + 1
+		, GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
+	GLERROR("MergeLayers 5");
 }
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
