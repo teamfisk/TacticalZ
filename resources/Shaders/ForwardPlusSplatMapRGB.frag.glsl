@@ -11,6 +11,7 @@ uniform vec4 DiffuseColor;
 uniform vec4 FillColor;
 uniform vec4 Color;
 uniform vec4 AmbientColor;
+uniform int SSAOQuality;
 
 //Get bineded at the same time as the textures
 uniform vec2 DiffuseUVRepeat1;
@@ -177,7 +178,7 @@ vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
 
 void main()
 {
-	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy), 0).r;
+	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy) >> int(SSAOQuality), 0).r;
 	ao = (clamp(1.0 - (1.0 - ao), 0.0, 1.0) + MIN_AMBIENT_LIGHT) /  (1.0 + MIN_AMBIENT_LIGHT);
 
 	vec4 splatTexel = texture2D(SplatMapTexture, Input.TextureCoordinate);
