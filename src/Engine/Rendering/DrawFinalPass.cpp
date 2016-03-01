@@ -187,10 +187,11 @@ void DrawFinalPass::Draw(RenderScene& scene)
     state->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
     GLERROR("OpaqueObjects");
-    state->BlendFunc(GL_ONE, GL_ONE);
-    DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
-    GLERROR("TransparentObjects");
+    //state->BlendFunc(GL_ONE, GL_ONE);
     state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    GLERROR("TransparentObjects");
+    //state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     DrawSprites(scene.Jobs.SpriteJob, scene);
     GLERROR("SpriteJobs");
 
