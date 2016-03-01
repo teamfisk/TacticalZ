@@ -6,36 +6,32 @@ void DefenderWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWr
     WeaponBehaviour::UpdateComponent(entity, cWeapon, dt);
 }
 
-void DefenderWeaponBehaviour::UpdateWeapon(WeaponInfo& wi, double dt)
+void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
-    ComponentWrapper cWeapon = wi.GetComponent();
-
     bool isFiring = cWeapon["IsFiring"];
     bool cooldownPassed = (double)cWeapon["TimeSinceLastFire"] >= (60.0 / (double)cWeapon["RPM"]);
     bool isNotShielding = wi.Player.ChildrenWithComponent("Shield").size() == 0;
     if (isFiring && cooldownPassed && isNotShielding) {
-        fireShell(wi);
+        fireShell(cWeapon, wi);
     }
 }
 
-void DefenderWeaponBehaviour::OnPrimaryFire(WeaponInfo& wi)
+void DefenderWeaponBehaviour::OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    ComponentWrapper cWeapon = wi.GetComponent();
     cWeapon["IsFiring"] = true;
     bool cooldownPassed = (double)cWeapon["TimeSinceLastFire"] >= (60.0 / (double)cWeapon["RPM"]);
     bool isNotShielding = wi.Player.ChildrenWithComponent("Shield").size() == 0;
     if (cooldownPassed && isNotShielding) {
-        fireShell(wi);
+        fireShell(cWeapon, wi);
     }
 }
 
-void DefenderWeaponBehaviour::OnCeasePrimaryFire(WeaponInfo& wi)
+void DefenderWeaponBehaviour::OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    ComponentWrapper cWeapon = wi.GetComponent();
     cWeapon["IsFiring"] = false;
 }
 
-bool DefenderWeaponBehaviour::OnInputCommand(WeaponInfo& wi, const Events::InputCommand& e)
+bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e)
 {
     if (e.Command == "SpecialAbility" && IsServer) {
         EntityWrapper attachment = wi.Player.FirstChildByName("ShieldAttachment");
@@ -57,10 +53,8 @@ bool DefenderWeaponBehaviour::OnSetCamera(const Events::SetCamera& e)
     return true;
 }
 
-void DefenderWeaponBehaviour::fireShell(WeaponInfo& wi)
+void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    ComponentWrapper cWeapon = wi.GetComponent();
-
     cWeapon["TimeSinceLastFire"] = 0.0;
     int numPellets = cWeapon["NumPellets"];
     float spreadAngle = cWeapon["SpreadAngle"];
@@ -95,13 +89,13 @@ void DefenderWeaponBehaviour::fireShell(WeaponInfo& wi)
             orientation.x += angles.x;
             orientation.y += angles.y;
             glm::vec3 trajectory = direction * distance;
-            dealDamage(wi, direction, pelletDamage);
+            dealDamage(cWeapon, wi, direction, pelletDamage);
         }
     }
 
 }
 
-void DefenderWeaponBehaviour::dealDamage(WeaponInfo& wi, glm::vec3 direction, double damage)
+void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage)
 {
     // Only deal damage client side
     if (!IsClient) {
