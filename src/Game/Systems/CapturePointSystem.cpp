@@ -78,9 +78,6 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     std::map<std::string, int> nextPossibleCapturePoint;
     nextPossibleCapturePoint["Red"] = -1;
     nextPossibleCapturePoint["Blue"] = -1;
-    if (m_RecentlyCapturedNeedNextCapturePointNow) {
-        nextPossibleCapturePoint["Blue"] = -2;
-    }
     for (int i = 0; i < m_NumberOfCapturePoints; i++) {
         if (!m_CapturePointNumberToEntityMap[i].HasComponent("Team")) {
             continue;
