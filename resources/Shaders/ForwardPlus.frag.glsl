@@ -350,7 +350,8 @@ void main()
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));	
 	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
-	color_result = color_result * clamp(1/specularTexel, 0, 1)*2 + reflectionColor * clamp(specularTexel, 0, 1)/2;
+	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
+	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
 
@@ -359,9 +360,9 @@ void main()
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 	//sceneColor = vec4(reflectionColor.xyz, 1);
-	color_result += glowTexel*GlowIntensity;
+	color_result.xyz += glowTexel.xyz*GlowIntensity;
 
-	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), clamp(color_result.a, 0, 1));
+	bloomColor = vec4(max(color_result.xyz - 1.0, 0.0), clamp(color_result.a, 0, 1));
 
 	//Tiled Debug Code
 	/*
