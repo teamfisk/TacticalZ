@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="CapturePointGameMode">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="RespawnTime" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The time since the last respawn wave. Players will be spawned when this reaches MaxRespawnTime.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="MaxRespawnTime" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Players will be spawned when RespawnTime reaches this.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
