@@ -4,6 +4,7 @@ PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerDeathSystem::OnPlayerDeath);
+    EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &PlayerDeathSystem::OnEntityDeleted);
 }
 
 void PlayerDeathSystem::Update(double dt)
@@ -59,9 +60,32 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 
     //camera (with lifetime) behind the player
     if (player == LocalPlayer) {
+        m_LocalPlayerDeathEffect = deathEffectEW;
         auto cam = deathEffectEW.FirstChildByName("Camera");
         Events::SetCamera eSetCamera;
         eSetCamera.CameraEntity = cam;
         m_EventBroker->Publish(eSetCamera);
     }
+}
+
+bool PlayerDeathSystem::OnEntityDeleted(Events::EntityDeleted& e)
+{
+    // We only care about when the local players death effect is removed.
+    if (m_LocalPlayerDeathEffect.ID != e.DeletedEntity) {
+        return false;
+    }
+    // Set the spectator camera as active, if it exists.
+    auto pool = m_World->GetComponents("CapturePointGameMode");
+    if (pool == nullptr || pool->size() == 0) {
+        return false;
+    }
+    ComponentWrapper modeComponent = *pool->begin();
+    EntityWrapper theLevel = EntityWrapper(m_LocalPlayerDeathEffect.World, modeComponent.EntityID);
+    EntityWrapper spectatorCam = theLevel.FirstChildByName("SpectatorCamera");
+    if (!spectatorCam.Valid() && spectatorCam.HasComponent("Camera")) {
+        return false;
+    }
+    Events::SetCamera eSetCamera;
+    eSetCamera.CameraEntity = spectatorCam;
+    m_EventBroker->Publish(eSetCamera);
 }

@@ -11,6 +11,7 @@
 #include "Core/EntityFileParser.h"
 
 #include "Core/EPlayerDeath.h"
+#include "Core/EEntityDeleted.h"
 
 class PlayerDeathSystem : public ImpureSystem
 {
@@ -20,8 +21,12 @@ public:
     virtual void Update(double dt) override;
 
 private:
+    EntityWrapper m_LocalPlayerDeathEffect;
+
     EventRelay<PlayerDeathSystem, Events::PlayerDeath> m_OnPlayerDeath;
     bool OnPlayerDeath(Events::PlayerDeath& e);
+    EventRelay<PlayerDeathSystem, Events::EntityDeleted> m_EEntityDeleted;
+    bool OnEntityDeleted(Events::EntityDeleted& e);
 
     void createDeathEffect(EntityWrapper player);
 

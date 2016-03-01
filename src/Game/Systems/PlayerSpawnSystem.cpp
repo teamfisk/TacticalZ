@@ -27,6 +27,18 @@ void PlayerSpawnSystem::Update(double dt)
         double& timer = (double&)modeComponent["RespawnTime"];
         timer += dt;
         double maxRespawnTime = m_DbgConfigForceRespawn ? m_ForcedRespawnTime : (double)modeComponent["MaxRespawnTime"];
+        EntityWrapper theLevel = EntityWrapper(m_World, modeComponent.EntityID);
+        EntityWrapper spectatorCam = theLevel.FirstChildByName("SpectatorCamera");
+        if (spectatorCam.Valid()) {
+            EntityWrapper HUD = spectatorCam.FirstChildByName("SpectatorHUD");
+            if (HUD.Valid()) {
+                EntityWrapper respawnTimer = spectatorCam.FirstChildByName("RespawnTimer");
+                if (respawnTimer.Valid()) {
+                    //Update respawn time in the HUD element.
+                    respawnTimer["Text"]["Content"] = "Time to respawn: " + std::to_string(1 + (int)(maxRespawnTime - timer));
+                }
+            }
+        }
         if (timer < maxRespawnTime) {
             return;
         }
