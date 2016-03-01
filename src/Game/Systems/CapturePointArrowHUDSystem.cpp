@@ -64,6 +64,9 @@ void CapturePointArrowHUDSystem::Update(double dt)
                     }
                 }
                 //Check what team is the owner of Home1 and set their target to the next capturepoint
+                if(!home1.Valid() || !home2.Valid()) {
+                    return;
+                }
                 if((int)home1["CapturePoint"]["HomePointForTeam"] == redTeam) {
                     m_RedTeamCurrentTarget = target1;
                 } else if ((int)home1["CapturePoint"]["HomePointForTeam"] == blueTeam) {
@@ -77,10 +80,7 @@ void CapturePointArrowHUDSystem::Update(double dt)
                     m_BlueTeamCurrentTarget = target2;
                 }
             }
-
-
         }
-
         //if red team, get red team next point, otherwise blue team next point.
         //Untill this is awailable we will just use the hardcoded value in the component.
         //This will also give us a position, so we wont need to loop through all capturePoints.
@@ -132,4 +132,6 @@ bool CapturePointArrowHUDSystem::OnCapturePointCaptured(Events::Captured& e)
     } else if (e.TeamNumberThatCapturedCapturePoint == blueTeam) {
         m_BlueTeamCurrentTarget = Transform::AbsolutePosition(e.NextCapturePoint);;
     }
+
+    m_InitialtargetsSet = true;
 }
