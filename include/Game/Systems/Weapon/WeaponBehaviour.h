@@ -7,6 +7,7 @@
 #include "Collision/EntityAABB.h"
 #include "Input/EInputCommand.h"
 #include "Systems/SpawnerSystem.h"
+#include "Rendering/ESetCamera.h"
 
 template <typename ETYPE>
 class WeaponBehaviour : public PureSystem
@@ -21,6 +22,7 @@ public:
         , m_CollisionOctree(collisionOctree)
     {
         EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponBehaviour::_OnInputCommand)
+        EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &WeaponBehaviour::_OnSetCamera)
     }
     virtual ~WeaponBehaviour() = default;
 
@@ -44,6 +46,7 @@ protected:
     };
 
     IRenderer* m_Renderer;
+    EntityWrapper m_CurrentCamera;
     Octree<EntityAABB>* m_CollisionOctree;
     std::unordered_map<EntityWrapper, WeaponInfo> m_ActiveWeapons;
 
@@ -51,10 +54,49 @@ protected:
     virtual void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) { }
     virtual void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) { }
     virtual void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) { }
+    virtual void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) { }
     virtual void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) { }
     virtual bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) { return false; }
 
+    bool isPlayerInFirstPerson(EntityWrapper player)
+    {
+        if (!m_CurrentCamera.Valid()) {
+            return false;
+        } else {
+            return m_CurrentCamera == player || m_CurrentCamera.IsChildOf(player);
+        }
+    }
+
+    // Returns wi.FirstPersonEntity or wi.ThirdPersonEntity depending on
+    // if the player is in first person mode or not.
+    EntityWrapper getRelevantWeaponModelEntity(WeaponInfo& wi)
+    {
+        if (isPlayerInFirstPerson(wi.Player)) {
+            return wi.FirstPersonEntity;
+        } else {
+            return wi.ThirdPersonEntity;
+        }
+    }
+
+    float traceRayDistance(glm::vec3 origin, glm::vec3 direction)
+    {
+        float distance;
+        glm::vec3 pos;
+        auto entity = Collision::EntityFirstHitByRay(Ray(origin, direction), m_CollisionOctree, distance, pos);
+        if (entity) {
+            return distance;
+        } else {
+            return 100.f;
+        }
+    }
+
 private:
+    EventRelay<ETYPE, Events::SetCamera> m_ESetCamera;
+    bool _OnSetCamera(const Events::SetCamera& e)
+    {
+        m_CurrentCamera = e.CameraEntity;
+        return true;
+    }
     EventRelay<ETYPE, Events::InputCommand> m_EInputCommand;
     bool _OnInputCommand(const Events::InputCommand& e)
     {
@@ -78,7 +120,7 @@ private:
         if (e.Command == "SelectWeapon") {
             if (e.Value > 0) {
                 if (static_cast<ComponentInfo::EnumType>(e.Value) == static_cast<ComponentInfo::EnumType>((*cWeapon)["Slot"])) {
-                    selectWeapon(player);
+                    selectWeapon(*cWeapon, player);
                 } else {
                     holsterWeapon(*cWeapon, player);
                 }
@@ -132,7 +174,7 @@ private:
         return activeWeapon;
     }
 
-    void selectWeapon(EntityWrapper player)
+    void selectWeapon(ComponentWrapper cWeapon, EntityWrapper player)
     {
         // Don't reselect weapon if it's already active
         if (getActiveWeapon(player)) {
@@ -170,10 +212,13 @@ private:
             thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
         }
 
-        m_ActiveWeapons[player].Player = player;
-        m_ActiveWeapons[player].WeaponEntity = player;
-        m_ActiveWeapons[player].FirstPersonEntity = firstPersonWeapon;
-        m_ActiveWeapons[player].ThirdPersonEntity = thirdPersonWeapon;
+        WeaponInfo& wi = m_ActiveWeapons[player];
+        wi.Player = player;
+        wi.WeaponEntity = player;
+        wi.FirstPersonEntity = firstPersonWeapon;
+        wi.ThirdPersonEntity = thirdPersonWeapon;
+        
+        OnEquip(cWeapon, wi);
     }
 
     void holsterWeapon(ComponentWrapper cWeapon, EntityWrapper player)

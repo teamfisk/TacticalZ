@@ -15,12 +15,12 @@ public:
     void UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt) override;
     void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
 
 private:
     std::random_device m_RandomDevice;
     std::mt19937 m_RandomEngine;
-    EntityWrapper m_CurrentCamera;
 
     // Weapon functions
     void fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi);
@@ -28,5 +28,6 @@ private:
 
     // Utility
     bool canFire(ComponentWrapper cWeapon);
+    bool playerInFirstPerson(EntityWrapper player);
     //float traceRayDistance(glm::vec3 origin, glm::vec3 direction);
 };
