@@ -13,7 +13,7 @@
     </c:AssaultWeapon>
     <c:Collidable/>
     <c:DefenderWeapon>
-      <TimeSinceLastFire>1.6944730461160304</TimeSinceLastFire>
+      <TimeSinceLastFire>326.69883589440087</TimeSinceLastFire>
     </c:DefenderWeapon>
     <c:DoubleJump/>
     <c:Health/>
@@ -30,7 +30,7 @@
       </Team>
     </c:Team>
     <c:Transform>
-      <Position X="0" Y="0.0288832653" Z="3.63052702"/>
+      <Position X="-3.10689902" Y="0.755898118" Z="8.34500504"/>
     </c:Transform>
   </Components>
 
@@ -193,7 +193,6 @@
                           <CapturePointNumber>3</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Fill>
-                          <Percentage>0.80222018197612788</Percentage>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Fill>
                         <c:Sprite>
@@ -228,6 +227,7 @@
                           <CapturePointNumber>4</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Fill>
+                          <Percentage>1</Percentage>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Fill>
                         <c:Sprite>
@@ -283,7 +283,7 @@
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <GlowMap></GlowMap>
-                      <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
+                      <Color A="0.699999988" B="0" G="0" R="1"/>
                     </c:Sprite>
                     <c:Transform>
                       <Position X="-1.58304751" Y="0.919596612" Z="0"/>
@@ -294,7 +294,8 @@
                       <Components>
                         <c:CapturePointHUD/>
                         <c:Fill>
-                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                          <Percentage>1</Percentage>
+                          <Color A="0.699999988" B="0" G="0" R="1"/>
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
@@ -303,7 +304,7 @@
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
                           <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                          <Orientation X="0" Y="0" Z="1.57079637"/>
+                          <Orientation X="0" Y="0" Z="4.71238899"/>
                         </c:Transform>
                       </Components>
                       <Children/>
@@ -372,7 +373,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.67172915251515519</Time1>
+              <Time1>0.20909021680133577</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -386,29 +387,43 @@
           <Children>
             <Entity name="PrimaryAttachment">
               <Components>
+                <c:WeaponAttachment>
+                  <Weapon>DefenderWeapon</Weapon>
+                </c:WeaponAttachment>
                 <c:Spawner>
                   <EntityFile>Schema/Entities/DefenderWeaponViewRed.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform/>
-                <c:WeaponAttachment>
-                  <Weapon>DefenderWeapon</Weapon>
-                </c:WeaponAttachment>
               </Components>
               <Children/>
             </Entity>
             <Entity name="SecondaryAttachment">
               <Components>
+                <c:WeaponAttachment>
+                  <Weapon>AssaultWeapon</Weapon>
+                </c:WeaponAttachment>
                 <c:Spawner>
                   <EntityFile>Schema/Entities/AssaultWeaponView.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform/>
-                <c:WeaponAttachment>
-                  <Weapon>AssaultWeapon</Weapon>
-                </c:WeaponAttachment>
               </Components>
               <Children/>
             </Entity>
           </Children>
+        </Entity>
+        <Entity name="CapturePointTargetIndicator">
+          <Components>
+            <c:CapturePointArrowHUD/>
+            <c:Model>
+              <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.200000003" Y="0.150000006" Z="-0.5"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Orientation X="-1.63629317" Y="1.90765047" Z="-0.0229658931"/>
+            </c:Transform>
+          </Components>
+          <Children/>
         </Entity>
       </Children>
     </Entity>
@@ -430,6 +445,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
+          <Time1>0.22069183859343156</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -449,31 +465,31 @@
       <Children>
         <Entity name="PrimaryAttachment">
           <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/DefenderWeaponWorldRed.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
             <c:WeaponAttachment>
               <Weapon>DefenderWeapon</Weapon>
               <Person>
                 <ThirdPerson/>
               </Person>
             </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/DefenderWeaponWorldRed.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
           </Components>
           <Children/>
         </Entity>
         <Entity name="SecondaryAttachment">
           <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
             <c:WeaponAttachment>
               <Weapon>AssaultWeapon</Weapon>
               <Person>
                 <ThirdPerson/>
               </Person>
             </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
           </Components>
           <Children/>
         </Entity>

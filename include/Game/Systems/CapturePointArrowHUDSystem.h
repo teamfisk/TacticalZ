@@ -3,9 +3,12 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/common.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 #include "Common.h"
 #include "Core/System.h"
+#include "Core/Transform.h"
+
 
 class CapturePointArrowHUDSystem : public ImpureSystem
 {
