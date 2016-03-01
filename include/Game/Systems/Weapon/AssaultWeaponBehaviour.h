@@ -1,37 +1,33 @@
+#ifndef AssaultWeaponBehaviour_h__
+#define AssaultWeaponBehaviour_h__
+
 #include "Sound/EPlaySoundOnEntity.h"
 #include "Collision/Collision.h"
-#include "Rendering/AnimationSystem.h"
 #include "Core/ConfigFile.h"
 #include "WeaponBehaviour.h"
 #include "../SpawnerSystem.h"
 #include "Core/EPlayerDamage.h"
 #include "Core/EShoot.h"
 
-
-class AssaultWeaponBehaviour : public WeaponBehaviour
+class AssaultWeaponBehaviour : public WeaponBehaviour<AssaultWeaponBehaviour>
 {
 public:
-    AssaultWeaponBehaviour(SystemParams systemParams, IRenderer* renderer, Octree<EntityAABB>* collisionOctree, EntityWrapper weaponEntity);
-    
-    virtual void Fire() override;
-    virtual void CeaseFire() override;
-    virtual void Reload() override;
+    AssaultWeaponBehaviour(SystemParams systemParams, IRenderer* renderer, Octree<EntityAABB>* collisionOctree)
+        : WeaponBehaviour(systemParams, "AssaultWeapon", renderer, collisionOctree) 
+    { }
 
-    virtual void Update(double dt) override;
+protected:
+    virtual void OnPrimaryFire(WeaponInfo& wi) override;
+    virtual void OnCeasePrimaryFire(WeaponInfo& wi) override;
+    virtual void OnReload(WeaponInfo& wi) override;
 
 private:
-    EntityWrapper m_FirstPersonModel;
-    EntityWrapper m_ThirdPersonModel;
     // State
     bool m_Firing = false;
     bool m_Reloading = false;
     double m_ReloadTimer = 0.0;
-    EntityWrapper m_FirstPersonReloadImpersonator;
-    EntityWrapper m_ThirdPersonReloadImpersonator;
     double m_TimeSinceLastFire = 0.0;
-
-    EventRelay<WeaponBehaviour, Events::AnimationComplete> m_EAnimationComplete;
-    bool OnAnimationComplete(Events::AnimationComplete& e);
+    EntityWrapper m_FirstPersonReloadImpostor;
 
     bool hasAmmo();
     void fireRound();
@@ -47,3 +43,5 @@ private:
     bool shoot(double damage);
     void showHitMarker();
 };
+
+#endif

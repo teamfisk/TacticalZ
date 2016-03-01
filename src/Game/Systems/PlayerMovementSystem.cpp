@@ -4,6 +4,7 @@ PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
 }
 
 PlayerMovementSystem::~PlayerMovementSystem()
@@ -16,7 +17,15 @@ PlayerMovementSystem::~PlayerMovementSystem()
 void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
-    updateVelocity(dt);
+    if (IsServer) {
+        for (auto& kv : m_PlayerInputControllers) {
+            updateVelocity(kv.first, dt);
+        }
+    } else {
+        if (LocalPlayer.Valid()) {
+            updateVelocity(LocalPlayer, dt);
+        }
+    }
 }
 
 void PlayerMovementSystem::updateMovementControllers(double dt)
@@ -28,7 +37,6 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         if (!player.Valid()) {
             continue;
         }
-
         // Aim pitch
         EntityWrapper cameraEntity = player.FirstChildByName("Camera");
         if (cameraEntity.Valid()) {
@@ -108,25 +116,29 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
 
-            //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
-            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (isOnGround || !controller->DoubleJumping())) {
-                (bool)cPhysics["IsOnGround"] = false;
+            if (isOnGround) {
+                controller->SetDoubleJumping(false);
+            }
+            //If player presses Jump and is not crouching.
+            if (controller->Jumping() && !controller->Crouching()) {
                 if (isOnGround) {
-                    controller->SetDoubleJumping(false);
-                } else {
+                    (bool)cPhysics["IsOnGround"] = false;
+                    velocity.y = player["Player"]["JumpSpeed"];
+                } else if (player.HasComponent("DoubleJump") && !controller->DoubleJumping()) {
+                    //Enter here if player can double jump and is doing so.
+                    (bool)cPhysics["IsOnGround"] = false;
+                    velocity.y = player["DoubleJump"]["DoubleJumpSpeed"];
+                    // If IsServer and network is off this will not work
                     if (IsClient) {
                         //put a hexagon at the players feet
-                        auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
-                        EntityFileParser parser(hexagonEffect);
-                        EntityID hexagonEffectID = parser.MergeEntities(m_World);
-                        EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
-                        hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                        spawnHexagon(player);
                         controller->SetDoubleJumping(true);
+                        // Publish event for client to listen to
                         Events::DoubleJump e;
+                        e.entityID = player.ID;
                         m_EventBroker->Publish(e);
                     }
                 }
-                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
@@ -221,15 +233,11 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
 }
 
 
-void PlayerMovementSystem::updateVelocity(double dt)
+void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
 {
     // Only apply velocity to local player
-    if (!LocalPlayer.Valid()) {
-        return;
-    }
-
-    ComponentWrapper& cTransform = LocalPlayer["Transform"];
-    ComponentWrapper& cPhysics = LocalPlayer["Physics"];
+    ComponentWrapper& cTransform = player["Transform"];
+    ComponentWrapper& cPhysics = player["Physics"];
     glm::vec3& velocity = cPhysics["Velocity"];
     bool isOnGround = (bool)cPhysics["IsOnGround"];
 
@@ -290,4 +298,27 @@ bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         m_LocalPlayer = e.Player;
     }
     return true;
+}
+
+bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
+{
+    // If entity does not exist, exit
+    if (!EntityWrapper(m_World, e.entityID).Valid()) { 
+        return false;
+    }
+    // If entity IsLocalPlayer, exit
+    if (e.entityID == m_LocalPlayer.ID) { 
+        return false;
+    }
+    spawnHexagon(EntityWrapper(m_World, e.entityID));
+}
+
+void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
+{ 
+    //put a hexagon at the entitys... feet?
+    auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+    EntityFileParser parser(hexagonEffect);
+    EntityID hexagonEffectID = parser.MergeEntities(m_World);
+    EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
+    hexagonEW["Transform"]["Position"] = (glm::vec3)target["Transform"]["Position"];
 }

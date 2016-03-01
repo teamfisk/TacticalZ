@@ -51,6 +51,40 @@ EntityWrapper EntityWrapper::FirstParentWithComponent(const std::string& compone
     return EntityWrapper::Invalid;
 }
 
+EntityWrapper EntityWrapper::Clone(EntityWrapper parent /*= Invalid*/)
+{
+    if (!Valid()) {
+        return EntityWrapper::Invalid;
+    }
+
+    EntityWrapper clone = cloneRecursive(*this, EntityWrapper::Invalid);
+    this->World->SetParent(clone.ID, parent.ID);
+    return clone;
+}
+
+std::vector<EntityWrapper> EntityWrapper::ChildrenWithComponent(const std::string& componentType)
+{
+    std::vector<EntityWrapper> childrenWithComponent;
+    childrenWithComponentRecursive(componentType, *this, childrenWithComponent);
+    return childrenWithComponent;
+}
+
+void EntityWrapper::DeleteChildren()
+{
+    auto itPair = this->World->GetDirectChildren(this->ID);
+    if (itPair.first == itPair.second) {
+        return;
+    }
+
+    std::vector<EntityID> entitiesToDelete;
+    for (auto it = itPair.first; it != itPair.second; it++) {
+        entitiesToDelete.push_back(it->second);
+    }
+    for (auto& e : entitiesToDelete) {
+        this->World->DeleteEntity(e);
+    }
+}
+
 bool EntityWrapper::IsChildOf(EntityWrapper potentialParent)
 {
     EntityWrapper entity = *this;
@@ -90,6 +124,11 @@ ComponentWrapper EntityWrapper::operator[](const char* componentName)
     }
 }
 
+ComponentWrapper EntityWrapper::operator[](const std::string& componentName)
+{
+    return this->operator[](componentName.c_str());
+}
+
 bool EntityWrapper::operator==(const EntityWrapper& e) const
 {
     return (this->ID == e.ID) && (this->World == e.World);
@@ -111,7 +150,7 @@ EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, 
         return EntityWrapper::Invalid;
     }
 
-    auto itPair = this->World->GetChildren(parent);
+    auto itPair = this->World->GetDirectChildren(parent);
     if (itPair.first == itPair.second) {
         return EntityWrapper::Invalid;
     }
@@ -131,3 +170,42 @@ EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, 
     return EntityWrapper::Invalid;
 }
 
+EntityWrapper EntityWrapper::cloneRecursive(EntityWrapper entity, EntityWrapper parent)
+{
+    EntityWrapper clone = EntityWrapper(entity.World, entity.World->CreateEntity(parent.ID));
+    entity.World->SetName(clone.ID, entity.Name());
+
+    // Clone components
+    for (auto& kv : entity.World->GetComponentPools()) {
+        if (kv.second->KnowsEntity(entity.ID)) {
+            ComponentWrapper c1 = kv.second->GetByEntity(entity.ID);
+            ComponentWrapper c2 = entity.World->AttachComponent(clone.ID, kv.first);
+            c1.Copy(c2);
+        }
+    }
+
+    // Clone children
+    auto children = entity.World->GetDirectChildren(entity.ID);
+    for (auto it = children.first; it != children.second; ++it) {
+        EntityWrapper child(entity.World, it->second);
+        cloneRecursive(child, clone);
+    }
+      
+    return clone;
+}
+
+void EntityWrapper::childrenWithComponentRecursive(const std::string& componentType, EntityWrapper& entity, std::vector<EntityWrapper>& childrenWithComponent)
+{
+    auto itPair = this->World->GetDirectChildren(entity.ID);
+    if (itPair.first == itPair.second) {
+        return;
+    }
+
+    for (auto it = itPair.first; it != itPair.second; ++it) {
+        EntityWrapper child = EntityWrapper(entity.World, it->second);
+        if (child.HasComponent(componentType)) {
+            childrenWithComponent.push_back(child);
+        }
+        childrenWithComponentRecursive(componentType, child, childrenWithComponent);
+    }
+}

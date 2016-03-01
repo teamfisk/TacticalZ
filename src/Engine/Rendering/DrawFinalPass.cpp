@@ -1,10 +1,11 @@
 #include "Rendering/DrawFinalPass.h"
 
-DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass)
+DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass)
+    : m_Renderer(renderer)
+    , m_LightCullingPass(lightCullingPass)
+    , m_CubeMapPass(cubeMapPass)
 {
     //TODO: Make sure that uniforms are not sent into shader if not needed.
-    m_Renderer = renderer;
-    m_LightCullingPass = lightCullingPass;
     m_ShieldPixelRate = 8;
     InitializeTextures();
     InitializeShaderPrograms();
@@ -192,8 +193,12 @@ void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
     state->StencilMask(0x00);
     DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene, SSAOTexture);
     GLERROR("OpaqueObjects");
+    //state->BlendFunc(GL_ONE, GL_ONE);
+    state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene, SSAOTexture);
     GLERROR("TransparentObjects");
+    //state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     DrawSprites(scene.Jobs.SpriteJob, scene);
     GLERROR("SpriteJobs");
 
@@ -259,20 +264,35 @@ void DrawFinalPass::Draw(RenderScene& scene, GLuint SSAOTexture)
 
 void DrawFinalPass::ClearBuffer()
 {
+    GLERROR("PRE");
     m_FinalPassFrameBufferLowRes.Bind();
+    GLERROR("Bind LowRes");
+
     glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_ShieldPixelRate, m_Renderer->GetViewportSize().Height/m_ShieldPixelRate);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    GLERROR("ViewPort,Scissor LowRes");
+
     glClearColor(0.f, 0.f, 0.f, 0.f);
+    GLERROR("1");
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLERROR("2");
+
     glDisable(GL_SCISSOR_TEST);
+    GLERROR("3");
+
     m_FinalPassFrameBufferLowRes.Unbind();
 
+    GLERROR("prebind HighRes");
     m_FinalPassFrameBuffer.Bind();
+    GLERROR("Bind HighRes");
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    GLERROR("ViewPort,Scissor LowRes");
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_FinalPassFrameBuffer.Unbind();
+    GLERROR("END");
 }
 
 
@@ -356,12 +376,17 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             case RawModel::MaterialType::SingleTextures:
             {
                 if (explosionEffectJob->Model->IsSkinned()) {
+
                     m_ExplosionEffectSkinnedProgram->Bind();
                     GLERROR("Bind ExplosionEffectSkinned program");
                     //bind uniforms
                     BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
                     //bind textures
                     BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
+                    glActiveTexture(GL_TEXTURE5);
+                    glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
                     std::vector<glm::mat4> frameBones;
                     if (explosionEffectJob->AnimationOffset.animation != nullptr) {
                         frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
@@ -376,6 +401,10 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                     BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
                     //bind textures
                     BindExplosionTextures(explosionHandle, explosionEffectJob);
+                    glActiveTexture(GL_TEXTURE5);
+                    glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                    glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
                 }
                 break;
             }
@@ -434,6 +463,10 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
                             //bind textures
                             BindModelTextures(forwardSkinnedHandle, modelJob);
+                            glActiveTexture(GL_TEXTURE5);
+                            glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                            glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
                             std::vector<glm::mat4> frameBones;
                             if (modelJob->AnimationOffset.animation != nullptr) {
                                 frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
@@ -449,6 +482,9 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                             BindModelUniforms(forwardHandle, modelJob, scene);
                             //bind textures
                             BindModelTextures(forwardHandle, modelJob);
+                            glActiveTexture(GL_TEXTURE5);
+                            glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                            glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
                         }
                         break;
                     }
@@ -807,6 +843,8 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 
 void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job)
 {
+
+
 	switch (job->Type) {
 	case RawModel::MaterialType::SingleTextures:
 	case RawModel::MaterialType::Basic:

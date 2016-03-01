@@ -21,23 +21,13 @@ void PickingPass::InitializeTextures()
 {
     GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
         glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
+
+	GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
+		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 }
 
 void PickingPass::InitializeFrameBuffers()
 {
-   /* glGenRenderbuffers(1, &m_DepthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);*/
-
-	glGenTextures(1, &m_DepthBuffer);
-
-	glBindTexture(GL_TEXTURE_2D, m_DepthBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, (int)(m_Renderer->GetViewportSize().Width), (int)(m_Renderer->GetViewportSize().Height), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
     m_PickingBuffer.Generate();
@@ -64,6 +54,7 @@ void PickingPass::InitializeShaderPrograms()
 
 void PickingPass::Draw(RenderScene& scene)
 {
+    GLERROR("PRE");
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
     //TODO: Render: Add code for more jobs than modeljobs.
@@ -367,6 +358,7 @@ void PickingPass::Draw(RenderScene& scene)
 
 void PickingPass::ClearPicking()
 {
+    GLERROR("PRE");
     m_PickingColorsToEntity.clear();
     m_EntityColors.clear();
     m_ColorCounter[0] = 0;
@@ -376,14 +368,13 @@ void PickingPass::ClearPicking()
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_PickingBuffer.Unbind();
+    GLERROR("END");
 }
 
 
 void PickingPass::OnWindowResize()
 {
     InitializeTextures();
-    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     m_PickingBuffer.Generate();
 }
 

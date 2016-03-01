@@ -12,6 +12,7 @@ uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
 uniform float GlowIntensity = 10;
+uniform vec3 CameraPosition;
 
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
@@ -22,6 +23,7 @@ layout (binding = 1) uniform sampler2D DiffuseTexture;
 layout (binding = 2) uniform sampler2D NormalMapTexture;
 layout (binding = 3) uniform sampler2D SpecularMapTexture;
 layout (binding = 4) uniform sampler2D GlowMapTexture;
+layout (binding = 5) uniform samplerCube CubeMap;
 
 #define TILE_SIZE 16
 
@@ -76,7 +78,7 @@ struct LightResult {
 };
 
 float CalcAttenuation(float radius, float dist, float falloff) {
-	return 1.0 - smoothstep(radius * 0.3, radius, dist);
+	return 1.0 - smoothstep(radius * falloff, radius, dist);
 }
 
 vec4 CalcSpecular(vec4 lightColor, vec4 viewVec,  vec4 lightVec, vec4 normal) {
@@ -132,7 +134,11 @@ void main()
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
-	vec4 viewVec = normalize(-position); 
+	vec4 viewVec = normalize(-position);
+	vec3 I = normalize(vec3(M * vec4(Input.Position, 1.0)) - CameraPosition);
+	vec3 R = reflect(-I, Input.Normal);
+	//R = vec3(P * vec4(R, 1.0));
+	vec4 reflectionColor = texture(CubeMap, R);
 
 	vec2 tilePos;
 	tilePos.x = int(gl_FragCoord.x/TILE_SIZE);
@@ -163,6 +169,9 @@ void main()
 
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
+	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
+	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
+	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
@@ -172,9 +181,10 @@ void main()
 		color_result += FillColor;
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
-	color_result += glowTexel*GlowIntensity;
+	//sceneColor = vec4(reflectionColor.xyz, 1);
+	color_result.xyz += glowTexel.xyz*GlowIntensity;
 
-	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
+	bloomColor = vec4(max(color_result.xyz - 1.0, 0.0), clamp(color_result.a, 0, 1));
 
 	//Tiled Debug Code
 	/*
