@@ -5,6 +5,7 @@
 #include "DrawFinalPassState.h"
 #include "LightCullingPass.h"
 #include "CubeMapPass.h"
+#include "SSAOPass.h"
 #include "FrameBuffer.h"
 #include "ShaderProgram.h"
 #include "Util/UnorderedMapVec2.h"
@@ -14,12 +15,12 @@
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, GLuint* depthBuffer);
     ~DrawFinalPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
-    void Draw(RenderScene& scene, GLuint SSAOTexture);
+    void Draw(RenderScene& scene);
     void ClearBuffer();
     void OnWindowResize();
 
@@ -34,11 +35,8 @@ public:
     FrameBuffer* FinalPassFrameBufferLowRes() { return &m_FinalPassFrameBufferLowRes; }
 
 private:
-    void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
-    void GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps) const;
-
     void DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene);
-    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene, GLuint SSAOTexture);
+    void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
@@ -61,7 +59,7 @@ private:
     GLuint m_SceneTexture;
     GLuint m_BloomTextureLowRes;
     GLuint m_SceneTextureLowRes;
-    GLuint m_DepthBuffer;
+    GLuint* m_DepthBuffer;
     GLuint m_DepthBufferLowRes;
     GLuint m_CubeMapTexture;
 
@@ -71,6 +69,7 @@ private:
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
     const CubeMapPass* m_CubeMapPass;
+	const SSAOPass* m_SSAOPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;
