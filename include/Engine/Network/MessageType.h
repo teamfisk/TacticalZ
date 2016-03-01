@@ -21,6 +21,7 @@ enum class MessageType
     PlayerTransform,
     OnDoubleJump,
     ServerlistRequest,
+    AmmoPickup,
     Invalid
 };
 

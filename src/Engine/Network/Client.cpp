@@ -143,6 +143,9 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
         break;
+    case MessageType::AmmoPickup:
+        parseAmmoPickup(packet);
+        break;
     default:
         break;
     }
@@ -292,6 +295,14 @@ void Client::parseDoubleJump(Packet & packet)
     if (e.entityID != m_LocalPlayer.ID) {
         m_EventBroker->Publish(e);
     }
+}
+
+void Client::parseAmmoPickup(Packet & packet)
+{ 
+    Events::AmmoPickup e;
+    e.AmmoGain = packet.ReadPrimitive<int>();
+    e.Player = m_LocalPlayer;
+    m_EventBroker->Publish(e);
 }
 
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)
