@@ -55,9 +55,6 @@ void AmmoPickupSystem::Update(double dt)
 
 bool AmmoPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
 {
-    if (e.Entity != LocalPlayer) {
-        return false;
-    }
     //TODO: add other weapontypes
     if (!e.Entity.HasComponent("AssaultWeapon")) {
         return false;

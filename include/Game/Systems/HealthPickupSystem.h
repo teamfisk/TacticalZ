@@ -10,6 +10,7 @@
 #include "Engine/Collision/ETrigger.h"
 #include "Common.h"
 #include <tuple>
+#include "Core/ConfigFile.h"
 
 class HealthPickupSystem : public ImpureSystem
 {
@@ -34,9 +35,11 @@ private:
     std::vector<NewHealthPickup> m_ETriggerTouchVector;
     struct EntityAtMaxValuePickupStruct {
         EntityWrapper player;
-        EntityWrapper pickup;
+        NewHealthPickup pickup;
+        EntityWrapper trigger;
     };
     std::vector<EntityAtMaxValuePickupStruct> m_PickupAtMaximum;
     void DoPickup(EntityWrapper &player, EntityWrapper &trigger);
+    void DoPickup(EntityWrapper &player, NewHealthPickup &triggerCopy, EntityWrapper &trigger);
 };
 #endif
