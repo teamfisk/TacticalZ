@@ -338,6 +338,15 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
         }
     }
 
+    if (ci.Name == "Spawner") {
+        if (ImGui::Button("Activate")) {
+            Events::SpawnerSpawn e;
+            e.Spawner = entity;
+            e.Parent = entity;
+            m_EventBroker->Publish(e);
+        }
+    }
+
     return true;
 }
 
