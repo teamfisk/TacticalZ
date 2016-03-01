@@ -83,7 +83,7 @@ bool HealthPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
 bool HealthPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
     //triggerleave erases possible m_PickupAtMaximum
     for (auto& it = m_PickupAtMaximum.begin(); it != m_PickupAtMaximum.end(); ++it) {
-        if (it->pickup.ID == e.Trigger.ID && it->player.ID == e.Entity.ID) {
+        if (it->trigger.ID == e.Trigger.ID && it->player.ID == e.Entity.ID) {
             LOG_INFO("trigger leave - erasing max");
             m_PickupAtMaximum.erase(it);
             break;
