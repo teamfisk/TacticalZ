@@ -19,7 +19,7 @@ void PlayerSpawnSystem::Update(double dt)
     // Should be able to support older maps with this.
     // TODO: In the future we might want to return instead, to avoid spawning in the menu for instance.
     auto pool = m_World->GetComponents("CapturePointGameMode");
-    if (pool != nullptr)
+    if (pool != nullptr && pool->size() > 0)
     {
         // Take the first CapturePointGameMode component found.
         ComponentWrapper& modeComponent = *pool->begin();
