@@ -580,6 +580,11 @@ void EditorGUI::createWidgetToolButton(WidgetMode mode)
 
 bool EditorGUI::OnKeyDown(const Events::KeyDown& e)
 {
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.WantCaptureKeyboard) {
+        return false;
+    }
+
     if (e.ModCtrl && e.KeyCode == GLFW_KEY_S) {
         if (m_CurrentSelection.Valid()) {
             EntityWrapper baseParent = m_CurrentSelection;

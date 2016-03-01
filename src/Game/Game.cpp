@@ -53,7 +53,7 @@ Game::Game(int argc, char* argv[])
     m_EventBroker = new EventBroker();
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_Config);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -138,7 +138,6 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
-    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthHUDSystem>(updateOrderLevel);
@@ -148,6 +147,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeTrigger);
+    // Octree for frustum culling must be updated after collisions, otherwise players frustum may be moved after tree is filled, and wrong things are culled.
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame, m_OctreeFrustrumCulling);
     ++updateOrderLevel;

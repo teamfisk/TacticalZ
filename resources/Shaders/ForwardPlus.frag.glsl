@@ -13,6 +13,7 @@ uniform vec4 AmbientColor;
 uniform float FillPercentage;
 uniform float GlowIntensity = 10;
 uniform vec3 CameraPosition;
+uniform int SSAOQuality;
 
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
@@ -125,7 +126,7 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 
 void main()
 {
-	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy), 0).r;
+	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy) >> int(SSAOQuality), 0).r;
 	ao = (clamp(1.0 - (1.0 - ao), 0.0, 1.0) + MIN_AMBIENT_LIGHT) /  (1.0 + MIN_AMBIENT_LIGHT);
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
@@ -170,7 +171,8 @@ void main()
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
-	color_result = color_result * clamp(1/specularTexel, 0, 1)*2 + reflectionColor * clamp(specularTexel, 0, 1)/2;
+	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
+	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
@@ -181,9 +183,9 @@ void main()
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 	//sceneColor = vec4(reflectionColor.xyz, 1);
-	color_result += glowTexel*GlowIntensity;
+	color_result.xyz += glowTexel.xyz*GlowIntensity;
 
-	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), clamp(color_result.a, 0, 1));
+	bloomColor = vec4(max(color_result.xyz - 1.0, 0.0), clamp(color_result.a, 0, 1));
 
 	//Tiled Debug Code
 	/*
