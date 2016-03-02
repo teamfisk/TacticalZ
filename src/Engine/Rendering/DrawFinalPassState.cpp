@@ -27,6 +27,7 @@ DrawStencilState::DrawStencilState(GLuint frameBuffer)
     BindFramebuffer(frameBuffer);
     Enable(GL_DEPTH_TEST);
 	DepthMask(GL_TRUE);
+	Enable(GL_CULL_FACE);
     ClearColor(glm::vec4(0.f));
 }
 

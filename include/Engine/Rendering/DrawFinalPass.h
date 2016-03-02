@@ -38,12 +38,6 @@ private:
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
 
-	void DrawExplosionSetup(ShaderProgram* shader, GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>&  job, RenderScene& scene);
-	void DrawSkinnedExplosionSetup(ShaderProgram* shader, GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
-
-	void DrawModelSetup(ShaderProgram* shader, GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
-	void DrawSkinnedModelSetup(ShaderProgram* shader, GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
-
     void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
 

@@ -236,7 +236,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 void DrawFinalPass::Draw(RenderScene& scene)
 {
     GLERROR("Pre");
-	DrawStencilState* stateDethp = new DrawStencilState(m_ShieldDepthFrameBuffer.GetHandle());
+	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer.GetHandle());
 	//Draw shields to stencil
 	DrawToDepthStencilBuffer(scene.Jobs.ShieldObjects, scene);
 	GLERROR("StencilPass");
@@ -276,13 +276,13 @@ void DrawFinalPass::Draw(RenderScene& scene)
 
 	//state->Disable(GL_STENCIL_TEST);
     //Draw Transparen Shielded objects
+	state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	DrawModelRenderQueuesWithShieldCheck(scene.Jobs.TransparentObjects, scene); //might need changing
     GLERROR("Shielded Transparent objects");
 
 	//Draw Transparen objects
 	//state->BlendFunc(GL_ONE, GL_ONE);
 	//state->StencilFunc(GL_EQUAL, 1, 0xFF);
-	state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	//DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
 	GLERROR("TransparentObjects");
 	//state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -349,78 +349,72 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             switch (explosionEffectJob->Type) {
             case RawModel::MaterialType::Basic:
 			case RawModel::MaterialType::SingleTextures:
-			{
-				if (explosionEffectJob->Model->IsSkinned()) {
+				{
+					if (explosionEffectJob->Model->IsSkinned()) {
 
-					m_ExplosionEffectSkinnedProgram->Bind();
-					GLERROR("Bind ExplosionEffectSkinned program");
-					//bind uniforms
-					BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
-					//bind textures
-					BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
-					glActiveTexture(GL_TEXTURE5);
-					glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-					glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+						m_ExplosionEffectSkinnedProgram->Bind();
+						GLERROR("Bind ExplosionEffectSkinned program");
+						//bind uniforms
+						BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
+						//bind textures
+						BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
+						glActiveTexture(GL_TEXTURE5);
+						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+						glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
-					std::vector<glm::mat4> frameBones;
-					if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-						frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+						std::vector<glm::mat4> frameBones;
+						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+						}
+						else {
+							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+						}
+						glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 					}
 					else {
-						frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+						m_ExplosionEffectProgram->Bind();
+						GLERROR("Bind ExplosionEffect program");
+						//bind uniforms
+						BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
+						//bind textures
+						BindExplosionTextures(explosionHandle, explosionEffectJob);
+						glActiveTexture(GL_TEXTURE5);
+						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+						glUniform3fv(glGetUniformLocation(explosionHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 					}
-					glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-					DrawSkinnedExplosionSetup(m_ExplosionEffectSkinnedProgram, explosionSkinnedHandle, explosionEffectJob, scene);
-				}
-				else {
-					m_ExplosionEffectProgram->Bind();
-					GLERROR("Bind ExplosionEffect program");
-					//bind uniforms
-					BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
-					//bind textures
-					BindExplosionTextures(explosionHandle, explosionEffectJob);
-					glActiveTexture(GL_TEXTURE5);
-					glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-					glUniform3fv(glGetUniformLocation(explosionHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
-					DrawExplosionSetup(m_ExplosionEffectProgram, explosionHandle, explosionEffectJob, scene);
-				}
-				break;
+					break;
 			}
 			case RawModel::MaterialType::SplatMapping:
-			{
-				if (explosionEffectJob->Model->IsSkinned()) {
-					m_ExplosionEffectSplatMapSkinnedProgram->Bind();
-					GLERROR("Bind ExplosionEffectSplatMapSkinned program");
-					//bind uniforms
-					BindExplosionUniforms(explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
-					//bind textures
-					BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
-					GLERROR("asdasd");
-					std::vector<glm::mat4> frameBones;
-					if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-						frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+				{
+					if (explosionEffectJob->Model->IsSkinned()) {
+						m_ExplosionEffectSplatMapSkinnedProgram->Bind();
+						GLERROR("Bind ExplosionEffectSplatMapSkinned program");
+						//bind uniforms
+						BindExplosionUniforms(explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
+						//bind textures
+						BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
+						GLERROR("asdasd");
+						std::vector<glm::mat4> frameBones;
+						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+						}
+						else {
+							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+						}
+						glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 					}
 					else {
-						frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+						m_ExplosionEffectSplatMapProgram->Bind();
+						GLERROR("Bind ExplosionEffectSplatMap program");
+						//bind uniforms
+						//bind uniforms
+						BindExplosionUniforms(explosionSplatMapHandle, explosionEffectJob, scene);
+						//bind textures
+						BindExplosionTextures(explosionSplatMapHandle, explosionEffectJob);
+						GLERROR("asdasd");
 					}
-					glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
-					DrawSkinnedExplosionSetup(m_ExplosionEffectSplatMapSkinnedProgram, explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
+					break;
 				}
-				else {
-					m_ExplosionEffectSplatMapProgram->Bind();
-					GLERROR("Bind ExplosionEffectSplatMap program");
-					//bind uniforms
-					//bind uniforms
-					BindExplosionUniforms(explosionSplatMapHandle, explosionEffectJob, scene);
-					//bind textures
-					BindExplosionTextures(explosionSplatMapHandle, explosionEffectJob);
-					GLERROR("asdasd");
-					DrawExplosionSetup(m_ExplosionEffectSplatMapProgram, explosionSplatMapHandle, explosionEffectJob, scene);
-				}
-				break;
-			}
             }
             glDisable(GL_CULL_FACE);
 
@@ -554,99 +548,145 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 				switch (explosionEffectJob->Type) {
 				case RawModel::MaterialType::Basic:
 				case RawModel::MaterialType::SingleTextures:
-				{
-					if (explosionEffectJob->Model->IsSkinned()) {
+					{
+						if (explosionEffectJob->Model->IsSkinned()) {
 
-						m_ExplosionEffectSkinnedShieldCheckProgram->Bind();
-						GLERROR("Bind ExplosionEffectSkinned program");
-						//bind uniforms
-						BindExplosionUniforms(explosionSkinnedShieldCheckHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSkinnedShieldCheckHandle, explosionEffectJob);
-						glActiveTexture(GL_TEXTURE5);
-						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-						glUniform3fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+							m_ExplosionEffectSkinnedShieldCheckProgram->Bind();
+							GLERROR("Bind ExplosionEffectSkinned program");
+							//bind uniforms
+							BindExplosionUniforms(explosionSkinnedShieldCheckHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionSkinnedShieldCheckHandle, explosionEffectJob);
+							glActiveTexture(GL_TEXTURE5);
+							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+							glUniform3fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
-						std::vector<glm::mat4> frameBones;
-						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+							std::vector<glm::mat4> frameBones;
+							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+							}
+							else {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+							}
+							glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 						}
 						else {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-						}
-						glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-					}
-					else {
-						m_ExplosionEffectShieldCheckProgram->Bind();
-						GLERROR("Bind ExplosionEffect program");
-						//bind uniforms
-						BindExplosionUniforms(explosionShieldCheckHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionShieldCheckHandle, explosionEffectJob);
-						glActiveTexture(GL_TEXTURE5);
-						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-						glUniform3fv(glGetUniformLocation(explosionShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+							m_ExplosionEffectShieldCheckProgram->Bind();
+							GLERROR("Bind ExplosionEffect program");
+							//bind uniforms
+							BindExplosionUniforms(explosionShieldCheckHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionShieldCheckHandle, explosionEffectJob);
+							glActiveTexture(GL_TEXTURE5);
+							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+							glUniform3fv(glGetUniformLocation(explosionShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
+						}
+						break;
 					}
-					break;
-				}
 				case RawModel::MaterialType::SplatMapping:
-				{
-					if (explosionEffectJob->Model->IsSkinned()) {
-						m_ExplosionEffectSplatMapSkinnedShieldCheckProgram->Bind();
-						GLERROR("Bind ExplosionEffectSplatMapSkinned program");
-						//bind uniforms
-						BindExplosionUniforms(explosionSplatMapSkinnedShieldCheckHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSplatMapSkinnedShieldCheckHandle, explosionEffectJob);
-						GLERROR("asdasd");
-						std::vector<glm::mat4> frameBones;
-						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+					{
+						if (explosionEffectJob->Model->IsSkinned()) {
+							m_ExplosionEffectSplatMapSkinnedShieldCheckProgram->Bind();
+							GLERROR("Bind ExplosionEffectSplatMapSkinned program");
+							//bind uniforms
+							BindExplosionUniforms(explosionSplatMapSkinnedShieldCheckHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionSplatMapSkinnedShieldCheckHandle, explosionEffectJob);
+							GLERROR("asdasd");
+							std::vector<glm::mat4> frameBones;
+							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+							}
+							else {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+							}
+							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 						}
 						else {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+							m_ExplosionEffectSplatMapShieldCheckProgram->Bind();
+							GLERROR("Bind ExplosionEffectSplatMap program");
+							//bind uniforms
+							//bind uniforms
+							BindExplosionUniforms(explosionSplatMapShieldCheckHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionSplatMapShieldCheckHandle, explosionEffectJob);
+							GLERROR("asdasd");
 						}
-						glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
+						break;
 					}
-					else {
-						m_ExplosionEffectSplatMapShieldCheckProgram->Bind();
-						GLERROR("Bind ExplosionEffectSplatMap program");
-						//bind uniforms
-						//bind uniforms
-						BindExplosionUniforms(explosionSplatMapShieldCheckHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSplatMapShieldCheckHandle, explosionEffectJob);
-						GLERROR("asdasd");
-					}
-					break;
 				}
-				}
-			}
-			else {
+			} else {
 				switch (explosionEffectJob->Type) {
 				case RawModel::MaterialType::Basic:
 				case RawModel::MaterialType::SingleTextures:
-				{
-					if (explosionEffectJob->Model->IsSkinned()) {
-						DrawSkinnedExplosionSetup(m_ExplosionEffectSkinnedProgram, explosionSkinnedHandle, explosionEffectJob, scene);
+					{
+						if (explosionEffectJob->Model->IsSkinned()) {
+
+							m_ExplosionEffectSkinnedProgram->Bind();
+							GLERROR("Bind ExplosionEffectSkinned program");
+							//bind uniforms
+							BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
+							glActiveTexture(GL_TEXTURE5);
+							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+							glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
+							std::vector<glm::mat4> frameBones;
+							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+							}
+							else {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+							}
+							glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+						}
+						else {
+							m_ExplosionEffectProgram->Bind();
+							GLERROR("Bind ExplosionEffect program");
+							//bind uniforms
+							BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionHandle, explosionEffectJob);
+							glActiveTexture(GL_TEXTURE5);
+							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+							glUniform3fv(glGetUniformLocation(explosionHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+						}
+						break;
 					}
-					else {
-						DrawExplosionSetup(m_ExplosionEffectProgram, explosionHandle, explosionEffectJob, scene);
-					}
-					break;
-				}
 				case RawModel::MaterialType::SplatMapping:
-				{
-					if (explosionEffectJob->Model->IsSkinned()) {
-						DrawSkinnedExplosionSetup(m_ExplosionEffectSplatMapSkinnedProgram, explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
+					{
+						if (explosionEffectJob->Model->IsSkinned()) {
+							m_ExplosionEffectSplatMapSkinnedProgram->Bind();
+							GLERROR("Bind ExplosionEffectSplatMapSkinned program");
+							//bind uniforms
+							BindExplosionUniforms(explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
+							GLERROR("asdasd");
+							std::vector<glm::mat4> frameBones;
+							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+							}
+							else {
+								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+							}
+							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+						}
+						else {
+							m_ExplosionEffectSplatMapProgram->Bind();
+							GLERROR("Bind ExplosionEffectSplatMap program");
+							//bind uniforms
+							//bind uniforms
+							BindExplosionUniforms(explosionSplatMapHandle, explosionEffectJob, scene);
+							//bind textures
+							BindExplosionTextures(explosionSplatMapHandle, explosionEffectJob);
+							GLERROR("asdasd");
+						}
+						break;
 					}
-					else {
-						DrawExplosionSetup(m_ExplosionEffectSplatMapProgram, explosionSplatMapHandle, explosionEffectJob, scene);
-					}
-					break;
-				}
 				}
 			}
 			glDisable(GL_CULL_FACE);
@@ -658,175 +698,159 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 			glEnable(GL_CULL_FACE);
 			GLERROR("explosion effect end");
 		} else {
-			auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
-			if (explosionEffectJob) {
-				switch (explosionEffectJob->Type) {
-				case RawModel::MaterialType::Basic:
-				case RawModel::MaterialType::SingleTextures:
-				{
-					if (explosionEffectJob->Model->IsSkinned()) {
-
-						m_ExplosionEffectSkinnedProgram->Bind();
-						GLERROR("Bind ExplosionEffectSkinned program");
-						//bind uniforms
-						BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
-						glActiveTexture(GL_TEXTURE5);
-						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-						glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
-						std::vector<glm::mat4> frameBones;
-						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-						}
-						else {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-						}
-						glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-						DrawSkinnedExplosionSetup(m_ExplosionEffectSkinnedProgram, explosionSkinnedHandle, explosionEffectJob, scene);
-					}
-					else {
-						m_ExplosionEffectProgram->Bind();
-						GLERROR("Bind ExplosionEffect program");
-						//bind uniforms
-						BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionHandle, explosionEffectJob);
-						glActiveTexture(GL_TEXTURE5);
-						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-						glUniform3fv(glGetUniformLocation(explosionHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
-						DrawExplosionSetup(m_ExplosionEffectProgram, explosionHandle, explosionEffectJob, scene);
-					}
-					break;
-				}
-				case RawModel::MaterialType::SplatMapping:
-				{
-					if (explosionEffectJob->Model->IsSkinned()) {
-						m_ExplosionEffectSplatMapSkinnedProgram->Bind();
-						GLERROR("Bind ExplosionEffectSplatMapSkinned program");
-						//bind uniforms
-						BindExplosionUniforms(explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
-						GLERROR("asdasd");
-						std::vector<glm::mat4> frameBones;
-						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-						}
-						else {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-						}
-						glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
-						DrawSkinnedExplosionSetup(m_ExplosionEffectSplatMapSkinnedProgram, explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
-					}
-					else {
-						m_ExplosionEffectSplatMapProgram->Bind();
-						GLERROR("Bind ExplosionEffectSplatMap program");
-						//bind uniforms
-						//bind uniforms
-						BindExplosionUniforms(explosionSplatMapHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSplatMapHandle, explosionEffectJob);
-						GLERROR("asdasd");
-						DrawExplosionSetup(m_ExplosionEffectSplatMapProgram, explosionSplatMapHandle, explosionEffectJob, scene);
-					}
-					break;
-				}
-				}
-				glDisable(GL_CULL_FACE);
-
-				//draw
-				glBindVertexArray(explosionEffectJob->Model->VAO);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
-				glDrawElements(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(explosionEffectJob->StartIndex*sizeof(unsigned int)));
-				glEnable(GL_CULL_FACE);
-				GLERROR("explosion effect end");
-			}
-			else {
-				auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
-				if (modelJob) {
-					//bind forward program
-					//TODO: JOHAN/TOBIAS: Bind shader based on ModelJob->ShaderID;
+			auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
+			if (modelJob) {
+				//bind forward program
+				//TODO: JOHAN/TOBIAS: Bind shader based on ModelJob->ShaderID;
+				if (modelJob->IsShielded) {
 					switch (modelJob->Type) {
 					case RawModel::MaterialType::Basic:
 					case RawModel::MaterialType::SingleTextures:
-					{
-						if (modelJob->Model->IsSkinned()) {
-							m_ForwardPlusSkinnedProgram->Bind();
-							GLERROR("Bind ForwardPlusSkinnedProgram");
-							//bind uniforms
-							BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
-							//bind textures
-							BindModelTextures(forwardSkinnedHandle, modelJob);
-							glActiveTexture(GL_TEXTURE5);
-							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-							glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+						{
+							if (modelJob->Model->IsSkinned()) {
+								m_ForwardPlusSkinnedShieldCheckProgram->Bind();
+								GLERROR("Bind ForwardPlusSkinnedProgram");
+								//bind uniforms
+								BindModelUniforms(forwardSkinnedShieldCheckHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardSkinnedShieldCheckHandle, modelJob);
+								glActiveTexture(GL_TEXTURE5);
+								glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+								glUniform3fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
-							std::vector<glm::mat4> frameBones;
-							if (modelJob->AnimationOffset.animation != nullptr) {
-								frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+								std::vector<glm::mat4> frameBones;
+								if (modelJob->AnimationOffset.animation != nullptr) {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+								}
+								else {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+								}
+								glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 							}
 							else {
-								frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+								m_ForwardPlusShieldCheckProgram->Bind();
+								GLERROR("Bind ForwardPlusProgram");
+								//bind uniforms
+								BindModelUniforms(forwardShieldCheckHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardShieldCheckHandle, modelJob);
+								glActiveTexture(GL_TEXTURE5);
+								glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+								glUniform3fv(glGetUniformLocation(forwardShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 							}
-							glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
+							break;
 						}
-						else {
-							m_ForwardPlusProgram->Bind();
-							GLERROR("Bind ForwardPlusProgram");
-							//bind uniforms
-							BindModelUniforms(forwardHandle, modelJob, scene);
-							//bind textures
-							BindModelTextures(forwardHandle, modelJob);
-							glActiveTexture(GL_TEXTURE5);
-							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-							glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-						}
-						break;
-					}
 					case RawModel::MaterialType::SplatMapping:
-					{
-						if (modelJob->Model->IsSkinned()) {
-							m_ForwardPlusSplatMapSkinnedProgram->Bind();
-							GLERROR("Bind SplatMap program");
-							//bind uniforms
-							BindModelUniforms(forwardSplatMapSkinnedHandle, modelJob, scene);
-							//bind textures
-							BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
-							GLERROR("asdasd");
-							std::vector<glm::mat4> frameBones;
-							if (modelJob->AnimationOffset.animation != nullptr) {
-								frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+						{
+							if (modelJob->Model->IsSkinned()) {
+								m_ForwardPlusSplatMapSkinnedShieldCheckProgram->Bind();
+								GLERROR("Bind SplatMap program");
+								//bind uniforms
+								BindModelUniforms(forwardSplatMapSkinnedShieldCheckHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardSplatMapSkinnedShieldCheckHandle, modelJob);
+								GLERROR("asdasd");
+								std::vector<glm::mat4> frameBones;
+								if (modelJob->AnimationOffset.animation != nullptr) {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+								}
+								else {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+								}
+								glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 							}
 							else {
-								frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+								m_ForwardPlusSplatMapShieldCheckProgram->Bind();
+								GLERROR("Bind SplatMap program");
+								//bind uniforms
+								BindModelUniforms(forwardSplatShieldCheckHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardSplatShieldCheckHandle, modelJob);
+								GLERROR("asdasd");
 							}
-							glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+							break;
+						}
+					}
+				} else {
+					switch (modelJob->Type) {
+					case RawModel::MaterialType::Basic:
+					case RawModel::MaterialType::SingleTextures:
+						{
+							if (modelJob->Model->IsSkinned()) {
+								m_ForwardPlusSkinnedProgram->Bind();
+								GLERROR("Bind ForwardPlusSkinnedProgram");
+								//bind uniforms
+								BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardSkinnedHandle, modelJob);
+								glActiveTexture(GL_TEXTURE5);
+								glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+								glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
+								std::vector<glm::mat4> frameBones;
+								if (modelJob->AnimationOffset.animation != nullptr) {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+								}
+								else {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+								}
+								glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+							}
+							else {
+								m_ForwardPlusProgram->Bind();
+								GLERROR("Bind ForwardPlusProgram");
+								//bind uniforms
+								BindModelUniforms(forwardHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardHandle, modelJob);
+								glActiveTexture(GL_TEXTURE5);
+								glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+								glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+							}
+							break;
 						}
-						else {
-							m_ForwardPlusSplatMapProgram->Bind();
-							GLERROR("Bind SplatMap program");
-							//bind uniforms
-							BindModelUniforms(forwardSplatMapHandle, modelJob, scene);
-							//bind textures
-							BindModelTextures(forwardSplatMapHandle, modelJob);
-							GLERROR("asdasd");
+					case RawModel::MaterialType::SplatMapping:
+						{
+							if (modelJob->Model->IsSkinned()) {
+								m_ForwardPlusSplatMapSkinnedProgram->Bind();
+								GLERROR("Bind SplatMap program");
+								//bind uniforms
+								BindModelUniforms(forwardSplatMapSkinnedHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
+								GLERROR("asdasd");
+								std::vector<glm::mat4> frameBones;
+								if (modelJob->AnimationOffset.animation != nullptr) {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+								}
+								else {
+									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+								}
+								glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+							}
+							else {
+								m_ForwardPlusSplatMapProgram->Bind();
+								GLERROR("Bind SplatMap program");
+								//bind uniforms
+								BindModelUniforms(forwardSplatMapHandle, modelJob, scene);
+								//bind textures
+								BindModelTextures(forwardSplatMapHandle, modelJob);
+								GLERROR("asdasd");
+							}
+							break;
 						}
-						break;
 					}
-					}
-					//draw
-					glBindVertexArray(modelJob->Model->VAO);
-					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-					glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex*sizeof(unsigned int)));
-					if (GLERROR("models end")) {
-						continue;
-					}
+				}
+				//draw
+				glBindVertexArray(modelJob->Model->VAO);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+				glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex*sizeof(unsigned int)));
+				if (GLERROR("models end")) {
+					continue;
 				}
 			}
 		}
@@ -1011,76 +1035,6 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
         }
     }
    // m_SpriteProgram->Unbind();
-}
-
-void DrawFinalPass::DrawExplosionSetup(ShaderProgram* shader, GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
-{
-	shader->Bind();
-	GLERROR("Bind ExplosionEffect program");
-	//bind uniforms
-	BindExplosionUniforms(shaderHandle, job, scene);
-	//bind textures
-	BindExplosionTextures(shaderHandle, job);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-	glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-}
-
-void DrawFinalPass::DrawSkinnedExplosionSetup(ShaderProgram* shader, GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
-{
-	shader->Bind();
-	GLERROR("Bind ExplosionEffectSkinned program");
-	//bind uniforms
-	BindExplosionUniforms(shaderHandle, job, scene);
-	//bind textures
-	BindExplosionTextures(shaderHandle, job);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-	glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
-	std::vector<glm::mat4> frameBones;
-	if (job->AnimationOffset.animation != nullptr) {
-		frameBones = job->Skeleton->GetFrameBones(job->Animations, job->AnimationOffset);
-	}
-	else {
-		frameBones = job->Skeleton->GetFrameBones(job->Animations);
-	}
-	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-}
-
-void DrawFinalPass::DrawModelSetup(ShaderProgram* shader, GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene)
-{
-	m_ForwardPlusProgram->Bind();
-	GLERROR("Bind ForwardPlusProgram");
-	//bind uniforms
-	BindModelUniforms(shaderHandle, job, scene);
-	//bind textures
-	BindModelTextures(shaderHandle, job);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-	glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-}
-
-void DrawFinalPass::DrawSkinnedModelSetup(ShaderProgram* shader, GLuint shaderHandle , std::shared_ptr<ModelJob>& job, RenderScene& scene)
-{
-	shader->Bind();
-	GLERROR("Bind ForwardPlusSkinnedProgram");
-	//bind uniforms
-	BindModelUniforms(shaderHandle, job, scene);
-	//bind textures
-	BindModelTextures(shaderHandle, job);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-	glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
-	std::vector<glm::mat4> frameBones;
-	if (job->AnimationOffset.animation != nullptr) {
-		frameBones = job->Skeleton->GetFrameBones(job->Animations, job->AnimationOffset);
-	}
-	else {
-		frameBones = job->Skeleton->GetFrameBones(job->Animations);
-	}
-	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 }
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
