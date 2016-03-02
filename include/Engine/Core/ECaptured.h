@@ -13,8 +13,7 @@ struct Captured : Event
 {
     int TeamNumberThatCapturedCapturePoint;
     EntityID CapturePointTakenID;
-    EntityWrapper BlueTeamNextCapturePoint;
-    EntityWrapper RedTeamNextCapturePoint;
+    EntityWrapper NextCapturePoint;
 };
 
 }
