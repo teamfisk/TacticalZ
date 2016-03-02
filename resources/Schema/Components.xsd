@@ -57,4 +57,5 @@
 	<xs:include schemaLocation="Components/CapturePointGameMode.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointArrowHUD.xsd"/>
 	<xs:include schemaLocation="Components/FloatingEffect.xsd"/>
+	<xs:include schemaLocation="Components/BoostIconsHUD.xsd"/>
 </xs:schema>
