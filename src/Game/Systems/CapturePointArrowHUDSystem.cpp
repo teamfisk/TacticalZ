@@ -11,9 +11,9 @@ CapturePointArrowHUDSystem::CapturePointArrowHUDSystem(SystemParams params)
 void CapturePointArrowHUDSystem::Update(double dt)
 {
     bool loadCheck = true;
-    int redTeam;
-    int blueTeam;
-    int spectatorTeam;
+    int redTeamEnum;
+    int blueTeamEnum;
+    int spectatorTeamEnum;
 
     //Get list for all CapturePointArrowHUDComponents
     auto arrowHUDs = m_World->GetComponents("CapturePointArrowHUD");
@@ -35,9 +35,9 @@ void CapturePointArrowHUDSystem::Update(double dt)
         int currentTeam = (int)cTeam["Team"];
 
         if (loadCheck) {
-            redTeam = (int)cTeam["Team"].Enum("Red");
-            blueTeam = (int)cTeam["Team"].Enum("Blue");
-            spectatorTeam = (int)cTeam["Team"].Enum("Spectator");
+            redTeamEnum = (int)cTeam["Team"].Enum("Red");
+            blueTeamEnum = (int)cTeam["Team"].Enum("Blue");
+            spectatorTeamEnum = (int)cTeam["Team"].Enum("Spectator");
             loadCheck = false;
 
 
@@ -66,21 +66,21 @@ void CapturePointArrowHUDSystem::Update(double dt)
 
                     int currentOwner = (int)capturePointEntity["Team"]["Team"];
 
-                    if(currentOwner != redTeam) {
+                    if(currentOwner != redTeamEnum) {
                         //This capturePoint is not owned by the red team and is therefor an eligible target for red team
                         glm::vec3 targetPos = Transform::AbsolutePosition(capturePointEntity);
                         redTargets.insert(std::pair<int, glm::vec3>(capturePointID, targetPos));
                     }
-                    if(currentOwner != blueTeam) {
+                    if(currentOwner != blueTeamEnum) {
                         //This capturePoint is not owned by the blue team and is therefor an eligible target for blue team
                         glm::vec3 targetPos = Transform::AbsolutePosition(capturePointEntity);
                         blueTargets.insert(std::pair<int, glm::vec3>(capturePointID, targetPos));
                     }
 
-                    if(homePointTeam == blueTeam) {
+                    if(homePointTeam == blueTeamEnum) {
                         //CP is the home point for blue team.
                         homeBlue = capturePointEntity;
-                    } else if (homePointTeam == redTeam) {
+                    } else if (homePointTeam == redTeamEnum) {
                         //CP is the home point for red team.
                         homeRed = capturePointEntity;
                     }
@@ -149,13 +149,11 @@ void CapturePointArrowHUDSystem::Update(double dt)
         //Untill this is awailable we will just use the hardcoded value in the component.
         //This will also give us a position, so we wont need to loop through all capturePoints.
         glm::vec3 pos;
-        if(currentTeam == redTeam) {
+        if(currentTeam == redTeamEnum) {
             pos = m_RedTeamCurrentTarget;
-        } else if (currentTeam == blueTeam) {
+        } else if (currentTeam == blueTeamEnum) {
             pos = m_BlueTeamCurrentTarget;
         }
-
-        //pos = currentTeam == redTeam ? m_RedTeamCurrentTarget : currentTeam == blueTeam ? m_BlueTeamCurrentTarget : glm::vec3(0.f);
 
         glm::vec3& arrowOri = arrowEntity["Transform"]["Orientation"];
         glm::vec3 lookVector = glm::normalize(Transform::AbsolutePosition(arrowEntity) - pos); //Maybe should be player instead
@@ -173,21 +171,13 @@ void CapturePointArrowHUDSystem::Update(double dt)
 
 bool CapturePointArrowHUDSystem::OnCapturePointCaptured(Events::Captured& e)
 {
-    if (!e.NextCapturePoint.HasComponent("Team")) {
+    if(!e.BlueTeamNextCapturePoint.Valid() || !e.RedTeamNextCapturePoint.Valid()) {
         return 0;
     }
 
-    auto cTeam = e.NextCapturePoint["Team"];
-    
-    int redTeam = (int)cTeam["Team"].Enum("Red");
-    int blueTeam = (int)cTeam["Team"].Enum("Blue");
-    int spectatorTeam = (int)cTeam["Team"].Enum("Spectator");
-
-    if(e.TeamNumberThatCapturedCapturePoint == redTeam) {
-        m_RedTeamCurrentTarget = Transform::AbsolutePosition(e.NextCapturePoint);
-    } else if (e.TeamNumberThatCapturedCapturePoint == blueTeam) {
-        m_BlueTeamCurrentTarget = Transform::AbsolutePosition(e.NextCapturePoint);
-    }
+    m_RedTeamCurrentTarget = Transform::AbsolutePosition(e.RedTeamNextCapturePoint);
+    m_BlueTeamCurrentTarget = Transform::AbsolutePosition(e.BlueTeamNextCapturePoint);
 
     m_InitialtargetsSet = true;
+    return 0;
 }

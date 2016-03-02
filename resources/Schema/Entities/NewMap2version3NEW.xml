@@ -810,6 +810,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -820,9 +821,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="24062.1504" Z="0"/>
+                              <Orientation X="0" Y="24080.8184" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -852,6 +852,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -862,9 +863,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="24041.0996" Z="0"/>
+                              <Orientation X="0" Y="24059.7676" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -894,6 +894,7 @@
                         <Entity>
                           <Components>
                             <c:AmmoPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -904,9 +905,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23982.3906" Z="0"/>
+                              <Orientation X="0" Y="24001.0586" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -936,6 +936,7 @@
                         <Entity>
                           <Components>
                             <c:AmmoPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -946,9 +947,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5727.98584" Z="0"/>
+                              <Orientation X="0" Y="5746.52246" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -978,6 +978,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -988,9 +989,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5638.45654" Z="0"/>
+                              <Orientation X="0" Y="5656.99316" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -1020,6 +1020,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -1030,9 +1031,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="15092.2393" Z="0"/>
+                              <Orientation X="0" Y="15110.7119" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -1062,6 +1062,7 @@
                         <Entity>
                           <Components>
                             <c:AmmoPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -1072,9 +1073,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="12983.1709" Z="0"/>
+                              <Orientation X="0" Y="13001.6436" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -2326,6 +2326,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -2336,9 +2337,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="16608.0488" Z="0"/>
+                              <Orientation X="0" Y="16626.7168" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -2368,6 +2368,7 @@
                         <Entity>
                           <Components>
                             <c:AmmoPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -2378,9 +2379,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5564.23389" Z="0"/>
+                              <Orientation X="0" Y="5582.77051" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -2865,6 +2865,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -2875,9 +2876,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="24035.8359" Z="0"/>
+                              <Orientation X="0" Y="24054.5039" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -2907,6 +2907,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -2917,9 +2918,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="24014.7852" Z="0"/>
+                              <Orientation X="0" Y="24033.4531" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -2949,6 +2949,7 @@
                         <Entity>
                           <Components>
                             <c:AmmoPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -2959,9 +2960,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23956.0762" Z="0"/>
+                              <Orientation X="0" Y="23974.7441" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -2991,6 +2991,7 @@
                         <Entity>
                           <Components>
                             <c:AmmoPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -3001,9 +3002,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5701.64502" Z="0"/>
+                              <Orientation X="0" Y="5720.18164" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -3033,6 +3033,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -3043,9 +3044,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5612.11572" Z="0"/>
+                              <Orientation X="0" Y="5630.65234" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -3075,6 +3075,7 @@
                         <Entity>
                           <Components>
                             <c:HealthPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -3085,9 +3086,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="15065.876" Z="0"/>
+                              <Orientation X="0" Y="15084.3486" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -3117,6 +3117,7 @@
                         <Entity>
                           <Components>
                             <c:AmmoPickup/>
+                            <c:Trigger/>
                             <c:RaptorCopter>
                               <Speed>8</Speed>
                               <Axis X="0" Y="0.100000001" Z="0"/>
@@ -3127,9 +3128,8 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="12956.8076" Z="0"/>
+                              <Orientation X="0" Y="12975.2803" Z="0"/>
                             </c:Transform>
-                            <c:Trigger/>
                           </Components>
                           <Children/>
                         </Entity>
@@ -4225,6 +4225,7 @@
                   <CapturePointMaxTimer>-15</CapturePointMaxTimer>
                   <CapturePointNumber>4</CapturePointNumber>
                 </c:CapturePoint>
+                <c:Trigger/>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
                   <Color A="0.300000012" B="1" G="0" R="0"/>
@@ -4239,7 +4240,6 @@
                   <Position X="0" Y="30.5569248" Z="0"/>
                   <Scale X="8.5" Y="62.2000046" Z="8.5"/>
                 </c:Transform>
-                <c:Trigger/>
               </Components>
               <Children/>
             </Entity>
@@ -4261,6 +4261,7 @@
                 <c:CapturePoint>
                   <CapturePointNumber>3</CapturePointNumber>
                 </c:CapturePoint>
+                <c:Trigger/>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
                   <Color A="0.300000012" B="1" G="1" R="1"/>
@@ -4271,7 +4272,6 @@
                   <Position X="0" Y="24.8728676" Z="0"/>
                   <Scale X="8.5" Y="60" Z="8.5"/>
                 </c:Transform>
-                <c:Trigger/>
               </Components>
               <Children/>
             </Entity>
@@ -4293,6 +4293,7 @@
                 <c:CapturePoint>
                   <CapturePointNumber>2</CapturePointNumber>
                 </c:CapturePoint>
+                <c:Trigger/>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
                   <Color A="0.300000012" B="1" G="1" R="1"/>
@@ -4303,7 +4304,6 @@
                   <Position X="0" Y="25.7207146" Z="0"/>
                   <Scale X="9" Y="60" Z="9"/>
                 </c:Transform>
-                <c:Trigger/>
               </Components>
               <Children/>
             </Entity>
@@ -4325,6 +4325,7 @@
                 <c:CapturePoint>
                   <CapturePointNumber>1</CapturePointNumber>
                 </c:CapturePoint>
+                <c:Trigger/>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
                   <Color A="0.300000012" B="1" G="1" R="1"/>
@@ -4335,7 +4336,6 @@
                   <Position X="0" Y="27.9425964" Z="0"/>
                   <Scale X="8.5" Y="60" Z="8.5"/>
                 </c:Transform>
-                <c:Trigger/>
               </Components>
               <Children/>
             </Entity>
@@ -4360,6 +4360,7 @@
                   </HomePointForTeam>
                   <CaptureTimer>15</CaptureTimer>
                 </c:CapturePoint>
+                <c:Trigger/>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
                   <Color A="0.300000012" B="0" G="0" R="1"/>
@@ -4374,7 +4375,6 @@
                   <Position X="0" Y="29.0392075" Z="0"/>
                   <Scale X="8.5" Y="60" Z="8.5"/>
                 </c:Transform>
-                <c:Trigger/>
               </Components>
               <Children/>
             </Entity>
@@ -4445,7 +4445,6 @@
           <Components>
             <c:DirectionalLight>
               <Intensity>1</Intensity>
-              <Visible>false</Visible>
             </c:DirectionalLight>
             <c:Transform>
               <Orientation X="0" Y="1.16600001" Z="2.08000016"/>
