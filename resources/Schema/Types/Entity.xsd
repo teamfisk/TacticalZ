@@ -52,6 +52,7 @@
 							<xs:element ref="c:Button" minOccurs="0"/>
 							<xs:element ref="c:WeaponAttachment" minOccurs="0"/>
 							<xs:element ref="c:DefenderWeapon" minOccurs="0"/>
+							<xs:element ref="c:CapturePointArrowHUD" minOccurs="0"/>
 							<xs:element ref="c:AmmoPickup" minOccurs="0"/>
 							<xs:element ref="c:HealthPickup" minOccurs="0"/>
 							<xs:element ref="c:CapturePointGameMode" minOccurs="0"/>
