@@ -20,6 +20,7 @@
 #include "../Game/Events/EDoubleJump.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
+#include "Core/EAmmoPickup.h"
 
 class Server : public Network
 {
@@ -88,7 +89,7 @@ private:
     void parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint);
     bool shouldSendToClient(EntityWrapper childEntity);
 
-    // Debug event
+    // Events
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
     EventRelay<Server, Events::PlayerSpawned> m_EPlayerSpawned;
@@ -99,6 +100,8 @@ private:
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
     EventRelay<Server, Events::PlayerDamage> m_EPlayerDamage;
     bool OnPlayerDamage(const Events::PlayerDamage& e);
+    EventRelay<Server, Events::AmmoPickup> m_EAmmoPickup;
+    bool OnAmmoPickup(const Events::AmmoPickup& e);
 };
 
 #endif
