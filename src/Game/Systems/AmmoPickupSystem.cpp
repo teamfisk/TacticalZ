@@ -15,7 +15,8 @@ AmmoPickupSystem::AmmoPickupSystem(SystemParams params)
 void AmmoPickupSystem::Update(double dt)
 {
     if (IsServer) {
-        for (auto it = m_ETriggerTouchVector.begin(); it != m_ETriggerTouchVector.end(); ++it) {
+        auto it = m_ETriggerTouchVector.begin();
+        while (it != m_ETriggerTouchVector.end()) {
             auto& somePickup = *it;
             somePickup.DecreaseThisRespawnTimer -= dt;
             if (somePickup.DecreaseThisRespawnTimer < 0.0) {
@@ -36,8 +37,10 @@ void AmmoPickupSystem::Update(double dt)
                 m_World->SetParent(newAmmoPickupEntity.ID, somePickup.parentID);
 
                 //erase the current element (somePickup)
-                m_ETriggerTouchVector.erase(it);
-                break;
+                it = m_ETriggerTouchVector.erase(it);
+            }
+            else { 
+                it++;
             }
         }
         //still touching m_PickupAtMaximum?

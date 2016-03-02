@@ -12,7 +12,8 @@ PickupSpawnSystem::PickupSpawnSystem(SystemParams params)
 void PickupSpawnSystem::Update(double dt)
 {
     if (IsServer) {
-        for (auto it = m_ETriggerTouchVector.begin(); it != m_ETriggerTouchVector.end(); ++it) {
+        auto it = m_ETriggerTouchVector.begin();
+        while (it != m_ETriggerTouchVector.end()) {
             auto& somePickup = *it;
             somePickup.DecreaseThisRespawnTimer -= dt;
             if (somePickup.DecreaseThisRespawnTimer < 0.0) {
@@ -34,8 +35,9 @@ void PickupSpawnSystem::Update(double dt)
                 m_World->SetParent(newHealthPickupEntity.ID, somePickup.parentID);
 
                 //erase the current element (somePickup)
-                m_ETriggerTouchVector.erase(it);
-                break;
+                it = m_ETriggerTouchVector.erase(it);
+            } else {
+                it++;
             }
         }
         //still touching PickupAtMaximum?
@@ -66,7 +68,8 @@ bool PickupSpawnSystem::OnTriggerTouch(Events::TriggerTouch& e)
     DoPickup(e.Entity, e.Trigger);
     return true;
 }
-bool PickupSpawnSystem::OnTriggerLeave(Events::TriggerLeave& e) {
+bool PickupSpawnSystem::OnTriggerLeave(Events::TriggerLeave& e)
+{
     if (!e.Trigger.HasComponent("HealthPickup")) {
         return false;
     }
@@ -79,7 +82,8 @@ bool PickupSpawnSystem::OnTriggerLeave(Events::TriggerLeave& e) {
     }
     return true;
 }
-void PickupSpawnSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger) {
+void PickupSpawnSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger)
+{
     double healthGiven = 0.01*(double)trigger["HealthPickup"]["HealthGain"] * (double)player["Health"]["MaxHealth"];
 
     //only the server will increase the players hp and set it in the next delta
@@ -90,8 +94,8 @@ void PickupSpawnSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger) 
 
     //copy position, healthgain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)
     //we need to copy all values since each value can be different for each healthPickup
-    m_ETriggerTouchVector.push_back({ (glm::vec3)trigger["Transform"]["Position"] ,trigger["HealthPickup"]["HealthGain"],
-        trigger["HealthPickup"]["RespawnTimer"],trigger["HealthPickup"]["RespawnTimer"], m_World->GetParent(trigger.ID) });
+    m_ETriggerTouchVector.push_back({ (glm::vec3)trigger["Transform"]["Position"], trigger["HealthPickup"]["HealthGain"],
+        trigger["HealthPickup"]["RespawnTimer"], trigger["HealthPickup"]["RespawnTimer"], m_World->GetParent(trigger.ID) });
 
     //delete the healthpickup
     m_World->DeleteEntity(trigger.ID);
