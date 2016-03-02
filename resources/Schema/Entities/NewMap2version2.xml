@@ -804,11 +804,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>3002.0048499272534</Time>
+                          <Time>3297.0538973857279</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00320033543" Z="0"/>
+                          <Position X="-0" Y="-0.0338360146" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -825,7 +825,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23665.3672" Z="0"/>
+                              <Orientation X="0" Y="23901.0449" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -851,11 +851,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2981.7884295114754</Time>
+                          <Time>3276.8374769699499</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.123386621" Z="-0"/>
+                          <Position X="0" Y="0.0977828354" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -872,7 +872,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23644.3164" Z="0"/>
+                              <Orientation X="0" Y="23879.9941" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -898,11 +898,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2965.4934667508096</Time>
+                          <Time>3260.542514209284</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.199960142" Z="-0"/>
+                          <Position X="0" Y="0.19820635" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -919,7 +919,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23585.6074" Z="0"/>
+                              <Orientation X="0" Y="23821.2852" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -945,11 +945,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2922.0307477781698</Time>
+                          <Time>3217.0797952366443</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.0194334686" Z="0"/>
+                          <Position X="-0" Y="-0.0497358106" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -966,7 +966,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5331.15967" Z="0"/>
+                              <Orientation X="0" Y="5567.29199" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -992,11 +992,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2871.33224525081</Time>
+                          <Time>3166.3812927092845</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.172897741" Z="-0"/>
+                          <Position X="0" Y="0.186271787" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -1013,7 +1013,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5241.63037" Z="0"/>
+                              <Orientation X="0" Y="5477.7627" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -1039,11 +1039,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2854.2794756870871</Time>
+                          <Time>3149.3285231455616</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.154012829" Z="0"/>
+                          <Position X="-0" Y="-0.171761468" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -1060,7 +1060,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="14694.2959" Z="0"/>
+                              <Orientation X="0" Y="14930.6826" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -1086,11 +1086,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2839.2647225755118</Time>
+                          <Time>3134.3137700339862</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.147846922" Z="-0"/>
+                          <Position X="0" Y="0.166757002" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -1107,7 +1107,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="12585.2275" Z="0"/>
+                              <Orientation X="0" Y="12821.6143" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -2242,7 +2242,7 @@
                                       <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
                                     </c:Model>
                                     <c:Transform>
-                                      <Position X="-3.47628784" Y="0.507368565" Z="0.99732101"/>
+                                      <Position X="-3.30188537" Y="0.507368565" Z="1.6052227"/>
                                     </c:Transform>
                                   </Components>
                                   <Children/>
@@ -2355,11 +2355,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2746.6837512442808</Time>
+                          <Time>3041.7327987027552</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.16754517" Z="0"/>
+                          <Position X="-0" Y="-0.148809776" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -2376,7 +2376,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="16210.457" Z="0"/>
+                              <Orientation X="0" Y="16446.9434" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -2402,11 +2402,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2732.8386366079758</Time>
+                          <Time>3027.8876840664502</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.0970942229" Z="0"/>
+                          <Position X="-0" Y="-0.0691253543" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -2423,7 +2423,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5167.40771" Z="0"/>
+                              <Orientation X="0" Y="5403.54004" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -2904,11 +2904,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2969.073541383088</Time>
+                          <Time>3264.1225888415624</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0458931364" Z="-0"/>
+                          <Position X="0" Y="0.0752089471" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -2925,7 +2925,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23639.0527" Z="0"/>
+                              <Orientation X="0" Y="23874.7305" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -2951,11 +2951,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2948.85712096731</Time>
+                          <Time>3243.9061684257845</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.0866934955" Z="0"/>
+                          <Position X="-0" Y="-0.0580219813" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -2972,7 +2972,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23618.002" Z="0"/>
+                              <Orientation X="0" Y="23853.6797" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -2998,11 +2998,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2932.5621582066442</Time>
+                          <Time>3227.6112056651186</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.196187839" Z="0"/>
+                          <Position X="-0" Y="-0.187905088" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3019,7 +3019,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="23559.293" Z="0"/>
+                              <Orientation X="0" Y="23794.9707" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -3045,11 +3045,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2889.0994392340044</Time>
+                          <Time>3184.1484866924789</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0615537763" Z="-0"/>
+                          <Position X="0" Y="0.0900137872" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3066,7 +3066,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5304.81885" Z="0"/>
+                              <Orientation X="0" Y="5540.95117" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -3092,11 +3092,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2838.4009367066446</Time>
+                          <Time>3133.4499841651191</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.190397173" Z="0"/>
+                          <Position X="-0" Y="-0.197535709" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3113,7 +3113,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="5215.28955" Z="0"/>
+                              <Orientation X="0" Y="5451.42188" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -3139,11 +3139,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2821.3481671429217</Time>
+                          <Time>3116.3972146013962</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.177647248" Z="-0"/>
+                          <Position X="0" Y="0.189699799" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3160,7 +3160,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="14667.9326" Z="0"/>
+                              <Orientation X="0" Y="14904.3193" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
@@ -3186,11 +3186,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Axis X="0" Y="0.200000003" Z="0"/>
-                          <Time>2806.3334140313464</Time>
+                          <Time>3101.3824614898208</Time>
                           <Period>2</Period>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.173328787" Z="0"/>
+                          <Position X="-0" Y="-0.186583459" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3207,7 +3207,7 @@
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-                              <Orientation X="0" Y="12558.8643" Z="0"/>
+                              <Orientation X="0" Y="12795.251" Z="0"/>
                             </c:Transform>
                             <c:Trigger/>
                           </Components>
