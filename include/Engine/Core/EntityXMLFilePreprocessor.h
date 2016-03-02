@@ -1,5 +1,5 @@
-#ifndef EntityFilePreprocessor_h__
-#define EntityFilePreprocessor_h__
+#ifndef EntityXMLFilePreprocessor_h__
+#define EntityXMLFilePreprocessor_h__
 
 #include <xercesc/framework/psvi/XSElementDeclaration.hpp>
 #include <xercesc/framework/psvi/XSComplexTypeDefinition.hpp>

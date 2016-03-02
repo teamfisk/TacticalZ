@@ -1,5 +1,5 @@
-#ifndef EntityFileWriter_h__
-#define EntityFileWriter_h__
+#ifndef EntityXMLFileWriter_h__
+#define EntityXMLFileWriter_h__
 
 #include <boost/filesystem.hpp>
 #include <xercesc/dom/DOM.hpp>

@@ -1,5 +1,5 @@
-#ifndef EntityFile_h__
-#define EntityFile_h__
+#ifndef EntityXMLFile_h__
+#define EntityXMLFile_h__
 
 #include <stack>
 #include <boost/lexical_cast.hpp>

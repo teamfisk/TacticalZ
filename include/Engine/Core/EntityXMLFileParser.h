@@ -1,5 +1,5 @@
-#ifndef EntityFileParser_h__
-#define EntityFileParser_h__
+#ifndef EntityXMLFileParser_h__
+#define EntityXMLFileParser_h__
 
 #include "EntityXMLFile.h"
 #include "World.h"
