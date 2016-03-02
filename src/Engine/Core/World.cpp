@@ -1,6 +1,7 @@
 #include "Core/World.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
+#include "Core/EntityWrapper.h"
 
 World::~World()
 {
@@ -149,6 +150,23 @@ std::string World::GetName(EntityID entity) const
     } else {
         return std::string();
     }
+}
+
+EntityWrapper World::GetFirstEntityByName(const std::string& name)
+{
+    auto itPair = GetDirectChildren(EntityID_Invalid);
+    for (auto it = itPair.first; it != itPair.second; it++) {
+        EntityID childEntityID = it->second;
+        EntityWrapper childEntity(this, childEntityID);
+        if (!childEntity.Valid()) {
+            continue;
+        }
+        EntityWrapper entityWithName = childEntity.Name() == name ? childEntity : childEntity.FirstChildByName(name);
+        if (entityWithName.Valid()) {
+            return entityWithName;
+        }
+    }
+    return EntityWrapper::Invalid;
 }
 
 EntityID World::generateEntityID()

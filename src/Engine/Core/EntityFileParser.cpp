@@ -1,6 +1,6 @@
 #include "Core/EntityFileParser.h"
 
-EntityFileParser::EntityFileParser(const EntityFile* entityFile) 
+EntityFileParser::EntityFileParser(const EntityFile* entityFile)
     : m_EntityFile(entityFile)
 {
     m_Handler.SetStartEntityCallback(std::bind(&EntityFileParser::onStartEntity, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
@@ -33,13 +33,20 @@ void EntityFileParser::onStartEntity(EntityID entity, EntityID parent, const std
 
 void EntityFileParser::onStartComponent(EntityID entity, const std::string& component)
 {
-    EntityID realEntity = m_EntityIDMapper.at(entity);
-    m_World->AttachComponent(realEntity, component);
+    if (m_World->GetComponentPools().count(component) != 0) {
+        EntityID realEntity = m_EntityIDMapper.at(entity);
+        m_World->AttachComponent(realEntity, component);
+    } else {
+        LOG_ERROR("Tried to attach unregistered component \"%s\"! to entity #%i. Ignoring.", component.c_str(), entity);
+    }
     //LOG_DEBUG("Attached component of type \"%s\" to entity #%i (%i)", component.c_str(), entity, realEntity);
 }
 
 void EntityFileParser::onStartComponentField(EntityID entity, const std::string& componentType, const std::string& fieldName, const std::map<std::string, std::string>& attributes)
 {
+    if (m_World->GetComponentPools().count(componentType) == 0) {
+        return;
+    }
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
     auto fieldIt = component.Info.Fields.find(fieldName);
@@ -61,6 +68,9 @@ void EntityFileParser::onStartComponentField(EntityID entity, const std::string&
 
 void EntityFileParser::onFieldData(EntityID entity, const std::string& componentType, const std::string& fieldName, const char* fieldData)
 {
+    if (m_World->GetComponentPools().count(componentType) == 0) {
+        return;
+    }
     EntityID realEntity = m_EntityIDMapper.at(entity);
     ComponentWrapper component = m_World->GetComponent(realEntity, componentType);
     auto fieldIt = component.Info.Fields.find(fieldName);
