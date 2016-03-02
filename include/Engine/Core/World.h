@@ -55,7 +55,7 @@ public:
 
     // Merge another world into this one
     // Returns a map that maps entities from the other world to their copies in this one
-    std::unordered_map<EntityID, EntityID> Merge(World& other);
+    std::unordered_map<EntityID, EntityID> Merge(const World* other);
 
 private:
     EventBroker* m_EventBroker = nullptr;

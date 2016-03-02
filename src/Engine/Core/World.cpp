@@ -169,27 +169,29 @@ EntityWrapper World::GetFirstEntityByName(const std::string& name)
     return EntityWrapper::Invalid;
 }
 
-std::unordered_map<EntityID, EntityID> World::Merge(World& other)
+std::unordered_map<EntityID, EntityID> World::Merge(const World* other)
 {
     std::unordered_map<EntityID, EntityID> oldToNew;
 
     // Create new entities
-    for (auto& kv : other.m_EntityParents) {
+    for (auto& kv : other->m_EntityParents) {
         EntityID entity = kv.first;
 
         EntityID newEntity = CreateEntity();
-        SetName(newEntity, other.GetName(entity));
+        SetName(newEntity, other->GetName(entity));
         oldToNew[entity] = newEntity;
     }
     // Fix relationships
-    for (auto& kv : other.m_EntityParents) {
+    for (auto& kv : other->m_EntityParents) {
         EntityID entity = kv.first;
         EntityID parent = kv.second;
-        SetParent(oldToNew.at(entity), oldToNew.at(parent));
+        if (parent != EntityID_Invalid) {
+            SetParent(oldToNew.at(entity), oldToNew.at(parent));
+        }
     }
 
     // Transfer components
-    for (auto& kv : other.m_ComponentPools) {
+    for (auto& kv : other->m_ComponentPools) {
         auto& componentType = kv.first;
         ComponentPool* pool = kv.second;
         // Register pool if it's not present in world
