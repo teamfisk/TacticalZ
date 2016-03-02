@@ -103,6 +103,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         }
     }
     if (m_RecentlyCapturedNeedNextCapturePointNow) {
+        //TODO: Next capture point for both teams
         m_CapturedEvent.NextCapturePoint = m_CapturedEvent.TeamNumberThatCapturedCapturePoint == blueTeam ?
             m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Blue"]] :
             m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Red"]];

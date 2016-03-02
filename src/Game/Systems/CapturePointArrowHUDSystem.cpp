@@ -10,74 +10,134 @@ CapturePointArrowHUDSystem::CapturePointArrowHUDSystem(SystemParams params)
 
 void CapturePointArrowHUDSystem::Update(double dt)
 {
-    bool LoadCheck = true;
+    bool loadCheck = true;
     int redTeam;
     int blueTeam;
     int spectatorTeam;
 
     //Get list for all CapturePointArrowHUDComponents
-    auto ArrowHUDs = m_World->GetComponents("CapturePointArrowHUD");
-    auto CapturePoints = m_World->GetComponents("CapturePoint");
-    if(ArrowHUDs == nullptr) {
+    auto arrowHUDs = m_World->GetComponents("CapturePointArrowHUD");
+    auto capturePoints = m_World->GetComponents("CapturePoint");
+    if(arrowHUDs == nullptr) {
         return;
     }
 
-    for(auto& cArrowHUD : *ArrowHUDs) {
+    for(auto& cArrowHUD : *arrowHUDs) {
         //Get what team the current arrow corresponds to
-        EntityWrapper ArrowEntity = EntityWrapper(m_World, cArrowHUD.EntityID);
-        if (!ArrowEntity.Valid()) {
+        EntityWrapper arrowEntity = EntityWrapper(m_World, cArrowHUD.EntityID);
+        if (!arrowEntity.Valid()) {
             continue;
         }
-        if(!ArrowEntity.HasComponent("Team")) {
+        if(!arrowEntity.HasComponent("Team")) {
             continue;
         }
-        auto cTeam = ArrowEntity["Team"];
+        auto cTeam = arrowEntity["Team"];
         int currentTeam = (int)cTeam["Team"];
 
-        if (LoadCheck) {
+        if (loadCheck) {
             redTeam = (int)cTeam["Team"].Enum("Red");
             blueTeam = (int)cTeam["Team"].Enum("Blue");
             spectatorTeam = (int)cTeam["Team"].Enum("Spectator");
-            LoadCheck = false;
+            loadCheck = false;
 
 
             if (!m_InitialtargetsSet) {
-                glm::vec3 target1, target2;
-                EntityWrapper home1, home2;
+                std::unordered_map<int, glm::vec3> blueTargets, redTargets;
+                EntityWrapper homeBlue, homeRed;
+                int lastCP = -INFINITY;
+                int firstCP = INFINITY;
 
-                for (auto& cCP : *CapturePoints) {
+                for (auto& cCP : *capturePoints) {
                     auto homePointTeam = (int)cCP["HomePointForTeam"];
-                    auto CPID = (int)cCP["CapturePointNumber"];
+                    EntityWrapper capturePointEntity = EntityWrapper(m_World, cCP.EntityID);
+                    int capturePointID = (int)capturePointEntity["CapturePoint"]["CapturePointNumber"];
 
-                    if(CPID == 0) {
-                        //Home point for one team
-                        home1 = EntityWrapper(m_World, cCP.EntityID);
-                    } else if (CPID == 1) {
-                        //First target for one team, so save it for later use.
-                        target1 = Transform::AbsolutePosition(EntityWrapper(m_World, cCP.EntityID));
-                    } else if (CPID == 3) {
-                        //First target for one team, so save it for later use.
-                        target2 = Transform::AbsolutePosition(EntityWrapper(m_World, cCP.EntityID));
-                    } else if (CPID == 4) {
-                        //Home point for one team
-                        home2 = EntityWrapper(m_World, cCP.EntityID);
+                    if(capturePointID < firstCP) {
+                        firstCP = capturePointID;
+                    }
+
+                    if(capturePointID > lastCP) {
+                        lastCP = capturePointID;
+                    }
+
+                    if (!capturePointEntity.HasComponent("Team")) {
+                        continue;
+                    }
+
+                    int currentOwner = (int)capturePointEntity["Team"]["Team"];
+
+                    if(currentOwner != redTeam) {
+                        //This capturePoint is not owned by the red team and is therefor an eligible target for red team
+                        glm::vec3 targetPos = Transform::AbsolutePosition(capturePointEntity);
+                        redTargets.insert(std::pair<int, glm::vec3>(capturePointID, targetPos));
+                    }
+                    if(currentOwner != blueTeam) {
+                        //This capturePoint is not owned by the blue team and is therefor an eligible target for blue team
+                        glm::vec3 targetPos = Transform::AbsolutePosition(capturePointEntity);
+                        blueTargets.insert(std::pair<int, glm::vec3>(capturePointID, targetPos));
+                    }
+
+                    if(homePointTeam == blueTeam) {
+                        //CP is the home point for blue team.
+                        homeBlue = capturePointEntity;
+                    } else if (homePointTeam == redTeam) {
+                        //CP is the home point for red team.
+                        homeRed = capturePointEntity;
                     }
                 }
-                //Check what team is the owner of Home1 and set their target to the next capturepoint
-                if(!home1.Valid() || !home2.Valid()) {
+
+                if(!homeRed.Valid() || !homeBlue.Valid()) {
+                    //One or both teams have no home point, cant continue
                     return;
                 }
-                if((int)home1["CapturePoint"]["HomePointForTeam"] == redTeam) {
-                    m_RedTeamCurrentTarget = target1;
-                } else if ((int)home1["CapturePoint"]["HomePointForTeam"] == blueTeam) {
-                    m_BlueTeamCurrentTarget = target1;
+
+                std::unordered_map<int, glm::vec3>::const_iterator got;
+                //Find next target for red team.
+                if((int)homeRed["CapturePoint"]["CapturePointNumber"] == lastCP) {
+                    //Red home base is the last capture point, count back from lastCP and find next target
+                    for (int i = lastCP; i >= firstCP; i--) {
+                        got = redTargets.find(i);
+                        if(got == redTargets.end()) {
+                            continue;
+                        } else {
+                            m_RedTeamCurrentTarget = got->second;
+                        }
+                    }
+                } else if ((int)homeRed["CapturePoint"]["CapturePointNumber"] == firstCP) {
+                    //Red home is the first capture point, count forward from firstCP and find next target.
+                    for (int i = firstCP; i <= lastCP; i++) {
+                        got = redTargets.find(i);
+                        if(got == redTargets.end()) {
+                            //Target was not found, try the next one after that.
+                            continue;
+                        } else {
+                            m_RedTeamCurrentTarget = got->second;
+                        }
+                    }
                 }
 
-                //Check what team is the owner of Home2 and set their target to the next capturepoint
-                if ((int)home2["CapturePoint"]["HomePointForTeam"] == redTeam) {
-                    m_RedTeamCurrentTarget = target2;
-                } else if ((int)home2["CapturePoint"]["HomePointForTeam"] == blueTeam) {
-                    m_BlueTeamCurrentTarget = target2;
+                //Find next target for blue team
+                if ((int)homeBlue["CapturePoint"]["CapturePointNumber"] == lastCP) {
+                    //Red home base is the last capture point, count back from lastCP and find next target
+                    for (int i = lastCP; i >= firstCP; i--) {
+                        got = blueTargets.find(i);
+                        if (got == blueTargets.end()) {
+                            continue;
+                        } else {
+                            m_BlueTeamCurrentTarget = got->second;
+                        }
+                    }
+                } else if ((int)homeBlue["CapturePoint"]["CapturePointNumber"] == firstCP) {
+                    //Red home is the first capture point, count forward from firstCP and find next target.
+                    for (int i = firstCP; i <= lastCP; i++) {
+                        got = blueTargets.find(i);
+                        if (got == blueTargets.end()) {
+                            //Target was not found, try the next one after that.
+                            continue;
+                        } else {
+                            m_BlueTeamCurrentTarget = got->second;
+                        }
+                    }
                 }
             }
         }
@@ -93,14 +153,14 @@ void CapturePointArrowHUDSystem::Update(double dt)
 
         pos = currentTeam == redTeam ? m_RedTeamCurrentTarget : currentTeam == blueTeam ? m_BlueTeamCurrentTarget : glm::vec3(0.f);
 
-        glm::vec3& arrowOri = ArrowEntity["Transform"]["Orientation"];
-        glm::vec3 lookVector = glm::normalize(Transform::AbsolutePosition(ArrowEntity) - pos); //Maybe should be player instead
+        glm::vec3& arrowOri = arrowEntity["Transform"]["Orientation"];
+        glm::vec3 lookVector = glm::normalize(Transform::AbsolutePosition(arrowEntity) - pos); //Maybe should be player instead
         float pitch = std::asin(-lookVector.y);
         float yaw = std::atan2(lookVector.x, lookVector.z);
         arrowOri.x = pitch;
         arrowOri.y = yaw;
         arrowOri.z = 0.f;
-        EntityWrapper parent = ArrowEntity.Parent();
+        EntityWrapper parent = arrowEntity.Parent();
         if (parent.Valid()) {
             arrowOri -= Transform::AbsoluteOrientationEuler(parent);
         }
@@ -109,8 +169,7 @@ void CapturePointArrowHUDSystem::Update(double dt)
 
 bool CapturePointArrowHUDSystem::OnCapturePointCaptured(Events::Captured& e)
 {
-    if (!e.NextCapturePoint.HasComponent("Team"))
-    {
+    if (!e.NextCapturePoint.HasComponent("Team")) {
         return 0;
     }
 
@@ -119,18 +178,11 @@ bool CapturePointArrowHUDSystem::OnCapturePointCaptured(Events::Captured& e)
     int redTeam = (int)cTeam["Team"].Enum("Red");
     int blueTeam = (int)cTeam["Team"].Enum("Blue");
     int spectatorTeam = (int)cTeam["Team"].Enum("Spectator");
-    int target = -1;
-
-    if (e.NextCapturePoint.HasComponent("CapturePoint")) {
-        target = (int)e.NextCapturePoint["CapturePoint"]["CapturePointNumber"];
-    } else {
-        return 0;
-    }
 
     if(e.TeamNumberThatCapturedCapturePoint == redTeam) {
         m_RedTeamCurrentTarget = Transform::AbsolutePosition(e.NextCapturePoint);
     } else if (e.TeamNumberThatCapturedCapturePoint == blueTeam) {
-        m_BlueTeamCurrentTarget = Transform::AbsolutePosition(e.NextCapturePoint);;
+        m_BlueTeamCurrentTarget = Transform::AbsolutePosition(e.NextCapturePoint);
     }
 
     m_InitialtargetsSet = true;
