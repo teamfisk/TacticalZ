@@ -40,7 +40,6 @@ layout (binding = 10) uniform sampler2D SpecularMapTexture3;
 layout (binding = 11) uniform sampler2D GlowMapTexture1;
 layout (binding = 12) uniform sampler2D GlowMapTexture2;
 layout (binding = 13) uniform sampler2D GlowMapTexture3;
-layout (binding = 13) uniform sampler2D GlowMapTexture3;
 layout (binding = 31) uniform samplerCube ShieldBuffer;
 
 #define TILE_SIZE 16
