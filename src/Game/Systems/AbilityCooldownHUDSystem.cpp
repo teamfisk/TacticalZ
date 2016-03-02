@@ -17,10 +17,12 @@ void AbilityCooldownHUDSystem::Update(double dt)
         if(cooldownTextEntity.Valid()) {
             if(cooldownTextEntity.HasComponent("Text"))
             {
-                double abilityCD = (double)abilityEntity["DashAbility"]["CoolDownMaxTimer"];
-                std::string t = (std::string&)cooldownTextEntity["Text"]["Content"] = std::to_string(abilityCD).substr(0, 3);
+                double maxAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownMaxTimer"];
+                double currentAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownTimer"];
+                currentAbilityCD = currentAbilityCD >= 0.0 ? currentAbilityCD : 0.0;
+                std::string t = (std::string&)cooldownTextEntity["Text"]["Content"] = std::to_string(currentAbilityCD).substr(0, 3);
                 if(entity.HasComponent("Fill")) {
-                    entity["Fill"]["Percentage"] = abilityCD/abilityCD; //TODO: current time needs to be in the component.
+                    entity["Fill"]["Percentage"] = currentAbilityCD/maxAbilityCD; //TODO: current time needs to be in the component.
                 }
             }
         }
