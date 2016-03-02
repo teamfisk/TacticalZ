@@ -11,6 +11,7 @@
 #include "Systems/PlayerSpawnSystem.h"
 #include "Systems/PlayerDeathSystem.h"
 #include "Systems/FloatingEffectSystem.h"
+#include "Core/EntityFile.h"
 #include "Core/EntityXMLFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
@@ -44,7 +45,8 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<PNG>("Png");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
-    ResourceManager::RegisterType<EntityXMLFile>("EntityFile");
+    ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<Font>("FontFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
