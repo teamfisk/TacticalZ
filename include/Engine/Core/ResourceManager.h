@@ -19,6 +19,7 @@ class Resource
 
 protected:
 	Resource() { }
+    virtual ~Resource() { }
 
 public:
     //Should be thrown in a Resource's constructor if it cannot complete because another resource is still loading.

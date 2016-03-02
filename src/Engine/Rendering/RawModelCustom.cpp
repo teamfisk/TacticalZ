@@ -271,7 +271,7 @@ void RawModelCustom::ReadMaterialTextureProperties(RawModelCustom::TextureProper
 		}
 		texture.TexturePath = "Textures/";
 		texture.TexturePath += (fileData + offset);
-		texture.TexturePath += ".png";
+		texture.TexturePath += ".dds";
 		offset += nameLength;
 		if (offset + sizeof(glm::vec2) > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading Material texture UVTiling failed");

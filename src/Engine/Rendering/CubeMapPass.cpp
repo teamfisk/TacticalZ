@@ -13,8 +13,8 @@ void CubeMapPass::LoadTextures(std::string input)
         for (int i = 0; i < 6; i++) {
             std::string str;
             str = "Textures/Test/CubeMap/" + input + "/CubeMapTest0" + std::to_string(i) + ".png";
-            Texture* img = ResourceManager::Load<Texture>(str);
-            m_CubeMapTextures.push_back(img);
+            //Texture* img = ResourceManager::Load<Texture>(str);
+            //m_CubeMapTextures.push_back(img);
         }
         GenerateCubeMapTexture();
         m_PreviusCubeMapTexture = input;
@@ -29,7 +29,7 @@ void CubeMapPass::GenerateCubeMapTexture()
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapTexture);
 
     for (int i = 0; i < 6; i++) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, m_CubeMapTextures[0]->Width, m_CubeMapTextures[0]->Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_CubeMapTextures[i]->Data);
+        //glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, m_CubeMapTextures[0]->Width, m_CubeMapTextures[0]->Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_CubeMapTextures[i]->Data);
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
