@@ -13,7 +13,7 @@
     </c:AssaultWeapon>
     <c:Collidable/>
     <c:DefenderWeapon>
-      <TimeSinceLastFire>361.81593010381596</TimeSinceLastFire>
+      <TimeSinceLastFire>384.13256760035051</TimeSinceLastFire>
     </c:DefenderWeapon>
     <c:DoubleJump/>
     <c:Health/>
@@ -373,7 +373,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>1.6231050125476969</Time1>
+              <Time1>0.75626404186195373</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -417,11 +417,15 @@
             <c:Model>
               <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
             </c:Model>
-            <c:Team/>
+            <c:Team>
+              <Team>
+                <Red/>
+              </Team>
+            </c:Team>
             <c:Transform>
               <Position X="-0.200000003" Y="0.150000006" Z="-0.5"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-              <Orientation X="-0.250997096" Y="-0.398927212" Z="0"/>
+              <Orientation X="-0.0344330445" Y="-0.486859739" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -446,7 +450,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.8847063959212136</Time1>
+          <Time1>1.1511986314122282</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
