@@ -238,7 +238,7 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
     return blendInfo;
 }
 
-void BlendTree::Blend(std::map<int, glm::mat4>& pose)
+void BlendTree::Blend(std::map<int, Skeleton::PoseData>& pose)
 {
     Node* currentNode;
     Node* start = m_Root;
@@ -301,7 +301,7 @@ std::vector<glm::mat4> BlendTree::AccumulateFinalPose()
         return finalPose;
     }
 
-    std::map<int, glm::mat4> pose;
+    std::map<int, Skeleton::PoseData> pose;
     Blend(pose);
 
     m_Skeleton->GetFinalPose(pose, finalPose, m_FinalBoneTransforms);

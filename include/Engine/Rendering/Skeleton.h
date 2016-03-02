@@ -50,11 +50,16 @@ public:
         std::map<int, std::vector<Keyframe>> JointAnimations;
 	};
 
+    struct PoseData {
+        glm::vec3 Translation;
+        glm::quat Orientation;
+        glm::vec3 Scale;
+    };
+
 	Skeleton() { }
 	~Skeleton();
 
 	Bone* RootBone;
-
 	std::map<int, Bone*> Bones;
 
     std::unordered_map<EntityWrapper, std::shared_ptr<BlendTree>> BlendTrees;
@@ -65,20 +70,20 @@ public:
 	int GetBoneID(std::string name);
     const Animation* GetAnimation(std::string name);
 
-    std::map<int, glm::mat4> GetFrameBones(const Animation* animation, double time, bool additive, bool noRootMotion = false);
-    glm::mat4 GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 childMatrix);
-    std::map<int, glm::mat4> BlendPoses(const std::map<int, glm::mat4>& pose1, const std::map<int, glm::mat4>& pose2, double weight);
-    std::map<int, glm::mat4> OverridePose(const std::map<int, glm::mat4>& overridePose, const std::map<int, glm::mat4>& targetPose);
-    std::map<int, glm::mat4> BlendPoseAdditive(const std::map<int, glm::mat4>& additivePose, const std::map<int, glm::mat4>& targetPose);
-    void GetFinalPose(std::map<int, glm::mat4>& boneMatrices, std::vector<glm::mat4>& finalPose, std::map<int, glm::mat4>& boneTransforms);
+    std::map<int, Skeleton::PoseData> GetFrameBones(const Animation* animation, double time, bool additive, bool noRootMotion = false);
+    
+    std::map<int, Skeleton::PoseData> BlendPoses(const std::map<int, PoseData>& pose1, const std::map<int, PoseData>& pose2, double weight);
+    std::map<int, Skeleton::PoseData> OverridePose(const std::map<int, PoseData>& overridePose, const std::map<int, PoseData>& targetPose);
+    std::map<int, Skeleton::PoseData> BlendPoseAdditive(const std::map<int, PoseData>& additivePose, const std::map<int, PoseData>& targetPose);
+    void GetFinalPose(std::map<int, Skeleton::PoseData>& boneMatrices, std::vector<glm::mat4>& finalPose, std::map<int, glm::mat4>& boneTransforms);
     
     std::map<std::string, Animation> Animations;
 private:
-    glm::mat4 GetAdditiveBonePose(const Bone* bone, const Animation* animation, double time);
-    glm::mat4 GetBonePose(const Bone* bone, const Animation* animation, double time, bool noRootMotion);
-    void AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, std::map<int, glm::mat4>& boneTransforms, const Bone* bone, glm::mat4 parentMatrix);
-    void AdditiveBoneTransforms(const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone);
-    void AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, double time, std::map<int, glm::mat4>& boneMatrices, const Bone* bone, glm::mat4 parentMatrix);
+    Skeleton::PoseData GetAdditiveBonePose(const Bone* bone, const Animation* animation, double time);
+    
+    void AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, std::map<int, Skeleton::PoseData>& poseDatas, std::map<int, glm::mat4>& boneTransforms, const Bone* bone, glm::mat4 parentMatrix);
+    void AdditiveBoneTransforms(const Animation* animation, double time, std::map<int, PoseData>& boneMatrices, const Bone* bone);
+    void AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, double time, std::map<int, PoseData>& boneMatrices, const Bone* bone);
 
 	std::map<std::string, Bone*> m_BonesByName;
     

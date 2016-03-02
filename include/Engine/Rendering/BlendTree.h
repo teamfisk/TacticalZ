@@ -19,6 +19,7 @@ public:
         Animation,
     };
 
+    
 
     struct Node
     {
@@ -27,7 +28,7 @@ public:
         Node* Parent = nullptr;
         Node* Child[2] = { nullptr, nullptr };
         NodeType Type;
-        std::map<int, glm::mat4> Pose;
+        std::map<int, Skeleton::PoseData> Pose;
         //std::vector<glm::mat4> Pose;
         double Weight = 0.0;
 
@@ -85,7 +86,7 @@ private:
     BlendTree::Node* FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity);
     std::vector<BlendTree::Node*> FindNodesByName(std::string name);
 
-    void Blend(std::map<int, glm::mat4>& pose);
+    void Blend(std::map<int, Skeleton::PoseData>& pose);
 };
 
 #endif
