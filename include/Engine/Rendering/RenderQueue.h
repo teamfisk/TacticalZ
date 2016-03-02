@@ -24,7 +24,6 @@ struct RenderScene
         std::list<std::shared_ptr<RenderJob>> OpaqueObjects;
         std::list<std::shared_ptr<RenderJob>> TransparentObjects;
         std::list<std::shared_ptr<RenderJob>> OpaqueShieldedObjects;
-        std::list<std::shared_ptr<RenderJob>> TransparentShieldedObjects;
         std::list<std::shared_ptr<RenderJob>> ShieldObjects;
         std::list<std::shared_ptr<RenderJob>> SpriteJob;
         std::list<std::shared_ptr<RenderJob>> PointLight;
@@ -41,7 +40,6 @@ struct RenderScene
         Jobs.OpaqueObjects.clear();
         Jobs.TransparentObjects.clear();
         Jobs.OpaqueShieldedObjects.clear();
-        Jobs.TransparentShieldedObjects.clear();
         Jobs.ShieldObjects.clear();
         Jobs.SpriteJob.clear();
         Jobs.DirectionalLight.clear();

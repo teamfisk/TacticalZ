@@ -26,6 +26,7 @@
 #include "Network/EInterpolate.h"
 #include "Network/SnapshotFilter.h"
 #include "Core/EPlayerSpawned.h"
+#include "Core/EAmmoPickup.h"
 #include "Network/ESearchForServers.h"
 
 struct ServerInfo
@@ -106,7 +107,8 @@ private:
     void parsePlayerDamage(Packet& packet);
     void parseComponentDeletion(Packet& packet);
     void parseDoubleJump(Packet& packet);
-    void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
+    void parseAmmoPickup(Packet& packet);
+    void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     void hasServerTimedOut();

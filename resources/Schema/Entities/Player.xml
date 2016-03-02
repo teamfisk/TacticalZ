@@ -13,7 +13,7 @@
     </c:AssaultWeapon>
     <c:Collidable/>
     <c:DefenderWeapon>
-      <TimeSinceLastFire>23.911064541134579</TimeSinceLastFire>
+      <TimeSinceLastFire>52.867678870419283</TimeSinceLastFire>
     </c:DefenderWeapon>
     <c:DoubleJump/>
     <c:Health/>
@@ -37,7 +37,10 @@
   <Children>
     <Entity name="Camera">
       <Components>
-        <c:Camera/>
+        <c:Camera>
+          <NearClip>0.10000000149011612</NearClip>
+          <FarClip>300</FarClip>
+        </c:Camera>
         <c:Transform>
           <Position X="0" Y="1.27700007" Z="0"/>
         </c:Transform>
@@ -193,6 +196,7 @@
                           <CapturePointNumber>3</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Fill>
+                          <Percentage>0.80222018197612788</Percentage>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Fill>
                         <c:Sprite>
@@ -227,7 +231,6 @@
                           <CapturePointNumber>4</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Fill>
-                          <Percentage>1</Percentage>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Fill>
                         <c:Sprite>
@@ -283,7 +286,7 @@
                     <c:Sprite>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <GlowMap></GlowMap>
-                      <Color A="0.699999988" B="0" G="0" R="1"/>
+                      <Color A="0.699999988" B="0" G="0.200000003" R="1"/>
                     </c:Sprite>
                     <c:Transform>
                       <Position X="-1.58304751" Y="0.919596612" Z="0"/>
@@ -294,8 +297,7 @@
                       <Components>
                         <c:CapturePointHUD/>
                         <c:Fill>
-                          <Percentage>1</Percentage>
-                          <Color A="0.699999988" B="0" G="0" R="1"/>
+                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Fill>
                         <c:Sprite>
                           <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
@@ -304,7 +306,7 @@
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
                           <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                          <Orientation X="0" Y="0" Z="4.71238899"/>
+                          <Orientation X="0" Y="0" Z="1.57079637"/>
                         </c:Transform>
                       </Components>
                       <Children/>
@@ -373,7 +375,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.22110820884665827</Time1>
+              <Time1>1.9408570429715581</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -411,30 +413,14 @@
             </Entity>
           </Children>
         </Entity>
-        <Entity name="CapturePointIndicator">
-          <Components>
-            <c:CapturePointArrowHUD/>
-            <c:Model>
-              <Resource>Models/Widgets/Arrows/Arrow10.mesh</Resource>
-            </c:Model>
-            <c:Team>
-              <Team>
-                <Blue/>
-              </Team>
-            </c:Team>
-            <c:Transform>
-              <Position X="0" Y="0.118000008" Z="-0.354000002"/>
-              <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-              <Orientation X="-0.0286321267" Y="-1.85983479" Z="0"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
       </Children>
     </Entity>
     <Entity name="ThirdPersonCamera">
       <Components>
-        <c:Camera/>
+        <c:Camera>
+          <NearClip>0.10000000149011612</NearClip>
+          <FarClip>300</FarClip>
+        </c:Camera>
         <c:Model>
           <Resource>Models/Widgets/Camera.mesh</Resource>
           <Visible>false</Visible>
@@ -450,7 +436,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
-          <Time1>1.6993789132803556</Time1>
+          <Time1>1.5631122524686134</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
