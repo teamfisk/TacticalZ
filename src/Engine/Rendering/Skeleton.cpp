@@ -57,7 +57,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
             Animation::Keyframe::BoneProperty nextBoneProperty = nextFrame.BoneProperties;
 
             glm::vec3 position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
-            glm::quat rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
+            glm::quat rotation = glm::normalize(glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress));
             glm::vec3 scale = currentBoneProperty.Scale * (1.f - progress) + nextBoneProperty.Scale * progress;
 
             // Flag for no root motion
@@ -71,7 +71,7 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
 
         } else { // 1 keyframes for the current bone
             currentFrame = boneKeyFrames.at(0);
-            boneMatrix =  (glm::translate(currentFrame.BoneProperties.Position) * glm::toMat4(currentFrame.BoneProperties.Rotation) * glm::scale(currentFrame.BoneProperties.Scale));
+            boneMatrix =  (glm::translate(currentFrame.BoneProperties.Position) * glm::toMat4(glm::normalize(currentFrame.BoneProperties.Rotation)) * glm::scale(currentFrame.BoneProperties.Scale));
             boneMatrices[bone->ID] = boneMatrix;// *bone->OffsetMatrix;
         }
     } else { // 0 keyframes for the current bone
@@ -244,7 +244,7 @@ glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation* animatio
             }
 
             if (progress > 1.0f || progress < 0.0f) {
-                LOG_INFO("Progress %f", progress);
+                //LOG_INFO("Progress %f", progress);
                 progress = glm::clamp(progress, 0.0f, 1.0f);
             }
             Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
@@ -276,7 +276,7 @@ glm::mat4 Skeleton::GetBoneTransform(const Bone* bone, const Animation* animatio
     }
 }
 
-std::map<int, glm::mat4> Skeleton::BlendPoses(const std::map<int, glm::mat4>& pose1, const std::map<int, glm::mat4>& pose2, float weight)
+std::map<int, glm::mat4> Skeleton::BlendPoses(const std::map<int, glm::mat4>& pose1, const std::map<int, glm::mat4>& pose2, double weight)
 {
     std::map<int, glm::mat4> finalPose;
 
@@ -285,8 +285,8 @@ std::map<int, glm::mat4> Skeleton::BlendPoses(const std::map<int, glm::mat4>& po
         glm::mat4 blendedPose = glm::mat4(0);
 
         if(pose1.find(boneID) != pose1.end() && pose2.find(boneID) != pose2.end()) {
-            blendedPose += pose1.at(boneID) * weight;
-            blendedPose += pose2.at(boneID) * (1.f - weight);
+            blendedPose += pose1.at(boneID) * (float)(1.0 - weight);
+            blendedPose += pose2.at(boneID) * (float)weight;
             finalPose[boneID] = blendedPose;
         } else if(pose1.find(boneID) != pose1.end()) {
             finalPose[boneID] = pose1.at(boneID);
@@ -347,15 +347,11 @@ void Skeleton::GetFinalPose(std::map<int, glm::mat4>& boneMatrices, std::vector<
 
 void Skeleton::AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, std::map<int, glm::mat4>& boneTransforms, const Bone* bone, glm::mat4 parentMatrix)
 {
-
     glm::mat4 boneMatrix;
 
-
     if (boneMatrices.find(bone->ID) != boneMatrices.end()) {
-
         boneMatrix = parentMatrix * boneMatrices.at(bone->ID);
         boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
-
     } else {
         if (bone->Parent) {
             boneMatrix = parentMatrix * (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);

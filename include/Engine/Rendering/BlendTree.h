@@ -23,12 +23,13 @@ public:
     struct Node
     {
         std::string Name;
+        EntityWrapper Entity;
         Node* Parent = nullptr;
         Node* Child[2] = { nullptr, nullptr };
         NodeType Type;
         std::map<int, glm::mat4> Pose;
         //std::vector<glm::mat4> Pose;
-        float Weight = 0.f;
+        double Weight = 0.0;
 
         Node* Next() {
             Node* next = this;
@@ -54,7 +55,12 @@ public:
     };
 
   
-
+    struct AutoBlendInfo
+    {
+        std::string NodeName;
+        double progress;
+        std::unordered_map<EntityWrapper, double> StartWeights;
+    };
 
 
     BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton);
@@ -66,6 +72,7 @@ public:
     bool IsValid() { return  (m_Root == nullptr ? false : true); }
 
     void PrintTree();
+    BlendTree::AutoBlendInfo AutoBlendStep(AutoBlendInfo blendInfo);
 
 private:
     Skeleton* m_Skeleton = nullptr;
@@ -76,6 +83,7 @@ private:
 
     std::vector<glm::mat4> AccumulateFinalPose();
     BlendTree::Node* FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity);
+    std::vector<BlendTree::Node*> FindNodesByName(std::string name);
 
     void Blend(std::map<int, glm::mat4>& pose);
 };

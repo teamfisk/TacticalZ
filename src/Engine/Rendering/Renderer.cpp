@@ -142,7 +142,7 @@ void Renderer::Draw(RenderFrame& frame)
 		PerformanceTimer::StopTimer("Renderer-Depth");
 	}
 	PerformanceTimer::StartTimer("AO generation");
-	m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
+	//m_SSAOPass->Draw(m_PickingPass->DepthBuffer(), frame.RenderScenes.front()->Camera);
 	GLuint ao = m_SSAOPass->SSAOTexture();
 	PerformanceTimer::StopTimer("AO generation");
     for (auto scene : frame.RenderScenes){

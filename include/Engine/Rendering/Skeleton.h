@@ -67,7 +67,7 @@ public:
 
     std::map<int, glm::mat4> GetFrameBones(const Animation* animation, double time, bool additive, bool noRootMotion = false);
     glm::mat4 GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 childMatrix);
-    std::map<int, glm::mat4> BlendPoses(const std::map<int, glm::mat4>& pose1, const std::map<int, glm::mat4>& pose2, float weight);
+    std::map<int, glm::mat4> BlendPoses(const std::map<int, glm::mat4>& pose1, const std::map<int, glm::mat4>& pose2, double weight);
     std::map<int, glm::mat4> OverridePose(const std::map<int, glm::mat4>& overridePose, const std::map<int, glm::mat4>& targetPose);
     std::map<int, glm::mat4> BlendPoseAdditive(const std::map<int, glm::mat4>& additivePose, const std::map<int, glm::mat4>& targetPose);
     void GetFinalPose(std::map<int, glm::mat4>& boneMatrices, std::vector<glm::mat4>& finalPose, std::map<int, glm::mat4>& boneTransforms);
