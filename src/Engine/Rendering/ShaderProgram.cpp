@@ -98,8 +98,7 @@ void ShaderProgram::AddShader(std::shared_ptr<Shader> shader)
 
 void ShaderProgram::Compile()
 {
-	if (m_ShaderProgramHandle == 0)
-	{
+	if (m_ShaderProgramHandle == 0)	{
 		m_ShaderProgramHandle = glCreateProgram();
 	}
 

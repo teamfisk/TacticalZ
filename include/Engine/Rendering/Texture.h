@@ -18,6 +18,7 @@ public:
 	void Bind(GLenum textureUnit = GL_TEXTURE0);
 
 	GLuint m_Texture = 0;
+    unsigned char* Data = nullptr;
     
 };
 
