@@ -142,9 +142,13 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         } else if (node->Weight == 0.f) {
             node->Child[1] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose2"], childEntity);
         }*/
+        
+        if(node->Child[0] == nullptr && node->Child[1] == nullptr) {
+            return nullptr;
+        } else {
+            return node;
+        }
 
-
-        return node;
     } else if (childEntity.HasComponent("BlendOverride")) {
         Node* node = new Node();
         node->Entity = childEntity;
@@ -153,7 +157,12 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         node->Type = NodeType::Override;
         node->Child[0] = FillTreeByName(node, (std::string)childEntity["BlendOverride"]["Master"], childEntity);
         node->Child[1] = FillTreeByName(node, (std::string)childEntity["BlendOverride"]["Slave"], childEntity);
-        return node;
+        
+        if (node->Child[0] == nullptr && node->Child[1] == nullptr) {
+            return nullptr;
+        } else {
+            return node;
+        }
     } else if (childEntity.HasComponent("BlendAdditive")) {
         Node* node = new Node();
         node->Entity = childEntity;
@@ -162,7 +171,12 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         node->Type = NodeType::Additive;
         node->Child[0] = FillTreeByName(node, (std::string)childEntity["BlendAdditive"]["Adder"], childEntity);
         node->Child[1] = FillTreeByName(node, (std::string)childEntity["BlendAdditive"]["Receiver"], childEntity);
-        return node;
+        
+        if(node->Child[0] == nullptr && node->Child[1] == nullptr) {
+            return nullptr;
+        } else {
+            return node;
+        }
     }
     
 
@@ -252,7 +266,6 @@ void BlendTree::Blend(std::map<int, Skeleton::PoseData>& pose)
         if(currentNode->Pose.size() == 0) {
             if (currentNode->Child[0] != nullptr && currentNode->Child[1] != nullptr) {
                 if (currentNode->Child[0]->Pose.size() != 0 && currentNode->Child[1]->Pose.size() != 0) {
-
                     switch (currentNode->Type) {
                     case BlendTree::NodeType::Additive:
                         currentNode->Pose = m_Skeleton->BlendPoseAdditive(currentNode->Child[0]->Pose, currentNode->Child[1]->Pose);
