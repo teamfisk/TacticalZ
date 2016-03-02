@@ -11,8 +11,11 @@ EntityFile::EntityFile(std::string path)
     m_RootEntity = parser.MergeEntities(this);
 
     if (m_RootEntity == EntityID_Invalid) {
+        ResourceManager::Release("EntityXMLFile", path);
         throw Resource::FailedLoadingException("Failed to merge entities; root entity is invalid");
     }
+
+    ResourceManager::Release("EntityXMLFile", path);
 }
 
 EntityWrapper EntityFile::MergeInto(World* other)
