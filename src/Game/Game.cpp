@@ -82,11 +82,8 @@ Game::Game(int argc, char* argv[])
     m_World = new World(m_EventBroker);
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
-        auto file = ResourceManager::Load<EntityXMLFile>(mapToLoad);
-        EntityXMLFilePreprocessor fpp(file);
-        fpp.RegisterComponents(m_World);
-        EntityXMLFileParser fp(file);
-        fp.MergeEntities(m_World);
+        auto file = ResourceManager::Load<EntityFile>(mapToLoad);
+        file->MergeInto(m_World);
     }
 
     // Create the sound manager

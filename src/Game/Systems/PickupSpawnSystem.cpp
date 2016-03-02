@@ -18,17 +18,16 @@ void PickupSpawnSystem::Update(double dt)
             somePickup.DecreaseThisRespawnTimer -= dt;
             if (somePickup.DecreaseThisRespawnTimer < 0.0) {
                 //spawn the new healthPickup
-                auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/HealthPickup.xml");
-                EntityXMLFileParser parser(entityFile);
-                EntityID healthPickupID = parser.MergeEntities(m_World);
+                auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/HealthPickup.xml");
+                EntityWrapper healthPickup = entityFile->MergeInto(m_World);
 
                 //let the world know a pickup has spawned (graphics effects, etc)
                 Events::PickupSpawned ePickupSpawned;
-                ePickupSpawned.Pickup = EntityWrapper(m_World, healthPickupID);
+                ePickupSpawned.Pickup = healthPickup;
                 m_EventBroker->Publish(ePickupSpawned);
 
                 //copy values from the old entity to the new entity
-                auto& newHealthPickupEntity = EntityWrapper(m_World, healthPickupID);
+                auto& newHealthPickupEntity = healthPickup;
                 newHealthPickupEntity["Transform"]["Position"] = somePickup.Pos;
                 newHealthPickupEntity["HealthPickup"]["HealthGain"] = somePickup.HealthGain;
                 newHealthPickupEntity["HealthPickup"]["RespawnTimer"] = somePickup.RespawnTimer;

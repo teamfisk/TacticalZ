@@ -6,12 +6,13 @@
 
 class EntityXMLFileParser
 {
+    friend class EntityFile;
 public:
     EntityXMLFileParser(const EntityXMLFile* entityFile);
 
+private:
     EntityID MergeEntities(World* world, EntityID baseParent = EntityID_Invalid);
 
-private:
     const EntityXMLFile* m_EntityFile;
     EntityFileHandler m_Handler;
     World* m_World = nullptr;

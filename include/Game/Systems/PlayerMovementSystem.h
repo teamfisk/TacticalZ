@@ -6,9 +6,7 @@
 #include <imgui/imgui.h>
 #include "Events/EDoubleJump.h"
 #include "../Engine/Sound/EPlaySoundOnEntity.h"
-
-#include "Core/EntityXMLFile.h"
-#include "Core/EntityXMLFileParser.h"
+#include "Core/EntityFile.h"
 
 class PlayerMovementSystem : public ImpureSystem
 {

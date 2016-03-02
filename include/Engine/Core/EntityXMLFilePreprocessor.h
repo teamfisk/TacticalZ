@@ -21,12 +21,13 @@
 
 class EntityXMLFilePreprocessor
 {
+    friend class EntityFile;
 public:
     EntityXMLFilePreprocessor(const EntityXMLFile* entityFile);
 
+private:
     void RegisterComponents(World* world);
 
-private:
     const EntityXMLFile* m_EntityFile;
     std::map<std::string, unsigned int> m_ComponentCounts;
 	std::map<std::string, ComponentInfo> m_ComponentInfo;

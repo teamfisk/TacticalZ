@@ -49,16 +49,14 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
     float angleBetweenVectors = CalculateAngle(e.Victim, inflictorPos);
 
     //load & set the "2d" sprite
-    auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/DamageIndicator.xml");
-    EntityXMLFileParser parser(entityFile);
-    EntityID spriteID = parser.MergeEntities(m_World);
-    m_World->SetParent(spriteID, m_CurrentCamera);
-    auto spriteWrapper = EntityWrapper(m_World, spriteID);
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
+    EntityWrapper sprite = entityFile->MergeInto(m_World);
+    m_World->SetParent(sprite.ID, m_CurrentCamera);
     //simply set the rotation z-wise to the angleBetweenVectors
-    spriteWrapper["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);
+    sprite["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);
 
     if (!IsServer) {
-        updateDamageIndicatorVector.emplace_back(spriteWrapper, inflictorPos);
+        updateDamageIndicatorVector.emplace_back(sprite, inflictorPos);
     }
 
     return true;
