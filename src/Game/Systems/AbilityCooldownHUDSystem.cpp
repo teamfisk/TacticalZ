@@ -14,17 +14,19 @@ void AbilityCooldownHUDSystem::Update(double dt)
         if (!abilityEntity.Valid())
             return;
         EntityWrapper cooldownTextEntity = entity.FirstChildByName("Cooldown");
+
+        double maxAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownMaxTimer"];
+        double currentAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownTimer"];
+
         if(cooldownTextEntity.Valid()) {
             if(cooldownTextEntity.HasComponent("Text"))
             {
-                double maxAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownMaxTimer"];
-                double currentAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownTimer"];
-                currentAbilityCD = currentAbilityCD >= 0.0 ? currentAbilityCD : 0.0;
                 std::string t = (std::string&)cooldownTextEntity["Text"]["Content"] = std::to_string(currentAbilityCD).substr(0, 3);
-                if(entity.HasComponent("Fill")) {
-                    entity["Fill"]["Percentage"] = currentAbilityCD/maxAbilityCD; //TODO: current time needs to be in the component.
-                }
             }
+        }
+        if (entity.HasComponent("Fill")) {
+            currentAbilityCD = currentAbilityCD >= 0.0 ? currentAbilityCD : 0.0;
+            entity["Fill"]["Percentage"] = currentAbilityCD/maxAbilityCD;
         }
     }
 }
