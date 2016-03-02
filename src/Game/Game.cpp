@@ -27,6 +27,7 @@
 #include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
 #include "Game/Systems/AmmunitionHUDSystem.h"
+#include "Game/Systems/AbilityCooldownHUDSystem.h"
 #include "Game/Systems/CapturePointArrowHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
 #include "Game/Systems/BoostSystem.h"
@@ -135,6 +136,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
