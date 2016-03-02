@@ -3,7 +3,7 @@
 
   <Components>
     <c:CapturePointGameMode>
-      <RespawnTime>3.6027407165331624</RespawnTime>
+      <RespawnTime>0.0</RespawnTime>
       <MaxRespawnTime>15</MaxRespawnTime>
     </c:CapturePointGameMode>
     <c:Transform/>
@@ -5336,12 +5336,9 @@
                   <Content></Content>
                   <Resource>Fonts/DroidSans.ttf,64</Resource>
                   <Color A="1" B="0" G="1" R="0.784313738"/>
-                  <Alignment>
-                    <Left/>
-                  </Alignment>
                 </c:Text>
                 <c:Transform>
-                  <Position X="-0.115000000" Y="0.15304254" Z="0"/>
+                  <Position X="0" Y="0.178199276" Z="0"/>
                   <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
                 </c:Transform>
               </Components>

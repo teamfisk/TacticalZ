@@ -37,7 +37,7 @@ void PlayerSpawnSystem::Update(double dt)
                 EntityWrapper respawnTimer = spectatorCam.FirstChildByName("RespawnTimer");
                 if (respawnTimer.Valid()) {
                     //Update respawn time in the HUD element.
-                    respawnTimer["Text"]["Content"] = "Time to respawn: " + std::to_string(1 + (int)(maxRespawnTime - timer));
+                    respawnTimer["Text"]["Content"] = std::to_string(1 + (int)(maxRespawnTime - timer));
                 }
             }
         }
