@@ -18,6 +18,8 @@ void AbilityCooldownHUDSystem::Update(double dt)
         double maxAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownMaxTimer"];
         double currentAbilityCD = (double)abilityEntity["DashAbility"]["CoolDownTimer"];
 
+        currentAbilityCD = currentAbilityCD >= 0.0 ? currentAbilityCD : 0.0;
+
         if(cooldownTextEntity.Valid()) {
             if(cooldownTextEntity.HasComponent("Text"))
             {
@@ -25,7 +27,6 @@ void AbilityCooldownHUDSystem::Update(double dt)
             }
         }
         if (entity.HasComponent("Fill")) {
-            currentAbilityCD = currentAbilityCD >= 0.0 ? currentAbilityCD : 0.0;
             entity["Fill"]["Percentage"] = currentAbilityCD/maxAbilityCD;
         }
     }
