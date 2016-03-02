@@ -4,14 +4,16 @@
 #include "../../Engine/Core/System.h"
 #include "../../Engine/GLM.h"
 
-class BoostIconsHUDSystem : public ImpureSystem
+class BoostIconsHUDSystem : public PureSystem
 {
 public:
     BoostIconsHUDSystem(SystemParams params)
         : System(params)
+        , PureSystem("BoostIconsHUD")
     { }
 
-    virtual void Update(double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt) override;
+
 };
 
 #endif
