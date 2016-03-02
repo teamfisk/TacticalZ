@@ -39,10 +39,9 @@ bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
     }
     //load boost XML file, set it entity parented with the victim player
     auto entityFile = ResourceManager::Load<EntityFile>(classXML);
-    EntityFileParser parser(entityFile);
-    EntityID boostAssaultEntity = parser.MergeEntities(m_World);
-    m_World->SetName(boostAssaultEntity, className);
-    m_World->SetParent(boostAssaultEntity, e.Victim.ID);
+    EntityWrapper boostAssaultEntity = entityFile->MergeInto(m_World);
+    m_World->SetName(boostAssaultEntity.ID, className);
+    m_World->SetParent(boostAssaultEntity.ID, e.Victim.ID);
 
     return true;
 }
