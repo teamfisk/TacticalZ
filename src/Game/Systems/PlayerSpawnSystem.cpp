@@ -10,7 +10,7 @@ PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params)
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_NetworkEnabled = config->Get("Networking.StartNetwork", false);
     m_ForcedRespawnTime = config->Get("Debug.RespawnTime", -1.0f);
-    m_DbgConfigForceRespawn = m_ForcedRespawnTime > 0;
+    m_DbgConfigForceRespawn = m_ForcedRespawnTime > 0 && IsServer;
 }
 
 void PlayerSpawnSystem::Update(double dt)
@@ -26,7 +26,10 @@ void PlayerSpawnSystem::Update(double dt)
         // Increase timer.
         double& timer = (double&)modeComponent["RespawnTime"];
         timer += dt;
-        double maxRespawnTime = m_DbgConfigForceRespawn ? m_ForcedRespawnTime : (double)modeComponent["MaxRespawnTime"];
+        if (m_DbgConfigForceRespawn) {
+            (double&)modeComponent["MaxRespawnTime"] = m_ForcedRespawnTime;
+        }
+        double maxRespawnTime = (double)modeComponent["MaxRespawnTime"];
         EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
         if (spectatorCam.Valid()) {
             EntityWrapper HUD = spectatorCam.FirstChildByName("SpectatorHUD");
