@@ -7,7 +7,7 @@ using boost::unit_test_framework::test_case;
 
 #include "Collision/TriggerSystem.h"
 #include "Collision/CollisionSystem.h"
-#include "Core/EntityFileWriter.h"
+#include "Core/EntityXMLFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 
 BOOST_AUTO_TEST_SUITE(CapturePointTestSuite)
@@ -82,7 +82,7 @@ bool CapturePointTest::CapturePoint_Game_Loop_OneHundredTimes() {
 CapturePointTest::CapturePointTest(int runTestNumber)
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
-    ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -99,10 +99,10 @@ CapturePointTest::CapturePointTest(int runTestNumber)
     m_SystemPipeline->AddSystem<CapturePointSystem>(1);
 
     //must register components (Components.xsd), else you cant create entities. Easiest done by loading a test xsd file
-    auto file = ResourceManager::Load<EntityFile>("Schema/Entities/TeamTest.xml");
-    EntityFilePreprocessor fpp(file);
+    auto file = ResourceManager::Load<EntityXMLFile>("Schema/Entities/TeamTest.xml");
+    EntityXMLFilePreprocessor fpp(file);
     fpp.RegisterComponents(m_World);
-    EntityFileParser fp(file);
+    EntityXMLFileParser fp(file);
     fp.MergeEntities(m_World);
 
     EntityID playerID = m_World->CreateEntity();

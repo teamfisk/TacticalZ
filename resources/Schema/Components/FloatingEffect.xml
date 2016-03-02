@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<FloatingEffect xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="FloatingEffect.xsd">
+	<Period>1</Period>
+	<Amplitude>1</Amplitude>
+	<Time>0</Time>
+	<Axis X="0" Y="0" Z="0"/>
+	<Position X="0" Y="0" Z="0"/>
+</FloatingEffect>

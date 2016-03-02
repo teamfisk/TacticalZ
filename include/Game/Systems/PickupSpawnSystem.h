@@ -4,12 +4,11 @@
 #include "Core/System.h"
 #include "Core/Transform.h"
 #include "Core/ResourceManager.h"
-#include "Core/EntityFileParser.h"
+#include "Core/EntityFile.h"
 #include "Core/EPickupSpawned.h"
 #include "Core/EPlayerHealthPickup.h"
 #include "Engine/Collision/ETrigger.h"
 #include "Common.h"
-#include <tuple>
 
 class PickupSpawnSystem : public ImpureSystem
 {
@@ -21,6 +20,8 @@ public:
 private:
     EventRelay<PickupSpawnSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(Events::TriggerTouch& e);
+    EventRelay<PickupSpawnSystem, Events::TriggerLeave> m_ETriggerLeave;
+    bool OnTriggerLeave(Events::TriggerLeave& e);
 
     struct NewHealthPickup {
         glm::vec3 Pos;
@@ -30,5 +31,11 @@ private:
         EntityID parentID;
     };
     std::vector<NewHealthPickup> m_ETriggerTouchVector;
+    struct EntityAtMaxValuePickupStruct {
+        EntityWrapper player;
+        EntityWrapper trigger;
+    };
+    std::vector<EntityAtMaxValuePickupStruct> m_PickupAtMaximum;
+    void DoPickup(EntityWrapper &player, EntityWrapper &trigger);
 };
 #endif
