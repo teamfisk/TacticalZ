@@ -5,6 +5,7 @@ PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &PlayerMovementSystem::OnDashAbility);
 }
 
 PlayerMovementSystem::~PlayerMovementSystem()
@@ -322,4 +323,25 @@ void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
     EntityID hexagonEffectID = parser.MergeEntities(m_World);
     EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
     hexagonEW["Transform"]["Position"] = (glm::vec3)target["Transform"]["Position"];
+}
+
+bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
+{
+    auto dashEffectResource = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
+    EntityFileParser parser(dashEffectResource);
+    EntityID dashEffectID = parser.MergeEntities(m_World);
+    EntityWrapper dashEffect(m_World, dashEffectID);
+    auto playerModel = LocalPlayer.FirstChildByName("PlayerModel");
+    auto playerEntityModel = playerModel["Model"];
+    auto playerEntityAnimation = playerModel["Animation"];
+    playerEntityModel.Copy(dashEffect["Model"]);
+    playerEntityAnimation.Copy(dashEffect["Animation"]);
+    dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+    ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+    dashEffect["Animation"]["Speed1"] = 0.0;
+    dashEffect["Animation"]["Speed2"] = 0.0;
+    dashEffect["Animation"]["Speed3"] = 0.0;
+    dashEffect["Transform"]["Position"] = (glm::vec3)LocalPlayer["Transform"]["Position"];
+    dashEffect["Transform"]["Orientation"] = (glm::vec3)LocalPlayer["Transform"]["Orientation"];
+    return true;
 }

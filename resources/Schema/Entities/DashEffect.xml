@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Animation/>
+    <c:Lifetime>
+      <Lifetime>1</Lifetime>
+    </c:Lifetime>
+    <c:ExplosionEffect>
+      <Velocity X="0" Y="0" Z="0"/>
+      <TimeSinceDeath>0</TimeSinceDeath>
+      <ExplosionDuration>1</ExplosionDuration>
+      <EndColor A="0" B="0" G="0" R="0"/>
+    </c:ExplosionEffect>
+    <c:Model/>
+    <c:Transform/>
+  </Components>
+</Entity>

@@ -51,10 +51,11 @@ protected:
     bool m_ShiftDashing = false;
     bool m_ValidDoubleTap = false;
 
-    //specialabilitys
+    //specialabilities
     bool m_MovementKeyDown = false;
     bool m_SpecialAbilityKeyDown = false;
     int m_NumberOfMovementKeysDown = 0;
+    void spawnDashEffect();
 
     EventRelay<EventContext, Events::LockMouse> m_ELockMouse;
     bool OnLockMouse(const Events::LockMouse& e);
@@ -207,6 +208,8 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
         assaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
         m_AssaultDashDoubleTapped = true;
         m_AssaultDashDoubleTapDeltaTime = 0.f;
+        Events::DashAbility e;
+        m_EventBroker->Publish(e);
         return;
     }
 
