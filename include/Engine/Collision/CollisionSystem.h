@@ -15,16 +15,15 @@ class CollisionSystem : public PureSystem
 public:
     CollisionSystem(SystemParams params, Octree<EntityAABB>* octree)
         : System(params)
-        , PureSystem("Physics")
+        , PureSystem("Collidable")
         , m_Octree(octree)
     { }
 
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPhysics, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override;
 
 private:
     Octree<EntityAABB>* m_Octree;
     std::vector<EntityAABB> m_OctreeResult;
-    std::unordered_map<EntityWrapper, glm::vec3> m_PrevPositions;
 };
 
 #endif

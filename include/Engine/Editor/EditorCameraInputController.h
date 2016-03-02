@@ -104,11 +104,6 @@ protected:
         if (!m_Enabled) {
             return false;
         }
-            
-        ImGuiIO& io = ImGui::GetIO();
-        if (io.WantCaptureMouse || io.WantCaptureKeyboard) {
-            return false;
-        }
 
         m_SpeedMultiplier += e.DeltaY * (0.1 * m_SpeedMultiplier);
         m_Config->Set("Editor.CameraSpeed", m_SpeedMultiplier);

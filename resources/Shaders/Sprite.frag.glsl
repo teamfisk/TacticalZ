@@ -7,8 +7,8 @@ uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
-layout (binding = 1) uniform sampler2D DiffuseTexture;
-layout (binding = 2) uniform sampler2D GlowMapTexture;
+layout (binding = 0) uniform sampler2D DiffuseTexture;
+layout (binding = 1) uniform sampler2D GlowMapTexture;
 
 
 in VertexData{

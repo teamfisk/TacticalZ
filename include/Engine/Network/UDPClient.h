@@ -14,14 +14,13 @@ public:
     void Disconnect();
     void Receive(Packet& packet);
     void Send(Packet & packet);
-    void Broadcast(Packet& packet, int port);
     bool IsSocketAvailable();
 private:
     // Assio UDP logic
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::shared_ptr<boost::asio::ip::udp::socket> m_Socket;
-    int readBuffer();
+    int readBuffer(char* data);
     PacketID m_SendPacketID = 0;
 };
 

@@ -16,22 +16,16 @@ public:
     void Send(Packet & packet, PlayerDefinition & playerDefinition);
     void Send(Packet & packet);
     void Disconnect();
-    int Port() { return m_Port; }
-    std::string Address() { return m_Address; }
-
 private:
     // TCP logic
     boost::asio::io_service m_IOService;
     std::unique_ptr<boost::asio::ip::tcp::acceptor> acceptor;
     boost::shared_ptr<boost::asio::ip::tcp::socket> lastReceivedSocket;
 
-    int readBuffer(PlayerDefinition& playerDefinition);
-    PlayerID getPlayerIDFromEndpoint(const std::map<PlayerID, PlayerDefinition>& connectedPlayers,
-        boost::asio::ip::address address, unsigned short port);
-    int GetPort();
-    std::string GetAddress();
-    int m_Port = 0;
-    std::string m_Address = "";
+    void handle_accept(boost::shared_ptr<boost::asio::ip::tcp::socket> socket,
+        int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers,
+        const boost::system::error_code& error);
+    int readBuffer(char* data, PlayerDefinition& playerDefinition);
 };
 
 #endif

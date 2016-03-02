@@ -6,7 +6,6 @@
 #include "System.h"
 #include "World.h"
 #include "EPause.h"
-#include "PerformanceTimer.h"
 
 class SystemPipeline
 {
@@ -73,10 +72,7 @@ public:
 
             // Update
             for (auto& system : group.ImpureSystems) {
-                auto className = (std::string)typeid(*system).name();
-                PerformanceTimer::StartTimer(className);
                 system->Update(dt);
-                PerformanceTimer::StopTimer(className);
             }
             for (auto& pair : group.PureSystems) {
                 const std::string& componentName = pair.first;
@@ -87,10 +83,7 @@ public:
                 }
                 for (auto& component : *pool) {
                     for (auto& system : systems) {
-                        auto className = (std::string)typeid(*system).name();
-                        PerformanceTimer::StartTimer(className);
                         system->UpdateComponent(EntityWrapper(m_World, component.EntityID), component, dt);
-                        PerformanceTimer::StopTimer(className);
                     }
                 }
             }
@@ -113,9 +106,9 @@ private:
     std::vector<UnorderedSystems> m_OrderedSystemGroups;
 
     EventRelay<SystemPipeline, Events::Pause> m_EPause;
-    bool OnPause(const Events::Pause& e) {
-        if (e.World == m_World) {
-            m_Paused = true;
+    bool OnPause(const Events::Pause& e) { 
+        if (e.World == m_World) { 
+            m_Paused = true; 
         }
         return true;
     }

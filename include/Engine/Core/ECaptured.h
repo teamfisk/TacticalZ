@@ -12,8 +12,7 @@ namespace Events
 struct Captured : Event
 {
     int TeamNumberThatCapturedCapturePoint;
-    EntityID CapturePointTakenID;
-    EntityWrapper NextCapturePoint;
+    EntityID CapturePointID;
 };
 
 }

@@ -15,21 +15,19 @@ PickingPass::~PickingPass()
 
 }
 
-
-
 void PickingPass::InitializeTextures()
 {
-    CommonFunctions::GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
+    GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
         glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
-
-	CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 }
 
 void PickingPass::InitializeFrameBuffers()
 {
+    glGenRenderbuffers(1, &m_DepthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 
-    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
+    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
     m_PickingBuffer.Generate();
 }
@@ -55,7 +53,6 @@ void PickingPass::InitializeShaderPrograms()
 
 void PickingPass::Draw(RenderScene& scene)
 {
-    GLERROR("PRE");
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
     //TODO: Render: Add code for more jobs than modeljobs.
@@ -64,9 +61,7 @@ void PickingPass::Draw(RenderScene& scene)
     m_PickingProgram->Bind();
 
     if (scene.ClearDepth) {
-        //glClear(GL_DEPTH_BUFFER_BIT);
-		state->Disable(GL_DEPTH_TEST);
-		state->DepthMask(GL_FALSE);
+        glClear(GL_DEPTH_BUFFER_BIT);
     }
     m_Camera = scene.Camera;
 
@@ -239,52 +234,6 @@ void PickingPass::Draw(RenderScene& scene)
         }
     }
 
-    for (auto& job : scene.Jobs.SpriteJob) {
-        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
-        if (!spriteJob->Pickable) {
-            continue;
-        }
-        RenderState jobState;
-
-        if (spriteJob) {
-            if (spriteJob->Depth == 0) {
-                jobState.Disable(GL_DEPTH_TEST);
-            }
-            int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
-
-            PickingInfo pickInfo;
-            pickInfo.Entity = spriteJob->Entity;
-            pickInfo.World = spriteJob->World;
-            pickInfo.Camera = scene.Camera;
-
-            auto color = m_EntityColors.find(std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera));
-            if (color != m_EntityColors.end()) {
-                pickColor[0] = color->second[0];
-                pickColor[1] = color->second[1];
-            } else {
-                m_EntityColors[std::make_tuple(pickInfo.Entity, pickInfo.World, pickInfo.Camera)] = glm::ivec2(pickColor[0], pickColor[1]);
-                if (m_ColorCounter[0] > 255) {
-                    m_ColorCounter[0] = 0;
-                    m_ColorCounter[1] += 1;
-                } else {
-                    m_ColorCounter[0] += 1;
-                }
-            }
-
-            m_PickingColorsToEntity[glm::ivec2(pickColor[0], pickColor[1])] = pickInfo;
-
-            m_PickingProgram->Bind();
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
-
-            glBindVertexArray(spriteJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
-            glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex * sizeof(unsigned int)));
-        }
-    }
-
  /*   for (auto &job : scene.Jobs.TransparentShieldedObjects) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
@@ -357,9 +306,10 @@ void PickingPass::Draw(RenderScene& scene)
     delete state;
 }
 
+
+
 void PickingPass::ClearPicking()
 {
-    GLERROR("PRE");
     m_PickingColorsToEntity.clear();
     m_EntityColors.clear();
     m_ColorCounter[0] = 0;
@@ -367,16 +317,8 @@ void PickingPass::ClearPicking()
 
     m_PickingBuffer.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_PickingBuffer.Unbind();
-    GLERROR("END");
-}
-
-
-void PickingPass::OnWindowResize()
-{
-    InitializeTextures();
-    m_PickingBuffer.Generate();
 }
 
 PickData PickingPass::Pick(glm::vec2 screenCoord)
@@ -407,4 +349,17 @@ PickData PickingPass::Pick(glm::vec2 screenCoord)
     pickData.Camera = pickInfo.Camera;
     pickData.World = pickInfo.World;
     return pickData;
+}
+
+void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
+{
+    //TODO: Renderer: Make this in a sparate class
+    glGenTextures(1, texture);
+    glBindTexture(GL_TEXTURE_2D, *texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
+    GLERROR("Texture initialization failed");
 }
