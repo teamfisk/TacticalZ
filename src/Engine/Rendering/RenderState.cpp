@@ -135,6 +135,26 @@ bool RenderState::DepthMask(GLboolean flag)
     return !GLERROR("DepthMask");
 }
 
+bool RenderState::DepthFunc(GLenum func)
+{
+	GLint original;
+	glGetIntegerv(GL_DEPTH_FUNC, &original);
+	m_ResetFunctions.push_back(std::bind(glDepthFunc, original));
+	glDepthFunc(func);
+	return !GLERROR("DepthFunc");
+}
+
+bool RenderState::AlphaFunc(GLenum func, GLclampf thresholder)
+{
+	GLint originalFunc;
+	glGetIntegerv(GL_ALPHA_TEST_FUNC, &originalFunc);
+	GLint originalRef;
+	glGetIntegerv(GL_ALPHA_TEST_REF, &originalRef);
+	m_ResetFunctions.push_back(std::bind(glAlphaFunc, originalFunc, originalRef));
+	glAlphaFunc(func, thresholder);
+	return !GLERROR("AlphaFunc");
+}
+
 RenderState::~RenderState()
 {
     for (auto& f : boost::adaptors::reverse(m_ResetFunctions)) {
