@@ -41,6 +41,8 @@ private:
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
     EventRelay<PlayerMovementSystem, Events::DoubleJump> m_EDoubleJump;
     bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e);
+    EventRelay<PlayerMovementSystem, Events::DashAbility> m_EDashAbility;
+    bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e);
 
     void updateMovementControllers(double dt);
     void updateVelocity(EntityWrapper player, double dt);

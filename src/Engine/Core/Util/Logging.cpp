@@ -33,8 +33,8 @@ void _LOG(_LOG_LEVEL logLevel, const char* file, const char* func, unsigned int 
 	va_end(args);
 
 	if (logLevel == LOG_LEVEL_ERROR) {
-		//std::cerr << file << ":" << line << " " << func << std::endl;
-		//std::cerr << _LOG_LEVEL_PREFIX[logLevel] << message << std::endl;
+		std::cerr << file << ":" << line << " " << func << std::endl;
+		std::cerr << _LOG_LEVEL_PREFIX[logLevel] << message << std::endl;
 	} else {
 		std::cout << _LOG_LEVEL_PREFIX[logLevel] << message << std::endl;
 	}
