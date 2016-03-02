@@ -48,7 +48,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
-                float pitch = cameraOrientation.x + 0.2;
+                float pitch = cameraOrientation.x + 0.2f;
                 double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
                 cAnimationOffset["Time"] = time;
             }
@@ -66,7 +66,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check
             if (player.HasComponent("DashAbility")) {
-                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"]);
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"]);
             }
             wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
@@ -311,6 +311,7 @@ bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
         return false;
     }
     spawnHexagon(EntityWrapper(m_World, e.entityID));
+    return true;
 }
 
 void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
