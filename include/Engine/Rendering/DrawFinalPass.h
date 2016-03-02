@@ -15,7 +15,7 @@
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, GLuint* depthBuffer);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass);
     ~DrawFinalPass() { }
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -26,20 +26,17 @@ public:
 
     //Return the texture that is used in later stages to apply the bloom effect
     GLuint BloomTexture() const { return m_BloomTexture; }
-    GLuint BloomTextureLowRes() const { return m_BloomTextureLowRes; }
     //Return the texture with diffuse and lighting of the scene.
     GLuint SceneTexture() const { return m_SceneTexture; }
-    GLuint SceneTextureLowRes() const { return m_SceneTextureLowRes; }
     //Return the framebuffer used in the scene rendering stage.
     FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
-    FrameBuffer* FinalPassFrameBufferLowRes() { return &m_FinalPassFrameBufferLowRes; }
 
 private:
     void DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene);
     void DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
-    void DrawShieldToStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+	void DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
     void DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
-    void DrawToDepthBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
+    void DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene);
 
     void BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene);
     void BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene);
@@ -54,13 +51,11 @@ private:
     Texture* m_ErrorTexture;
 
     FrameBuffer m_FinalPassFrameBuffer;
-    FrameBuffer m_FinalPassFrameBufferLowRes;
+	FrameBuffer m_ShieldDepthFrameBuffer;
     GLuint m_BloomTexture;
     GLuint m_SceneTexture;
-    GLuint m_BloomTextureLowRes;
-    GLuint m_SceneTextureLowRes;
-    GLuint* m_DepthBuffer;
-    GLuint m_DepthBufferLowRes;
+    GLuint m_DepthBuffer;
+	GLuint m_ShieldBuffer;
     GLuint m_CubeMapTexture;
 
     //maqke this component based i guess?
@@ -76,16 +71,27 @@ private:
 	ShaderProgram* m_ExplosionEffectSplatMapProgram;
     ShaderProgram* m_SpriteProgram;
 	ShaderProgram* m_ForwardPlusSplatMapProgram;
-    ShaderProgram* m_ShieldToStencilProgram;
-    ShaderProgram* m_FillDepthBufferProgram;
+    ShaderProgram* m_FillDepthStencilBufferProgram;
+
+	ShaderProgram* m_ForwardPlusShieldCheckProgram;
+	ShaderProgram* m_ExplosionEffectShieldCheckProgram;
+	ShaderProgram* m_ExplosionEffectSplatMapShieldCheckProgram;
+	ShaderProgram* m_SpriteShieldCheckProgram;
+	ShaderProgram* m_ForwardPlusSplatMapShieldCheckProgram;
+
 
 
 	ShaderProgram* m_ForwardPlusSkinnedProgram;
 	ShaderProgram* m_ExplosionEffectSkinnedProgram;
 	ShaderProgram* m_ExplosionEffectSplatMapSkinnedProgram;
 	ShaderProgram* m_ForwardPlusSplatMapSkinnedProgram;
-    ShaderProgram* m_ShieldToStencilSkinnedProgram;
-    ShaderProgram* m_FillDepthBufferSkinnedProgram;
+    ShaderProgram* m_FillDepthStencilBufferSkinnedProgram;
+
+	ShaderProgram* m_ForwardPlusSkinnedShieldCheckProgram;
+	ShaderProgram* m_ExplosionEffectSkinnedShieldCheckProgram;
+	ShaderProgram* m_ExplosionEffectSplatMapSkinnedShieldCheckProgram;
+	ShaderProgram* m_ForwardPlusSplatMapSkinnedShieldCheckProgram;
+	ShaderProgram* m_FillDepthBufferSkinnedShieldCheckProgram;
 };
 
 #endif 
