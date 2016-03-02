@@ -101,8 +101,7 @@ void Client::Update()
 
 void Client::parseMessageType(Packet& packet)
 {
-    // Pop packetSize which is used by TCP Client to
-    // create a packet of the correct size
+    // Pop packetSize
     packet.ReadPrimitive<int>();
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
@@ -143,6 +142,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
+        break;
+    case MessageType::AmmoPickup:
+        parseAmmoPickup(packet);
         break;
     default:
         break;
@@ -233,7 +235,6 @@ void Client::parseSpawnEvents()
         m_EventBroker->Publish(e);
     }
     m_PlayerSpawnEvents = tempSpawn;
-    // m_PlayerSpawnEvents.clear();
 }
 
 void Client::parsePlayersSpawned(Packet& packet)
@@ -294,6 +295,14 @@ void Client::parseDoubleJump(Packet & packet)
     if (e.entityID != m_LocalPlayer.ID) {
         m_EventBroker->Publish(e);
     }
+}
+
+void Client::parseAmmoPickup(Packet & packet)
+{ 
+    Events::AmmoPickup e;
+    e.AmmoGain = packet.ReadPrimitive<int>();
+    e.Player = m_LocalPlayer;
+    m_EventBroker->Publish(e);
 }
 
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)

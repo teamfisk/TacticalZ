@@ -2,6 +2,7 @@
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+	<xs:include schemaLocation="../Types/WeaponSlotEnum.xsd"/>
 
 	<xs:element name="AssaultWeapon">
 		<xs:complexType>
@@ -28,6 +29,7 @@
 				<xs:element name="ReloadTime" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Time it takes to reload the weapon in seconds</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Slot" type="WeaponSlotEnum" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

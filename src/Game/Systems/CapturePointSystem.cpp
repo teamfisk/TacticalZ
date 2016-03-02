@@ -6,7 +6,7 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
     , PureSystem("CapturePoint")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
-    if (!IsClient) {
+    if (IsServer) {
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
         EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
@@ -18,7 +18,7 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
 void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, ComponentWrapper& cCapturePoint, double dt)
 {
-    if (IsClient) {
+    if (!IsServer) {
         return;
     }
     if (m_WinnerWasFound) {
@@ -101,6 +101,13 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         if ((int)capturePointOwnedBy["Team"] == blueTeam && m_BlueTeamHomeCapturePoint != 0) {
             nextPossibleCapturePoint["Blue"] = i - 1;
         }
+    }
+    if (m_RecentlyCapturedNeedNextCapturePointNow) {
+        m_CapturedEvent.NextCapturePoint = m_CapturedEvent.TeamNumberThatCapturedCapturePoint == blueTeam ?
+            m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Blue"]] :
+            m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Red"]];
+        m_EventBroker->Publish(m_CapturedEvent);
+        m_RecentlyCapturedNeedNextCapturePointNow = false;
     }
 
     //reset timers and reset the bool that triggers this
@@ -188,10 +195,9 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             teamComponent["Team"] = currentTeam;
             cCapturePoint["CaptureTimer"] = glm::sign((double)cCapturePoint["CaptureTimer"])*captureTimeToTakeOver;
             //publish Captured event
-            Events::Captured e;
-            e.CapturePointID = cCapturePoint.EntityID;
-            e.TeamNumberThatCapturedCapturePoint = currentTeam;
-            m_EventBroker->Publish(e);
+            m_RecentlyCapturedNeedNextCapturePointNow = true;
+            m_CapturedEvent.CapturePointTakenID = cCapturePoint.EntityID;
+            m_CapturedEvent.TeamNumberThatCapturedCapturePoint = currentTeam;
             //NextPossibleCapturePoint will be calculated in the next update...
         }
     }
