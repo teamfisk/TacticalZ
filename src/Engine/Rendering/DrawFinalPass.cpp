@@ -253,14 +253,6 @@ void DrawFinalPass::Draw(RenderScene& scene)
     glClearStencil(0x00);
     glClear(GL_STENCIL_BUFFER_BIT);
 
-    //Fill depth buffer
-	state->Enable(GL_STENCIL_TEST);
-	state->StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	state->StencilFunc(GL_ALWAYS, 1, 0xFF);
-	state->StencilMask(0xFF);
-	state->DepthMask(GL_FALSE);
-	//DrawToDepthStencilBuffer(scene.Jobs.ShieldObjects, scene);
-	state->DepthMask(GL_TRUE);
 
     //Draw Opaque shielded objects
 	state->Disable(GL_STENCIL_TEST);
@@ -275,17 +267,11 @@ void DrawFinalPass::Draw(RenderScene& scene)
 	GLERROR("OpaqueObjects");
 
 	//state->Disable(GL_STENCIL_TEST);
-    //Draw Transparen Shielded objects
+    //Draw Transparen objects
 	state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	DrawModelRenderQueuesWithShieldCheck(scene.Jobs.TransparentObjects, scene); //might need changing
-    GLERROR("Shielded Transparent objects");
+    GLERROR("Transparent objects");
 
-	//Draw Transparen objects
-	//state->BlendFunc(GL_ONE, GL_ONE);
-	//state->StencilFunc(GL_EQUAL, 1, 0xFF);
-	//DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
-	GLERROR("TransparentObjects");
-	//state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	DrawSprites(scene.Jobs.SpriteJob, scene);
 	GLERROR("SpriteJobs");
 
@@ -438,16 +424,12 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						GLERROR("Bind ForwardPlusSkinnedProgram");
 						//bind uniforms
 						BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
-							GLERROR("Basic/SingleTextures BindModelUniforms");
 						//bind textures
 						BindModelTextures(forwardSkinnedHandle, modelJob);
-							GLERROR("Basic/SingleTextures BindModelTextures");
 						glActiveTexture(GL_TEXTURE5);
-							GLERROR("Basic/SingleTextures CameraPosition1");
 						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-							GLERROR("Basic/SingleTextures CameraPosition2");
-							glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-							GLERROR("Basic/SingleTextures CameraPosition3");
+						glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
 						std::vector<glm::mat4> frameBones;
 						if (modelJob->AnimationOffset.animation != nullptr) {
 							frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
@@ -456,7 +438,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 							frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
 						}
 						glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-							GLERROR("Basic/SingleTextures skinned end");
+
 					}
 					else {
 						m_ForwardPlusProgram->Bind();
@@ -468,7 +450,6 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						glActiveTexture(GL_TEXTURE5);
 						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
 						glUniform3fv(glGetUniformLocation(forwardHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-							GLERROR("Basic/SingleTextures end");
 					}
 					break;
 				}
@@ -490,7 +471,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 							frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
 						}
 						glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-							GLERROR("SplatMapping skinned end");
+
 					}
 					else {
 						m_ForwardPlusSplatMapProgram->Bind();
@@ -499,7 +480,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						BindModelUniforms(forwardSplatMapHandle, modelJob, scene);
 						//bind textures
 						BindModelTextures(forwardSplatMapHandle, modelJob);
-						GLERROR("SplatMapping end");
+						GLERROR("asdasd");
 					}
 					break;
 				}
