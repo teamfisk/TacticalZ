@@ -45,7 +45,7 @@ bool World::ValidEntity(EntityID entity) const
     return m_EntityParents.find(entity) != m_EntityParents.end();
 }
 
-void World::RegisterComponent(ComponentInfo& ci)
+void World::RegisterComponent(const ComponentInfo& ci)
 {
     if (m_ComponentPools.find(ci.Name) == m_ComponentPools.end()) {
         m_ComponentPools[ci.Name] = new ComponentPool(ci);
@@ -167,6 +167,43 @@ EntityWrapper World::GetFirstEntityByName(const std::string& name)
         }
     }
     return EntityWrapper::Invalid;
+}
+
+std::unordered_map<EntityID, EntityID> World::Merge(World& other)
+{
+    std::unordered_map<EntityID, EntityID> oldToNew;
+
+    // Create new entities
+    for (auto& kv : other.m_EntityParents) {
+        EntityID entity = kv.first;
+
+        EntityID newEntity = CreateEntity();
+        SetName(newEntity, other.GetName(entity));
+        oldToNew[entity] = newEntity;
+    }
+    // Fix relationships
+    for (auto& kv : other.m_EntityParents) {
+        EntityID entity = kv.first;
+        EntityID parent = kv.second;
+        SetParent(oldToNew.at(entity), oldToNew.at(parent));
+    }
+
+    // Transfer components
+    for (auto& kv : other.m_ComponentPools) {
+        auto& componentType = kv.first;
+        ComponentPool* pool = kv.second;
+        // Register pool if it's not present in world
+        if (m_ComponentPools.count(componentType) == 0) {
+            RegisterComponent(pool->ComponentInfo());
+        }
+        // Copy components
+        for (auto component : *pool) {
+            ComponentWrapper newComponent = AttachComponent(oldToNew.at(component.EntityID), componentType);
+            component.Copy(newComponent);
+        }
+    }
+
+    return oldToNew;
 }
 
 EntityID World::generateEntityID()
