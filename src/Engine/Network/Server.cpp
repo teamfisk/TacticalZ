@@ -632,7 +632,7 @@ bool Server::shouldSendToClient(EntityWrapper childEntity)
     }
     return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid()
         || childEntity.HasComponent("CapturePoint") || childEntity.HasComponent("HealthPickup")
-        || childEntity.HasComponent("AmmoPickup")/* || childEntity.Name() == "DashEffect"*/;
+        || childEntity.HasComponent("AmmoPickup");
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()

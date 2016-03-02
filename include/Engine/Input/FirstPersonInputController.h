@@ -27,7 +27,7 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override;
     virtual void Reset();
 
-    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityWrapper player);
+    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID);
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
 
@@ -56,7 +56,6 @@ protected:
     bool m_MovementKeyDown = false;
     bool m_SpecialAbilityKeyDown = false;
     int m_NumberOfMovementKeysDown = 0;
-    void spawnDashEffect();
 
     EventRelay<EventContext, Events::LockMouse> m_ELockMouse;
     bool OnLockMouse(const Events::LockMouse& e);
@@ -192,7 +191,7 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 }
 
 template <typename EventContext>
-void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityWrapper player) {
+void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID) {
     m_AssaultDashDoubleTapDeltaTime += dt;
     m_DashEffectResetTimer += dt;
     assaultDashCoolDownTimer -= dt;
@@ -201,7 +200,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
         m_PlayerIsDashing = true;
         if (m_DashEffectResetTimer > 0.05) {
             Events::DashAbility e;
-            e.Player = player.ID;
+            e.Player = playerID;
             m_EventBroker->Publish(e);
             m_DashEffectResetTimer = 0.0;
         }
@@ -217,7 +216,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
         m_AssaultDashDoubleTapped = true;
         m_AssaultDashDoubleTapDeltaTime = 0.f;
         Events::DashAbility e;
-        e.Player = player.ID;
+        e.Player = playerID;
         m_EventBroker->Publish(e);
         return;
     }
@@ -249,7 +248,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     assaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
 
     Events::DashAbility e;
-    e.Player = player.ID;
+    e.Player = playerID;
     m_EventBroker->Publish(e);
 }
 

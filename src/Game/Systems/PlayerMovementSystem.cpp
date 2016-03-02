@@ -73,7 +73,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check
             if (player.HasComponent("DashAbility")) {
-                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"], player);
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"], player.ID);
             }
             wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
