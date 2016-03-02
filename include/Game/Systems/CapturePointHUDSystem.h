@@ -7,7 +7,7 @@
 
 #include "Common.h"
 #include "Core/System.h"
-#include "Engine/Collision/ETrigger.h"
+#include "Collision/ETrigger.h"
 
 class CapturePointHUDSystem : public ImpureSystem
 {
