@@ -1,6 +1,6 @@
-#include "Core/EntityFile.h"
+#include "Core/EntityXMLFile.h"
 
-EntityFile::EntityFile(boost::filesystem::path path)
+EntityXMLFile::EntityXMLFile(boost::filesystem::path path)
     : m_FilePath(path)
 {
     using namespace xercesc;
@@ -9,14 +9,14 @@ EntityFile::EntityFile(boost::filesystem::path path)
     m_SAX2XMLReader = XMLReaderFactory::createXMLReader(XMLPlatformUtils::fgMemoryManager, m_GrammarPool);
 }
 
-EntityFile::~EntityFile()
+EntityXMLFile::~EntityXMLFile()
 {
     delete m_SAX2XMLReader;
     delete m_GrammarPool;
     xercesc::XMLPlatformUtils::Terminate();
 }
 
-void EntityFile::Parse(const EntityFileHandler* handler) const
+void EntityXMLFile::Parse(const EntityFileHandler* handler) const
 {
     using namespace xercesc;
 
@@ -28,7 +28,7 @@ void EntityFile::Parse(const EntityFileHandler* handler) const
     m_SAX2XMLReader->parse(m_FilePath.string().c_str());
 }
 
-void EntityFile::setReaderFeatures(xercesc::SAX2XMLReader* reader)
+void EntityXMLFile::setReaderFeatures(xercesc::SAX2XMLReader* reader)
 {
     using namespace xercesc;
     reader->setFeature(XMLUni::fgXercesCacheGrammarFromParse, true);
@@ -41,7 +41,7 @@ void EntityFile::setReaderFeatures(xercesc::SAX2XMLReader* reader)
     reader->setFeature(XMLUni::fgXercesIdentityConstraintChecking, true);
 }
 
-unsigned int EntityFile::GetTypeStride(std::string typeName)
+unsigned int EntityXMLFile::GetTypeStride(std::string typeName)
 {
     std::map<std::string, unsigned int> typeStrides{
         { "bool", sizeof(bool) },
@@ -59,7 +59,7 @@ unsigned int EntityFile::GetTypeStride(std::string typeName)
     return (it != typeStrides.end()) ? it->second : 0;
 }
 
-void EntityFile::WriteAttributeData(char* outData, const ComponentInfo::Field_t& field, const std::map<std::string, std::string>& attributes)
+void EntityXMLFile::WriteAttributeData(char* outData, const ComponentInfo::Field_t& field, const std::map<std::string, std::string>& attributes)
 {
     if (field.Type == "Vector") {
         glm::vec3 vec;
@@ -86,7 +86,7 @@ void EntityFile::WriteAttributeData(char* outData, const ComponentInfo::Field_t&
     }
 }
 
-void EntityFile::WriteValueData(char* outData, const ComponentInfo::Field_t& field, const char* valueData)
+void EntityXMLFile::WriteValueData(char* outData, const ComponentInfo::Field_t& field, const char* valueData)
 {
     // Catch and ignore casting errors so whitespace around string enums won't mess anything up
     try {
@@ -243,7 +243,7 @@ void EntityFileSAXHandler::onStartEntityRef(const xercesc::Attributes& attrs)
     std::string path = XS::ToString(attrs.getValue(XS::ToXMLCh("file")));
 
     xercesc::SAX2XMLReader* reader = xercesc::XMLReaderFactory::createXMLReader();
-    EntityFile::setReaderFeatures(reader);
+    EntityXMLFile::setReaderFeatures(reader);
     reader->setContentHandler(this);
     reader->setErrorHandler(this);
     reader->parse(path.c_str());

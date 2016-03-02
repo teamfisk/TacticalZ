@@ -7,8 +7,8 @@
 #include "Rendering/ESetCamera.h"
 #include "Core/ConfigFile.h"
 
-#include "Core/EntityFile.h"
-#include "Core/EntityFileParser.h"
+#include "Core/EntityXMLFile.h"
+#include "Core/EntityXMLFileParser.h"
 
 #include "Core/EPlayerDeath.h"
 #include "Core/EEntityDeleted.h"

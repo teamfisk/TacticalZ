@@ -11,7 +11,7 @@
 #include "Systems/PlayerSpawnSystem.h"
 #include "Systems/PlayerDeathSystem.h"
 #include "Systems/FloatingEffectSystem.h"
-#include "Core/EntityFileWriter.h"
+#include "Core/EntityXMLFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
@@ -44,7 +44,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<PNG>("Png");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
-    ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityFile");
     ResourceManager::RegisterType<Font>("FontFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
@@ -80,10 +80,10 @@ Game::Game(int argc, char* argv[])
     m_World = new World(m_EventBroker);
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
-        auto file = ResourceManager::Load<EntityFile>(mapToLoad);
-        EntityFilePreprocessor fpp(file);
+        auto file = ResourceManager::Load<EntityXMLFile>(mapToLoad);
+        EntityXMLFilePreprocessor fpp(file);
         fpp.RegisterComponents(m_World);
-        EntityFileParser fp(file);
+        EntityXMLFileParser fp(file);
         fp.MergeEntities(m_World);
     }
 

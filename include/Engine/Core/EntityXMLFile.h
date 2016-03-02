@@ -134,13 +134,13 @@ private:
 	}
 };
 
-class EntityFile : public Resource
+class EntityXMLFile : public Resource
 {
     friend class ResourceManager;
     friend class EntityFileSAXHandler;
 private:
-    EntityFile(boost::filesystem::path path);
-    ~EntityFile();
+    EntityXMLFile(boost::filesystem::path path);
+    ~EntityXMLFile();
 
 public:
     static unsigned int GetTypeStride(std::string typeName);

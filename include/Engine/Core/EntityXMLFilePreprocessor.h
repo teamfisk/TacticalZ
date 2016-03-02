@@ -17,17 +17,17 @@
 #include "Util/XercesString.h"
 #include "ResourceManager.h"
 #include "World.h"
-#include "EntityFile.h"
+#include "EntityXMLFile.h"
 
-class EntityFilePreprocessor
+class EntityXMLFilePreprocessor
 {
 public:
-    EntityFilePreprocessor(const EntityFile* entityFile);
+    EntityXMLFilePreprocessor(const EntityXMLFile* entityFile);
 
     void RegisterComponents(World* world);
 
 private:
-    const EntityFile* m_EntityFile;
+    const EntityXMLFile* m_EntityFile;
     std::map<std::string, unsigned int> m_ComponentCounts;
 	std::map<std::string, ComponentInfo> m_ComponentInfo;
 

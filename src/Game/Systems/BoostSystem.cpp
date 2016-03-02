@@ -38,8 +38,8 @@ bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
         m_World->DeleteEntity(playerBoostAssaultEntity.ID);
     }
     //load boost XML file, set it entity parented with the victim player
-    auto entityFile = ResourceManager::Load<EntityFile>(classXML);
-    EntityFileParser parser(entityFile);
+    auto entityFile = ResourceManager::Load<EntityXMLFile>(classXML);
+    EntityXMLFileParser parser(entityFile);
     EntityID boostAssaultEntity = parser.MergeEntities(m_World);
     m_World->SetName(boostAssaultEntity, className);
     m_World->SetParent(boostAssaultEntity, e.Victim.ID);

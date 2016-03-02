@@ -4,7 +4,7 @@
 #include "Core/System.h"
 #include "Core/Transform.h"
 #include "Core/ResourceManager.h"
-#include "Core/EntityFileParser.h"
+#include "Core/EntityXMLFileParser.h"
 #include "Core/EPickupSpawned.h"
 #include "Core/EAmmoPickup.h"
 #include "Engine/Collision/ETrigger.h"

@@ -17,11 +17,11 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 
     // Load the entity file and parse it
     const std::string& entityFilePath = spawner["Spawner"]["EntityFile"];
-    auto entityFile = ResourceManager::Load<EntityFile>(entityFilePath);
+    auto entityFile = ResourceManager::Load<EntityXMLFile>(entityFilePath);
     if (entityFile == nullptr) {
         return EntityWrapper::Invalid;
     }
-    EntityFileParser parser(entityFile);
+    EntityXMLFileParser parser(entityFile);
     EntityWrapper spawnedEntity(world, parser.MergeEntities(world, parent.ID));
 
     //If the spawned entity is collideable, then we must not spawn it where it collides with something that

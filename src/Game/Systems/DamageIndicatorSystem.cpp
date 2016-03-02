@@ -9,7 +9,7 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
 
     //load texture to cache
     auto texture = CommonFunctions::LoadTexture("Textures/DamageIndicator.png", false);
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
+    auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/DamageIndicator.xml");
 }
 
 void DamageIndicatorSystem::Update(double dt) {
@@ -49,8 +49,8 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
     float angleBetweenVectors = CalculateAngle(e.Victim, inflictorPos);
 
     //load & set the "2d" sprite
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
-    EntityFileParser parser(entityFile);
+    auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/DamageIndicator.xml");
+    EntityXMLFileParser parser(entityFile);
     EntityID spriteID = parser.MergeEntities(m_World);
     m_World->SetParent(spriteID, m_CurrentCamera);
     auto spriteWrapper = EntityWrapper(m_World, spriteID);
@@ -127,8 +127,8 @@ glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
      auto inflictorPos = glm::vec3(currentPos.x + testVar*6.0f, currentPos.y, currentPos.z + testVar2*6.0f);
 
     //load the explosioneffect XML
-    auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
-    EntityFileParser parser(deathEffect);
+    auto deathEffect = ResourceManager::Load<EntityXMLFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
+    EntityXMLFileParser parser(deathEffect);
     EntityID deathEffectID = parser.MergeEntities(m_World);
     EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
 

@@ -28,8 +28,8 @@ bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
 void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 {
     //load the explosioneffect XML
-    auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
-    EntityFileParser parser(deathEffect);
+    auto deathEffect = ResourceManager::Load<EntityXMLFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
+    EntityXMLFileParser parser(deathEffect);
     EntityID deathEffectID = parser.MergeEntities(m_World);
     EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
 

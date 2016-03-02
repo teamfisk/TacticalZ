@@ -1,18 +1,18 @@
 #ifndef EntityFileParser_h__
 #define EntityFileParser_h__
 
-#include "EntityFile.h"
+#include "EntityXMLFile.h"
 #include "World.h"
 
-class EntityFileParser
+class EntityXMLFileParser
 {
 public:
-    EntityFileParser(const EntityFile* entityFile);
+    EntityXMLFileParser(const EntityXMLFile* entityFile);
 
     EntityID MergeEntities(World* world, EntityID baseParent = EntityID_Invalid);
 
 private:
-    const EntityFile* m_EntityFile;
+    const EntityXMLFile* m_EntityFile;
     EntityFileHandler m_Handler;
     World* m_World = nullptr;
     EntityID m_FirstEntity = EntityID_Invalid;

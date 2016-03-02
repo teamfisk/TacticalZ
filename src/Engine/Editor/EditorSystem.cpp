@@ -129,7 +129,7 @@ void EditorSystem::OnEntitySelected(EntityWrapper entity)
 
 void EditorSystem::OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath)
 {
-    EntityFileWriter writer(filePath);
+    EntityXMLFileWriter writer(filePath);
     writer.WriteEntity(entity.World, entity.ID);
 }
 
@@ -259,10 +259,10 @@ EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem
     }
 
     try {
-        auto entityFile = ResourceManager::Load<EntityFile>(filePath.string());
-        EntityFilePreprocessor fpp(entityFile);
+        auto entityFile = ResourceManager::Load<EntityXMLFile>(filePath.string());
+        EntityXMLFilePreprocessor fpp(entityFile);
         fpp.RegisterComponents(parent.World);
-        EntityFileParser fp(entityFile);
+        EntityXMLFileParser fp(entityFile);
         EntityID newEntity = fp.MergeEntities(parent.World, parent.ID);
         return EntityWrapper(parent.World, newEntity);
     } catch (const std::exception& e) {

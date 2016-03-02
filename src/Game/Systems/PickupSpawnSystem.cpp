@@ -18,8 +18,8 @@ void PickupSpawnSystem::Update(double dt)
             somePickup.DecreaseThisRespawnTimer -= dt;
             if (somePickup.DecreaseThisRespawnTimer < 0.0) {
                 //spawn the new healthPickup
-                auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/HealthPickup.xml");
-                EntityFileParser parser(entityFile);
+                auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/HealthPickup.xml");
+                EntityXMLFileParser parser(entityFile);
                 EntityID healthPickupID = parser.MergeEntities(m_World);
 
                 //let the world know a pickup has spawned (graphics effects, etc)

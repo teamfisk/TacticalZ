@@ -20,8 +20,8 @@ void AmmoPickupSystem::Update(double dt)
             auto& somePickup = *it;
             somePickup.DecreaseThisRespawnTimer -= dt;
             if (somePickup.DecreaseThisRespawnTimer < 0.0) {
-                auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/AmmoPickup.xml");
-                EntityFileParser parser(entityFile);
+                auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/AmmoPickup.xml");
+                EntityXMLFileParser parser(entityFile);
                 EntityID ammoPickupID = parser.MergeEntities(m_World);
 
                 //let the world know a pickup has spawned
