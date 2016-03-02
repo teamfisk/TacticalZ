@@ -17,6 +17,7 @@ void CubeMapPass::LoadTextures(std::string input)
             m_CubeMapTextures.push_back(img);
         }
         GenerateCubeMapTexture();
+        m_PreviusCubeMapTexture = input;
     }
 }
 

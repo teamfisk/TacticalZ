@@ -13,7 +13,7 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &Server::OnEntityDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Server::OnPlayerDamage);
-
+    EVENT_SUBSCRIBE_MEMBER(m_EAmmoPickup, &Server::OnAmmoPickup);
     // BindWW
     if (port == 0) {
         port = config->Get<float>("Networking.Port", 27666);
@@ -186,7 +186,7 @@ void Server::addInputCommandsToPacket(Packet& packet)
 
 void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
 {
-    auto itPair = m_World->GetChildren(entityID);
+    auto itPair = m_World->GetDirectChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
@@ -234,7 +234,7 @@ void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
 
 void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
 {
-    auto itPair = m_World->GetChildren(entityID);
+    auto itPair = m_World->GetDirectChildren(entityID);
     std::unordered_map<std::string, ComponentPool*> worldComponentPools = m_World->GetComponentPools();
     // Loop through every child
     for (auto it = itPair.first; it != itPair.second; it++) {
@@ -510,6 +510,19 @@ bool Server::OnPlayerDamage(const Events::PlayerDamage& e)
     return true;
 }
 
+bool Server::OnAmmoPickup(const Events::AmmoPickup & e)
+{
+    for (auto& kv : m_ConnectedPlayers) {
+        if (e.Player.ID == kv.second.EntityID) {
+            Packet packet(MessageType::AmmoPickup);
+            // We dont send playerID as it will be set at client to local 
+            packet.WritePrimitive(e.AmmoGain);
+            m_Reliable.Send(packet, kv.second);
+        }
+    }
+    return true;
+}
+
 void Server::parseClientPing()
 {
     LOG_INFO("%i: Parsing ping", m_PacketID);
@@ -601,15 +614,17 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    auto children = m_World->GetChildren(childEntity.ID);
+    auto children = m_World->GetDirectChildren(childEntity.ID);
     for (auto it = children.first; it != children.second; it++) {
         EntityWrapper child(m_World, it->second);
-        if(child.HasComponent("CapturePoint")) {
+        if (child.HasComponent("CapturePoint") || child.HasComponent("HealthPickup")
+            || child.HasComponent("AmmoPickup")) {
             return true;
         }
     }
     return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid()
-        || childEntity.HasComponent("CapturePoint");
+        || childEntity.HasComponent("CapturePoint") || childEntity.HasComponent("HealthPickup")
+        || childEntity.HasComponent("AmmoPickup");
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()
