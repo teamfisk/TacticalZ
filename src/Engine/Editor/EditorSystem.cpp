@@ -265,7 +265,8 @@ EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem
         EntityFileParser fp(entityFile);
         EntityID newEntity = fp.MergeEntities(parent.World, parent.ID);
         return EntityWrapper(parent.World, newEntity);
-    } catch (const std::exception&) {
+    } catch (const std::exception& e) {
+        LOG_ERROR("Failed to import entity \"%s\": \"%s\"", filePath.string().c_str(), e.what());
         return EntityWrapper::Invalid;
     }
 }

@@ -5,6 +5,7 @@ PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &PlayerMovementSystem::OnDashAbility);
 }
 
 PlayerMovementSystem::~PlayerMovementSystem()
@@ -72,7 +73,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check
             if (player.HasComponent("DashAbility")) {
-                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"]);
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"], player.ID);
             }
             wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
@@ -313,11 +314,11 @@ bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
 {
     // If entity does not exist, exit
-    if (!EntityWrapper(m_World, e.entityID).Valid()) { 
+    if (!EntityWrapper(m_World, e.entityID).Valid()) {
         return false;
     }
     // If entity IsLocalPlayer, exit
-    if (e.entityID == m_LocalPlayer.ID) { 
+    if (e.entityID == m_LocalPlayer.ID) {
         return false;
     }
     spawnHexagon(EntityWrapper(m_World, e.entityID));
@@ -325,11 +326,37 @@ bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
 }
 
 void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
-{ 
+{
     //put a hexagon at the entitys... feet?
     auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
     EntityFileParser parser(hexagonEffect);
     EntityID hexagonEffectID = parser.MergeEntities(m_World);
     EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
     hexagonEW["Transform"]["Position"] = (glm::vec3)target["Transform"]["Position"];
+}
+
+bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
+{
+    EntityWrapper player(m_World, e.Player);
+    if (!player.Valid() || !IsClient || player.ID == LocalPlayer.ID) {
+        return false;
+    }
+
+    auto dashEffectResource = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
+    EntityFileParser parser(dashEffectResource);
+    EntityID dashEffectID = parser.MergeEntities(m_World);
+    EntityWrapper dashEffect(m_World, dashEffectID);
+    auto playerModel = player.FirstChildByName("PlayerModel");
+    auto playerEntityModel = playerModel["Model"];
+    auto playerEntityAnimation = playerModel["Animation"];
+    playerEntityModel.Copy(dashEffect["Model"]);
+    playerEntityAnimation.Copy(dashEffect["Animation"]);
+    dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+    ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+    dashEffect["Animation"]["Speed1"] = 0.0;
+    dashEffect["Animation"]["Speed2"] = 0.0;
+    dashEffect["Animation"]["Speed3"] = 0.0;
+    dashEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+    dashEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+    return true;
 }
