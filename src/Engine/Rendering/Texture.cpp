@@ -18,6 +18,7 @@ Texture::Texture(std::string path)
 
     this->Width = img->Width;
     this->Height = img->Height;
+    this->Data = img->Data;
 
     GLint format;
     switch (img->Format) {
@@ -28,6 +29,7 @@ Texture::Texture(std::string path)
         format = GL_RGBA;
         break;
     }
+    
 
     // Construct the OpenGL texture
     glGenTextures(1, &m_Texture);

@@ -47,6 +47,11 @@
 							<xs:element ref="c:KillFeed" minOccurs="0"/>
 							<xs:element ref="c:Sprite" minOccurs="0"/>
 							<xs:element ref="c:AnimationOffset" minOccurs="0"/>
+							<xs:element ref="c:Menu" minOccurs="0"/>
+							<xs:element ref="c:Page" minOccurs="0"/>
+							<xs:element ref="c:Button" minOccurs="0"/>
+							<xs:element ref="c:WeaponAttachment" minOccurs="0"/>
+							<xs:element ref="c:DefenderWeapon" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

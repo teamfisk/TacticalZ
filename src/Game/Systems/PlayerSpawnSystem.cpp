@@ -1,29 +1,40 @@
 #include "Systems/PlayerSpawnSystem.h"
 
-//This should be set by the config anyway.
-float PlayerSpawnSystem::m_RespawnTime = 15.0f;
-
-PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params) 
+PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params)
     : System(params)
-    , m_Timer(0.f)
+    , m_DbgConfigForceRespawn(false)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerSpawnerd, &PlayerSpawnSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerSpawnSystem::OnPlayerDeath);
-    m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_NetworkEnabled = config->Get("Networking.StartNetwork", false);
+    m_ForcedRespawnTime = config->Get("Debug.RespawnTime", -1.0f);
+    m_DbgConfigForceRespawn = m_ForcedRespawnTime > 0;
 }
 
 void PlayerSpawnSystem::Update(double dt)
 {
-    //Increase timer.
-    m_Timer += dt;
-    if (m_Timer < m_RespawnTime) {
-        return;
+    // If there are no CapturePointGameMode components we will just spawn immediately.
+    // Should be able to support older maps with this.
+    // TODO: In the future we might want to return instead, to avoid spawning in the menu for instance.
+    auto pool = m_World->GetComponents("CapturePointGameMode");
+    if (pool != nullptr && pool->size() > 0)
+    {
+        // Take the first CapturePointGameMode component found.
+        ComponentWrapper& modeComponent = *pool->begin();
+        // Increase timer.
+        double& timer = (double&)modeComponent["RespawnTime"];
+        timer += dt;
+        double maxRespawnTime = m_DbgConfigForceRespawn ? m_ForcedRespawnTime : (double)modeComponent["MaxRespawnTime"];
+        if (timer < maxRespawnTime) {
+            return;
+        }
+        // If respawn time has passed, we spawn all players that have requested to be spawned.
+        timer = 0;
     }
-    //If respawn time has passed, we spawn all players that have requested to be spawned.
-    m_Timer = 0.f;
 
-    //If there are no spawn requests, return immediately, if we are client the SpawnRequests should always be empty.
+    // If there are no spawn requests, return immediately, if we are client the SpawnRequests should always be empty.
     if (m_SpawnRequests.size() == 0) {
         return;
     }
@@ -49,7 +60,7 @@ void PlayerSpawnSystem::Update(double dt)
             }
 
             // Spawn the player!
-            EntityWrapper player = SpawnerSystem::Spawn(spawner);
+            EntityWrapper player = SpawnerSystem::Spawn(spawner, EntityWrapper::Invalid, "Player");
             // Set the player team affiliation
             player["Team"]["Team"] = req.Team;
 

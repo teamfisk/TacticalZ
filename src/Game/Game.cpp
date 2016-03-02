@@ -16,7 +16,7 @@
 #include "Game/Systems/PickupSpawnSystem.h"
 #include "Game/Systems/AmmoPickupSystem.h"
 #include "Game/Systems/DamageIndicatorSystem.h"
-#include "Game/Systems/Weapon/WeaponSystem.h"
+#include "Game/Systems/Weapon/DefenderWeaponBehaviour.h"
 #include "Rendering/AnimationSystem.h"
 #include "Game/Systems/HealthHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
@@ -27,6 +27,8 @@
 #include "Game/Systems/AmmunitionHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
 #include "Game/Systems/BoostSystem.h"
+#include "GUI/ButtonSystem.h"
+#include "GUI/MainMenuSystem.h"
 
 
 Game::Game(int argc, char* argv[])
@@ -47,13 +49,12 @@ Game::Game(int argc, char* argv[])
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
-    PlayerSpawnSystem::SetRespawnTime(m_Config->Get<float>("Debug.RespawnTime", 15.0f));
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_Config);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -72,11 +73,6 @@ Game::Game(int argc, char* argv[])
     m_InputProxy->AddHandler<KeyboardInputHandler>();
     m_InputProxy->AddHandler<MouseInputHandler>();
     m_InputProxy->LoadBindings("Input.ini");
-
-    // Create the root level GUI frame
-    m_FrameStack = new GUI::Frame(m_EventBroker);
-    m_FrameStack->Width = m_Renderer->Resolution().Width;
-    m_FrameStack->Height = m_Renderer->Resolution().Height;
 
     // Create a world
     m_World = new World(m_EventBroker);
@@ -102,6 +98,10 @@ Game::Game(int argc, char* argv[])
             m_NetworkClient->Connect(m_NetworkAddress, m_NetworkPort);
             m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " CLIENT");
         }
+    } else {
+        // If network is disabled, pretend we're a server
+        m_IsClient = true;
+        m_IsServer = true;
     }
 
     // Create Octrees
@@ -124,7 +124,15 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<WeaponSystem>(updateOrderLevel, m_Renderer, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<DefenderWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
@@ -134,11 +142,12 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<BoostSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
-    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthHUDSystem>(updateOrderLevel);
@@ -148,6 +157,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeTrigger);
+    // Octree for frustum culling must be updated after collisions, otherwise players frustum may be moved after tree is filled, and wrong things are culled.
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame, m_OctreeFrustrumCulling);
     ++updateOrderLevel;
@@ -170,7 +182,6 @@ Game::~Game()
         delete m_NetworkServer;
     }
     delete m_World;
-    delete m_FrameStack;
     delete m_InputProxy;
     delete m_InputManager;
     delete m_RenderFrame;
@@ -189,16 +200,20 @@ void Game::Tick()
     // Handle input in a weird looking but responsive way
     m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
+    PerformanceTimer::StartTimer("InputManager");
     m_InputManager->Update(dt);
     m_EventBroker->Swap();
+    PerformanceTimer::StartTimerAndStopPrevious("InputProxy");
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
     m_InputProxy->Process();
     m_EventBroker->Swap();
 
+    PerformanceTimer::StartTimerAndStopPrevious("SoundManager");
     m_SoundManager->Update(dt);
 
     // Update network
+    PerformanceTimer::StartTimerAndStopPrevious("Network");
     m_EventBroker->Process<MultiplayerSnapshotFilter>();
     if (m_NetworkClient != nullptr) {
         m_NetworkClient->Update();
@@ -209,10 +224,14 @@ void Game::Tick()
     //m_SoundManager->Update(dt);
 
     // Iterate through systems and update world!
+    PerformanceTimer::StartTimerAndStopPrevious("SystemPipeline");
     m_EventBroker->Process<SystemPipeline>();
     m_SystemPipeline->Update(dt);
+    PerformanceTimer::StartTimerAndStopPrevious("RendererUpdate");
     m_Renderer->Update(dt);
+    PerformanceTimer::StartTimerAndStopPrevious("RendererDraw");
     m_Renderer->Draw(*m_RenderFrame);
+    PerformanceTimer::StopTimer("RendererDraw");
     m_RenderFrame->Clear();
     m_EventBroker->Swap();
     m_EventBroker->Clear();

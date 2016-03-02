@@ -18,7 +18,7 @@
 
 struct ModelJob : RenderJob
 {
-    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage)
+    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded)
         : RenderJob()
     {
         Model = model;
@@ -108,6 +108,7 @@ struct ModelJob : RenderJob
         EndIndex = matGroup->EndIndex;
         Matrix = matrix;
         Color = modelComponent["Color"];
+        GlowIntensity = ((double)modelComponent["GlowIntensity"]);
         Entity = modelComponent.EntityID;
         glm::vec3 abspos = Transform::AbsolutePosition(world, modelComponent.EntityID);
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
@@ -116,7 +117,7 @@ struct ModelJob : RenderJob
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;
-
+		IsShielded = isShielded;
 
         if (model->IsSkinned()) {
             Skeleton = Model->m_RawModel->m_Skeleton;
@@ -170,7 +171,7 @@ struct ModelJob : RenderJob
     ::Skeleton::AnimationOffset AnimationOffset;
     
 
-
+    float GlowIntensity = 8.0;
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;
     glm::vec4 IncandescenceColor;
@@ -180,10 +181,10 @@ struct ModelJob : RenderJob
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;
-
+	bool IsShielded;
     void CalculateHash() override
     {
-        Hash = TextureID + ModelID << 10 + ShaderID << 20;
+        Hash = ShaderID << 20 + ModelID << 10 + TextureID;
     }
 };
 
