@@ -50,19 +50,6 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         glm::vec4 perspective;
         glm::decompose(boneTransform, scale, rotation, translation, skew, perspective);
 
-        float lowRange = 0.98f;
-        float highRange = 1.02f;
-        if(scale.x <  lowRange || scale.y <  lowRange || scale.z <  lowRange ||
-            scale.x >  highRange || scale.y >  highRange || scale.z >  highRange) {
-            if (entity.HasComponent("Model")) {
-                (glm::vec4&)entity["Model"]["Color"] = glm::vec4(1, 0, 0, 1);
-            }
-        } else {
-            if (entity.HasComponent("Model")) {
-                (glm::vec4&)entity["Model"]["Color"] = glm::vec4(0, 1, 0, 1);
-            }
-        }
-
         glm::vec3 angles = glm::vec3(-glm::pitch(rotation), -glm::yaw(rotation), -glm::roll(rotation));
         
         if ((bool)entity["BoneAttachment"]["InheritPosition"]) {
