@@ -10,10 +10,7 @@
 		<xs:complexType>
 			<xs:all>
 				<xs:element name="CoolDownMaxTimer" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>This is the max cooldown on dash</xs:documentation></xs:annotation>
-				</xs:element>
-				<xs:element name="CoolDownTimer" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>This is the current cooldown on dash</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>This is the cooldown on dash</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>

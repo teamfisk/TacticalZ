@@ -24,7 +24,7 @@ void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHea
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
-    if (!IsServer && m_NetworkEnabled || !e.Victim.Valid()) {
+    if (!IsServer && m_NetworkEnabled) {
         return false;
     }
 

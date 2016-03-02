@@ -8,5 +8,4 @@
 	<NormalMap>true</NormalMap>
 	<SpecularMap>true</SpecularMap>
 	<GlowMap>true</GlowMap>
-	<GlowIntensity>3.0</GlowIntensity>
 </Model>

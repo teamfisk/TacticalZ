@@ -29,22 +29,16 @@ struct EntityWrapper
     EntityWrapper Parent();
     EntityWrapper FirstChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
-    EntityWrapper Clone(EntityWrapper parent = EntityWrapper::Invalid);
-    std::vector<EntityWrapper> ChildrenWithComponent(const std::string& componentType);
-    void DeleteChildren();
     bool IsChildOf(EntityWrapper potentialParent);
     bool Valid() const;
 
     ComponentWrapper operator[](const char* componentName);
-    ComponentWrapper operator[](const std::string& componentName);
     bool operator==(const EntityWrapper& e) const;
     bool operator!=(const EntityWrapper& e) const;
     explicit operator EntityID() const;
 
 private:
     EntityWrapper firstChildByNameRecursive(const std::string& name, EntityID parent);
-    EntityWrapper cloneRecursive(EntityWrapper entity, EntityWrapper parent);
-    void childrenWithComponentRecursive(const std::string& componentType, EntityWrapper& entity, std::vector<EntityWrapper>& childrenWithComponent);
 };
 
 namespace std

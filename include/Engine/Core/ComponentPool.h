@@ -1,7 +1,6 @@
 #ifndef ComponentPool_h__
 #define ComponentPool_h__
 
-#include <set>
 #include "MemoryPool.h"
 #include "ComponentInfo.h"
 #include "ComponentWrapper.h"
@@ -46,8 +45,7 @@ public:
         : m_ComponentInfo(ci)
         , m_Pool(ci.Meta->Allocation, sizeof(EntityID) + ci.Stride)
     { }
-    ~ComponentPool();
-	ComponentPool(const ComponentPool& other);
+	ComponentPool(const ComponentPool& other) = delete;
 	ComponentPool(const ComponentPool&& other) = delete;
 
     const ::ComponentInfo& ComponentInfo() const { return m_ComponentInfo; }

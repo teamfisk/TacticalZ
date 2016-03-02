@@ -56,7 +56,6 @@ private:
     void OnEntityDelete(EntityWrapper entity);
     void OnEntityChangeParent(EntityWrapper entity, EntityWrapper parent);
     void OnEntityChangeName(EntityWrapper entity, const std::string& name);
-    EntityWrapper OnEntityPaste(EntityWrapper entityToCopy, EntityWrapper parent);
     void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
     void OnWidgetSpace(EditorGUI::WidgetSpace widgetSpace);

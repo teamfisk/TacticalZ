@@ -20,15 +20,12 @@ public:
 private:
     EventRelay<AmmoPickupSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(Events::TriggerTouch& e);
-    EventRelay<AmmoPickupSystem, Events::AmmoPickup> m_EAmmoPickup;
-    bool OnAmmoPickup(Events::AmmoPickup& e);
 
     struct NewAmmoPickup {
         glm::vec3 Pos;
         double AmmoGain;
         double RespawnTimer;
         double DecreaseThisRespawnTimer;
-        EntityID parentID;
     };
     std::vector<NewAmmoPickup> m_ETriggerTouchVector;
 };

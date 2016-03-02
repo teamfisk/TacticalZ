@@ -9,16 +9,13 @@ typedef unsigned int PacketID;
 class NetworkClient
 {
 public:
-    NetworkClient();
-    virtual ~NetworkClient();
     virtual void Connect(std::string playerName, std::string address, int port) = 0;
     virtual void Disconnect() = 0;
     virtual void Receive(Packet& packet) = 0;
     virtual void Send(Packet & packet) = 0;
     virtual bool IsSocketAvailable() = 0;
 protected:
-    char* m_ReadBuffer;
-    unsigned int m_BufferSize = BUFFERSIZE;
+    char m_ReadBuffer[BUFFERSIZE] = { 0 };
 };
 
 #endif

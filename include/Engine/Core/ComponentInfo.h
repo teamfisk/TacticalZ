@@ -2,7 +2,6 @@
 #define ComponentInfo_h__
 
 #include "../Common.h"
-#include <boost/shared_array.hpp>
 
 struct ComponentInfo
 {
@@ -28,9 +27,8 @@ struct ComponentInfo
 	std::string Name;
     std::unordered_map<std::string, Field_t> Fields;
     std::vector<std::string> FieldsInOrder;
-    std::vector<std::string> StringFields;
     unsigned int Stride = 0;
-    boost::shared_array<char> Defaults = nullptr;
+    std::shared_ptr<char> Defaults = nullptr;
 	std::shared_ptr<Meta_t> Meta = nullptr;
 };
 

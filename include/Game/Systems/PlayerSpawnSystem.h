@@ -13,6 +13,8 @@ public:
     PlayerSpawnSystem(SystemParams params);
 
     virtual void Update(double dt) override;
+    
+    static void SetRespawnTime(float respawnTime) { m_RespawnTime = respawnTime; };
 
 private:
     struct SpawnRequest
@@ -29,8 +31,8 @@ private:
     //EntityWrapper ID -> Player ID.
     std::map<EntityID, int> m_PlayerIDs;
 
-    float m_ForcedRespawnTime;
-    bool m_DbgConfigForceRespawn;
+    static float m_RespawnTime;
+    float m_Timer;
 
     EventRelay<PlayerSpawnSystem, Events::InputCommand> m_OnInputCommand;
     bool OnInputCommand(Events::InputCommand& e);

@@ -24,8 +24,6 @@ public:
     bool StencilFunc(GLenum func, GLint ref, GLuint mask);
     bool StencilMask(GLuint mask);
     bool DepthMask(GLboolean flag);
-	bool DepthFunc(GLenum func);
-	bool AlphaFunc(GLenum func, GLclampf thresholder);
 
 private:
     std::vector<std::function<void(void)>> m_ResetFunctions;

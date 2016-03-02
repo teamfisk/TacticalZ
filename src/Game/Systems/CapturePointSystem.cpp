@@ -1,39 +1,32 @@
 #include "Systems/CapturePointSystem.h"
 #include <algorithm>
 
-CapturePointSystem::CapturePointSystem(SystemParams params)
+CapturePointSystem::CapturePointSystem(SystemParams params) 
     : System(params)
     , PureSystem("CapturePoint")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
-    if (IsServer) {
+    if (IsClient) {
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
         EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
     }
-
 }
 
 //here all capturepoints will update their component
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
 void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, ComponentWrapper& cCapturePoint, double dt)
 {
-    if (!IsServer) {
+    if (!IsClient) {
         return;
     }
+
     if (m_WinnerWasFound) {
         return;
     }
     const int capturePointNumber = cCapturePoint["CapturePointNumber"];
     const bool hasTeamComponent = capturePointEntity.HasComponent("Team");
 
-    if (m_NumberOfCapturePoints != 0) {
-        if (!m_CapturePointNumberToEntityMap[0].HasComponent("CapturePoint")) {
-            //if map has changed, the capturepoints has changed, now have to redo them
-            m_NumberOfCapturePoints = 0;
-            m_CapturePointNumberToEntityMap.clear();
-        }
-    }
     //if point doesnt have a teamComponent yet, add one. since:
     //what if capture point has no team -> we cant get/use the team enum from it...
     if (!hasTeamComponent) {
@@ -78,7 +71,8 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     std::map<std::string, int> nextPossibleCapturePoint;
     nextPossibleCapturePoint["Red"] = -1;
     nextPossibleCapturePoint["Blue"] = -1;
-    for (int i = 0; i < m_NumberOfCapturePoints; i++) {
+    for (int i = 0; i < m_NumberOfCapturePoints; i++)
+    {
         if (!m_CapturePointNumberToEntityMap[i].HasComponent("Team")) {
             continue;
         }
@@ -90,7 +84,8 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             nextPossibleCapturePoint["Blue"] = i + 1;
         }
     }
-    for (int i = m_NumberOfCapturePoints - 1; i >= 0; i--) {
+    for (int i = m_NumberOfCapturePoints - 1; i >= 0; i--)
+    {
         if (!m_CapturePointNumberToEntityMap[i].HasComponent("Team")) {
             continue;
         }
@@ -102,17 +97,11 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             nextPossibleCapturePoint["Blue"] = i - 1;
         }
     }
-    if (m_RecentlyCapturedNeedNextCapturePointNow) {
-        m_CapturedEvent.NextCapturePoint = m_CapturedEvent.TeamNumberThatCapturedCapturePoint == blueTeam ?
-            m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Blue"]] :
-            m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Red"]];
-        m_EventBroker->Publish(m_CapturedEvent);
-        m_RecentlyCapturedNeedNextCapturePointNow = false;
-    }
 
     //reset timers and reset the bool that triggers this
     if (m_ResetTimers) {
-        for (int i = 0; i < m_NumberOfCapturePoints; i++) {
+        for (int i = 0; i < m_NumberOfCapturePoints; i++)
+        {
             ComponentWrapper& capturePoint = m_CapturePointNumberToEntityMap[i]["CapturePoint"];
             if ((int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Red"] &&
                 (int)capturePoint["CapturePointNumber"] != nextPossibleCapturePoint["Blue"]) {
@@ -127,7 +116,8 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     }
 
     //check how many players are standing inside and are healthy
-    for (size_t i = m_ETriggerTouchVector.size(); i > 0; i--) {
+    for (size_t i = m_ETriggerTouchVector.size(); i > 0; i--)
+    {
         auto triggerTouched = m_ETriggerTouchVector[i - 1];
         if (std::get<1>(triggerTouched) == capturePointEntity) {
             //some player has touched this - lets figure out: what team, health
@@ -186,8 +176,8 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //if capturePoint is owned by the team, and the other team has been trying to take it, then increase/decrease the timer towards 0.0
-        if ((ownedBy == currentTeam && currentTeam == redTeam && (double)cCapturePoint["CaptureTimer"] < captureTimeToTakeOver) ||
-            (ownedBy == currentTeam && currentTeam == blueTeam && (double)cCapturePoint["CaptureTimer"] > -captureTimeToTakeOver)) {
+        if ((ownedBy == currentTeam && currentTeam == redTeam && (double)cCapturePoint["CaptureTimer"] < 0.0) ||
+            (ownedBy == currentTeam && currentTeam == blueTeam && (double)cCapturePoint["CaptureTimer"] > 0.0)) {
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //check if captureTimer > captureTimeToTakeOver and if so change owner and publish the eCaptured event
@@ -195,23 +185,27 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             teamComponent["Team"] = currentTeam;
             cCapturePoint["CaptureTimer"] = glm::sign((double)cCapturePoint["CaptureTimer"])*captureTimeToTakeOver;
             //publish Captured event
-            m_RecentlyCapturedNeedNextCapturePointNow = true;
-            m_CapturedEvent.CapturePointTakenID = cCapturePoint.EntityID;
-            m_CapturedEvent.TeamNumberThatCapturedCapturePoint = currentTeam;
+            Events::Captured e;
+            e.CapturePointID = cCapturePoint.EntityID;
+            e.TeamNumberThatCapturedCapturePoint = currentTeam;
+            m_EventBroker->Publish(e);
             //NextPossibleCapturePoint will be calculated in the next update...
         }
     }
 
     //check for possible winCondition = check if the homebase is owned by the other team
     bool checkForWinner = false;
-    if (capturePointNumber == m_RedTeamHomeCapturePoint && ownedBy != redTeam) {
+    if (capturePointNumber == m_RedTeamHomeCapturePoint && ownedBy != redTeam)
+    {
         checkForWinner = true;
     }
-    if (capturePointNumber == m_BlueTeamHomeCapturePoint && ownedBy != blueTeam) {
+    if (capturePointNumber == m_BlueTeamHomeCapturePoint && ownedBy != blueTeam)
+    {
         checkForWinner = true;
     }
 
-    if (checkForWinner && !m_WinnerWasFound) {
+    if (checkForWinner && !m_WinnerWasFound)
+    {
         //publish Win event
         Events::Win e;
         e.TeamThatWon = ownedBy;
@@ -230,7 +224,8 @@ bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e)
 
 bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e)
 {
-    for (size_t i = 0; i < m_ETriggerTouchVector.size(); i++) {
+    for (size_t i = 0; i < m_ETriggerTouchVector.size(); i++)
+    {
         auto triggerTouched = m_ETriggerTouchVector[i];
         if (std::get<0>(triggerTouched) == e.Entity && std::get<1>(triggerTouched) == e.Trigger) {
             m_ETriggerTouchVector.erase(m_ETriggerTouchVector.begin() + i);

@@ -16,8 +16,6 @@
 #include "DrawScreenQuadPass.h"
 #include "DrawBloomPass.h"
 #include "DrawColorCorrectionPass.h"
-#include "SSAOPass.h"
-#include "CubeMapPass.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
@@ -25,16 +23,12 @@
 #include "imgui/imgui.h"
 #include "TextPass.h"
 #include "Util/CommonFunctions.h"
-#include "Core/PerformanceTimer.h"
 
 class Renderer : public IRenderer
 {
-    static void glfwFrameBufferCallback(GLFWwindow* window, int width, int height);
-
 public:
-	Renderer(EventBroker* eventBroker, ConfigFile* config)
-		: m_EventBroker(eventBroker)
-		, m_Config(config)
+    Renderer(EventBroker* eventBroker) 
+        : m_EventBroker(eventBroker)
     { }
 
     virtual void Initialize() override;
@@ -43,13 +37,8 @@ public:
 
     virtual PickData Pick(glm::vec2 screenCoord) override;
 
-
 private:
     //----------------------Variables----------------------//
-
-    static std::unordered_map <GLFWwindow*, Renderer*> m_WindowToRenderer;
-	ConfigFile* m_Config;
-
     EventBroker* m_EventBroker;
     TextPass* m_TextPass;
 
@@ -61,10 +50,6 @@ private:
     Model* m_UnitSphere;
 
     int m_DebugTextureToDraw = 0;
-    int m_CubeMapTexture = 0;
-    bool m_ResizeWindow = false;
-	int m_SSAO_Quality = 0;
-	int m_GLOW_Quality = 2;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
@@ -73,8 +58,6 @@ private:
     DrawScreenQuadPass* m_DrawScreenQuadPass;
     DrawBloomPass* m_DrawBloomPass;
     DrawColorCorrectionPass* m_DrawColorCorrectionPass;
-	SSAOPass* m_SSAOPass;
-    CubeMapPass* m_CubeMapPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();

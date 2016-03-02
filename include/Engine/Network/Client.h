@@ -19,27 +19,11 @@
 #include "Core/World.h"
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
-#include "Core/EPlayerDeath.h"
 #include "Input/EInputCommand.h"
 #include "Core/EPlayerDamage.h"
-#include "../Game/Events/EDoubleJump.h"
 #include "Network/EInterpolate.h"
 #include "Network/SnapshotFilter.h"
 #include "Core/EPlayerSpawned.h"
-#include "Core/EAmmoPickup.h"
-#include "Network/ESearchForServers.h"
-
-struct ServerInfo
-{
-    ServerInfo(std::string a, int b, std::string c, int d)
-    {
-        Address = a; Port = b; Name = c; PlayersConnected = d;
-    }
-    std::string Address = "";
-    int Port = 0;
-    std::string Name = "";
-    int PlayersConnected = 0;
-};
 
 class Client : public Network
 {
@@ -50,9 +34,7 @@ public:
 
     void Connect(std::string address, int port);
     void Update() override;
-private:
-    UDPClient m_Unreliable;
-    TCPClient m_Reliable;
+
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();
     // Save for children
@@ -100,15 +82,11 @@ private:
     void parseTCPConnect(Packet& packet);
     void parsePlayerConnected(Packet& packet);
     void parsePing();
-    void parseServerlist(Packet& packet);
     void parseKick();
     void parsePlayersSpawned(Packet& packet);
     void parseEntityDeletion(Packet& packet);
-    void parsePlayerDamage(Packet& packet);
     void parseComponentDeletion(Packet& packet);
-    void parseDoubleJump(Packet& packet);
-    void parseAmmoPickup(Packet& packet);
-    void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
+    void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     void hasServerTimedOut();
@@ -116,7 +94,6 @@ private:
     void sendInputCommands();
     void sendLocalPlayerTransform();
     void becomePlayer();
-    void displayServerlist();
     // Mapping Logic
     // Returns if local EntityID exist in map
     bool clientServerMapsHasEntity(EntityID clientEntityID);
@@ -132,15 +109,10 @@ private:
     bool OnPlayerDamage(const Events::PlayerDamage& e);
     EventRelay<Client, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned& e);
-    EventRelay< Client, Events::SearchForServers> m_ESearchForServers;
-    EventRelay<Client, Events::DoubleJump> m_EDoubleJump;
-    bool OnDoubleJump(Events::DoubleJump & e);
-    bool OnSearchForServers(const Events::SearchForServers& e);
-    UDPClient m_ServerlistRequest;
-    std::vector<ServerInfo> m_Serverlist;
-    bool m_SearchingForServers = false;
-    std::clock_t m_StartSearchTime;
-    double m_SearchingTime = 2000; // Config I guess
+    void parsePlayerDamage(Packet& packet);
+private:
+    UDPClient m_Unreliable;
+    TCPClient m_Reliable;
 };
 
 #endif

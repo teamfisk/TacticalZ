@@ -207,7 +207,7 @@ bool RayVsModel(const Ray& ray,
         glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        float dist = outDistance;
+        float dist = INFINITY;
         float u;
         float v;
         if (RayVsTriangle(ray, v0, v1, v2, dist, u, v)) {
@@ -366,8 +366,7 @@ bool AABBvsTriangle(const AABB& box,
     float verticalStepHeight,
     bool& isOnGround,
     glm::vec3& boxVelocity,
-    glm::vec3& outResolution,
-    bool resolveCollision)
+    glm::vec3& outResolution)
 {
     //Check so we don't have a zero area triangle when calculating the normal.
     //Also, don't check a triangle facing away from the player.
@@ -427,7 +426,7 @@ bool AABBvsTriangle(const AABB& box,
         //if projections don't overlap, return false.
         if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector, resolutionDist, pushedFromTriangleLine)) {
             return false;
-        } else if (resolveCollision) {
+        } else {
             //Overwrite the smallest resolution if this is smaller.
             if (resolutionDist < resolveShortest.DistanceSq) {
                 resolveShortest.Vector = glm::vec3(0.f);
@@ -464,11 +463,6 @@ bool AABBvsTriangle(const AABB& box,
     if (glm::abs(t) > 1) {
         return false;
     }
-
-    if (!resolveCollision) {
-        return true;
-    }
-
     glm::vec3 cornerResolution = (1+t) * diagonal;
     //Overwrite the smallest resolution if cornerResolution is smaller.
     float lenSq = glm::length2(cornerResolution);
@@ -543,8 +537,7 @@ bool AABBvsTriangles(const AABB& box,
     glm::vec3& boxVelocity,
     float verticalStepHeight,
     bool& isOnGround,
-    glm::vec3& outResolutionVector,
-    bool resolveCollision)
+    glm::vec3& outResolutionVector)
 {
     bool hit = false;
 
@@ -560,7 +553,7 @@ bool AABBvsTriangles(const AABB& box,
         };
         glm::vec3 outVec;
         bool collideWithGround = isOnGround;
-        if (AABBvsTriangle(newBox, triVertices, originalBoxVelocity, verticalStepHeight, collideWithGround, boxVelocity, outVec, resolveCollision)) {
+        if (AABBvsTriangle(newBox, triVertices, originalBoxVelocity, verticalStepHeight, collideWithGround, boxVelocity, outVec)) {
             hit = true;
             outResolutionVector += outVec;
             newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
@@ -574,44 +567,6 @@ bool AABBvsTriangles(const AABB& box,
         isOnGround = false;
     }
     return hit;
-}
-
-bool AABBvsTriangles(const AABB& box,
-    const RawModel::Vertex* modelVertices,
-    const std::vector<unsigned int>& modelIndices,
-    const glm::mat4& modelMatrix,
-    glm::vec3& boxVelocity,
-    float verticalStepHeight,
-    bool& isOnGround,
-    glm::vec3& outResolutionVector)
-{
-    return AABBvsTriangles(box,
-        modelVertices,
-        modelIndices,
-        modelMatrix,
-        boxVelocity,
-        verticalStepHeight,
-        isOnGround,
-        outResolutionVector,
-        true);
-}
-
-bool AABBvsTriangles(const AABB& box,
-    const RawModel::Vertex* modelVertices,
-    const std::vector<unsigned int>& modelIndices,
-    const glm::mat4& modelMatrix)
-{
-    glm::vec3 vel, outres;
-    bool g;
-    return AABBvsTriangles(box,
-        modelVertices,
-        modelIndices,
-        modelMatrix,
-        vel,
-        0.f,
-        g,
-        outres,
-        false);
 }
 
 boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeModelBox)
@@ -693,9 +648,8 @@ boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<Enti
         if (!entityBox.Entity.HasComponent("Model")) {
             continue;
         }
-        auto& cModel = entityBox.Entity["Model"];
-        std::string res = cModel["Resource"];
-        if (res.empty() || (bool)cModel["Transparent"] || !((bool)cModel["Visible"])) {
+        std::string res = entityBox.Entity["Model"]["Resource"];
+        if (res.empty()) {
             continue;
         }
         Model* model;

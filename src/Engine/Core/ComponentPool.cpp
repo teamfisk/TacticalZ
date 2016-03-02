@@ -1,5 +1,7 @@
 #include "Core/ComponentPool.h"
 
+
+
 ComponentWrapper ComponentPoolForwardIterator::operator*() const
 {
     char* data = &(*m_MemoryPoolIterator);
@@ -30,34 +32,6 @@ ComponentPoolForwardIterator& ComponentPoolForwardIterator::operator++()
     return *this;
 }
 
-ComponentPool::ComponentPool(const ComponentPool& other)
-    : m_ComponentInfo(other.m_ComponentInfo)
-    , m_Pool(other.m_Pool)
-    , m_EntityToComponent()
-{
-    // Update EntityToComponent pointers
-    for (char& ptr : m_Pool) {
-        EntityID entity = *reinterpret_cast<EntityID*>(&ptr);
-        m_EntityToComponent[entity] = &ptr;
-    }
-
-    // Duplicate strings
-    for (auto& name : m_ComponentInfo.StringFields) {
-        for (auto& c : *this) {
-            std::string& val = c[name];
-            ComponentWrapper::SolidifyStrings(c);
-        }
-    }
-}
-
-ComponentPool::~ComponentPool()
-{
-    // Destroy component data
-    for (auto& c : *this) {
-        ComponentWrapper::Destroy(c.Info, c.Data);
-    }
-}
-
 //const ::ComponentInfo& ComponentPool::ComponentInfo() const
 //{
 //    return m_ComponentInfo;
@@ -65,19 +39,10 @@ ComponentPool::~ComponentPool()
 
 ComponentWrapper ComponentPool::Allocate(EntityID entity)
 {
-    // Allocate pool data
     char* data = m_Pool.Allocate();
-    // Copy EntityID
     memcpy(data, &entity, sizeof(EntityID));
-
     m_EntityToComponent[entity] = data;
-    ComponentWrapper component(m_ComponentInfo, data);
-
-    // Copy defaults
-    memcpy(component.Data, m_ComponentInfo.Defaults.get(), m_ComponentInfo.Stride);
-    ComponentWrapper::SolidifyStrings(component);
-
-    return component;
+    return ComponentWrapper(m_ComponentInfo, data);
 }
 
 ComponentWrapper ComponentPool::GetByEntity(EntityID ent)
@@ -92,7 +57,6 @@ bool ComponentPool::KnowsEntity(EntityID ent)
 
 void ComponentPool::Delete(ComponentWrapper& wrapper)
 {
-    ComponentWrapper::Destroy(wrapper.Info, wrapper.Data);
     m_EntityToComponent.erase(wrapper.EntityID);
     m_Pool.Free(wrapper.Data - sizeof(EntityID));
 }

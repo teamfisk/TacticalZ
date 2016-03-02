@@ -15,7 +15,6 @@ public:
         : m_EventBroker(eventBroker)
     { }
     ~World();
-    World(const World& other);
 
     // Create empty entity
     EntityID CreateEntity(EntityID parent = 0);
@@ -40,7 +39,7 @@ public:
     // Change the parent of an entity
     void SetParent(EntityID entity, EntityID parent);
     // Get children of an entity
-    const std::pair<std::unordered_multimap<EntityID, EntityID>::const_iterator, std::unordered_multimap<EntityID, EntityID>::const_iterator> GetDirectChildren(EntityID entity);
+    const std::pair<std::unordered_multimap<EntityID, EntityID>::const_iterator, std::unordered_multimap<EntityID, EntityID>::const_iterator> GetChildren(EntityID entity);
     // Get all component pools
     const std::unordered_map<std::string, ComponentPool*>& GetComponentPools() const { return m_ComponentPools; }
     // Get the entity children map

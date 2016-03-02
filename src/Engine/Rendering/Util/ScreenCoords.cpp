@@ -31,27 +31,22 @@ glm::vec3 ScreenCoords::ToWorldPos(glm::vec2 screenCoord, float depth, float scr
 
 ScreenCoords::PixelData ScreenCoords::ToPixelData(float x, float y, FrameBuffer* PickDataBuffer, GLuint DepthBuffer)
 {
-	GLERROR("Pre");
     PickDataBuffer->Bind();
     unsigned char pdata[3];
     glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &pdata);
-	GLERROR("glReadPixels(pdata) Error");
     PickDataBuffer->Unbind();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, DepthBuffer); 
-	GLERROR("glBindFramebuffer(DepthBuffer) Error");
+    glBindFramebuffer(GL_FRAMEBUFFER, DepthBuffer);
     float depthData;
     glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depthData);
-	GLERROR("glReadPixels(depthData) Error");
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	GLERROR("glBindFramebuffer(0) Error");
 
     PixelData p;
     p.Color[0] = (int)pdata[0];
     p.Color[1] = (int)pdata[1];
     p.Depth = depthData;
 
-    GLERROR("End");
+    GLERROR("ScreenCoords::ToPixelData Error");
 
     return p;
 }
