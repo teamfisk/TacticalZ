@@ -18,7 +18,8 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
 	auto cCamera = m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
-	//(double&)cCamera["FarClip"] = 300.0;
+	// TOBIAS TVINGADE MIG ATT HÅRDKODA
+	(double&)cCamera["FarClip"] = 400.0;
 
     m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1);
 
