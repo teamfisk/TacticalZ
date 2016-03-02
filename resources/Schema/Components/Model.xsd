@@ -33,6 +33,9 @@
 				<xs:element name="GlowMap" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Whether the model should use the Glowmap or not</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="GlowIntensity" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Intensity of the glow map</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

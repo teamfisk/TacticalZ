@@ -52,6 +52,101 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
             continue;
         }
 
+		glm::mat4 modelMatrix;
+
+		// See a sprite is an SpriteIndicator
+		bool isIndicator = false;
+		if (world->HasComponent(entity.ID, "SpriteIndicator"))
+		{
+			auto indicator = entity["SpriteIndicator"];
+
+			float minScale = (float)(double)indicator["MinScale"];
+			bool hasTeam = indicator["VisibleForSingleTeamOnly"];
+			isIndicator = true;
+			glm::vec3 pos = Transform::AbsolutePosition(entity);
+
+
+			EntityWrapper entityTeam;
+			if (hasTeam && (entity.HasComponent("Team") || entity.FirstParentWithComponent("Team").Valid()) && m_LocalPlayer.World != nullptr) {
+				if (!entity.HasComponent("Team")) {
+					entityTeam = entity.FirstParentWithComponent("Team");
+				}
+				else {
+					entityTeam = entity;
+				}
+
+				ComponentWrapper& entityTeamComponent = entityTeam["Team"];
+				ComponentWrapper& localComponent = m_LocalPlayer["Team"];
+				int entityTeamInt = entityTeamComponent["Team"];
+				int localComponentInt = localComponent["Team"];
+				int SpectatorInt = localComponent["Team"].Enum("Spectator");
+				if (entityTeamInt != localComponentInt && localComponentInt != SpectatorInt) {
+					continue;
+				}
+			}
+
+			// Code for check if sprite is inside or outside of screen
+			//glm::vec4 projectedPos = m_Camera->ProjectionMatrix() * m_Camera->ViewMatrix() * glm::vec4(pos, 1.0f);
+			//projectedPos /= projectedPos.w;
+			//// Check if inside of outside of screen.
+			//if (projectedPos.x < -1.0f || projectedPos.x > 1.0f || projectedPos.y < -1.0f || projectedPos.y > 1.0f) {
+			//	// is outside of screen
+			//} else {
+			//	// is inside of screen
+			//}
+
+
+			glm::vec3 zAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+			glm::vec3 normal = pos - m_Camera->Position();
+
+			//float distance = glm::length(normal);
+			//if (distance < minDistance) {
+			//	pos = pos - glm::normalize(normal) * (distance - minDistance);
+			//} else if (distance > maxDistance) {
+			//	pos = pos - glm::normalize(normal) * (distance - maxDistance);
+			//}
+			normal.y = 0;
+			normal = glm::normalize(normal);
+			glm::vec3 right = glm::cross(normal, zAxis);
+			glm::vec3 up = glm::cross(right, normal);
+
+			modelMatrix[0][0] = right.x;
+			modelMatrix[0][1] = right.y;
+			modelMatrix[0][2] = right.z;
+			modelMatrix[0][3] = 0.0f;
+
+			modelMatrix[1][0] = zAxis.x;
+			modelMatrix[1][1] = zAxis.y;
+			modelMatrix[1][2] = zAxis.z;
+			modelMatrix[1][3] = 0.0f;
+
+			modelMatrix[2][0] = normal.x;
+			modelMatrix[2][1] = normal.y;
+			modelMatrix[2][2] = normal.z;
+			modelMatrix[2][3] = 0.0f;
+
+			modelMatrix[3][0] = pos.x;
+			modelMatrix[3][1] = pos.y;
+			modelMatrix[3][2] = pos.z;
+			modelMatrix[3][3] = 1.0f;
+
+			glm::mat4 tranformationMatrix = modelMatrix * glm::scale(Transform::AbsoluteScale(entity));
+			glm::vec4 tmp = tranformationMatrix * glm::vec4(glm::vec3(0.5, 0.5, 0), 1.0f);
+			glm::vec2 projectedTopRight = m_Camera->WorldToScreen(glm::vec3(tmp), m_Renderer->GetViewportSize());
+			tmp = tranformationMatrix * glm::vec4(glm::vec3(-0.5, -0.5, 0), 1.0f);
+			glm::vec2 projectedBottomLeft = m_Camera->WorldToScreen(glm::vec3(tmp), m_Renderer->GetViewportSize());
+
+			float diag = glm::length(projectedBottomLeft - projectedTopRight);
+			if (diag < minScale) {
+				tranformationMatrix = tranformationMatrix * glm::scale(glm::vec3(minScale / diag, minScale / diag, minScale / diag));
+			}
+			modelMatrix = tranformationMatrix;
+		}
+		else {
+			modelMatrix = Transform::ModelMatrix(entity.ID, world);
+		}
+
+
         std::string diffuseResource = cSprite["DiffuseTexture"];
         std::string glowResource = cSprite["GlowMap"];
         bool depthSorted = cSprite["DepthSort"];
@@ -67,11 +162,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, world);
-        //modelMatrix *= m_Camera->BillboardMatrix();
-
-
-        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted));
+        std::shared_ptr<SpriteJob> spriteJob = std::shared_ptr<SpriteJob>(new SpriteJob(cSprite, m_Camera, modelMatrix, world, fillColor, fillPercentage, depthSorted, isIndicator));
         
         jobs.push_back(spriteJob);
     }
@@ -93,7 +184,6 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
     ) {
         return false;
     }
-
     return true;
 }
 
@@ -150,6 +240,8 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
+		bool isShielded = m_World->HasComponent(cModel.EntityID, "Shielded") || m_World->HasComponent(cModel.EntityID, "Player");
+
         glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
         //Loop through all materialgroups of a model
         for (auto matGroup : model->MaterialGroups()) {
@@ -165,20 +257,19 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     cModel, 
                     m_World, 
                     fillColor, 
-                    fillPercentage
+                    fillPercentage,
+					isShielded
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
                     explosionEffectJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(explosionEffectJob);
-                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
-                    || m_World->HasComponent(cModel.EntityID, "Player")) {
-
+                } else if (isShielded) {
                     if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
                         cModel["Transparent"] = true;
                     }
 
                     if (cModel["Transparent"]) {
-                        Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
+                        Jobs.TransparentObjects.push_back(explosionEffectJob);
                     } else {
 					    explosionEffectJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
@@ -204,20 +295,20 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     cModel, 
                     m_World, 
                     fillColor, 
-                    fillPercentage
+                    fillPercentage,
+					isShielded
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
                     modelJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(modelJob);
-                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
-                    || m_World->HasComponent(cModel.EntityID, "Player")) {
+                } else if (isShielded) {
 
                     if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
                         cModel["Transparent"] = true;
                     }
 
                     if (cModel["Transparent"]) {
-                        Jobs.TransparentShieldedObjects.push_back(modelJob);
+                        Jobs.TransparentObjects.push_back(modelJob);
                     } else {
 					    modelJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(modelJob);

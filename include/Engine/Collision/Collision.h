@@ -78,13 +78,21 @@ bool AABBvsTriangles(const AABB& box,
     bool& isOnGround,
     glm::vec3& outResolutionVector);
 
+//Detects collision, but does not resolve.
+bool AABBvsTriangles(const AABB& box,
+    const RawModel::Vertex* modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix);
+
 //Return true if the boxes are intersecting.
 bool AABBVsAABB(const AABB& a, const AABB& b);
 //Return true if the boxes are intersecting.
 //Also outputs the minimum translation that box [a] would need in order to resolve collision.
 bool AABBVsAABB(const AABB& a, const AABB& b, glm::vec3& minimumTranslation);
 
-// Calculates an absolute AABB from an entity AABB component
+// Calculates an absolute AABB from an entity AABB component or Model component.
+// if takeModelBox is true, the AABB component will be ignored and box is calculated from Model.
+// if takeModelBox is false, the AABB component will be prefered, if it exists.
 boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeModelBox = false);
 boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity);
 //Returns the first entity hit by the input ray. entitiesPotentiallyHitSorted needs to be sorted 

@@ -42,38 +42,38 @@ void FrameBuffer::Generate()
     GLERROR("PRE");
 
     std::vector<GLenum> attachments;
-
-    glGenFramebuffers(1, &m_BufferHandle);
+	if (m_BufferHandle == 0) {
+		glGenFramebuffers(1, &m_BufferHandle);
+	}
     glBindFramebuffer(GL_FRAMEBUFFER, m_BufferHandle);
     GLERROR("1");
 
-    for (auto it = m_Resources.begin(); it != m_Resources.end(); it++) {
-        switch ((*it)->m_ResourceType) {
-        case GL_TEXTURE_2D:
-            glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
-            GLERROR("FrameBuffer generate: glFramebufferTexture2D");
+	for (auto it = m_Resources.begin(); it != m_Resources.end(); it++) {
+		switch ((*it)->m_ResourceType) {
+		case GL_TEXTURE_2D:
+			glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
+			GLERROR("FrameBuffer generate: glFramebufferTexture2D");
 
-            break;
-        case GL_RENDERBUFFER:
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
-            GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
-            break;
-        }
-        GLERROR("2");
+			break;
+		case GL_RENDERBUFFER:
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
+			GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
+			break;
+		}
+		GLERROR("2");
 
-        if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT && (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
-            attachments.push_back((*it)->m_Attachment);
-        }
-        GLERROR("Attachment");
+		if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT && (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
+			attachments.push_back((*it)->m_Attachment);
+		}
+		GLERROR("Attachment");
 
-    }
-    GLERROR("3");
-
+	}
+	GLERROR("3");
 
     GLenum* bufferTextures = &attachments[0];
     glDrawBuffers(attachments.size(), bufferTextures);
-    if(GLERROR("4")) {
-        printf("hello");
+    if (GLERROR("GLBufferAttachement error")) {
+        printf(": AttachmentSize %i", attachments.size());
     }
 
     if (GLenum frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {

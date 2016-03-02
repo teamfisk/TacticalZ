@@ -19,6 +19,9 @@ enum class MessageType
     EntityDeleted,
     ComponentDeleted,
     PlayerTransform,
+    OnDoubleJump,
+    ServerlistRequest,
+    AmmoPickup,
     Invalid
 };
 

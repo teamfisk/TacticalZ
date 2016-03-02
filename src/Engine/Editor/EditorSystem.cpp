@@ -28,6 +28,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_EditorGUI->SetEntityDeleteCallback(std::bind(&EditorSystem::OnEntityDelete, this, std::placeholders::_1));
     m_EditorGUI->SetEntityChangeParentCallback(std::bind(&EditorSystem::OnEntityChangeParent, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetEntityChangeNameCallback(std::bind(&EditorSystem::OnEntityChangeName, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetEntityPasteCallback(std::bind(&EditorSystem::OnEntityPaste, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
@@ -160,6 +161,11 @@ void EditorSystem::OnEntityChangeName(EntityWrapper entity, const std::string& n
     }
 }
 
+EntityWrapper EditorSystem::OnEntityPaste(EntityWrapper entityToCopy, EntityWrapper parent)
+{
+    return entityToCopy.Clone(parent);
+}
+
 void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& componentType)
 {
     if (entity.Valid()) {
@@ -224,6 +230,12 @@ bool EditorSystem::OnInputCommand(const Events::InputCommand& e)
         } else {
             Enable();
         }
+    }
+    if (e.Command == "PerformanceTimingResetAllTimers" && e.Value > 0) {
+        PerformanceTimer::ResetAllTimers();
+    }
+    if (e.Command == "PerformanceTimingCreateExcelData" && e.Value > 0) {
+        PerformanceTimer::CreateExcelData();
     }
     return true;
 }
