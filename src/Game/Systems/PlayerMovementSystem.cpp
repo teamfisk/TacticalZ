@@ -48,7 +48,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
-                float pitch = cameraOrientation.x + 0.2;
+                float pitch = cameraOrientation.x + 0.2f;
                 double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
                 cAnimationOffset["Time"] = time;
             }
@@ -61,12 +61,18 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         float playerMovementSpeed = player["Player"]["MovementSpeed"];
         float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
         glm::vec3& wishDirection = player["Player"]["CurrentWishDirection"];
+        auto playerBoostAssaultEntity = player.FirstChildByName("BoostAssault");
+        if (playerBoostAssaultEntity.Valid()) {
+            playerMovementSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+            playerCrouchSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+        }
+
 
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check
             if (player.HasComponent("DashAbility")) {
-                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"]);
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"]);
             }
             wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
@@ -112,6 +118,10 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 //if doubleTapped do Assault Dash - but only boost maximum 50.0f
                 float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
                 accelerationSpeed = glm::min(doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed), 50.0f);
+                //if player has Boost from an Assault class, accelerate the player faster
+                if (playerBoostAssaultEntity.Valid()) {
+                    accelerationSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+                }
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
@@ -311,6 +321,7 @@ bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
         return false;
     }
     spawnHexagon(EntityWrapper(m_World, e.entityID));
+    return true;
 }
 
 void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
