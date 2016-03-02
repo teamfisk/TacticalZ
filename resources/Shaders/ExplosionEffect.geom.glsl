@@ -169,7 +169,7 @@ void main()
 			// account for velocity
 			// account for color
 			
-			ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * maxDistance * (ExplosionDuration - TimeSinceDeath));
+			ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * maxDistance /** (ExplosionDuration - TimeSinceDeath)*/);
 		}
 			
 		// pass through vertex data

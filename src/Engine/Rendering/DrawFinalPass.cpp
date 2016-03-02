@@ -786,6 +786,8 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 	GLERROR("Bind 14 uniform");
     glUniform1i(glGetUniformLocation(shaderHandle, "ExponentialAccelaration"), job->ExponentialAccelaration);
 	GLERROR("Bind 15 uniform");
+	glUniform1i(glGetUniformLocation(shaderHandle, "Reverse"), job->Reverse);
+	GLERROR("Bind 15-2 uniform");
 
     glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(job->Color));
 	GLERROR("Bind 16 uniform");
