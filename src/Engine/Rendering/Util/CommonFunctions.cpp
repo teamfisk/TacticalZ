@@ -12,7 +12,7 @@ Texture* CommonFunctions::LoadTexture(std::string path, bool threaded)
     } catch (const Resource::StillLoadingException&) {
         img = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
     } catch (const std::exception&) {
-        img = nullptr;
+        img = ResourceManager::Load<Texture>("Textures/Core/ErrorTexture.png");
     }
 
     return img;
