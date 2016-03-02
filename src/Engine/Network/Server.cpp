@@ -141,6 +141,9 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
         break;
+    case MessageType::OnDashEffect:
+        parseDashEffect(packet);
+        break;
     default:
         break;
     }
@@ -555,6 +558,11 @@ bool Server::parseDoubleJump(Packet & packet)
     return true;
 }
 
+void Server::parseDashEffect(Packet& packet)
+{
+    reliableBroadcast(packet);
+}
+
 void Server::parseOnInputCommand(Packet& packet)
 {
     PlayerID player = -1;
@@ -624,7 +632,7 @@ bool Server::shouldSendToClient(EntityWrapper childEntity)
     }
     return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid()
         || childEntity.HasComponent("CapturePoint") || childEntity.HasComponent("HealthPickup")
-        || childEntity.HasComponent("AmmoPickup");
+        || childEntity.HasComponent("AmmoPickup")/* || childEntity.Name() == "DashEffect"*/;
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()
