@@ -74,18 +74,14 @@ bool PlayerDeathSystem::OnEntityDeleted(Events::EntityDeleted& e)
     if (m_LocalPlayerDeathEffect.ID != e.DeletedEntity) {
         return false;
     }
-    // Set the spectator camera as active, if it exists.
-    auto pool = m_World->GetComponents("CapturePointGameMode");
-    if (pool == nullptr || pool->size() == 0) {
-        return false;
-    }
-    ComponentWrapper modeComponent = *pool->begin();
-    EntityWrapper theLevel = EntityWrapper(m_LocalPlayerDeathEffect.World, modeComponent.EntityID);
-    EntityWrapper spectatorCam = theLevel.FirstChildByName("SpectatorCamera");
-    if (!spectatorCam.Valid() && spectatorCam.HasComponent("Camera")) {
+    
+    // Look for the spectator camera entity in the level.
+    EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
+    if (!spectatorCam.Valid() || !spectatorCam.HasComponent("Camera") || LocalPlayer.Valid()) {
         return false;
     }
     Events::SetCamera eSetCamera;
     eSetCamera.CameraEntity = spectatorCam;
     m_EventBroker->Publish(eSetCamera);
+    return true;
 }

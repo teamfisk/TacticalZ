@@ -6,6 +6,7 @@
 #include "ObjectPool.h"
 #include "ComponentPool.h"
 #include "EventBroker.h"
+struct EntityWrapper;
 
 class World
 {
@@ -49,6 +50,8 @@ public:
     void SetName(EntityID entity, const std::string& name);
     // Get the textual name of an entity
     std::string GetName(EntityID entity) const;
+    // Get the first entity in the world with the name.
+    EntityWrapper GetFirstEntityByName(const std::string& name);
 
 private:
     EventBroker* m_EventBroker = nullptr;
