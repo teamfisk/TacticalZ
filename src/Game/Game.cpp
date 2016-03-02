@@ -10,6 +10,7 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Systems/PlayerDeathSystem.h"
+#include "Systems/FloatingEffectSystem.h"
 #include "Core/EntityFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
@@ -120,6 +121,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<FloatingEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
