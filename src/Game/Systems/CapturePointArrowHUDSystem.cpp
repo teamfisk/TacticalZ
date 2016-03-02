@@ -101,6 +101,7 @@ void CapturePointArrowHUDSystem::Update(double dt)
                             continue;
                         } else {
                             m_RedTeamCurrentTarget = got->second;
+                            break;
                         }
                     }
                 } else if ((int)homeRed["CapturePoint"]["CapturePointNumber"] == firstCP) {
@@ -112,6 +113,7 @@ void CapturePointArrowHUDSystem::Update(double dt)
                             continue;
                         } else {
                             m_RedTeamCurrentTarget = got->second;
+                            break;
                         }
                     }
                 }
@@ -125,6 +127,7 @@ void CapturePointArrowHUDSystem::Update(double dt)
                             continue;
                         } else {
                             m_BlueTeamCurrentTarget = got->second;
+                            break;
                         }
                     }
                 } else if ((int)homeBlue["CapturePoint"]["CapturePointNumber"] == firstCP) {
@@ -136,6 +139,7 @@ void CapturePointArrowHUDSystem::Update(double dt)
                             continue;
                         } else {
                             m_BlueTeamCurrentTarget = got->second;
+                            break;
                         }
                     }
                 }
@@ -151,7 +155,7 @@ void CapturePointArrowHUDSystem::Update(double dt)
             pos = m_BlueTeamCurrentTarget;
         }
 
-        pos = currentTeam == redTeam ? m_RedTeamCurrentTarget : currentTeam == blueTeam ? m_BlueTeamCurrentTarget : glm::vec3(0.f);
+        //pos = currentTeam == redTeam ? m_RedTeamCurrentTarget : currentTeam == blueTeam ? m_BlueTeamCurrentTarget : glm::vec3(0.f);
 
         glm::vec3& arrowOri = arrowEntity["Transform"]["Orientation"];
         glm::vec3 lookVector = glm::normalize(Transform::AbsolutePosition(arrowEntity) - pos); //Maybe should be player instead
