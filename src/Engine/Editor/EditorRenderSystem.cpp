@@ -1,7 +1,7 @@
 #include "Editor/EditorRenderSystem.h"
 
-EditorRenderSystem::EditorRenderSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame)
-    : System(world, eventBroker)
+EditorRenderSystem::EditorRenderSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame)
+    : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
 {
@@ -24,8 +24,9 @@ void EditorRenderSystem::Update(double dt)
     if (cameras != nullptr) {
         for (auto& cCamera : *cameras) {
             EntityWrapper entity(m_World, cCamera.EntityID);
+            entity["Model"]["Resource"] = "Models/Widgets/Camera.mesh";
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity);
-            enqueueModel(scene, entity, modelMatrix, "Models/Camera.mesh", false);
+            enqueueModel(scene, entity, modelMatrix, "Models/Widgets/Camera.mesh", entity["Model"], false);
         }
     }
 
@@ -36,7 +37,8 @@ void EditorRenderSystem::Update(double dt)
             glm::vec3 absPosition = Transform::AbsolutePosition(entity) + (glm::vec3)cAABB["Origin"];
             glm::vec3 absScale = Transform::AbsoluteScale(entity) * (glm::vec3)cAABB["Size"];
             glm::mat4 modelMatrix = glm::translate(absPosition) * glm::scale(absScale);
-            enqueueModel(scene, entity, modelMatrix, "Models/Core/UnitCube.mesh", true);
+            entity["Model"]["Resource"] = "Models/Core/UnitCube.mesh";
+            enqueueModel(scene, entity, modelMatrix, "Models/Core/UnitCube.mesh", entity["Model"], true);
         }
     }
 
@@ -56,7 +58,7 @@ bool EditorRenderSystem::OnSetCamera(Events::SetCamera& e)
     return true;
 }
 
-void EditorRenderSystem::enqueueModel(RenderScene& scene, EntityWrapper entity, const glm::mat4& modelMatrix, const std::string& modelResource, bool wireframe)
+void EditorRenderSystem::enqueueModel(RenderScene& scene, EntityWrapper entity, const glm::mat4& modelMatrix, const std::string& modelResource, ComponentWrapper cModel, bool wireframe)
 {
     Model* model;
     try {
@@ -72,27 +74,19 @@ void EditorRenderSystem::enqueueModel(RenderScene& scene, EntityWrapper entity, 
     }
 
     for (auto matGroup : model->MaterialGroups()) {
-        std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>();
-        modelJob->Model = model;
-        modelJob->TextureID = (matGroup.Texture) ? matGroup.Texture->ResourceID : 0;
-        modelJob->DiffuseTexture = matGroup.Texture.get();
-        modelJob->NormalTexture = nullptr;
-        modelJob->SpecularTexture = nullptr;
-        modelJob->IncandescenceTexture = nullptr;
-        modelJob->DiffuseColor = matGroup.DiffuseColor;
-        modelJob->SpecularColor = matGroup.SpecularColor;
-        modelJob->IncandescenceColor = matGroup.IncandescenceColor;
-        modelJob->StartIndex = matGroup.StartIndex;
-        modelJob->EndIndex = matGroup.EndIndex;
-        modelJob->Matrix = modelMatrix;
-        modelJob->Entity = entity.ID;
-        glm::vec3 abspos = Transform::AbsolutePosition(entity);
-        glm::vec3 worldpos = glm::vec3(m_Camera->ViewMatrix() * glm::vec4(abspos, 1));
-        modelJob->Depth = worldpos.z;
-        modelJob->World = m_World;
+        std::shared_ptr<ModelJob> modelJob = std::shared_ptr<ModelJob>(new ModelJob(
+                    model, 
+                    m_Camera, 
+                    modelMatrix, 
+                    matGroup, 
+                    cModel, 
+                    m_World, 
+                    glm::vec4(1.f, 1.f, 1.f, 1.f), 
+                    0.f,
+					false
+                ));
         modelJob->Wireframe = wireframe;
-
-        scene.OpaqueObjects.push_back(modelJob);
+        scene.Jobs.OpaqueObjects.push_back(modelJob);
     }
 }
 

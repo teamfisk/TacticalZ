@@ -7,7 +7,7 @@
 class EditorRenderSystem : public ImpureSystem
 {
 public:
-    EditorRenderSystem(World* world, EventBroker* eventBroker, IRenderer* renderer, RenderFrame* renderFrame);
+    EditorRenderSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame);
 
     virtual void Update(double dt) override;
 
@@ -20,5 +20,5 @@ private:
     EventRelay<EditorRenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(Events::SetCamera& e);
 
-    void enqueueModel(RenderScene& scene, EntityWrapper entity, const glm::mat4& modelMatrix, const std::string& modelResource, bool wireframe);
+    void enqueueModel(RenderScene& scene, EntityWrapper entity, const glm::mat4& modelMatrix, const std::string& modelResource, ComponentWrapper cModel, bool wireframe);
 };

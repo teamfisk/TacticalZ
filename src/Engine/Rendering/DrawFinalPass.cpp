@@ -429,6 +429,12 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 			if (modelJob) {
 				//bind forward program
 				//TODO: JOHAN/TOBIAS: Bind shader based on ModelJob->ShaderID;
+                RenderState jobState;
+                if (modelJob->Wireframe) {
+                    jobState.Disable(GL_CULL_FACE);
+                    jobState.PolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+
 				switch (modelJob->Type) {
 				case RawModel::MaterialType::Basic:
 				case RawModel::MaterialType::SingleTextures:
@@ -917,8 +923,6 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
         } else {
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
             if (modelJob) {
-                RenderState jobState;
-
                 //bind forward program
                 m_ForwardPlusProgram->Bind();
                 glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
@@ -981,10 +985,6 @@ void DrawFinalPass::DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
         }
 
-
-                    jobState.Disable(GL_CULL_FACE);
-                    jobState.PolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                }
 
         //draw
         glBindVertexArray(modelJob->Model->VAO);
