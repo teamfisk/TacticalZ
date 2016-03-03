@@ -13,8 +13,9 @@
     </c:AssaultWeapon>
     <c:Collidable/>
     <c:DefenderWeapon>
-      <TimeSinceLastFire>1.6944730461160304</TimeSinceLastFire>
+      <TimeSinceLastFire>22.22055262342397</TimeSinceLastFire>
     </c:DefenderWeapon>
+    <c:DoubleJump/>
     <c:Health/>
     <c:Physics>
       <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
@@ -36,7 +37,10 @@
   <Children>
     <Entity name="Camera">
       <Components>
-        <c:Camera/>
+        <c:Camera>
+          <NearClip>0.10000000149011612</NearClip>
+          <FarClip>300</FarClip>
+        </c:Camera>
         <c:Transform>
           <Position X="0" Y="1.27700007" Z="0"/>
         </c:Transform>
@@ -371,7 +375,7 @@
           <Components>
             <c:Animation>
               <AnimationName1>Idle</AnimationName1>
-              <Time1>0.67172915251515519</Time1>
+              <Time1>1.1978087298230946</Time1>
               <Speed1>1</Speed1>
               <AnimationName2></AnimationName2>
               <AnimationName3></AnimationName3>
@@ -385,25 +389,25 @@
           <Children>
             <Entity name="PrimaryAttachment">
               <Components>
+                <c:WeaponAttachment>
+                  <Weapon>DefenderWeapon</Weapon>
+                </c:WeaponAttachment>
                 <c:Spawner>
                   <EntityFile>Schema/Entities/DefenderWeaponViewRed.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform/>
-                <c:WeaponAttachment>
-                  <Weapon>DefenderWeapon</Weapon>
-                </c:WeaponAttachment>
               </Components>
               <Children/>
             </Entity>
             <Entity name="SecondaryAttachment">
               <Components>
+                <c:WeaponAttachment>
+                  <Weapon>AssaultWeapon</Weapon>
+                </c:WeaponAttachment>
                 <c:Spawner>
                   <EntityFile>Schema/Entities/AssaultWeaponView.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform/>
-                <c:WeaponAttachment>
-                  <Weapon>AssaultWeapon</Weapon>
-                </c:WeaponAttachment>
               </Components>
               <Children/>
             </Entity>
@@ -413,7 +417,10 @@
     </Entity>
     <Entity name="ThirdPersonCamera">
       <Components>
-        <c:Camera/>
+        <c:Camera>
+          <NearClip>0.10000000149011612</NearClip>
+          <FarClip>300</FarClip>
+        </c:Camera>
         <c:Model>
           <Resource>Models/Widgets/Camera.mesh</Resource>
           <Visible>false</Visible>
@@ -429,6 +436,7 @@
       <Components>
         <c:Animation>
           <AnimationName1>Idle</AnimationName1>
+          <Time1>0.69274608502888668</Time1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -448,31 +456,31 @@
       <Children>
         <Entity name="PrimaryAttachment">
           <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/DefenderWeaponWorldRed.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
             <c:WeaponAttachment>
               <Weapon>DefenderWeapon</Weapon>
               <Person>
                 <ThirdPerson/>
               </Person>
             </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/DefenderWeaponWorldRed.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
           </Components>
           <Children/>
         </Entity>
         <Entity name="SecondaryAttachment">
           <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
             <c:WeaponAttachment>
               <Weapon>AssaultWeapon</Weapon>
               <Person>
                 <ThirdPerson/>
               </Person>
             </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
           </Components>
           <Children/>
         </Entity>

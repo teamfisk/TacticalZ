@@ -31,12 +31,12 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
     if (e.PlayerID == -1) { // Local player
         m_World->AttachComponent(e.Player.ID, "Listener");
         Events::PlayAnonuncerVoice go;
-        go.FilePath = "Audio/announcer/" + m_Announcer + "/go.wav";
+        go.FilePath = "Audio/Announcer/" + m_Announcer + "/Go.wav";
         m_EventBroker->Publish(go);
         // TEMP: starts bgm
         {
             Events::PlayBackgroundMusic ev;
-            ev.FilePath = "Audio/bgm/layer1.wav";
+            ev.FilePath = "Audio/BGM/Layer1.wav";
             m_EventBroker->Publish(ev);
         }
     }
@@ -78,7 +78,7 @@ void SoundSystem::playerJumps()
     if (grounded) {
         Events::PlaySoundOnEntity e;
         e.EmitterID = LocalPlayer.ID;
-        e.FilePath = "Audio/jump/jump1.wav";
+        e.FilePath = "Audio/Jump/Jump1.wav";
         m_EventBroker->Publish(e);
     }
 }
@@ -88,13 +88,13 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     if (!LocalPlayer.Valid()) {
         return false;
     }
-    int homeTeam = (int)m_World->GetComponent(e.CapturePointID, "Team")["Team"];
+    int homeTeam = (int)m_World->GetComponent(e.CapturePointTakenID, "Team")["Team"];
     int team = (int)m_World->GetComponent(LocalPlayer.ID, "Team")["Team"];
     Events::PlayAnonuncerVoice ev;
     if (team == homeTeam) {
-        ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_achieved.wav";
+        ev.FilePath = "Audio/Announcer/" + m_Announcer + "/ObjectiveAchieved.wav";
     } else {
-        ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_failed.wav"; // have not been tested
+        ev.FilePath = "Audio/Announcer/" + m_Announcer + "/ObjectiveFailed.wav"; 
     }
     m_EventBroker->Publish(ev);
     return false;
@@ -112,7 +112,7 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     std::uniform_int_distribution<int> dist(1, 12);
     int rand = dist(generator);
     std::vector<std::string> paths;
-    paths.push_back("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
+    paths.push_back("Audio/Hurt/Hurt" + std::to_string(rand) + ".wav");
 
     Events::PlayQueueOnEntity ev;
     ev.Emitter = LocalPlayer;
@@ -133,7 +133,7 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
     // Play the sound from the listener.
     // TODO: We might want to hear other players die.
     Events::PlayBackgroundMusic ev;
-    ev.FilePath = "Audio/die/die2.wav";
+    ev.FilePath = "Audio/Die/Die2.wav";
     m_EventBroker->Publish(ev);
     return false;
 }
@@ -142,7 +142,7 @@ bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
     Events::PlaySoundOnEntity ev;
     ev.EmitterID = LocalPlayer.ID;
-    ev.FilePath = "Audio/pickup/pickup2.wav";
+    ev.FilePath = "Audio/Pickup/Pickup2.wav";
     m_EventBroker->Publish(ev);
     return false;
 }
@@ -157,7 +157,7 @@ bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
     }
     Events::PlaySoundOnEntity ev;
     ev.EmitterID = e.entityID;
-    ev.FilePath = "Audio/jump/jump2.wav";
+    ev.FilePath = "Audio/Jump/Jump2.wav";
     m_EventBroker->Publish(ev);
     return false;
 }

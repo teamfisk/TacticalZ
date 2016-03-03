@@ -363,7 +363,7 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
         if (m_TempPleaseDeleteMeASAP) {
             return true;
         }
-        m_CurrentBGMCombo = createSource("Audio/bgm/layer2.wav");
+        m_CurrentBGMCombo = createSource("Audio/BGM/Layer2.wav");
         m_CurrentBGMCombo->Type = SoundType::BGM;
         alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
         setGain(m_CurrentBGMCombo, 0);

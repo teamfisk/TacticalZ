@@ -35,7 +35,12 @@
 	<xs:include schemaLocation="Components/AmmoPickup.xsd"/>
 	<xs:include schemaLocation="Components/AnimationOffset.xsd"/>
 	<xs:include schemaLocation="Components/DashAbility.xsd"/>
+	<xs:include schemaLocation="Components/ShieldAbility.xsd"/>
+	<xs:include schemaLocation="Components/SprintAbility.xsd"/>
 	<xs:include schemaLocation="Components/AssaultWeapon.xsd"/>
+	<xs:include schemaLocation="Components/BoostAssault.xsd"/>
+	<xs:include schemaLocation="Components/BoostDefender.xsd"/>
+	<xs:include schemaLocation="Components/BoostSniper.xsd"/>
 	<xs:include schemaLocation="Components/Shield.xsd"/>
 	<xs:include schemaLocation="Components/Sprite.xsd"/>
 	<xs:include schemaLocation="Components/Shielded.xsd"/>
@@ -46,6 +51,12 @@
 	<xs:include schemaLocation="Components/Page.xsd"/>
 	<xs:include schemaLocation="Components/SpriteIndicator.xsd"/>
 	<xs:include schemaLocation="Components/Button.xsd"/>
+	<xs:include schemaLocation="Components/AbilityCooldownHUD.xsd"/>
+	<xs:include schemaLocation="Components/DoubleJump.xsd"/>
 	<xs:include schemaLocation="Components/WeaponAttachment.xsd"/>
 	<xs:include schemaLocation="Components/DefenderWeapon.xsd"/>
+	<xs:include schemaLocation="Components/CapturePointGameMode.xsd"/>
+	<xs:include schemaLocation="Components/CapturePointArrowHUD.xsd"/>
+	<xs:include schemaLocation="Components/FloatingEffect.xsd"/>
+	<xs:include schemaLocation="Components/BoostIconsHUD.xsd"/>
 </xs:schema>

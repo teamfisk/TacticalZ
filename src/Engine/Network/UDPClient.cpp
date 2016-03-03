@@ -45,7 +45,10 @@ int UDPClient::readBuffer()
          boost::asio::ip::udp::socket::message_peek, error);
     int sizeOfPacket = 0;
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
-
+    if (sizeOfPacket > m_Socket->available()) {
+        LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
+        return 0;
+    }
     // if the buffer is to small increase the size of it
     if (sizeOfPacket > m_BufferSize) {
         delete[] m_ReadBuffer;

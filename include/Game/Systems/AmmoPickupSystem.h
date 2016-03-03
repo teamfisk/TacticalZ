@@ -4,7 +4,7 @@
 #include "Core/System.h"
 #include "Core/Transform.h"
 #include "Core/ResourceManager.h"
-#include "Core/EntityFileParser.h"
+#include "Core/EntityFile.h"
 #include "Core/EPickupSpawned.h"
 #include "Core/EAmmoPickup.h"
 #include "Engine/Collision/ETrigger.h"
@@ -20,6 +20,11 @@ public:
 private:
     EventRelay<AmmoPickupSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool OnTriggerTouch(Events::TriggerTouch& e);
+    EventRelay<AmmoPickupSystem, Events::TriggerLeave> m_ETriggerLeave;
+    bool OnTriggerLeave(Events::TriggerLeave& e);
+
+    EventRelay<AmmoPickupSystem, Events::AmmoPickup> m_EAmmoPickup;
+    bool OnAmmoPickup(Events::AmmoPickup& e);
 
     struct NewAmmoPickup {
         glm::vec3 Pos;
@@ -29,5 +34,11 @@ private:
         EntityID parentID;
     };
     std::vector<NewAmmoPickup> m_ETriggerTouchVector;
+    struct EntityAtMaxValuePickupStruct {
+        EntityWrapper player;
+        EntityWrapper trigger;
+    };
+    std::vector<EntityAtMaxValuePickupStruct> m_PickupAtMaximum;
+    void DoPickup(EntityWrapper &player, EntityWrapper &trigger);
 };
 #endif

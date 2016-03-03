@@ -26,7 +26,9 @@
 #include "Network/EInterpolate.h"
 #include "Network/SnapshotFilter.h"
 #include "Core/EPlayerSpawned.h"
+#include "Core/EAmmoPickup.h"
 #include "Network/ESearchForServers.h"
+#include "../Game/Events/EDashAbility.h"
 
 struct ServerInfo
 {
@@ -106,7 +108,9 @@ private:
     void parsePlayerDamage(Packet& packet);
     void parseComponentDeletion(Packet& packet);
     void parseDoubleJump(Packet& packet);
-    void InterpolateFields(Packet & packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
+    void parseDashEffect(Packet& packet);
+    void parseAmmoPickup(Packet& packet);
+    void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
     void hasServerTimedOut();
@@ -133,6 +137,9 @@ private:
     EventRelay< Client, Events::SearchForServers> m_ESearchForServers;
     EventRelay<Client, Events::DoubleJump> m_EDoubleJump;
     bool OnDoubleJump(Events::DoubleJump & e);
+    EventRelay<Client, Events::DashAbility> m_EDashAbility;
+    bool OnDashAbility(const Events::DashAbility& e);
+
     bool OnSearchForServers(const Events::SearchForServers& e);
     UDPClient m_ServerlistRequest;
     std::vector<ServerInfo> m_Serverlist;

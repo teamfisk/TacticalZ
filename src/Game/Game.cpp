@@ -10,7 +10,9 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Systems/PlayerDeathSystem.h"
-#include "Core/EntityFileWriter.h"
+#include "Systems/FloatingEffectSystem.h"
+#include "Core/EntityFile.h"
+#include "Core/EntityXMLFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
@@ -25,7 +27,11 @@
 #include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
 #include "Game/Systems/AmmunitionHUDSystem.h"
+#include "Game/Systems/AbilityCooldownHUDSystem.h"
+#include "Game/Systems/CapturePointArrowHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
+#include "Game/Systems/BoostSystem.h"
+#include "Game/Systems/BoostIconsHUDSystem.h"
 #include "GUI/ButtonSystem.h"
 #include "GUI/MainMenuSystem.h"
 
@@ -42,19 +48,19 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<PNG>("Png");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<Font>("FontFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
-    PlayerSpawnSystem::SetRespawnTime(m_Config->Get<float>("Debug.RespawnTime", 15.0f));
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_Config);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -79,10 +85,7 @@ Game::Game(int argc, char* argv[])
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
-        EntityFilePreprocessor fpp(file);
-        fpp.RegisterComponents(m_World);
-        EntityFileParser fp(file);
-        fp.MergeEntities(m_World);
+        file->MergeInto(m_World);
     }
 
     // Create the sound manager
@@ -119,6 +122,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<FloatingEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
@@ -132,14 +136,25 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<BoostSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<BoostIconsHUDSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
-    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<UniformScaleSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthHUDSystem>(updateOrderLevel);
@@ -149,6 +164,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<BoneAttachmentSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CollisionSystem>(updateOrderLevel, m_OctreeCollision);
     m_SystemPipeline->AddSystem<TriggerSystem>(updateOrderLevel, m_OctreeTrigger);
+    // Octree for frustum culling must be updated after collisions, otherwise players frustum may be moved after tree is filled, and wrong things are culled.
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame, m_OctreeFrustrumCulling);
     ++updateOrderLevel;

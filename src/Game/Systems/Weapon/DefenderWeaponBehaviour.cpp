@@ -88,7 +88,7 @@ void DefenderWeaponBehaviour::fireShell(WeaponInfo& wi)
         EntityWrapper spawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
         Events::PlaySoundOnEntity e;
         e.EmitterID = weaponModelEntity.ID;
-        e.FilePath = "Audio/laser/laser1.wav";
+        e.FilePath = "Audio/weapon/Shotgun/ShotgunFire.wav";
         m_EventBroker->Publish(e);
         for (auto& angles : pelletAngles) {
             glm::vec3 direction = Transform::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
