@@ -49,7 +49,9 @@ void Packet::WriteString(const std::string& str)
     // Message, add one extra byte for null terminator
     size_t sizeOfString = str.size() + 1;
     if (m_Offset + sizeOfString > m_MaxPacketSize) {
-        //LOG_WARNING("Package::WriteString(): Data size in packet exceeded maximum package size. New size is %i bytes\n", m_MaxPacketSize*2);
+        if (m_MaxPacketSize >= 32000) {
+            LOG_WARNING("Package::WriteString(): New size is huge %i bytes\n", m_MaxPacketSize*2);
+        }
         resizeData();
     }
     memcpy(m_Data + m_Offset, str.data(), sizeOfString * sizeof(char));
@@ -60,7 +62,9 @@ void Packet::WriteData(char * data, int sizeOfData)
 {
 
     if (m_Offset + sizeOfData > m_MaxPacketSize) {
-        //LOG_WARNING("Packet::WriteData(): Data size in packet exceeded maximum packet size. New size is %i bytes\n", m_MaxPacketSize*2);
+        if (m_MaxPacketSize >= 32000) {
+            LOG_WARNING("Package::WriteData(): New size is huge %i bytes\n", m_MaxPacketSize*2);
+        }
         while (m_Offset + sizeOfData > m_MaxPacketSize) {
             resizeData();
         }

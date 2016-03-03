@@ -24,7 +24,9 @@ public:
     {
         // Check if we are trying to add more than the package can fit.
         if (m_MaxPacketSize < m_Offset + sizeof(T)) {
-            //LOG_WARNING("Packet AddPrimitive(): You are trying to add more than we have allocated for! New size is %i bytes\n", m_MaxPacketSize*2);
+            if (m_MaxPacketSize >= 32000) {
+                LOG_WARNING("Package::WritePrimitive(): New size is huge %i bytes\n", m_MaxPacketSize*2);
+            }
             resizeData();
         }
         memcpy(m_Data + m_Offset, &val, sizeof(T));
