@@ -1,7 +1,6 @@
 #version 430
 
 #define MIN_AMBIENT_LIGHT 0.3
-#define MAX_SPLITS 4
 
 uniform mat4 M;
 uniform mat4 V;
@@ -84,7 +83,6 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
-	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;
