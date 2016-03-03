@@ -1,7 +1,10 @@
+#ifndef DefenderWeaponBehaviour_h__
+#define DefenderWeaponBehaviour_h__
+
 #include "WeaponBehaviour.h"
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
-#include "Rendering/ESetCamera.h"
+#include "Sound/EPlaySoundOnEntity.h"
 
 class DefenderWeaponBehaviour : public WeaponBehaviour<DefenderWeaponBehaviour>
 {
@@ -10,29 +13,27 @@ public:
         : System(systemParams)
         , WeaponBehaviour(systemParams, "DefenderWeapon", renderer, collisionOctree)
         , m_RandomEngine(m_RandomDevice())
-    {
-        EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &DefenderWeaponBehaviour::OnSetCamera);
-    }
+    { }
 
     void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt) override;
-    void UpdateWeapon(WeaponInfo& wi, double dt) override;
-    void OnPrimaryFire(WeaponInfo& wi) override;
-    void OnCeasePrimaryFire(WeaponInfo& wi) override;
-    bool OnInputCommand(WeaponInfo& wi, const Events::InputCommand& e) override;
+    void UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt) override;
+    void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
 
 private:
     std::random_device m_RandomDevice;
     std::mt19937 m_RandomEngine;
-    EntityWrapper m_CurrentCamera;
-
-    EventRelay<DefenderWeaponBehaviour, Events::SetCamera> m_ESetCamera;
-    bool OnSetCamera(const Events::SetCamera& e);
 
     // Weapon functions
-    void fireShell(WeaponInfo& wi);
-    void dealDamage(WeaponInfo& wi, glm::vec3 direction, double damage);
+    void fireShell(ComponentWrapper cWeapon, WeaponInfo& wi);
+    void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage);
+    bool canFire(ComponentWrapper cWeapon, WeaponInfo& wi);
 
     // Utility
-    float traceRayDistance(glm::vec3 origin, glm::vec3 direction);
     Camera cameraFromEntity(EntityWrapper camera);
 };
+
+#endif

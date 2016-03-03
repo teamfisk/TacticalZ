@@ -34,6 +34,18 @@ EntityWrapper EntityWrapper::Parent()
     }
 }
 
+EntityWrapper EntityWrapper::FirstParentByName(const std::string& parentEntityName)
+{
+    EntityWrapper entity = *this;
+    while (entity.Parent().Valid()) {
+        entity = entity.Parent();
+        if (entity.Name() == parentEntityName) {
+            return entity;
+        }
+    }
+    return EntityWrapper::Invalid;
+}
+
 EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
 {
     return firstChildByNameRecursive(name, this->ID);

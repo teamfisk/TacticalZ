@@ -7,6 +7,8 @@
 #include "Collision/EntityAABB.h"
 #include "Input/EInputCommand.h"
 #include "Systems/SpawnerSystem.h"
+#include "Rendering/ESetCamera.h"
+#include "Core/ConfigFile.h"
 
 template <typename ETYPE>
 class WeaponBehaviour : public PureSystem
@@ -20,42 +22,85 @@ public:
         , m_Renderer(renderer)
         , m_CollisionOctree(collisionOctree)
     {
-        EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponBehaviour::_OnInputCommand)
+        EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponBehaviour::_OnInputCommand);
+        EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &WeaponBehaviour::_OnSetCamera);
+        auto config = ResourceManager::Load<ConfigFile>("Config.ini");
+        m_ConfigAutoReload = config->Get<bool>("Gameplay.AutoReload", true);
     }
     virtual ~WeaponBehaviour() = default;
 
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt) override
     {
         auto weapon = getActiveWeapon(entity);
         if (!weapon) {
             return;
         } else {
-            UpdateWeapon(*weapon, dt);
+            UpdateWeapon(cWeapon, *weapon, dt);
         }
     }
 
 protected:
     struct WeaponInfo
     {
-        std::string WeaponComponent;
         EntityWrapper Player;
         EntityWrapper WeaponEntity;
         EntityWrapper FirstPersonEntity;
         EntityWrapper ThirdPersonEntity;
-        ComponentWrapper GetComponent() { return WeaponEntity[WeaponComponent]; }
     };
 
     IRenderer* m_Renderer;
+    EntityWrapper m_CurrentCamera;
     Octree<EntityAABB>* m_CollisionOctree;
     std::unordered_map<EntityWrapper, WeaponInfo> m_ActiveWeapons;
+    bool m_ConfigAutoReload;
 
-    virtual void UpdateWeapon(WeaponInfo& wi, double dt) { }
-    virtual void OnPrimaryFire(WeaponInfo& wi) { }
-    virtual void OnCeasePrimaryFire(WeaponInfo& wi) { }
-    virtual void OnReload(WeaponInfo& wi) { }
-    virtual bool OnInputCommand(WeaponInfo& wi, const Events::InputCommand& e) { return false; }
+    virtual void UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt) { }
+    virtual void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) { }
+    virtual void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) { }
+    virtual void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) { }
+    virtual void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) { }
+    virtual void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) { }
+    virtual bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) { return false; }
+
+    bool isPlayerInFirstPerson(EntityWrapper player)
+    {
+        if (!m_CurrentCamera.Valid()) {
+            return false;
+        } else {
+            return m_CurrentCamera == player || m_CurrentCamera.IsChildOf(player);
+        }
+    }
+
+    // Returns wi.FirstPersonEntity or wi.ThirdPersonEntity depending on
+    // if the player is in first person mode or not.
+    EntityWrapper getRelevantWeaponModelEntity(WeaponInfo& wi)
+    {
+        if (isPlayerInFirstPerson(wi.Player)) {
+            return wi.FirstPersonEntity;
+        } else {
+            return wi.ThirdPersonEntity;
+        }
+    }
+
+    float traceRayDistance(glm::vec3 origin, glm::vec3 direction)
+    {
+        float distance;
+        glm::vec3 pos;
+        auto entity = Collision::EntityFirstHitByRay(Ray(origin, direction), m_CollisionOctree, distance, pos);
+        if (entity) {
+            return distance;
+        } else {
+            return 100.f;
+        }
+    }
 
 private:
+    EventRelay<ETYPE, Events::SetCamera> m_ESetCamera;
+    bool _OnSetCamera(const Events::SetCamera& e)
+    {
+        m_CurrentCamera = e.CameraEntity;
+        return true;
+    }
     EventRelay<ETYPE, Events::InputCommand> m_EInputCommand;
     bool _OnInputCommand(const Events::InputCommand& e)
     {
@@ -70,15 +115,19 @@ private:
         }
 
         // Make sure the player has this weapon
-        auto weapon = getWeaponComponent(player);
-        if (!weapon) {
+        auto cWeapon = getWeaponComponent(player);
+        if (!cWeapon) {
             return false;
         }
 
         // Weapon selection
         if (e.Command == "SelectWeapon") {
-            if (static_cast<ComponentInfo::EnumType>(e.Value) == static_cast<ComponentInfo::EnumType>((*weapon)["Slot"])) {
-                selectWeapon(player);
+            if (e.Value > 0) {
+                if (static_cast<ComponentInfo::EnumType>(e.Value) == static_cast<ComponentInfo::EnumType>((*cWeapon)["Slot"])) {
+                    selectWeapon(*cWeapon, player);
+                } else {
+                    holsterWeapon(*cWeapon, player);
+                }
             }
         }
 
@@ -91,18 +140,18 @@ private:
         // Fire
         if (e.Command == "PrimaryFire") {
             if (e.Value > 0) {
-                OnPrimaryFire(*activeWeapon);
+                OnPrimaryFire(*cWeapon, *activeWeapon);
             } else {
-                OnCeasePrimaryFire(*activeWeapon);
+                OnCeasePrimaryFire(*cWeapon, *activeWeapon);
             }
         }
 
         // Reload
         if (e.Command == "Reload" && e.Value != 0) {
-            OnReload(*activeWeapon);
+            OnReload(*cWeapon, *activeWeapon);
         }
 
-        return OnInputCommand(*activeWeapon, e);
+        return OnInputCommand(*cWeapon, *activeWeapon, e);
     }
 
     boost::optional<ComponentWrapper> getWeaponComponent(EntityWrapper player)
@@ -129,8 +178,13 @@ private:
         return activeWeapon;
     }
 
-    void selectWeapon(EntityWrapper player)
+    void selectWeapon(ComponentWrapper cWeapon, EntityWrapper player)
     {
+        // Don't reselect weapon if it's already active
+        if (getActiveWeapon(player)) {
+            return;
+        }
+
         // Find the weapon attachments matching the weapon type
         std::vector<EntityWrapper> weaponAttachments = player.ChildrenWithComponent("WeaponAttachment");
         EntityWrapper firstPersonAttachment;
@@ -152,14 +206,6 @@ private:
             return;
         }
 
-        // Purge other weapon entities
-        for (auto& attachment : weaponAttachments) {
-            //if (attachment == firstPersonAttachment || attachment == thirdPersonAttachment) {
-            //    continue;
-            //}
-            attachment.DeleteChildren();
-        }
-
         // Spawn the weapon(s)
         EntityWrapper firstPersonWeapon;
         EntityWrapper thirdPersonWeapon;
@@ -170,11 +216,36 @@ private:
             thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
         }
 
-        m_ActiveWeapons[player].WeaponComponent = m_ComponentType;
-        m_ActiveWeapons[player].Player = player;
-        m_ActiveWeapons[player].WeaponEntity = player;
-        m_ActiveWeapons[player].FirstPersonEntity = firstPersonWeapon;
-        m_ActiveWeapons[player].ThirdPersonEntity = thirdPersonWeapon;
+        WeaponInfo& wi = m_ActiveWeapons[player];
+        wi.Player = player;
+        wi.WeaponEntity = player;
+        wi.FirstPersonEntity = firstPersonWeapon;
+        wi.ThirdPersonEntity = thirdPersonWeapon;
+        
+        OnEquip(cWeapon, wi);
+    }
+
+    void holsterWeapon(ComponentWrapper cWeapon, EntityWrapper player)
+    {
+        auto activeWeapon = getActiveWeapon(player);
+        if (!activeWeapon) {
+            return;
+        }
+        WeaponInfo& wi = *activeWeapon;
+
+        // Send holster event
+        OnHolster(cWeapon, wi);
+
+        // Delete weapon entities
+        if (wi.FirstPersonEntity.Valid()) {
+            m_World->DeleteEntity(wi.FirstPersonEntity.ID);
+        }
+        if (wi.ThirdPersonEntity.Valid()) {
+            m_World->DeleteEntity(wi.ThirdPersonEntity.ID);
+        }
+
+        // Make weapon inactive
+        m_ActiveWeapons.erase(player);
     }
 };
 
