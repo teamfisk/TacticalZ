@@ -64,7 +64,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         }
         bool sniperSprinting = false;
         if (player.HasComponent("SprintAbility")) {
-            if (controller->SniperSprintingCheck()) {
+            if (controller->SpecialAbilityKeyDown()) {
                 playerMovementSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
                 playerCrouchSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
                 sniperSprinting = true;

@@ -28,9 +28,9 @@ public:
     virtual void Reset();
 
     void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID);
-    bool SniperSprintingCheck();
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
+    bool SpecialAbilityKeyDown() const { return m_SpecialAbilityKeyDown; }
 
 protected:
     const int m_PlayerID;
@@ -146,10 +146,10 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
             if (m_NumberOfMovementKeysDown == 0) {
                 m_MovementKeyDown = false;
             }
-                //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
-                m_AssaultDashTapDirection = m_CurrentDirectionVector;
-                m_AssaultDashDoubleTapDeltaTime = 0.f;
-            
+            //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
+            m_AssaultDashTapDirection = m_CurrentDirectionVector;
+            m_AssaultDashDoubleTapDeltaTime = 0.f;
+
         }
     }
 
@@ -162,17 +162,10 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
     }
 
     if (e.Command == "SpecialAbility") {
-        if (e.Value > 0) {
-            m_SpecialAbilityKeyDown = true;
-        } else {
-            m_SpecialAbilityKeyDown = false;
-        }
+        m_SpecialAbilityKeyDown = e.Value > 0;
     }
-    if (m_SpecialAbilityKeyDown && m_MovementKeyDown) {
-        m_ShiftDashing = true;
-    } else {
-        m_ShiftDashing = false;
-    }
+
+    m_ShiftDashing = m_SpecialAbilityKeyDown && m_MovementKeyDown;
 
     return true;
 }
@@ -253,12 +246,4 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     m_EventBroker->Publish(e);
 }
 
-template <typename EventContext>
-bool FirstPersonInputController<EventContext>::SniperSprintingCheck() {
-    if (m_SpecialAbilityKeyDown) {
-        return true;
-    } else {
-        return false;
-    }
-}
 #endif

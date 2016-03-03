@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="InputCmdButton">
+		<xs:annotation><xs:documentation>Used with a Button component, the button will send an inputCommand event instead of ButtonPressed/Released event.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Command" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>The command name for the inputCommand.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="PressValue" type="t:float" minOccurs="0">
+					<xs:annotation><xs:documentation>The value in inputCommand.Value that will be sent on button press.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
