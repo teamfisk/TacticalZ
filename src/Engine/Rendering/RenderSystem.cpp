@@ -240,6 +240,8 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
+		bool isShielded = m_World->HasComponent(cModel.EntityID, "Shielded") || m_World->HasComponent(cModel.EntityID, "Player");
+
         glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
         //Loop through all materialgroups of a model
         for (auto matGroup : model->MaterialGroups()) {
@@ -255,20 +257,19 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     cModel, 
                     m_World, 
                     fillColor, 
-                    fillPercentage
+                    fillPercentage,
+					isShielded
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
                     explosionEffectJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(explosionEffectJob);
-                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
-                    || m_World->HasComponent(cModel.EntityID, "Player")) {
-
+                } else if (isShielded) {
                     if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
                         cModel["Transparent"] = true;
                     }
 
                     if (cModel["Transparent"]) {
-                        Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
+                        Jobs.TransparentObjects.push_back(explosionEffectJob);
                     } else {
 					    explosionEffectJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
@@ -294,20 +295,20 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     cModel, 
                     m_World, 
                     fillColor, 
-                    fillPercentage
+                    fillPercentage,
+					isShielded
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
                     modelJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(modelJob);
-                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
-                    || m_World->HasComponent(cModel.EntityID, "Player")) {
+                } else if (isShielded) {
 
                     if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
                         cModel["Transparent"] = true;
                     }
 
                     if (cModel["Transparent"]) {
-                        Jobs.TransparentShieldedObjects.push_back(modelJob);
+                        Jobs.TransparentObjects.push_back(modelJob);
                     } else {
 					    modelJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(modelJob);

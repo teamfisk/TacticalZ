@@ -41,8 +41,9 @@ void FrameBuffer::Generate()
     GLERROR("PRE");
 
     std::vector<GLenum> attachments;
-
-    glGenFramebuffers(1, &m_BufferHandle);
+	if (m_BufferHandle == 0) {
+		glGenFramebuffers(1, &m_BufferHandle);
+	}
     glBindFramebuffer(GL_FRAMEBUFFER, m_BufferHandle);
     GLERROR("1");
 
@@ -66,11 +67,12 @@ void FrameBuffer::Generate()
 		GLERROR("2");
 
 		if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT && (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
-			GLERROR("Attachment");
-
+			attachments.push_back((*it)->m_Attachment);
 		}
-		GLERROR("3");
+		GLERROR("Attachment");
 
+	}
+	GLERROR("3");
 
 		GLenum* bufferTextures = &attachments[0];
 		glDrawBuffers(attachments.size(), bufferTextures);

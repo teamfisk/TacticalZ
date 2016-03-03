@@ -5,41 +5,27 @@
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
-uniform vec2 ScreenDimensions;
-uniform float FillPercentage;
-uniform vec4 DiffuseColor;
-uniform vec4 FillColor;
 uniform vec4 Color;
+uniform vec4 DiffuseColor;
+uniform vec2 ScreenDimensions;
+uniform vec4 FillColor;
 uniform vec4 AmbientColor;
+uniform float FillPercentage;
+uniform float GlowIntensity = 10;
+uniform vec3 CameraPosition;
 uniform int SSAOQuality;
 
-//Get bineded at the same time as the textures
-uniform vec2 DiffuseUVRepeat1;
-uniform vec2 DiffuseUVRepeat2;
-uniform vec2 DiffuseUVRepeat3;
-uniform vec2 NormalUVRepeat1;
-uniform vec2 NormalUVRepeat2;
-uniform vec2 NormalUVRepeat3;
-uniform vec2 SpecularUVRepeat1;
-uniform vec2 SpecularUVRepeat2;
-uniform vec2 SpecularUVRepeat3;
-uniform vec2 GlowUVRepeat1;
-uniform vec2 GlowUVRepeat2;
-uniform vec2 GlowUVRepeat3;
+uniform vec2 DiffuseUVRepeat;
+uniform vec2 NormalUVRepeat;
+uniform vec2 SpecularUVRepeat;
+uniform vec2 GlowUVRepeat;
 layout (binding = 0) uniform sampler2D AOTexture;
-layout (binding = 1) uniform sampler2D SplatMapTexture;
-layout (binding = 2) uniform sampler2D DiffuseTexture1;
-layout (binding = 3) uniform sampler2D DiffuseTexture2;
-layout (binding = 4) uniform sampler2D DiffuseTexture3;
-layout (binding = 5) uniform sampler2D NormalMapTexture1;
-layout (binding = 6) uniform sampler2D NormalMapTexture2;
-layout (binding = 7) uniform sampler2D NormalMapTexture3;
-layout (binding = 8) uniform sampler2D SpecularMapTexture1;
-layout (binding = 9) uniform sampler2D SpecularMapTexture2;
-layout (binding = 10) uniform sampler2D SpecularMapTexture3;
-layout (binding = 11) uniform sampler2D GlowMapTexture1;
-layout (binding = 12) uniform sampler2D GlowMapTexture2;
-layout (binding = 13) uniform sampler2D GlowMapTexture3;
+layout (binding = 1) uniform sampler2D DiffuseTexture;
+layout (binding = 2) uniform sampler2D NormalMapTexture;
+layout (binding = 3) uniform sampler2D SpecularMapTexture;
+layout (binding = 4) uniform sampler2D GlowMapTexture;
+layout (binding = 5) uniform samplerCube CubeMap;
+layout (binding = 31) uniform sampler2D ShieldBuffer;
 
 #define TILE_SIZE 16
 
@@ -83,7 +69,6 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
-	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;
@@ -95,7 +80,7 @@ struct LightResult {
 };
 
 float CalcAttenuation(float radius, float dist, float falloff) {
-	return 1.0 - smoothstep(radius * 0.3, radius, dist);
+	return 1.0 - smoothstep(radius * falloff, radius, dist);
 }
 
 vec4 CalcSpecular(vec4 lightColor, vec4 viewVec,  vec4 lightVec, vec4 normal) {
@@ -140,63 +125,28 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
-vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
-	 				  vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues){
-	vec4 R_Channel = texture2D(R, Input.TextureCoordinate * R_TileValues);
-	vec4 G_Channel = texture2D(G, Input.TextureCoordinate * G_TileValues);
-	vec4 B_Channel = texture2D(B, Input.TextureCoordinate * B_TileValues);
-
-	float total = blendValue.r + blendValue.g + blendValue.b;
-	float totalDiv = 1.0f / total;
-	blendValue.r = blendValue.r * totalDiv;
-	blendValue.g = blendValue.g * totalDiv;
-	blendValue.b = blendValue.b * totalDiv;
-
-	return blendValue.r * R_Channel
-		 + blendValue.g * G_Channel
-		 + blendValue.b * B_Channel;
-}
-
-vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
-					   vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues){
-	mat3 TBN = mat3(Input.Tangent, Input.BiTangent, Input.Normal);
-	vec3 R_Channel = texture(R, Input.TextureCoordinate * R_TileValues).xyz * 2.0 - vec3(1.0);
-	vec3 G_Channel = texture(G, Input.TextureCoordinate * G_TileValues).xyz * 2.0 - vec3(1.0);
-	vec3 B_Channel = texture(B, Input.TextureCoordinate * B_TileValues).xyz * 2.0 - vec3(1.0);
-
-	float total = blendValue.r + blendValue.g + blendValue.b + blendValue.a;
-	float totalDiv = 1 / total;
-	blendValue.r = blendValue.r * totalDiv;
-	blendValue.g = blendValue.g * totalDiv;
-	blendValue.b = blendValue.b * totalDiv;
-
-	vec3 Normal_result = blendValue.r * R_Channel
-					   + blendValue.g * G_Channel 
-		 			   + blendValue.b * B_Channel;
-
-	return vec4(TBN * normalize(Normal_result), 0.0);
-}
-
 void main()
 {
+	float shieldDepthValue = texelFetch(ShieldBuffer, ivec2(gl_FragCoord.xy), 0).r;
+	
+	if(shieldDepthValue < gl_FragCoord.z){
+		discard;
+	}
+
 	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy) >> int(SSAOQuality), 0).r;
 	ao = (clamp(1.0 - (1.0 - ao), 0.0, 1.0) + MIN_AMBIENT_LIGHT) /  (1.0 + MIN_AMBIENT_LIGHT);
-
-	vec4 splatTexel = texture2D(SplatMapTexture, Input.TextureCoordinate);
-
-	vec4 diffuseTexel = CalcBlendedTexel(splatTexel, DiffuseTexture1, DiffuseTexture2, DiffuseTexture3,
-	 									 DiffuseUVRepeat1, DiffuseUVRepeat2, DiffuseUVRepeat3);
-	vec4 glowTexel = CalcBlendedTexel(splatTexel, GlowMapTexture1, GlowMapTexture2, GlowMapTexture3,
-	 									 GlowUVRepeat1, GlowUVRepeat2, GlowUVRepeat3);
-	vec4 specularTexel = CalcBlendedTexel(splatTexel, SpecularMapTexture1, SpecularMapTexture2, SpecularMapTexture3,
-										 SpecularUVRepeat1, SpecularUVRepeat2, SpecularUVRepeat3);
+	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
+	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
+	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate * SpecularUVRepeat);
 	vec4 position = V * M * vec4(Input.Position, 1.0); 
-	//vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, SplatMapTexture);
-	vec4 normal = V * CalcBlendedNormal(splatTexel, NormalMapTexture1, NormalMapTexture2, NormalMapTexture3,
-		   								NormalUVRepeat1, NormalUVRepeat2, NormalUVRepeat3);
+	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
-	vec4 viewVec = normalize(-position); 
+	vec4 viewVec = normalize(-position);
+	vec3 I = normalize(vec3(M * vec4(Input.Position, 1.0)) - CameraPosition);
+	vec3 R = reflect(-I, Input.Normal);
+	//R = vec3(P * vec4(R, 1.0));
+	vec4 reflectionColor = texture(CubeMap, R);
 
 	vec2 tilePos;
 	tilePos.x = int(gl_FragCoord.x/TILE_SIZE);
@@ -227,6 +177,9 @@ void main()
 
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
+	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
+	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
+	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
 
@@ -236,9 +189,10 @@ void main()
 		color_result += FillColor;
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
-	color_result += glowTexel*3;
+	//sceneColor = vec4(reflectionColor.xyz, 1);
+	color_result.xyz += glowTexel.xyz*GlowIntensity;
 
-	bloomColor = vec4(clamp(color_result.xyz - 1.0, 0, 100), 1.0);
+	bloomColor = vec4(max(color_result.xyz - 1.0, 0.0), clamp(color_result.a, 0, 1));
 
 	//Tiled Debug Code
 	/*
