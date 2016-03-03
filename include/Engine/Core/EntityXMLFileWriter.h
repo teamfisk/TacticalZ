@@ -1,5 +1,5 @@
-#ifndef EntityFileWriter_h__
-#define EntityFileWriter_h__
+#ifndef EntityXMLFileWriter_h__
+#define EntityXMLFileWriter_h__
 
 #include <boost/filesystem.hpp>
 #include <xercesc/dom/DOM.hpp>
@@ -8,13 +8,13 @@
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 
 #include "Util/XercesString.h"
-#include "EntityFile.h"
+#include "EntityXMLFile.h"
 #include "World.h"
 
-class EntityFileWriter
+class EntityXMLFileWriter
 {
 public:
-    EntityFileWriter(boost::filesystem::path file)
+    EntityXMLFileWriter(boost::filesystem::path file)
         : m_FilePath(file)
     {
         using namespace xercesc;

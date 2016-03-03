@@ -21,16 +21,15 @@ void AmmoPickupSystem::Update(double dt)
             somePickup.DecreaseThisRespawnTimer -= dt;
             if (somePickup.DecreaseThisRespawnTimer < 0.0) {
                 auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/AmmoPickup.xml");
-                EntityFileParser parser(entityFile);
-                EntityID ammoPickupID = parser.MergeEntities(m_World);
+                EntityWrapper ammoPickup = entityFile->MergeInto(m_World);
 
                 //let the world know a pickup has spawned
                 Events::PickupSpawned ePickupSpawned;
-                ePickupSpawned.Pickup = EntityWrapper(m_World, ammoPickupID);
+                ePickupSpawned.Pickup = ammoPickup;
                 m_EventBroker->Publish(ePickupSpawned);
 
                 //copy values from the old entity to the new entity
-                auto& newAmmoPickupEntity = EntityWrapper(m_World, ammoPickupID);
+                auto& newAmmoPickupEntity = ammoPickup;
                 newAmmoPickupEntity["Transform"]["Position"] = somePickup.Pos;
                 newAmmoPickupEntity["AmmoPickup"]["AmmoGain"] = somePickup.AmmoGain;
                 newAmmoPickupEntity["AmmoPickup"]["RespawnTimer"] = somePickup.RespawnTimer;

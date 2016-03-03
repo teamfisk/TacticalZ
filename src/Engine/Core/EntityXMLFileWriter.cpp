@@ -1,13 +1,13 @@
-#include "Core/EntityFileWriter.h"
+#include "Core/EntityXMLFileWriter.h"
 
 #define X(str) XS::ToXMLCh(str)
 
-void EntityFileWriter::WriteWorld(World* world)
+void EntityXMLFileWriter::WriteWorld(World* world)
 {
     WriteEntity(world, 0);
 }
 
-void EntityFileWriter::WriteEntity(World* world, EntityID entity)
+void EntityXMLFileWriter::WriteEntity(World* world, EntityID entity)
 {
     using namespace xercesc;
     DOMDocument* doc = m_DOMImplementation->createDocument(nullptr, X("Entity"), nullptr);
@@ -41,7 +41,7 @@ void EntityFileWriter::WriteEntity(World* world, EntityID entity)
     doc->release();
 }
 
-void EntityFileWriter::appendEntityChildren(xercesc::DOMElement* parentElement, const World* world, EntityID entity)
+void EntityXMLFileWriter::appendEntityChildren(xercesc::DOMElement* parentElement, const World* world, EntityID entity)
 {
     using namespace xercesc;
     DOMDocument* doc = parentElement->getOwnerDocument();
@@ -67,7 +67,7 @@ void EntityFileWriter::appendEntityChildren(xercesc::DOMElement* parentElement, 
     }
 }
 
-void EntityFileWriter::appentEntityComponents(xercesc::DOMElement* parentElement, const World* world, EntityID entity)
+void EntityXMLFileWriter::appentEntityComponents(xercesc::DOMElement* parentElement, const World* world, EntityID entity)
 {
     using namespace xercesc;
     DOMDocument* doc = parentElement->getOwnerDocument();
