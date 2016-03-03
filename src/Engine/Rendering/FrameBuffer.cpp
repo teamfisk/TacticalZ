@@ -74,7 +74,7 @@ void FrameBuffer::Generate()
 	}
 	GLERROR("3");
 
-    GLenum* bufferTextures = &attachments[0];
+    GLenum* bufferTextures = attachments.data();
     glDrawBuffers(attachments.size(), bufferTextures);
     if (GLERROR("GLBufferAttachement error")) {
         printf(": AttachmentSize %i", attachments.size());

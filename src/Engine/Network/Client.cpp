@@ -33,6 +33,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &Client::OnDashAbility);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
@@ -142,6 +143,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
+        break;
+    case MessageType::OnDashEffect:
+        parseDashEffect(packet);
         break;
     case MessageType::AmmoPickup:
         parseAmmoPickup(packet);
@@ -262,7 +266,7 @@ void Client::parseEntityDeletion(Packet & packet)
     if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
         EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
         if (m_World->ValidEntity(localEntity)) {
-            if (m_World->HasComponent(localEntity,"Player")) {
+            if (m_World->HasComponent(localEntity, "Player")) {
                 Events::PlayerDeath e;
                 e.Player = EntityWrapper(m_World, localEntity);
                 m_EventBroker->Publish(e);
@@ -297,8 +301,22 @@ void Client::parseDoubleJump(Packet & packet)
     }
 }
 
+
+void Client::parseDashEffect(Packet& packet)
+{
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
+    }
+    Events::DashAbility e;
+    e.Player = m_ServerIDToClientID.at(serverID);
+    if (e.Player != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
+    }
+}
+
 void Client::parseAmmoPickup(Packet & packet)
-{ 
+{
     Events::AmmoPickup e;
     e.AmmoGain = packet.ReadPrimitive<int>();
     e.Player = m_LocalPlayer;
@@ -388,7 +406,7 @@ void Client::parseSnapshot(Packet& packet)
                     if (m_SnapshotFilter != nullptr) {
                         shouldApply = m_SnapshotFilter->FilterComponent(localEntity, newComponent);
                     }
-                    if (shouldApply) {                        
+                    if (shouldApply) {
                         ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
                         memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
                     }
@@ -515,6 +533,18 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
     if (e.PlayerID == -1) {
         m_LocalPlayer = e.Player;
     }
+    return true;
+}
+
+
+bool Client::OnDashAbility(const Events::DashAbility& e)
+{
+    if (!clientServerMapsHasEntity(e.Player) || e.Player != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDashEffect);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player));
+    m_Reliable.Send(packet);
     return true;
 }
 

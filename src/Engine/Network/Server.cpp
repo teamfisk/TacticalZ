@@ -141,6 +141,9 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
         break;
+    case MessageType::OnDashEffect:
+        parseDashEffect(packet);
+        break;
     default:
         break;
     }
@@ -553,6 +556,11 @@ bool Server::parseDoubleJump(Packet & packet)
 {
     reliableBroadcast(packet);
     return true;
+}
+
+void Server::parseDashEffect(Packet& packet)
+{
+    reliableBroadcast(packet);
 }
 
 void Server::parseOnInputCommand(Packet& packet)

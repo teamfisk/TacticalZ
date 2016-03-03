@@ -4,6 +4,7 @@ PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerDeathSystem::OnPlayerDeath);
+    EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &PlayerDeathSystem::OnEntityDeleted);
 }
 
 void PlayerDeathSystem::Update(double dt)
@@ -27,10 +28,8 @@ bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
 void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 {
     //load the explosioneffect XML
-    auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
-    EntityFileParser parser(deathEffect);
-    EntityID deathEffectID = parser.MergeEntities(m_World);
-    EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
+    EntityWrapper deathEffectEW = entityFile->MergeInto(m_World);
 
     //components that we need from player
     auto playerModel = player.FirstChildByName("PlayerModel");
@@ -59,9 +58,28 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 
     //camera (with lifetime) behind the player
     if (player == LocalPlayer) {
+        m_LocalPlayerDeathEffect = deathEffectEW;
         auto cam = deathEffectEW.FirstChildByName("Camera");
         Events::SetCamera eSetCamera;
         eSetCamera.CameraEntity = cam;
         m_EventBroker->Publish(eSetCamera);
     }
+}
+
+bool PlayerDeathSystem::OnEntityDeleted(Events::EntityDeleted& e)
+{
+    // We only care about when the local players death effect is removed.
+    if (m_LocalPlayerDeathEffect.ID != e.DeletedEntity) {
+        return false;
+    }
+    
+    // Look for the spectator camera entity in the level.
+    EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
+    if (!spectatorCam.Valid() || !spectatorCam.HasComponent("Camera") || LocalPlayer.Valid()) {
+        return false;
+    }
+    Events::SetCamera eSetCamera;
+    eSetCamera.CameraEntity = spectatorCam;
+    m_EventBroker->Publish(eSetCamera);
+    return true;
 }
