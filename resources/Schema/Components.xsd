@@ -60,4 +60,5 @@
 	<xs:include schemaLocation="Components/FloatingEffect.xsd"/>
 	<xs:include schemaLocation="Components/BoostIconsHUD.xsd"/>
 	<xs:include schemaLocation="Components/ScoreScreen.xsd"/>
+	<xs:include schemaLocation="Components/ScoreIdentity.xsd"/>
 </xs:schema>
