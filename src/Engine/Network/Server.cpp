@@ -635,9 +635,13 @@ bool Server::shouldSendToClient(EntityWrapper childEntity)
             return true;
         }
     }
-    return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid()
-        || childEntity.HasComponent("CapturePoint") || childEntity.HasComponent("HealthPickup")
-        || childEntity.HasComponent("AmmoPickup");
+    return childEntity.HasComponent("Player") 
+        || childEntity.FirstParentWithComponent("Player").Valid()
+        || childEntity.HasComponent("CapturePoint") 
+        || childEntity.HasComponent("HealthPickup")
+        || childEntity.HasComponent("AmmoPickup")
+        || childEntity.HasComponent("ScoreScreen")
+        || childEntity.FirstParentWithComponent("ScoreScreen").Valid();
 }
 
 PlayerID Server::GetPlayerIDFromEndpoint()

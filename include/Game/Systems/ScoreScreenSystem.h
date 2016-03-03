@@ -34,6 +34,7 @@ private:
         EntityWrapper Player = EntityWrapper::Invalid;
     };
 
+    std::vector<int> m_DisconnectedIdentities;
     int m_PlayerCounter = 0;
     std::unordered_map<int, PlayerData> m_PlayerIdentities;
 };

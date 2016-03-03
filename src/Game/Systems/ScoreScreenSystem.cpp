@@ -13,7 +13,6 @@ ScoreScreenSystem::ScoreScreenSystem(SystemParams params)
 
 void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt)
 {
-    //TODO: Check team al
     if (!IsServer) {
         return;
     }
@@ -37,6 +36,8 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
 
     auto children = entity.ChildrenWithComponent("ScoreIdentity");
 
+    float position = 0.f;
+
     for (auto it = m_PlayerIdentities.begin(); it != m_PlayerIdentities.end(); ++it) {
 
         bool found = false;
@@ -45,20 +46,38 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
             if (it->first == ID) {
                 if (it->second.Team != currentTeam) {
                     m_World->DeleteEntity(child.ID);
+                    (int&)entity["ScoreScreen"]["TotalIdentities"] -= 1;
                     break;
                 }
+                for (auto it = m_DisconnectedIdentities.begin(); it != m_DisconnectedIdentities.end(); ++it) {
+                    if (ID = *it) {
+
+                        m_World->DeleteEntity(child.ID);
+                        (int&)entity["ScoreScreen"]["TotalIdentities"] -= 1;
+                        it = m_DisconnectedIdentities.erase(it);
+                        break;
+                    }
+                }
                 found = true;
+                //Update position for childs
+                glm::vec3 offset = (glm::vec3)entity["ScoreScreen"]["Offset"];
+                (glm::vec3&) child["Transform"]["Position"] = offset * position;
+                position += 1.f;
+
                 break;
             }
         }
         if(found == false) {
             if(it->second.Team != currentTeam) {
                 //This player is not the same team as this scoreboard should show.
-                break;
+                continue;
             }
             //There is no entry for this player, create one.
             auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/ScoreIdentity.xml");
             EntityWrapper scoreIdentity = entityFile->MergeInto(m_World);
+            glm::vec3 offset = (glm::vec3)entity["ScoreScreen"]["Offset"];
+            int newPosition = (int)entity["ScoreScreen"]["TotalIdentities"];
+            (glm::vec3&) scoreIdentity["Transform"]["Position"] = offset * (float)newPosition;
             auto cScoreIdentity = scoreIdentity["ScoreIdentity"];
             auto data = it->second;
 
@@ -67,12 +86,12 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
             (int&)cScoreIdentity["Ping"] = 1337;
 
             m_World->SetParent(scoreIdentity.ID, entity.ID);
+
+            (int&)entity["ScoreScreen"]["TotalIdentities"] += 1;
+
         }
     }
-    //For each scoreboard, go through children and see if they have all of the ones needed. 
-    //Also need to take into account the order so they dont flicker.
-    //If they do not have all children we need to add them.
-    //Just add a new component to the scorescreen entity, the "ScoreIdentity" component.
+    //Local player should have an icon, compare with LocalPlayer somthing
 }
 
 bool ScoreScreenSystem::OnPlayerDeath(const Events::PlayerDeath& e)
@@ -113,6 +132,7 @@ bool ScoreScreenSystem::OnPlayerConnected(const Events::PlayerConnected& e)
 bool ScoreScreenSystem::OnPlayerDisconnected(const Events::PlayerDisconnected& e)
 {
     //player has disconnected, remove him from list of ScoreIdentities
+    m_DisconnectedIdentities.push_back(e.PlayerID);
     m_PlayerIdentities.erase(e.PlayerID);
     return 0;
 }
