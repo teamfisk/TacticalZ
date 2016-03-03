@@ -94,7 +94,7 @@ int UDPServer::readBuffer()
 
     if (sizeOfPacket > m_Socket->available()) {
         LOG_WARNING("UDPServer::readBuffer(): We haven't got the whole packet yet.");
-        return 0;
+        //return 0;
     }
 
     // if the buffer is to small increase the size of it
