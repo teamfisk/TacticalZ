@@ -1,3 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <ScoreIdentity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ScoreIdentity.xsd">
+	<Name></Name>
+	<ID>-1</ID>
+	<KD>0.0</KD>
+	<Kills>0</Kills>
+	<Deaths>0</Deaths>
+	<Ping>0</Ping>
+	<Connected>true</Connected>
 </ScoreIdentity>

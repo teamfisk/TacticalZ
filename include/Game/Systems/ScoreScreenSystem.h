@@ -14,9 +14,20 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt) override;
 
     EventRelay<ScoreScreenSystem, Events::PlayerDeath> m_EPlayerDeath;
-    void OnPlayerDeath(const Events::PlayerDeath& e);
+    bool OnPlayerDeath(const Events::PlayerDeath& e);
     EventRelay<ScoreScreenSystem, Events::PlayerSpawned> m_EPlayerSpawned;
-    void OnPlayerSpawn(const Events::PlayerSpawned& e);
+    bool OnPlayerSpawn(const Events::PlayerSpawned& e);
+
+private:
+    struct PlayerData {
+        int ID = -1;
+        std::string Name = "";
+        int Team = -1;
+        EntityWrapper Player = EntityWrapper::Invalid;
+    };
+
+    int m_PlayerCounter = 0;
+    std::unordered_map<std::string, PlayerData> m_PlayerIdentities;
 };
 
 #endif

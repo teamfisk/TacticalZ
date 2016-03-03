@@ -4,6 +4,9 @@
 	<xs:element name="ScoreIdentity">
 		<xs:annotation><xs:documentation>A component tracking data for the score of a player.</xs:documentation></xs:annotation>
 		<xs:element name="Name" type="t:string" minOccurs="0"/>
+		<xs:element name="ID" type="t:int" minOccurs="0">
+		<xs:annotation><xs:documentation>A unique id for tracking identities</xs:documentation></xs:annotation>
+		</xs:element>
 		<xs:element name="KD" type="t:double" minOccurs="0">
 		<xs:annotation><xs:documentation>The Kills per death score.</xs:documentation></xs:annotation>
 		</xs:element>
@@ -15,6 +18,9 @@
 		</xs:element>
 		<xs:element name="Ping" type="t:int" minOccurs="0">
 		<xs:annotation><xs:documentation>Ping of a player.</xs:documentation></xs:annotation>
+		</xs:element>
+		<xs:element name="Connected" type="t:Bool" minOccurs="0">
+		<xs:annotation><xs:documentation>If the player is currently connected or not</xs:documentation></xs:annotation>
 		</xs:element>
 	</xs:element>
 </xs:schema>
