@@ -10,24 +10,51 @@ void DefenderWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWr
 
 void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
+    // Decrement reload timer
     double& reloadTimer = cWeapon["ReloadTimer"];
     reloadTimer = glm::max(0.0, reloadTimer - dt);
 
-    double reloadTime = cWeapon["ReloadTime"];
+    // Start reloading automatically if at 0 mag ammo
+    int& magAmmo = cWeapon["MagazineAmmo"];
+    if (m_ConfigAutoReload && magAmmo <= 0) {
+        OnReload(cWeapon, wi);
+    }
+
+    // Handle reloading
     bool& isReloading = cWeapon["IsReloading"];
     if (isReloading && reloadTimer <= 0.0) {
-        int& magAmmo = cWeapon["MagazineAmmo"];
+        double reloadTime = cWeapon["ReloadTime"];
         int& magSize = cWeapon["MagazineSize"];
         int& ammo = cWeapon["Ammo"];
         if (magAmmo < magSize && ammo > 0) {
             ammo -= 1;
             magAmmo += 1;
             reloadTimer = reloadTime;
+            Events::PlaySoundOnEntity e;
+            e.EmitterID = wi.Player.ID;
+            e.FilePath = "Audio/weapon/Zoom.wav";
+            m_EventBroker->Publish(e);
         } else {
             isReloading = false;
         }
     }
 
+    // Restore view angle
+    if (IsClient) {
+        float& currentTravel = cWeapon["CurrentTravel"];
+        float& returnSpeed = cWeapon["ViewReturnSpeed"];
+        if (currentTravel > 0) {
+            float change = returnSpeed * dt;
+            currentTravel = glm::max(0.f, currentTravel - change);
+            EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+            if (camera.Valid()) {
+                glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
+                cameraOrientation.x -= change;
+            }
+        }
+    }
+
+    // Fire if we're able to fire
     if (canFire(cWeapon, wi)) {
         fireShell(cWeapon, wi);
     }
@@ -71,6 +98,16 @@ void DefenderWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     reloadTimer = reloadTime;
 }
 
+void DefenderWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    // Make sure the trigger is released if weapon is holstered while firing
+    cWeapon["TriggerHeld"] = false;
+
+    // Cancel any reload
+    cWeapon["IsReloading"] = false;
+    cWeapon["ReloadTimer"] = 0.0;
+}
+
 bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e)
 {
     if (e.Command == "SpecialAbility" && IsServer) {
@@ -98,7 +135,6 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     // Ammo
     int& magAmmo = cWeapon["MagazineAmmo"];
     if (magAmmo <= 0) {
-        OnReload(cWeapon, wi);
         return;
     } else {
         magAmmo -= 1;
@@ -114,10 +150,28 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     std::vector<glm::vec2> pelletAngles;
     for (int i = 0; i < numPellets; i++) {
         pelletAngles.push_back(glm::vec2(randomSpreadAngle(m_RandomEngine), randomSpreadAngle(m_RandomEngine)));
-        LOG_DEBUG("%f %f", pelletAngles[i].x, pelletAngles[i].y);
     }
 
     double pelletDamage = (double)cWeapon["BaseDamage"] / numPellets;
+
+    // View punch
+    if (IsClient) {
+        EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+        if (camera.Valid()) {
+            glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
+            float viewPunch = cWeapon["ViewPunch"];
+            float maxTravelAngle = cWeapon["MaxTravelAngle"];
+            float& currentTravel = cWeapon["CurrentTravel"];
+            if (currentTravel < maxTravelAngle) {
+                float change = viewPunch;
+                if (currentTravel + change > maxTravelAngle) {
+                    change = maxTravelAngle - currentTravel;
+                }
+                cameraOrientation.x += change;
+                currentTravel += change;
+            }
+        }
+    }
 
     // Tracers
     EntityWrapper weaponModelEntity;
@@ -140,6 +194,12 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
             dealDamage(cWeapon, wi, direction, pelletDamage);
         }
     }
+
+    // Sound
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = wi.Player.ID;
+    e.FilePath = "Audio/weapon/Blast.wav";
+    m_EventBroker->Publish(e);
 }
 
 void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage)
@@ -206,7 +266,6 @@ bool DefenderWeaponBehaviour::canFire(ComponentWrapper cWeapon, WeaponInfo& wi)
     bool triggerHeld = cWeapon["TriggerHeld"];
     bool cooldownPassed = (double)cWeapon["FireCooldown"] <= 0.0;
     bool isNotShielding = wi.Player.ChildrenWithComponent("Shield").size() == 0;
-    // TODO: Ammo checks
     return triggerHeld && cooldownPassed && isNotShielding;
 }
 

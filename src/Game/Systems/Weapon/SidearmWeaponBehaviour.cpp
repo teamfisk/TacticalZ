@@ -45,8 +45,6 @@ void SidearmWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
     // Cancel any reload
     cWeapon["IsReloading"] = false;
     cWeapon["ReloadTimer"] = 0.0;
-    
-    LOG_DEBUG("HOLSTER");
 }
 
 void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi)

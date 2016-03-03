@@ -63,6 +63,7 @@
 							<xs:element ref="c:DoubleJump" minOccurs="0"/>
 							<xs:element ref="c:HealthHUD" minOccurs="0"/>
 							<xs:element ref="c:SpriteIndicator" minOccurs="0"/>
+							<xs:element ref="c:InputCmdButton" minOccurs="0"/>
 							<xs:element ref="c:ScoreScreen" minOccurs="0"/>
 							<xs:element ref="c:ScoreIdentity" minOccurs="0"/>
 						</xs:all>

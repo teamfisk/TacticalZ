@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <AssaultWeapon xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="AssaultWeapon.xsd">
+	<Slot><Primary/></Slot>
 	<MagazineAmmo>32</MagazineAmmo>
 	<MagazineSize>32</MagazineSize>
-	<Ammo>360</Ammo>
-	<MaxAmmo>360</MaxAmmo>
-	<BaseDamage>5</BaseDamage>
-	<RPM>120</RPM>
-	<ViewPunch>0.01</ViewPunch>
+	<Ammo>320</Ammo>
+	<MaxAmmo>320</MaxAmmo>
+	<BaseDamage>15</BaseDamage>
+	<SpreadAngle>0.174533</SpreadAngle> <!-- 0.174533 = 10 degrees -->
+	<MaxTravelAngle>0.10</MaxTravelAngle> <!-- 0.174533 = 10 degrees -->
+	<RPM>420</RPM>
+	<ViewPunch>0.03</ViewPunch>
+	<ViewReturnSpeed>0.18</ViewReturnSpeed>
 	<ReloadTime>2</ReloadTime>
-	<Slot><Primary/></Slot>
+	<EquipTime>0.5</EquipTime>
+	<TriggerHeld>false</TriggerHeld>
+	<FireCooldown>0</FireCooldown>
+	<IsReloading>false</IsReloading>
+	<ReloadTimer>0</ReloadTimer>
+	<CurrentTravel>0</CurrentTravel>
 </AssaultWeapon>

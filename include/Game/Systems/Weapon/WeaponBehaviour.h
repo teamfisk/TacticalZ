@@ -8,6 +8,7 @@
 #include "Input/EInputCommand.h"
 #include "Systems/SpawnerSystem.h"
 #include "Rendering/ESetCamera.h"
+#include "Core/ConfigFile.h"
 
 template <typename ETYPE>
 class WeaponBehaviour : public PureSystem
@@ -21,8 +22,10 @@ public:
         , m_Renderer(renderer)
         , m_CollisionOctree(collisionOctree)
     {
-        EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponBehaviour::_OnInputCommand)
-        EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &WeaponBehaviour::_OnSetCamera)
+        EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &WeaponBehaviour::_OnInputCommand);
+        EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &WeaponBehaviour::_OnSetCamera);
+        auto config = ResourceManager::Load<ConfigFile>("Config.ini");
+        m_ConfigAutoReload = config->Get<bool>("Gameplay.AutoReload", true);
     }
     virtual ~WeaponBehaviour() = default;
 
@@ -49,6 +52,7 @@ protected:
     EntityWrapper m_CurrentCamera;
     Octree<EntityAABB>* m_CollisionOctree;
     std::unordered_map<EntityWrapper, WeaponInfo> m_ActiveWeapons;
+    bool m_ConfigAutoReload;
 
     virtual void UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt) { }
     virtual void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) { }
