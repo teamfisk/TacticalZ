@@ -26,6 +26,7 @@
 #include "TextPass.h"
 #include "Util/CommonFunctions.h"
 #include "Core/PerformanceTimer.h"
+#include "ShadowPass.h"
 
 class Renderer : public IRenderer
 {
@@ -75,6 +76,7 @@ private:
     DrawColorCorrectionPass* m_DrawColorCorrectionPass;
 	SSAOPass* m_SSAOPass;
     CubeMapPass* m_CubeMapPass;
+	ShadowPass* m_ShadowPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
