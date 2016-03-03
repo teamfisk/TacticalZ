@@ -1,4 +1,5 @@
 #include "GUI/ButtonSystem.h"
+#include "Input/EInputCommand.h"
 
 ButtonSystem::ButtonSystem(SystemParams params, IRenderer* renderer)
     : System(params)
@@ -37,10 +38,19 @@ bool ButtonSystem::OnMousePress(const Events::MousePress& e)
                 m_PickEntity = EntityWrapper(m_World, m_PickData.Entity);
 
                 //You have clicked on a button entity, send pressed event.
-                Events::ButtonPressed ePressed;
-                ePressed.Entity = m_PickEntity;
-                ePressed.EntityName = m_PickEntity.Name();
-                m_EventBroker->Publish(ePressed);
+                if (m_World->HasComponent(m_PickData.Entity, "InputCmdButton")) {
+                    Events::InputCommand eInputCmd;
+                    eInputCmd.PlayerID = LocalPlayer.ID;
+                    eInputCmd.Player = LocalPlayer;
+                    EntityWrapper button = EntityWrapper(m_World, m_PickData.Entity);
+                    eInputCmd.Command = (std::string)button["InputCmdButton"]["Command"];
+                    eInputCmd.Value = (float)button["InputCmdButton"]["PressValue"];
+                } else {
+                    Events::ButtonPressed ePressed;
+                    ePressed.Entity = m_PickEntity;
+                    ePressed.EntityName = m_PickEntity.Name();
+                    m_EventBroker->Publish(ePressed);
+                }
             }
         }
     }
@@ -55,10 +65,19 @@ bool ButtonSystem::OnMouseRelease(const Events::MouseRelease& e)
         if(m_PickData.Entity != EntityID_Invalid && m_PickData.World == m_World) {
             EntityWrapper ent = EntityWrapper(m_World, m_PickData.Entity);
 
-            Events::ButtonReleased eReleased;
-            eReleased.EntityName = m_PickEntity.Name();
-            eReleased.Entity = m_PickEntity;
-            m_EventBroker->Publish(eReleased);
+            if (m_World->HasComponent(m_PickData.Entity, "InputCmdButton")) {
+                Events::InputCommand eInputCmd;
+                eInputCmd.PlayerID = LocalPlayer.ID;
+                eInputCmd.Player = LocalPlayer;
+                EntityWrapper button = EntityWrapper(m_World, m_PickData.Entity);
+                eInputCmd.Command = (std::string)button["InputCmdButton"]["Command"];
+                eInputCmd.Value = 0;
+            } else {
+                Events::ButtonReleased eReleased;
+                eReleased.EntityName = m_PickEntity.Name();
+                eReleased.Entity = m_PickEntity;
+                m_EventBroker->Publish(eReleased);
+            }
 
             if(m_World->HasComponent(m_PickData.Entity, "Button")) {
                 if (ent == m_PickEntity) {

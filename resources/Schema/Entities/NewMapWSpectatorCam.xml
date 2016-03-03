@@ -27,6 +27,16 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
+                  <Resource>Models/Props/Highground3.mesh</Resource>
+                </c:Model>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
                   <Resource>Models/Props/Highground4.mesh</Resource>
                 </c:Model>
                 <c:Transform/>
@@ -74,16 +84,6 @@
                 <c:Transform>
                   <Scale X="-1" Y="1" Z="-1"/>
                 </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Highground3.mesh</Resource>
-                </c:Model>
-                <c:Transform/>
               </Components>
               <Children/>
             </Entity>
@@ -3082,6 +3082,148 @@
             </Entity>
           </Children>
         </Entity>
+        <Entity name="PickupHolders">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-1.10366142" Y="0.0513040125" Z="38.9427757"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="49.2240753" Y="6.60090208" Z="-31.2720833"/>
+                  <Orientation X="0" Y="0.371000022" Z="0"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="1.41505229" Y="-0.100573562" Z="-39.1804695"/>
+                  <Orientation X="0" Y="0.362000018" Z="0"/>
+                  <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="54.7569733" Y="5.88003111" Z="29.0024357"/>
+                  <Orientation X="0" Y="1.93500006" Z="0"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-59.3862228" Y="6.55247116" Z="-20.5942402"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource></Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-42.4500389" Y="6.29388857" Z="81.8648911"/>
+                  <Orientation X="0" Y="1.78300011" Z="0"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-51.6183357" Y="7.27001905" Z="32.4122047"/>
+                  <Orientation X="0" Y="1.63800013" Z="0"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="49.0003967" Y="6.34798431" Z="-79.0335312"/>
+                  <Orientation X="0" Y="0.427000016" Z="0"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-9.89951515" Y="7.07768536" Z="39.5232887"/>
+                  <Orientation X="0" Y="0.075000003" Z="0"/>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
         <Entity name="AssaultHolders">
           <Components>
             <c:Transform/>
@@ -3263,53 +3405,12 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                  <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-40.5458374" Y="-0.729142785" Z="-45.7907982"/>
-                  <Orientation X="4.93700027" Y="4.81200027" Z="1.37700009"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="9.91392708" Y="1.43551338" Z="54.4210777"/>
-                  <Orientation X="0" Y="1.78500009" Z="0.165000007"/>
+                  <Position X="-14.6974993" Y="0.955289125" Z="-68.5010834"/>
+                  <Orientation X="4.74100018" Y="1.94900012" Z="1.93100011"/>
                   <Scale X="3" Y="3" Z="3"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-37.1246147" Y="0.00247524865" Z="24.7832203"/>
-                  <Orientation X="1.64200008" Y="5.78300047" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="5.28967953" Y="2.78933692" Z="12.5779057"/>
-                  <Orientation X="0" Y="0.785000026" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3346,6 +3447,47 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
+                  <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-8.17854309" Y="4.35002041" Z="-60.110321"/>
+                  <Orientation X="0" Y="1.19000006" Z="0.721000016"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-37.1246147" Y="0.00247524865" Z="24.7832203"/>
+                  <Orientation X="1.64200008" Y="5.78300047" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="24.1598759" Y="0.587870896" Z="20.9966831"/>
+                  <Orientation X="0" Y="2.89500022" Z="5.56500006"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
@@ -3357,12 +3499,11 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="7.52924776" Y="0.407071143" Z="-2.09290624"/>
-                      <Orientation X="0" Y="1.7700001" Z="0"/>
-                      <Scale X="3.4000001" Y="5.70000029" Z="3.70000029"/>
+                      <Position X="13.3016024" Y="-1.04082656" Z="-2.06582665"/>
+                      <Orientation X="0" Y="1.17200005" Z="6.28300047"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -3384,11 +3525,12 @@
                   <Components>
                     <c:Collidable/>
                     <c:Model>
-                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                      <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="-2.64413857" Y="0" Z="1.92853355"/>
-                      <Orientation X="0" Y="2.26900005" Z="0.168000013"/>
+                      <Position X="7.52924776" Y="0.407071143" Z="-2.09290624"/>
+                      <Orientation X="0" Y="1.7700001" Z="0"/>
+                      <Scale X="3.4000001" Y="5.70000029" Z="3.70000029"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -3400,8 +3542,8 @@
                       <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                     </c:Model>
                     <c:Transform>
-                      <Position X="13.3016024" Y="-1.04082656" Z="-2.06582665"/>
-                      <Orientation X="0" Y="1.17200005" Z="6.28300047"/>
+                      <Position X="-2.64413857" Y="0" Z="1.92853355"/>
+                      <Orientation X="0" Y="2.26900005" Z="0.168000013"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -3428,104 +3570,8 @@
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="24.1598759" Y="0.587870896" Z="20.9966831"/>
-                  <Orientation X="0" Y="2.89500022" Z="5.56500006"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-30.8568707" Y="0.686234176" Z="26.1162262"/>
-                  <Orientation X="0" Y="3.22900009" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="53.9309578" Y="-0.160480574" Z="-64.0063782"/>
-                  <Orientation X="0" Y="2.03299999" Z="0.308000028"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="40.1403427" Y="-0.480271548" Z="46.9729843"/>
-                  <Orientation X="4.75" Y="3.2420001" Z="3.31600022"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="10.6690178" Y="6.30028152" Z="-55.6381416"/>
-                  <Orientation X="3.4150002" Y="0" Z="0.330000013"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-2.31557918" Y="-0.540249169" Z="-65.8759995"/>
-                  <Orientation X="0.176000014" Y="6.28300047" Z="2.73400021"/>
-                  <Scale X="3" Y="3" Z="3"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-8.17941284" Y="2.02789736" Z="-54.2649231"/>
-                  <Orientation X="0.611000001" Y="0.800000012" Z="0"/>
-                  <Scale X="3" Y="3" Z="3"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="3.81246185" Y="6.00487947" Z="-43.7138367"/>
-                  <Orientation X="4.58600044" Y="0.95600003" Z="5.44900036"/>
-                  <Scale X="1.20000005" Y="1.20000005" Z="1.20000005"/>
+                  <Position X="-40.5458374" Y="-0.729142785" Z="-45.7907982"/>
+                  <Orientation X="4.93700027" Y="4.81200027" Z="1.37700009"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3548,11 +3594,39 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="53.9309578" Y="-0.160480574" Z="-64.0063782"/>
+                  <Orientation X="0" Y="2.03299999" Z="0.308000028"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-8.17941284" Y="2.02789736" Z="-54.2649231"/>
+                  <Orientation X="0.611000001" Y="0.800000012" Z="0"/>
+                  <Scale X="3" Y="3" Z="3"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="16.6543713" Y="-0.0228324197" Z="16.8465405"/>
-                  <Orientation X="0" Y="5.49800014" Z="0.118000008"/>
+                  <Position X="-31.0276947" Y="2.50035119" Z="-20.3112068"/>
+                  <Orientation X="5.25000048" Y="3.76200008" Z="0.694000006"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3578,9 +3652,248 @@
                   <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-60.3314171" Y="-0.180673569" Z="39.3239975"/>
-                  <Orientation X="0.309000015" Y="3.45100021" Z="0.213000014"/>
+                  <Position X="10.6690178" Y="6.30028152" Z="-55.6381416"/>
+                  <Orientation X="3.4150002" Y="0" Z="0.330000013"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-31.7061939" Y="-0.37538749" Z="41.2581596"/>
+                  <Orientation X="5.06900024" Y="4.2130003" Z="0"/>
                   <Scale X="3" Y="3" Z="3"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="59.6173592" Y="-0.210660428" Z="-38.642601"/>
+                  <Orientation X="0.873000026" Y="0.175000012" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-3.79336667" Y="0.279969275" Z="0.486344576"/>
+                      <Orientation X="5.8760004" Y="0" Z="5.66600037"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="3.2295444" Y="-1.16415167" Z="-0.976173937"/>
+                      <Orientation X="0" Y="2.15300012" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-22.8538628" Y="0" Z="72.4865646"/>
+                  <Orientation X="5.76000023" Y="4.87300014" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="4.29533958" Y="1.77226758" Z="-3.06248784"/>
+                      <Orientation X="0.524000049" Y="0.201000005" Z="0.756000042"/>
+                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-0.798823476" Y="2.74860883" Z="-5.69741392"/>
+                      <Orientation X="1.49000013" Y="0.604000032" Z="0.835000038"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="6.65788317" Y="1.37803173" Z="6.50973177"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-33.7365837" Y="-0.0430271626" Z="26.9390125"/>
+                  <Orientation X="5.21200037" Y="4.1170001" Z="3.1420002"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-17.7297821" Y="-0.241449535" Z="37.0815544"/>
+                  <Orientation X="0" Y="3.05400014" Z="2.2190001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="36.8410912" Y="0" Z="13.8404799"/>
+                  <Orientation X="0" Y="1.00600004" Z="0.595000029"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-54.9714813" Y="-0.652778208" Z="38.8988113"/>
+                  <Orientation X="0" Y="3.02300024" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="3.11592245" Y="3.68196058" Z="2.37394643"/>
+                      <Orientation X="0.452000022" Y="3.30800009" Z="0"/>
+                      <Scale X="1.5" Y="1" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="1.2732774" Y="0.778613508" Z="-3.14401078"/>
+                      <Orientation X="5.49800014" Y="4.02200031" Z="0.26000002"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-8.79821205" Y="6.16685486" Z="58.7618103"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="6.39843082" Y="3.14988804" Z="9.88351059"/>
+                  <Orientation X="6.28300047" Y="2.11800003" Z="4.22800016"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-33.3887215" Y="0.0362219103" Z="23.886467"/>
+                  <Orientation X="0.357000023" Y="2.73700023" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="27.5397015" Y="2.39479899" Z="2.70710754"/>
+                  <Orientation X="0" Y="0.604000032" Z="5.44800043"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3603,11 +3916,12 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="8.55254269" Y="1.52523661" Z="25.5198822"/>
-                  <Orientation X="0.738000035" Y="3.45100021" Z="0.0240000002"/>
+                  <Position X="9.91392708" Y="1.43551338" Z="54.4210777"/>
+                  <Orientation X="0" Y="1.78500009" Z="0.165000007"/>
+                  <Scale X="3" Y="3" Z="3"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3619,8 +3933,103 @@
                   <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-33.3887215" Y="0.0362219103" Z="23.886467"/>
-                  <Orientation X="0.357000023" Y="2.73700023" Z="0"/>
+                  <Position X="5.28967953" Y="2.78933692" Z="12.5779057"/>
+                  <Orientation X="0" Y="0.785000026" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-30.8568707" Y="0.686234176" Z="26.1162262"/>
+                  <Orientation X="0" Y="3.22900009" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="40.1403427" Y="-0.480271548" Z="46.9729843"/>
+                  <Orientation X="4.75" Y="3.2420001" Z="3.31600022"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-2.31557918" Y="-0.540249169" Z="-65.8759995"/>
+                  <Orientation X="0.176000014" Y="6.28300047" Z="2.73400021"/>
+                  <Scale X="3" Y="3" Z="3"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="3.81246185" Y="6.00487947" Z="-43.7138367"/>
+                  <Orientation X="4.58600044" Y="0.95600003" Z="5.44900036"/>
+                  <Scale X="1.20000005" Y="1.20000005" Z="1.20000005"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="16.6543713" Y="-0.0228324197" Z="16.8465405"/>
+                  <Orientation X="0" Y="5.49800014" Z="0.118000008"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-60.3314171" Y="-0.180673569" Z="39.3239975"/>
+                  <Orientation X="0.309000015" Y="3.45100021" Z="0.213000014"/>
+                  <Scale X="3" Y="3" Z="3"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="8.55254269" Y="1.52523661" Z="25.5198822"/>
+                  <Orientation X="0.738000035" Y="3.45100021" Z="0.0240000002"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3635,19 +4044,6 @@
                   <Position X="15.4685984" Y="1.01793146" Z="-5.04095173"/>
                   <Orientation X="0" Y="1.67100012" Z="0.371000022"/>
                   <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-31.0276947" Y="2.50035119" Z="-20.3112068"/>
-                  <Orientation X="5.25000048" Y="3.76200008" Z="0.694000006"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3673,19 +4069,6 @@
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="27.5397015" Y="2.39479899" Z="2.70710754"/>
-                  <Orientation X="0" Y="0.604000032" Z="5.44800043"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="16.1645775" Y="-1.94040036" Z="80.0768585"/>
                   <Orientation X="1.73400009" Y="2.38800001" Z="0.474000037"/>
                   <Scale X="2" Y="2" Z="2"/>
@@ -3700,63 +4083,8 @@
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-22.8538628" Y="0" Z="72.4865646"/>
-                  <Orientation X="5.76000023" Y="4.87300014" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-0.798823476" Y="2.74860883" Z="-5.69741392"/>
-                      <Orientation X="1.49000013" Y="0.604000032" Z="0.835000038"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="4.29533958" Y="1.77226758" Z="-3.06248784"/>
-                      <Orientation X="0.524000049" Y="0.201000005" Z="0.756000042"/>
-                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="-5.40415859" Y="0.937124789" Z="31.5393486"/>
                   <Orientation X="1.21400011" Y="0" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-31.7061939" Y="-0.37538749" Z="41.2581596"/>
-                  <Orientation X="5.06900024" Y="4.2130003" Z="0"/>
-                  <Scale X="3" Y="3" Z="3"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3782,77 +4110,11 @@
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="59.6173592" Y="-0.210660428" Z="-38.642601"/>
-                  <Orientation X="0.873000026" Y="0.175000012" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="3.2295444" Y="-1.16415167" Z="-0.976173937"/>
-                      <Orientation X="0" Y="2.15300012" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/MediumStone1.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-3.79336667" Y="0.279969275" Z="0.486344576"/>
-                      <Orientation X="5.8760004" Y="0" Z="5.66600037"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="33.3622704" Y="1.28959298" Z="53.289402"/>
                   <Orientation X="0" Y="0" Z="0.262000024"/>
                 </c:Transform>
               </Components>
               <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="2.85156512" Y="-1.23010564" Z="-1.48294902"/>
-                      <Scale X="1.50000012" Y="1" Z="1.4000001"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-3.14530659" Y="-0.287389398" Z="5.00969267"/>
-                      <Orientation X="0.980000019" Y="2.99100018" Z="5.9470005"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
                 <Entity>
                   <Components>
                     <c:Collidable/>
@@ -3887,8 +4149,34 @@
                       <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                     </c:Model>
                     <c:Transform>
+                      <Position X="2.85156512" Y="-1.23010564" Z="-1.48294902"/>
+                      <Scale X="1.50000012" Y="1" Z="1.4000001"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
                       <Position X="-4.13566351" Y="0.154750317" Z="-0.905313909"/>
                       <Orientation X="2.18700004" Y="2.28700018" Z="3.86500025"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Stones/BigStone.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-3.14530659" Y="-0.287389398" Z="5.00969267"/>
+                      <Orientation X="0.980000019" Y="2.99100018" Z="5.9470005"/>
                     </c:Transform>
                   </Components>
                   <Children/>
@@ -3916,33 +4204,7 @@
                   <Resource>Models/Props/Stones/BigStone.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="36.8410912" Y="0" Z="13.8404799"/>
-                  <Orientation X="0" Y="1.00600004" Z="0.595000029"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/BigStone.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="33.0107498" Y="-1.2082448" Z="33.2633705"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-33.7365837" Y="-0.0430271626" Z="26.9390125"/>
-                  <Orientation X="5.21200037" Y="4.1170001" Z="3.1420002"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3957,18 +4219,6 @@
                   <Position X="32.4720192" Y="5.98342133" Z="-63.2217178"/>
                   <Orientation X="5.95900011" Y="4.3130002" Z="0"/>
                   <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Walls/MediumWall1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="6.65788317" Y="1.37803173" Z="6.50973177"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -3994,34 +4244,7 @@
                   <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-17.7297821" Y="-0.241449535" Z="37.0815544"/>
-                  <Orientation X="0" Y="3.05400014" Z="2.2190001"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="29.9889526" Y="0.960915685" Z="10.4787979"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-8.17854309" Y="4.35002041" Z="-60.110321"/>
-                  <Orientation X="0" Y="1.19000006" Z="0.721000016"/>
-                  <Scale X="2" Y="2" Z="2"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -4035,20 +4258,6 @@
                 <c:Transform>
                   <Position X="-35.1645393" Y="1.39689624" Z="-13.8673277"/>
                   <Orientation X="0" Y="1.65800011" Z="2.73800015"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-14.6974993" Y="0.955289125" Z="-68.5010834"/>
-                  <Orientation X="4.74100018" Y="1.94900012" Z="1.93100011"/>
-                  <Scale X="3" Y="3" Z="3"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -4102,12 +4311,11 @@
                       <Components>
                         <c:Collidable/>
                         <c:Model>
-                          <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
+                          <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
                         </c:Model>
                         <c:Transform>
-                          <Position X="3.55691409" Y="-2.71267676" Z="5.57869864"/>
-                          <Orientation X="5.40400028" Y="0.578000009" Z="0"/>
-                          <Scale X="3" Y="3" Z="3"/>
+                          <Position X="3.05303264" Y="0.495791674" Z="-4.19238997"/>
+                          <Orientation X="3.29200006" Y="0" Z="5.21100044"/>
                         </c:Transform>
                       </Components>
                       <Children/>
@@ -4116,11 +4324,12 @@
                       <Components>
                         <c:Collidable/>
                         <c:Model>
-                          <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
+                          <Resource>Models/Props/Stones/SmallStone2.mesh</Resource>
                         </c:Model>
                         <c:Transform>
-                          <Position X="3.05303264" Y="0.495791674" Z="-4.19238997"/>
-                          <Orientation X="3.29200006" Y="0" Z="5.21100044"/>
+                          <Position X="3.55691409" Y="-2.71267676" Z="5.57869864"/>
+                          <Orientation X="5.40400028" Y="0.578000009" Z="0"/>
+                          <Scale X="3" Y="3" Z="3"/>
                         </c:Transform>
                       </Components>
                       <Children/>
@@ -4147,19 +4356,6 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-8.79821205" Y="6.16685486" Z="58.7618103"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
                   <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
                 </c:Model>
                 <c:Transform>
@@ -4177,63 +4373,9 @@
                   <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-54.9714813" Y="-0.652778208" Z="38.8988113"/>
-                  <Orientation X="0" Y="3.02300024" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="1.2732774" Y="0.778613508" Z="-3.14401078"/>
-                      <Orientation X="5.49800014" Y="4.02200031" Z="0.26000002"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Stones/SmallStone1.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="3.11592245" Y="3.68196058" Z="2.37394643"/>
-                      <Orientation X="0.452000022" Y="3.30800009" Z="0"/>
-                      <Scale X="1.5" Y="1" Z="2"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="-60.3285904" Y="1.38075519" Z="30.0447998"/>
                   <Orientation X="0" Y="3.45100021" Z="1.34600008"/>
                   <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/MediumStone2.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="6.39843082" Y="3.14988804" Z="9.88351059"/>
-                  <Orientation X="6.28300047" Y="2.11800003" Z="4.22800016"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -4254,153 +4396,24 @@
             </Entity>
           </Children>
         </Entity>
-        <Entity name="PickupHolders">
-          <Components>
-            <c:Transform/>
-          </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-42.4500389" Y="6.29388857" Z="81.8648911"/>
-                  <Orientation X="0" Y="1.78300011" Z="0"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-1.10366142" Y="0.0513040125" Z="38.9427757"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-51.6183357" Y="7.27001905" Z="32.4122047"/>
-                  <Orientation X="0" Y="1.63800013" Z="0"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="1.41505229" Y="-0.100573562" Z="-39.1804695"/>
-                  <Orientation X="0" Y="0.362000018" Z="0"/>
-                  <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="49.0003967" Y="6.34798431" Z="-79.0335312"/>
-                  <Orientation X="0" Y="0.427000016" Z="0"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-59.3862228" Y="6.55247116" Z="-20.5942402"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource></Resource>
-                    </c:Model>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="54.7569733" Y="5.88003111" Z="29.0024357"/>
-                  <Orientation X="0" Y="1.93500006" Z="0"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-9.89951515" Y="7.07768536" Z="39.5232887"/>
-                  <Orientation X="0" Y="0.075000003" Z="0"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="49.2240753" Y="6.60090208" Z="-31.2720833"/>
-                  <Orientation X="0" Y="0.371000022" Z="0"/>
-                  <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
-        </Entity>
         <Entity name="SciFiHolders">
           <Components>
             <c:Transform/>
           </Components>
           <Children>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-28.6847095" Y="5.74966621" Z="49.3048592"/>
+                  <Orientation X="0" Y="2.78500009" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
             <Entity>
               <Components>
                 <c:Collidable/>
@@ -4486,19 +4499,6 @@
                   <Resource>Models/Props/SciFiHolder1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-28.6847095" Y="5.74966621" Z="49.3048592"/>
-                  <Orientation X="0" Y="2.78500009" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="28.546957" Y="5.7377243" Z="-49.1212616"/>
                   <Orientation X="0" Y="5.87300014" Z="0"/>
                 </c:Transform>
@@ -4512,74 +4512,6 @@
             <c:Transform/>
           </Components>
           <Children>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-15.64149" Y="4.06747103" Z="46.9777374"/>
-                  <Orientation X="0.553000033" Y="4.33400011" Z="0.49000001"/>
-                  <Scale X="3" Y="3" Z="2.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="28.9290161" Y="-0.0643097907" Z="59.6764565"/>
-                  <Orientation X="5.85600042" Y="5.85600042" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-42.1386566" Y="0.844538689" Z="-14.1157408"/>
-                  <Orientation X="0" Y="0" Z="5.73600006"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-44.5098763" Y="0" Z="74.7973785"/>
-                  <Orientation X="0" Y="5.32300043" Z="6.02400017"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="14.539196" Y="4.56123304" Z="-44.0134811"/>
-                  <Orientation X="5.32700014" Y="4.1170001" Z="0"/>
-                  <Scale X="3" Y="3" Z="2.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
             <Entity>
               <Components>
                 <c:Collidable/>
@@ -4601,91 +4533,8 @@
                   <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-29.5323219" Y="5.70502806" Z="61.5454369"/>
-                  <Orientation X="0" Y="1.37000012" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="45.3390808" Y="5.87882566" Z="-48.1003838"/>
-                  <Orientation X="2.8670001" Y="5.31100035" Z="2.35000014"/>
-                  <Scale X="2" Y="2" Z="2.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-17.0007591" Y="1.49978495" Z="-28.1909218"/>
-                  <Orientation X="0" Y="1.65800011" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-40.4708786" Y="0.452676624" Z="-31.320673"/>
-                  <Orientation X="0" Y="2.64700007" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-11.7034636" Y="-0.0491730012" Z="76.0223083"/>
-                  <Orientation X="0.495000035" Y="2.88000011" Z="0.432000011"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="6.82107449" Y="4.28142357" Z="60.6378365"/>
-                  <Orientation X="6.02100039" Y="0.727000058" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="10.9524012" Y="-0.298019737" Z="-76.0087204"/>
-                  <Orientation X="6.0800004" Y="3.92200017" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
+                  <Position X="-44.5098763" Y="0" Z="74.7973785"/>
+                  <Orientation X="0" Y="5.32300043" Z="6.02400017"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -4711,8 +4560,36 @@
                   <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-10.9834871" Y="2.43890929" Z="-61.4999962"/>
-                  <Orientation X="0.378000021" Y="1.34600008" Z="0"/>
+                  <Position X="45.3390808" Y="5.87882566" Z="-48.1003838"/>
+                  <Orientation X="2.8670001" Y="5.31100035" Z="2.35000014"/>
+                  <Scale X="2" Y="2" Z="2.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="28.9290161" Y="-0.0643097907" Z="59.6764565"/>
+                  <Orientation X="5.85600042" Y="5.85600042" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="6.82107449" Y="4.28142357" Z="60.6378365"/>
+                  <Orientation X="6.02100039" Y="0.727000058" Z="0"/>
                   <Scale X="2" Y="2" Z="2"/>
                 </c:Transform>
               </Components>
@@ -4739,6 +4616,129 @@
                   <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
+                  <Position X="-40.4708786" Y="0.452676624" Z="-31.320673"/>
+                  <Orientation X="0" Y="2.64700007" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-15.64149" Y="4.06747103" Z="46.9777374"/>
+                  <Orientation X="0.553000033" Y="4.33400011" Z="0.49000001"/>
+                  <Scale X="3" Y="3" Z="2.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-42.1386566" Y="0.844538689" Z="-14.1157408"/>
+                  <Orientation X="0" Y="0" Z="5.73600006"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="14.539196" Y="4.56123304" Z="-44.0134811"/>
+                  <Orientation X="5.32700014" Y="4.1170001" Z="0"/>
+                  <Scale X="3" Y="3" Z="2.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-29.5323219" Y="5.70502806" Z="61.5454369"/>
+                  <Orientation X="0" Y="1.37000012" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-17.0007591" Y="1.49978495" Z="-28.1909218"/>
+                  <Orientation X="0" Y="1.65800011" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-11.7034636" Y="-0.0491730012" Z="76.0223083"/>
+                  <Orientation X="0.495000035" Y="2.88000011" Z="0.432000011"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="10.9524012" Y="-0.298019737" Z="-76.0087204"/>
+                  <Orientation X="6.0800004" Y="3.92200017" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-10.9834871" Y="2.43890929" Z="-61.4999962"/>
+                  <Orientation X="0.378000021" Y="1.34600008" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
                   <Position X="-29.8569813" Y="1.11728144" Z="-54.4840736"/>
                   <Orientation X="6.28300047" Y="3.00100017" Z="6.08900023"/>
                   <Scale X="2" Y="2" Z="2"/>
@@ -4750,19 +4750,102 @@
         </Entity>
       </Children>
     </Entity>
-    <Entity name="SpawnerRedTeam">
+    <Entity name="Lights">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:PointLight>
+              <Radius>10</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="37.862999" Y="10.1269999" Z="-55.0098801"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SceneLight>
+              <Gamma>1</Gamma>
+            </c:SceneLight>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:PointLight>
+              <Radius>10</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-38.6936989" Y="2.9200933" Z="-61.8637123"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:PointLight>
+              <Radius>10</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-37.8627815" Y="10.1265135" Z="55.871048"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:PointLight>
+                  <Radius>10</Radius>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="75.9573059" Y="-7.13794327" Z="5.75230598"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:PointLight>
+              <Radius>10</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="0" Y="3.14644003" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Directional">
+          <Components>
+            <c:DirectionalLight>
+              <Intensity>1</Intensity>
+            </c:DirectionalLight>
+            <c:Transform>
+              <Orientation X="0" Y="1.16600001" Z="2.08000016"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="SpawnerBlueTeam">
       <Components>
         <c:PlayerSpawn/>
         <c:Spawner>
-          <EntityFile>Schema/Entities/PlayerRed.xml</EntityFile>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
         </c:Spawner>
         <c:Team>
           <Team>
-            <Red/>
+            <Blue/>
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="-60.3695679" Y="5.64500046" Z="-79.3789597"/>
+          <Position X="60.0169258" Y="5.78000021" Z="76.2893906"/>
         </c:Transform>
       </Components>
       <Children>
@@ -4774,7 +4857,7 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="1.14053249" Y="0" Z="-1.67306876"/>
+              <Position X="-6.58577824" Y="1.97348273" Z="-2.86768818"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4787,7 +4870,7 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="5.59104443" Y="2.14147282" Z="6.07936668"/>
+              <Position X="1.64179754" Y="0.634559035" Z="4.27690458"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4800,7 +4883,7 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="9.3347702" Y="2.70210314" Z="2.33294678"/>
+              <Position X="2.02889442" Y="0.194165871" Z="-1.17950201"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4813,166 +4896,7 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="-2.2788806" Y="0" Z="3.17202592"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
-    </Entity>
-    <Entity name="HealthPickups">
-      <Components>
-        <c:Transform/>
-      </Components>
-      <Children>
-        <Entity>
-          <Components>
-            <c:AmmoPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="-59.3499641" Y="7.46932745" Z="-20.6276321"/>
-              <Orientation X="0" Y="170.618805" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:HealthPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="54.7225227" Y="6.51863909" Z="29.0052128"/>
-              <Orientation X="0" Y="168.540482" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:AmmoPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="49.2257118" Y="7.39368248" Z="-31.1810112"/>
-              <Orientation X="0" Y="162.378082" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:HealthPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="-42.3974304" Y="7.28327894" Z="81.9305344"/>
-              <Orientation X="0" Y="166.11824" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:HealthPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="48.9189453" Y="7.06223536" Z="-78.9347992"/>
-              <Orientation X="0" Y="173.964676" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:HealthPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="-1.13644195" Y="1.38919806" Z="38.9768829"/>
-              <Orientation X="0" Y="168.226532" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:AmmoPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="-51.6792374" Y="8.44526482" Z="32.5153465"/>
-              <Orientation X="0" Y="167.989212" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:AmmoPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="-9.85184956" Y="8.25567532" Z="39.6119232"/>
-              <Orientation X="0" Y="165.167038" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+              <Position X="-9.04242706" Y="1.82531989" Z="-0.421615779"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -4988,10 +4912,42 @@
           <Components>
             <c:Collidable/>
             <c:Model>
-              <Resource>Models/Props/CapturePoint/CapturePointBlue.mesh</Resource>
+              <Resource>Models/Props/CapturePoint/CapturePointNeutral.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="36.6624298" Y="0.25" Z="63.2383499"/>
+              <Position X="0" Y="1.81599998" Z="-2.44199991"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:CapturePoint>
+                  <CapturePointNumber>2</CapturePointNumber>
+                </c:CapturePoint>
+                <c:Trigger/>
+                <c:Model>
+                  <Resource>Models/Core/UnitCylinder.mesh</Resource>
+                  <Color A="0.300000012" B="1" G="1" R="1"/>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Team/>
+                <c:Transform>
+                  <Position X="0" Y="20.0245457" Z="0"/>
+                  <Scale X="9" Y="40" Z="9"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:Collidable/>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/CapturePointRed.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-38.0929985" Y="0.25156638" Z="-62.2369995"/>
             </c:Transform>
           </Components>
           <Children>
@@ -4999,24 +4955,23 @@
               <Components>
                 <c:CapturePoint>
                   <HomePointForTeam>
-                    <Blue/>
+                    <Red/>
                   </HomePointForTeam>
-                  <CapturePointNumber>4</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Trigger/>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
-                  <Color A="0.300000012" B="1" G="0" R="0"/>
+                  <Color A="0.300000012" B="0" G="0" R="1"/>
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Team>
                   <Team>
-                    <Blue/>
+                    <Red/>
                   </Team>
                 </c:Team>
                 <c:Transform>
-                  <Position X="0" Y="30.5569248" Z="0"/>
-                  <Scale X="8.5" Y="62.2000046" Z="8.5"/>
+                  <Position X="0" Y="18.1249008" Z="0"/>
+                  <Scale X="8.5" Y="40" Z="8.5"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -5062,38 +5017,6 @@
               <Resource>Models/Props/CapturePoint/CapturePointNeutral.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="0" Y="1.81599998" Z="-2.44199991"/>
-            </c:Transform>
-          </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:CapturePoint>
-                  <CapturePointNumber>2</CapturePointNumber>
-                </c:CapturePoint>
-                <c:Trigger/>
-                <c:Model>
-                  <Resource>Models/Core/UnitCylinder.mesh</Resource>
-                  <Color A="0.300000012" B="1" G="1" R="1"/>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Team/>
-                <c:Transform>
-                  <Position X="0" Y="20.0245457" Z="0"/>
-                  <Scale X="9" Y="40" Z="9"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:Collidable/>
-            <c:Model>
-              <Resource>Models/Props/CapturePoint/CapturePointNeutral.mesh</Resource>
-            </c:Model>
-            <c:Transform>
               <Position X="36.7999992" Y="6.9000001" Z="-56"/>
             </c:Transform>
           </Components>
@@ -5124,10 +5047,10 @@
           <Components>
             <c:Collidable/>
             <c:Model>
-              <Resource>Models/Props/CapturePoint/CapturePointRed.mesh</Resource>
+              <Resource>Models/Props/CapturePoint/CapturePointBlue.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="-38.0929985" Y="0.25156638" Z="-62.2369995"/>
+              <Position X="36.6624298" Y="0.25" Z="63.2383499"/>
             </c:Transform>
           </Components>
           <Children>
@@ -5135,23 +5058,24 @@
               <Components>
                 <c:CapturePoint>
                   <HomePointForTeam>
-                    <Red/>
+                    <Blue/>
                   </HomePointForTeam>
+                  <CapturePointNumber>4</CapturePointNumber>
                 </c:CapturePoint>
                 <c:Trigger/>
                 <c:Model>
                   <Resource>Models/Core/UnitCylinder.mesh</Resource>
-                  <Color A="0.300000012" B="0" G="0" R="1"/>
+                  <Color A="0.300000012" B="1" G="0" R="0"/>
                   <Transparent>true</Transparent>
                 </c:Model>
                 <c:Team>
                   <Team>
-                    <Red/>
+                    <Blue/>
                   </Team>
                 </c:Team>
                 <c:Transform>
-                  <Position X="0" Y="18.1249008" Z="0"/>
-                  <Scale X="8.5" Y="40" Z="8.5"/>
+                  <Position X="0" Y="30.5569248" Z="0"/>
+                  <Scale X="8.5" Y="62.2000046" Z="8.5"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -5160,102 +5084,19 @@
         </Entity>
       </Children>
     </Entity>
-    <Entity name="Lights">
-      <Components>
-        <c:Transform/>
-      </Components>
-      <Children>
-        <Entity>
-          <Components>
-            <c:PointLight>
-              <Radius>10</Radius>
-            </c:PointLight>
-            <c:Transform>
-              <Position X="-38.6936989" Y="2.9200933" Z="-61.8637123"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:SceneLight>
-              <Gamma>1</Gamma>
-            </c:SceneLight>
-            <c:Transform/>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:PointLight>
-              <Radius>10</Radius>
-            </c:PointLight>
-            <c:Transform>
-              <Position X="-37.8627815" Y="10.1265135" Z="55.871048"/>
-            </c:Transform>
-          </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:PointLight>
-                  <Radius>10</Radius>
-                </c:PointLight>
-                <c:Transform>
-                  <Position X="75.9573059" Y="-7.13794327" Z="5.75230598"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:PointLight>
-              <Radius>10</Radius>
-            </c:PointLight>
-            <c:Transform>
-              <Position X="0" Y="3.14644003" Z="0"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:PointLight>
-              <Radius>10</Radius>
-            </c:PointLight>
-            <c:Transform>
-              <Position X="37.862999" Y="10.1269999" Z="-55.0098801"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="Directional">
-          <Components>
-            <c:DirectionalLight>
-              <Intensity>1</Intensity>
-            </c:DirectionalLight>
-            <c:Transform>
-              <Orientation X="0" Y="1.16600001" Z="2.08000016"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
-    </Entity>
-    <Entity name="SpawnerBlueTeam">
+    <Entity name="SpawnerRedTeam">
       <Components>
         <c:PlayerSpawn/>
         <c:Spawner>
-          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+          <EntityFile>Schema/Entities/PlayerRed.xml</EntityFile>
         </c:Spawner>
         <c:Team>
           <Team>
-            <Blue/>
+            <Red/>
           </Team>
         </c:Team>
         <c:Transform>
-          <Position X="60.0169258" Y="5.78000021" Z="76.2893906"/>
+          <Position X="-60.3695679" Y="5.64500046" Z="-79.3789597"/>
         </c:Transform>
       </Components>
       <Children>
@@ -5267,7 +5108,7 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="2.02889442" Y="0.194165871" Z="-1.17950201"/>
+              <Position X="-2.2788806" Y="0" Z="3.17202592"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5280,7 +5121,7 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="1.64179754" Y="0.634559035" Z="4.27690458"/>
+              <Position X="5.59104443" Y="2.14147282" Z="6.07936668"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5293,7 +5134,7 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="-9.04242706" Y="1.82531989" Z="-0.421615779"/>
+              <Position X="1.14053249" Y="0" Z="-1.67306876"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5306,7 +5147,166 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="-6.58577824" Y="1.97348273" Z="-2.86768818"/>
+              <Position X="9.3347702" Y="2.70210314" Z="2.33294678"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="HealthPickups">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="48.9189453" Y="7.06223536" Z="-78.9347992"/>
+              <Orientation X="0" Y="173.964676" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="49.2257118" Y="7.39368248" Z="-31.1810112"/>
+              <Orientation X="0" Y="162.378082" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-51.6792374" Y="8.44526482" Z="32.5153465"/>
+              <Orientation X="0" Y="167.989212" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-59.3499641" Y="7.46932745" Z="-20.6276321"/>
+              <Orientation X="0" Y="170.618805" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="54.7225227" Y="6.51863909" Z="29.0052128"/>
+              <Orientation X="0" Y="168.540482" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-42.3974304" Y="7.28327894" Z="81.9305344"/>
+              <Orientation X="0" Y="166.11824" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-1.13644195" Y="1.38919806" Z="38.9768829"/>
+              <Orientation X="0" Y="168.226532" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-9.85184956" Y="8.25567532" Z="39.6119232"/>
+              <Orientation X="0" Y="165.167038" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5332,65 +5332,6 @@
             </c:Transform>
           </Components>
           <Children>
-            <Entity name="PickClassCamera">
-              <Components>
-                <c:Camera/>
-                <c:Transform/>
-              </Components>
-              <Children>
-                <Entity name="PickClassHUD">
-                  <Components>
-                    <c:Transform>
-                      <Position X="0" Y="0" Z="-0.5"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity name="AssaultClassPick">
-                      <Components>
-                        <c:Button/>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitRaptor.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Position X="0.349999994" Y="0.149504215" Z="0"/>
-                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="DefenderClassPick">
-                      <Components>
-                        <c:Button/>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Position X="0.349999994" Y="0.0500000007" Z="0"/>
-                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="SniperClassPick">
-                      <Components>
-                        <c:Button/>
-                        <c:Sprite>
-                          <DiffuseTexture>Textures/Test/aM4ME4GR.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Position X="0.349999994" Y="-0.0500000007" Z="0"/>
-                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
             <Entity name="SpectatorCamera">
               <Components>
                 <c:Camera/>
@@ -5593,6 +5534,77 @@
                         <c:Transform>
                           <Position X="0" Y="0.178199276" Z="0"/>
                           <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="PickClassCamera">
+              <Components>
+                <c:Camera/>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="PickClassHUD">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="-0.5"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="DefenderClassPick">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:InputCmdButton>
+                          <Command>PickClass</Command>
+                          <PressValue>2</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="0.349999994" Y="0.0500000007" Z="0"/>
+                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="AssaultClassPick">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitRaptor.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:InputCmdButton>
+                          <Command>PickClass</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="0.349999994" Y="0.149504215" Z="0"/>
+                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="SniperClassPick">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Test/aM4ME4GR.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:InputCmdButton>
+                          <Command>PickClass</Command>
+                          <PressValue>3</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="0.349999994" Y="-0.0500000007" Z="0"/>
+                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
                         </c:Transform>
                       </Components>
                       <Children/>
