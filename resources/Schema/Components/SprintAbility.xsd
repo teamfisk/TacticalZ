@@ -9,8 +9,8 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="CoolDownMaxTimer" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>This is the cooldown on sprint</xs:documentation></xs:annotation>
+				<xs:element name="StrengthOfEffect" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>This is the strength of the sprint effect</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>
