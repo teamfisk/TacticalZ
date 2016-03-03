@@ -106,7 +106,10 @@ int TCPServer::readBuffer(PlayerDefinition & playerDefinition)
         boost::asio::ip::tcp::socket::message_peek, error);
     unsigned int sizeOfPacket = 0;
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
-
+    if (sizeOfPacket > playerDefinition.TCPSocket->available()) {
+        LOG_WARNING("TCPServer::readBuffer(): We haven't got the whole packet yet.");
+        return 0;
+    }
     // if the buffer is to small increase the size of it
     if (sizeOfPacket > m_BufferSize) {
         delete[] m_ReadBuffer;
