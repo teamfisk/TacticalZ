@@ -9,24 +9,17 @@
   </Components>
 
   <Children>
-    <Entity name="Simonplzpush">
-      <Components>
-        <c:Text>
-          <Content>Simon needs to push shit shit so i can write text from Component</Content>
-          <Resource>Fonts/DroidSans.ttf,64</Resource>
-        </c:Text>
-        <c:Transform>
-          <Position X="0" Y="2.09157753" Z="0"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
     <Entity name="ID">
       <Components>
         <c:Text>
-          <Content>ID</Content>
+          <Content>-1</Content>
           <Resource>Fonts/DroidSans.ttf,64</Resource>
         </c:Text>
+        <c:TextFieldReader>
+          <ParentEntityName>ScoreIdentity</ParentEntityName>
+          <ComponentType>ScoreIdentity</ComponentType>
+          <Field>ID</Field>
+        </c:TextFieldReader>
         <c:Transform>
           <Position X="-9.66245842" Y="0" Z="0"/>
         </c:Transform>
@@ -36,35 +29,16 @@
     <Entity name="Name">
       <Components>
         <c:Text>
-          <Content>DickButt</Content>
+          <Content></Content>
           <Resource>Fonts/DroidSans.ttf,64</Resource>
         </c:Text>
+        <c:TextFieldReader>
+          <ParentEntityName>ScoreIdentity</ParentEntityName>
+          <ComponentType>ScoreIdentity</ComponentType>
+          <Field>Name</Field>
+        </c:TextFieldReader>
         <c:Transform>
-          <Position X="-5.08430147" Y="0" Z="0"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity name="Kills">
-      <Components>
-        <c:Text>
-          <Content>5</Content>
-          <Resource>Fonts/DroidSans.ttf,64</Resource>
-        </c:Text>
-        <c:Transform>
-          <Position X="-1.23991621" Y="0" Z="0"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity name="Deaths">
-      <Components>
-        <c:Text>
-          <Content>12</Content>
-          <Resource>Fonts/DroidSans.ttf,64</Resource>
-        </c:Text>
-        <c:Transform>
-          <Position X="1.3544426" Y="0" Z="0"/>
+          <Position X="-6.30237818" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -72,11 +46,50 @@
     <Entity name="KD">
       <Components>
         <c:Text>
-          <Content>0.42</Content>
+          <Content>0</Content>
           <Resource>Fonts/DroidSans.ttf,64</Resource>
         </c:Text>
+        <c:TextFieldReader>
+          <ParentEntityName>ScoreIdentity</ParentEntityName>
+          <ComponentType>ScoreIdentity</ComponentType>
+          <Field>KD</Field>
+        </c:TextFieldReader>
         <c:Transform>
-          <Position X="4.43798256" Y="0" Z="0"/>
+          <Position X="-1.88777053" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Kills">
+      <Components>
+        <c:Text>
+          <Content>0</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:TextFieldReader>
+          <ParentEntityName>ScoreIdentity</ParentEntityName>
+          <ComponentType>ScoreIdentity</ComponentType>
+          <Field>Kills</Field>
+        </c:TextFieldReader>
+        <c:Transform>
+          <Position X="0.558054805" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Deaths">
+      <Components>
+        <c:Text>
+          <Content>0</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:TextFieldReader>
+          <ParentEntityName>ScoreIdentity</ParentEntityName>
+          <ComponentType>ScoreIdentity</ComponentType>
+          <Field>Deaths</Field>
+        </c:TextFieldReader>
+        <c:Transform>
+          <Position X="2.71133566" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -84,11 +97,16 @@
     <Entity name="Ping">
       <Components>
         <c:Text>
-          <Content>84</Content>
+          <Content>0</Content>
           <Resource>Fonts/DroidSans.ttf,64</Resource>
         </c:Text>
+        <c:TextFieldReader>
+          <ParentEntityName>ScoreIdentity</ParentEntityName>
+          <ComponentType>ScoreIdentity</ComponentType>
+          <Field>Ping</Field>
+        </c:TextFieldReader>
         <c:Transform>
-          <Position X="8.05187988" Y="0" Z="0"/>
+          <Position X="5.79302835" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>

@@ -14,6 +14,10 @@ ScoreScreenSystem::ScoreScreenSystem(SystemParams params)
 void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt)
 {
     //TODO: Check team al
+    if (!IsServer) {
+        return;
+    }
+
     if(!entity.HasComponent("ScoreScreen")){
         return;
     }
@@ -62,9 +66,6 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
             (int&)cScoreIdentity["ID"] = data.ID;
             (int&)cScoreIdentity["Ping"] = 1337;
 
-            std::string IdentityName = "#" + std::to_string(data.ID) + ": " + data.Name;
-
-            m_World->SetName(scoreIdentity.ID, IdentityName);
             m_World->SetParent(scoreIdentity.ID, entity.ID);
         }
     }
