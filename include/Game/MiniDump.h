@@ -1,8 +1,11 @@
 #ifndef MiniDump_h__
 #define MiniDump_h__
 
-#include <Windows.h>
+#include <DbgHelp.h>
 
-void WINAPI Create_Dump(PEXCEPTION_POINTERS pException);
+#include <ctime>
+#include <comdef.h>
+
+long WINAPI Create_Dump_Immediate(LPEXCEPTION_POINTERS pException);
 
 #endif
