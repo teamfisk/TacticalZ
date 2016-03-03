@@ -1,5 +1,5 @@
-#ifndef EntityFilePreprocessor_h__
-#define EntityFilePreprocessor_h__
+#ifndef EntityXMLFilePreprocessor_h__
+#define EntityXMLFilePreprocessor_h__
 
 #include <xercesc/framework/psvi/XSElementDeclaration.hpp>
 #include <xercesc/framework/psvi/XSComplexTypeDefinition.hpp>
@@ -17,17 +17,18 @@
 #include "Util/XercesString.h"
 #include "ResourceManager.h"
 #include "World.h"
-#include "EntityFile.h"
+#include "EntityXMLFile.h"
 
-class EntityFilePreprocessor
+class EntityXMLFilePreprocessor
 {
+    friend class EntityFile;
 public:
-    EntityFilePreprocessor(const EntityFile* entityFile);
-
-    void RegisterComponents(World* world);
+    EntityXMLFilePreprocessor(const EntityXMLFile* entityFile);
 
 private:
-    const EntityFile* m_EntityFile;
+    void RegisterComponents(World* world);
+
+    const EntityXMLFile* m_EntityFile;
     std::map<std::string, unsigned int> m_ComponentCounts;
 	std::map<std::string, ComponentInfo> m_ComponentInfo;
 

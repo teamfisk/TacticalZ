@@ -27,7 +27,7 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override;
     virtual void Reset();
 
-    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer);
+    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID);
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
 
@@ -41,6 +41,7 @@ protected:
     bool m_Crouching = false;
     //assault dash membervariables - needed to calculate the doubletap- and dashlogic
     double m_AssaultDashDoubleTapDeltaTime = 0.0;
+    double m_DashEffectResetTimer = 0.0;
     //i will let m_AssaultDashDoubleTapSensitivityTimer stay hardcoded, its not really a gamevariable (more an inputvariable), 
     //and its very unlikely that someone wants to change that value
     const float m_AssaultDashDoubleTapSensitivityTimer = 0.25f;
@@ -51,7 +52,7 @@ protected:
     bool m_ShiftDashing = false;
     bool m_ValidDoubleTap = false;
 
-    //specialabilitys
+    //specialabilities
     bool m_MovementKeyDown = false;
     bool m_SpecialAbilityKeyDown = false;
     int m_NumberOfMovementKeysDown = 0;
@@ -190,12 +191,19 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 }
 
 template <typename EventContext>
-void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer) {
+void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID) {
     m_AssaultDashDoubleTapDeltaTime += dt;
+    m_DashEffectResetTimer += dt;
     assaultDashCoolDownTimer -= dt;
     //cooldown = assaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)
     if (assaultDashCoolDownTimer > (assaultDashCoolDownMaxTimer - 0.25f)) {
         m_PlayerIsDashing = true;
+        if (m_DashEffectResetTimer > 0.05) {
+            Events::DashAbility e;
+            e.Player = playerID;
+            m_EventBroker->Publish(e);
+            m_DashEffectResetTimer = 0.0;
+        }
     } else {
         m_PlayerIsDashing = false;
     }
@@ -207,6 +215,9 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
         assaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
         m_AssaultDashDoubleTapped = true;
         m_AssaultDashDoubleTapDeltaTime = 0.f;
+        Events::DashAbility e;
+        e.Player = playerID;
+        m_EventBroker->Publish(e);
         return;
     }
 
@@ -237,6 +248,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     assaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
 
     Events::DashAbility e;
+    e.Player = playerID;
     m_EventBroker->Publish(e);
 }
 

@@ -1,10 +1,10 @@
-#include "Core/EntityFilePreprocessor.h"
+#include "Core/EntityXMLFilePreprocessor.h"
 
-EntityFilePreprocessor::EntityFilePreprocessor(const EntityFile* entityFile) 
+EntityXMLFilePreprocessor::EntityXMLFilePreprocessor(const EntityXMLFile* entityFile) 
     : m_EntityFile(entityFile)
 {
     EntityFileHandler handler;
-    handler.SetStartComponentCallback(std::bind(&EntityFilePreprocessor::onStartComponent, this, std::placeholders::_1, std::placeholders::_2));
+    handler.SetStartComponentCallback(std::bind(&EntityXMLFilePreprocessor::onStartComponent, this, std::placeholders::_1, std::placeholders::_2));
     m_EntityFile->Parse(&handler);
 
     //LOG_DEBUG("___ COMPONENT DEFINITIONS ___");
@@ -28,20 +28,20 @@ EntityFilePreprocessor::EntityFilePreprocessor(const EntityFile* entityFile)
     parseDefaults();
 }
 
-void EntityFilePreprocessor::RegisterComponents(World* world)
+void EntityXMLFilePreprocessor::RegisterComponents(World* world)
 {
     for (auto& kv : m_ComponentInfo) {
         world->RegisterComponent(kv.second);
     }
 }
 
-void EntityFilePreprocessor::onStartComponent(EntityID entity, std::string type)
+void EntityXMLFilePreprocessor::onStartComponent(EntityID entity, std::string type)
 {
     //LOG_DEBUG("Component: %s", type.c_str());
     m_ComponentCounts[type]++;
 }
 
-void EntityFilePreprocessor::parseComponentInfo()
+void EntityXMLFilePreprocessor::parseComponentInfo()
 {
     using namespace xercesc;
     EntityFileXMLErrorHandler errorHandler;
@@ -141,9 +141,9 @@ void EntityFilePreprocessor::parseComponentInfo()
             std::string baseType = XS::ToString(elementDeclaration->getTypeDefinition()->getBaseType()->getName());
 
             std::string effectiveType = type;
-            unsigned int stride = EntityFile::GetTypeStride(type);
+            unsigned int stride = EntityXMLFile::GetTypeStride(type);
             if (stride == 0) {
-                stride = EntityFile::GetTypeStride(baseType);
+                stride = EntityXMLFile::GetTypeStride(baseType);
                 if (stride == 0) {
                     LOG_WARNING("Field \"%s\" in component \"%s\" uses unexpected field type \"%s\" with base type \"%s\". Skipping.", name.c_str(), compInfo.Name.c_str(), type.c_str(), baseType.c_str());
                     continue;
@@ -196,7 +196,7 @@ void EntityFilePreprocessor::parseComponentInfo()
     }
 }
 
-void EntityFilePreprocessor::parseDefaults()
+void EntityXMLFilePreprocessor::parseDefaults()
 {
     using namespace xercesc;
 
@@ -261,7 +261,7 @@ void EntityFilePreprocessor::parseDefaults()
                     auto attribItem = attributeMap->item(i);
                     attributes[XS::ToString(attribItem->getNodeName())] = XS::ToString(attribItem->getNodeValue());
                 }
-                EntityFile::WriteAttributeData(data, field, attributes);
+                EntityXMLFile::WriteAttributeData(data, field, attributes);
             }
 
             auto childNode = fieldElement->getFirstChild();
@@ -278,14 +278,14 @@ void EntityFilePreprocessor::parseDefaults()
             // Handle potential field values
             if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
                 char* cstrValue = XMLString::transcode(childNode->getNodeValue());
-                EntityFile::WriteValueData(data, field, cstrValue);
+                EntityXMLFile::WriteValueData(data, field, cstrValue);
                 XMLString::release(&cstrValue);
             }
         }
     }
 }
 
-std::string EntityFilePreprocessor::parseAnnotationXML(const XMLCh* xml)
+std::string EntityXMLFilePreprocessor::parseAnnotationXML(const XMLCh* xml)
 {
     using namespace xercesc;
 
