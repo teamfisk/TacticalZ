@@ -54,8 +54,10 @@ void Packet::WriteString(const std::string& str)
         }
         resizeData();
     }
-    memcpy(m_Data + m_Offset, str.data(), sizeOfString * sizeof(char));
-    m_Offset += sizeOfString * sizeof(char);
+    memcpy(m_Data + m_Offset, str.data(), str.size() * sizeof(char));
+    m_Offset += str.size() * sizeof(char);
+    m_Data[m_Offset] = '\0';
+    m_Offset += 1;
 }
 
 void Packet::WriteData(char * data, int sizeOfData)
