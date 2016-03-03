@@ -60,7 +60,23 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
                     }
                 }
                 found = true;
-                //Update position for childs
+                //Update Deaths for child
+                std::unordered_map<int, int>::iterator gotDeaths = m_DeathAmount.find(ID);
+                if(gotDeaths != m_DeathAmount.end()) {
+                    (int&)child["ScoreIdentity"]["Deaths"] += gotDeaths->second;
+                    (double&)child["ScoreIdentity"]["KD"] = (double)((int)child["ScoreIdentity"]["Deaths"]/(int)child["ScoreIdentity"]["Deaths"]);
+                    m_DeathAmount.erase(gotDeaths);
+
+                }
+                //Update Kills for child
+                std::unordered_map<int, int>::iterator gotKills = m_KillAmount.find(ID);
+                if (gotKills != m_KillAmount.end()) {
+                    (int&)child["ScoreIdentity"]["Kills"] += gotKills->second;
+                    (double&)child["ScoreIdentity"]["KD"] = (double)((int)child["ScoreIdentity"]["Deaths"]/(int)child["ScoreIdentity"]["Deaths"]);
+                    m_KillAmount.erase(gotKills);
+
+                }
+                //Update position for child
                 glm::vec3 offset = (glm::vec3)entity["ScoreScreen"]["Offset"];
                 (glm::vec3&) child["Transform"]["Position"] = offset * position;
                 position += 1.f;
@@ -89,7 +105,6 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
 
             (std::string&)cScoreIdentity["Name"] = data.Name;
             (int&)cScoreIdentity["ID"] = data.ID;
-            (int&)cScoreIdentity["Ping"] = 1337;
 
             m_World->SetParent(scoreIdentity.ID, entity.ID);
 
@@ -100,9 +115,11 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
     //Local player should have an icon, compare with LocalPlayer somthing
 }
 
-bool ScoreScreenSystem::OnPlayerDeath(const Events::PlayerDeath& e)
+bool ScoreScreenSystem::OnPlayerDeath(const Events::KillDeath& e)
 {
     //When player die, add it to his score, and when possible the player who killed him.
+    m_DeathAmount[e.Casualty]++;
+    m_KillAmount[e.Killer]++;
     return 0;
 }
 
