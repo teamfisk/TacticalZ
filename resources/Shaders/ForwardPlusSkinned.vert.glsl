@@ -1,9 +1,13 @@
 #version 430
 
+#define MAX_SPLITS 4
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 uniform mat4 Bones[100];
+uniform mat4 LightV[MAX_SPLITS];
+uniform mat4 LightP[MAX_SPLITS];
 
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
@@ -44,5 +48,9 @@ void main()
  	Output.BiTangent = vec3(M * vec4(BiTangent, 0.0));
 	Output.ExplosionColor = vec4(1.0);
 	Output.ExplosionPercentageElapsed = 0.0;
-	Output.PositionLightSpace = boneTransform * vec4(Position, 1.0);
+	
+	for(int i = 0; i < MAX_SPLITS; i++)
+	{
+		Output.PositionLightSpace[i] = LightP[i] * LightV[i] * M * boneTransform * vec4(Position, 1.0);
+	}
 }

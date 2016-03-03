@@ -1,5 +1,5 @@
-#ifndef ShadowPass_h_
-#define ShadowPass_h_
+#ifndef ShadowPass_h__
+#define ShadowPass_h__
 
 #include "IRenderer.h"
 #include "FrameBuffer.h"
@@ -38,6 +38,8 @@ public:
 	void ClearBuffer();
 	void Draw(RenderScene& scene);
 
+	void DebugGUI();
+
 	GLuint DepthMap() const { return m_DepthMap; }
 	std::array<glm::mat4, MAX_SPLITS> LightP() const { return m_LightProjection; }
 	std::array<glm::mat4, MAX_SPLITS> LightV() const { return m_LightView; }
@@ -62,7 +64,6 @@ private:
 	GLuint m_DepthMap;
 	FrameBuffer m_DepthBuffer;
 	ShaderProgram* m_ShadowProgram;
-	//ShaderProgram* m_TransparentShadowProgram;
 
 	std::array<glm::mat4, MAX_SPLITS> m_LightProjection;
 	std::array<glm::mat4, MAX_SPLITS> m_LightView;
@@ -71,8 +72,12 @@ private:
 	GLuint m_ResolutionSizeWidth = 1024 * 2;
 	GLuint m_ResolutionSizeHeight = 1024 * 2;
 
+	bool m_TransparentObjects = false;
+	bool m_TexturedShadows = false;
+	bool m_EnableShadows = true;
+
 	int m_CurrentNrOfSplits = 4;
-	float m_SplitWeight = 0.91f;
+	float m_SplitWeight = 0.962f;
 
 	std::array<ShadowFrustum, MAX_SPLITS> m_shadowFrusta;
 

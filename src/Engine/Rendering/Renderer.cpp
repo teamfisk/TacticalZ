@@ -86,6 +86,11 @@ void Renderer::InitializeShaders()
 {
     m_BasicForwardProgram = ResourceManager::Load<ShaderProgram>("#m_BasicForwardProgram");
     m_ExplosionEffectProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectProgram");
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ExplosionEffect.vert.glsl")));
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/ExplosionEffect.geom.glsl")));
+    //m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ExplosionEffect.frag.glsl")));
+    //m_ExplosionEffectProgram->Compile();
+    //m_ExplosionEffectProgram->Link();
 }
 
 void Renderer::InputUpdate(double dt)
@@ -127,8 +132,9 @@ void Renderer::Draw(RenderFrame& frame)
     m_PickingPass->ClearPicking();
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
-    m_ShadowPass->ClearBuffer();
 	m_SSAOPass->ClearBuffer();
+	m_ShadowPass->ClearBuffer();
+	m_ShadowPass->DebugGUI();
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
     GLERROR("ClearBuffers");
 	for (auto scene : frame.RenderScenes) {
@@ -144,7 +150,9 @@ void Renderer::Draw(RenderFrame& frame)
         PerformanceTimer::StartTimer("Renderer-Depth");
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
-        m_ShadowPass->Draw(*scene);
+		PerformanceTimer::StartTimerAndStopPrevious("Draw shadow maps");
+		m_ShadowPass->Draw(*scene);
+		GLERROR("Draw shadow maps");
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Generate Frustrums");
         m_LightCullingPass->GenerateNewFrustum(*scene);
         GLERROR("Generate frustums");
@@ -187,7 +195,7 @@ void Renderer::Draw(RenderFrame& frame)
     }
     if (m_DebugTextureToDraw == 4) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
-    } 
+    }
 	if (m_DebugTextureToDraw == 5) {
 		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
 	}
@@ -239,9 +247,9 @@ void Renderer::InitializeRenderPasses()
 {
     m_PickingPass = new PickingPass(this, m_EventBroker);
     m_LightCullingPass = new LightCullingPass(this);
-    m_ShadowPass = new ShadowPass(this);
     m_CubeMapPass = new CubeMapPass(this);
 	m_SSAOPass = new SSAOPass(this, m_Config);
+	m_ShadowPass = new ShadowPass(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);

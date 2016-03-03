@@ -17,10 +17,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_EditorCamera = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/Empty.xml");
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
-	auto cCamera = m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
-	// TOBIAS TVINGADE MIG ATT HÅRDKODA
-	(double&)cCamera["FarClip"] = 400.0;
-
+    m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
     m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1);
 
     m_EditorGUI = new EditorGUI(m_World, m_EventBroker);

@@ -1,6 +1,7 @@
 #version 430
 
 #define MIN_AMBIENT_LIGHT 0.3
+#define MAX_SPLITS 4
 
 uniform mat4 M;
 uniform mat4 V;

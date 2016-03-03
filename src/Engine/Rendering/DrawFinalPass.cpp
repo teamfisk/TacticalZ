@@ -4,10 +4,10 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
 	, m_LightCullingPass(lightCullingPass)
 	, m_CubeMapPass(cubeMapPass)
 	, m_SSAOPass(ssaoPass)
+	, m_ShadowPass(shadowPass)
 {
     //TODO: Make sure that uniforms are not sent into shader if not needed.
     m_ShieldPixelRate = 8;
-    m_ShadowPass = shadowPass;
     InitializeTextures();
     InitializeShaderPrograms();
     InitializeFrameBuffers();
@@ -343,7 +343,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_SSAOPass->SSAOTexture());
-	glActiveTexture(GL_TEXTURE6);
+
+	glActiveTexture(GL_TEXTURE13);
 	if (m_ShadowPass->DepthMap() != NULL) {
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_ShadowPass->DepthMap());
 	}
@@ -1091,10 +1092,10 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
     glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
     GLERROR("Bind 20 uniform");
     glUniform1f(glGetUniformLocation(shaderHandle, "GlowIntensity"), job->GlowIntensity);
+
 	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
 	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
 	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
-
     GLERROR("END");
 }
 
@@ -1133,12 +1134,10 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 
     GLERROR("Bind 10 uniform");
     GLint Location_GlowIntensity = glGetUniformLocation(shaderHandle, "GlowIntensity");
+	glUniform1f(Location_GlowIntensity, job->GlowIntensity);
 
-    glUniform1f(Location_GlowIntensity, job->GlowIntensity);
-
-    //Shadow
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
 	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
 
 	GLERROR("END");
@@ -1309,7 +1308,6 @@ void DrawFinalPass::BindModelTextures(GLuint shaderHandle, std::shared_ptr<Model
 				glBindTexture(GL_TEXTURE_2D, m_BlackTexture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, "GlowUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
 			}
-
 			break;
 		}
 		case RawModel::MaterialType::SplatMapping:

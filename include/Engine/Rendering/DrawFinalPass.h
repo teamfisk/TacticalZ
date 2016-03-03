@@ -64,9 +64,9 @@ private:
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
-    const ShadowPass* m_ShadowPass;
     const CubeMapPass* m_CubeMapPass;
 	const SSAOPass* m_SSAOPass;
+	const ShadowPass* m_ShadowPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;

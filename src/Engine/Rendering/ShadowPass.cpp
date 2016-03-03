@@ -1,6 +1,5 @@
 #include "Rendering/ShadowPass.h"
 
-
 ShadowPass::ShadowPass(IRenderer * renderer, int shadow_res_x, int shadow_res_y)
 {
 	m_Renderer = renderer;
@@ -22,6 +21,15 @@ ShadowPass::ShadowPass(IRenderer * renderer)
 ShadowPass::~ShadowPass()
 {
 
+}
+
+void ShadowPass::DebugGUI()
+{
+	ImGui::Checkbox("EnableShadows", &m_EnableShadows);
+	ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
+	ImGui::DragFloat("ShadowClippingWeight", &m_SplitWeight, 0.001f, 0.f, 1.f);
+	ImGui::Checkbox("ShadowTransparentObjects", &m_TransparentObjects);
+	ImGui::Checkbox("ShadowOnTextureAlphas", &m_TexturedShadows);
 }
 
 void ShadowPass::InitializeCameras(RenderScene & scene)
@@ -198,101 +206,100 @@ void ShadowPass::RadiusToLightspace(ShadowFrustum& frustum)
 
 void ShadowPass::Draw(RenderScene & scene)
 {
-	ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
-	ImGui::DragFloat("ShadowClippingWeight", &m_SplitWeight, 0.001f, 0.f, 1.f);
+	if (m_EnableShadows) {
+		InitializeCameras(scene);
+		UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
 
-	InitializeCameras(scene);
-	UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
+		ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
 
-	ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
+		m_ShadowProgram->Bind();
+		GLuint shaderHandle = m_ShadowProgram->GetHandle();
+		glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight);
 
-	m_ShadowProgram->Bind();
-	GLuint shaderHandle = m_ShadowProgram->GetHandle();
-	glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight);
+		for (int i = 0; i < m_CurrentNrOfSplits; i++) {
+			UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward());
 
-	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward());
+			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
 
-		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
+			for (auto &job : scene.Jobs.DirectionalLight) {
+				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
-		for (auto &job : scene.Jobs.DirectionalLight) {
-			auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
+				if (directionalLightJob) {
+					m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
 
-			if (directionalLightJob) {
-				m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
+					PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
+					//FindRadius(m_shadowFrusta[i]);
+					//RadiusToLightspace(m_shadowFrusta[i]);
+					m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[LEFT], m_shadowFrusta[i].LRBT[RIGHT], m_shadowFrusta[i].LRBT[BOTTOM], m_shadowFrusta[i].LRBT[TOP], m_NearFarPlane[NEAR], m_NearFarPlane[FAR]);
 
-				PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
-				//FindRadius(m_shadowFrusta[i]);
-				//RadiusToLightspace(m_shadowFrusta[i]);
-				m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[LEFT], m_shadowFrusta[i].LRBT[RIGHT], m_shadowFrusta[i].LRBT[BOTTOM], m_shadowFrusta[i].LRBT[TOP], m_NearFarPlane[NEAR], m_NearFarPlane[FAR]);
+					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
+					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
 
-				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
-				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
+					GLERROR("ShadowLight ERROR");
 
-				GLERROR("ShadowLight ERROR");
+					for (auto &objectJob : scene.Jobs.OpaqueObjects) {
+						if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob)) {
+							auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
-				for (auto &objectJob : scene.Jobs.OpaqueObjects) {
-					if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob))
-					{
-						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
+							glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+							glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), 1.f);
 
-						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+							glBindVertexArray(modelJob->Model->VAO);
+							glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+							glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
 
-						glBindVertexArray(modelJob->Model->VAO);
-						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-						glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
-
-						GLERROR("Shadow Draw ERROR");
+							GLERROR("Shadow Draw ERROR");
+						}
 					}
-				}
+					if (m_TransparentObjects) {
+						state->CullFace(GL_BACK);
+						for (auto &objectJob : scene.Jobs.TransparentObjects) {
+							if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob)) {
+								auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
-				state->CullFace(GL_BACK);
-				for (auto &objectJob : scene.Jobs.TransparentObjects) {
-					if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob))
-					{
-						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
+								glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+								glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
 
-						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-						glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
-
-						if (directionalLightJob->TextureAlphaShadows) {
-							switch (modelJob->Type) {
-							case RawModel::MaterialType::SingleTextures:
-							case RawModel::MaterialType::Basic:
-							{
-								glActiveTexture(GL_TEXTURE24);
-								if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
-									glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
-									glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+								if (m_TexturedShadows) {
+									switch (modelJob->Type) {
+									case RawModel::MaterialType::SingleTextures:
+									case RawModel::MaterialType::Basic:
+									{
+										glActiveTexture(GL_TEXTURE24);
+										if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+											glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+											glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+										}
+										else {
+											glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+											glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+										}
+										break;
+									}
+									case RawModel::MaterialType::SplatMapping:
+									{
+										glActiveTexture(GL_TEXTURE24);
+										glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+										glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+										break;
+									}
+									}
 								}
-								else {
-									glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-									glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
-								}
-								break;
-							}
-							case RawModel::MaterialType::SplatMapping:
-							{
-								glActiveTexture(GL_TEXTURE24);
-								glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-								glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
-								break;
-							}
+
+								glBindVertexArray(modelJob->Model->VAO);
+								glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+								glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+
+								GLERROR("Shadow Draw ERROR");
 							}
 						}
-
-						glBindVertexArray(modelJob->Model->VAO);
-						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-						glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
-
-						GLERROR("Shadow Draw ERROR");
+						state->CullFace(GL_FRONT);
 					}
 				}
-				state->CullFace(GL_FRONT);
 			}
 		}
+		glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+		m_DepthBuffer.Unbind();
+		delete state;
 	}
-	glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-	m_DepthBuffer.Unbind();
-	delete state;
 }

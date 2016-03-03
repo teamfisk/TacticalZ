@@ -24,9 +24,9 @@
 #include "../Core/Transform.h"
 #include "imgui/imgui.h"
 #include "TextPass.h"
-#include "ShadowPass.h"
 #include "Util/CommonFunctions.h"
 #include "Core/PerformanceTimer.h"
+#include "ShadowPass.h"
 
 class Renderer : public IRenderer
 {
@@ -74,9 +74,9 @@ private:
     DrawScreenQuadPass* m_DrawScreenQuadPass;
     DrawBloomPass* m_DrawBloomPass;
     DrawColorCorrectionPass* m_DrawColorCorrectionPass;
-    ShadowPass* m_ShadowPass;
 	SSAOPass* m_SSAOPass;
     CubeMapPass* m_CubeMapPass;
+	ShadowPass* m_ShadowPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();

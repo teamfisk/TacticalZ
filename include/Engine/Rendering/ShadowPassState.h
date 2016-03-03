@@ -6,8 +6,8 @@
 class ShadowPassState : public RenderState
 {
 public:
-    ShadowPassState(GLuint frameBuffer);
-    ~ShadowPassState();
+	ShadowPassState(GLuint frameBuffer);
+	~ShadowPassState();
 
 private:
 };

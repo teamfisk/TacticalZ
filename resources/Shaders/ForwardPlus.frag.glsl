@@ -1,7 +1,7 @@
 #version 430
 
-#define MAX_SPLITS 4
 #define MIN_AMBIENT_LIGHT 0.3
+#define MAX_SPLITS 4
 
 uniform mat4 M;
 uniform mat4 V;
@@ -12,22 +12,22 @@ uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
-uniform float FarDistance[MAX_SPLITS];
 uniform float GlowIntensity = 10;
 uniform vec3 CameraPosition;
 uniform int SSAOQuality;
+uniform float FarDistance[MAX_SPLITS];
 
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
 uniform vec2 SpecularUVRepeat;
 uniform vec2 GlowUVRepeat;
 layout (binding = 0) uniform sampler2D AOTexture;
-layout (binding = 6) uniform sampler2DArrayShadow DepthMap;
 layout (binding = 1) uniform sampler2D DiffuseTexture;
 layout (binding = 2) uniform sampler2D NormalMapTexture;
 layout (binding = 3) uniform sampler2D SpecularMapTexture;
 layout (binding = 4) uniform sampler2D GlowMapTexture;
 layout (binding = 5) uniform samplerCube CubeMap;
+layout (binding = 13) uniform sampler2DArrayShadow DepthMap;
 
 #define TILE_SIZE 16
 
@@ -61,7 +61,6 @@ layout (std430, binding = 4) buffer LightIndexBuffer
 {
 	float LightIndex[];
 };
-
 
 in VertexData{
 	vec3 Position;
@@ -155,6 +154,62 @@ float Random(vec3 seed, int i)
 	return fract(sin(dot_product) * 43758.5453);
 }
 
+int getShadowIndex(float far_distance[1])
+{
+	return 0;
+}
+
+int getShadowIndex(float far_distance[2])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 1;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+
+	return index;
+}
+
+int getShadowIndex(float far_distance[3])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 2;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+	else if ( depth < far_distance[1] && depth > far_distance[0] )
+	{
+		index = 1;
+	}
+
+	return index;
+}
+
+int getShadowIndex(float far_distance[4])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 3;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+	else if ( depth < far_distance[1] && depth > far_distance[0] )
+	{
+		index = 1;
+	}
+	else if ( depth < far_distance[2] && depth > far_distance[1] )
+	{
+		index = 2;
+	}
+
+	return index;
+}
+
 // Standard hardware-calculated PCF method
 float PCFShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index)
 {
@@ -237,62 +292,6 @@ float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler
 	shadowMapDepth = SoftwarePCF(depth_texture_array, projCoords, layer_index, bias);
 
     return shadowMapDepth;
-} 
-
-int getShadowIndex(float far_distance[1])
-{
-	return 0;
-}
-
-int getShadowIndex(float far_distance[2])
-{
-	float depth = gl_FragCoord.z / gl_FragCoord.w;
-	
-	int index = 1;
-	if ( depth < far_distance[0] )
-	{
-		index = 0;
-	}
-
-	return index;
-}
-
-int getShadowIndex(float far_distance[3])
-{
-	float depth = gl_FragCoord.z / gl_FragCoord.w;
-	
-	int index = 2;
-	if ( depth < far_distance[0] )
-	{
-		index = 0;
-	}
-	else if ( depth < far_distance[1] && depth > far_distance[0] )
-	{
-		index = 1;
-	}
-
-	return index;
-}
-
-int getShadowIndex(float far_distance[4])
-{
-	float depth = gl_FragCoord.z / gl_FragCoord.w;
-	
-	int index = 3;
-	if ( depth < far_distance[0] )
-	{
-		index = 0;
-	}
-	else if ( depth < far_distance[1] && depth > far_distance[0] )
-	{
-		index = 1;
-	}
-	else if ( depth < far_distance[2] && depth > far_distance[1] )
-	{
-		index = 2;
-	}
-
-	return index;
 }
 
 void main()
@@ -322,14 +321,14 @@ void main()
 
 	int start = int(LightGrids.Data[currentTile].Start);
 	int amount = int(LightGrids.Data[currentTile].Amount);
-
-	float shadowFactor = 0.0;
 	
+	float shadowFactor = 0.0;
+
 	for(int i = start; i < start + amount; i++) {
 
 		int l = int(LightIndex[i]);
 		LightSource light = LightSources.List[l];
-		
+
 		LightResult light_result;
 		//These if statements should be removed.
 		if(light.Type == 1) { // point
@@ -342,17 +341,17 @@ void main()
 		totalLighting.Diffuse += vec4(light_result.Diffuse.rgb * ao, light_result.Diffuse.a);
 		totalLighting.Specular += vec4(light_result.Specular.rgb * ao, light_result.Specular.a);
 	}
-
+	
 	totalLighting.Diffuse *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
 	totalLighting.Specular *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
-	
-	//LightResult getInformation;
-	
+
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
-	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));	
+	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
 	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
 	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
+	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
+	
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
 
