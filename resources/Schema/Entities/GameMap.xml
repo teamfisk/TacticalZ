@@ -245,13 +245,6 @@
         </Entity>
       </Children>
     </Entity>
-    <Entity name="Ambient">
-      <Components>
-        <c:SceneLight/>
-        <c:Transform/>
-      </Components>
-      <Children/>
-    </Entity>
   </Children>
 
 </Entity>
