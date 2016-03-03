@@ -6,11 +6,7 @@
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
-    <c:AssaultWeapon>
-      <Slot>
-        <Secondary/>
-      </Slot>
-    </c:AssaultWeapon>
+    <c:AssaultWeapon/>
     <c:Collidable/>
     <c:DashAbility/>
     <c:DoubleJump/>
@@ -548,6 +544,9 @@
       <Children>
         <Entity name="PrimaryAttachment">
           <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
             <c:WeaponAttachment>
               <Weapon>AssaultWeapon</Weapon>
               <Person>
@@ -557,9 +556,43 @@
             <c:Spawner>
               <EntityFile>Schema/Entities/AssaultWeaponWorld.xml</EntityFile>
             </c:Spawner>
-            <c:Transform/>
+            <c:Transform>
+              <Position X="0.15691258" Y="1.04389966" Z="-0.213815808"/>
+              <Orientation X="-0.00425229501" Y="-0.0330814682" Z="0.137528151"/>
+            </c:Transform>
           </Components>
-          <Children/>
+          <Children>
+            <Entity name="AssaultWeapon">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="WeaponMuzzle">
+                  <Components>
+                    <c:Spawner>
+                      <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
+                    </c:Spawner>
+                    <c:Transform>
+                      <Position X="0.00624208851" Y="0.0957332104" Z="-0.159257293"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="ThirdPersonReloadSpawner">
+                  <Components>
+                    <c:Spawner>
+                      <EntityFile>Schema/Entities/ReloadEffectWorld.xml</EntityFile>
+                    </c:Spawner>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
         </Entity>
         <Entity name="SecondaryAttachment">
           <Components>
