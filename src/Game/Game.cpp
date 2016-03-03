@@ -10,7 +10,9 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Systems/PlayerDeathSystem.h"
-#include "Core/EntityFileWriter.h"
+#include "Systems/FloatingEffectSystem.h"
+#include "Core/EntityFile.h"
+#include "Core/EntityXMLFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
 #include "Game/Systems/PickupSpawnSystem.h"
@@ -25,9 +27,11 @@
 #include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
 #include "Game/Systems/AmmunitionHUDSystem.h"
+#include "Game/Systems/AbilityCooldownHUDSystem.h"
 #include "Game/Systems/CapturePointArrowHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
 #include "Game/Systems/BoostSystem.h"
+#include "Game/Systems/BoostIconsHUDSystem.h"
 #include "GUI/ButtonSystem.h"
 #include "GUI/MainMenuSystem.h"
 
@@ -44,6 +48,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<PNG>("Png");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<Font>("FontFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
@@ -80,10 +85,7 @@ Game::Game(int argc, char* argv[])
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
-        EntityFilePreprocessor fpp(file);
-        fpp.RegisterComponents(m_World);
-        EntityFileParser fp(file);
-        fp.MergeEntities(m_World);
+        file->MergeInto(m_World);
     }
 
     // Create the sound manager
@@ -120,6 +122,7 @@ Game::Game(int argc, char* argv[])
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<FloatingEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
@@ -133,6 +136,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
@@ -146,6 +150,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<BoostSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<BoostIconsHUDSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
