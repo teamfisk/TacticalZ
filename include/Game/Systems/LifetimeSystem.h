@@ -10,7 +10,7 @@ public:
         : System(params)
         , PureSystem("Lifetime")
     {
-        LOG_INFO("ASDASDASSA");
+
     }
 
     virtual void Update(double dt) override;

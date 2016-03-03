@@ -56,6 +56,7 @@ void SSAOPass::InitializeShaderProgram()
 		m_SSAOProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/SSAO.vert.glsl")));
 		m_SSAOProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/SSAO.frag.glsl")));
 		m_SSAOProgram->Compile();
+        m_SSAOProgram->BindFragDataLocation(0, "AO");
 		m_SSAOProgram->Link();
 	}
 
@@ -64,6 +65,7 @@ void SSAOPass::InitializeShaderProgram()
 		m_SSAOViewSpaceZProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/SSAO.vert.glsl")));
 		m_SSAOViewSpaceZProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/SSAOViewSpaceZ.frag.glsl")));
 		m_SSAOViewSpaceZProgram->Compile();
+        m_SSAOViewSpaceZProgram->BindFragDataLocation(0, "depthLinear");
 		m_SSAOViewSpaceZProgram->Link();
 	}
 
@@ -72,6 +74,7 @@ void SSAOPass::InitializeShaderProgram()
 		m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_horiz.vert.glsl")));
 		m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_horiz.frag.glsl")));
 		m_GaussianProgram_horiz->Compile();
+        m_GaussianProgram_horiz->BindFragDataLocation(0, "fragmentColor");
 		m_GaussianProgram_horiz->Link();
 	}
 
@@ -80,6 +83,7 @@ void SSAOPass::InitializeShaderProgram()
 		m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_vert.vert.glsl")));
 		m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_vert.frag.glsl")));
 		m_GaussianProgram_vert->Compile();
+        m_GaussianProgram_vert->BindFragDataLocation(0, "fragmentColor");
 		m_GaussianProgram_vert->Link();
 	}
 }

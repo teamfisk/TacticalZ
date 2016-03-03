@@ -15,6 +15,7 @@
 #include "../Core/Transform.h"
 #include "Skeleton.h"
 #include "ShaderProgram.h"
+#include "BlendTree.h"
 
 struct ModelJob : RenderJob
 {
@@ -123,32 +124,14 @@ struct ModelJob : RenderJob
             Skeleton = Model->m_RawModel->m_Skeleton;
 
             if (Skeleton != nullptr) {
-                if (world->HasComponent(Entity, "Animation")) {
-                    auto animationComponent = world->GetComponent(Entity, "Animation");
+                
+                EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
 
-                    for (int i = 1; i <= 3; i++) {
-                        ::Skeleton::AnimationData animationData;
-                        animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationComponent["AnimationName" + std::to_string(i)]);
-                        if (animationData.animation == nullptr) {
-                            continue;
-                        }
-                        animationData.time = (double)animationComponent["Time" + std::to_string(i)];
-                        animationData.weight = (double)animationComponent["Weight" + std::to_string(i)];
-
-                        Animations.push_back(animationData);
-                    }
-                }
-
-                if (world->HasComponent(Entity, "AnimationOffset")) {
-                    auto animationOffsetComponent = world->GetComponent(Entity, "AnimationOffset");
-                    AnimationOffset.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationOffsetComponent["AnimationName"]);
-                    AnimationOffset.time = (double)animationOffsetComponent["Time"];
-                } else {
-                    AnimationOffset.animation = nullptr;
+                if(Skeleton->BlendTrees.find(entityWrapper) != Skeleton->BlendTrees.end()) {
+                    BlendTree = Skeleton->BlendTrees.at(entityWrapper);
                 }
             }
         }
-            
     };
 
     unsigned int TextureID;
@@ -167,10 +150,7 @@ struct ModelJob : RenderJob
     glm::vec4 Color;
     const ::Model* Model = nullptr;
     ::Skeleton* Skeleton = nullptr;
-    std::vector<::Skeleton::AnimationData> Animations;
-    ::Skeleton::AnimationOffset AnimationOffset;
-    
-
+    std::shared_ptr<::BlendTree> BlendTree = nullptr;
     float GlowIntensity = 8.0;
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;

@@ -51,6 +51,31 @@ EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
     return firstChildByNameRecursive(name, this->ID);
 }
 
+
+EntityWrapper EntityWrapper::FirstLevelChildByName(const std::string& name)
+{
+    EntityID parent = this->ID;
+    if (!this->World->ValidEntity(parent)) {
+        return EntityWrapper::Invalid;
+    }
+
+    auto itPair = this->World->GetDirectChildren(parent);
+    if (itPair.first == itPair.second) {
+        return EntityWrapper::Invalid;
+    }
+
+    for (auto it = itPair.first; it != itPair.second; ++it) {
+        std::string itName = this->World->GetName(it->second);
+        if (itName == name) {
+            return EntityWrapper(this->World, it->second);
+        } else if (it->second != EntityID_Invalid) {
+            continue;
+        }
+    }
+
+    return EntityWrapper::Invalid;
+}
+
 EntityWrapper EntityWrapper::FirstParentWithComponent(const std::string& componentType)
 {
     EntityWrapper entity = *this;
