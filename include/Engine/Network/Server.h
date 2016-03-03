@@ -83,6 +83,7 @@ private:
     void parseClientPing();
     void parsePing();
     bool parseDoubleJump(Packet& packet);
+    void parseDashEffect(Packet& packet);
     void parseUDPConnect(Packet& packet);
     void parseTCPConnect(Packet& packet);
     void parseDisconnect();

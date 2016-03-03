@@ -5,6 +5,7 @@ PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &PlayerMovementSystem::OnDashAbility);
 }
 
 PlayerMovementSystem::~PlayerMovementSystem()
@@ -17,14 +18,9 @@ PlayerMovementSystem::~PlayerMovementSystem()
 void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
-    if (IsServer) {
-        for (auto& kv : m_PlayerInputControllers) {
-            updateVelocity(kv.first, dt);
-        }
-    } else {
-        if (LocalPlayer.Valid()) {
-            updateVelocity(LocalPlayer, dt);
-        }
+    // Only do physics calculations on client and only for themselves.
+    if (IsClient && LocalPlayer.Valid()) {
+        updateVelocity(LocalPlayer, dt);
     }
 }
 
@@ -61,12 +57,25 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         float playerMovementSpeed = player["Player"]["MovementSpeed"];
         float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
         glm::vec3& wishDirection = player["Player"]["CurrentWishDirection"];
+        auto playerBoostAssaultEntity = player.FirstChildByName("BoostAssault");
+        if (playerBoostAssaultEntity.Valid()) {
+            playerMovementSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+            playerCrouchSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+        }
+        bool sniperSprinting = false;
+        if (player.HasComponent("SprintAbility")) {
+            if (controller->SpecialAbilityKeyDown()) {
+                playerMovementSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                playerCrouchSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                sniperSprinting = true;
+            }
+        }
 
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check
             if (player.HasComponent("DashAbility")) {
-                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"]);
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"], player.ID);
             }
             wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
@@ -112,6 +121,13 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 //if doubleTapped do Assault Dash - but only boost maximum 50.0f
                 float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
                 accelerationSpeed = glm::min(doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed), 50.0f);
+                //if player has Boost from an Assault class, accelerate the player faster
+                if (playerBoostAssaultEntity.Valid()) {
+                    accelerationSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+                }
+                if (sniperSprinting) {
+                    accelerationSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                }
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
@@ -303,11 +319,11 @@ bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
 {
     // If entity does not exist, exit
-    if (!EntityWrapper(m_World, e.entityID).Valid()) { 
+    if (!EntityWrapper(m_World, e.entityID).Valid()) {
         return false;
     }
     // If entity IsLocalPlayer, exit
-    if (e.entityID == m_LocalPlayer.ID) { 
+    if (e.entityID == m_LocalPlayer.ID) {
         return false;
     }
     spawnHexagon(EntityWrapper(m_World, e.entityID));
@@ -315,11 +331,33 @@ bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
 }
 
 void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
-{ 
+{
     //put a hexagon at the entitys... feet?
-    auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
-    EntityFileParser parser(hexagonEffect);
-    EntityID hexagonEffectID = parser.MergeEntities(m_World);
-    EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+    EntityWrapper hexagonEW = entityFile->MergeInto(m_World);
     hexagonEW["Transform"]["Position"] = (glm::vec3)target["Transform"]["Position"];
+}
+
+bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
+{
+    EntityWrapper player(m_World, e.Player);
+    if (!player.Valid() || !IsClient || player.ID == LocalPlayer.ID) {
+        return false;
+    }
+
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
+    EntityWrapper dashEffect = entityFile->MergeInto(m_World);
+    auto playerModel = player.FirstChildByName("PlayerModel");
+    auto playerEntityModel = playerModel["Model"];
+    auto playerEntityAnimation = playerModel["Animation"];
+    playerEntityModel.Copy(dashEffect["Model"]);
+    playerEntityAnimation.Copy(dashEffect["Animation"]);
+    dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+    ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+    dashEffect["Animation"]["Speed1"] = 0.0;
+    dashEffect["Animation"]["Speed2"] = 0.0;
+    dashEffect["Animation"]["Speed3"] = 0.0;
+    dashEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+    dashEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+    return true;
 }

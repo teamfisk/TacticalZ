@@ -9,12 +9,12 @@
 #include "Input/KeyboardInputHandler.h"
 #include "Input/MouseInputHandler.h"
 #include "Core/EKeyDown.h"
-#include "Core/EntityFile.h"
+#include "Core/EntityXMLFile.h"
 #include "Core/SystemPipeline.h"
 
-#include "Core/EntityFilePreprocessor.h"
-#include "Core/EntityFileParser.h"
-#include "Core/EntityFileWriter.h"
+#include "Core/EntityXMLFilePreprocessor.h"
+#include "Core/EntityXMLFileParser.h"
+#include "Core/EntityXMLFileWriter.h"
 
 #include "Engine/Collision/ETrigger.h"
 
