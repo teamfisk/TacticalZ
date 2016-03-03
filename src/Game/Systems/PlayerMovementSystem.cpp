@@ -18,14 +18,9 @@ PlayerMovementSystem::~PlayerMovementSystem()
 void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
-    if (IsServer) {
-        for (auto& kv : m_PlayerInputControllers) {
-            updateVelocity(kv.first, dt);
-        }
-    } else {
-        if (LocalPlayer.Valid()) {
-            updateVelocity(LocalPlayer, dt);
-        }
+    // Only do physics calculations on client and only for themselves.
+    if (!IsServer && LocalPlayer.Valid()) {
+        updateVelocity(LocalPlayer, dt);
     }
 }
 
