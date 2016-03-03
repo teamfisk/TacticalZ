@@ -30,12 +30,12 @@ private:
     struct PlayerData {
         int ID = -1;
         std::string Name = "";
-        int Team = -1;
+        int Team = 1;
         EntityWrapper Player = EntityWrapper::Invalid;
     };
 
     int m_PlayerCounter = 0;
-    std::unordered_map<std::string, PlayerData> m_PlayerIdentities;
+    std::unordered_map<int, PlayerData> m_PlayerIdentities;
 };
 
 #endif

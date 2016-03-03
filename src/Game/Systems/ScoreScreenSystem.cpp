@@ -18,32 +18,53 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
         return;
     }
 
+    int redTeamEnum;
+    int blueTeamEnum;
+    int spectatorTeamEnum;
+    int currentTeam = 0;
+
+    if(entity.HasComponent("Team")) {
+        auto cTeam = entity["Team"];
+        redTeamEnum = (int)cTeam["Team"].Enum("Red");
+        blueTeamEnum = (int)cTeam["Team"].Enum("Blue");
+        spectatorTeamEnum = (int)cTeam["Team"].Enum("Spectator");
+        currentTeam = (int)cTeam["Team"];
+    }
+
     auto children = entity.ChildrenWithComponent("ScoreIdentity");
 
     for (auto it = m_PlayerIdentities.begin(); it != m_PlayerIdentities.end(); ++it) {
+
         bool found = false;
         for (auto child : children) {
-            std::string name = (std::string)child["ScoreIdentity"]["Name"];
-            if (it->first == name) {
+            int ID = (int)child["ScoreIdentity"]["ID"];
+            if (it->first == ID) {
+                if (it->second.Team != currentTeam) {
+                    m_World->DeleteEntity(child.ID);
+                    break;
+                }
                 found = true;
                 break;
             }
         }
         if(found == false) {
+            if(it->second.Team != currentTeam) {
+                //This player is not the same team as this scoreboard should show.
+                break;
+            }
             //There is no entry for this player, create one.
             auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/ScoreIdentity.xml");
             EntityWrapper scoreIdentity = entityFile->MergeInto(m_World);
             auto cScoreIdentity = scoreIdentity["ScoreIdentity"];
             auto data = it->second;
-            std::printf("\n\n");
-            std::printf(data.Name.c_str());
-            std::printf("\n\n");
 
             (std::string&)cScoreIdentity["Name"] = data.Name;
             (int&)cScoreIdentity["ID"] = data.ID;
             (int&)cScoreIdentity["Ping"] = 1337;
 
-            m_World->SetName(scoreIdentity.ID, data.Name);
+            std::string IdentityName = "#" + std::to_string(data.ID) + ": " + data.Name;
+
+            m_World->SetName(scoreIdentity.ID, IdentityName);
             m_World->SetParent(scoreIdentity.ID, entity.ID);
         }
     }
@@ -61,37 +82,36 @@ bool ScoreScreenSystem::OnPlayerDeath(const Events::PlayerDeath& e)
 
 bool ScoreScreenSystem::OnPlayerSpawn(const Events::PlayerSpawned& e)
 {
-    //When a player spawn, add a new entry to the score screen.
-    if(!e.Player.Valid()) {
+    //When a player spawn, add data to the list entry with the same ID.
+
+    std::unordered_map<int, PlayerData>::iterator got;
+
+    got = m_PlayerIdentities.find(e.PlayerID);
+    if(got == m_PlayerIdentities.end()) {
+        LOG_ERROR("Player spawned without having an entry on score screen");
         return 0;
     }
-    EntityWrapper entity = e.Player;
+    auto& data = got->second;
+    data.Player = e.Player;
+    data.Team = (int)data.Player["Team"]["Team"];
 
-    std::unordered_map<std::string, PlayerData>::const_iterator got;
-    got = m_PlayerIdentities.find(e.PlayerName);
-    if (got == m_PlayerIdentities.end()) {
-        PlayerData data;
-        data.ID = m_PlayerCounter;
-        data.Name = e.PlayerName;
-        data.Player = e.Player;
-        if(!entity.HasComponent("Team")) {
-            return 0;
-        }
-        data.Team = (int)entity["Team"]["Team"];
-
-        std::pair<std::string, PlayerData> list (data.Name, data);
-        m_PlayerIdentities.insert(list);
-        m_PlayerCounter++;
-    }
     return 0;
 }
 
 bool ScoreScreenSystem::OnPlayerConnected(const Events::PlayerConnected& e)
 {
+    //player has connected, add his data to the list of ScoreIdentities
+    PlayerData data;
+    data.ID = e.PlayerID;
+    data.Name = e.PlayerName;
+    m_PlayerIdentities.insert( {data.ID, data} );
+
     return 0;
 }
 
 bool ScoreScreenSystem::OnPlayerDisconnected(const Events::PlayerDisconnected& e)
 {
+    //player has disconnected, remove him from list of ScoreIdentities
+    m_PlayerIdentities.erase(e.PlayerID);
     return 0;
 }
