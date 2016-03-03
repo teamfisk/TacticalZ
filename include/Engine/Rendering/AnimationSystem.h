@@ -57,10 +57,13 @@ private:
         EntityWrapper RootNode = EntityWrapper::Invalid;
         double Duration;
         double CurrentTime = 0.0;
+        double Delay = 0.0;
         BlendTree::AutoBlendInfo BlendInfo;
     };
 
+
     std::list<AutoBlendJob> m_AutoBlendJobs;
+    std::unordered_map<EntityWrapper, AutoBlendJob> m_QueuedAutoBlendJobs;
     std::list<BlendJob> m_BlendJobs;
     std::list<QueuedBlendJob> m_QueuedBlendJobs;
 

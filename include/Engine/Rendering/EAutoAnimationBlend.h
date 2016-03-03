@@ -11,7 +11,12 @@ struct AutoAnimationBlend : Event
 {
     EntityWrapper RootNode = EntityWrapper::Invalid;
     std::string NodeName;
-    double Duration;
+    double Duration = 0.0;
+    double Delay = 0.0;
+
+
+    double AnimationSpeed = 1.0;
+    bool Restart = false;
 
     EntityWrapper AnimationEntity = EntityWrapper::Invalid;
 };

@@ -207,6 +207,21 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 {
     std::vector<Node*> goalNodes = FindNodesByName(blendInfo.NodeName);
 
+    if (blendInfo.Restart) {
+        for (auto it = goalNodes.begin(); it != goalNodes.end(); it++) {
+            EntityWrapper entity = (*it)->Entity;
+
+            if (entity.Valid()) {
+                if (entity.HasComponent("Animation")) {
+                    (double&)entity["Animation"]["Time"] = 0.0;
+                    (double&)entity["Animation"]["Speed"] = blendInfo.AnimationSpeed;
+                }
+            }
+        }
+        blendInfo.Restart = false;
+    }
+
+
     if(goalNodes.size() == 0) {
         return blendInfo;
     } else if(goalNodes.size() == 1) {

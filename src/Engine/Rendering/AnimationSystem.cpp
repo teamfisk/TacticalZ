@@ -92,7 +92,28 @@ void AnimationSystem::UpdateAnimations(double dt)
         double animationSpeed = (double)animationC["Speed"];
 
         if (animationSpeed != 0.0) {
+
             double nextTime = (double)animationC["Time"] + animationSpeed * dt;
+
+
+            //Pre animation end blend
+            if (m_QueuedAutoBlendJobs.find(entity) != m_QueuedAutoBlendJobs.end()) {
+                if (glm::sign(m_QueuedAutoBlendJobs.at(entity).Delay) < 0) {
+                    if (!(bool)animationC["Loop"]) {
+                        if (nextTime > animation->Duration + m_QueuedAutoBlendJobs.at(entity).Delay  && glm::sign(animationSpeed) > 0) {
+                            AnimationComplete(entity);
+                        } else if (nextTime < 0 - m_QueuedAutoBlendJobs.at(entity).Delay && glm::sign(animationSpeed) < 0) {
+                            AnimationComplete(entity);
+                        }
+                    } else {
+                        if (nextTime > animation->Duration + m_QueuedAutoBlendJobs.at(entity).Delay && glm::sign(animationSpeed) > 0) {
+                            AnimationComplete(entity);
+                        } else if (nextTime < 0 - m_QueuedAutoBlendJobs.at(entity).Delay && glm::sign(animationSpeed) < 0) {
+                            AnimationComplete(entity);
+                        }
+                    }
+                }
+            }
 
 
             if (!(bool)animationC["Loop"]) {
@@ -119,6 +140,7 @@ void AnimationSystem::UpdateAnimations(double dt)
                     e.Entity = entity;
                     e.Name = (std::string)animationC["AnimationName"];
                     m_EventBroker->Publish(e);
+                    AnimationComplete(entity);
 
                     while (nextTime > animation->Duration) {
                         nextTime -= animation->Duration;
@@ -128,13 +150,12 @@ void AnimationSystem::UpdateAnimations(double dt)
                     e.Entity = entity;
                     e.Name = (std::string)animationC["AnimationName"];
                     m_EventBroker->Publish(e);
-
+                    AnimationComplete(entity);
                     while (nextTime < 0) {
                         nextTime += animation->Duration;
                     }
                 }
             }
-
             (double&)animationC["Time"] = nextTime;
         }
     }
@@ -143,7 +164,7 @@ void AnimationSystem::UpdateAnimations(double dt)
 
 void AnimationSystem::UpdateWeights(double dt)
 {
- /*   for (auto it = m_BlendJobs.begin(); it != m_BlendJobs.end(); it++) {
+    for (auto it = m_BlendJobs.begin(); it != m_BlendJobs.end();) {
         if (!it->BlendEntity.Valid()) {
             it = m_BlendJobs.erase(it);
             continue;
@@ -161,7 +182,9 @@ void AnimationSystem::UpdateWeights(double dt)
                 it = m_BlendJobs.erase(it);
             }
         }
-    }*/
+
+        ++it;
+    }
 
 
     for (auto it = m_AutoBlendJobs.begin(); it != m_AutoBlendJobs.end();) {
@@ -214,7 +237,7 @@ void AnimationSystem::UpdateWeights(double dt)
 
 void AnimationSystem::AnimationComplete(EntityWrapper animationEntity)
 {
-    for (auto it = m_QueuedBlendJobs.begin(); it != m_QueuedBlendJobs.end(); it++) {
+    for (auto it = m_QueuedBlendJobs.begin(); it != m_QueuedBlendJobs.end();) {
         if (!it->BlendEntity.Valid() || !it->AnimationEntity.Valid()) {
             it = m_QueuedBlendJobs.erase(it);
             continue;
@@ -229,9 +252,27 @@ void AnimationSystem::AnimationComplete(EntityWrapper animationEntity)
             bj.CurrentTime = 0.0;
             m_BlendJobs.push_back(bj);
             it = m_QueuedBlendJobs.erase(it);
+            continue;
         }
 
+        ++it;
     }
+
+
+    if (m_QueuedAutoBlendJobs.find(animationEntity) != m_QueuedAutoBlendJobs.end()) {
+        AutoBlendJob abj = m_QueuedAutoBlendJobs.at(animationEntity);
+
+        if (!abj.RootNode.Valid() || !animationEntity.Valid()) {
+            m_QueuedAutoBlendJobs.erase(animationEntity);
+        } else {
+            m_AutoBlendJobs.push_back(abj);
+            m_QueuedAutoBlendJobs.erase(animationEntity);
+        }
+
+
+
+    }
+
 
 }
 
@@ -256,17 +297,16 @@ bool AnimationSystem::OnAnimationBlend(Events::AnimationBlend& e)
              m_QueuedBlendJobs.push_back(qbj);
              return true;
          }
+     } else {
+         BlendJob bj;
+         bj.BlendEntity = e.BlendEntity;
+         bj.StartWeight = (double)e.BlendEntity["Blend"]["Weight"];
+         bj.GoalWeight = e.GoalWeight;
+         bj.Duration = e.Duration;
+         bj.CurrentTime = 0.0;
+         m_BlendJobs.push_back(bj);
+         return true;
      }
-
-     BlendJob bj;
-     bj.BlendEntity = e.BlendEntity;
-     bj.StartWeight = (double)e.BlendEntity["Blend"]["Weight"];
-     bj.GoalWeight = e.GoalWeight;
-     bj.Duration = e.Duration;
-     bj.CurrentTime = 0.0;
-     m_BlendJobs.push_back(bj);
-
-    return true;
 }
 
 
@@ -280,18 +320,39 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
         return false;
     }
 
-    AutoBlendJob abj;
-    abj.RootNode = e.RootNode;
-    abj.CurrentTime = 0.0;
-    abj.Duration = e.Duration;
+    if (e.AnimationEntity.Valid()) {
+        AutoBlendJob abj;
+        abj.RootNode = e.RootNode;
+        abj.CurrentTime = 0.0;
+        abj.Duration = e.Duration;
+        abj.Delay = e.Delay;
 
-    BlendTree::AutoBlendInfo abInfo;
-    abInfo.NodeName = e.NodeName;
-    abInfo.progress = 0.0;
-    
-    abj.BlendInfo = abInfo;
+        BlendTree::AutoBlendInfo abInfo;
+        abInfo.NodeName = e.NodeName;
+        abInfo.progress = 0.0;
+        abInfo.Restart = e.Restart;
+        abInfo.AnimationSpeed = e.AnimationSpeed;
+        abj.BlendInfo = abInfo;
 
-    m_AutoBlendJobs.push_back(abj);
+        m_QueuedAutoBlendJobs[e.AnimationEntity] = abj;
+        return true;
+    } else {
+        AutoBlendJob abj;
+        abj.RootNode = e.RootNode;
+        abj.CurrentTime = 0.0;
+        abj.Duration = e.Duration;
+
+        BlendTree::AutoBlendInfo abInfo;
+        abInfo.NodeName = e.NodeName;
+        abInfo.progress = 0.0;
+        abInfo.Restart = e.Restart;
+        abInfo.AnimationSpeed = e.AnimationSpeed;
+
+        abj.BlendInfo = abInfo;
+
+        m_AutoBlendJobs.push_back(abj);
+        return true;
+    }
 
 
 }
@@ -301,8 +362,6 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
 
     if (e.Value == 1.f) {
         if (e.Command == "BlendTest0") {
-
-
             auto blendComponents = m_World->GetComponents("BlendAdditive");
 
             if (blendComponents == nullptr) {
@@ -314,11 +373,12 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
                 EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
 
                 if (entity.Name() == "Assault") {
-
                     Events::AutoAnimationBlend aeb;
                     aeb.Duration = m_BlendTime1;
                     aeb.NodeName = m_AnimationName1;
                     aeb.RootNode = entity;
+                    aeb.Restart = true;
+
                     m_EventBroker->Publish(aeb);
 
                 }
@@ -338,15 +398,183 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
 
                 if (entity.Name() == "Assault") {
 
-                    Events::AutoAnimationBlend aeb;
-                    aeb.Duration = m_BlendTime2;
-                    aeb.NodeName = m_AnimationName2;
-                    aeb.RootNode = entity;
-                    m_EventBroker->Publish(aeb);
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = m_BlendTime2;
+                        aeb.NodeName = m_AnimationName2;
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = m_BlendTime2;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        aeb.AnimationEntity = entity.FirstChildByName("DashLeft");
+                        m_EventBroker->Publish(aeb);
+                    }
 
                 }
             }
         }
+
+
+        if(e.Command == "DashForward") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "DashForward";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.3;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        aeb.Delay = 0;
+                        aeb.AnimationEntity = entity.FirstChildByName("DashForward");
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+
+        } else if (e.Command == "DashBackward") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "DashBackward";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.3;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        aeb.Delay = -0.3;
+                        aeb.AnimationEntity = entity.FirstChildByName("DashBackward");
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        } else if (e.Command == "DashLeft") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "DashLeft";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.3;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        aeb.Delay = -0.3;
+                        aeb.AnimationEntity = entity.FirstChildByName("DashLeft");
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        } else if (e.Command == "DashRight") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "DashRight";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.3;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        aeb.AnimationEntity = entity.FirstChildByName("DashRight");
+                        aeb.Delay = -0.3;
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        } else if (e.Command == "Jump") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.35;
+                        aeb.NodeName = "Jump";
+                        aeb.RootNode = entity;
+                        aeb.Restart = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.35;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = entity;
+                        aeb.Restart = false;
+                        aeb.AnimationEntity = entity.FirstChildByName("Jump");
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        }
+
+
     }
 }
 

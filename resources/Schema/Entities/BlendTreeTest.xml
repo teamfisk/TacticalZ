@@ -68,9 +68,9 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.154985309" Y="1.07679462" Z="-0.201120675"/>
+                  <Position X="0.153846264" Y="1.07432497" Z="-0.209223658"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
-                  <Orientation X="-0.0289514996" Y="-0.119508959" Z="0.18072544"/>
+                  <Orientation X="-0.033799246" Y="-0.120032266" Z="0.188354403"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -183,7 +183,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>RunF</AnimationName>
-                                          <Time>0.89967686078176468</Time>
+                                          <Time>0.032768287014830921</Time>
                                           <Speed>1</Speed>
                                         </c:Animation>
                                         <c:Transform/>
@@ -228,7 +228,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>IdleF</AnimationName>
-                                  <Time>0.33219857512804407</Time>
+                                  <Time>0.8319563183471943</Time>
                                   <Speed>1</Speed>
                                 </c:Animation>
                                 <c:Transform/>
@@ -301,7 +301,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>CrouchF</AnimationName>
-                                  <Time>0.86553330718370836</Time>
+                                  <Time>0.99862473341677438</Time>
                                   <Speed>1</Speed>
                                 </c:Animation>
                                 <c:Transform/>
@@ -428,7 +428,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>ReloadSwitchU</AnimationName>
-                          <Time>0.86721706215490468</Time>
+                          <Time>0.00030848838797092881</Time>
                           <Speed>1</Speed>
                         </c:Animation>
                         <c:Transform/>
@@ -488,7 +488,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>ShootFastRifleU</AnimationName>
-                                  <Time>0.19605135393254369</Time>
+                                  <Time>0.12914212153428517</Time>
                                   <Speed>1</Speed>
                                 </c:Animation>
                                 <c:Transform/>

@@ -60,9 +60,12 @@ public:
     {
         std::string NodeName;
         double progress;
+        bool Restart;
+        double AnimationSpeed;
         std::unordered_map<EntityWrapper, double> StartWeights;
     };
 
+    
 
     BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton);
     ~BlendTree();
