@@ -59,4 +59,5 @@
 	<xs:include schemaLocation="Components/CapturePointArrowHUD.xsd"/>
 	<xs:include schemaLocation="Components/FloatingEffect.xsd"/>
 	<xs:include schemaLocation="Components/BoostIconsHUD.xsd"/>
+	<xs:include schemaLocation="Components/InputCmdButton.xsd"/>
 </xs:schema>
