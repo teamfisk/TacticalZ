@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ScoreIdentity" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:ScoreIdentity>
+      <Name></Name>
+    </c:ScoreIdentity>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Simonplzpush">
+      <Components>
+        <c:Text>
+          <Content>Simon needs to push shit shit so i can write text from Component</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:Transform>
+          <Position X="0" Y="2.09157753" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ID">
+      <Components>
+        <c:Text>
+          <Content>ID</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:Transform>
+          <Position X="-9.66245842" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Name">
+      <Components>
+        <c:Text>
+          <Content>DickButt</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:Transform>
+          <Position X="-5.08430147" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Kills">
+      <Components>
+        <c:Text>
+          <Content>5</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:Transform>
+          <Position X="-1.23991621" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Deaths">
+      <Components>
+        <c:Text>
+          <Content>12</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:Transform>
+          <Position X="1.3544426" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="KD">
+      <Components>
+        <c:Text>
+          <Content>0.42</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:Transform>
+          <Position X="4.43798256" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Ping">
+      <Components>
+        <c:Text>
+          <Content>84</Content>
+          <Resource>Fonts/DroidSans.ttf,64</Resource>
+        </c:Text>
+        <c:Transform>
+          <Position X="8.05187988" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

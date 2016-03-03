@@ -21,6 +21,7 @@
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
 #include "Core/EAmmoPickup.h"
+#include "Network/EPlayerConnected.h"
 
 class Server : public Network
 {

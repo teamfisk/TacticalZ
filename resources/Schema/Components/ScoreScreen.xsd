@@ -3,11 +3,15 @@
 	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
 	<xs:element name="ScoreScreen">
 		<xs:annotation><xs:documentation>The screen where player scores will be shown.</xs:documentation></xs:annotation>
-		<xs:element name="TotalIdentities" type="t:int" minOccurs="0">
-			<xs:annotation><xs:documentation>The amount of score identities this scoreboard hold</xs:documentation></xs:annotation>
-		</xs:element>
-		<xs:element name="NextPosition" type="t:int" minOccurs="0">
-			<xs:annotation><xs:documentation>Where the next scoreIdentity should be placed.</xs:documentation></xs:annotation>
-		</xs:element>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="TotalIdentities" type="t:int" minOccurs="0">
+					<xs:annotation><xs:documentation>The amount of score identities this scoreboard hold</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="NextPosition" type="t:int" minOccurs="0">
+					<xs:annotation><xs:documentation>Where the next scoreIdentity should be placed.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
 	</xs:element>
 </xs:schema>

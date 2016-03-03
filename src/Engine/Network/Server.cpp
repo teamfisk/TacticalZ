@@ -363,6 +363,11 @@ void Server::parseTCPConnect(Packet & packet)
     m_ConnectedPlayers.at(playerID).TCPAddress = m_Address;
     m_ConnectedPlayers.at(playerID).TCPPort = m_Port;
 
+    Events::PlayerConnected e;
+    e.PlayerID = playerID;
+    e.PlayerName = m_ConnectedPlayers.at(playerID).Name;
+    m_EventBroker->Publish(e);
+
     LOG_INFO("parseTCPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(),
         m_ConnectedPlayers.at(playerID).TCPAddress.to_string().c_str());
 

@@ -2,8 +2,12 @@
 #define ScoreScreenSystem_h__
 
 #include "Core/System.h"
+#include "Core/ResourceManager.h"
+#include "Core/EntityFile.h"
 #include "Core/EPlayerDeath.h"
 #include "Core/EPlayerSpawned.h"
+#include "Network/EPlayerConnected.h"
+#include "Network/EPlayerDisconnected.h"
 #include "GLM.h"
 
 class ScoreScreenSystem : public PureSystem
@@ -17,6 +21,10 @@ public:
     bool OnPlayerDeath(const Events::PlayerDeath& e);
     EventRelay<ScoreScreenSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawn(const Events::PlayerSpawned& e);
+    EventRelay<ScoreScreenSystem, Events::PlayerConnected> m_EPlayerConnected;
+    bool OnPlayerConnected(const Events::PlayerConnected& e);
+    EventRelay<ScoreScreenSystem, Events::PlayerDisconnected> m_EPlayerDisconnected;
+    bool OnPlayerDisconnected(const Events::PlayerDisconnected& e);
 
 private:
     struct PlayerData {
