@@ -4,7 +4,7 @@
 #include "Core/System.h"
 #include "Core/Transform.h"
 #include "Core/ResourceManager.h"
-#include "Core/EntityFileParser.h"
+#include "Core/EntityFile.h"
 #include "Core/EPlayerDamage.h"
 #include "Common.h"
 #include <tuple>

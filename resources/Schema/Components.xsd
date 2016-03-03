@@ -51,10 +51,12 @@
 	<xs:include schemaLocation="Components/Page.xsd"/>
 	<xs:include schemaLocation="Components/SpriteIndicator.xsd"/>
 	<xs:include schemaLocation="Components/Button.xsd"/>
+	<xs:include schemaLocation="Components/AbilityCooldownHUD.xsd"/>
 	<xs:include schemaLocation="Components/DoubleJump.xsd"/>
 	<xs:include schemaLocation="Components/WeaponAttachment.xsd"/>
 	<xs:include schemaLocation="Components/DefenderWeapon.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointGameMode.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointArrowHUD.xsd"/>
 	<xs:include schemaLocation="Components/FloatingEffect.xsd"/>
+	<xs:include schemaLocation="Components/BoostIconsHUD.xsd"/>
 </xs:schema>

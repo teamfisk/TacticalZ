@@ -1,15 +1,15 @@
-#include "Core/EntityFileParser.h"
+#include "Core/EntityXMLFileParser.h"
 
-EntityFileParser::EntityFileParser(const EntityFile* entityFile)
+EntityXMLFileParser::EntityXMLFileParser(const EntityXMLFile* entityFile)
     : m_EntityFile(entityFile)
 {
-    m_Handler.SetStartEntityCallback(std::bind(&EntityFileParser::onStartEntity, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-    m_Handler.SetStartComponentCallback(std::bind(&EntityFileParser::onStartComponent, this, std::placeholders::_1, std::placeholders::_2));
-    m_Handler.SetStartFieldCallback(std::bind(&EntityFileParser::onStartComponentField, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-    m_Handler.SetStartFieldDataCallback(std::bind(&EntityFileParser::onFieldData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+    m_Handler.SetStartEntityCallback(std::bind(&EntityXMLFileParser::onStartEntity, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    m_Handler.SetStartComponentCallback(std::bind(&EntityXMLFileParser::onStartComponent, this, std::placeholders::_1, std::placeholders::_2));
+    m_Handler.SetStartFieldCallback(std::bind(&EntityXMLFileParser::onStartComponentField, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+    m_Handler.SetStartFieldDataCallback(std::bind(&EntityXMLFileParser::onFieldData, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
 }
 
-EntityID EntityFileParser::MergeEntities(World* world, EntityID baseParent /*= EntityID_Invalid */)
+EntityID EntityXMLFileParser::MergeEntities(World* world, EntityID baseParent /*= EntityID_Invalid */)
 {
     m_World = world;
     m_EntityIDMapper[0] = baseParent;
@@ -17,7 +17,7 @@ EntityID EntityFileParser::MergeEntities(World* world, EntityID baseParent /*= E
     return m_FirstEntity;
 }
 
-void EntityFileParser::onStartEntity(EntityID entity, EntityID parent, const std::string& name)
+void EntityXMLFileParser::onStartEntity(EntityID entity, EntityID parent, const std::string& name)
 {
     EntityID realParent = m_EntityIDMapper.at(parent);
     EntityID realEntity = m_World->CreateEntity(realParent);
@@ -31,7 +31,7 @@ void EntityFileParser::onStartEntity(EntityID entity, EntityID parent, const std
     //LOG_DEBUG("Created entity #%i (%i) with parent %i (%i)", entity, realEntity, parent, realParent);
 }
 
-void EntityFileParser::onStartComponent(EntityID entity, const std::string& component)
+void EntityXMLFileParser::onStartComponent(EntityID entity, const std::string& component)
 {
     if (m_World->GetComponentPools().count(component) != 0) {
         EntityID realEntity = m_EntityIDMapper.at(entity);
@@ -42,7 +42,7 @@ void EntityFileParser::onStartComponent(EntityID entity, const std::string& comp
     //LOG_DEBUG("Attached component of type \"%s\" to entity #%i (%i)", component.c_str(), entity, realEntity);
 }
 
-void EntityFileParser::onStartComponentField(EntityID entity, const std::string& componentType, const std::string& fieldName, const std::map<std::string, std::string>& attributes)
+void EntityXMLFileParser::onStartComponentField(EntityID entity, const std::string& componentType, const std::string& fieldName, const std::map<std::string, std::string>& attributes)
 {
     if (m_World->GetComponentPools().count(componentType) == 0) {
         return;
@@ -63,10 +63,10 @@ void EntityFileParser::onStartComponentField(EntityID entity, const std::string&
     //}
 
     char* data = component.Data + field.Offset;
-    EntityFile::WriteAttributeData(data, field, attributes);
+    EntityXMLFile::WriteAttributeData(data, field, attributes);
 }
 
-void EntityFileParser::onFieldData(EntityID entity, const std::string& componentType, const std::string& fieldName, const char* fieldData)
+void EntityXMLFileParser::onFieldData(EntityID entity, const std::string& componentType, const std::string& fieldName, const char* fieldData)
 {
     if (m_World->GetComponentPools().count(componentType) == 0) {
         return;
@@ -80,5 +80,5 @@ void EntityFileParser::onFieldData(EntityID entity, const std::string& component
     auto& field = fieldIt->second;
 
     char* data = component.Data + field.Offset;
-    EntityFile::WriteValueData(data, field, fieldData);
+    EntityXMLFile::WriteValueData(data, field, fieldData);
 }

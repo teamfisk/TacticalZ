@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE_END()
 GameHealthSystemTest::GameHealthSystemTest()
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
-    ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -41,10 +41,10 @@ GameHealthSystemTest::GameHealthSystemTest()
     // Create a world
     m_World = new World();
 
-    auto file = ResourceManager::Load<EntityFile>("Schema/Entities/TeamTest.xml");
-    EntityFilePreprocessor fpp(file);
+    auto file = ResourceManager::Load<EntityXMLFile>("Schema/Entities/TeamTest.xml");
+    EntityXMLFilePreprocessor fpp(file);
     fpp.RegisterComponents(m_World);
-    EntityFileParser fp(file);
+    EntityXMLFileParser fp(file);
     fp.MergeEntities(m_World);
 
     // Create system pipeline

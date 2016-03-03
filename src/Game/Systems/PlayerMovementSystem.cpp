@@ -323,10 +323,8 @@ bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
 void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
 {
     //put a hexagon at the entitys... feet?
-    auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
-    EntityFileParser parser(hexagonEffect);
-    EntityID hexagonEffectID = parser.MergeEntities(m_World);
-    EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+    EntityWrapper hexagonEW = entityFile->MergeInto(m_World);
     hexagonEW["Transform"]["Position"] = (glm::vec3)target["Transform"]["Position"];
 }
 
@@ -337,10 +335,8 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
         return false;
     }
 
-    auto dashEffectResource = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
-    EntityFileParser parser(dashEffectResource);
-    EntityID dashEffectID = parser.MergeEntities(m_World);
-    EntityWrapper dashEffect(m_World, dashEffectID);
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
+    EntityWrapper dashEffect = entityFile->MergeInto(m_World);
     auto playerModel = player.FirstChildByName("PlayerModel");
     auto playerEntityModel = playerModel["Model"];
     auto playerEntityAnimation = playerModel["Animation"];
