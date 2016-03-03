@@ -661,9 +661,9 @@ PlayerID Server::getPlayerIDFromEndpoint()
 
 PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
 {
-    for (int i = 0; i < m_ConnectedPlayers.size(); ++i) {
-        if (entityID == m_ConnectedPlayers[i].EntityID) {
-            return i;
+    for(auto& kv : m_ConnectedPlayers) {
+        if (entityID == kv.second.EntityID) {
+            return kv.first;
         }
     }
     return -1;
