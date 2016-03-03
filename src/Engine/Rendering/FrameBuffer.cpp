@@ -53,16 +53,20 @@ void FrameBuffer::Generate()
 		case GL_TEXTURE_2D:
 			glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
 			GLERROR("FrameBuffer generate: glFramebufferTexture2D");
-
 			break;
 		case GL_RENDERBUFFER:
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
 			GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
 			break;
+		case GL_TEXTURE_2D_ARRAY:
+			glFramebufferTexture(GL_FRAMEBUFFER, (*it)->m_Attachment, *(*it)->m_ResourceHandle, 0);
+			GLERROR("FrameBuffer generate: glFramebufferTexture2DArray");
+			break;
 		}
 		GLERROR("2");
 
-		if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT && (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
+		// Need GL_DEPTH_ATTACHMENT for shadows
+		if (/*(*it)->m_Attachment != GL_DEPTH_ATTACHMENT &&*/ (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
 			attachments.push_back((*it)->m_Attachment);
 		}
 		GLERROR("Attachment");
