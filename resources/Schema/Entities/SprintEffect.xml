@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="SprintEffect" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Animation>
+      <AnimationName1></AnimationName1>
+      <AnimationName2></AnimationName2>
+      <AnimationName3></AnimationName3>
+    </c:Animation>
+    <c:Lifetime>
+      <Lifetime>0.1</Lifetime>
+    </c:Lifetime>
+    <c:ExplosionEffect>
+      <Velocity X="0" Y="0" Z="0"/>
+      <ExplosionDuration>0.1</ExplosionDuration>
+    </c:ExplosionEffect>
+    <c:Model>
+      <Resource></Resource>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children/>
+
+</Entity>
