@@ -14,11 +14,16 @@ void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo&
     double& reloadTimer = cWeapon["ReloadTimer"];
     reloadTimer = glm::max(0.0, reloadTimer - dt);
 
+    // Start reloading automatically if at 0 mag ammo
+    int& magAmmo = cWeapon["MagazineAmmo"];
+    if (m_ConfigAutoReload && magAmmo <= 0) {
+        OnReload(cWeapon, wi);
+    }
+
     // Handle reloading
-    double reloadTime = cWeapon["ReloadTime"];
     bool& isReloading = cWeapon["IsReloading"];
     if (isReloading && reloadTimer <= 0.0) {
-        int& magAmmo = cWeapon["MagazineAmmo"];
+        double reloadTime = cWeapon["ReloadTime"];
         int& magSize = cWeapon["MagazineSize"];
         int& ammo = cWeapon["Ammo"];
         if (magAmmo < magSize && ammo > 0) {
@@ -130,7 +135,6 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     // Ammo
     int& magAmmo = cWeapon["MagazineAmmo"];
     if (magAmmo <= 0) {
-        OnReload(cWeapon, wi);
         return;
     } else {
         magAmmo -= 1;
