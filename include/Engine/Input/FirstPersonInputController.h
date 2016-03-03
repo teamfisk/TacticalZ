@@ -165,11 +165,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
         m_SpecialAbilityKeyDown = e.Value > 0;
     }
 
-    if (m_SpecialAbilityKeyDown && m_MovementKeyDown) {
-        m_ShiftDashing = true;
-    } else {
-        m_ShiftDashing = false;
-    }
+    m_ShiftDashing = m_SpecialAbilityKeyDown && m_MovementKeyDown;
 
     return true;
 }
