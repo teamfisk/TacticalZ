@@ -29,6 +29,7 @@ struct EntityWrapper
     EntityWrapper Parent();
     EntityWrapper FirstParentByName(const std::string& parentEntityName);
     EntityWrapper FirstChildByName(const std::string& name);
+    EntityWrapper FirstLevelChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
     EntityWrapper Clone(EntityWrapper parent = EntityWrapper::Invalid);
     std::vector<EntityWrapper> ChildrenWithComponent(const std::string& componentType);

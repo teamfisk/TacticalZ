@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Blend xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Blend.xsd">
+	<Pose1></Pose1>
+	<Pose2></Pose2>
+	<Weight>0.5</Weight>
+	<SubTreeRoot>false</SubTreeRoot>
+</Blend>
