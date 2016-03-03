@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Entity name="RayBlue" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+<Entity name="RayRed" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
     <c:Lifetime>
@@ -16,7 +16,7 @@
         <c:Sprite>
           <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
           <GlowMap></GlowMap>
-          <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+          <Color A="0.419607848" B="0" G="0.0470588244" R="3.92156863"/>
         </c:Sprite>
         <c:Transform>
           <Position X="0" Y="0" Z="-0.5"/>
@@ -31,7 +31,7 @@
         <c:Sprite>
           <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
           <GlowMap></GlowMap>
-          <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+          <Color A="0.419607848" B="0" G="0.0470588244" R="3.92156863"/>
         </c:Sprite>
         <c:Transform>
           <Position X="0" Y="0" Z="-0.5"/>
