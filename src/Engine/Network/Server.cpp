@@ -534,6 +534,7 @@ bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
     eKD.Casualty = getPlayerIDFromEntityID(e.Player.ID);
     eKD.Killer = getPlayerIDFromEntityID(e.Killer.ID);
     m_EventBroker->Publish(eKD);
+    return false;
 }
 
 void Server::parseClientPing()

@@ -80,7 +80,7 @@ private:
     void identifyPacketLoss();
     void kick(PlayerID player);
     PlayerID getPlayerIDFromEndpoint();
-    PlayerID getPlayerIDFromEntityID();
+    PlayerID getPlayerIDFromEntityID(EntityID entityID);
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
