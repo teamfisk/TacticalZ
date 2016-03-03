@@ -15,6 +15,7 @@
 	<EquipTime>0.5</EquipTime>
 	<TriggerHeld>false</TriggerHeld>
 	<FireCooldown>0</FireCooldown>
+	<ReloadQueued>false</ReloadQueued>
 	<IsReloading>false</IsReloading>
 	<ReloadTimer>0</ReloadTimer>
 	<CurrentTravel>0</CurrentTravel>

@@ -20,6 +20,7 @@ public:
     void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     //bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
 
