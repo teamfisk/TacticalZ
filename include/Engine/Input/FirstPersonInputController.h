@@ -30,6 +30,7 @@ public:
     void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID);
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
+    bool SpecialAbilityKeyDown() const { return m_SpecialAbilityKeyDown; }
 
 protected:
     const int m_PlayerID;
@@ -145,10 +146,10 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
             if (m_NumberOfMovementKeysDown == 0) {
                 m_MovementKeyDown = false;
             }
-                //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
-                m_AssaultDashTapDirection = m_CurrentDirectionVector;
-                m_AssaultDashDoubleTapDeltaTime = 0.f;
-            
+            //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
+            m_AssaultDashTapDirection = m_CurrentDirectionVector;
+            m_AssaultDashDoubleTapDeltaTime = 0.f;
+
         }
     }
 
@@ -161,17 +162,10 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
     }
 
     if (e.Command == "SpecialAbility") {
-        if (e.Value > 0) {
-            m_SpecialAbilityKeyDown = true;
-        } else {
-            m_SpecialAbilityKeyDown = false;
-        }
+        m_SpecialAbilityKeyDown = e.Value > 0;
     }
-    if (m_SpecialAbilityKeyDown && m_MovementKeyDown) {
-        m_ShiftDashing = true;
-    } else {
-        m_ShiftDashing = false;
-    }
+
+    m_ShiftDashing = m_SpecialAbilityKeyDown && m_MovementKeyDown;
 
     return true;
 }

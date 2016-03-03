@@ -62,7 +62,14 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             playerMovementSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
             playerCrouchSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
         }
-
+        bool sniperSprinting = false;
+        if (player.HasComponent("SprintAbility")) {
+            if (controller->SpecialAbilityKeyDown()) {
+                playerMovementSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                playerCrouchSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                sniperSprinting = true;
+            }
+        }
 
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
@@ -117,6 +124,9 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 //if player has Boost from an Assault class, accelerate the player faster
                 if (playerBoostAssaultEntity.Valid()) {
                     accelerationSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+                }
+                if (sniperSprinting) {
+                    accelerationSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
                 }
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
