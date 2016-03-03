@@ -45,6 +45,7 @@ bool ButtonSystem::OnMousePress(const Events::MousePress& e)
                     EntityWrapper button = EntityWrapper(m_World, m_PickData.Entity);
                     eInputCmd.Command = (std::string)button["InputCmdButton"]["Command"];
                     eInputCmd.Value = (float)button["InputCmdButton"]["PressValue"];
+                    m_EventBroker->Publish(eInputCmd);
                 } else {
                     Events::ButtonPressed ePressed;
                     ePressed.Entity = m_PickEntity;
@@ -72,6 +73,7 @@ bool ButtonSystem::OnMouseRelease(const Events::MouseRelease& e)
                 EntityWrapper button = EntityWrapper(m_World, m_PickData.Entity);
                 eInputCmd.Command = (std::string)button["InputCmdButton"]["Command"];
                 eInputCmd.Value = 0;
+                m_EventBroker->Publish(eInputCmd);
             } else {
                 Events::ButtonReleased eReleased;
                 eReleased.EntityName = m_PickEntity.Name();

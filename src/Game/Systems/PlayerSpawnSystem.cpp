@@ -105,7 +105,7 @@ void PlayerSpawnSystem::Update(double dt)
 
 bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
 {
-    if (e.Command != "PickTeam" && e.Command != "PickClass") {
+    if (e.Command != "PickTeam" && e.Command != "SwapToClassPick") {
         return false;
     }
 
@@ -117,7 +117,7 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
     if (IsClient && !LocalPlayer.Valid()) {
         // Set the camera as active, if it exists.
         // Find the respawn camera or class pick camera.
-        std::string camName = e.Command == "PickClass" ? "PickClassCamera" : "SpectatorCamera";
+        std::string camName = e.Command == "SwapToClassPick" ? "PickClassCamera" : "SpectatorCamera";
         EntityWrapper spectatorCam = m_World->GetFirstEntityByName(camName);
         if (spectatorCam.Valid() && spectatorCam.HasComponent("Camera")) {
             Events::SetCamera eSetCamera;
@@ -137,14 +137,14 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
     for (; iter != m_SpawnRequests.end(); ++iter) {
         if (iter->PlayerID == e.PlayerID) {
             // If player wants to switch class, remove their spawn request.
-            if (e.Command == "PickClass") {
+            if (e.Command == "SwapToClassPick") {
                 m_SpawnRequests.erase(iter);
             }
             break;
         }
     }
 
-    if (e.Command == "PickClass") {
+    if (e.Command == "SwapToClassPick") {
         return true;
     }
 
