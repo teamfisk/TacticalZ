@@ -222,10 +222,12 @@ bool SoundManager::OnPlaySoundOnEntity(const Events::PlaySoundOnEntity & e)
 {
     Source* source = createSource(e.FilePath);
     source->Type = SoundType::SFX;
-    EntityID child = m_World->CreateEntity(e.EmitterID);
+    EntityID child = m_World->CreateEntity(e.Emitter.ID);
     m_World->AttachComponent(child, "Transform");
-    m_World->AttachComponent(child, "SoundEmitter");
+    auto cEmitter = m_World->AttachComponent(child, "SoundEmitter");
+    (double&)(float)cEmitter["Gain"] = e.Gain;
     m_Sources[child] = source;
+    setGain(source, cEmitter["Gain"]);
     playSound(source);
     return false;
 }

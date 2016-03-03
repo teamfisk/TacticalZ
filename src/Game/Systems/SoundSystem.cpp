@@ -60,7 +60,7 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
         auto model = m_World->AttachComponent(entity.ID, "Model");
         (std::string&)model["Resource"] = "Models/Core/UnitCube.mesh";
         Events::PlaySoundOnEntity ev;
-        ev.EmitterID = entity.ID;
+        ev.Emitter = entity;
         ev.FilePath = "Audio/crosscounter.wav";
         m_EventBroker->Publish(ev);
     }
@@ -77,7 +77,7 @@ void SoundSystem::playerJumps()
     bool grounded = (bool)m_World->GetComponent(LocalPlayer.ID, "Physics")["IsOnGround"];
     if (grounded) {
         Events::PlaySoundOnEntity e;
-        e.EmitterID = LocalPlayer.ID;
+        e.Emitter = LocalPlayer;
         e.FilePath = "Audio/Jump/Jump1.wav";
         m_EventBroker->Publish(e);
     }
@@ -106,7 +106,7 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     if (!IsClient) { // Only play for clients
         return false;
     }
-    if (LocalPlayer.ID = e.Victim.ID) { // You're local player was the one who took dmg
+    if(!e.Victim.Valid()) {
         return false;
     }
     std::uniform_int_distribution<int> dist(1, 12);
@@ -115,7 +115,7 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     paths.push_back("Audio/Hurt/Hurt" + std::to_string(rand) + ".wav");
 
     Events::PlayQueueOnEntity ev;
-    ev.Emitter = LocalPlayer;
+    ev.Emitter = e.Victim;
     ev.FilePaths = paths;
     m_EventBroker->Publish(ev);
     return false;
@@ -123,7 +123,7 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 
 bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
-    if (e.Player.ID != LocalPlayer.ID) {
+    if (!e.Player.Valid()) {
         return false;
     }
     if (!IsClient) {
@@ -132,7 +132,8 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
     // The local player is dead. The local player might be invalid?
     // Play the sound from the listener.
     // TODO: We might want to hear other players die.
-    Events::PlayBackgroundMusic ev;
+    Events::PlaySoundOnEntity ev;
+    ev.Emitter = e.Player;
     ev.FilePath = "Audio/Die/Die2.wav";
     m_EventBroker->Publish(ev);
     return false;
@@ -141,7 +142,7 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
+    ev.Emitter = LocalPlayer;
     ev.FilePath = "Audio/Pickup/Pickup2.wav";
     m_EventBroker->Publish(ev);
     return false;
@@ -156,7 +157,7 @@ bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
         return false;
     }
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = e.entityID;
+    ev.Emitter = EntityWrapper(m_World, e.entityID);
     ev.FilePath = "Audio/Jump/Jump2.wav";
     m_EventBroker->Publish(ev);
     return false;

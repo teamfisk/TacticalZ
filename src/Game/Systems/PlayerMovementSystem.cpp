@@ -287,7 +287,7 @@ void PlayerMovementSystem::playerStep(double dt)
         // Player moved a step's distance
         // Create footstep sound
         Events::PlaySoundOnEntity e;
-        e.EmitterID = m_LocalPlayer.ID;
+        e.Emitter = m_LocalPlayer;
         e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
         m_LeftFoot = !m_LeftFoot;
         m_EventBroker->Publish(e);

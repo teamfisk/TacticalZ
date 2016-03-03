@@ -87,9 +87,12 @@ void DefenderWeaponBehaviour::fireShell(WeaponInfo& wi)
     if (weaponModelEntity.Valid()) {
         EntityWrapper spawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
         Events::PlaySoundOnEntity e;
-        e.EmitterID = weaponModelEntity.ID;
+        e.Emitter = weaponModelEntity;
         e.FilePath = "Audio/weapon/Shotgun/ShotgunFire.wav";
-        m_EventBroker->Publish(e);
+        e.Gain = 1.f;
+        if (IsClient) {
+            m_EventBroker->Publish(e);
+        }
         for (auto& angles : pelletAngles) {
             glm::vec3 direction = Transform::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
             float distance = traceRayDistance(Transform::AbsolutePosition(spawner), direction);
