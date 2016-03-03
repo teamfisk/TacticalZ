@@ -11,6 +11,8 @@
 	<ViewPunch>0.01</ViewPunch>
 	<ReloadTime>0.5</ReloadTime>
 	<Slot><Primary/></Slot>
-	<IsFiring>false</IsFiring>
-	<TimeSinceLastFire>0</TimeSinceLastFire>
+	<TriggerHeld>false</TriggerHeld>
+	<FireCooldown>0</FireCooldown>
+	<IsReloading>false</IsReloading>
+	<ReloadTimer>0</ReloadTimer>
 </DefenderWeapon>

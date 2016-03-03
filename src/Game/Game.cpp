@@ -19,6 +19,7 @@
 #include "Game/Systems/AmmoPickupSystem.h"
 #include "Game/Systems/DamageIndicatorSystem.h"
 #include "Game/Systems/Weapon/DefenderWeaponBehaviour.h"
+#include "Game/Systems/Weapon/SidearmWeaponBehaviour.h"
 #include "Rendering/AnimationSystem.h"
 #include "Game/Systems/HealthHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
@@ -26,7 +27,7 @@
 #include "../Engine/Core/UniformScaleSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
-#include "Game/Systems/AmmunitionHUDSystem.h"
+#include "Game/Systems/TextFieldReader.h"
 #include "Game/Systems/AbilityCooldownHUDSystem.h"
 #include "Game/Systems/CapturePointArrowHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
@@ -130,13 +131,14 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DefenderWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<SidearmWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TextFieldReader>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
@@ -146,7 +148,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TextFieldReader>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<BoostSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);

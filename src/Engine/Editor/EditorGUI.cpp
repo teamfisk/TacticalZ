@@ -338,6 +338,15 @@ bool EditorGUI::drawComponentNode(EntityWrapper entity, const ComponentInfo& ci)
         }
     }
 
+    if (ci.Name == "Spawner") {
+        if (ImGui::Button("Activate")) {
+            Events::SpawnerSpawn e;
+            e.Spawner = entity;
+            e.Parent = entity;
+            m_EventBroker->Publish(e);
+        }
+    }
+
     return true;
 }
 
@@ -381,14 +390,52 @@ bool EditorGUI::drawComponentField_Vector(ComponentWrapper &c, const ComponentIn
         // Limit scale values to a minimum of 0
         return ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, 0.f, std::numeric_limits<float>::max());
     } else if (field.Name == "Orientation") {
-        // Make orentations have a period of 2*Pi
-        glm::vec3 tempVal = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
-        if (ImGui::SliderFloat3("", glm::value_ptr(tempVal), 0.f, glm::two_pi<float>())) {
-            val = tempVal;
-            return true;
-        } else {
-            return false;
+        //glm::vec3 tempVal = val;
+        glm::vec3 originalVal = val;
+
+        ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+        glm::tvec3<bool> isSnapping(false, false, false);
+        bool changed = ImGui::DragFloat3("", glm::value_ptr(val), 0.066666f);
+        if (changed) {
+            // Make orentations have a period of 2*Pi
+            val = glm::fmod(val, glm::vec3(glm::two_pi<float>()));
+            for (int i = 0; i < 3; i++) {
+                if (val[i] < 0) {
+                    val[i] += glm::two_pi<float>();
+                }
+            }
         }
+
+        // Snap to angle
+        //float snapRange = glm::pi<float>() / 15.f;
+        //float snapAngle = glm::quarter_pi<float>();
+        //glm::vec3 snap = glm::fmod(val, glm::vec3(snapAngle));
+        //for (int i = 0; i < 3; i++) {
+        //    isSnapping[i] = glm::abs(snap[i] - (snapRange / 2.f)) < snapRange;
+        //}
+        //if (changed && ImGui::IsMouseDown(0)) {
+        //    glm::vec3 change = val - originalVal;
+        //    for (int i = 0; i < 3; i++) {
+        //        if (isSnapping[i] && glm::abs(change[i]) < snapRange) {
+        //            val[i] -= snap[i] - snapRange;
+        //        }
+        //    }
+        //}
+
+        // Draw snapping outline
+        float width = ImGui::CalcItemWidth() / 3.f;;
+        float spacing = GImGui->Style.ItemInnerSpacing.x;
+        for (int i = 0; i < 3; i++) {
+            if (isSnapping[i]) {
+                ImVec2 pos = cursorPos + ImVec2(i * (width + spacing), 0.f);
+                ImRect bb(pos - ImVec2(1, 1), pos + ImVec2(width, 17));
+                auto window = ImGui::GetCurrentWindow();
+                const ImU32 col = window->Color(ImGuiCol_HeaderActive);
+                window->DrawList->AddRect(bb.Min, bb.Max, col, 3.f);
+            }
+        }
+
+        return changed;
     } else {
         return ImGui::DragFloat3("", glm::value_ptr(val), 0.1f, std::numeric_limits<float>::lowest(), std::numeric_limits<float>::max());
     }

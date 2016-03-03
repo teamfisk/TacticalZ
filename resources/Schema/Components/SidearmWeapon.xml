@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<SidearmWeapon xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="SidearmWeapon.xsd">
+	<MagazineAmmo>16</MagazineAmmo>
+	<MagazineSize>16</MagazineSize>
+	<BaseDamage>20</BaseDamage>
+	<RPM>500</RPM>
+	<Automatic>false</Automatic>
+	<ViewPunch>0.01</ViewPunch>
+	<ReloadTime>0.5</ReloadTime>
+	<EquipTime>0.5</EquipTime>
+	<Slot><Secondary/></Slot>
+	<TriggerHeld>false</TriggerHeld>
+	<FireCooldown>0</FireCooldown>
+	<IsReloading>false</IsReloading>
+	<ReloadTimer>0</ReloadTimer>
+</SidearmWeapon>

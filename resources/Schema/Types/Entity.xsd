@@ -43,7 +43,7 @@
 							<xs:element ref="c:Shield" minOccurs="0"/>
 							<xs:element ref="c:Shielded" minOccurs="0"/>
 							<xs:element ref="c:CapturePointHUD" minOccurs="0"/>
-							<xs:element ref="c:AmmunitionHUD" minOccurs="0"/>
+							<xs:element ref="c:TextFieldReader" minOccurs="0"/>
 							<xs:element ref="c:KillFeed" minOccurs="0"/>
 							<xs:element ref="c:Sprite" minOccurs="0"/>
 							<xs:element ref="c:AnimationOffset" minOccurs="0"/>
@@ -53,6 +53,7 @@
 							<xs:element ref="c:WeaponAttachment" minOccurs="0"/>
 							<xs:element ref="c:AbilityCooldownHUD" minOccurs="0"/>
 							<xs:element ref="c:DefenderWeapon" minOccurs="0"/>
+							<xs:element ref="c:SidearmWeapon" minOccurs="0"/>
 							<xs:element ref="c:CapturePointArrowHUD" minOccurs="0"/>
 							<xs:element ref="c:BoostIconsHUD" minOccurs="0"/>
 							<xs:element ref="c:FloatingEffect" minOccurs="0"/>
