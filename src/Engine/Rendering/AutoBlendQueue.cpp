@@ -54,6 +54,11 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
                 for (auto it = m_BlendQueue.begin(); it != m_BlendQueue.end(); it++) {
                     auto next = std::next(it, 1);
 
+
+                    if (it->BlendJob.BlendInfo.NodeName == autoBlendJob.BlendInfo.NodeName) {
+                        (*it) = blendNode;
+                    }
+
                     if (next != m_BlendQueue.end()) {
                         if (it->StartTime >= blendNode.StartTime && next->StartTime <= blendNode.StartTime) {
                             LOG_INFO("Inserted %s between %s and %s", blendNode.BlendJob.BlendInfo.NodeName.c_str(), it->BlendJob.BlendInfo.NodeName.c_str(), next->BlendJob.BlendInfo.NodeName.c_str());
@@ -83,11 +88,11 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
 void AutoBlendQueue::UpdateTime(double dt)
 {
     for (auto it = m_BlendQueue.begin(); it != m_BlendQueue.end();) {
-        it->EndTime -= dt;
-        it->StartTime -= dt;
         if (it->EndTime <= 0) {
             it = m_BlendQueue.erase(it);
         } else {
+            it->EndTime -= dt;
+            it->StartTime -= dt;
             it++;
         }
     }

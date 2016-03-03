@@ -29,7 +29,7 @@ public:
         Node* Child[2] = { nullptr, nullptr };
         NodeType Type;
         std::map<int, Skeleton::PoseData> Pose;
-        //std::vector<glm::mat4> Pose;
+        bool SubTreeRoot = false;
         double Weight = 0.0;
 
         Node* Next() {
@@ -61,6 +61,7 @@ public:
         std::string NodeName;
         double progress;
         bool Start;
+        bool SingleBlend;
         std::unordered_map<EntityWrapper, double> StartWeights;
     };
 

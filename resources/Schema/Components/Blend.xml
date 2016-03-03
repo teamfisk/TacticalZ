@@ -3,4 +3,5 @@
 	<Pose1></Pose1>
 	<Pose2></Pose2>
 	<Weight>0.5</Weight>
+	<SubTreeRoot>false</SubTreeRoot>
 </Blend>

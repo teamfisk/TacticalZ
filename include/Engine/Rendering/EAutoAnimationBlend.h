@@ -17,6 +17,7 @@ struct AutoAnimationBlend : Event
     bool Start = false;
     bool Reverse = false;
     bool Restart = false;
+    bool SingleLevelBlend = false;
 
     EntityWrapper AnimationEntity = EntityWrapper::Invalid;
 };

@@ -148,11 +148,11 @@ void AnimationSystem::UpdateWeights(double dt)
 bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
 {
 
-    if(!e.RootNode.Valid()) {
+    if (!e.RootNode.Valid()) {
         return false;
     }
 
-    if(!e.RootNode.HasComponent("Model")) {
+    if (!e.RootNode.HasComponent("Model")) {
         return false;
     }
 
@@ -179,7 +179,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
 
     EntityWrapper subTreeRoot = blendTree->GetSubTreeRoot(e.NodeName);
 
-    if(!subTreeRoot.Valid()) {
+    if (!subTreeRoot.Valid()) {
         return false;
     }
 
@@ -193,16 +193,18 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
     abj.BlendInfo.NodeName = e.NodeName;
     abj.BlendInfo.progress = 0.0;
     abj.BlendInfo.Start = e.Start;
+    abj.BlendInfo.SingleBlend = e.SingleLevelBlend;
 
-    if (e.Restart) {
-        EntityWrapper nodeEntity = subTreeRoot.FirstChildByName(e.NodeName);
-        if (nodeEntity.Valid()) {
-            if (nodeEntity.HasComponent("Animation")) {
-                const Skeleton::Animation* animation = skeleton->GetAnimation(nodeEntity["Animation"]["AnimationName"]);
 
+    EntityWrapper nodeEntity = subTreeRoot.FirstChildByName(e.NodeName); // more than one
+    if (nodeEntity.Valid()) {
+        if (nodeEntity.HasComponent("Animation")) {
+            const Skeleton::Animation* animation = skeleton->GetAnimation(nodeEntity["Animation"]["AnimationName"]);
+            (bool&)nodeEntity["Animation"]["Reverse"] = e.Reverse;
+
+            if (e.Restart) {
                 if (animation != nullptr) {
                     if (e.Restart) {
-                        (bool&)nodeEntity["Animation"]["Reverse"] = e.Reverse;
                         if (e.Reverse) {
                             (double&)nodeEntity["Animation"]["Time"] = animation->Duration;
                         } else {
@@ -439,27 +441,7 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
                         aeb.RootNode = entity;
                         aeb.Start = true;
                         aeb.Restart = true;
-                        m_EventBroker->Publish(aeb);
-                    }
-                }
-            }
-        } else if (e.Command == "Stand") {
-            auto blendComponents = m_World->GetComponents("BlendAdditive");
-
-            if (blendComponents == nullptr) {
-                return false;
-            }
-            for (auto& bc : *blendComponents) {
-                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
-
-                if (entity.Name() == "Assault") {
-                    {
-                        Events::AutoAnimationBlend aeb;
-                        aeb.Duration = 0.3;
-                        aeb.NodeName = "StandMovement";
-                        aeb.RootNode = entity;
-                        aeb.Start = true;
-                        aeb.Restart = true;
+                        aeb.SingleLevelBlend = true;
                         m_EventBroker->Publish(aeb);
                     }
                 }
@@ -526,27 +508,15 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
                 EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
 
                 if (entity.Name() == "Assault") {
-                   /* {
+                    {
                         Events::AutoAnimationBlend aeb;
                         aeb.Duration = 0.1;
                         aeb.NodeName = "Right";
                         aeb.RootNode = entity;
                         aeb.Start = true;
                         m_EventBroker->Publish(aeb);
-                    }*/
-
-
-                    {
-                        Events::AutoAnimationBlend aeb;
-                        aeb.Duration = 0.3;
-                        aeb.NodeName = "Right";
-                        aeb.RootNode = entity;
-                        aeb.Start = true;
-                        aeb.Restart = false;
-                        aeb.AnimationEntity = entity.FirstChildByName("DashRight");
-                        aeb.Delay = -0.3;
-                        m_EventBroker->Publish(aeb);
                     }
+
                 }
             }
         } else if (e.Command == "ForwardTest") {
@@ -570,8 +540,51 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
                 }
             }
         }
+    } else if (e.Command == "BackwardTest") {
+        auto blendComponents = m_World->GetComponents("BlendAdditive");
 
+        if (blendComponents == nullptr) {
+            return false;
+        }
+        for (auto& bc : *blendComponents) {
+            EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
 
+            if (entity.Name() == "Assault") {
+                {
+                    Events::AutoAnimationBlend aeb;
+                    aeb.Duration = 0.1;
+                    aeb.NodeName = "Walk";
+                    aeb.RootNode = entity;
+                    aeb.Start = true;
+                    aeb.Reverse = true;
+                    m_EventBroker->Publish(aeb);
+                }
+            }
+        }
+    } else if (e.Value == 0.f) {
+         if (e.Command == "Crouch") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.3;
+                        aeb.NodeName = "StandMovement";
+                        aeb.RootNode = entity;
+                        aeb.Start = true;
+                        aeb.Restart = true;
+                        aeb.SingleLevelBlend = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        } 
     }
 }
 

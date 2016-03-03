@@ -27,6 +27,7 @@ BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
         m_Root->Parent = nullptr;
         m_Root->Type = NodeType::Blend;
         m_Root->Weight = (double)ModelEntity["Blend"]["Weight"];
+        m_Root->SubTreeRoot = (bool)ModelEntity["Blend"]["SubTreeRoot"];
         (double&)ModelEntity["Blend"]["Weight"] = glm::clamp((double)ModelEntity["Blend"]["Weight"], 0.0, 1.0);
         m_Root->Child[0] = FillTreeByName(m_Root, (std::string)ModelEntity["Blend"]["Pose1"], ModelEntity);
         m_Root->Child[1] = FillTreeByName(m_Root, (std::string)ModelEntity["Blend"]["Pose2"], ModelEntity);
@@ -132,6 +133,7 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         node->Type = NodeType::Blend;
         (double&)childEntity["Blend"]["Weight"] = glm::clamp((double)childEntity["Blend"]["Weight"], 0.0, 1.0);
         node->Weight = (double)childEntity["Blend"]["Weight"];
+        node->SubTreeRoot = (bool)childEntity["Blend"]["SubTreeRoot"];
         //if (node->Weight < 1.f && node->Weight > 0.f) {
             node->Child[0] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose1"], childEntity);
             node->Child[1] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose2"], childEntity);
@@ -251,6 +253,10 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 
             lastNode = currentNode;
             currentNode = currentNode->Parent;
+
+            if (blendInfo.SingleBlend) {
+                break;
+            }
         }
     } else if(goalNodes.size() >= 2) {
         std::vector<Node*> sharedParents;
@@ -380,8 +386,8 @@ EntityWrapper BlendTree::GetSubTreeRoot(std::string nodeName)
     std::vector<Node*> subTreeRoots;
 
     for (auto it = nodes.begin(); it != nodes.end(); it++) {
-        Node* currentNode = (*it);
-        while (currentNode->Parent->Type == NodeType::Blend) {
+        Node* currentNode = (*it)->Parent;
+        while (!currentNode->SubTreeRoot) {
             currentNode = currentNode->Parent;
         }
         subTreeRoots.push_back(currentNode);
