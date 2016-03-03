@@ -10,7 +10,6 @@
 #include "Rendering/Skeleton.h"
 #include "Rendering/BlendTree.h"
 #include "Rendering/EAutoAnimationBlend.h"
-#include "../Input/EInputCommand.h"
 #include "../Core/EntityWrapper.h"
 #include "Rendering/AutoBlendQueue.h"
 
@@ -29,10 +28,6 @@ private:
 
     EventRelay<AnimationSystem, Events::AutoAnimationBlend> m_EAutoAnimationBlend;
     bool OnAutoAnimationBlend(Events::AutoAnimationBlend& e);
-
-
-    EventRelay<AnimationSystem, Events::InputCommand> m_EInputCommand;
-    bool OnInputCommand(const Events::InputCommand& e);
 
     std::unordered_map<EntityWrapper, AutoBlendQueue> m_AutoBlendQueues;
 };

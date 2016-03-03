@@ -68,8 +68,8 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.11860811" Y="1.0820415" Z="-0.239292726"/>
-                  <Orientation X="-0.0479474887" Y="0.0671224222" Z="0.17587325"/>
+                  <Position X="0.157041892" Y="1.0375092" Z="-0.236085728"/>
+                  <Orientation X="-0.00432149554" Y="-0.0343661793" Z="0.138000518"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
                 </c:Transform>
               </Components>
@@ -86,11 +86,11 @@
                 <c:Transform/>
               </Components>
               <Children>
-                <Entity name="AimPrimary">
+                <Entity name="AimSecondary">
                   <Components>
                     <c:Animation>
-                      <AnimationName>AimRifleA</AnimationName>
-                      <Time>0.49999979138374329</Time>
+                      <AnimationName>AimSecWepA</AnimationName>
+                      <Time>0.5</Time>
                       <Loop>false</Loop>
                       <Additive>true</Additive>
                     </c:Animation>
@@ -98,10 +98,10 @@
                   </Components>
                   <Children/>
                 </Entity>
-                <Entity name="AimSecondary">
+                <Entity name="AimPrimary">
                   <Components>
                     <c:Animation>
-                      <AnimationName>AimSecWepA</AnimationName>
+                      <AnimationName>AimRifleA</AnimationName>
                       <Time>0.5</Time>
                       <Loop>false</Loop>
                       <Additive>true</Additive>
@@ -148,7 +148,7 @@
                             <c:Blend>
                               <Pose1>MovementBlend</Pose1>
                               <Pose2>Idle</Pose2>
-                              <Weight>0</Weight>
+                              <Weight>1</Weight>
                             </c:Blend>
                             <c:Transform/>
                           </Components>
@@ -177,7 +177,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>WalkF</AnimationName>
-                                          <Time>0.62248157279189154</Time>
+                                          <Time>0.28642783708275554</Time>
                                           <Speed>1</Speed>
                                           <Play>true</Play>
                                         </c:Animation>
@@ -189,7 +189,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>RunF</AnimationName>
-                                          <Time>0.89449507681579532</Time>
+                                          <Time>0.55844134110665933</Time>
                                           <Speed>1</Speed>
                                           <Play>true</Play>
                                         </c:Animation>
@@ -213,7 +213,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>StrafeLeftF</AnimationName>
-                                          <Time>0.80407419382543011</Time>
+                                          <Time>0.46802045811629411</Time>
                                           <Speed>1</Speed>
                                           <Play>true</Play>
                                         </c:Animation>
@@ -225,7 +225,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>StrafeRightF</AnimationName>
-                                          <Time>0.82758972370554473</Time>
+                                          <Time>0.49153598799640874</Time>
                                           <Speed>1</Speed>
                                           <Play>true</Play>
                                         </c:Animation>
@@ -241,8 +241,9 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>IdleF</AnimationName>
-                                  <Time>0.8319563183471943</Time>
+                                  <Time>1.9353306180083529</Time>
                                   <Speed>1</Speed>
+                                  <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
                               </Components>
@@ -284,7 +285,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>CrouchStrafeLeftF</AnimationName>
-                                          <Time>0.41163149625393314</Time>
+                                          <Time>0.075577760544797146</Time>
                                           <Speed>1</Speed>
                                           <Play>true</Play>
                                         </c:Animation>
@@ -296,7 +297,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>CrouchStrafeRightF</AnimationName>
-                                          <Time>0.33895295820471616</Time>
+                                          <Time>0.0028992224955801671</Time>
                                           <Speed>1</Speed>
                                           <Play>true</Play>
                                         </c:Animation>
@@ -310,7 +311,7 @@
                                   <Components>
                                     <c:Animation>
                                       <AnimationName>CrouchWalkF</AnimationName>
-                                      <Time>0.11732694338211824</Time>
+                                      <Time>0.78127320767298225</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -473,7 +474,7 @@
                         <c:Blend>
                           <Pose1>IdleBlend</Pose1>
                           <Pose2>ShootBlend</Pose2>
-                          <Weight>1</Weight>
+                          <Weight>0</Weight>
                         </c:Blend>
                         <c:Transform/>
                       </Components>
@@ -483,6 +484,7 @@
                             <c:Blend>
                               <Pose1>IdlePrimary</Pose1>
                               <Pose2>IdleSecondary</Pose2>
+                              <Weight>0</Weight>
                             </c:Blend>
                             <c:Transform/>
                           </Components>
@@ -491,6 +493,9 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>IdleAssaultRifleU</AnimationName>
+                                  <Time>0.71065052212526325</Time>
+                                  <Speed>1</Speed>
+                                  <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
                               </Components>
@@ -500,6 +505,9 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>IdleSecWepU</AnimationName>
+                                  <Time>0.71417556241505054</Time>
+                                  <Speed>1</Speed>
+                                  <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
                               </Components>

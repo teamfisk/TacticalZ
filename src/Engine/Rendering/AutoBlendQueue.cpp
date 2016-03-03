@@ -45,7 +45,6 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
                 AnimationDuration = (animation->Duration * animationSpeed) - animationTime;
             }
 
-            LOG_INFO("Animation Duration %f", AnimationDuration);
             blendNode.StartTime += AnimationDuration;
             blendNode.EndTime += AnimationDuration;
             if (m_BlendQueue.size() == 0) {
@@ -61,16 +60,13 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
 
                     if (next != m_BlendQueue.end()) {
                         if (it->StartTime >= blendNode.StartTime && next->StartTime <= blendNode.StartTime) {
-                            LOG_INFO("Inserted %s between %s and %s", blendNode.BlendJob.BlendInfo.NodeName.c_str(), it->BlendJob.BlendInfo.NodeName.c_str(), next->BlendJob.BlendInfo.NodeName.c_str());
                             m_BlendQueue.insert(next, blendNode);
                             return;
                         }
                     } else if(it->StartTime > blendNode.StartTime){
-                        LOG_INFO("Inserted %s after %s", blendNode.BlendJob.BlendInfo.NodeName.c_str(), it->BlendJob.BlendInfo.NodeName.c_str());
                         m_BlendQueue.push_front(blendNode);
                         return;
                     } else if (it->StartTime <= blendNode.StartTime) {
-                        LOG_INFO("Inserted %s after %s", blendNode.BlendJob.BlendInfo.NodeName.c_str(), it->BlendJob.BlendInfo.NodeName.c_str());
                         m_BlendQueue.push_back(blendNode);
                         return;
                     }
@@ -80,7 +76,6 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
     }
 
 
-    LOG_INFO("Cleared BlendQueue and inserted %s", blendNode.BlendJob.BlendInfo.NodeName.c_str());
     m_BlendQueue.clear();
     m_BlendQueue.push_back(blendNode);
 }
