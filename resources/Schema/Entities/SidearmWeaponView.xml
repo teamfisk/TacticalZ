@@ -24,7 +24,11 @@
     </Entity>
     <Entity name="AmmunitionHUD">
       <Components>
-        <c:AmmunitionHUD/>
+        <c:TextFieldReader>
+          <ParentEntityName></ParentEntityName>
+          <ComponentType></ComponentType>
+          <Field></Field>
+        </c:TextFieldReader>
         <c:Transform>
           <Position X="-0.0300000012" Y="0.077000007" Z="-0.063000001"/>
           <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
@@ -52,6 +56,11 @@
           <Children>
             <Entity name="MagazineAmmo">
               <Components>
+                <c:TextFieldReader>
+                  <ParentEntityName>Player</ParentEntityName>
+                  <ComponentType>SidearmWeapon</ComponentType>
+                  <Field>MagazineAmmo</Field>
+                </c:TextFieldReader>
                 <c:Text>
                   <Content>16</Content>
                   <Resource>Fonts/DroidSans.ttf,64</Resource>
@@ -73,8 +82,8 @@
                 </c:Text>
                 <c:Transform>
                   <Position X="0.0150000006" Y="-0.029000001" Z="0"/>
-                  <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
                   <Orientation X="0" Y="0" Z="1.5710001"/>
+                  <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
                 </c:Transform>
               </Components>
               <Children/>

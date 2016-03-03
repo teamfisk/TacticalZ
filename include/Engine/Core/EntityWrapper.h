@@ -27,6 +27,7 @@ struct EntityWrapper
     bool HasComponent(const std::string& componentType);
     void AttachComponent(const char* componentName);
     EntityWrapper Parent();
+    EntityWrapper FirstParentByName(const std::string& parentEntityName);
     EntityWrapper FirstChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
     EntityWrapper Clone(EntityWrapper parent = EntityWrapper::Invalid);
