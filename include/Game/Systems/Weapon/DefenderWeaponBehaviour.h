@@ -1,3 +1,6 @@
+#ifndef DefenderWeaponBehaviour_h__
+#define DefenderWeaponBehaviour_h__
+
 #include "WeaponBehaviour.h"
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
@@ -32,3 +35,5 @@ private:
     // Utility
     Camera cameraFromEntity(EntityWrapper camera);
 };
+
+#endif

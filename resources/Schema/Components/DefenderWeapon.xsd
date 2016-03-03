@@ -19,6 +19,7 @@
 	<xs:element name="DefenderWeapon">
 		<xs:complexType>
 			<xs:all>
+				<xs:element name="Slot" type="WeaponSlotEnum" minOccurs="0"/>
 				<xs:element name="MagazineAmmo" type="t:int" minOccurs="0">
 					<xs:annotation><xs:documentation>Ammo currently loaded into the magazine</xs:documentation></xs:annotation>
 				</xs:element>
@@ -53,7 +54,6 @@
 				<xs:element name="ReloadTime" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Time it takes to load ONE SHELL into the weapon in seconds</xs:documentation></xs:annotation>
 				</xs:element>
-				<xs:element name="Slot" type="WeaponSlotEnum" minOccurs="0"/>
 				<xs:element name="TriggerHeld" type="t:bool" minOccurs="0"/>
 				<xs:element name="FireCooldown" type="t:double" minOccurs="0"/>
 				<xs:element name="IsReloading" type="t:bool" minOccurs="0"/>

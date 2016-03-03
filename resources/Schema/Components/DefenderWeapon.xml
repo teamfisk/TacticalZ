@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <DefenderWeapon xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DefenderWeapon.xsd">
+	<Slot><Primary/></Slot>
 	<MagazineAmmo>8</MagazineAmmo>
 	<MagazineSize>8</MagazineSize>
 	<Ammo>64</Ammo>
@@ -12,7 +13,6 @@
 	<ViewPunch>0.03</ViewPunch>
 	<ViewReturnSpeed>0.2</ViewReturnSpeed>
 	<ReloadTime>0.5</ReloadTime>
-	<Slot><Primary/></Slot>
 	<TriggerHeld>false</TriggerHeld>
 	<FireCooldown>0</FireCooldown>
 	<IsReloading>false</IsReloading>

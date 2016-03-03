@@ -1,3 +1,6 @@
+#ifndef SidearmWeaponBehaviour_h__
+#define SidearmWeaponBehaviour_h__
+
 #include "WeaponBehaviour.h"
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
@@ -31,3 +34,5 @@ private:
     bool playerInFirstPerson(EntityWrapper player);
     //float traceRayDistance(glm::vec3 origin, glm::vec3 direction);
 };
+
+#endif
