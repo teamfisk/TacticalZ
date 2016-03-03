@@ -371,7 +371,7 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
                 if (entity.Name() == "Assault") {
                     {
                         Events::AutoAnimationBlend aeb;
-                        aeb.Duration = 0.35;
+                        aeb.Duration = 0.25;
                         aeb.NodeName = "Jump";
                         aeb.RootNode = entity;
                         aeb.Start = true;
@@ -380,7 +380,7 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
                     }
                     {
                         Events::AutoAnimationBlend aeb;
-                        aeb.Duration = 0.6;
+                        aeb.Duration = 0.3;
                         aeb.NodeName = "StandCrouchBlend";
                         aeb.RootNode = entity;
                         aeb.Start = true;
@@ -492,6 +492,79 @@ bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
                         aeb.Start = true;
                         aeb.Restart = false;
                         aeb.AnimationEntity = entity.FirstChildByName("ShootPrimary");
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        } else if (e.Command == "LeftTest") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Left";
+                        aeb.RootNode = entity;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        } else if (e.Command == "RightTest") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                   /* {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Right";
+                        aeb.RootNode = entity;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    }*/
+
+
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.3;
+                        aeb.NodeName = "Right";
+                        aeb.RootNode = entity;
+                        aeb.Start = true;
+                        aeb.Restart = false;
+                        aeb.AnimationEntity = entity.FirstChildByName("DashRight");
+                        aeb.Delay = -0.3;
+                        m_EventBroker->Publish(aeb);
+                    }
+                }
+            }
+        } else if (e.Command == "ForwardTest") {
+            auto blendComponents = m_World->GetComponents("BlendAdditive");
+
+            if (blendComponents == nullptr) {
+                return false;
+            }
+            for (auto& bc : *blendComponents) {
+                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
+
+                if (entity.Name() == "Assault") {
+                    {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Walk";
+                        aeb.RootNode = entity;
+                        aeb.Start = true;
                         m_EventBroker->Publish(aeb);
                     }
                 }

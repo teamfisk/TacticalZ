@@ -68,8 +68,8 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.165889457" Y="1.06815922" Z="-0.204587683"/>
-                  <Orientation X="-0.0241590273" Y="-0.118801616" Z="0.15191035"/>
+                  <Position X="0.11611557" Y="1.09652853" Z="-0.231708765"/>
+                  <Orientation X="-0.0518394187" Y="-0.00663758488" Z="0.23004289"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
                 </c:Transform>
               </Components>
@@ -125,7 +125,7 @@
                     <c:Blend>
                       <Pose1>StandCrouchBlend</Pose1>
                       <Pose2>JumpDashBlend</Pose2>
-                      <Weight>0.00067602147306955462</Weight>
+                      <Weight>1.055110346338068e-57</Weight>
                     </c:Blend>
                     <c:Transform/>
                   </Components>
@@ -135,7 +135,7 @@
                         <c:Blend>
                           <Pose1>StandMovement</Pose1>
                           <Pose2>CrouchMovement</Pose2>
-                          <Weight>0</Weight>
+                          <Weight>0.0069837930620454403</Weight>
                         </c:Blend>
                         <c:Transform/>
                       </Components>
@@ -155,7 +155,7 @@
                                 <c:Blend>
                                   <Pose1>RunWalkBlend</Pose1>
                                   <Pose2>StrafeLRBlend</Pose2>
-                                  <Weight>0</Weight>
+                                  <Weight>2.4565650245976452e-16</Weight>
                                 </c:Blend>
                                 <c:Transform/>
                               </Components>
@@ -165,7 +165,7 @@
                                     <c:Blend>
                                       <Pose1>Walk</Pose1>
                                       <Pose2>Run</Pose2>
-                                      <Weight>1</Weight>
+                                      <Weight>1.2938206818383024e-24</Weight>
                                     </c:Blend>
                                     <c:Transform/>
                                   </Components>
@@ -174,6 +174,9 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>WalkF</AnimationName>
+                                          <Time>0.27508859963322152</Time>
+                                          <Speed>1</Speed>
+                                          <Play>true</Play>
                                         </c:Animation>
                                         <c:Transform/>
                                       </Components>
@@ -183,7 +186,7 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>RunF</AnimationName>
-                                          <Time>0.44556648193146309</Time>
+                                          <Time>0.5471021036571253</Time>
                                           <Speed>1</Speed>
                                           <Play>true</Play>
                                         </c:Animation>
@@ -198,7 +201,7 @@
                                     <c:Blend>
                                       <Pose1>Left</Pose1>
                                       <Pose2>Right</Pose2>
-                                      <Weight>0</Weight>
+                                      <Weight>0.033793529385008014</Weight>
                                     </c:Blend>
                                     <c:Transform/>
                                   </Components>
@@ -207,6 +210,9 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>StrafeLeftF</AnimationName>
+                                          <Time>0.45668122066676009</Time>
+                                          <Speed>1</Speed>
+                                          <Play>true</Play>
                                         </c:Animation>
                                         <c:Transform/>
                                       </Components>
@@ -216,6 +222,9 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>StrafeRightF</AnimationName>
+                                          <Time>0.48019675054687472</Time>
+                                          <Speed>1</Speed>
+                                          <Play>true</Play>
                                         </c:Animation>
                                         <c:Transform/>
                                       </Components>
@@ -243,6 +252,7 @@
                             <c:Blend>
                               <Pose1>MovementBlend</Pose1>
                               <Pose2>Idle</Pose2>
+                              <Weight>0</Weight>
                             </c:Blend>
                             <c:Transform/>
                           </Components>
@@ -252,7 +262,7 @@
                                 <c:Blend>
                                   <Pose1>Walk</Pose1>
                                   <Pose2>StrafeLRBlend</Pose2>
-                                  <Weight>0</Weight>
+                                  <Weight>2.4565650245976452e-16</Weight>
                                 </c:Blend>
                                 <c:Transform/>
                               </Components>
@@ -262,7 +272,7 @@
                                     <c:Blend>
                                       <Pose1>Left</Pose1>
                                       <Pose2>Right</Pose2>
-                                      <Weight>0</Weight>
+                                      <Weight>0.033793529385008014</Weight>
                                     </c:Blend>
                                     <c:Transform/>
                                   </Components>
@@ -271,6 +281,9 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>CrouchStrafeLeftF</AnimationName>
+                                          <Time>0.064238523095263123</Time>
+                                          <Speed>1</Speed>
+                                          <Play>true</Play>
                                         </c:Animation>
                                         <c:Transform/>
                                       </Components>
@@ -280,6 +293,9 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>CrouchStrafeRightF</AnimationName>
+                                          <Time>0.99155998504604614</Time>
+                                          <Speed>1</Speed>
+                                          <Play>true</Play>
                                         </c:Animation>
                                         <c:Transform/>
                                       </Components>
@@ -291,6 +307,9 @@
                                   <Components>
                                     <c:Animation>
                                       <AnimationName>CrouchWalkF</AnimationName>
+                                      <Time>0.76993397022344823</Time>
+                                      <Speed>1</Speed>
+                                      <Play>true</Play>
                                     </c:Animation>
                                     <c:Transform/>
                                   </Components>
@@ -318,7 +337,7 @@
                         <c:Blend>
                           <Pose1>Jump</Pose1>
                           <Pose2>DashBlend</Pose2>
-                          <Weight>0.01016461050458084</Weight>
+                          <Weight>1</Weight>
                         </c:Blend>
                         <c:Transform/>
                       </Components>
@@ -340,7 +359,7 @@
                             <c:Blend>
                               <Pose1>DashFBBlend</Pose1>
                               <Pose2>DashLRBlend</Pose2>
-                              <Weight>0.99999999999984523</Weight>
+                              <Weight>0.014621149736541383</Weight>
                             </c:Blend>
                             <c:Transform/>
                           </Components>
@@ -350,7 +369,7 @@
                                 <c:Blend>
                                   <Pose1>DashForward</Pose1>
                                   <Pose2>DashBackward</Pose2>
-                                  <Weight>0.98238059685988577</Weight>
+                                  <Weight>0.014363533804961248</Weight>
                                 </c:Blend>
                                 <c:Transform/>
                               </Components>
@@ -386,7 +405,7 @@
                                 <c:Blend>
                                   <Pose1>DashLeft</Pose1>
                                   <Pose2>DashRight</Pose2>
-                                  <Weight>0.96547196574235861</Weight>
+                                  <Weight>4.3244885367500671e-16</Weight>
                                 </c:Blend>
                                 <c:Transform/>
                               </Components>

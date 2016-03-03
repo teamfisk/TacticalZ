@@ -85,7 +85,7 @@ void AutoBlendQueue::UpdateTime(double dt)
     for (auto it = m_BlendQueue.begin(); it != m_BlendQueue.end();) {
         it->EndTime -= dt;
         it->StartTime -= dt;
-        if (it->EndTime < 0) {
+        if (it->EndTime <= 0) {
             it = m_BlendQueue.erase(it);
         } else {
             it++;

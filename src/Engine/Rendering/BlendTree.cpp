@@ -252,15 +252,71 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
             lastNode = currentNode;
             currentNode = currentNode->Parent;
         }
-
-
     } else if(goalNodes.size() >= 2) {
+        std::vector<Node*> sharedParents;
+        std::vector<Node*> nodes = goalNodes;
+
+        for (auto it = nodes.begin(); it != nodes.end(); it++) {
+            auto next = std::next(it, 1);
+            if (next != nodes.end()) {
+                Node* commonParent = FirstCommonParent((*it), (*next));
+                sharedParents.push_back(commonParent);
+                (*next) = commonParent;
+                nodes.erase(it);
+                it = nodes.begin();
+            }
+        }
+
+
+        for (auto it = goalNodes.begin(); it != goalNodes.end(); it++) {
+
+            Node* currentNode = (*it)->Parent;
+            Node* lastNode = (*it);
+
+            while (currentNode != nullptr) {
+                if (!currentNode->Entity.HasComponent("Blend")) {
+                    return blendInfo;
+                }
+
+                bool ShouldBreak = false;
+                for (auto it = sharedParents.begin(); it != sharedParents.end(); it++) {
+                    if(currentNode == (*it)) {
+                        ShouldBreak = true;
+                    }
+                }
+
+                if(ShouldBreak) {
+                    break;
+                }
+
+                double startWeight;
+                if (blendInfo.StartWeights.find(currentNode->Entity) != blendInfo.StartWeights.end()) {
+                    startWeight = blendInfo.StartWeights.at(currentNode->Entity);
+                } else {
+                    startWeight = currentNode->Weight;
+                    blendInfo.StartWeights[currentNode->Entity] = startWeight;
+                }
+
+                double goalWeight;
+                if (currentNode->Child[0] == lastNode) {
+                    goalWeight = 0.0;
+                } else if (currentNode->Child[1] == lastNode) {
+                    goalWeight = 1.0;
+                }
+
+                double weight = ((goalWeight - startWeight) * blendInfo.progress) + startWeight;
+                (double&)currentNode->Entity["Blend"]["Weight"] = weight;
+                currentNode->Weight = weight;
+
+                lastNode = currentNode;
+                currentNode = currentNode->Parent;
+            }
+        }
 
     }
 
     return blendInfo;
 }
-
 
 BlendTree::Node* BlendTree::GetCommonParent(std::string NodeName1, std::string NodeName2)
 {
