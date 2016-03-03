@@ -17,15 +17,17 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 
     // Load the entity file and parse it
     const std::string& entityFilePath = spawner["Spawner"]["EntityFile"];
-    auto entityFile = ResourceManager::Load<EntityFile>(entityFilePath);
-    if (entityFile == nullptr) {
+    EntityWrapper spawnedEntity;
+    try {
+        auto entityFile = ResourceManager::Load<EntityFile>(entityFilePath);
+        spawnedEntity = entityFile->MergeInto(world);
+        world->SetParent(spawnedEntity.ID, parent.ID);
+    } catch (const Resource::FailedLoadingException& e) {
         return EntityWrapper::Invalid;
     }
-    EntityFileParser parser(entityFile);
-    EntityWrapper spawnedEntity(world, parser.MergeEntities(world, parent.ID));
 
-    //If the spawned entity is collideable, then we must not spawn it where it collides with something that
-    //has a dontCollideComponent attached.
+    // If the spawned entity is collidable, then we must not spawn it where it collides with something that
+    // has a dontCollideComponent attached.
     bool spawnOnCollidable = dontCollideComponent.empty() || !spawnedEntity.HasComponent("Collidable");
     if (!spawnOnCollidable) {
         boost::optional<EntityAABB> optBox = Collision::EntityAbsoluteAABB(spawnedEntity);
@@ -36,7 +38,7 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
     }
 
     // Find any SpawnPoints existing as children of spawner
-    auto children = spawner.World->GetChildren(spawner.ID);
+    auto children = spawner.World->GetDirectChildren(spawner.ID);
     std::vector<EntityWrapper> spawnPoints;
     for (auto kv = children.first; kv != children.second; ++kv) {
         const EntityID& child = kv->second;

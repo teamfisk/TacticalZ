@@ -1,6 +1,7 @@
 #include "Core/World.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
+#include "Core/EntityWrapper.h"
 
 World::~World()
 {
@@ -44,7 +45,7 @@ bool World::ValidEntity(EntityID entity) const
     return m_EntityParents.find(entity) != m_EntityParents.end();
 }
 
-void World::RegisterComponent(ComponentInfo& ci)
+void World::RegisterComponent(const ComponentInfo& ci)
 {
     if (m_ComponentPools.find(ci.Name) == m_ComponentPools.end()) {
         m_ComponentPools[ci.Name] = new ComponentPool(ci);
@@ -127,7 +128,7 @@ void World::SetParent(EntityID entity, EntityID parent)
     m_EntityChildren.insert(std::make_pair(parent, entity));
 }
 
-const std::pair<std::unordered_multimap<EntityID, EntityID>::const_iterator, std::unordered_multimap<EntityID, EntityID>::const_iterator> World::GetChildren(EntityID entity)
+const std::pair<std::unordered_multimap<EntityID, EntityID>::const_iterator, std::unordered_multimap<EntityID, EntityID>::const_iterator> World::GetDirectChildren(EntityID entity)
 {
     return m_EntityChildren.equal_range(entity);
 }
@@ -149,6 +150,62 @@ std::string World::GetName(EntityID entity) const
     } else {
         return std::string();
     }
+}
+
+EntityWrapper World::GetFirstEntityByName(const std::string& name)
+{
+    auto itPair = GetDirectChildren(EntityID_Invalid);
+    for (auto it = itPair.first; it != itPair.second; it++) {
+        EntityID childEntityID = it->second;
+        EntityWrapper childEntity(this, childEntityID);
+        if (!childEntity.Valid()) {
+            continue;
+        }
+        EntityWrapper entityWithName = childEntity.Name() == name ? childEntity : childEntity.FirstChildByName(name);
+        if (entityWithName.Valid()) {
+            return entityWithName;
+        }
+    }
+    return EntityWrapper::Invalid;
+}
+
+std::unordered_map<EntityID, EntityID> World::Merge(const World* other)
+{
+    std::unordered_map<EntityID, EntityID> oldToNew;
+
+    // Create new entities
+    for (auto& kv : other->m_EntityParents) {
+        EntityID entity = kv.first;
+
+        EntityID newEntity = CreateEntity();
+        SetName(newEntity, other->GetName(entity));
+        oldToNew[entity] = newEntity;
+    }
+    // Fix relationships
+    for (auto& kv : other->m_EntityParents) {
+        EntityID entity = kv.first;
+        EntityID parent = kv.second;
+        if (parent != EntityID_Invalid) {
+            SetParent(oldToNew.at(entity), oldToNew.at(parent));
+        }
+    }
+
+    // Transfer components
+    for (auto& kv : other->m_ComponentPools) {
+        auto& componentType = kv.first;
+        ComponentPool* pool = kv.second;
+        // Register pool if it's not present in world
+        if (m_ComponentPools.count(componentType) == 0) {
+            RegisterComponent(pool->ComponentInfo());
+        }
+        // Copy components
+        for (auto component : *pool) {
+            ComponentWrapper newComponent = AttachComponent(oldToNew.at(component.EntityID), componentType);
+            component.Copy(newComponent);
+        }
+    }
+
+    return oldToNew;
 }
 
 EntityID World::generateEntityID()

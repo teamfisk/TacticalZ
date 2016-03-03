@@ -18,7 +18,7 @@
 
 struct ModelJob : RenderJob
 {
-    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage)
+    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded)
         : RenderJob()
     {
         Model = model;
@@ -117,7 +117,7 @@ struct ModelJob : RenderJob
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;
-
+		IsShielded = isShielded;
 
         if (model->IsSkinned()) {
             Skeleton = Model->m_RawModel->m_Skeleton;
@@ -181,10 +181,10 @@ struct ModelJob : RenderJob
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;
-
+	bool IsShielded;
     void CalculateHash() override
     {
-        Hash = TextureID + ModelID << 10 + ShaderID << 20;
+        Hash = ShaderID << 20 + ModelID << 10 + TextureID;
     }
 };
 

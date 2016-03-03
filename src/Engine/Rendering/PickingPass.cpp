@@ -19,17 +19,17 @@ PickingPass::~PickingPass()
 
 void PickingPass::InitializeTextures()
 {
-    GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
+    CommonFunctions::GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
         glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
+
+	CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
+		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 }
 
 void PickingPass::InitializeFrameBuffers()
 {
-    glGenRenderbuffers(1, &m_DepthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 
-    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
+    m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
     m_PickingBuffer.Generate();
 }
@@ -55,6 +55,7 @@ void PickingPass::InitializeShaderPrograms()
 
 void PickingPass::Draw(RenderScene& scene)
 {
+    GLERROR("PRE");
     PickingPassState* state = new PickingPassState(m_PickingBuffer.GetHandle());
 
     //TODO: Render: Add code for more jobs than modeljobs.
@@ -63,7 +64,9 @@ void PickingPass::Draw(RenderScene& scene)
     m_PickingProgram->Bind();
 
     if (scene.ClearDepth) {
-        glClear(GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_DEPTH_BUFFER_BIT);
+		state->Disable(GL_DEPTH_TEST);
+		state->DepthMask(GL_FALSE);
     }
     m_Camera = scene.Camera;
 
@@ -356,6 +359,7 @@ void PickingPass::Draw(RenderScene& scene)
 
 void PickingPass::ClearPicking()
 {
+    GLERROR("PRE");
     m_PickingColorsToEntity.clear();
     m_EntityColors.clear();
     m_ColorCounter[0] = 0;
@@ -363,16 +367,15 @@ void PickingPass::ClearPicking()
 
     m_PickingBuffer.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     m_PickingBuffer.Unbind();
+    GLERROR("END");
 }
 
 
 void PickingPass::OnWindowResize()
 {
     InitializeTextures();
-    glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     m_PickingBuffer.Generate();
 }
 
@@ -404,17 +407,4 @@ PickData PickingPass::Pick(glm::vec2 screenCoord)
     pickData.Camera = pickInfo.Camera;
     pickData.World = pickInfo.World;
     return pickData;
-}
-
-void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
-{
-    //TODO: Renderer: Make this in a sparate class
-    glGenTextures(1, texture);
-    glBindTexture(GL_TEXTURE_2D, *texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
-    GLERROR("Texture initialization failed");
 }

@@ -50,6 +50,18 @@
 							<xs:element ref="c:Menu" minOccurs="0"/>
 							<xs:element ref="c:Page" minOccurs="0"/>
 							<xs:element ref="c:Button" minOccurs="0"/>
+							<xs:element ref="c:WeaponAttachment" minOccurs="0"/>
+							<xs:element ref="c:AbilityCooldownHUD" minOccurs="0"/>
+							<xs:element ref="c:DefenderWeapon" minOccurs="0"/>
+							<xs:element ref="c:CapturePointArrowHUD" minOccurs="0"/>
+							<xs:element ref="c:BoostIconsHUD" minOccurs="0"/>
+							<xs:element ref="c:FloatingEffect" minOccurs="0"/>
+							<xs:element ref="c:AmmoPickup" minOccurs="0"/>
+							<xs:element ref="c:HealthPickup" minOccurs="0"/>
+							<xs:element ref="c:CapturePointGameMode" minOccurs="0"/>
+							<xs:element ref="c:DoubleJump" minOccurs="0"/>
+							<xs:element ref="c:HealthHUD" minOccurs="0"/>
+							<xs:element ref="c:SpriteIndicator" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

@@ -2,6 +2,7 @@
 #include "Core/UniformScaleSystem.h"
 #include "Editor/EditorRenderSystem.h"
 #include "Editor/EditorWidgetSystem.h"
+#include "Core/EntityFile.h"
 
 EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
     : System(params)
@@ -28,6 +29,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_EditorGUI->SetEntityDeleteCallback(std::bind(&EditorSystem::OnEntityDelete, this, std::placeholders::_1));
     m_EditorGUI->SetEntityChangeParentCallback(std::bind(&EditorSystem::OnEntityChangeParent, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetEntityChangeNameCallback(std::bind(&EditorSystem::OnEntityChangeName, this, std::placeholders::_1, std::placeholders::_2));
+    m_EditorGUI->SetEntityPasteCallback(std::bind(&EditorSystem::OnEntityPaste, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentAttachCallback(std::bind(&EditorSystem::OnComponentAttach, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetComponentDeleteCallback(std::bind(&EditorSystem::OnComponentDelete, this, std::placeholders::_1, std::placeholders::_2));
     m_EditorGUI->SetWidgetModeCallback(std::bind(&EditorSystem::setWidgetMode, this, std::placeholders::_1));
@@ -128,7 +130,7 @@ void EditorSystem::OnEntitySelected(EntityWrapper entity)
 
 void EditorSystem::OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath)
 {
-    EntityFileWriter writer(filePath);
+    EntityXMLFileWriter writer(filePath);
     writer.WriteEntity(entity.World, entity.ID);
 }
 
@@ -158,6 +160,11 @@ void EditorSystem::OnEntityChangeName(EntityWrapper entity, const std::string& n
     if (entity.Valid()) {
         entity.World->SetName(entity.ID, name);
     }
+}
+
+EntityWrapper EditorSystem::OnEntityPaste(EntityWrapper entityToCopy, EntityWrapper parent)
+{
+    return entityToCopy.Clone(parent);
 }
 
 void EditorSystem::OnComponentAttach(EntityWrapper entity, const std::string& componentType)
@@ -254,12 +261,11 @@ EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem
 
     try {
         auto entityFile = ResourceManager::Load<EntityFile>(filePath.string());
-        EntityFilePreprocessor fpp(entityFile);
-        fpp.RegisterComponents(parent.World);
-        EntityFileParser fp(entityFile);
-        EntityID newEntity = fp.MergeEntities(parent.World, parent.ID);
-        return EntityWrapper(parent.World, newEntity);
-    } catch (const std::exception&) {
+        EntityWrapper newEntity = entityFile->MergeInto(parent.World);
+        parent.World->SetParent(newEntity.ID, parent.ID);
+        return newEntity;
+    } catch (const std::exception& e) {
+        LOG_ERROR("Failed to import entity \"%s\": \"%s\"", filePath.string().c_str(), e.what());
         return EntityWrapper::Invalid;
     }
 }

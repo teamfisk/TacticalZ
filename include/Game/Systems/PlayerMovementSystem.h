@@ -6,9 +6,7 @@
 #include <imgui/imgui.h>
 #include "Events/EDoubleJump.h"
 #include "../Engine/Sound/EPlaySoundOnEntity.h"
-
 #include "Core/EntityFile.h"
-#include "Core/EntityFileParser.h"
 
 class PlayerMovementSystem : public ImpureSystem
 {
@@ -34,10 +32,16 @@ private:
     glm::vec3 m_LastPosition = glm::vec3();
     // The logic for making the sound play when player is moving
     void playerStep(double dt);
+    // Spawn a hexagon at origin of an Entity
+    void spawnHexagon(EntityWrapper target);
 
     EventRelay<PlayerMovementSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(Events::PlayerSpawned& e);
+    EventRelay<PlayerMovementSystem, Events::DoubleJump> m_EDoubleJump;
+    bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e);
+    EventRelay<PlayerMovementSystem, Events::DashAbility> m_EDashAbility;
+    bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e);
 
     void updateMovementControllers(double dt);
-    void updateVelocity(double dt);
+    void updateVelocity(EntityWrapper player, double dt);
 };
