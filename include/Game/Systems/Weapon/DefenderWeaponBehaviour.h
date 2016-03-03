@@ -1,6 +1,7 @@
 #include "WeaponBehaviour.h"
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
+#include "Sound/EPlaySoundOnEntity.h"
 
 class DefenderWeaponBehaviour : public WeaponBehaviour<DefenderWeaponBehaviour>
 {
@@ -16,6 +17,7 @@ public:
     void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
 
 private:

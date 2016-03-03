@@ -458,7 +458,7 @@
               <AnimationName3></AnimationName3>
             </c:Animation>
             <c:Model>
-              <Resource>Models/Characters/Assault/FirstPerson.mesh</Resource>
+              <Resource>Models/Characters/Assault/Test/FirstPerson.mesh</Resource>
               <Color A="1" B="1" G="0.309803933" R="0"/>
             </c:Model>
             <c:Transform/>
@@ -524,8 +524,7 @@
     <Entity name="PlayerModel">
       <Components>
         <c:Animation>
-          <AnimationName1>Idle</AnimationName1>
-          <Time1>0.013134522267137072</Time1>
+          <AnimationName1>IdleF</AnimationName1>
           <Speed1>1</Speed1>
           <AnimationName2></AnimationName2>
           <AnimationName3></AnimationName3>
@@ -537,8 +536,8 @@
         <c:Shielded/>
         <c:HiddenForLocalPlayer/>
         <c:Model>
-          <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
-          <Color A="1" B="1" G="0.309803933" R="0"/>
+          <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
+          <Color A="1" B="1" G="0.952941179" R="1"/>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -573,8 +572,8 @@
               <EntityFile>Schema/Entities/SidearmWeaponWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.156846598" Y="1.03287792" Z="-0.216207206"/>
-              <Orientation X="-0.0626498386" Y="-0.0301200207" Z="0.12067578"/>
+              <Position X="0.15691258" Y="1.04389966" Z="-0.213815808"/>
+              <Orientation X="-0.00425229501" Y="-0.0330814682" Z="0.137528151"/>
             </c:Transform>
           </Components>
           <Children/>
