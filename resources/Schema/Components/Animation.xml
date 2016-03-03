@@ -2,6 +2,8 @@
 <Animation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Animation.xsd">
 	<AnimationName></AnimationName>
 	<Time>0</Time>
+	<Play>false</Play>
+	<Reverse>false</Reverse>
 	<Speed>0</Speed>
 	<Loop>true</Loop>
 	<Additive>false</Additive>

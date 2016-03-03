@@ -51,8 +51,6 @@ BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
     }
 
     m_FinalPose = AccumulateFinalPose();
-
-
    // PrintTree();
 }
 
@@ -207,18 +205,16 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 {
     std::vector<Node*> goalNodes = FindNodesByName(blendInfo.NodeName);
 
-    if (blendInfo.Restart) {
+    if (blendInfo.Start) {
         for (auto it = goalNodes.begin(); it != goalNodes.end(); it++) {
             EntityWrapper entity = (*it)->Entity;
 
             if (entity.Valid()) {
                 if (entity.HasComponent("Animation")) {
-                    (double&)entity["Animation"]["Time"] = 0.0;
-                    (double&)entity["Animation"]["Speed"] = blendInfo.AnimationSpeed;
+                    (bool&)entity["Animation"]["Play"] = true;
                 }
             }
         }
-        blendInfo.Restart = false;
     }
 
 
@@ -230,8 +226,6 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 
         while (currentNode != nullptr)
         {
-            
-
             if(!currentNode->Entity.HasComponent("Blend")) {
                 return blendInfo;
             }
@@ -265,6 +259,91 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
     }
 
     return blendInfo;
+}
+
+
+BlendTree::Node* BlendTree::GetCommonParent(std::string NodeName1, std::string NodeName2)
+{
+    std::vector<Node*> nodes1 = FindNodesByName(NodeName1);
+    std::vector<Node*> nodes2 = FindNodesByName(NodeName2);
+
+    for (auto it = nodes1.begin(); it != nodes1.end(); it++) {
+        auto next = std::next(it, 1);
+
+        if(next != nodes1.end()) {
+            Node* commonParent = FirstCommonParent((*it), (*next));
+            (*next) = commonParent;
+            nodes1.erase(it);
+            it = nodes1.begin();
+        }
+    }
+
+    for (auto it = nodes2.begin(); it != nodes2.end(); it++) {
+        auto next = std::next(it, 1);
+
+        if (next != nodes2.end()) {
+            Node* commonParent = FirstCommonParent((*it), (*next));
+            (*next) = commonParent;
+            nodes2.erase(it);
+            it = nodes2.begin();
+        }
+    }
+
+    return FirstCommonParent(nodes1.front(), nodes2.front());;
+}
+
+
+BlendTree::Node* BlendTree::FirstCommonParent(Node* node1, Node* node2)
+{
+    std::list<Node*> node1Parents;
+
+    Node* currentNode = node1;
+    while (currentNode != nullptr) {
+        node1Parents.push_back(currentNode);
+        currentNode = currentNode->Parent;
+    }
+
+    currentNode = node2;
+    while (currentNode != nullptr) {
+        for (auto it = node1Parents.begin(); it != node1Parents.end(); it++) {
+            if (currentNode == (*it)) {
+                return currentNode;
+            }
+        }
+        currentNode = currentNode->Parent;
+    }
+
+    return nullptr;
+}
+
+
+EntityWrapper BlendTree::GetSubTreeRoot(std::string nodeName)
+{
+    std::vector<Node*> nodes = FindNodesByName(nodeName);
+
+    std::vector<Node*> subTreeRoots;
+
+    for (auto it = nodes.begin(); it != nodes.end(); it++) {
+        Node* currentNode = (*it);
+        while (currentNode->Parent->Type == NodeType::Blend) {
+            currentNode = currentNode->Parent;
+        }
+        subTreeRoots.push_back(currentNode);
+    }
+
+
+    for (auto it = subTreeRoots.begin(); it != subTreeRoots.end(); it++) {
+        auto next = std::next(it, 1);
+
+        if (next != subTreeRoots.end()) {
+            Node* commonParent = FirstCommonParent((*it), (*next));
+            (*next) = commonParent;
+            subTreeRoots.erase(it);
+            it = subTreeRoots.begin();
+        }
+    }
+
+    return subTreeRoots.front()->Entity;
 }
 
 void BlendTree::Blend(std::map<int, Skeleton::PoseData>& pose)

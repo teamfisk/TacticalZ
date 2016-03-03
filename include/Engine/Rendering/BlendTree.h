@@ -60,8 +60,7 @@ public:
     {
         std::string NodeName;
         double progress;
-        bool Restart;
-        double AnimationSpeed;
+        bool Start;
         std::unordered_map<EntityWrapper, double> StartWeights;
     };
 
@@ -77,6 +76,11 @@ public:
 
     void PrintTree();
     BlendTree::AutoBlendInfo AutoBlendStep(AutoBlendInfo blendInfo);
+
+    BlendTree::Node* GetCommonParent(std::string NodeName1, std::string NodeName2);
+    BlendTree::Node* FirstCommonParent(Node* node1, Node* node2);
+
+    EntityWrapper GetSubTreeRoot(std::string nodeName);
 
 private:
     Skeleton* m_Skeleton = nullptr;

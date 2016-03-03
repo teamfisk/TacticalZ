@@ -68,9 +68,9 @@
                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="0.153846264" Y="1.07432497" Z="-0.209223658"/>
+                  <Position X="0.165889457" Y="1.06815922" Z="-0.204587683"/>
+                  <Orientation X="-0.0241590273" Y="-0.118801616" Z="0.15191035"/>
                   <Scale X="1.00000012" Y="1" Z="1.00000012"/>
-                  <Orientation X="-0.033799246" Y="-0.120032266" Z="0.188354403"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -85,11 +85,11 @@
                 <c:Transform/>
               </Components>
               <Children>
-                <Entity name="AimPrimary">
+                <Entity name="AimSecondary">
                   <Components>
                     <c:Animation>
-                      <AnimationName>AimRifleA</AnimationName>
-                      <Time>0.49999979138374329</Time>
+                      <AnimationName>AimSecWepA</AnimationName>
+                      <Time>0.5</Time>
                       <Loop>false</Loop>
                       <Additive>true</Additive>
                     </c:Animation>
@@ -97,11 +97,11 @@
                   </Components>
                   <Children/>
                 </Entity>
-                <Entity name="AimSecondary">
+                <Entity name="AimPrimary">
                   <Components>
                     <c:Animation>
-                      <AnimationName>AimSecWepA</AnimationName>
-                      <Time>0.5</Time>
+                      <AnimationName>AimRifleA</AnimationName>
+                      <Time>0.49999979138374329</Time>
                       <Loop>false</Loop>
                       <Additive>true</Additive>
                     </c:Animation>
@@ -125,7 +125,7 @@
                     <c:Blend>
                       <Pose1>StandCrouchBlend</Pose1>
                       <Pose2>JumpDashBlend</Pose2>
-                      <Weight>0</Weight>
+                      <Weight>0.00067602147306955462</Weight>
                     </c:Blend>
                     <c:Transform/>
                   </Components>
@@ -183,8 +183,9 @@
                                       <Components>
                                         <c:Animation>
                                           <AnimationName>RunF</AnimationName>
-                                          <Time>0.032768287014830921</Time>
+                                          <Time>0.44556648193146309</Time>
                                           <Speed>1</Speed>
+                                          <Play>true</Play>
                                         </c:Animation>
                                         <c:Transform/>
                                       </Components>
@@ -317,7 +318,7 @@
                         <c:Blend>
                           <Pose1>Jump</Pose1>
                           <Pose2>DashBlend</Pose2>
-                          <Weight>1</Weight>
+                          <Weight>0.01016461050458084</Weight>
                         </c:Blend>
                         <c:Transform/>
                       </Components>
@@ -327,6 +328,8 @@
                             <c:Animation>
                               <AnimationName>JumpF</AnimationName>
                               <Time>0.5</Time>
+                              <Speed>1</Speed>
+                              <Loop>false</Loop>
                             </c:Animation>
                             <c:Transform/>
                           </Components>
@@ -337,7 +340,7 @@
                             <c:Blend>
                               <Pose1>DashFBBlend</Pose1>
                               <Pose2>DashLRBlend</Pose2>
-                              <Weight>0</Weight>
+                              <Weight>0.99999999999984523</Weight>
                             </c:Blend>
                             <c:Transform/>
                           </Components>
@@ -347,7 +350,7 @@
                                 <c:Blend>
                                   <Pose1>DashForward</Pose1>
                                   <Pose2>DashBackward</Pose2>
-                                  <Weight>1</Weight>
+                                  <Weight>0.98238059685988577</Weight>
                                 </c:Blend>
                                 <c:Transform/>
                               </Components>
@@ -356,6 +359,8 @@
                                   <Components>
                                     <c:Animation>
                                       <AnimationName>DashForwardF</AnimationName>
+                                      <Time>1</Time>
+                                      <Speed>1</Speed>
                                       <Loop>false</Loop>
                                     </c:Animation>
                                     <c:Transform/>
@@ -367,6 +372,7 @@
                                     <c:Animation>
                                       <AnimationName>DashBackwardF</AnimationName>
                                       <Time>1</Time>
+                                      <Speed>1</Speed>
                                       <Loop>false</Loop>
                                     </c:Animation>
                                     <c:Transform/>
@@ -380,7 +386,7 @@
                                 <c:Blend>
                                   <Pose1>DashLeft</Pose1>
                                   <Pose2>DashRight</Pose2>
-                                  <Weight>0</Weight>
+                                  <Weight>0.96547196574235861</Weight>
                                 </c:Blend>
                                 <c:Transform/>
                               </Components>
@@ -390,6 +396,7 @@
                                     <c:Animation>
                                       <AnimationName>DashLeftF</AnimationName>
                                       <Time>1</Time>
+                                      <Speed>1</Speed>
                                       <Loop>false</Loop>
                                     </c:Animation>
                                     <c:Transform/>
@@ -400,6 +407,8 @@
                                   <Components>
                                     <c:Animation>
                                       <AnimationName>DashRightF</AnimationName>
+                                      <Time>1</Time>
+                                      <Speed>1</Speed>
                                       <Loop>false</Loop>
                                     </c:Animation>
                                     <c:Transform/>
