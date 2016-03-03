@@ -1,41 +1,22 @@
 #include "Game.h"
 #include "MiniDump.h"
 
-LONG WINAPI CrashHandler(EXCEPTION_POINTERS* pException);
+LONG WINAPI CrashHandler(LPEXCEPTION_POINTERS pException);
 
 int main(int argc, char* argv[])
 {
-    //::SetUnhandledExceptionFilter(CrashHandler);
+    SetUnhandledExceptionFilter(CrashHandler);
 
-    //EXCEPTION_POINTERS* pException = new EXCEPTION_POINTERS();
-    //pException->ContextRecord = new _CONTEXT();
-    //pException->ExceptionRecord = new EXCEPTION_RECORD();
-    //CrashHandler(pException);
-    //return 0;
-
-    __try {
-        int* ii = nullptr;
-        *ii = 17;
-
-        //int x = asd[4];
-        //std::cout << "crash before we get here, don't optimize x. " << x;
-
-        //throw std::exception();
-    } __except (CrashHandler(GetExceptionInformation())) {
-        system("pause");
-        return 0;
-    }
-    system("pause");
-    /*
+    //run the .exe file to get a possible crashdump
     Game game(argc, argv);
     while (game.Running()) {
         game.Tick();
     }
-    */
+
     return 0;
 }
 
-LONG WINAPI CrashHandler(EXCEPTION_POINTERS* pException)
+LONG WINAPI CrashHandler(LPEXCEPTION_POINTERS pException)
 {
     // Get absolute path of current process: C:/ ... /name.exe
     CHAR Dump_Path[MAX_PATH];
@@ -46,22 +27,17 @@ LONG WINAPI CrashHandler(EXCEPTION_POINTERS* pException)
     path = path.substr(0, path.length() - 4);
     path += "Dump.exe";
 
-    DWORD procId = GetCurrentProcessId();
-    DWORD threadId = GetCurrentThreadId();
-    std::uintptr_t intExcPtr = reinterpret_cast<std::uintptr_t>(pException);
-    std::ostringstream ss;
-    ss << procId << " " << threadId << " " << intExcPtr;
-    char cmds[128];
-    strcpy(cmds, ss.str().c_str());
+    wchar_t commandLine[32768];
+    swprintf_s(commandLine, sizeof(commandLine) / sizeof(commandLine[0]), L"\"%ls\" %lu %lu %p", path.c_str(), GetCurrentProcessId(), GetCurrentThreadId(), pException);
 
-    STARTUPINFO sInfo;
+    STARTUPINFOW sInfo;
     PROCESS_INFORMATION pInfo;
     ZeroMemory(&sInfo, sizeof(sInfo));
     ZeroMemory(&pInfo, sizeof(pInfo));
     sInfo.cb = sizeof(sInfo);
 
-    if (CreateProcess(path.c_str(),
-        cmds,
+    if (CreateProcessW(L"TacticalZDump.exe",
+        commandLine,
         nullptr,
         nullptr,
         FALSE,
@@ -69,8 +45,7 @@ LONG WINAPI CrashHandler(EXCEPTION_POINTERS* pException)
         nullptr,
         nullptr,
         &sInfo,
-        &pInfo)
-        ) {
+        &pInfo)) {
         WaitForSingleObject(pInfo.hProcess, INFINITE);
         CloseHandle(pInfo.hProcess);
         CloseHandle(pInfo.hThread);
@@ -84,3 +59,4 @@ LONG WINAPI CrashHandler(EXCEPTION_POINTERS* pException)
 
     return EXCEPTION_EXECUTE_HANDLER;// EXCEPTION_CONTINUE_SEARCH
 }
+
