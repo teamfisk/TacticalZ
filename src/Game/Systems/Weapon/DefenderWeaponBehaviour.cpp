@@ -117,7 +117,7 @@ void DefenderWeaponBehaviour::dealDamage(WeaponInfo& wi, glm::vec3 direction, do
     if (!wi.Player.Valid()) {
         return;
     }
-    
+
     glm::vec3 maxRange = direction * 2.f;
     EntityWrapper camera = wi.Player.FirstChildByName("Camera");
     glm::vec3 cameraPosition = Transform::AbsolutePosition(camera);
@@ -147,8 +147,9 @@ void DefenderWeaponBehaviour::dealDamage(WeaponInfo& wi, glm::vec3 direction, do
     }
 
     // Check for friendly fire
+    //this needs to not return, for the boosts. in all weaponclasses: assault,defender,sniper
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
-        return;
+        damage = 0;
     }
 
     // Deal damage! 
@@ -177,11 +178,11 @@ Camera DefenderWeaponBehaviour::cameraFromEntity(EntityWrapper camera)
     ComponentWrapper cTransform = camera["Transform"];
     ComponentWrapper cCamera = camera["Camera"];
     Camera cam(
-        (float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, 
-        (double)cCamera["FOV"], 
-        (double)cCamera["NearClip"], 
+        (float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height,
+        (double)cCamera["FOV"],
+        (double)cCamera["NearClip"],
         (double)cCamera["FarClip"]
-    );
+        );
     cam.SetPosition(cTransform["Position"]);
     cam.SetOrientation(glm::quat((const glm::vec3&)cTransform["Orientation"]));
     return cam;
