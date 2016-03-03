@@ -39,7 +39,6 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
     float position = 0.f;
 
     for (auto it = m_PlayerIdentities.begin(); it != m_PlayerIdentities.end(); ++it) {
-
         bool found = false;
         for (auto child : children) {
             int ID = (int)child["ScoreIdentity"]["ID"];
@@ -49,12 +48,14 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
                     (int&)entity["ScoreScreen"]["TotalIdentities"] -= 1;
                     break;
                 }
-                for (auto it = m_DisconnectedIdentities.begin(); it != m_DisconnectedIdentities.end(); ++it) {
-                    if (ID = *it) {
-
+                for (auto it2 = m_DisconnectedIdentities.begin(); it2 != m_DisconnectedIdentities.end(); ++it2) {
+                    if (ID == *it2) {
                         m_World->DeleteEntity(child.ID);
                         (int&)entity["ScoreScreen"]["TotalIdentities"] -= 1;
-                        it = m_DisconnectedIdentities.erase(it);
+                        it2 = m_DisconnectedIdentities.erase(it2);
+                        it = m_PlayerIdentities.erase(it);
+
+                        //Remove from m_playerIdentities
                         break;
                     }
                 }
@@ -67,6 +68,11 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
                 break;
             }
         }
+
+        if (it == m_PlayerIdentities.end()) {
+            break;
+        }
+
         if(found == false) {
             if(it->second.Team != currentTeam) {
                 //This player is not the same team as this scoreboard should show.
@@ -133,6 +139,5 @@ bool ScoreScreenSystem::OnPlayerDisconnected(const Events::PlayerDisconnected& e
 {
     //player has disconnected, remove him from list of ScoreIdentities
     m_DisconnectedIdentities.push_back(e.PlayerID);
-    m_PlayerIdentities.erase(e.PlayerID);
     return 0;
 }
