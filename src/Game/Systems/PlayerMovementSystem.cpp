@@ -34,7 +34,7 @@ void PlayerMovementSystem::Update(double dt)
             return;
         }
         for (auto cSprint : *pool) {
-            if (/*cSprint.EntityID != LocalPlayer.ID && */(bool)cSprint["Active"]) {
+            if (cSprint.EntityID != LocalPlayer.ID && (bool)cSprint["Active"]) {
                 // Spawn one afterimage for each player that sprints.
                 EntityWrapper player(m_World, cSprint.EntityID);
                 auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/SprintEffect.xml");
