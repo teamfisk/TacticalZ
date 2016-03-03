@@ -14,6 +14,7 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Server::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EAmmoPickup, &Server::OnAmmoPickup);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &Server::OnPlayerDeath);
     // BindWW
     if (port == 0) {
         port = config->Get<float>("Networking.Port", 27666);
@@ -351,7 +352,7 @@ void Server::parseTCPConnect(Packet & packet)
     LOG_INFO("Parsing connections");
     // Check if player is already connected
     // Ska vara till lagd i TCPServer receive
-    PlayerID playerID = GetPlayerIDFromEndpoint();
+    PlayerID playerID = getPlayerIDFromEndpoint();
     if (playerID == -1) {
         return;
     }
@@ -526,10 +527,19 @@ bool Server::OnAmmoPickup(const Events::AmmoPickup & e)
     return true;
 }
 
+
+bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
+{
+    Events::KillDeath eKD;
+    eKD.Casualty = getPlayerIDFromEntityID(e.Player.ID);
+    eKD.Killer = getPlayerIDFromEntityID(e.Killer.ID);
+    m_EventBroker->Publish(eKD);
+}
+
 void Server::parseClientPing()
 {
     LOG_INFO("%i: Parsing ping", m_PacketID);
-    PlayerID player = GetPlayerIDFromEndpoint();
+    PlayerID player = getPlayerIDFromEndpoint();
     if (player == -1) {
         return;
     }
@@ -567,7 +577,7 @@ void Server::parseOnInputCommand(Packet& packet)
 {
     PlayerID player = -1;
     // Check which player it was who sent the message
-    player = GetPlayerIDFromEndpoint();
+    player = getPlayerIDFromEndpoint();
     if (player != -1) {
         while (packet.DataReadSize() < packet.Size()) {
             Events::InputCommand e;
@@ -586,7 +596,7 @@ void Server::parseOnInputCommand(Packet& packet)
 
 void Server::parsePlayerTransform(Packet& packet)
 {
-    PlayerID playerID = GetPlayerIDFromEndpoint();
+    PlayerID playerID = getPlayerIDFromEndpoint();
     if (playerID == -1) {
         return;
     }
@@ -635,7 +645,7 @@ bool Server::shouldSendToClient(EntityWrapper childEntity)
         || childEntity.HasComponent("AmmoPickup");
 }
 
-PlayerID Server::GetPlayerIDFromEndpoint()
+PlayerID Server::getPlayerIDFromEndpoint()
 {
     // check both tcp and udp connection
     for (auto& kv : m_ConnectedPlayers) {
@@ -644,6 +654,16 @@ PlayerID Server::GetPlayerIDFromEndpoint()
             || (kv.second.Endpoint.address() == m_Address
                 && kv.second.Endpoint.port() == m_Port)) {
             return kv.first;
+        }
+    }
+    return -1;
+}
+
+PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
+{
+    for (int i = 0; i < m_ConnectedPlayers.size(); ++i) {
+        if (entityID == m_ConnectedPlayers[i].EntityID) {
+            return i;
         }
     }
     return -1;

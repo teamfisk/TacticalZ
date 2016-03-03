@@ -21,6 +21,8 @@
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
 #include "Core/EAmmoPickup.h"
+#include "Core/EPlayerDeath.h"
+#include "Network/EKillDeath.h"
 
 class Server : public Network
 {
@@ -77,7 +79,8 @@ private:
     void parseOnPlayerDamage(Packet& packet);
     void identifyPacketLoss();
     void kick(PlayerID player);
-    PlayerID GetPlayerIDFromEndpoint();
+    PlayerID getPlayerIDFromEndpoint();
+    PlayerID getPlayerIDFromEntityID();
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
@@ -103,6 +106,8 @@ private:
     bool OnPlayerDamage(const Events::PlayerDamage& e);
     EventRelay<Server, Events::AmmoPickup> m_EAmmoPickup;
     bool OnAmmoPickup(const Events::AmmoPickup& e);
+    EventRelay<Server, Events::PlayerDeath> m_EPlayerDeath;
+    bool OnPlayerDeath(const Events::PlayerDeath& e);
 };
 
 #endif
