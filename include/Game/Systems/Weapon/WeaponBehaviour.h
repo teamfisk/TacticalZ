@@ -94,6 +94,39 @@ protected:
         }
     }
 
+    void playAnimationAndReturn(EntityWrapper weaponModelEntity, const std::string& subTreeName, const std::string& animationNodeName)
+    {
+        EntityWrapper root = weaponModelEntity.FirstParentWithComponent("Model");
+        if (!root.Valid()) {
+            return;
+        }
+
+        EntityWrapper subTree = root.FirstChildByName(subTreeName);
+        if (!subTree.Valid()) {
+            return;
+        }
+
+        EntityWrapper animationNode = subTree.FirstChildByName(animationNodeName);
+        if (!animationNode.Valid()) {
+            return;
+        }
+
+        Events::AutoAnimationBlend eFireBlend;
+        eFireBlend.RootNode = root;
+        eFireBlend.NodeName = animationNodeName;
+        eFireBlend.Restart = true;
+        eFireBlend.Start = true;
+        m_EventBroker->Publish(eFireBlend);
+
+        Events::AutoAnimationBlend eIdleBlend;
+        eIdleBlend.RootNode = root;
+        eIdleBlend.NodeName = "Idle";
+        eIdleBlend.AnimationEntity = animationNode;
+        eIdleBlend.Delay = -0.2;
+        eIdleBlend.Duration = 0.2;
+        m_EventBroker->Publish(eIdleBlend);
+    }
+
 private:
     EventRelay<ETYPE, Events::SetCamera> m_ESetCamera;
     bool _OnSetCamera(const Events::SetCamera& e)

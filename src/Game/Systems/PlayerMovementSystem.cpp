@@ -84,10 +84,10 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             // Set third person model aim pitch
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
-                ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
-                float pitch = cameraOrientation.x + 0.2f;
-                double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
-                cAnimationOffset["Time"] = time;
+                //ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
+                //float pitch = cameraOrientation.x + 0.2f;
+                //double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
+                //cAnimationOffset["Time"] = time;
             }
         }
 
@@ -208,81 +208,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 }
             }
 
-            // Animations
-            EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
-            if (playerModel.Valid()) {
-                ComponentWrapper cAnimation = playerModel["Animation"];
-                std::string& animationName1 = cAnimation["AnimationName1"];
-                std::string& animationName2 = cAnimation["AnimationName2"];
-                double& animationTime1 = cAnimation["Time1"];
-                double& animationTime2 = cAnimation["Time2"];
-                double& animationSpeed1 = cAnimation["Speed1"];
-                double& animationSpeed2 = cAnimation["Speed2"];
-                double& animationWeight1 = cAnimation["Weight1"];
-                double& animationWeight2 = cAnimation["Weight2"];
-
-                float movementLength = glm::length(groundVelocity);
-                //TODO: add assault dash animation here
-                if (glm::length(controller->Movement()) > 0.f) {
-                    double forwardMovement = controller->Movement().z;
-                    double strafeMovement = controller->Movement().x;
-
-                    if (controller->Crouching() && animationName1 != "CrouchWalk") {
-                        animationName1 = "CrouchWalk";
-                        animationSpeed1 = 1.0 * -glm::sign(controller->Movement().z);
-                    } else {
-                        if (glm::abs(forwardMovement) > 0) {
-                            if (animationName1 != "Run") {
-                                animationName1 = "Run";
-                                if (animationName2 == "StrafeLeft" || animationName2 == "StrafeRight") {
-                                    animationTime1 = animationTime2;
-                                } else {
-                                    animationTime1 = 0.0;
-                                }
-                            }
-                            animationSpeed1 = 2.f * -glm::sign(forwardMovement);
-                        }
-
-                        if (glm::abs(strafeMovement) > 0) {
-                            if (animationName2 != "StrafeLeft" && animationName2 != "StrafeRight") {
-                                if (strafeMovement < 0) {
-                                    animationName2 = "StrafeLeft";
-                                }
-                                if (strafeMovement > 0) {
-                                    animationName2 = "StrafeRight";
-                                }
-                                if (animationName1 == "Run") {
-                                    animationTime2 = animationTime1;
-                                } else {
-                                    animationTime2 = 0.0;
-                                }
-                            }
-                            animationSpeed2 = 2.f * glm::abs(strafeMovement);
-                        }
-
-                        double strafeWeight = glm::abs(strafeMovement) / (glm::abs(forwardMovement) + glm::abs(strafeMovement));
-                        animationWeight2 = strafeWeight;
-                        animationWeight1 = 1.0 - strafeWeight;
-                    }
-                } else {
-                    if (controller->Crouching()) {
-                        animationName1 = "Crouch";
-                        animationName2 = "";
-                        animationSpeed1 = 1.0;
-                        animationSpeed2 = 0.0;
-                        animationWeight1 = 1.0;
-                        animationWeight2 = 0.0;
-                    } else {
-                        animationName1 = "Idle";
-                        animationName2 = "";
-                        animationSpeed1 = 1.f;
-                        animationSpeed2 = 0.0;
-                        animationWeight1 = 1.0;
-                        animationWeight2 = 0.0;
-                        //cAnimation["AnimationName2"] = "Idle";
-                    }
-                }
-            }
+            // TODO: Animations
         }
 
         controller->Reset();
@@ -396,10 +322,5 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
     playerEntityAnimation.Copy(dashEffect["Animation"]);
     dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
     ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
-    dashEffect["Animation"]["Speed1"] = 0.0;
-    dashEffect["Animation"]["Speed2"] = 0.0;
-    dashEffect["Animation"]["Speed3"] = 0.0;
-    dashEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
-    dashEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
     return true;
 }

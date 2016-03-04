@@ -10,18 +10,28 @@ void AssaultWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWra
 
 void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
-    // Decrement reload timer
-    double& reloadTimer = cWeapon["ReloadTimer"];
-    reloadTimer = glm::max(0.0, reloadTimer - dt);
-
     // Start reloading automatically if at 0 mag ammo
     int& magAmmo = cWeapon["MagazineAmmo"];
     if (m_ConfigAutoReload && magAmmo <= 0) {
         OnReload(cWeapon, wi);
     }
 
-    // Handle reloading
+    // Only start reloading once we're done firing
+    bool& reloadQueued = cWeapon["ReloadQueued"];
+    double& fireCooldown = cWeapon["FireCooldown"];
     bool& isReloading = cWeapon["IsReloading"];
+    if (reloadQueued && fireCooldown <= 0) {
+        reloadQueued = fireCooldown;
+        isReloading = true;
+    }
+
+    // Decrement reload timer
+    double& reloadTimer = cWeapon["ReloadTimer"];
+    if (isReloading) {
+        reloadTimer = glm::max(0.0, reloadTimer - dt);
+    }
+
+    // Handle reloading
     if (isReloading && reloadTimer <= 0.0) {
         int& magSize = cWeapon["MagazineSize"];
         int& ammo = cWeapon["Ammo"];
@@ -46,6 +56,21 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         }
     }
 
+    // Update first person run animation
+    /*ComponentWrapper cPlayer = wi.Player["Player"];
+    ComponentWrapper cPhysics = wi.Player["Physics"];
+    const float& movementSpeed = cPlayer["MovementSpeed"];
+    float speed = glm::length((const glm::vec3&)cPhysics["Velocity"]);
+    float animationSpeed = glm::max(speed, movementSpeed) / movementSpeed;
+    EntityWrapper rootNode = wi.FirstPersonEntity.FirstParentWithComponent("Model");
+    if (rootNode.Valid()) {
+        EntityWrapper animationNode = rootNode.FirstChildByName("Run");
+        if (animationNode.Valid()) {
+            (bool&)animationNode["Animation"]["Play"] = animationSpeed > 0;
+            (double&)animationNode["Animation"]["Speed"] = animationSpeed;
+        }
+    }*/
+
     // Fire if we're able to fire
     if (canFire(cWeapon, wi)) {
         fireBullet(cWeapon, wi);
@@ -67,8 +92,9 @@ void AssaultWeaponBehaviour::OnCeasePrimaryFire(ComponentWrapper cWeapon, Weapon
 
 void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
+    bool& reloadQueued = cWeapon["ReloadQueued"];
     bool& isReloading = cWeapon["IsReloading"];
-    if (isReloading) {
+    if (reloadQueued || isReloading) {
         return;
     }
 
@@ -86,8 +112,22 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     double& reloadTimer = cWeapon["ReloadTimer"];
    
     // Start reload
-    isReloading = true;
+    reloadQueued = true;
     reloadTimer = reloadTime;
+
+    // Play animation
+    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Reload");
+
+    // Spawn explosion effect
+    EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("FirstPersonReloadSpawner");
+    if (reloadEffectSpawner.Valid()) {
+        SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+    }
+}
+
+void AssaultWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    cWeapon["FireCooldown"] = (double)cWeapon["EquipTime"];
 }
 
 void AssaultWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -161,14 +201,17 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
             m_EventBroker->Publish(e);
         }
     }
+    
+    // Play animation
+    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Fire");
 }
 
 bool AssaultWeaponBehaviour::canFire(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
     bool triggerHeld = cWeapon["TriggerHeld"];
     bool cooldownPassed = (double)cWeapon["FireCooldown"] <= 0.0;
-    bool isReloading = cWeapon["IsReloading"];
-    return triggerHeld && cooldownPassed;
+    bool isNotReloading = !(bool)cWeapon["IsReloading"];
+    return triggerHeld && cooldownPassed && isNotReloading;
 }
 
 bool AssaultWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi)

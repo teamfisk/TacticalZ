@@ -133,7 +133,12 @@ void AnimationSystem::UpdateWeights(double dt)
             std::shared_ptr<BlendTree> blendTree = autoBlendQueue.second.GetBlendTree();
 
             if (blendTree != nullptr) {
-                blendJob.BlendInfo.progress = glm::clamp(blendJob.CurrentTime / blendJob.Duration, 0.0, 1.0);
+                if (blendJob.Duration != 0.0) {
+                    blendJob.BlendInfo.progress = glm::clamp(blendJob.CurrentTime / blendJob.Duration, 0.0, 1.0);
+                } else {
+                    blendJob.BlendInfo.progress = 1.0;
+                }
+
                 blendJob.BlendInfo = blendTree->AutoBlendStep(blendJob.BlendInfo);
             }
 

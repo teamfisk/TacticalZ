@@ -5,6 +5,7 @@
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
 #include "Sound/EPlaySoundOnEntity.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 class AssaultWeaponBehaviour : public WeaponBehaviour<AssaultWeaponBehaviour>
 {
@@ -20,6 +21,7 @@ public:
     void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     //bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
 
