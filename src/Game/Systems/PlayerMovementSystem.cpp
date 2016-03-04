@@ -283,6 +283,9 @@ void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
 void PlayerMovementSystem::playerStep(double dt, EntityWrapper player)
 {
     // Position of the local player, used see how far a player has moved.
+    if(!IsClient) {
+        return;
+    }
     glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
     // Used to see if a player is airborne.
     bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
