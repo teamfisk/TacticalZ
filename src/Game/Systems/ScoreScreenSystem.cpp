@@ -21,9 +21,6 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
         return;
     }
 
-    int redTeamEnum;
-    int blueTeamEnum;
-    int spectatorTeamEnum;
     int currentTeam = 0;
 
     if(entity.HasComponent("Team")) {
