@@ -117,11 +117,12 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Reload");
-
-    // Spawn explosion effect
-    EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("FirstPersonReloadSpawner");
-    if (reloadEffectSpawner.Valid()) {
-        SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+    if (IsClient) {
+        // Spawn explosion effect
+        EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("FirstPersonReloadSpawner");
+        if (reloadEffectSpawner.Valid()) {
+            SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+        }
     }
 }
 
