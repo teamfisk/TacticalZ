@@ -66,6 +66,9 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
                 //Update Kills for child
                 (int&)child["ScoreIdentity"]["Deaths"] = it->second.Deaths;
                 //KD is not updated at the moment.
+                if (it->second.Deaths != 0) {
+                    (double&)child["ScoreIdentity"]["KD"] = it->second.Kills/it->second.Deaths;
+                }
 
                 //Update position for child
                 glm::vec3 offset = (glm::vec3)entity["ScoreScreen"]["Offset"];
