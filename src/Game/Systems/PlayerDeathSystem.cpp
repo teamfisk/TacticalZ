@@ -1,4 +1,5 @@
 #include "Systems/PlayerDeathSystem.h"
+#include "Core/ELockMouse.h"
 
 PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
     : System(params)
@@ -33,10 +34,10 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 
     //components that we need from player
     auto playerModel = player.FirstChildByName("PlayerModel");
-    if (!playerModel.Valid()) {
-        return;
-    }
-    if (!playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
+    if (!playerModel.Valid() || !playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
+        if (player == LocalPlayer) {
+            setSpectatorCamera();
+        }
         return;
     }
     auto playerEntityModel = playerModel["Model"];
@@ -46,9 +47,7 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     playerEntityModel.Copy(deathEffectEW["Model"]);
     playerEntityAnimation.Copy(deathEffectEW["Animation"]);
     //freeze the animation
-    deathEffectEW["Animation"]["Speed1"] = 0.0;
-    deathEffectEW["Animation"]["Speed2"] = 0.0;
-    deathEffectEW["Animation"]["Speed3"] = 0.0;
+    deathEffectEW["Animation"]["Speed"] = 0.0;
 
     //copy the models position,orientation
     deathEffectEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
@@ -73,13 +72,20 @@ bool PlayerDeathSystem::OnEntityDeleted(Events::EntityDeleted& e)
         return false;
     }
     
+    setSpectatorCamera();
+    return true;
+}
+
+void PlayerDeathSystem::setSpectatorCamera()
+{
     // Look for the spectator camera entity in the level.
     EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
     if (!spectatorCam.Valid() || !spectatorCam.HasComponent("Camera") || LocalPlayer.Valid()) {
-        return false;
+        return;
     }
     Events::SetCamera eSetCamera;
     eSetCamera.CameraEntity = spectatorCam;
     m_EventBroker->Publish(eSetCamera);
-    return true;
+    Events::UnlockMouse unlock;
+    m_EventBroker->Publish(unlock);
 }

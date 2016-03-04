@@ -1,5 +1,6 @@
 #include "Systems/SpectatorCameraSystem.h"
 #include "Rendering/ESetCamera.h"
+#include "Core/ELockMouse.h"
 
 SpectatorCameraSystem::SpectatorCameraSystem(SystemParams params)
     : System(params)
@@ -19,6 +20,8 @@ void SpectatorCameraSystem::Update(double dt)
             Events::SetCamera eSetCamera;
             eSetCamera.CameraEntity = spectatorCam;
             m_EventBroker->Publish(eSetCamera);
+            Events::UnlockMouse unlock;
+            m_EventBroker->Publish(unlock);
         }
     }
 }
@@ -60,6 +63,8 @@ bool SpectatorCameraSystem::OnInputCommand(const Events::InputCommand& e)
         Events::SetCamera eSetCamera;
         eSetCamera.CameraEntity = spectatorCam;
         m_EventBroker->Publish(eSetCamera);
+        Events::UnlockMouse unlock;
+        m_EventBroker->Publish(unlock);
     }
 
     return true;

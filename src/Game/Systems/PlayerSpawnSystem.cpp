@@ -1,4 +1,5 @@
 #include "Systems/PlayerSpawnSystem.h"
+#include "Core/ELockMouse.h"
 
 PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params)
     : System(params)
@@ -100,6 +101,8 @@ void PlayerSpawnSystem::Update(double dt)
             e.Player = player;
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
+            Events::LockMouse lock;
+            m_EventBroker->Publish(lock);
             ++numSpawnedPlayers;
             it = m_SpawnRequests.erase(it);
             break;

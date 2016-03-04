@@ -25,6 +25,7 @@ private:
     EventRelay<PlayerDeathSystem, Events::EntityDeleted> m_EEntityDeleted;
     bool OnEntityDeleted(Events::EntityDeleted& e);
 
+    void setSpectatorCamera();
     void createDeathEffect(EntityWrapper player);
 
 };
