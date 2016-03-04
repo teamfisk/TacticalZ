@@ -60,6 +60,13 @@ void PlayerSpawnSystem::Update(double dt)
 
     int numSpawnedPlayers = 0;
     for (auto it = m_SpawnRequests.begin(); it != m_SpawnRequests.end(); ++it) {
+        // TODO: -1 Signifies no class picked, enum here later?
+        // Increase num spawned players if they didn't pick class yet since it is valid
+        // but don't spawn anything, goto next spawnrequest.
+        if (it->Class == -1) {
+            ++numSpawnedPlayers;
+            break;
+        }
         for (auto& cPlayerSpawn : *playerSpawns) {
             EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
             if (!spawner.HasComponent("Spawner")) {
@@ -70,11 +77,9 @@ void PlayerSpawnSystem::Update(double dt)
             if (spawner.HasComponent("Team")) {
                 auto cSpawnerTeam = spawner["Team"];
                 if ((int)cSpawnerTeam["Team"] != it->Team) {
-                    // Increase num spawned players if someone picks spectator or didn't 
-                    // pick a class yet, since it is valid
+                    // Increase num spawned players if someone picks spectator since it is valid
                     // but don't spawn anything, goto next spawnrequest.
-                    // TODO: -1 Signifies no class picked, enum here later?
-                    if (it->Class == -1 || it->Team == (int)cSpawnerTeam["Team"].Enum("Spectator")) {
+                    if (it->Team == (int)cSpawnerTeam["Team"].Enum("Spectator")) {
                         ++numSpawnedPlayers;
                         break;
                     }
@@ -149,8 +154,10 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         // If player is in queue to spawn, then change their team affiliation or class in the request.
         if (e.Command == "PickTeam") {
             iter->Team = (ComponentInfo::EnumType)e.Value;
+            LOG_INFO("old request swap Team");
         } else {
             iter->Class = (ComponentInfo::EnumType)e.Value;
+            LOG_INFO("old request swap Class");
         }
     } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
         // If player is not in queue to spawn, then create a spawn request, 
@@ -160,9 +167,11 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         if (e.Command == "PickTeam") {
             req.Team = (ComponentInfo::EnumType)e.Value;
             req.Class = -1;         // TODO: -1 Signifies no class picked, enum here later?
+            LOG_INFO("new request set Team");
         } else {
             req.Team = 1;           // TODO: 1 Signifies spectator, should probably have real enum here later.
             req.Class = (ComponentInfo::EnumType)e.Value;
+            LOG_INFO("new request set Class");
         }
         m_SpawnRequests.push_back(req);
     } else {
