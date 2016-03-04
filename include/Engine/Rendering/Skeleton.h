@@ -77,6 +77,9 @@ public:
     std::map<int, Skeleton::PoseData> BlendPoseAdditive(const std::map<int, PoseData>& additivePose, const std::map<int, PoseData>& targetPose);
     void GetFinalPose(std::map<int, Skeleton::PoseData>& boneMatrices, std::vector<glm::mat4>& finalPose, std::map<int, glm::mat4>& boneTransforms);
     
+    std::vector<glm::mat4> GetTPose();
+
+
     std::map<std::string, Animation> Animations;
 private:
     Skeleton::PoseData GetAdditiveBonePose(const Bone* bone, const Animation* animation, double time);
