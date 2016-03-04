@@ -15,7 +15,7 @@ class ScoreScreenSystem : public PureSystem
 public:
     ScoreScreenSystem(SystemParams params);
 
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt) override;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& scoreScreen, double dt) override;
 
     EventRelay<ScoreScreenSystem, Events::KillDeath> m_EPlayerDeath;
     bool OnPlayerDeath(const Events::KillDeath& e);

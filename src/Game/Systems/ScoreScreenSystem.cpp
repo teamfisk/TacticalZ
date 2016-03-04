@@ -11,7 +11,7 @@ ScoreScreenSystem::ScoreScreenSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDisconnected, &ScoreScreenSystem::OnPlayerDisconnected);
 }
 
-void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt)
+void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& scoreScreen, double dt)
 {
     if (!IsServer) {
         return;
@@ -28,6 +28,8 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
 
     if(entity.HasComponent("Team")) {
         currentTeam = (int)entity["Team"]["Team"];
+    } else {
+        return;
     }
 
     auto children = entity.ChildrenWithComponent("ScoreIdentity");
@@ -56,6 +58,9 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
                     }
                 }
                 found = true;
+                if(!child.Valid()) {
+                    break;
+                }
                 //Update Deaths for child
                 (int&)child["ScoreIdentity"]["Kills"] = it->second.Kills;
                 //Update Kills for child
