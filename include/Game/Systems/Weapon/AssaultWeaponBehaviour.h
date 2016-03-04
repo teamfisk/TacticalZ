@@ -5,6 +5,7 @@
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
 #include "Sound/EPlaySoundOnEntity.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 class AssaultWeaponBehaviour : public WeaponBehaviour<AssaultWeaponBehaviour>
 {

@@ -99,6 +99,29 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     // Start reload
     reloadQueued = true;
     reloadTimer = reloadTime;
+
+    // Play animation
+    EntityWrapper modelEntity = wi.FirstPersonEntity.Parent().Parent();
+    if (modelEntity.Valid()) {
+        EntityWrapper blendTree = modelEntity.FirstChildByName("PrimaryBlendTree");
+        EntityWrapper reloadBlend = blendTree.FirstChildByName("Reload");
+
+        Events::AutoAnimationBlend eFireBlend;
+        eFireBlend.RootNode = modelEntity;
+        eFireBlend.NodeName = "Reload";
+        eFireBlend.Restart = true;
+        eFireBlend.Start = true;
+        eFireBlend.Duration = 0.0001;
+        m_EventBroker->Publish(eFireBlend);
+
+        Events::AutoAnimationBlend eIdleBlend;
+        eIdleBlend.RootNode = modelEntity;
+        eIdleBlend.NodeName = "Idle";
+        eIdleBlend.AnimationEntity = reloadBlend;
+        eIdleBlend.Delay = -0.2;
+        eIdleBlend.Duration = 0.2;
+        m_EventBroker->Publish(eIdleBlend);
+    }
 }
 
 void AssaultWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -176,6 +199,29 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
             e.FilePath = "Audio/weapon/hitclick.wav";
             m_EventBroker->Publish(e);
         }
+    }
+    
+    // Play animation
+    EntityWrapper modelEntity = wi.FirstPersonEntity.Parent().Parent();
+    if (modelEntity.Valid()) {
+        EntityWrapper blendTree = modelEntity.FirstChildByName("PrimaryBlendTree");
+        EntityWrapper fireBlend = blendTree.FirstChildByName("Fire");
+
+        Events::AutoAnimationBlend eFireBlend;
+        eFireBlend.RootNode = modelEntity;
+        eFireBlend.NodeName = "Fire";
+        eFireBlend.Restart = true;
+        eFireBlend.Start = true;
+        eFireBlend.Duration = 0.0001;
+        m_EventBroker->Publish(eFireBlend);
+
+        Events::AutoAnimationBlend eIdleBlend;
+        eIdleBlend.RootNode = modelEntity;
+        eIdleBlend.NodeName = "Idle";
+        eIdleBlend.AnimationEntity = fireBlend;
+        eIdleBlend.Delay = -0.2;
+        eIdleBlend.Duration = 0.2;
+        m_EventBroker->Publish(eIdleBlend);
     }
 }
 
