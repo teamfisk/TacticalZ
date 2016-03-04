@@ -111,7 +111,6 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
         eFireBlend.NodeName = "Reload";
         eFireBlend.Restart = true;
         eFireBlend.Start = true;
-        eFireBlend.Duration = 0.0001;
         m_EventBroker->Publish(eFireBlend);
 
         Events::AutoAnimationBlend eIdleBlend;
