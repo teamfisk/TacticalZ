@@ -203,7 +203,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     // Play animation
     EntityWrapper modelEntity = wi.FirstPersonEntity.Parent().Parent();
     if (modelEntity.Valid()) {
-        EntityWrapper blendTree = modelEntity.FirstChildByName("PrimaryBlendTree");
+        EntityWrapper blendTree = modelEntity.FirstChildByName("BlendTreeAssaultWeapon");
         EntityWrapper fireBlend = blendTree.FirstChildByName("Fire");
 
         Events::AutoAnimationBlend eFireBlend;
