@@ -27,11 +27,7 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
     int currentTeam = 0;
 
     if(entity.HasComponent("Team")) {
-        auto cTeam = entity["Team"];
-        redTeamEnum = (int)cTeam["Team"].Enum("Red");
-        blueTeamEnum = (int)cTeam["Team"].Enum("Blue");
-        spectatorTeamEnum = (int)cTeam["Team"].Enum("Spectator");
-        currentTeam = (int)cTeam["Team"];
+        currentTeam = (int)entity["Team"]["Team"];
     }
 
     auto children = entity.ChildrenWithComponent("ScoreIdentity");
