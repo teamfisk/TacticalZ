@@ -9,6 +9,7 @@
 #include "Systems/SpawnerSystem.h"
 #include "Rendering/ESetCamera.h"
 #include "Core/ConfigFile.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 template <typename ETYPE>
 class WeaponBehaviour : public PureSystem
@@ -92,6 +93,31 @@ protected:
         } else {
             return 100.f;
         }
+    }
+
+    void playAnimation(EntityWrapper weaponModelEntity, const std::string& subTreeName, const std::string& animationNodeName)
+    {
+        EntityWrapper root = weaponModelEntity.FirstParentWithComponent("Model");
+        if (!root.Valid()) {
+            return;
+        }
+
+        EntityWrapper subTree = root.FirstChildByName(subTreeName);
+        if (!subTree.Valid()) {
+            return;
+        }
+
+        EntityWrapper animationNode = subTree.FirstChildByName(animationNodeName);
+        if (!animationNode.Valid()) {
+            return;
+        }
+
+        Events::AutoAnimationBlend eFireBlend;
+        eFireBlend.RootNode = root;
+        eFireBlend.NodeName = animationNodeName;
+        eFireBlend.Restart = true;
+        eFireBlend.Start = true;
+        m_EventBroker->Publish(eFireBlend);
     }
 
     void playAnimationAndReturn(EntityWrapper weaponModelEntity, const std::string& subTreeName, const std::string& animationNodeName)

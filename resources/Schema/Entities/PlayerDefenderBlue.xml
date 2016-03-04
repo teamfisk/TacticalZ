@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Entity name="Player" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+<Entity name="PlayerDefender" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
     <c:AABB>
       <Origin X="0" Y="0.772000015" Z="0"/>
       <Size X="1" Y="1.60000002" Z="1"/>
     </c:AABB>
-    <c:AssaultWeapon/>
     <c:Team>
       <Team>
-        <Blue/>
+        <Red/>
       </Team>
     </c:Team>
     <c:Collidable/>
-    <c:DashAbility/>
-    <c:DefenderWeapon/>
-    <c:DoubleJump/>
-    <c:Health/>
+    <c:DefenderWeapon>
+      <MagazineAmmo>4</MagazineAmmo>
+      <Ammo>52</Ammo>
+    </c:DefenderWeapon>
+    <c:Listener/>
+    <c:Health>
+      <Health>150</Health>
+      <MaxHealth>150</MaxHealth>
+    </c:Health>
+    <c:ShieldAbility/>
     <c:Physics>
-      <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
+      <Velocity X="-1.86527334e-13" Y="0" Z="1.89149233e-13"/>
+      <IsOnGround>true</IsOnGround>
     </c:Physics>
     <c:Player>
       <MovementSpeed>5</MovementSpeed>
       <CurrentWeapon></CurrentWeapon>
     </c:Player>
     <c:Transform>
-      <Position X="0" Y="0.0288832188" Z="2.64144421"/>
+      <Position X="0.67159152" Y="0.0288829375" Z="1.22672582"/>
+      <Orientation X="0" Y="-0.00174739491" Z="0"/>
     </c:Transform>
   </Components>
 
@@ -38,6 +45,7 @@
         </c:Camera>
         <c:Transform>
           <Position X="0" Y="1.27700007" Z="0"/>
+          <Orientation X="1.11789882" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -213,7 +221,7 @@
                       <Color A="1" B="1" G="0" R="0"/>
                     </c:Fill>
                     <c:Text>
-                      <Content>100/100</Content>
+                      <Content>150/150</Content>
                       <Resource>Fonts/DroidSans.ttf,64</Resource>
                       <Color A="0.505882382" B="3.92156863" G="1.17647064" R="0"/>
                     </c:Text>
@@ -422,6 +430,7 @@
                     <c:Text>
                       <Content></Content>
                       <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Color A="0.800000012" B="1" G="0.200000003" R="0"/>
                       <Alignment>
                         <Right/>
                       </Alignment>
@@ -485,12 +494,10 @@
         </Entity>
         <Entity name="Hands">
           <Components>
-            <c:Blend>
-              <Pose1>BlendTreeAssaultWeapon</Pose1>
-              <Pose2>BlendTreeSecondaryWeapon</Pose2>
-              <Weight>0</Weight>
-              <SubTreeRoot>true</SubTreeRoot>
-            </c:Blend>
+            <c:BlendAdditive>
+              <Adder>MovementBlend</Adder>
+              <Receiver>FinalBlend</Receiver>
+            </c:BlendAdditive>
             <c:Model>
               <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
             </c:Model>
@@ -501,7 +508,6 @@
               <Components>
                 <c:BoneAttachment>
                   <BoneName>R_Arm_Weapon_Joint</BoneName>
-                  <InheritScale>true</InheritScale>
                 </c:BoneAttachment>
                 <c:WeaponAttachment>
                   <Weapon>DefenderWeapon</Weapon>
@@ -510,9 +516,8 @@
                   <EntityFile>Schema/Entities/WeaponDefenderBlueView.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform>
-                  <Position X="0.120430484" Y="-0.233500004" Z="-0.181454703"/>
-                  <Orientation X="0.0104045747" Y="-0.00268182321" Z="0.0428442061"/>
-                  <Scale X="1.00000012" Y="1.00000024" Z="1.00000012"/>
+                  <Position X="0.120748252" Y="-0.228768602" Z="-0.181454718"/>
+                  <Orientation X="0.0104048951" Y="-0.00268237269" Z="0.0428444892"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -529,38 +534,39 @@
                   <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform>
-                  <Position X="0.120430484" Y="-0.233500004" Z="-0.181454703"/>
-                  <Orientation X="0.0104045747" Y="-0.00268182321" Z="0.0428442061"/>
+                  <Position X="0.120748252" Y="-0.228768602" Z="-0.181454718"/>
+                  <Orientation X="0.0104048951" Y="-0.00268237269" Z="0.0428444892"/>
                 </c:Transform>
               </Components>
               <Children/>
             </Entity>
-            <Entity name="BlendTreeAssaultWeapon">
+            <Entity name="FinalBlend">
               <Components>
                 <c:Blend>
-                  <Pose1>Idle</Pose1>
-                  <Pose2>WeaponAction</Pose2>
+                  <Pose1>BlendTreeDefenderWeapon</Pose1>
+                  <Pose2>BlendTreeSecondaryWeapon</Pose2>
                   <Weight>0</Weight>
                   <SubTreeRoot>true</SubTreeRoot>
                 </c:Blend>
                 <c:Transform/>
               </Components>
               <Children>
-                <Entity name="WeaponAction">
+                <Entity name="BlendTreeDefenderWeapon">
                   <Components>
                     <c:Blend>
-                      <Pose1>Fire</Pose1>
-                      <Pose2>Reload</Pose2>
-                      <Weight>1</Weight>
+                      <Pose1>ActionBlend</Pose1>
+                      <Pose2>Shield</Pose2>
+                      <Weight>0</Weight>
+                      <SubTreeRoot>true</SubTreeRoot>
                     </c:Blend>
                     <c:Transform/>
                   </Components>
                   <Children>
-                    <Entity name="Fire">
+                    <Entity name="Shield">
                       <Components>
                         <c:Animation>
-                          <AnimationName>ShootShotgunF</AnimationName>
-                          <Time>0.5</Time>
+                          <AnimationName>ActivateDeactiveShieldF</AnimationName>
+                          <Time>1</Time>
                           <Speed>1</Speed>
                           <Loop>false</Loop>
                         </c:Animation>
@@ -568,39 +574,112 @@
                       </Components>
                       <Children/>
                     </Entity>
-                    <Entity name="Reload">
+                    <Entity name="ActionBlend">
                       <Components>
-                        <c:Animation>
-                          <AnimationName>ReloadSwitchF</AnimationName>
-                          <Time>0.080754529576125833</Time>
-                          <Speed>1</Speed>
-                          <Play>true</Play>
-                        </c:Animation>
+                        <c:Blend>
+                          <Pose1>Idle</Pose1>
+                          <Pose2>ActionBlend2</Pose2>
+                          <Weight>0</Weight>
+                          <SubTreeRoot>true</SubTreeRoot>
+                        </c:Blend>
                         <c:Transform/>
                       </Components>
-                      <Children/>
+                      <Children>
+                        <Entity name="Idle">
+                          <Components>
+                            <c:Animation>
+                              <AnimationName>IdleF</AnimationName>
+                            </c:Animation>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ActionBlend2">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Fire</Pose1>
+                              <Pose2>Reload</Pose2>
+                              <Weight>0</Weight>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="Fire">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootShotgunF</AnimationName>
+                                  <Time>0.5</Time>
+                                  <Speed>1</Speed>
+                                  <Loop>false</Loop>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Reload">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShotgunReloadTwoF</AnimationName>
+                                  <Time>0.23333333432674408</Time>
+                                  <Speed>1</Speed>
+                                  <Loop>false</Loop>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
                     </Entity>
                   </Children>
                 </Entity>
-                <Entity name="Idle">
+                <Entity name="BlendTreeSecondaryWeapon">
                   <Components>
-                    <c:Animation>
-                      <AnimationName>IdleF</AnimationName>
-                      <Time>0.63921736993464151</Time>
-                      <Speed>1</Speed>
-                      <Play>true</Play>
-                    </c:Animation>
                     <c:Transform/>
                   </Components>
                   <Children/>
                 </Entity>
               </Children>
             </Entity>
-            <Entity name="BlendTreeSecondaryWeapon">
+            <Entity name="MovementBlend">
               <Components>
+                <c:Blend>
+                  <Pose1>Idle</Pose1>
+                  <Pose2>Run</Pose2>
+                  <Weight>0</Weight>
+                  <SubTreeRoot>true</SubTreeRoot>
+                </c:Blend>
                 <c:Transform/>
               </Components>
-              <Children/>
+              <Children>
+                <Entity name="Run">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>RunF</AnimationName>
+                      <Time>0.93061516164344571</Time>
+                      <Speed>1</Speed>
+                      <Play>true</Play>
+                      <Additive>true</Additive>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Idle">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>IdleF</AnimationName>
+                      <Time>0.11396167157691739</Time>
+                      <Speed>1</Speed>
+                      <Play>true</Play>
+                      <Additive>true</Additive>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
             </Entity>
           </Children>
         </Entity>
@@ -632,9 +711,8 @@
         <c:Shielded/>
         <c:HiddenForLocalPlayer/>
         <c:Model>
-          <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
-          <Color A="1" B="1" G="0.952941179" R="1"/>
-          <Visible>false</Visible>
+          <Resource>Models/Characters/Defender/DefenderBlue.mesh</Resource>
+          <Color A="1" B="0" G="0" R="1"/>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -651,11 +729,11 @@
               </Person>
             </c:WeaponAttachment>
             <c:Spawner>
-              <EntityFile>Schema/Entities/WeaponAssaultBlueWorld.xml</EntityFile>
+              <EntityFile>Schema/Entities/WeaponDefenderBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.167930618" Y="1.0368073" Z="-0.219703838"/>
-              <Orientation X="-0.00422216719" Y="-0.0830619708" Z="0.137322947"/>
+              <Position X="0.157449082" Y="1.04085267" Z="-0.234242111"/>
+              <Orientation X="-0.0042401799" Y="-0.0355410911" Z="0.137519509"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -675,8 +753,8 @@
               <EntityFile>Schema/Entities/SidearmWeaponWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.167930618" Y="1.0368073" Z="-0.219703838"/>
-              <Orientation X="-0.00422216719" Y="-0.0830619708" Z="0.137322947"/>
+              <Position X="0.157449082" Y="1.04085267" Z="-0.234242111"/>
+              <Orientation X="-0.0042401799" Y="-0.0355410911" Z="0.137519509"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -779,11 +857,11 @@
                                 <c:Transform/>
                               </Components>
                               <Children>
-                                <Entity name="Left">
+                                <Entity name="Right">
                                   <Components>
                                     <c:Animation>
-                                      <AnimationName>CrouchStrafeLeftF</AnimationName>
-                                      <Time>0.35189715631383223</Time>
+                                      <AnimationName>CrouchStrafeRightF</AnimationName>
+                                      <Time>0.73997265048741045</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -791,11 +869,11 @@
                                   </Components>
                                   <Children/>
                                 </Entity>
-                                <Entity name="Right">
+                                <Entity name="Left">
                                   <Components>
                                     <c:Animation>
-                                      <AnimationName>CrouchStrafeRightF</AnimationName>
-                                      <Time>0.2792186182646148</Time>
+                                      <AnimationName>CrouchStrafeLeftF</AnimationName>
+                                      <Time>0.81265118853662788</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -809,7 +887,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>CrouchWalkF</AnimationName>
-                                  <Time>0.057592603442017776</Time>
+                                  <Time>0.51834663566481343</Time>
                                   <Speed>1</Speed>
                                   <Play>true</Play>
                                 </c:Animation>
@@ -852,42 +930,6 @@
                             <c:Transform/>
                           </Components>
                           <Children>
-                            <Entity name="RunWalkBlend">
-                              <Components>
-                                <c:Blend>
-                                  <Pose1>Walk</Pose1>
-                                  <Pose2>Run</Pose2>
-                                  <Weight>1.2938206818383024e-24</Weight>
-                                </c:Blend>
-                                <c:Transform/>
-                              </Components>
-                              <Children>
-                                <Entity name="Walk">
-                                  <Components>
-                                    <c:Animation>
-                                      <AnimationName>WalkF</AnimationName>
-                                      <Time>0.56274723285179107</Time>
-                                      <Speed>1</Speed>
-                                      <Play>true</Play>
-                                    </c:Animation>
-                                    <c:Transform/>
-                                  </Components>
-                                  <Children/>
-                                </Entity>
-                                <Entity name="Run">
-                                  <Components>
-                                    <c:Animation>
-                                      <AnimationName>RunF</AnimationName>
-                                      <Time>0.83476073687569396</Time>
-                                      <Speed>1</Speed>
-                                      <Play>true</Play>
-                                    </c:Animation>
-                                    <c:Transform/>
-                                  </Components>
-                                  <Children/>
-                                </Entity>
-                              </Children>
-                            </Entity>
                             <Entity name="StrafeLRBlend">
                               <Components>
                                 <c:Blend>
@@ -902,7 +944,7 @@
                                   <Components>
                                     <c:Animation>
                                       <AnimationName>StrafeRightF</AnimationName>
-                                      <Time>0.76785538376544338</Time>
+                                      <Time>0.22860941598823903</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -914,7 +956,43 @@
                                   <Components>
                                     <c:Animation>
                                       <AnimationName>StrafeLeftF</AnimationName>
-                                      <Time>0.74433985388532875</Time>
+                                      <Time>0.2050938861081244</Time>
+                                      <Speed>1</Speed>
+                                      <Play>true</Play>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="RunWalkBlend">
+                              <Components>
+                                <c:Blend>
+                                  <Pose1>Walk</Pose1>
+                                  <Pose2>Run</Pose2>
+                                  <Weight>1.2938206818383024e-24</Weight>
+                                </c:Blend>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Walk">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>WalkF</AnimationName>
+                                      <Time>0.023501265074586719</Time>
+                                      <Speed>1</Speed>
+                                      <Play>true</Play>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Run">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>RunF</AnimationName>
+                                      <Time>0.29551476909848962</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -930,7 +1008,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>IdleF</AnimationName>
-                              <Time>0.67830193028129315</Time>
+                              <Time>0.038981432856261655</Time>
                               <Speed>1</Speed>
                               <Play>true</Play>
                             </c:Animation>
@@ -1099,7 +1177,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>IdleAssaultRifleU</AnimationName>
-                              <Time>1.9869699178942994</Time>
+                              <Time>0.44772395011709509</Time>
                               <Speed>1</Speed>
                               <Play>true</Play>
                             </c:Animation>
@@ -1111,7 +1189,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>IdleSecWepU</AnimationName>
-                              <Time>1.9904949581840867</Time>
+                              <Time>0.45124899040688238</Time>
                               <Speed>1</Speed>
                               <Play>true</Play>
                             </c:Animation>
@@ -1159,6 +1237,50 @@
             </Entity>
           </Children>
         </Entity>
+        <Entity name="ShieldSpawner">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0.854167223" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Shield">
+              <Components>
+                <c:Blend>
+                  <Pose1>Deploy</Pose1>
+                  <Pose2>Idle</Pose2>
+                  <Weight>0</Weight>
+                </c:Blend>
+                <c:Model>
+                  <Resource>Models/Characters/Defender/DefenderShield.mesh</Resource>
+                </c:Model>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="Deploy">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>ActivateDeactiveShieldF</AnimationName>
+                      <Speed>1</Speed>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Idle">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>ShieldFrontF</AnimationName>
+                      <Speed>1</Speed>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
       </Children>
     </Entity>
     <Entity name="AABBStanding">
@@ -1191,7 +1313,7 @@
     <Entity name="PlayerName">
       <Components>
         <c:Text>
-          <Content>Insert name here</Content>
+          <Content></Content>
           <Resource>Fonts/DroidSans.ttf,100</Resource>
           <Color A="1" B="0" G="1" R="0"/>
         </c:Text>

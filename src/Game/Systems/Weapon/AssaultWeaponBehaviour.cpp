@@ -39,6 +39,8 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         ammo = glm::max(0, ammo - (magSize - magAmmo));
         magAmmo = glm::min(magSize, ammo);
         isReloading = false;
+        wi.FirstPersonEntity["Model"]["Visible"] = true;
+        wi.ThirdPersonEntity["Model"]["Visible"] = true;
     }    
     
     // Restore view angle
@@ -57,19 +59,18 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     }
 
     // Update first person run animation
-    /*ComponentWrapper cPlayer = wi.Player["Player"];
+    ComponentWrapper cPlayer = wi.Player["Player"];
     ComponentWrapper cPhysics = wi.Player["Physics"];
     const float& movementSpeed = cPlayer["MovementSpeed"];
     float speed = glm::length((const glm::vec3&)cPhysics["Velocity"]);
-    float animationSpeed = glm::max(speed, movementSpeed) / movementSpeed;
+    float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
     EntityWrapper rootNode = wi.FirstPersonEntity.FirstParentWithComponent("Model");
     if (rootNode.Valid()) {
-        EntityWrapper animationNode = rootNode.FirstChildByName("Run");
-        if (animationNode.Valid()) {
-            (bool&)animationNode["Animation"]["Play"] = animationSpeed > 0;
-            (double&)animationNode["Animation"]["Speed"] = animationSpeed;
+        EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
+        if (blend.Valid()) {
+            (double&)blend["Blend"]["Weight"] = animationWeight;
         }
-    }*/
+    }
 
     // Fire if we're able to fire
     if (canFire(cWeapon, wi)) {
@@ -122,6 +123,8 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("FirstPersonReloadSpawner");
     if (reloadEffectSpawner.Valid()) {
         SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+        wi.FirstPersonEntity["Model"]["Visible"] = false;
+        wi.ThirdPersonEntity["Model"]["Visible"] = false;
     }
 }
 

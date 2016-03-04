@@ -3,11 +3,9 @@
 
   <Components>
     <c:Model>
-      <Resource>Models/Weapons/Blue/DefenderGunBlue.mesh</Resource>
+      <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
     </c:Model>
-    <c:Transform>
-      <Position X="0" Y="0.0350000001" Z="-0.295000017"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
@@ -34,7 +32,7 @@
     <Entity name="AmmunitionHUD">
       <Components>
         <c:Transform>
-          <Position X="-0.0490000024" Y="0.0520000011" Z="-0.063000001"/>
+          <Position X="-0.0460000038" Y="0.119000003" Z="-0.162"/>
           <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
         </c:Transform>
       </Components>
