@@ -32,6 +32,21 @@ public:
 
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt) override
     {
+        EntityWrapper firstPersonWeapon = entity.FirstChildByName("Hands").FirstChildByName("AssaultWeapon");
+        EntityWrapper thirdPersonWeapon = entity.FirstChildByName("PlayerModel").FirstChildByName("AssaultWeapon");
+        if (IsClient && (firstPersonWeapon.Valid() || thirdPersonWeapon.Valid())) {
+            if (m_ActiveWeapons.count(entity) == 0) {
+
+                WeaponInfo& wi = m_ActiveWeapons[entity];
+                wi.Player = entity;
+                wi.WeaponEntity = entity;
+                wi.FirstPersonEntity = firstPersonWeapon;
+                wi.ThirdPersonEntity = thirdPersonWeapon;
+
+                OnEquip(cWeapon, wi);
+            }
+        }
+
         auto weapon = getActiveWeapon(entity);
         if (!weapon) {
             return;
@@ -239,6 +254,10 @@ private:
 
     void selectWeapon(ComponentWrapper cWeapon, EntityWrapper player)
     {
+        if (!IsServer) {
+            return;
+        }
+
         // Don't reselect weapon if it's already active
         if (getActiveWeapon(player)) {
             return;
@@ -268,11 +287,11 @@ private:
         // Spawn the weapon(s)
         EntityWrapper firstPersonWeapon;
         EntityWrapper thirdPersonWeapon;
-        if (IsClient) {
+        //if (IsClient) {
             if (firstPersonAttachment.Valid()) {
                 firstPersonWeapon = SpawnerSystem::Spawn(firstPersonAttachment, firstPersonAttachment);
             }
-        }
+        //}
         if (thirdPersonAttachment.Valid()) {
             thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
         }
