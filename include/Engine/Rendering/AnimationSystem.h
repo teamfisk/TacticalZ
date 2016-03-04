@@ -12,7 +12,7 @@
 #include "Rendering/EAutoAnimationBlend.h"
 #include "../Core/EntityWrapper.h"
 #include "Rendering/AutoBlendQueue.h"
-
+#include "../Input/EInputCommand.h"
 #include "imgui/imgui.h"
 
 class AnimationSystem : public ImpureSystem
@@ -28,7 +28,8 @@ private:
 
     EventRelay<AnimationSystem, Events::AutoAnimationBlend> m_EAutoAnimationBlend;
     bool OnAutoAnimationBlend(Events::AutoAnimationBlend& e);
-
+    EventRelay<AnimationSystem, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(const Events::InputCommand& e);
     std::unordered_map<EntityWrapper, AutoBlendQueue> m_AutoBlendQueues;
 };
 
