@@ -38,22 +38,28 @@ void PlayerMovementSystem::Update(double dt)
                 // Spawn one afterimage for each player that sprints.
                 EntityWrapper player(m_World, cSprint.EntityID);
                 auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/SprintEffect.xml");
-                EntityWrapper dashEffect = entityFile->MergeInto(m_World);
+                EntityWrapper sprintEffect = entityFile->MergeInto(m_World);
                 auto playerModel = player.FirstChildByName("PlayerModel");
                 if (!playerModel.Valid()) {
                     continue;
                 }
+                if (!playerModel.HasComponent("Model")) {
+                    continue;
+                }
+                if (!playerModel.HasComponent("Animation")) {
+                    continue;
+                }
                 auto playerEntityModel = playerModel["Model"];
                 auto playerEntityAnimation = playerModel["Animation"];
-                playerEntityModel.Copy(dashEffect["Model"]);
-                playerEntityAnimation.Copy(dashEffect["Animation"]);
-                dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
-                ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
-                dashEffect["Animation"]["Speed1"] = 0.0;
-                dashEffect["Animation"]["Speed2"] = 0.0;
-                dashEffect["Animation"]["Speed3"] = 0.0;
-                dashEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
-                dashEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+                playerEntityModel.Copy(sprintEffect["Model"]);
+                playerEntityAnimation.Copy(sprintEffect["Animation"]);
+                sprintEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+                ((glm::vec4&)sprintEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+                sprintEffect["Animation"]["Speed1"] = 0.0;
+                sprintEffect["Animation"]["Speed2"] = 0.0;
+                sprintEffect["Animation"]["Speed3"] = 0.0;
+                sprintEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                sprintEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
             }
         }
     }
