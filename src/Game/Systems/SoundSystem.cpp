@@ -20,11 +20,7 @@ void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComp
 { }
 
 void SoundSystem::Update(double dt)
-{
-    if (!IsClient) {
-        return;
-    }
-}
+{ }
 
 bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
@@ -51,26 +47,12 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
             return true;
         }
     } 
-    if (e.Command == "SoundTemp" && e.Value > 0) {
-        EntityWrapper entity(m_World, m_World->CreateEntity());
-        auto transform = m_World->AttachComponent(entity.ID, "Transform");
-        (glm::vec3&)transform["Position"] = glm::vec3(0, 10, 0);
-        (glm::vec3&)transform["Scale"] = glm::vec3(10, 10, 10);
-        auto emitter = m_World->AttachComponent(entity.ID, "SoundEmitter");
-        auto model = m_World->AttachComponent(entity.ID, "Model");
-        (std::string&)model["Resource"] = "Models/Core/UnitCube.mesh";
-        Events::PlaySoundOnEntity ev;
-        ev.Emitter = entity;
-        ev.FilePath = "Audio/crosscounter.wav";
-        m_EventBroker->Publish(ev);
-    }
-
     return false;
 }
 
 void SoundSystem::playerJumps()
 {
-    if (!LocalPlayer.Valid()) {
+    if (!IsClient) { // Only play for clients
         return;
     }
 
@@ -85,7 +67,7 @@ void SoundSystem::playerJumps()
 
 bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
-    if (!LocalPlayer.Valid()) {
+    if (!IsClient) { // Only play for clients
         return false;
     }
     int homeTeam = (int)m_World->GetComponent(e.CapturePointTakenID, "Team")["Team"];

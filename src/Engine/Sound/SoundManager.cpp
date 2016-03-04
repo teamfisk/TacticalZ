@@ -14,9 +14,6 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     alDistanceModel(AL_LINEAR_DISTANCE);
     alDopplerFactor(1);
 
-    //m_CurrentBGM = createSource("Audio/lalala.wav");
-    //playSound(m_CurrentBGM);
-
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnEntity, &SoundManager::OnPlaySoundOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EPlaySoundOnPosition, &SoundManager::OnPlaySoundOnPosition);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayBackgroundMusic, &SoundManager::OnPlayBackgroundMusic);
@@ -122,7 +119,7 @@ void SoundManager::updateEmitters(double dt)
         // Calculate velocity
         glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt;
         setSourcePos(it->second->ALsource, nextPos);
-        setSourceVel(it->second->ALsource, glm::vec3(0));  
+        //setSourceVel(it->second->ALsource, glm::vec3(0));  
 
         auto emitter = m_World->GetComponent(it->first, "SoundEmitter");
         setSoundProperties(it->second, &emitter);
