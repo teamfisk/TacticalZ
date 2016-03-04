@@ -8,11 +8,11 @@
       <AnimationName3></AnimationName3>
     </c:Animation>
     <c:Lifetime>
-      <Lifetime>0.1</Lifetime>
+      <Lifetime>0.15</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
       <Velocity X="0" Y="0" Z="0"/>
-      <ExplosionDuration>0.1</ExplosionDuration>
+      <ExplosionDuration>0.15</ExplosionDuration>
     </c:ExplosionEffect>
     <c:Model>
       <Resource></Resource>
