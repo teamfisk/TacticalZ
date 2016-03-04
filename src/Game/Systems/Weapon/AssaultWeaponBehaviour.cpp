@@ -211,7 +211,6 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         eFireBlend.NodeName = "Fire";
         eFireBlend.Restart = true;
         eFireBlend.Start = true;
-        eFireBlend.Duration = 0.0001;
         m_EventBroker->Publish(eFireBlend);
 
         Events::AutoAnimationBlend eIdleBlend;
