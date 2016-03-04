@@ -103,7 +103,7 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     // Play animation
     EntityWrapper modelEntity = wi.FirstPersonEntity.Parent().Parent();
     if (modelEntity.Valid()) {
-        EntityWrapper blendTree = modelEntity.FirstChildByName("AssaultWeaponBlendTree");
+        EntityWrapper blendTree = modelEntity.FirstChildByName("BlendTreeAssaultWeapon");
         EntityWrapper reloadBlend = blendTree.FirstChildByName("Reload");
 
         Events::AutoAnimationBlend eFireBlend;

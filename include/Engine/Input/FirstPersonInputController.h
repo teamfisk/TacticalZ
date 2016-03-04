@@ -6,12 +6,13 @@
 #include "../Core/ELockMouse.h"
 #include "../Game/Events/EDashAbility.h"
 #include "InputHandler.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 template <typename EventContext>
 class FirstPersonInputController : public InputController<EventContext>
 {
 public:
-    FirstPersonInputController(EventBroker* eventBroker, int playerID);
+    FirstPersonInputController(EventBroker* eventBroker, int playerID, EntityWrapper playerEntity);
 
     virtual const glm::vec3 Movement() const { return m_Movement; }
     virtual const glm::vec3 Rotation() const { return m_Rotation; }
@@ -34,6 +35,8 @@ public:
 
 protected:
     const int m_PlayerID;
+    EntityWrapper m_PlayerEntity;
+
     bool m_MouseLocked = false;
     glm::vec3 m_Rotation;
     glm::vec3 m_Movement;
@@ -65,9 +68,10 @@ protected:
 };
 
 template <typename EventContext>
-FirstPersonInputController<EventContext>::FirstPersonInputController(EventBroker* eventBroker, int playerID)
+FirstPersonInputController<EventContext>::FirstPersonInputController(EventBroker* eventBroker, int playerID, EntityWrapper playerEntity)
     : InputController(eventBroker)
     , m_PlayerID(playerID)
+    , m_PlayerEntity(playerEntity)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &FirstPersonInputController::OnLockMouse);
     EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &FirstPersonInputController::OnUnlockMouse);
@@ -118,13 +122,75 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
         if (e.Command == "Forward") {
             float val = glm::clamp(e.Value, -1.f, 1.f);
             m_Movement.z = -val;
+
+            if (m_PlayerEntity.Valid()) {
+                EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+                if (playerModel.Valid()) {
+                    if (val > 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    } else if (val < 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Run";
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        aeb.Reverse = true;
+                        m_EventBroker->Publish(aeb);
+                    } else {
+                        
+                    }
+                }
+            }
         }
         if (e.Command == "Right") {
             float val = glm::clamp(e.Value, -1.f, 1.f);
             m_Movement.x = val;
+
+            if (m_PlayerEntity.Valid()) {
+                EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+
+                if (playerModel.Valid()) {
+                    if (val > 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Right";
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    } else if (val < 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Left";
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    } else {
+                        
+
+                    }
+                }
+            }
+            
         }
         if (glm::length2(m_Movement) > 0) {
             m_Movement = glm::normalize(m_Movement);
+        } else {
+            if (m_PlayerEntity.Valid()) {
+                EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+
+                if (playerModel.Valid()) {
+                    Events::AutoAnimationBlend aeb;
+                    aeb.Duration = 0.1;
+                    aeb.NodeName = "Idle";
+                    aeb.RootNode = playerModel;
+                    m_EventBroker->Publish(aeb);
+                }
+            }
         }
     }
 
@@ -159,6 +225,32 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
 
     if (e.Command == "Crouch") {
         m_Crouching = e.Value > 0;
+
+        if (m_PlayerEntity.Valid()) {
+            EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+            if (playerModel.Valid()) {
+                if (e.Value == 0.f) {
+                    Events::AutoAnimationBlend aeb;
+                    aeb.Duration = 0.3;
+                    aeb.NodeName = "StandMovement";
+                    aeb.RootNode = playerModel;
+                    aeb.Start = true;
+                    aeb.Restart = true;
+                    aeb.SingleLevelBlend = true;
+                    m_EventBroker->Publish(aeb);
+                } else if(e.Value == 1.0f) {
+                    Events::AutoAnimationBlend aeb;
+                    aeb.Duration = 0.3;
+                    aeb.NodeName = "CrouchMovement";
+                    aeb.RootNode = playerModel;
+                    aeb.Start = true;
+                    aeb.Restart = true;
+                    aeb.SingleLevelBlend = true;
+                    m_EventBroker->Publish(aeb);
+                }
+            }
+        }
+        
     }
 
     if (e.Command == "SpecialAbility") {

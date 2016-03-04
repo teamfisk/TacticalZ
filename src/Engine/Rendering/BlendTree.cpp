@@ -207,6 +207,22 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 {
     std::vector<Node*> goalNodes = FindNodesByName(blendInfo.NodeName);
 
+    if(blendInfo.Weight >= 0 && blendInfo.Weight <= 1.0) {
+        for (auto it = goalNodes.begin(); it != goalNodes.end(); it++) {
+            EntityWrapper entity = (*it)->Entity;
+
+            if (entity.Valid()) {
+                if (entity.HasComponent("Blend")) {
+                    (double&)entity["Blend"]["Weight"] = blendInfo.Weight;
+                }
+            }
+        }
+
+        return blendInfo;
+    }
+
+
+
     if (blendInfo.Start) {
         for (auto it = goalNodes.begin(); it != goalNodes.end(); it++) {
             EntityWrapper entity = (*it)->Entity;
