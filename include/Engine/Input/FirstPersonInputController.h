@@ -129,14 +129,23 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                     if (val > 0) {
                         Events::AutoAnimationBlend aeb;
                         aeb.Duration = 0.1;
-                        aeb.NodeName = "Run";
+
+                        if(m_Crouching) {
+                            aeb.NodeName = "Walk";
+                        } else {
+                            aeb.NodeName = "Run";
+                        }
                         aeb.RootNode = playerModel;
                         aeb.Start = true;
                         m_EventBroker->Publish(aeb);
                     } else if (val < 0) {
                         Events::AutoAnimationBlend aeb;
                         aeb.Duration = 0.1;
-                        aeb.NodeName = "Run";
+                        if (m_Crouching) {
+                            aeb.NodeName = "Walk";
+                        } else {
+                            aeb.NodeName = "Run";
+                        }
                         aeb.RootNode = playerModel;
                         aeb.Start = true;
                         aeb.Reverse = true;

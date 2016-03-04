@@ -894,11 +894,11 @@
                                 <c:Transform/>
                               </Components>
                               <Children>
-                                <Entity name="Left">
+                                <Entity name="Right">
                                   <Components>
                                     <c:Animation>
-                                      <AnimationName>StrafeLeftF</AnimationName>
-                                      <Time>0.25350140317161873</Time>
+                                      <AnimationName>StrafeRightF</AnimationName>
+                                      <Time>0.27701693305173336</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -906,11 +906,11 @@
                                   </Components>
                                   <Children/>
                                 </Entity>
-                                <Entity name="Right">
+                                <Entity name="Left">
                                   <Components>
                                     <c:Animation>
-                                      <AnimationName>StrafeRightF</AnimationName>
-                                      <Time>0.27701693305173336</Time>
+                                      <AnimationName>StrafeLeftF</AnimationName>
+                                      <Time>0.25350140317161873</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -1022,7 +1022,7 @@
                                 <c:Animation>
                                   <AnimationName>DashLeftF</AnimationName>
                                   <Time>1</Time>
-                                  <Speed>3</Speed>
+                                  <Speed>2</Speed>
                                   <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>
@@ -1034,7 +1034,7 @@
                                 <c:Animation>
                                   <AnimationName>DashRightF</AnimationName>
                                   <Time>1</Time>
-                                  <Speed>3</Speed>
+                                  <Speed>2</Speed>
                                   <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>

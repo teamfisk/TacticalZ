@@ -343,52 +343,109 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
     EntityWrapper dashEffect = entityFile->MergeInto(m_World);
     EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
 
-/*
-    auto playerEntityModel = playerModel["Model"];
-    
+    for (auto& kv : m_PlayerInputControllers) {
+        EntityWrapper player = kv.first;
+        auto& controller = kv.second;
 
-    if (player.HasComponent("Physics")) {
-        glm::vec3 velocity = (glm::vec3)player["Physics"]["Velocity"];
-
-        glm::vec2 direction = glm::vec2(velocity.x, velocity.z);
-
-        std::string DashName = "";
-        if (glm::abs(direction.x) > glm::abs(direction.y)) {
-            if(glm::sign(direction.x) > 0) {
-                DashName = "DashRight";
-            } else {
-                DashName = "DashLeft";
-            }
-        } else {
-            if (glm::sign(direction.y) > 0) {
-                DashName = "DashForward";
-            } else {
-                DashName = "DashBackward";
-            }
+        if (!player.Valid()) {
+            continue;
         }
 
-        {
-            Events::AutoAnimationBlend aeb;
-            aeb.Duration = 0.1;
-            aeb.NodeName = DashName;
-            aeb.RootNode = playerModel;
-            aeb.Restart = true;
-            aeb.Start = true;
-            m_EventBroker->Publish(aeb);
-        }
-        {
-            Events::AutoAnimationBlend aeb;
-            aeb.Duration = 0.3;
-            aeb.NodeName = "StandCrouchBlend";
-            aeb.RootNode = playerModel;
-            aeb.Delay = 0.3;
-            aeb.Start = true;
-            aeb.Restart = false;
-            aeb.AnimationEntity = playerModel.FirstChildByName(DashName);
-            m_EventBroker->Publish(aeb);
+        if (player.Valid()) {
+            EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+            if (playerModel.Valid()) {
+                if (glm::abs(controller->Movement().x) > glm::abs(controller->Movement().z)) {
+                    if (controller->Movement().x > 0) {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashRight";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    } else {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashLeft";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    }
+                } else {
+                    if (controller->Movement().z < 0) {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashForward";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    } else {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashBackward";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    }
+                }
+            }
         }
     }
-    */
 
 /*
     auto playerEntityAnimation = playerModel["Animation"];
