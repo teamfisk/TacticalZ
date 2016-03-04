@@ -47,19 +47,19 @@ void Server::Update()
         }
     }
 
-    PlayerDefinition pd;
-    while (m_Unreliable.IsSocketAvailable()) {
-        // Packet will get real data in receive
-        Packet packet(MessageType::Invalid);
-        m_Unreliable.Receive(packet, pd);
-        m_Address = pd.Endpoint.address();
-        m_Port = pd.Endpoint.port();
-        if (packet.GetMessageType() == MessageType::Connect) {
-            parseUDPConnect(packet);
-        } else {
-            parseMessageType(packet);
-        }
-    }
+    //PlayerDefinition pd;
+    //while (m_Unreliable.IsSocketAvailable()) {
+    //    // Packet will get real data in receive
+    //    Packet packet(MessageType::Invalid);
+    //    m_Unreliable.Receive(packet, pd);
+    //    m_Address = pd.Endpoint.address();
+    //    m_Port = pd.Endpoint.port();
+    //    if (packet.GetMessageType() == MessageType::Connect) {
+    //        parseUDPConnect(packet);
+    //    } else {
+    //        parseMessageType(packet);
+    //    }
+    //}
 
     while (m_ServerlistRequest.IsSocketAvailable()) {
         Packet packet(MessageType::Invalid);
@@ -162,7 +162,7 @@ void Server::unreliableBroadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
         packet.ChangePacketID(kv.second.PacketID);
-        m_Unreliable.Send(packet, kv.second);
+//        m_Unreliable.Send(packet, kv.second);
     }
 }
 
@@ -172,7 +172,7 @@ void Server::sendSnapshot()
     Packet packet(MessageType::Snapshot);
     addInputCommandsToPacket(packet);
     addPlayersToPacket(packet, EntityID_Invalid);
-    unreliableBroadcast(packet);
+    reliableBroadcast(packet);
 }
 
 void Server::addInputCommandsToPacket(Packet& packet)
@@ -320,25 +320,28 @@ void Server::checkForTimeOuts()
     }
 }
 
-void Server::parseUDPConnect(Packet & packet)
-{
-    // Pop size of message int
-    packet.ReadPrimitive<int>();
-    int messageType = packet.ReadPrimitive<int>();
-    // Read packet ID 
-    m_PreviousPacketID = m_PacketID;    // Set previous packet id
-    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    // parse player id and other stuff
-    PlayerID playerID = packet.ReadPrimitive<int>();
-    // Do something here?
-    boost::asio::ip::udp::endpoint endpoint(m_Address, m_Port);
-    m_ConnectedPlayers.at(playerID).Endpoint = endpoint;
-    LOG_INFO("parseUDPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
-    // Send a message to the player that connected
-    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
-    m_Unreliable.Send(connnectPacket);
-    LOG_INFO("UDP Connect sent to client");
-}
+//void Server::parseUDPConnect(Packet & packet)
+//{
+//    // Pop size of message int
+//    packet.ReadPrimitive<int>();
+//    int messageType = packet.ReadPrimitive<int>();
+//    // Read packet ID 
+//    m_PreviousPacketID = m_PacketID;    // Set previous packet id
+//    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+//    // parse player id and other stuff
+//    PlayerID playerID = packet.ReadPrimitive<int>();
+//    if (!EntityWrapper(m_World, playerID).Valid()) {
+//
+//    }
+//    // Do something here?
+//    boost::asio::ip::udp::endpoint endpoint(m_Address, m_Port);
+//    m_ConnectedPlayers.at(playerID).Endpoint = endpoint;
+//    LOG_INFO("parseUDPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
+//    // Send a message to the player that connected
+//    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
+//    m_Unreliable.Send(connnectPacket);
+//    LOG_INFO("UDP Connect sent to client");
+//}
 
 void Server::parseTCPConnect(Packet & packet)
 {

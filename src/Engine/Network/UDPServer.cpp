@@ -21,33 +21,38 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
             boost::asio::buffer(packet.Data(), packet.Size()),
             playerDefinition.Endpoint,
             0);
+        LOG_INFO("Size of packet is %i", bytesSent);
     } catch (const boost::system::system_error& e) {
+        LOG_INFO(e.what());
         // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
         playerDefinition.Endpoint = boost::asio::ip::udp::endpoint();
     }
+
 }
 // Send back to endpoint of received packet
 void UDPServer::Send(Packet & packet)
 {
     packet.UpdateSize();
-    m_Socket->send_to(
+     size_t bytesSent = m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
             packet.Size()),
         m_ReceiverEndpoint,
         0);
+     LOG_INFO("Size of packet is %i", bytesSent);
 }
 
 // Broadcasting respond specific logic
 void UDPServer::Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint)
 {
     packet.UpdateSize();
-    m_Socket->send_to(
+    size_t bytesSent = m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
             packet.Size()),
         endpoint,
         0);
+    LOG_INFO("Size of packet is %i", bytesSent);
 }
 
 // Broadcasting
@@ -55,7 +60,7 @@ void UDPServer::Broadcast(Packet & packet, int port)
 {
     packet.UpdateSize();
     m_Socket->set_option(boost::asio::socket_base::broadcast(true));
-    m_Socket->send_to(
+    size_t bytesSent = m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
             packet.Size()),

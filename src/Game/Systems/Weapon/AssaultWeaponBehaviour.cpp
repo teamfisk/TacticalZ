@@ -39,8 +39,12 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         ammo = glm::max(0, ammo - (magSize - magAmmo));
         magAmmo = glm::min(magSize, ammo);
         isReloading = false;
-        wi.FirstPersonEntity["Model"]["Visible"] = true;
-        wi.ThirdPersonEntity["Model"]["Visible"] = true;
+        if (wi.FirstPersonEntity.Valid()) {
+            wi.FirstPersonEntity["Model"]["Visible"] = true;
+        }
+        if (wi.ThirdPersonEntity.Valid()) {
+            wi.ThirdPersonEntity["Model"]["Visible"] = true;
+        }
     }    
     
     // Restore view angle
@@ -124,8 +128,12 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
         if (reloadEffectSpawner.Valid()) {
             SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
         }
-        wi.FirstPersonEntity["Model"]["Visible"] = false;
-        wi.ThirdPersonEntity["Model"]["Visible"] = false;
+        if (wi.FirstPersonEntity.Valid()) { 
+            wi.FirstPersonEntity["Model"]["Visible"] = false;
+        }
+        if (wi.ThirdPersonEntity.Valid()) {
+            wi.ThirdPersonEntity["Model"]["Visible"] = false;
+        }
     }
 
     // Sound
