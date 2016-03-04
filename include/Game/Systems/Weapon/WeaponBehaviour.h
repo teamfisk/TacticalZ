@@ -268,8 +268,10 @@ private:
         // Spawn the weapon(s)
         EntityWrapper firstPersonWeapon;
         EntityWrapper thirdPersonWeapon;
-        if (firstPersonAttachment.Valid()) {
-            firstPersonWeapon = SpawnerSystem::Spawn(firstPersonAttachment, firstPersonAttachment);
+        if (IsClient) {
+            if (firstPersonAttachment.Valid()) {
+                firstPersonWeapon = SpawnerSystem::Spawn(firstPersonAttachment, firstPersonAttachment);
+            }
         }
         if (thirdPersonAttachment.Valid()) {
             thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
