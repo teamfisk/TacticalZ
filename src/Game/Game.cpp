@@ -143,7 +143,6 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
