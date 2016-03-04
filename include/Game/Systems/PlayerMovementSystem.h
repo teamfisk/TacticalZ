@@ -30,6 +30,8 @@ private:
     bool m_LeftFoot = false;
     // To get a difference when calculating the walking state.
     glm::vec3 m_LastPosition = glm::vec3();
+    // Used to track afterimages for sprint effect.
+    float m_SprintEffectTimer;
     // The logic for making the sound play when player is moving
     void playerStep(double dt);
     // Spawn a hexagon at origin of an Entity

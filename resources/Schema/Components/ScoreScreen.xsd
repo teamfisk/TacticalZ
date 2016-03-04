@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+	<xs:element name="ScoreScreen">
+		<xs:annotation><xs:documentation>The screen where player scores will be shown.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="TotalIdentities" type="t:int" minOccurs="0">
+					<xs:annotation><xs:documentation>The amount of score identities this scoreboard hold</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="NextPosition" type="t:int" minOccurs="0">
+					<xs:annotation><xs:documentation>Where the next scoreIdentity should be placed.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Offset" type="t:Vector" minOccurs="0">
+					<xs:annotation><xs:documentation>How much offset should be applied per position</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
