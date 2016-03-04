@@ -249,6 +249,18 @@ void Skeleton::GetFinalPose(std::map<int, Skeleton::PoseData>& poseDatas, std::v
 
 }
 
+
+std::vector<glm::mat4> Skeleton::GetTPose()
+{
+    std::vector<glm::mat4> finalMatrices;
+
+    for (auto b : Bones) {
+        finalMatrices.push_back(glm::mat4(1));
+    }
+
+    return finalMatrices;
+}
+
 void Skeleton::AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, std::map<int, Skeleton::PoseData>& poseDatas, std::map<int, glm::mat4>& boneTransforms, const Bone* bone, glm::mat4 parentMatrix)
 {
     glm::mat4 boneMatrix;

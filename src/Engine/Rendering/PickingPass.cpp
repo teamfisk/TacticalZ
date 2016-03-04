@@ -104,11 +104,15 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
+                std::vector<glm::mat4> frameBones;
 				if (modelJob->BlendTree != nullptr) {
-                    std::vector<glm::mat4> frameBones;
                     frameBones = modelJob->BlendTree->GetFinalPose();
-                    glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                } else {
+                    frameBones = modelJob->Skeleton->GetTPose();
                 }
+                glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+
             } else {
                 m_PickingProgram->Bind();
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
@@ -210,11 +214,14 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
+                std::vector<glm::mat4> frameBones;
                 if (modelJob->BlendTree != nullptr) {
-                    std::vector<glm::mat4> frameBones;
                     frameBones = modelJob->BlendTree->GetFinalPose();
-                    glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                } else {
+                    frameBones = modelJob->Skeleton->GetTPose();
                 }
+
+                glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
             } else {
                 m_PickingProgram->Bind();
