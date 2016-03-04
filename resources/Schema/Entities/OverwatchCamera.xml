@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="OverwatchCamera" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:RaptorCopter>
+      <Speed>0.049999997019767761</Speed>
+      <Axis X="0" Y="1" Z="0"/>
+    </c:RaptorCopter>
+    <c:Transform>
+      <Position X="0" Y="-4" Z="0"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="CameraAnchor">
+      <Components>
+        <c:Transform>
+          <Position X="66" Y="59.2180023" Z="0"/>
+          <Orientation X="5.89000034" Y="1.57079637" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="SpectatorCamera">
+          <Components>
+            <c:Camera/>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="SpectatorHUD">
+              <Components>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-0.5"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="CapturePointHUD">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0" Y="0.190541431" Z="0"/>
+                      <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="BackgroundHexagon">
+                      <Components>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="0.300000012" B="1" G="1" R="1"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.919596612" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ProgressionHexagon">
+                          <Components>
+                            <c:CapturePointHUD>
+                              <CapturePointNumber>2</CapturePointNumber>
+                            </c:CapturePointHUD>
+                            <c:Fill>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00999999978"/>
+                              <Orientation X="0" Y="0" Z="1.57079637"/>
+                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="BackgroundHexagon">
+                      <Components>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="0.300000012" B="1" G="1" R="1"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ProgressionHexagon">
+                          <Components>
+                            <c:CapturePointHUD>
+                              <CapturePointNumber>3</CapturePointNumber>
+                            </c:CapturePointHUD>
+                            <c:Fill>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00999999978"/>
+                              <Orientation X="0" Y="0" Z="1.57079637"/>
+                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="BackgroundHexagon">
+                      <Components>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="1.62788737" Y="0.919596612" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ProgressionHexagon">
+                          <Components>
+                            <c:CapturePointHUD>
+                              <CapturePointNumber>4</CapturePointNumber>
+                            </c:CapturePointHUD>
+                            <c:Fill>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00999999978"/>
+                              <Orientation X="0" Y="0" Z="1.57079637"/>
+                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="BackgroundHexagon">
+                      <Components>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="0.300000012" B="1" G="1" R="1"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="-0.820431828" Y="0.441878349" Z="-0.100000001"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ProgressionHexagon">
+                          <Components>
+                            <c:CapturePointHUD>
+                              <CapturePointNumber>1</CapturePointNumber>
+                            </c:CapturePointHUD>
+                            <c:Fill>
+                              <Percentage>0.10332605343919568</Percentage>
+                              <Color A="0.699999988" B="0" G="0" R="1"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00999999978"/>
+                              <Orientation X="0" Y="0" Z="4.71238899"/>
+                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="BackgroundHexagon">
+                      <Components>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="0.699999988" B="0" G="0" R="1"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="-1.58304751" Y="0.919596612" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ProgressionHexagon">
+                          <Components>
+                            <c:CapturePointHUD/>
+                            <c:Fill>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00999999978"/>
+                              <Orientation X="0" Y="0" Z="1.57079637"/>
+                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="RespawnTimer">
+                  <Components>
+                    <c:Text>
+                      <Content>16</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Color A="1" B="0" G="1" R="0.784313738"/>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="0" Y="0.178199276" Z="0"/>
+                      <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="PickClassCamera">
+          <Components>
+            <c:Camera/>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="PickClassHUD">
+              <Components>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-0.5"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="DefenderClassPick">
+                  <Components>
+                    <c:Button/>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:InputCmdButton>
+                      <Command>PickClass</Command>
+                      <PressValue>2</PressValue>
+                    </c:InputCmdButton>
+                    <c:Transform>
+                      <Position X="0.349999994" Y="0.0500000007" Z="0"/>
+                      <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="AssaultClassPick">
+                  <Components>
+                    <c:Button/>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/UnitRaptor.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:InputCmdButton>
+                      <Command>PickClass</Command>
+                      <PressValue>1</PressValue>
+                    </c:InputCmdButton>
+                    <c:Transform>
+                      <Position X="0.349999994" Y="0.149504215" Z="0"/>
+                      <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="SniperClassPick">
+                  <Components>
+                    <c:Button/>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Test/aM4ME4GR.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:InputCmdButton>
+                      <Command>PickClass</Command>
+                      <PressValue>3</PressValue>
+                    </c:InputCmdButton>
+                    <c:Transform>
+                      <Position X="0.349999994" Y="-0.0500000007" Z="0"/>
+                      <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

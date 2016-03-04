@@ -74,7 +74,10 @@ size_t TCPClient::readBuffer()
         boost::asio::ip::tcp::socket::message_peek, error);
     unsigned int sizeOfPacket = 0;
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
-
+    if (sizeOfPacket > m_Socket->available()) {
+        LOG_WARNING("TCPClient::readBuffer(): We haven't got the whole packet yet.");
+        return 0;
+    }
     // if the buffer is to small increase the size of it
     // TODO if message is huge 1 time the buffer will not decrease.
     if (sizeOfPacket > m_BufferSize) {

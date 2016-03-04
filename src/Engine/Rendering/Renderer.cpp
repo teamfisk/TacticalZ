@@ -17,7 +17,7 @@ void Renderer::Initialize()
     m_TextPass->Initialize();
 
    /* m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.obj");
-    m_UnitQuad = ResourceManager::Load<Model>("Models/Core/UnitQuad.obj");
+    m_UnitQuad = ResourceManager::Load<Model>(sModels/Core/UnitQuad.obj");
     m_UnitSphere = ResourceManager::Load<Model>("Models/Core/UnitSphere.obj");*/
 
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
@@ -110,7 +110,7 @@ void Renderer::Draw(RenderFrame& frame)
 {
     GLERROR("PRE");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0SceneLowRes\0BloomLowRes\0Gaussian\0Picking\0Ambient Occlusion");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking\0Ambient Occlusion");
     ImGui::Combo("CubeMap", &m_CubeMapTexture, "Nevada(512)\0Sky(1024)");
     if(m_CubeMapTexture == 0) {
         m_CubeMapPass->LoadTextures("Nevada");
@@ -174,7 +174,7 @@ void Renderer::Draw(RenderFrame& frame)
 
     if (m_DebugTextureToDraw == 0) {
         PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), m_DrawFinalPass->SceneTextureLowRes(), m_DrawFinalPass->BloomTextureLowRes(), frame.Gamma, frame.Exposure);
+        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
         PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
 
@@ -186,18 +186,12 @@ void Renderer::Draw(RenderFrame& frame)
         m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTexture());
     }
     if (m_DebugTextureToDraw == 3) {
-        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->SceneTextureLowRes());
-    }
-    if (m_DebugTextureToDraw == 4) {
-        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->BloomTextureLowRes());
-    }
-    if (m_DebugTextureToDraw == 5) {
         m_DrawScreenQuadPass->Draw(m_DrawBloomPass->GaussianTexture());
     }
-    if (m_DebugTextureToDraw == 6) {
+    if (m_DebugTextureToDraw == 4) {
         m_DrawScreenQuadPass->Draw(m_PickingPass->PickingTexture());
     }
-	if (m_DebugTextureToDraw == 7) {
+	if (m_DebugTextureToDraw == 5) {
 		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
 	}
 	PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
@@ -250,7 +244,7 @@ void Renderer::InitializeRenderPasses()
     m_LightCullingPass = new LightCullingPass(this);
     m_CubeMapPass = new CubeMapPass(this);
 	m_SSAOPass = new SSAOPass(this, m_Config);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_PickingPass->DepthBuffer());
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);

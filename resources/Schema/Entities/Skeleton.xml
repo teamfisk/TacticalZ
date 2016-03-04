@@ -18,9 +18,9 @@
           <Transparent>true</Transparent>
         </c:Model>
         <c:Transform>
-          <Position X="0.47420007" Y="0.928898275" Z="0.0299553983"/>
+          <Position X="0.155832842" Y="1.12994993" Z="-0.201626897"/>
           <Scale X="0.0500000007" Y="0.0500000007" Z="0.100000001"/>
-          <Orientation X="1.60548508" Y="-1.10789871" Z="-1.51772225"/>
+          <Orientation X="0.195066273" Y="-0.0870126858" Z="0.148657113"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -29,16 +29,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Hand</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.448672563" Y="0.992614031" Z="0.0575723015"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="1.60548508" Y="-1.10789871" Z="-1.51772225"/>
+          <Position X="0.202149346" Y="1.12270021" Z="-0.144635201"/>
+          <Scale X="0.0500000231" Y="0.0500000305" Z="0.0500000119"/>
+          <Orientation X="1.41306889" Y="0.0776072815" Z="-0.744222522"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -47,16 +48,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Arm</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.12972948" Y="1.28044498" Z="-0.0855199769"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.178462029" Y="-0.240202308" Z="-0.227051333"/>
+          <Position X="0.0609518476" Y="1.16432548" Z="0.0783129707"/>
+          <Scale X="0.0500000194" Y="0.0500000082" Z="0.0500000194"/>
+          <Orientation X="0.311971247" Y="0.199406415" Z="0.162320927"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -65,16 +67,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Shoulder</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.0566707924" Y="1.22090316" Z="-0.110467494"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.798247218" Y="0.000491484476" Z="-0.00077928009"/>
+          <Position X="0.0742288083" Y="1.12503755" Z="-0.00992172211"/>
+          <Scale X="0.0500000119" Y="0.0500000082" Z="0.0500000119"/>
+          <Orientation X="-0.295679808" Y="-1.03809071" Z="-0.158694059"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -83,16 +86,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Neck</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="6.88049477e-05" Y="1.29971886" Z="-0.151777163"/>
-          <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
-          <Orientation X="-1.03466523" Y="-0.0017389874" Z="0.00627749134"/>
+          <Position X="0.0288712904" Y="1.20688999" Z="-0.0585537553"/>
+          <Scale X="0.0500000194" Y="0.0500000082" Z="0.0500000082"/>
+          <Orientation X="-0.0778672397" Y="-0.380205482" Z="-0.116210334"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -101,16 +105,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Spine_3</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.000299328996" Y="1.2487011" Z="-0.0936965123"/>
-          <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
-          <Orientation X="-0.798247218" Y="0.000491484476" Z="-0.00077928009"/>
+          <Position X="0.0190485716" Y="1.13146138" Z="-0.0447565243"/>
+          <Scale X="0.0500000119" Y="0.0500000082" Z="0.0500000119"/>
+          <Orientation X="-0.295679808" Y="-1.03809071" Z="-0.158694059"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -119,16 +124,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Spine_2</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.000528411241" Y="1.1669693" Z="0.000368326902"/>
-          <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
-          <Orientation X="-0.798247218" Y="0.000491484476" Z="-0.00077928009"/>
+          <Position X="0.00282198261" Y="1.01004541" Z="-0.0218831152"/>
+          <Scale X="0.0500000119" Y="0.0500000082" Z="0.0500000119"/>
+          <Orientation X="-0.295679808" Y="-1.03809071" Z="-0.158694059"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -137,16 +143,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Spine_1</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.000317580998" Y="1.03476369" Z="7.06899816e-17"/>
-          <Scale X="0.0500000007" Y="0.100000001" Z="0.0500000007"/>
-          <Orientation X="-0.168994248" Y="-0.000270629855" Z="-6.74916964e-06"/>
+          <Position X="-0.00298201409" Y="0.878305078" Z="-0.0124331526"/>
+          <Scale X="0.0500000082" Y="0.0500000007" Z="0.0500000007"/>
+          <Orientation X="-0.478212297" Y="-1.01566339" Z="-0.374480605"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -155,15 +162,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Hip</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="0" Y="0.901226044" Z="0"/>
-          <Scale X="0.100000001" Y="0.0500000007" Z="0.0500000007"/>
+          <Position X="0" Y="0.745380521" Z="0"/>
+          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <Orientation X="-0.0850669593" Y="-0.351720452" Z="0.0214110892"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -172,16 +181,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Leg_Top</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.0735318959" Y="0.86343354" Z="0.00186898722"/>
+          <Position X="-0.0688988566" Y="0.704185605" Z="-0.0198653266"/>
           <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="0.431212306" Y="-0.0456388369" Z="-0.00236316444"/>
+          <Orientation X="-0.124463096" Y="0.178934589" Z="0.0281526987"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -190,16 +200,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Leg_Bottom</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.0971027464" Y="0.534537971" Z="-0.158307418"/>
+          <Position X="-0.0895988718" Y="0.340622783" Z="0.022300493"/>
           <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.435873091" Y="0.0584642813" Z="-0.0526505522"/>
+          <Orientation X="-0.634849846" Y="0.204822823" Z="0.0869619399"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -208,16 +219,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Foot</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.136750847" Y="0.215778053" Z="0.0181705151"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-7.45058151e-06" Y="-4.34406102e-05" Z="-2.32085604e-05"/>
+          <Position X="-0.0861766189" Y="0.0597670376" Z="0.257741988"/>
+          <Scale X="0.0500000082" Y="0.0500000007" Z="0.0500000082"/>
+          <Orientation X="-0.185180262" Y="-0.00943047088" Z="-0.00198192359"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -226,16 +238,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Toe</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.142155826" Y="0.180158257" Z="-0.171162993"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-7.45058151e-06" Y="-4.34406102e-05" Z="-2.32085604e-05"/>
+          <Position X="-0.0898738578" Y="-0.0101006478" Z="0.078159079"/>
+          <Scale X="0.0500000082" Y="0.0500000007" Z="0.0500000082"/>
+          <Orientation X="-0.185180262" Y="-0.00943047088" Z="-0.00198192359"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -244,16 +257,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Shoulder</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.0569540039" Y="1.22099173" Z="-0.110411651"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.798247218" Y="0.000491484476" Z="-0.00077928009"/>
+          <Position X="0.0172477104" Y="1.11405122" Z="-0.107610352"/>
+          <Scale X="0.0500000119" Y="0.0500000082" Z="0.0500000119"/>
+          <Orientation X="-0.295679808" Y="-1.03809071" Z="-0.158694059"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -262,16 +276,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Arm</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.129911453" Y="1.28064728" Z="-0.0853923708"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="0.558630228" Y="-0.558619261" Z="-0.988305748"/>
+          <Position X="-0.0692541152" Y="1.13922095" Z="-0.14491269"/>
+          <Scale X="0.0500000194" Y="0.0500000194" Z="0.0500000231"/>
+          <Orientation X="1.49024689" Y="-0.866028547" Z="1.11317146"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -280,16 +295,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Hand</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.454215586" Y="1.41859245" Z="-0.370613039"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.931911349" Y="4.81306633e-05" Z="0.000111658264"/>
+          <Position X="0.100635156" Y="1.17628682" Z="-0.439798951"/>
+          <Scale X="0.0500000231" Y="0.0500000305" Z="0.050000038"/>
+          <Orientation X="0.026293885" Y="-0.262760967" Z="2.338521"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -298,16 +314,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Shoulder_Armor_Joint</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.138541639" Y="1.30872273" Z="-0.144261822"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.798247218" Y="0.000491484476" Z="-0.00077928009"/>
+          <Position X="-0.0505402647" Y="1.1960609" Z="-0.172250509"/>
+          <Scale X="0.0500000194" Y="0.0500000119" Z="0.0500000119"/>
+          <Orientation X="-0.295679778" Y="-1.03809094" Z="-0.506270111"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -316,16 +333,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Chin</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.00033863826" Y="1.2016536" Z="-0.251047492"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.931916714" Y="-9.67644155e-07" Z="2.18351502e-07"/>
+          <Position X="0.0539259352" Y="1.22412896" Z="-0.183897316"/>
+          <Scale X="0.0500000119" Y="0.0500000082" Z="0.0500000082"/>
+          <Orientation X="-0.0481163412" Y="-0.134963214" Z="-0.102023236"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -334,16 +352,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Head</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.000338668207" Y="1.33565879" Z="-0.254856527"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.931916714" Y="-9.67644155e-07" Z="2.18351502e-07"/>
+          <Position X="0.0481297895" Y="1.31164014" Z="-0.0825063139"/>
+          <Scale X="0.0500000119" Y="0.0500000082" Z="0.0500000082"/>
+          <Orientation X="-0.0481163412" Y="-0.134963214" Z="-0.102023236"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -352,16 +371,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>Perietal</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="19.6078434"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.000338537793" Y="1.43159795" Z="-0.410463303"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.931916714" Y="-9.67644155e-07" Z="2.18351502e-07"/>
+          <Position X="0.0686318353" Y="1.49197555" Z="-0.104337469"/>
+          <Scale X="0.0500000119" Y="0.0500000082" Z="0.0500000082"/>
+          <Orientation X="-0.0481163412" Y="-0.134963214" Z="-0.102023236"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -370,16 +390,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>L_Elbow</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="1" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="-0.312942117" Y="1.35850036" Z="-0.246365055"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="0.353978485" Y="-0.15571253" Z="-0.903516531"/>
+          <Position X="-0.0776530653" Y="1.10232043" Z="-0.397976696"/>
+          <Scale X="0.0500000231" Y="0.0500000231" Z="0.0500000231"/>
+          <Orientation X="2.36848879" Y="-0.278962672" Z="2.07910991"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -388,16 +409,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Leg_Bottom</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.105701312" Y="0.499459773" Z="0.030466903"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-1.02907228" Y="-0.0580535792" Z="0.116703011"/>
+          <Position X="0.115077674" Y="0.503088951" Z="-0.267230242"/>
+          <Scale X="0.0500000007" Y="0.0499999933" Z="0.049999997"/>
+          <Orientation X="-0.511662602" Y="-0.216903374" Z="-0.0133549664"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -406,16 +428,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Elbow</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.309118003" Y="1.12181115" Z="0.00506293867"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.391992599" Y="-0.509281039" Z="-0.0413108058"/>
+          <Position X="0.301801801" Y="1.09683371" Z="0.023665078"/>
+          <Scale X="0.0500000231" Y="0.0500000194" Z="0.0500000194"/>
+          <Orientation X="1.67780411" Y="0.697954118" Z="-1.36570835"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -424,16 +447,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Leg_Top</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.074000001" Y="0.863433301" Z="0.00200000009"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.0984009728" Y="0.0146064674" Z="0.00352247525"/>
+          <Position X="0.0695244595" Y="0.711660385" Z="0.0306202006"/>
+          <Scale X="0.0500000007" Y="0.0500000007" Z="0.049999997"/>
+          <Orientation X="0.929966331" Y="0.0844758675" Z="0.0447596237"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -442,16 +466,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Foot</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.139749736" Y="0.334264338" Z="0.356020123"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.000313894066" Y="0.00262229913" Z="0.00155029749"/>
+          <Position X="0.137999952" Y="0.19909358" Z="-0.0635268986"/>
+          <Scale X="0.0500000007" Y="0.0499999933" Z="0.049999997"/>
+          <Orientation X="-0.193798333" Y="-0.056662742" Z="-0.0102932369"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -460,16 +485,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Toe</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.144308567" Y="0.298593462" Z="0.166685253"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.000313894066" Y="0.00262229913" Z="0.00155029749"/>
+          <Position X="0.153348058" Y="0.127739012" Z="-0.24189125"/>
+          <Scale X="0.0500000007" Y="0.0499999933" Z="0.049999997"/>
+          <Orientation X="-0.193798333" Y="-0.056662742" Z="-0.0102932369"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -478,16 +504,17 @@
       <Components>
         <c:BoneAttachment>
           <BoneName>R_Shoulder_Armor_Joint</BoneName>
-          <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+          <ScaleOffset X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
+          <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Model>
           <Resource>Models/Core/UnitCube.mesh</Resource>
           <Color A="1" B="19.6078434" G="19.6078434" R="1"/>
         </c:Model>
         <c:Transform>
-          <Position X="0.13872239" Y="1.30850673" Z="-0.144398093"/>
-          <Scale X="0.0500000007" Y="0.0500000007" Z="0.0500000007"/>
-          <Orientation X="-0.798247218" Y="0.000491484476" Z="-0.00077928009"/>
+          <Position X="0.0885034204" Y="1.22286928" Z="0.0661265627"/>
+          <Scale X="0.0500000119" Y="0.0500000119" Z="0.0500000119"/>
+          <Orientation X="-0.295679808" Y="-1.03809083" Z="-0.237101197"/>
         </c:Transform>
       </Components>
       <Children/>

@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <Animation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Animation.xsd">
-	<AnimationName1></AnimationName1>
-	<Weight1>1.0</Weight1>
-	<Time1>0</Time1>
-	<Speed1>0</Speed1>
-	<Loop1>true</Loop1>
-	<AnimationName2></AnimationName2>
-	<Weight2>1.0</Weight2>
-	<Time2>0</Time2>
-	<Speed2>0</Speed2>
-	<Loop2>true</Loop2>
-	<AnimationName3></AnimationName3>
-	<Weight3>1.0</Weight3>
-	<Time3>0</Time3>
-	<Speed3>0</Speed3>
-	<Loop3>true</Loop3>
+	<AnimationName></AnimationName>
+	<Time>0</Time>
+	<Play>false</Play>
+	<Reverse>false</Reverse>
+	<Speed>0</Speed>
+	<Loop>true</Loop>
+	<Additive>false</Additive>
 </Animation>
