@@ -9,7 +9,7 @@ CapturePointHUDSystem::CapturePointHUDSystem(SystemParams params)
 
 void CapturePointHUDSystem::Update(double dt)
 {
-    bool LoadCheck = true;
+    bool loadCheck = true;
     int redTeam;
     int blueTeam;
     int spectatorTeam;
@@ -35,11 +35,11 @@ void CapturePointHUDSystem::Update(double dt)
             //Check if the HUD corresponds to the Capture Point Number
             if (HUD_ID == (int)entityCP["CapturePoint"]["CapturePointNumber"]) {
                 ComponentWrapper& teamComponent = entityCP["Team"];
-                if (LoadCheck) {
+                if (loadCheck) {
                     redTeam = (int)teamComponent["Team"].Enum("Red");
                     blueTeam = (int)teamComponent["Team"].Enum("Blue");
                     spectatorTeam = (int)teamComponent["Team"].Enum("Spectator");
-                    LoadCheck = false;
+                    loadCheck = false;
                 }
                 //Color hud with team color
                 auto capturePointTeam = (int)teamComponent["Team"];
