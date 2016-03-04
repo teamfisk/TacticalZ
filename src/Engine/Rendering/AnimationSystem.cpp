@@ -4,7 +4,6 @@ AnimationSystem::AnimationSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EAutoAnimationBlend, &AnimationSystem::OnAutoAnimationBlend);
-    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &AnimationSystem::OnInputCommand);
 }
 
 void AnimationSystem::Update(double dt)
@@ -220,43 +219,4 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
     }
     m_AutoBlendQueues[subTreeRoot].Insert(abj);
     return true;
-}
-
-bool AnimationSystem::OnInputCommand(const Events::InputCommand& e)
-{
-    if (e.Value == 1.0f) {
-        if (e.Command == "Shoot") {
-            auto blendComponents = m_World->GetComponents("Model");
-
-            if (blendComponents == nullptr) {
-                return false;
-            }
-            for (auto& bc : *blendComponents) {
-                EntityWrapper entity = EntityWrapper(m_World, bc.EntityID);
-
-                if (entity.Name() == "Hands") {
-                    {
-                        Events::AutoAnimationBlend aeb;
-                        aeb.Duration = 0.0;
-                        aeb.NodeName = "Fire";
-                        aeb.RootNode = entity;
-                        aeb.Start = true;
-                        aeb.Restart = true;
-                        m_EventBroker->Publish(aeb);
-                    }
-                    {
-                        Events::AutoAnimationBlend aeb;
-                        aeb.Duration = 0.1;
-                        aeb.NodeName = "Idle";
-                        aeb.RootNode = entity;
-                        aeb.Delay = 0.0;
-                        aeb.Start = true;
-                        aeb.Restart = false;
-                        aeb.AnimationEntity = entity.FirstChildByName("PrimaryBlendTree").FirstChildByName("Fire");
-                        m_EventBroker->Publish(aeb);
-                    }
-                }
-            }
-        }
-    }
 }
