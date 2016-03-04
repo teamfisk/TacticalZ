@@ -19,7 +19,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
-    m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1);
+    m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1, EntityWrapper::Invalid);
 
     m_EditorGUI = new EditorGUI(m_World, m_EventBroker);
     m_EditorGUI->SetEntitySelectedCallback(std::bind(&EditorSystem::OnEntitySelected, this, std::placeholders::_1));

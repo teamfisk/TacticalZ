@@ -196,7 +196,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
     abj.BlendInfo.progress = 0.0;
     abj.BlendInfo.Start = e.Start;
     abj.BlendInfo.SingleBlend = e.SingleLevelBlend;
-
+    abj.BlendInfo.Weight = e.Weight;
 
     EntityWrapper nodeEntity = subTreeRoot.FirstChildByName(e.NodeName); // more than one
     if (nodeEntity.Valid()) {
