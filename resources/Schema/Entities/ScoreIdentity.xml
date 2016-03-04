@@ -54,7 +54,7 @@
     <Entity name="KD">
       <Components>
         <c:Text>
-          <Content>0</Content>
+          <Content>0.0</Content>
           <Resource>Fonts/DroidSans.ttf,64</Resource>
           <Alignment>
             <Left/>
@@ -66,7 +66,7 @@
           <Field>KD</Field>
         </c:TextFieldReader>
         <c:Transform>
-          <Position X="2" Y="0" Z="0"/>
+          <Position X="1.28572214" Y="0" Z="0"/>
           <Scale X="2" Y="2" Z="2"/>
         </c:Transform>
       </Components>

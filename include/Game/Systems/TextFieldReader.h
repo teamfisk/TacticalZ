@@ -2,6 +2,8 @@
 #define AmmunitionHUDSystem_h__
 
 #include <boost/lexical_cast.hpp>
+#include <sstream>
+#include <iomanip>
 #include "../../Engine/Core/System.h"
 #include "../../Engine/GLM.h"
 
