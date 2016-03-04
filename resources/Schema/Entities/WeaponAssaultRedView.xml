@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="AssaultWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Model>
+      <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="WeaponMuzzle">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/RayRed.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="0.00800000038" Y="0.0920000076" Z="-0.416000009"/>
+          <Orientation X="6.2760005" Y="0.00500000035" Z="0.00600000005"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="FirstPersonReloadSpawner">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/ReloadEffectView.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="AmmunitionHUD">
+      <Components>
+        <c:Transform>
+          <Position X="-0.0440000035" Y="0.136000007" Z="-0.119000003"/>
+          <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="AmmunitionHUDBackground">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <GlowMap></GlowMap>
+              <Color A="0.588235319" B="0" G="0" R="0"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-0.00200000009"/>
+              <Scale X="0.119999997" Y="0.119999997" Z="0.119999997"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AmmunitionText">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="MagazineAmmo">
+              <Components>
+                <c:Text>
+                  <Content>32</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+                </c:Text>
+                <c:TextFieldReader>
+                  <ParentEntityName>Player</ParentEntityName>
+                  <ComponentType>AssaultWeapon</ComponentType>
+                  <Field>MagazineAmmo</Field>
+                </c:TextFieldReader>
+                <c:Transform>
+                  <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Ammo">
+              <Components>
+                <c:Text>
+                  <Content>320</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+                </c:Text>
+                <c:TextFieldReader>
+                  <ParentEntityName>Player</ParentEntityName>
+                  <ComponentType>AssaultWeapon</ComponentType>
+                  <Field>Ammo</Field>
+                </c:TextFieldReader>
+                <c:Transform>
+                  <Position X="5.2833886e-05" Y="-0.0407950208" Z="0"/>
+                  <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="ReloadEffect">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>
