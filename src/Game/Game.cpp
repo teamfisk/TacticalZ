@@ -34,6 +34,7 @@
 #include "Game/Systems/KillFeedSystem.h"
 #include "Game/Systems/BoostSystem.h"
 #include "Game/Systems/BoostIconsHUDSystem.h"
+#include "Game/Systems/SpectatorCameraSystem.h"
 #include "GUI/ButtonSystem.h"
 #include "GUI/MainMenuSystem.h"
 
@@ -155,6 +156,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<BoostIconsHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<SpectatorCameraSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");

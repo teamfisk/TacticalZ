@@ -19,6 +19,7 @@ private:
     {
         int PlayerID;
         ComponentInfo::EnumType Team;
+        ComponentInfo::EnumType Class;
     };
 
     bool m_NetworkEnabled = false;
