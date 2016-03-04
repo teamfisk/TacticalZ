@@ -127,6 +127,12 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
         wi.FirstPersonEntity["Model"]["Visible"] = false;
         wi.ThirdPersonEntity["Model"]["Visible"] = false;
     }
+
+    // Sound
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = wi.Player.ID;
+    e.FilePath = "Audio/weapon/Assault/AssaultWeaponReload.wav";
+    m_EventBroker->Publish(e);
 }
 
 void AssaultWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -208,6 +214,12 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Fire");
+
+    // Sound
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = wi.Player.ID;
+    e.FilePath = "Audio/weapon/Assault/AssaultWeaponFire.wav";
+    m_EventBroker->Publish(e);
 }
 
 bool AssaultWeaponBehaviour::canFire(ComponentWrapper cWeapon, WeaponInfo& wi)
