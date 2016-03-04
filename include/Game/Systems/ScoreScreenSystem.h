@@ -31,11 +31,11 @@ private:
         int ID = -1;
         std::string Name = "";
         int Team = 1;
+        int Kills = 0;
+        int Deaths = 0;
         EntityWrapper Player = EntityWrapper::Invalid;
     };
 
-    std::unordered_map<int, int> m_DeathAmount;
-    std::unordered_map<int, int> m_KillAmount;
     std::vector<int> m_DisconnectedIdentities;
     int m_PlayerCounter = 0;
     std::unordered_map<int, PlayerData> m_PlayerIdentities;

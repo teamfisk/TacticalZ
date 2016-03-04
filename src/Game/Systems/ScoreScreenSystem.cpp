@@ -40,7 +40,7 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
 
     for (auto it = m_PlayerIdentities.begin(); it != m_PlayerIdentities.end(); ++it) {
         bool found = false;
-        for (auto child : children) {
+        for (auto& child : children) {
             int ID = (int)child["ScoreIdentity"]["ID"];
             if (it->first == ID) {
                 if (it->second.Team != currentTeam) {
@@ -61,21 +61,11 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
                 }
                 found = true;
                 //Update Deaths for child
-                std::unordered_map<int, int>::iterator gotDeaths = m_DeathAmount.find(ID);
-                if(gotDeaths != m_DeathAmount.end()) {
-                    (int&)child["ScoreIdentity"]["Deaths"] += gotDeaths->second;
-                    (double&)child["ScoreIdentity"]["KD"] = (double)((int)child["ScoreIdentity"]["Deaths"]/(int)child["ScoreIdentity"]["Deaths"]);
-                    m_DeathAmount.erase(gotDeaths);
-
-                }
+                (int&)child["ScoreIdentity"]["Kills"] = it->second.Kills;
                 //Update Kills for child
-                std::unordered_map<int, int>::iterator gotKills = m_KillAmount.find(ID);
-                if (gotKills != m_KillAmount.end()) {
-                    (int&)child["ScoreIdentity"]["Kills"] += gotKills->second;
-                    (double&)child["ScoreIdentity"]["KD"] = (double)((int)child["ScoreIdentity"]["Deaths"]/(int)child["ScoreIdentity"]["Deaths"]);
-                    m_KillAmount.erase(gotKills);
+                (int&)child["ScoreIdentity"]["Deaths"] = it->second.Deaths;
+                //KD is not updated at the moment.
 
-                }
                 //Update position for child
                 glm::vec3 offset = (glm::vec3)entity["ScoreScreen"]["Offset"];
                 (glm::vec3&) child["Transform"]["Position"] = offset * position;
@@ -118,8 +108,15 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
 bool ScoreScreenSystem::OnPlayerDeath(const Events::KillDeath& e)
 {
     //When player die, add it to his score, and when possible the player who killed him.
-    m_DeathAmount[e.Casualty]++;
-    m_KillAmount[e.Killer]++;
+    std::unordered_map<int, PlayerData>::iterator got;
+    got = m_PlayerIdentities.find(e.Casualty);
+    if(got != m_PlayerIdentities.end()) {
+        got->second.Deaths++;
+    }
+    got = m_PlayerIdentities.find(e.Killer);
+    if (got != m_PlayerIdentities.end()) {
+        got->second.Kills++;
+    }
     return 0;
 }
 
