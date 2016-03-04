@@ -219,7 +219,6 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
         }
     }
 
-
     if(goalNodes.size() == 0) {
         return blendInfo;
     } else if(goalNodes.size() == 1) {
@@ -382,6 +381,10 @@ BlendTree::Node* BlendTree::FirstCommonParent(Node* node1, Node* node2)
 EntityWrapper BlendTree::GetSubTreeRoot(std::string nodeName)
 {
     std::vector<Node*> nodes = FindNodesByName(nodeName);
+
+    if (nodes.size() == 0) {
+        return EntityWrapper::Invalid;
+    }
 
     std::vector<Node*> subTreeRoots;
 
