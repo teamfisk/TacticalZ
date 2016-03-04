@@ -35,9 +35,17 @@ void TextFieldReader::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     if (field.Type == "int") {
         text = boost::lexical_cast<std::string>((const int&)component[fieldName]);
     } else if (field.Type == "float") {
-        text = boost::lexical_cast<std::string>((const float&)component[fieldName]);
+        std::ostringstream ss;
+        float f = (float)component[fieldName];
+        ss << std::fixed << std::setprecision(2);
+        ss << f;
+        text = ss.str();
     } else if (field.Type == "double") {
-        text = boost::lexical_cast<std::string>((const double&)component[fieldName]);
+        std::ostringstream ss;
+        double d = (double)component[fieldName];
+        ss << std::fixed << std::setprecision(1);
+        ss << d;
+        text = ss.str();
     } else if (field.Type == "bool") {
         text = boost::lexical_cast<std::string>((const bool&)component[fieldName]);
     } else if (field.Type == "string") {

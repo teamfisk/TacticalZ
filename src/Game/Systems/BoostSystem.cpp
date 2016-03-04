@@ -11,10 +11,16 @@ bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
     if (e.Victim.ID == e.Inflictor.ID) {
         return false;
     }
-    if (!e.Victim.Valid() && e.Victim != LocalPlayer && !e.Victim.IsChildOf(LocalPlayer)) {
+
+    if (!e.Victim.Valid() || !LocalPlayer.Valid()) {
         return false;
     }
-    if (!e.Inflictor.Valid() || !e.Victim.Valid()) {
+
+    if (e.Victim != LocalPlayer && !e.Victim.IsChildOf(LocalPlayer)) {
+        return false;
+    }
+
+    if (!e.Inflictor.Valid()) {
         return false;
     }
 
