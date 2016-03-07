@@ -16,6 +16,11 @@
     </c:Team>
     <c:Collidable/>
     <c:DashAbility/>
+    <c:DefenderWeapon>
+      <Slot>
+        <Secondary/>
+      </Slot>
+    </c:DefenderWeapon>
     <c:DoubleJump/>
     <c:Health/>
     <c:Physics>
@@ -493,250 +498,34 @@
             </Entity>
           </Children>
         </Entity>
-        <Entity name="Hands">
+        <Entity name="Weapons">
           <Components>
-            <c:BlendAdditive>
-              <Adder>MovementBlend</Adder>
-              <Receiver>FinalBlend</Receiver>
-            </c:BlendAdditive>
-            <c:Model>
-              <Resource>Models/Characters/Assault/FirstPersonAssaultBlue.mesh</Resource>
-            </c:Model>
             <c:Transform/>
           </Components>
           <Children>
             <Entity name="PrimaryAttachment">
               <Components>
-                <c:BoneAttachment>
-                  <BoneName>R_Arm_Weapon_Joint</BoneName>
-                </c:BoneAttachment>
                 <c:WeaponAttachment>
                   <Weapon>AssaultWeapon</Weapon>
                 </c:WeaponAttachment>
                 <c:Spawner>
                   <EntityFile>Schema/Entities/WeaponAssaultBlueView.xml</EntityFile>
                 </c:Spawner>
-                <c:Transform>
-                  <Position X="0.120748274" Y="-0.228437141" Z="-0.181454718"/>
-                  <Orientation X="0.0104048206" Y="-0.00268219248" Z="0.0428443849"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity name="AssaultWeapon">
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
-                    </c:Model>
-                    <c:Transform/>
-                  </Components>
-                  <Children>
-                    <Entity name="ReloadEffect">
-                      <Components>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="WeaponMuzzle">
-                      <Components>
-                        <c:Spawner>
-                          <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
-                        </c:Spawner>
-                        <c:Transform>
-                          <Position X="0.00800000038" Y="0.0920000076" Z="-0.416000009"/>
-                          <Orientation X="6.2760005" Y="0.00500000035" Z="0.00600000005"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="FirstPersonReloadSpawner">
-                      <Components>
-                        <c:Spawner>
-                          <EntityFile>Schema/Entities/ReloadEffectView.xml</EntityFile>
-                        </c:Spawner>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="AmmunitionHUD">
-                      <Components>
-                        <c:Transform>
-                          <Position X="-0.0440000035" Y="0.136000007" Z="-0.119000003"/>
-                          <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="AmmunitionHUDBackground">
-                          <Components>
-                            <c:Sprite>
-                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
-                              <Color A="0.588235319" B="0" G="0" R="0"/>
-                            </c:Sprite>
-                            <c:Transform>
-                              <Position X="0" Y="0" Z="-0.00200000009"/>
-                              <Scale X="0.119999997" Y="0.119999997" Z="0.119999997"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="AmmunitionText">
-                          <Components>
-                            <c:Transform/>
-                          </Components>
-                          <Children>
-                            <Entity name="MagazineAmmo">
-                              <Components>
-                                <c:Text>
-                                  <Content>32</Content>
-                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
-                                  <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
-                                </c:Text>
-                                <c:TextFieldReader>
-                                  <ParentEntityName>PlayerAssault</ParentEntityName>
-                                  <ComponentType>AssaultWeapon</ComponentType>
-                                  <Field>MagazineAmmo</Field>
-                                </c:TextFieldReader>
-                                <c:Transform>
-                                  <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                            <Entity name="Ammo">
-                              <Components>
-                                <c:Text>
-                                  <Content>320</Content>
-                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
-                                  <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
-                                </c:Text>
-                                <c:TextFieldReader>
-                                  <ParentEntityName>PlayerAssault</ParentEntityName>
-                                  <ComponentType>AssaultWeapon</ComponentType>
-                                  <Field>Ammo</Field>
-                                </c:TextFieldReader>
-                                <c:Transform>
-                                  <Position X="5.2833886e-05" Y="-0.0407950208" Z="0"/>
-                                  <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity name="SecondaryAttachment">
-              <Components>
-                <c:BoneAttachment>
-                  <BoneName>R_Arm_Weapon_Joint</BoneName>
-                </c:BoneAttachment>
-                <c:WeaponAttachment>
-                  <Weapon>SidearmWeapon</Weapon>
-                </c:WeaponAttachment>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform>
-                  <Position X="0.120748274" Y="-0.228437141" Z="-0.181454718"/>
-                  <Orientation X="0.0104048206" Y="-0.00268219248" Z="0.0428443849"/>
-                </c:Transform>
+                <c:Transform/>
               </Components>
               <Children/>
             </Entity>
-            <Entity name="FinalBlend">
+            <Entity name="SecondaryAttachment">
               <Components>
-                <c:Blend>
-                  <Pose1>BlendTreeAssaultWeapon</Pose1>
-                  <Pose2>BlendTreeSecondaryWeapon</Pose2>
-                  <Weight>0</Weight>
-                  <SubTreeRoot>true</SubTreeRoot>
-                </c:Blend>
+                <c:WeaponAttachment>
+                  <Weapon>DefenderWeapon</Weapon>
+                </c:WeaponAttachment>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/WeaponDefenderBlueView.xml</EntityFile>
+                </c:Spawner>
                 <c:Transform/>
               </Components>
-              <Children>
-                <Entity name="BlendTreeAssaultWeapon">
-                  <Components>
-                    <c:Blend>
-                      <Pose1>Fire</Pose1>
-                      <Pose2>Reload</Pose2>
-                      <Weight>0</Weight>
-                      <SubTreeRoot>true</SubTreeRoot>
-                    </c:Blend>
-                    <c:Transform/>
-                  </Components>
-                  <Children>
-                    <Entity name="Fire">
-                      <Components>
-                        <c:Animation>
-                          <AnimationName>ShootRifleF</AnimationName>
-                          <Speed>1</Speed>
-                          <Loop>false</Loop>
-                        </c:Animation>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="Reload">
-                      <Components>
-                        <c:Animation>
-                          <AnimationName>ReloadSwitchF</AnimationName>
-                          <Speed>1</Speed>
-                          <Loop>false</Loop>
-                        </c:Animation>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
-                <Entity name="BlendTreeSecondaryWeapon">
-                  <Components>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity name="MovementBlend">
-              <Components>
-                <c:Blend>
-                  <Pose1>Idle</Pose1>
-                  <Pose2>Run</Pose2>
-                  <Weight>0</Weight>
-                  <SubTreeRoot>true</SubTreeRoot>
-                </c:Blend>
-                <c:Transform/>
-              </Components>
-              <Children>
-                <Entity name="Run">
-                  <Components>
-                    <c:Animation>
-                      <AnimationName>RunF</AnimationName>
-                      <Speed>1</Speed>
-                      <Play>true</Play>
-                      <Additive>true</Additive>
-                    </c:Animation>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity name="Idle">
-                  <Components>
-                    <c:Animation>
-                      <AnimationName>IdleF</AnimationName>
-                      <Speed>1</Speed>
-                      <Play>true</Play>
-                      <Additive>true</Additive>
-                    </c:Animation>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
+              <Children/>
             </Entity>
           </Children>
         </Entity>
@@ -769,8 +558,6 @@
         <c:HiddenForLocalPlayer/>
         <c:Model>
           <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
-          <Color A="1" B="1" G="1" R="1"/>
-          <Visible>true</Visible>
         </c:Model>
         <c:Transform/>
       </Components>
@@ -790,8 +577,8 @@
               <EntityFile>Schema/Entities/WeaponAssaultBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.165396646" Y="1.14537966" Z="-0.206537575"/>
-              <Orientation X="0.484640986" Y="-0.00695174001" Z="0.0685098693"/>
+              <Position X="0.168977827" Y="1.03285813" Z="-0.227028549"/>
+              <Orientation X="-0.00427743886" Y="-0.0853471458" Z="0.137290105"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -811,8 +598,8 @@
               <EntityFile>Schema/Entities/SidearmWeaponWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.165396646" Y="1.14537966" Z="-0.206537575"/>
-              <Orientation X="0.484640986" Y="-0.00695174001" Z="0.0685098693"/>
+              <Position X="0.168977827" Y="1.03285813" Z="-0.227028549"/>
+              <Orientation X="-0.00427743886" Y="-0.0853471458" Z="0.137290105"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -832,7 +619,7 @@
               <Components>
                 <c:Animation>
                   <AnimationName>AimSecWepA</AnimationName>
-                  <Time>0.71143966913223267</Time>
+                  <Time>0.5</Time>
                   <Loop>false</Loop>
                   <Additive>true</Additive>
                 </c:Animation>
@@ -844,7 +631,7 @@
               <Components>
                 <c:Animation>
                   <AnimationName>AimRifleA</AnimationName>
-                  <Time>0.71143966913223267</Time>
+                  <Time>0.5</Time>
                   <Loop>false</Loop>
                   <Additive>true</Additive>
                 </c:Animation>
@@ -988,42 +775,6 @@
                             <c:Transform/>
                           </Components>
                           <Children>
-                            <Entity name="StrafeLRBlend">
-                              <Components>
-                                <c:Blend>
-                                  <Pose1>Left</Pose1>
-                                  <Pose2>Right</Pose2>
-                                  <Weight>0.033793529385008014</Weight>
-                                </c:Blend>
-                                <c:Transform/>
-                              </Components>
-                              <Children>
-                                <Entity name="Left">
-                                  <Components>
-                                    <c:Animation>
-                                      <AnimationName>StrafeLeftF</AnimationName>
-                                      <Time>0.32459360994030106</Time>
-                                      <Speed>1</Speed>
-                                      <Play>true</Play>
-                                    </c:Animation>
-                                    <c:Transform/>
-                                  </Components>
-                                  <Children/>
-                                </Entity>
-                                <Entity name="Right">
-                                  <Components>
-                                    <c:Animation>
-                                      <AnimationName>StrafeRightF</AnimationName>
-                                      <Time>0.34810913982041569</Time>
-                                      <Speed>1</Speed>
-                                      <Play>true</Play>
-                                    </c:Animation>
-                                    <c:Transform/>
-                                  </Components>
-                                  <Children/>
-                                </Entity>
-                              </Children>
-                            </Entity>
                             <Entity name="RunWalkBlend">
                               <Components>
                                 <c:Blend>
@@ -1051,6 +802,42 @@
                                     <c:Animation>
                                       <AnimationName>RunF</AnimationName>
                                       <Time>0.41501449293066628</Time>
+                                      <Speed>1</Speed>
+                                      <Play>true</Play>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="StrafeLRBlend">
+                              <Components>
+                                <c:Blend>
+                                  <Pose1>Left</Pose1>
+                                  <Pose2>Right</Pose2>
+                                  <Weight>0.033793529385008014</Weight>
+                                </c:Blend>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Left">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>StrafeLeftF</AnimationName>
+                                      <Time>0.32459360994030106</Time>
+                                      <Speed>1</Speed>
+                                      <Play>true</Play>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Right">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>StrafeRightF</AnimationName>
+                                      <Time>0.34810913982041569</Time>
                                       <Speed>1</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
@@ -1327,12 +1114,12 @@
     <Entity name="PlayerName">
       <Components>
         <c:Text>
-          <Content>Insert name here</Content>
+          <Content></Content>
           <Resource>Fonts/DroidSans.ttf,100</Resource>
           <Color A="1" B="0" G="1" R="0"/>
         </c:Text>
         <c:Transform>
-          <Position X="0.100000001" Y="1.50176644" Z="-0.248000011"/>
+          <Position X="0" Y="1.64533126" Z="-0.0171071123"/>
           <Orientation X="0" Y="3.14199996" Z="0"/>
           <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
         </c:Transform>

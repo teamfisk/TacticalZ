@@ -40,12 +40,16 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         magAmmo = glm::min(magSize, ammo);
         isReloading = false;
         if (wi.FirstPersonEntity.Valid()) {
-            wi.FirstPersonEntity["Model"]["Visible"] = true;
+            wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = true;
         }
         if (wi.ThirdPersonEntity.Valid()) {
             wi.ThirdPersonEntity["Model"]["Visible"] = true;
         }
     }    
+    double reloadTime = cWeapon["ReloadTime"];
+    if (isReloading && reloadTimer <= reloadTime / 2) {
+
+    }
     
     // Restore view angle
     if (IsClient) {
@@ -122,18 +126,26 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Reload");
-    if (IsClient) {
-        // Spawn explosion effect
-        EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("FirstPersonReloadSpawner");
-        if (reloadEffectSpawner.Valid()) {
-            SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+    // Spawn explosion effect
+    if (wi.FirstPersonEntity.Valid()) {
+        if (IsClient) {
+            EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("ReloadSpawner");
+            if (reloadEffectSpawner.Valid()) {
+                reloadEffectSpawner.DeleteChildren();
+                SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+            }
         }
-        if (wi.FirstPersonEntity.Valid()) { 
-            wi.FirstPersonEntity["Model"]["Visible"] = false;
+        wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = false;
+    }
+    if (wi.ThirdPersonEntity.Valid()) {
+        if (IsServer) {
+            EntityWrapper reloadEffectSpawner = wi.ThirdPersonEntity.FirstChildByName("ReloadSpawner");
+            if (reloadEffectSpawner.Valid()) {
+                reloadEffectSpawner.DeleteChildren();
+                SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+            }
         }
-        if (wi.ThirdPersonEntity.Valid()) {
-            wi.ThirdPersonEntity["Model"]["Visible"] = false;
-        }
+        wi.ThirdPersonEntity["Model"]["Visible"] = false;
     }
 
     // Sound
@@ -190,7 +202,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     }
 
     // Get weapon model based on current person
-    EntityWrapper weaponModelEntity = getRelevantWeaponModelEntity(wi);
+    EntityWrapper weaponModelEntity = getRelevantWeaponEntity(wi);
     if (!weaponModelEntity.Valid()) {
         return;
     }
