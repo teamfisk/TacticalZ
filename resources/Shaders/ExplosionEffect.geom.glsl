@@ -14,10 +14,10 @@ uniform vec2 Velocity;
 uniform bool ColorByDistance;
 uniform bool ExponentialAccelaration;
 uniform bool Reverse;
+uniform float ColorDistanceScalar;
 //uniform bool Gravity;
 //uniform bool Rotation;
 //uniform bool MaxRadius;
-//uniform bool Pulsate;
 
 in VertexData{
 	vec3 Position;
@@ -146,7 +146,7 @@ void main()
 	// if explosion color should be affected by distance instead of time...
 	if (ColorByDistance == true)
 	{
-		Output.ExplosionPercentageElapsed = (length(triangleCenter2ExplosionRadius) / maxDistance) * isInsideBlastRadius;
+		Output.ExplosionPercentageElapsed = (length(triangleCenter2ExplosionRadius) / maxDistance) * isInsideBlastRadius * ColorDistanceScalar;
 	}
 	else
 	{
@@ -157,21 +157,8 @@ void main()
 	for (int i = 0; i < gl_in.length(); i++)
 	{
 		// move the triangle to the blast radius
-		//if(Reverse == false)
-		//{
-			ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * isInsideBlastRadius);
-		//}
-		//else
-		//{
-		//	// TODO:
-		//	// Remove ifs
-		//	// account for randomness
-		//	// account for velocity
-		//	// account for color
-		//	
-		//	ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * maxDistance /** (ExplosionDuration - TimeSinceDeath)*/);
-		//}
-			
+		ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * isInsideBlastRadius);
+
 		// pass through vertex data
 		PassThingsThrough(i);
 		

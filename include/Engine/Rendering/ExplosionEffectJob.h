@@ -28,6 +28,7 @@ struct ExplosionEffectJob : ModelJob
         ColorByDistance = (bool)explosionEffectComponent["ColorByDistance"];
         ExponentialAccelaration = (bool)explosionEffectComponent["ExponentialAccelaration"];
 		Reverse = (bool)explosionEffectComponent["Reverse"];
+		ColorDistanceScalar = (double)explosionEffectComponent["ColorDistanceScalar"];
     };
 
     glm::vec3 ExplosionOrigin;
@@ -39,13 +40,14 @@ struct ExplosionEffectJob : ModelJob
     glm::vec4 EndColor;
     bool Randomness = false;
     
-    float RandomnessScalar = 1.f;
+    double RandomnessScalar = 1.f;
     glm::vec2 Velocity;
     bool ColorByDistance = false;
     //bool ReverseAnimation = false;
     //bool Wireframe = false;
     bool ExponentialAccelaration = false;
 	bool Reverse = false;
+	double ColorDistanceScalar = 1.f;
 
     std::array<float, 50> RandomNumbers = {
         0.3257552917701f,

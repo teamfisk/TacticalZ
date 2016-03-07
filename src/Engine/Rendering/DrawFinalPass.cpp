@@ -1047,7 +1047,12 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 
     glUniform3fv(glGetUniformLocation(shaderHandle, "ExplosionOrigin"), 1, glm::value_ptr(job->ExplosionOrigin));
 	GLERROR("Bind 6 uniform");
-    glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), job->TimeSinceDeath);
+	if (job->Reverse == false) {
+		glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), job->TimeSinceDeath);
+	}
+	else {
+		glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), (job->ExplosionDuration - job->TimeSinceDeath));
+	}
 	GLERROR("Bind 7 uniform");
     glUniform1f(glGetUniformLocation(shaderHandle, "ExplosionDuration"), job->ExplosionDuration);
 	GLERROR("Bind 8 uniform");
@@ -1067,6 +1072,8 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 	GLERROR("Bind 15 uniform");
 	glUniform1i(glGetUniformLocation(shaderHandle, "Reverse"), job->Reverse);
 	GLERROR("Bind 15-2 uniform");
+	glUniform1f(glGetUniformLocation(shaderHandle, "ColorDistanceScalar"), job->ColorDistanceScalar);
+	GLERROR("Bind 15-3 uniform");
 
     glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(job->Color));
 	GLERROR("Bind 16 uniform");

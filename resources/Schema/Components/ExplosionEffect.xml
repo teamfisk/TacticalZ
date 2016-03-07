@@ -11,9 +11,9 @@
 	<RandomnessScalar>1</RandomnessScalar>
 	<Velocity X="2" Y="2"/>
 	<ColorByDistance>0</ColorByDistance>
-	<!--<ReverseAnimation>0</ReverseAnimation>-->
 	<!--<Wireframe>0</Wireframe>-->
 	<ExponentialAccelaration>0</ExponentialAccelaration>
 	<Pulsate>0</Pulsate>
 	<Reverse>0</Reverse>
+	<ColorDistanceScalar>1</ColorDistanceScalar>
 </ExplosionEffect>

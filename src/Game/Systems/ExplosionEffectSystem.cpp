@@ -9,7 +9,7 @@ void ExplosionEffectSystem::UpdateComponent(EntityWrapper& entity, ComponentWrap
 		}
 	}
 
-	//((glm::vec2)component["Velocity"]).x = min(((glm::vec2)component["Velocity"]).x, ((glm::vec2)component["Velocity"]).y);
+	//((glm::vec2&)component["Velocity"]).x = glm::min(((glm::vec2)component["Velocity"]).x, ((glm::vec2)component["Velocity"]).y);
 
 	(double&)component["TimeSinceDeath"] += dt;
 
