@@ -45,7 +45,7 @@ void InputProxy::Update(double dt)
     }
 }
 
-void InputProxy::Process()
+void InputProxy::Process(bool suppressNewEvents /*= false*/)
 {
     for (auto& pair : m_CommandHandlers) {
         const std::string& command = pair.first;
@@ -62,8 +62,10 @@ void InputProxy::Process()
             e.PlayerID = -1;
             e.Command = command;
             e.Value = currentValue;
-            m_EventBroker->Publish(e);
-            //LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+            if (!suppressNewEvents || e.Value == 0) {
+                m_EventBroker->Publish(e);
+                LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+            }
             m_LastCommandValues[command] = currentValue;
         }
     }
@@ -78,8 +80,10 @@ void InputProxy::Process()
             e.Value += value;
         }
         //e.Value = std::max(-1.f, std::min(e.Value, 1.f));
-        m_EventBroker->Publish(e);
-        //LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+        if (!suppressNewEvents || e.Value == 0) {
+            m_EventBroker->Publish(e);
+            LOG_DEBUG("Input: Published command %s=%f for player %i", e.Command.c_str(), e.Value, e.PlayerID);
+        }
     }
     m_CommandQueue.clear();
 }
