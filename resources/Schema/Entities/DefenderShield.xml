@@ -2,36 +2,36 @@
 <Entity name="Shield" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:Blend>
+      <Pose1>Deploy</Pose1>
+      <Pose2>Idle</Pose2>
+      <Weight>0</Weight>
+    </c:Blend>
+    <c:Model>
+      <Resource>Models/Characters/Defender/DefenderShield.mesh</Resource>
+    </c:Model>
     <c:Transform/>
   </Components>
 
   <Children>
-    <Entity name="Shield">
+    <Entity name="Deploy">
       <Components>
-        <c:Model>
-          <Resource>Models/Core/UnitPlane.mesh</Resource>
-        </c:Model>
-        <c:Shield/>
-        <c:Transform>
-          <Scale X="1.11800003" Y="0.0320000015" Z="1.9180001"/>
-          <Orientation X="-1.57079995" Y="0" Z="0"/>
-        </c:Transform>
+        <c:Animation>
+          <AnimationName>ActivateDeactiveShieldF</AnimationName>
+          <Time>1</Time>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:Transform/>
       </Components>
       <Children/>
     </Entity>
-    <Entity name="VisibleSide">
+    <Entity name="Idle">
       <Components>
-        <c:Shielded/>
-        <c:Model>
-          <Resource>Models/Core/UnitHexagon.mesh</Resource>
-          <Color A="0" B="1" G="0" R="0"/>
-          <Transparent>true</Transparent>
-        </c:Model>
-        <c:Transform>
-          <Position X="0" Y="0" Z="0.0179871861"/>
-          <Scale X="1.01900005" Y="0.0120000001" Z="1.91000009"/>
-          <Orientation X="-1.57079995" Y="0" Z="0"/>
-        </c:Transform>
+        <c:Animation>
+          <AnimationName>ShieldFrontF</AnimationName>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:Transform/>
       </Components>
       <Children/>
     </Entity>

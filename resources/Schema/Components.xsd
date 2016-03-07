@@ -33,7 +33,6 @@
 	<xs:include schemaLocation="Components/HiddenForLocalPlayer.xsd"/>
 	<xs:include schemaLocation="Components/HealthPickup.xsd"/>
 	<xs:include schemaLocation="Components/AmmoPickup.xsd"/>
-	<xs:include schemaLocation="Components/AnimationOffset.xsd"/>
 	<xs:include schemaLocation="Components/DashAbility.xsd"/>
 	<xs:include schemaLocation="Components/ShieldAbility.xsd"/>
 	<xs:include schemaLocation="Components/SprintAbility.xsd"/>
@@ -45,9 +44,12 @@
 	<xs:include schemaLocation="Components/Sprite.xsd"/>
 	<xs:include schemaLocation="Components/Shielded.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointHUD.xsd"/>
-	<xs:include schemaLocation="Components/AmmunitionHUD.xsd"/>
+	<xs:include schemaLocation="Components/TextFieldReader.xsd"/>
 	<xs:include schemaLocation="Components/Menu.xsd"/>
 	<xs:include schemaLocation="Components/KillFeed.xsd"/>
+	<xs:include schemaLocation="Components/BlendOverride.xsd"/>
+	<xs:include schemaLocation="Components/Blend.xsd"/>
+	<xs:include schemaLocation="Components/BlendAdditive.xsd"/>
 	<xs:include schemaLocation="Components/Page.xsd"/>
 	<xs:include schemaLocation="Components/SpriteIndicator.xsd"/>
 	<xs:include schemaLocation="Components/Button.xsd"/>
@@ -55,8 +57,12 @@
 	<xs:include schemaLocation="Components/DoubleJump.xsd"/>
 	<xs:include schemaLocation="Components/WeaponAttachment.xsd"/>
 	<xs:include schemaLocation="Components/DefenderWeapon.xsd"/>
+	<xs:include schemaLocation="Components/SidearmWeapon.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointGameMode.xsd"/>
 	<xs:include schemaLocation="Components/CapturePointArrowHUD.xsd"/>
 	<xs:include schemaLocation="Components/FloatingEffect.xsd"/>
 	<xs:include schemaLocation="Components/BoostIconsHUD.xsd"/>
+	<xs:include schemaLocation="Components/InputCmdButton.xsd"/>
+	<xs:include schemaLocation="Components/ScoreScreen.xsd"/>
+	<xs:include schemaLocation="Components/ScoreIdentity.xsd"/>
 </xs:schema>

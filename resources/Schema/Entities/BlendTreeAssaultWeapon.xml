@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="PrimaryBlendTree" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Blend>
+      <Pose1>Idle</Pose1>
+      <Pose2>WeaponAction</Pose2>
+      <Weight>0</Weight>
+      <SubTreeRoot>true</SubTreeRoot>
+    </c:Blend>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="WeaponAction">
+      <Components>
+        <c:Blend>
+          <Pose1>Fire</Pose1>
+          <Pose2>Reload</Pose2>
+          <Weight>1</Weight>
+        </c:Blend>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Fire">
+          <Components>
+            <c:Animation>
+              <AnimationName>ShootShotgunF</AnimationName>
+              <Speed>1</Speed>
+              <Play>true</Play>
+              <Loop>false</Loop>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Reload">
+          <Components>
+            <c:Animation>
+              <AnimationName>ReloadSwitchF</AnimationName>
+              <Time>0.58991607886241582</Time>
+              <Speed>1</Speed>
+              <Play>true</Play>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Idle">
+      <Components>
+        <c:Animation>
+          <AnimationName>IdleF</AnimationName>
+          <Time>0.14837891922093149</Time>
+          <Speed>1</Speed>
+          <Play>true</Play>
+        </c:Animation>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>
