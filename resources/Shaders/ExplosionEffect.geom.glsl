@@ -157,20 +157,20 @@ void main()
 	for (int i = 0; i < gl_in.length(); i++)
 	{
 		// move the triangle to the blast radius
-		if(Reverse == false)
-		{
+		//if(Reverse == false)
+		//{
 			ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * isInsideBlastRadius);
-		}
-		else
-		{
-			// TODO:
-			// Remove ifs
-			// account for randomness
-			// account for velocity
-			// account for color
-			
-			ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * maxDistance /** (ExplosionDuration - TimeSinceDeath)*/);
-		}
+		//}
+		//else
+		//{
+		//	// TODO:
+		//	// Remove ifs
+		//	// account for randomness
+		//	// account for velocity
+		//	// account for color
+		//	
+		//	ExplodedPosition = Input[i].Position + (triangleCenter2ExplosionRadius * maxDistance /** (ExplosionDuration - TimeSinceDeath)*/);
+		//}
 			
 		// pass through vertex data
 		PassThingsThrough(i);
