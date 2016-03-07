@@ -233,7 +233,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 	
 }
 
-void DrawFinalPass::Draw(RenderScene& scene)
+void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 {
     GLERROR("Pre");
 	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer.GetHandle());
@@ -279,6 +279,11 @@ void DrawFinalPass::Draw(RenderScene& scene)
 	state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	DrawModelRenderQueuesWithShieldCheck(scene.Jobs.TransparentObjects, scene); //might need changing
     GLERROR("Shielded Transparent objects");
+
+    //Generate blur texture.
+    m_FullBlurredTexture = blurHUDPass->Draw(m_SceneTexture, scene);
+    //Combine nonblur and blur texture
+    m_CombinedTexture = blurHUDPass->CombineTextures(m_SceneTexture, m_FullBlurredTexture);
 
 	//Draw Transparen objects
 	//state->BlendFunc(GL_ONE, GL_ONE);
