@@ -283,7 +283,6 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
     //Generate blur texture.
     m_FullBlurredTexture = blurHUDPass->Draw(m_SceneTexture, scene);
     //Combine nonblur and blur texture
-    m_CombinedTexture = blurHUDPass->CombineTextures(m_SceneTexture, m_FullBlurredTexture);
 
 	//Draw Transparen objects
 	//state->BlendFunc(GL_ONE, GL_ONE);
@@ -292,6 +291,7 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 	GLERROR("TransparentObjects");
 	//state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	DrawSprites(scene.Jobs.SpriteJob, scene);
+
 	GLERROR("SpriteJobs");
 
 	delete state;
