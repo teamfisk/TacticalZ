@@ -70,7 +70,7 @@ void EditorSystem::Update(double dt)
         m_EditorGUI->Draw();
         m_EditorStats->Draw(actualDelta);
 
-        if (IsAnyParentMissingTransform(m_CurrentSelection.ID)) {
+        if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
             return;
         }
         if (m_CurrentSelection.Valid() && m_Widget.Valid()) {
@@ -205,7 +205,7 @@ bool EditorSystem::OnMousePress(const Events::MousePress& e)
 bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
 {
     if (m_CurrentSelection.Valid()) {
-        if (IsAnyParentMissingTransform(m_CurrentSelection.ID)) {
+        if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
             return false;
         }
         if (m_WidgetSpace == EditorGUI::WidgetSpace::Global) {
@@ -308,7 +308,7 @@ void EditorSystem::setWidgetMode(EditorGUI::WidgetMode mode)
     m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
 }
 
-bool EditorSystem::IsAnyParentMissingTransform(EntityID entityID)
+bool EditorSystem::isAnyParentMissingTransform(EntityID entityID)
 {
     EntityWrapper entity(m_World, entityID);
     while (entity.Parent().Valid()) {
