@@ -1,5 +1,7 @@
 #version 430
 
+#define MAX_SPLITS 4
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -22,6 +24,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input[];
 
 out VertexData{
@@ -32,6 +35,7 @@ out VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Output;
 
 layout(triangles) in;
@@ -145,6 +149,7 @@ void main()
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
 			Output.Tangent = Input[i].Tangent;
 			Output.BiTangent = Input[i].BiTangent;
+			Output.PositionLightSpace = Input[i].PositionLightSpace;
 			
 			// convert to model space for the gravity to always be in -y
 			vec4 ExplodedPositionInModelSpace = M * vec4(ExplodedPosition, 1.0);
@@ -186,6 +191,7 @@ void main()
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
 			Output.Tangent = Input[i].Tangent;
 			Output.BiTangent = Input[i].BiTangent;
+			Output.PositionLightSpace = Input[i].PositionLightSpace;
 
 			// no change in position, pass through vertex
 			gl_Position = gl_in[i].gl_Position;
