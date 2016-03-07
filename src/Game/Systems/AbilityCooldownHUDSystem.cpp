@@ -47,19 +47,36 @@ void AbilityCooldownHUDSystem::Update(double dt)
         }
 
         EntityWrapper cooldownTextEntity = entity.FirstChildByName("Cooldown");
+        //TODO: Fix so this track correctly for shield and sprint depending on how they work.
+        double maxAbilityCD, currentAbilityCD;
 
-        double maxAbilityCD = (double)abilityEntity[abilityName]["CoolDownMaxTimer"];
-        double currentAbilityCD = (double)abilityEntity[abilityName]["CoolDownTimer"];
-        currentAbilityCD = currentAbilityCD >= 0.0 ? currentAbilityCD : 0.0;
+        if (abilityName == "DashAbility") {
+            maxAbilityCD = (double)abilityEntity[abilityName]["CoolDownMaxTimer"];
+            currentAbilityCD = (double)abilityEntity[abilityName]["CoolDownTimer"];
+            currentAbilityCD = currentAbilityCD >= 0.0 ? currentAbilityCD : 0.0;
 
-        if (cooldownTextEntity.Valid()) {
-            if (cooldownTextEntity.HasComponent("Text")) {
-                std::string t = (std::string&)cooldownTextEntity["Text"]["Content"] = std::to_string(currentAbilityCD).substr(0, 3);
+            if (cooldownTextEntity.Valid()) {
+                if (cooldownTextEntity.HasComponent("Text")) {
+                    std::string t = (std::string&)cooldownTextEntity["Text"]["Content"] = std::to_string(currentAbilityCD).substr(0, 3);
+                }
             }
+        }
+
+        if (abilityName == "ShieldAbility") {
+            maxAbilityCD = 0.0;
+            currentAbilityCD = 1 - (bool)abilityEntity[abilityName]["Active"];
+        }
+
+        if (abilityName == "SprintAbility") {
+            maxAbilityCD = 0.0;
+            currentAbilityCD = 1 - (bool)abilityEntity[abilityName]["Active"];
         }
 
         if (entity.HasComponent("Fill")) {
             entity["Fill"]["Percentage"] = currentAbilityCD/maxAbilityCD;
         }
+
+
+
     }
 }
