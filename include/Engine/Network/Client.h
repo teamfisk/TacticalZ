@@ -52,7 +52,7 @@ public:
     void Connect(std::string address, int port);
     void Update() override;
 private:
-    //UDPClient m_Unreliable;
+    UDPClient m_Unreliable;
     TCPClient m_Reliable;
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();

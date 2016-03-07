@@ -49,16 +49,17 @@ void Client::Connect(std::string address, int port)
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    //while (m_Unreliable.IsSocketAvailable()) {
-    //    // Packet will get real data in receive
-    //    Packet packet(MessageType::Invalid);
-    //    m_Unreliable.Receive(packet);
-    //    if (packet.GetMessageType() == MessageType::Connect) {
-    //        parseUDPConnect(packet);
-    //    } else {
-    //        parseMessageType(packet);
-    //    }
-    //}
+    while (m_Unreliable.IsSocketAvailable()) {
+        // Packet will get real data in receive
+        Packet packet(MessageType::Invalid);
+        m_Unreliable.Receive(packet);
+        if (packet.GetMessageType() == MessageType::Connect) {
+            parseUDPConnect(packet);
+        } else {
+            parseMessageType(packet);
+        }
+    }
+
     while (m_Reliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -162,6 +163,7 @@ void Client::parseMessageType(Packet& packet)
 void Client::parseUDPConnect(Packet& packet)
 {
     // Map ServerEntityID and your PlayerID
+    // TODO: If this is not received send a new connect message.
     LOG_INFO("I be connected PogChamp");
 }
 
@@ -179,12 +181,12 @@ void Client::parseTCPConnect(Packet& packet)
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
     // parse player id and other stuff
     m_PlayerID = packet.ReadPrimitive<int>();
-    m_PlayerID = packet.ReadPrimitive<int>();
     LOG_INFO("A Player connected");
+    // TODO: If this is not received send a new connect message.
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
-    //  m_Unreliable.Send(packet);
+    m_Unreliable.Send(packet);
      //  LOG_INFO("Sent UDP Connect Server");
 }
 
@@ -483,7 +485,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
             m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
-            //    m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
+            m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -620,7 +622,7 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
 
-    m_Reliable.Send(packet);
+    m_Unreliable.Send(packet);
 }
 
 void Client::identifyPacketLoss()
