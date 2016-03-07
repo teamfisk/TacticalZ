@@ -18,8 +18,6 @@ bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
         return false;
     }
 
-    LOG_DEBUG("------ Player #%i died.", e.Player.ID);
-
     createDeathEffect(e.Player);
 
     // Delete player
@@ -38,7 +36,6 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     auto playerModel = player.FirstChildByName("PlayerModel");
     if (!playerModel.Valid() || !playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
         if (player == LocalPlayer) {
-            LOG_DEBUG("------ LocalPlayer's death effect could not be spawned, setting to spectator instead of death cam.");
             setSpectatorCamera();
         }
         return;
@@ -58,7 +55,6 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 
     //camera (with lifetime) behind the player
     if (player == LocalPlayer) {
-        LOG_DEBUG("------ LocalPlayer's death effect spawning, setting to death camera.");
         m_LocalPlayerDeathEffect = deathEffectEW;
         auto cam = deathEffectEW.FirstChildByName("Camera");
         Events::SetCamera eSetCamera;
@@ -76,10 +72,7 @@ bool PlayerDeathSystem::OnEntityDeleted(Events::EntityDeleted& e)
 
     // If the player hasn't spawned already, activate the spectator camera.
     if (!LocalPlayer.Valid()) {
-        LOG_DEBUG("------ LocalPlayer's death effect removed, setting to spectator.");
         setSpectatorCamera();
-    } else {
-        LOG_DEBUG("------ LocalPlayer's death effect removed, player is already spawned, not setting spectator.");
     }
     return true;
 }

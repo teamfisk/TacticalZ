@@ -59,16 +59,16 @@ void PlayerSpawnSystem::Update(double dt)
         return;
     }
 
-    int numHandledRequests = 0;
-    int playersStillPickingClass = 0;
+    int numSpawnedPlayers = 0;
+    int playersSpectating = 0;
     const int numRequestsToHandle = (int)m_SpawnRequests.size();
     for (auto it = m_SpawnRequests.begin(); it != m_SpawnRequests.end(); ++it) {
-        // TODO: -1 Signifies no class picked, enum here later?
+        // TODO: -1 Signifies no class picked, or they are a spectator, enum here later?
         // It is valid if they didn't pick class yet
         // but don't spawn anything, goto next spawnrequest.
         if (it->Class == -1) {
-            ++playersStillPickingClass;
-            break;
+            ++playersSpectating;
+            continue;
         }
         for (auto& cPlayerSpawn : *playerSpawns) {
             EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
@@ -80,13 +80,6 @@ void PlayerSpawnSystem::Update(double dt)
             if (spawner.HasComponent("Team")) {
                 auto cSpawnerTeam = spawner["Team"];
                 if ((int)cSpawnerTeam["Team"] != it->Team) {
-                    // It is valid if someone picks spectator
-                    // but don't spawn anything, goto next spawnrequest.
-                    if (it->Team == (int)cSpawnerTeam["Team"].Enum("Spectator")) {
-                        ++numHandledRequests;
-                        it = m_SpawnRequests.erase(it);
-                        break;
-                    }
                     continue;
                 }
             }
@@ -104,9 +97,7 @@ void PlayerSpawnSystem::Update(double dt)
             e.Player = player;
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
-            Events::LockMouse lock;
-            m_EventBroker->Publish(lock);
-            ++numHandledRequests;
+            ++numSpawnedPlayers;
             it = m_SpawnRequests.erase(it);
             break;
         }
@@ -114,11 +105,11 @@ void PlayerSpawnSystem::Update(double dt)
             break;
         }
     }
-    if (numHandledRequests != numRequestsToHandle - playersStillPickingClass) {
-        LOG_DEBUG("%i players were supposed to be spawned or set as spectator, but only %i was handled.", numRequestsToHandle, numHandledRequests);
+    if (numSpawnedPlayers != numRequestsToHandle - playersSpectating) {
+        LOG_DEBUG("%i players were supposed to be spawned, but only %i was successfully.", numRequestsToHandle - playersSpectating, numSpawnedPlayers);
     } else {
-        std::string dbg = numHandledRequests != 0 ? std::to_string(numHandledRequests) + " players were spawned or set as spectator. " : "";
-        dbg += playersStillPickingClass != 0 ? std::to_string(playersStillPickingClass) + " players are still picking class and will be spawned later." : "";
+        std::string dbg = numSpawnedPlayers != 0 ? std::to_string(numSpawnedPlayers) + " players were spawned. " : "";
+        dbg += playersSpectating != 0 ? std::to_string(playersSpectating) + " players are spectating/picking class. " : "";
         LOG_DEBUG(dbg.c_str());
     }
 }
@@ -162,10 +153,8 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         // If player is in queue to spawn, then change their team affiliation or class in the request.
         if (e.Command == "PickTeam") {
             iter->Team = (ComponentInfo::EnumType)e.Value;
-            LOG_DEBUG("old spawn request setting Team");
         } else {
             iter->Class = (ComponentInfo::EnumType)e.Value;
-            LOG_DEBUG("old spawn request setting Class");
         }
     } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
         // If player is not in queue to spawn, then create a spawn request, 
@@ -175,13 +164,11 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         if (e.Command == "PickTeam") {
             req.Team = (ComponentInfo::EnumType)e.Value;
             req.Class = -1;         // TODO: -1 Signifies no class picked, enum here later?
-            LOG_DEBUG("new spawn request setting Team");
         } else {
             // Should never get here, since you should have picked a team before you ever get a chance to pick class.
             LOG_WARNING("Sequence error: Should not be able to pick class before team");
             req.Team = 1;           // TODO: 1 Signifies spectator, should probably have real enum here later.
             req.Class = (ComponentInfo::EnumType)e.Value;
-            LOG_DEBUG("new spawn request setting Class");
         }
         m_SpawnRequests.push_back(req);
     } else {
@@ -217,6 +204,8 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         Events::SetCamera e;
         e.CameraEntity = cameraEntity;
         m_EventBroker->Publish(e);
+        Events::LockMouse lock;
+        m_EventBroker->Publish(lock);
     }
 
     // HACK: Set the player model color to team color
