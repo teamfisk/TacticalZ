@@ -16,7 +16,7 @@ class DrawFinalPass
 {
 public:
     DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass);
-    ~DrawFinalPass() { }
+	~DrawFinalPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();

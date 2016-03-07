@@ -12,6 +12,14 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
     InitializeFrameBuffers();
 }
 
+DrawFinalPass::~DrawFinalPass(){
+	CommonFunctions::DeleteTexture(&m_BloomTexture);
+	CommonFunctions::DeleteTexture(&m_SceneTexture);
+	CommonFunctions::DeleteTexture(&m_DepthBuffer);
+	CommonFunctions::DeleteTexture(&m_ShieldBuffer);
+	CommonFunctions::DeleteTexture(&m_CubeMapTexture);
+}
+
 void DrawFinalPass::InitializeTextures()
 {
     m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);

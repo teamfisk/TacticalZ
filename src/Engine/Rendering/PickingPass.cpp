@@ -12,7 +12,8 @@ PickingPass::PickingPass(IRenderer* renderer, EventBroker* eb)
 
 PickingPass::~PickingPass()
 {
-
+	CommonFunctions::DeleteTexture(&m_PickingTexture);
+	CommonFunctions::DeleteTexture(&m_DepthBuffer);
 }
 
 

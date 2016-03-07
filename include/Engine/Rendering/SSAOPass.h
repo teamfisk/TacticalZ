@@ -14,7 +14,7 @@ class SSAOPass
 {
 public:
 	SSAOPass(IRenderer* renderer, ConfigFile* config);
-	~SSAOPass() { };
+	~SSAOPass();
 
 	void ChangeQuality(int quality);
 

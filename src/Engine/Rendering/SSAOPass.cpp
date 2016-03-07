@@ -10,6 +10,13 @@ SSAOPass::SSAOPass(IRenderer* renderer, ConfigFile* config)
 
 }
 
+SSAOPass::~SSAOPass() {
+	CommonFunctions::DeleteTexture(&m_SSAOTexture);
+	CommonFunctions::DeleteTexture(&m_SSAOViewSpaceZTexture);
+	CommonFunctions::DeleteTexture(&m_Gaussian_horiz);
+	CommonFunctions::DeleteTexture(&m_Gaussian_vert);
+}
+
 void SSAOPass::ChangeQuality(int quality)
 {
 	if (m_Quality == quality) {
