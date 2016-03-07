@@ -36,6 +36,9 @@
 				<xs:element name="GlowIntensity" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Intensity of the glow map</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Shadow" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Whether the object cast/recieve shadows or not</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

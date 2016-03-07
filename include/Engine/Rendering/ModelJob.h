@@ -18,7 +18,7 @@
 
 struct ModelJob : RenderJob
 {
-    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded)
+    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded, bool shadow)
         : RenderJob()
     {
         Model = model;
@@ -114,6 +114,7 @@ struct ModelJob : RenderJob
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
         Depth = worldpos.z;
         World = world;
+		Shadow = shadow;
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;
@@ -182,6 +183,8 @@ struct ModelJob : RenderJob
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;
 	bool IsShielded;
+	bool Shadow;
+
     void CalculateHash() override
     {
         Hash = ShaderID << 20 + ModelID << 10 + TextureID;

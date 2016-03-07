@@ -24,6 +24,13 @@ RenderBuffer::~RenderBuffer()
     }
 }
 
+Texture2DArray::~Texture2DArray()
+{
+	if (m_ResourceHandle != 0) {
+		glDeleteTextures(1, m_ResourceHandle);
+	}
+}
+
 
 FrameBuffer::~FrameBuffer()
 {

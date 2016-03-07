@@ -149,9 +149,9 @@ void main()
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
 			Output.Tangent = Input[i].Tangent;
 			Output.BiTangent = Input[i].BiTangent;
-			for (int i = 0; i < MAX_SPLITS; i++)
+			for (int j = 0; j < MAX_SPLITS; j++)
 			{
-				Output.PositionLightSpace[i] = Input[i].PositionLightSpace[i];
+				Output.PositionLightSpace[j] = Input[i].PositionLightSpace[j];
 			}
 			
 			// convert to model space for the gravity to always be in -y
@@ -194,9 +194,9 @@ void main()
 			Output.TextureCoordinate = Input[i].TextureCoordinate;
 			Output.Tangent = Input[i].Tangent;
 			Output.BiTangent = Input[i].BiTangent;
-			for (int i = 0; i < MAX_SPLITS; i++)
+			for (int j = 0; j < MAX_SPLITS; j++)
 			{
-				Output.PositionLightSpace[i] = Input[i].PositionLightSpace[i];
+				Output.PositionLightSpace[j] = Input[i].PositionLightSpace[j];
 			}
 
 			// no change in position, pass through vertex

@@ -131,7 +131,7 @@ void ShadowPass::InitializeFrameBuffers()
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_DepthMap);
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits);
 
-	glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+	//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -141,7 +141,7 @@ void ShadowPass::InitializeFrameBuffers()
 	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, glm::vec4(1.f).data);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-	m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
+	m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2DArray(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
 	m_DepthBuffer.Generate();
 
 	GLERROR("depthMap failed END");
@@ -241,6 +241,10 @@ void ShadowPass::Draw(RenderScene & scene)
 						if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob)) {
 							auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
+							if (!modelJob->Shadow) {
+								continue;
+							}
+
 							glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 							glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), 1.f);
 
@@ -256,6 +260,10 @@ void ShadowPass::Draw(RenderScene & scene)
 						for (auto &objectJob : scene.Jobs.TransparentObjects) {
 							if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob)) {
 								auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
+
+								if (!modelJob->Shadow) {
+									continue;
+								}
 
 								glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 								glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);

@@ -344,11 +344,10 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_SSAOPass->SSAOTexture());
 
-	glActiveTexture(GL_TEXTURE13);
+	glActiveTexture(GL_TEXTURE30);
 	if (m_ShadowPass->DepthMap() != NULL) {
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_ShadowPass->DepthMap());
-	}
-	else {
+	} else {
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_WhiteTexture->m_Texture);
 	}
 

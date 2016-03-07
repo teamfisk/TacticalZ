@@ -27,7 +27,7 @@ layout (binding = 2) uniform sampler2D NormalMapTexture;
 layout (binding = 3) uniform sampler2D SpecularMapTexture;
 layout (binding = 4) uniform sampler2D GlowMapTexture;
 layout (binding = 5) uniform samplerCube CubeMap;
-layout (binding = 13) uniform sampler2DArrayShadow DepthMap;
+layout (binding = 30) uniform sampler2DArrayShadow DepthMap;
 
 #define TILE_SIZE 16
 
