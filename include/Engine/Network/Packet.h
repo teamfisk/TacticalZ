@@ -16,7 +16,8 @@ public:
     Packet(char* data, const size_t sizeOfPacket);
     Packet(MessageType type);
     ~Packet();
-    void Init(MessageType type, unsigned int& packetID);
+    void Init(MessageType type, unsigned int& packetID,
+        int sequenceNumber, int totalAmountOfPackets);
 
     // Add primitive types like int, float, char...
     template<typename T>

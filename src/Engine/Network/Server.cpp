@@ -107,8 +107,10 @@ void Server::Update()
 
 void Server::parseMessageType(Packet& packet)
 {
-    // Pop packetSize which is used by TCP Client to
+    // Pop packetSize, sequenceNumber and packetsInSequence.
     // create a packet of the correct size
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
     packet.ReadPrimitive<int>();
 
     int messageType = packet.ReadPrimitive<int>(); // Read what type off message was sent from server
@@ -322,8 +324,10 @@ void Server::checkForTimeOuts()
 
 //void Server::parseUDPConnect(Packet & packet)
 //{
-//    // Pop size of message int
-//    packet.ReadPrimitive<int>();
+// Pop packetSize, sequenceNumber and packetsInSequence.
+//packet.ReadPrimitive<int>();
+//packet.ReadPrimitive<int>();
+//packet.ReadPrimitive<int>();
 //    int messageType = packet.ReadPrimitive<int>();
 //    // Read packet ID 
 //    m_PreviousPacketID = m_PacketID;    // Set previous packet id
@@ -345,8 +349,11 @@ void Server::checkForTimeOuts()
 
 void Server::parseTCPConnect(Packet & packet)
 {
-    // Pop size of message int
+    // Pop packetSize, sequenceNumber and packetsInSequence.
     packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+
     int messageType = packet.ReadPrimitive<int>();
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id

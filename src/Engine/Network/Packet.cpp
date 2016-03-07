@@ -3,7 +3,7 @@
 Packet::Packet(MessageType type, unsigned int& packetID)
 {
     m_Data = new char[m_MaxPacketSize];
-    Init(type, packetID);
+    Init(type, packetID, 1, 1);
 }
 
 // Create message
@@ -21,7 +21,7 @@ Packet::Packet(MessageType type)
 {
     m_Data = new char[m_MaxPacketSize];
     unsigned int dummy = 0;
-    Init(type, dummy);
+    Init(type, dummy, 1, 1);
 }
 
 Packet::~Packet()
@@ -29,13 +29,17 @@ Packet::~Packet()
     delete[] m_Data;
 }
 
-void Packet::Init(MessageType type, unsigned int & packetID)
+void Packet::Init(MessageType type, unsigned int & packetID,
+    int sequenceNumber, int totalAmountOfPackets)
 {
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
-    // allocate memory for size of packet(only used in tcp)
+    // allocate memory for size of packet, sequenceNumber and totalPacketesInSequence
     WritePrimitive<int>(0);
+    WritePrimitive(sequenceNumber);
+    WritePrimitive(totalAmountOfPackets);
+    // If you add things before here be sure to change in GetMessageType()
     // Add message type
     int messageType = static_cast<int>(type);
     WritePrimitive<int>(messageType);
@@ -129,7 +133,7 @@ void Packet::ChangePacketID(unsigned int & packetID)
 MessageType Packet::GetMessageType()
 {
     MessageType messagType;
-    memcpy(&messagType, m_Data + sizeof(int), sizeof(int));
+    memcpy(&messagType, m_Data + 3 * sizeof(int), sizeof(int));
     return messagType;
 }
 
