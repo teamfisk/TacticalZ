@@ -21,11 +21,11 @@
     <Entity name="ScoreBoard_Spectators">
       <Components>
         <c:ScoreScreen>
-          <Offset X="0" Y="-1" Z="0"/>
+          <Offset X="0" Y="-2" Z="0"/>
         </c:ScoreScreen>
         <c:Team/>
         <c:Transform>
-          <Position X="0" Y="-14" Z="1.5"/>
+          <Position X="0" Y="-15.7886772" Z="1.5"/>
         </c:Transform>
       </Components>
       <Children/>

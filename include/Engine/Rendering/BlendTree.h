@@ -62,6 +62,7 @@ public:
         double progress;
         bool Start;
         bool SingleBlend;
+        double Weight;
         std::unordered_map<EntityWrapper, double> StartWeights;
     };
 

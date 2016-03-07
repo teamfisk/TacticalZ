@@ -49,8 +49,6 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     //copy the data from player to explosioneffectmodel
     playerEntityModel.Copy(deathEffectEW["Model"]);
     playerEntityAnimation.Copy(deathEffectEW["Animation"]);
-    //freeze the animation
-    deathEffectEW["Animation"]["Speed"] = 0.0;
 
     //copy the models position,orientation
     deathEffectEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
