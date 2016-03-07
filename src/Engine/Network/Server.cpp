@@ -641,7 +641,7 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    return childEntity.HasComponent("NetworkComponent") ||childEntity.FirstParentWithComponent("Player").Valid();
+    return childEntity.HasComponent("NetworkComponent") || childEntity.FirstParentWithComponent("NetworkComponent").Valid();
 }
 
 PlayerID Server::getPlayerIDFromEndpoint()
