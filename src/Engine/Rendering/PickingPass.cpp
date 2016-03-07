@@ -19,15 +19,16 @@ PickingPass::~PickingPass()
 
 void PickingPass::InitializeTextures()
 {
-    GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
+    CommonFunctions::GenerateTexture(&m_PickingTexture, GL_CLAMP_TO_BORDER, GL_LINEAR,
         glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RG8, GL_RG, GL_UNSIGNED_BYTE);
 
-	GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+	CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
+		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 }
 
 void PickingPass::InitializeFrameBuffers()
 {
+
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_ATTACHMENT)));
     m_PickingBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_PickingTexture, GL_COLOR_ATTACHMENT0)));
     m_PickingBuffer.Generate();
@@ -103,16 +104,15 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
-                if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-
-                    std::vector<glm::mat4> frameBones;
-                    if (modelJob->AnimationOffset.animation != nullptr) {
-                        frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-                    } else {
-                        frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-                    }
-                    glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                std::vector<glm::mat4> frameBones;
+				if (modelJob->BlendTree != nullptr) {
+                    frameBones = modelJob->BlendTree->GetFinalPose();
+                } else {
+                    frameBones = modelJob->Skeleton->GetTPose();
                 }
+                glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+
             } else {
                 m_PickingProgram->Bind();
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
@@ -161,13 +161,11 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
-                std::vector<glm::mat4> frameBones;
-                if (modelJob->AnimationOffset.animation != nullptr) {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-                } else {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                if (modelJob->BlendTree != nullptr) {
+                    std::vector<glm::mat4> frameBones;
+                    frameBones = modelJob->BlendTree->GetFinalPose();
+                    glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                 }
-                glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
             } else {
                 m_PickingProgram->Bind();
                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
@@ -217,11 +215,12 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
                 std::vector<glm::mat4> frameBones;
-                if (modelJob->AnimationOffset.animation != nullptr) {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                if (modelJob->BlendTree != nullptr) {
+                    frameBones = modelJob->BlendTree->GetFinalPose();
                 } else {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                    frameBones = modelJob->Skeleton->GetTPose();
                 }
+
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
             } else {
@@ -321,16 +320,10 @@ void PickingPass::Draw(RenderScene& scene)
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
-                if (modelJob->Model->m_RawModel->m_Skeleton != nullptr) {
-
+                if (modelJob->BlendTree != nullptr) {
                     std::vector<glm::mat4> frameBones;
-                    if (modelJob->AnimationOffset.animation != nullptr) {
-                        frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-                    } else {
-                        frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-                    }
+                    frameBones = modelJob->BlendTree->GetFinalPose();
                     glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
                 }
             } else {
                 m_PickingProgram->Bind();
@@ -366,7 +359,7 @@ void PickingPass::ClearPicking()
 
     m_PickingBuffer.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     m_PickingBuffer.Unbind();
     GLERROR("END");
 }
@@ -406,17 +399,4 @@ PickData PickingPass::Pick(glm::vec2 screenCoord)
     pickData.Camera = pickInfo.Camera;
     pickData.World = pickInfo.World;
     return pickData;
-}
-
-void PickingPass::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const
-{
-    //TODO: Renderer: Make this in a sparate class
-    glGenTextures(1, texture);
-    glBindTexture(GL_TEXTURE_2D, *texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
-    GLERROR("Texture initialization failed");
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="SprintAbility">
+		<xs:annotation>
+			<xs:documentation>A sprint component for one of the classes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="StrengthOfEffect" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>This is the strength of the sprint effect</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Active" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>True if currently sprinting.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

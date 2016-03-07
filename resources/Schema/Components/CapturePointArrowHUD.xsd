@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+	<xs:element name="CapturePointArrowHUD">
+		<xs:annotation>
+			<xs:documentation>HUD element for tracking next capturable Capture Point.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="CurrentTarget" type="t:int" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Corresponds to the current capturepoint the arrow points Towards</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -2,6 +2,7 @@
 #include "Core/UniformScaleSystem.h"
 #include "Editor/EditorRenderSystem.h"
 #include "Editor/EditorWidgetSystem.h"
+#include "Core/EntityFile.h"
 
 EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
     : System(params)
@@ -18,7 +19,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Camera");
-    m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1);
+    m_EditorCameraInputController = new EditorCameraInputController<EditorSystem>(m_EventBroker, -1, EntityWrapper::Invalid);
 
     m_EditorGUI = new EditorGUI(m_World, m_EventBroker);
     m_EditorGUI->SetEntitySelectedCallback(std::bind(&EditorSystem::OnEntitySelected, this, std::placeholders::_1));
@@ -129,7 +130,7 @@ void EditorSystem::OnEntitySelected(EntityWrapper entity)
 
 void EditorSystem::OnEntitySave(EntityWrapper entity, boost::filesystem::path filePath)
 {
-    EntityFileWriter writer(filePath);
+    EntityXMLFileWriter writer(filePath);
     writer.WriteEntity(entity.World, entity.ID);
 }
 
@@ -260,12 +261,11 @@ EntityWrapper EditorSystem::importEntity(EntityWrapper parent, boost::filesystem
 
     try {
         auto entityFile = ResourceManager::Load<EntityFile>(filePath.string());
-        EntityFilePreprocessor fpp(entityFile);
-        fpp.RegisterComponents(parent.World);
-        EntityFileParser fp(entityFile);
-        EntityID newEntity = fp.MergeEntities(parent.World, parent.ID);
-        return EntityWrapper(parent.World, newEntity);
-    } catch (const std::exception&) {
+        EntityWrapper newEntity = entityFile->MergeInto(parent.World);
+        parent.World->SetParent(newEntity.ID, parent.ID);
+        return newEntity;
+    } catch (const std::exception& e) {
+        LOG_ERROR("Failed to import entity \"%s\": \"%s\"", filePath.string().c_str(), e.what());
         return EntityWrapper::Invalid;
     }
 }

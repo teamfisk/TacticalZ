@@ -13,7 +13,8 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &Server::OnEntityDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EComponentDeleted, &Server::OnComponentDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Server::OnPlayerDamage);
-
+    EVENT_SUBSCRIBE_MEMBER(m_EAmmoPickup, &Server::OnAmmoPickup);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &Server::OnPlayerDeath);
     // BindWW
     if (port == 0) {
         port = config->Get<float>("Networking.Port", 27666);
@@ -46,19 +47,19 @@ void Server::Update()
         }
     }
 
-    PlayerDefinition pd;
-    while (m_Unreliable.IsSocketAvailable()) {
-        // Packet will get real data in receive
-        Packet packet(MessageType::Invalid);
-        m_Unreliable.Receive(packet, pd);
-        m_Address = pd.Endpoint.address();
-        m_Port = pd.Endpoint.port();
-        if (packet.GetMessageType() == MessageType::Connect) {
-            parseUDPConnect(packet);
-        } else {
-            parseMessageType(packet);
-        }
-    }
+    //PlayerDefinition pd;
+    //while (m_Unreliable.IsSocketAvailable()) {
+    //    // Packet will get real data in receive
+    //    Packet packet(MessageType::Invalid);
+    //    m_Unreliable.Receive(packet, pd);
+    //    m_Address = pd.Endpoint.address();
+    //    m_Port = pd.Endpoint.port();
+    //    if (packet.GetMessageType() == MessageType::Connect) {
+    //        parseUDPConnect(packet);
+    //    } else {
+    //        parseMessageType(packet);
+    //    }
+    //}
 
     while (m_ServerlistRequest.IsSocketAvailable()) {
         Packet packet(MessageType::Invalid);
@@ -141,6 +142,9 @@ void Server::parseMessageType(Packet& packet)
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
         break;
+    case MessageType::OnDashEffect:
+        parseDashEffect(packet);
+        break;
     default:
         break;
     }
@@ -158,7 +162,7 @@ void Server::unreliableBroadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
         packet.ChangePacketID(kv.second.PacketID);
-        m_Unreliable.Send(packet, kv.second);
+//        m_Unreliable.Send(packet, kv.second);
     }
 }
 
@@ -168,7 +172,7 @@ void Server::sendSnapshot()
     Packet packet(MessageType::Snapshot);
     addInputCommandsToPacket(packet);
     addPlayersToPacket(packet, EntityID_Invalid);
-    unreliableBroadcast(packet);
+    reliableBroadcast(packet);
 }
 
 void Server::addInputCommandsToPacket(Packet& packet)
@@ -316,25 +320,28 @@ void Server::checkForTimeOuts()
     }
 }
 
-void Server::parseUDPConnect(Packet & packet)
-{
-    // Pop size of message int
-    packet.ReadPrimitive<int>();
-    int messageType = packet.ReadPrimitive<int>();
-    // Read packet ID 
-    m_PreviousPacketID = m_PacketID;    // Set previous packet id
-    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
-    // parse player id and other stuff
-    PlayerID playerID = packet.ReadPrimitive<int>();
-    // Do something here?
-    boost::asio::ip::udp::endpoint endpoint(m_Address, m_Port);
-    m_ConnectedPlayers.at(playerID).Endpoint = endpoint;
-    LOG_INFO("parseUDPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
-    // Send a message to the player that connected
-    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
-    m_Unreliable.Send(connnectPacket);
-    LOG_INFO("UDP Connect sent to client");
-}
+//void Server::parseUDPConnect(Packet & packet)
+//{
+//    // Pop size of message int
+//    packet.ReadPrimitive<int>();
+//    int messageType = packet.ReadPrimitive<int>();
+//    // Read packet ID 
+//    m_PreviousPacketID = m_PacketID;    // Set previous packet id
+//    m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
+//    // parse player id and other stuff
+//    PlayerID playerID = packet.ReadPrimitive<int>();
+//    if (!EntityWrapper(m_World, playerID).Valid()) {
+//
+//    }
+//    // Do something here?
+//    boost::asio::ip::udp::endpoint endpoint(m_Address, m_Port);
+//    m_ConnectedPlayers.at(playerID).Endpoint = endpoint;
+//    LOG_INFO("parseUDPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
+//    // Send a message to the player that connected
+//    Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
+//    m_Unreliable.Send(connnectPacket);
+//    LOG_INFO("UDP Connect sent to client");
+//}
 
 void Server::parseTCPConnect(Packet & packet)
 {
@@ -348,7 +355,7 @@ void Server::parseTCPConnect(Packet & packet)
     LOG_INFO("Parsing connections");
     // Check if player is already connected
     // Ska vara till lagd i TCPServer receive
-    PlayerID playerID = GetPlayerIDFromEndpoint();
+    PlayerID playerID = getPlayerIDFromEndpoint();
     if (playerID == -1) {
         return;
     }
@@ -359,6 +366,11 @@ void Server::parseTCPConnect(Packet & packet)
     m_ConnectedPlayers.at(playerID).StopTime = std::clock();
     m_ConnectedPlayers.at(playerID).TCPAddress = m_Address;
     m_ConnectedPlayers.at(playerID).TCPPort = m_Port;
+
+    Events::PlayerConnected e;
+    e.PlayerID = playerID;
+    e.PlayerName = m_ConnectedPlayers.at(playerID).Name;
+    m_EventBroker->Publish(e);
 
     LOG_INFO("parseTCPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(),
         m_ConnectedPlayers.at(playerID).TCPAddress.to_string().c_str());
@@ -510,10 +522,33 @@ bool Server::OnPlayerDamage(const Events::PlayerDamage& e)
     return true;
 }
 
+bool Server::OnAmmoPickup(const Events::AmmoPickup & e)
+{
+    for (auto& kv : m_ConnectedPlayers) {
+        if (e.Player.ID == kv.second.EntityID) {
+            Packet packet(MessageType::AmmoPickup);
+            // We dont send playerID as it will be set at client to local 
+            packet.WritePrimitive(e.AmmoGain);
+            m_Reliable.Send(packet, kv.second);
+        }
+    }
+    return true;
+}
+
+
+bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
+{
+    Events::KillDeath eKD;
+    eKD.Casualty = getPlayerIDFromEntityID(e.Player.ID);
+    eKD.Killer = getPlayerIDFromEntityID(e.Killer.ID);
+    m_EventBroker->Publish(eKD);
+    return false;
+}
+
 void Server::parseClientPing()
 {
     LOG_INFO("%i: Parsing ping", m_PacketID);
-    PlayerID player = GetPlayerIDFromEndpoint();
+    PlayerID player = getPlayerIDFromEndpoint();
     if (player == -1) {
         return;
     }
@@ -542,11 +577,16 @@ bool Server::parseDoubleJump(Packet & packet)
     return true;
 }
 
+void Server::parseDashEffect(Packet& packet)
+{
+    reliableBroadcast(packet);
+}
+
 void Server::parseOnInputCommand(Packet& packet)
 {
     PlayerID player = -1;
     // Check which player it was who sent the message
-    player = GetPlayerIDFromEndpoint();
+    player = getPlayerIDFromEndpoint();
     if (player != -1) {
         while (packet.DataReadSize() < packet.Size()) {
             Events::InputCommand e;
@@ -565,7 +605,7 @@ void Server::parseOnInputCommand(Packet& packet)
 
 void Server::parsePlayerTransform(Packet& packet)
 {
-    PlayerID playerID = GetPlayerIDFromEndpoint();
+    PlayerID playerID = getPlayerIDFromEndpoint();
     if (playerID == -1) {
         return;
     }
@@ -604,15 +644,21 @@ bool Server::shouldSendToClient(EntityWrapper childEntity)
     auto children = m_World->GetDirectChildren(childEntity.ID);
     for (auto it = children.first; it != children.second; it++) {
         EntityWrapper child(m_World, it->second);
-        if(child.HasComponent("CapturePoint")) {
+        if (child.HasComponent("CapturePoint") || child.HasComponent("HealthPickup")
+            || child.HasComponent("AmmoPickup")) {
             return true;
         }
     }
-    return childEntity.HasComponent("Player") || childEntity.FirstParentWithComponent("Player").Valid()
-        || childEntity.HasComponent("CapturePoint");
+    return childEntity.HasComponent("Player") 
+        || childEntity.FirstParentWithComponent("Player").Valid()
+        || childEntity.HasComponent("CapturePoint") 
+        || childEntity.HasComponent("HealthPickup")
+        || childEntity.HasComponent("AmmoPickup")
+        || childEntity.HasComponent("ScoreScreen")
+        || childEntity.FirstParentWithComponent("ScoreScreen").Valid();
 }
 
-PlayerID Server::GetPlayerIDFromEndpoint()
+PlayerID Server::getPlayerIDFromEndpoint()
 {
     // check both tcp and udp connection
     for (auto& kv : m_ConnectedPlayers) {
@@ -620,6 +666,16 @@ PlayerID Server::GetPlayerIDFromEndpoint()
             && kv.second.TCPPort == m_Port)
             || (kv.second.Endpoint.address() == m_Address
                 && kv.second.Endpoint.port() == m_Port)) {
+            return kv.first;
+        }
+    }
+    return -1;
+}
+
+PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
+{
+    for(auto& kv : m_ConnectedPlayers) {
+        if (entityID == kv.second.EntityID) {
             return kv.first;
         }
     }

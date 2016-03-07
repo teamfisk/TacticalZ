@@ -12,15 +12,7 @@ HealthSystem::HealthSystem(SystemParams params)
 }
 
 void HealthSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cHealth, double dt)
-{
-    double& health = cHealth["Health"];
-    if (health <= 0.0) {
-        Events::PlayerDeath ePlayerDeath;
-        ePlayerDeath.Player = entity;
-        m_EventBroker->Publish(ePlayerDeath);
-        //Note: we will delete the entity in PlayerDeathSystem
-    }
-}
+{ }
 
 bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 {
@@ -30,7 +22,21 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
 
     ComponentWrapper cHealth = e.Victim["Health"];
     double& health = cHealth["Health"];
-    health -= e.Damage;
+    //if player has the boost from a defender, subtract the damage taken by StrengthOfEffect amount
+    auto playerBoostDefenderEntity = e.Victim.FirstChildByName("BoostDefender");
+    if (playerBoostDefenderEntity.Valid()) {
+        e.Damage -= (double)playerBoostDefenderEntity["BoostDefender"]["StrengthOfEffect"];
+    }
+    if (health > 0) {
+        health -= e.Damage;
+        if (health <= 0.0) {
+            Events::PlayerDeath ePlayerDeath;
+            ePlayerDeath.Player = e.Victim;
+            ePlayerDeath.Killer = e.Inflictor;
+            m_EventBroker->Publish(ePlayerDeath);
+            //Note: we will delete the entity in PlayerDeathSystem
+        }
+    }
 
     return true;
 }

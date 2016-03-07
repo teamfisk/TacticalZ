@@ -42,9 +42,9 @@ private:
     int m_NumberOfCapturePoints = 0;
     std::map<int, EntityWrapper> m_CapturePointNumberToEntityMap;
 
-    //std::vector<ComponentWrapper>
-
     bool m_ResetTimers = false;
+    bool m_RecentlyCapturedNeedNextCapturePointNow = false;
+    Events::Captured m_CapturedEvent;
 
     //vectors which will keep track of enter/leave changes
     std::vector<std::tuple<EntityWrapper, EntityWrapper>> m_ETriggerTouchVector;

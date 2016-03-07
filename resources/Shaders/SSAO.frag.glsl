@@ -2,11 +2,11 @@
 
 //Number of samples per pixel
 uniform int           uNumOfSamples;
-//#define NUM_SAMPLES (11)
+//#define uNumOfSamples (11)
 
 //Number of turns around the cirle
 uniform int           uNumOfTurns;
-//#define NUM_TURNS (7)
+//#define uNumOfTurns (7)
 
 layout (binding = 0) uniform sampler2D ViewSpaceZ;
 
@@ -16,15 +16,16 @@ uniform float           uProjScale;
 //#define ProjScale 500
 
 uniform float           uRadius;
-//#define Radius 1.0f
+//#define uRadius 1.0f
 
 uniform float           uBias;
-//#define Bias 0.012f
+//#define uBias 0.05f
 
 uniform float           uContrast;
-//#define IntensityDivR6 1
+//#define uContrast 1.5f
 
 uniform float           uIntensityScale;
+//#define uIntensityScale 1.0f
 
 out float				AO;
 
@@ -88,13 +89,7 @@ void main() {
 
 	vec3 origin = getVSPosition(originScreenCoord);
 
-	float radius;
-	if(origin.z < uRadius){
-		radius = origin.z;
-	} else {
-		radius = uRadius;
-	}
-
+	float radius = min(origin.z, uRadius);
 
 	vec3 originNormal = getVSFaceNormal(origin);
 

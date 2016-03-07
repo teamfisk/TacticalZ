@@ -6,6 +6,7 @@
 #include "ObjectPool.h"
 #include "ComponentPool.h"
 #include "EventBroker.h"
+struct EntityWrapper;
 
 class World
 {
@@ -18,13 +19,13 @@ public:
     World(const World& other);
 
     // Create empty entity
-    EntityID CreateEntity(EntityID parent = 0);
+    EntityID CreateEntity(EntityID parent = EntityID_Invalid);
     // Delete entity and all components within
     void DeleteEntity(EntityID entity);
     // Check if an entity exists
     bool ValidEntity(EntityID entity) const;
     // Register a component type and allocate space for it
-    void RegisterComponent(ComponentInfo& ci);
+    void RegisterComponent(const ComponentInfo& ci);
     // Attach a component to an entity and fill it with default values
     ComponentWrapper AttachComponent(EntityID entity, const std::string& componentType);
     // Check if an entity has a component
@@ -49,6 +50,12 @@ public:
     void SetName(EntityID entity, const std::string& name);
     // Get the textual name of an entity
     std::string GetName(EntityID entity) const;
+    // Get the first entity in the world with the name.
+    EntityWrapper GetFirstEntityByName(const std::string& name);
+
+    // Merge another world into this one
+    // Returns a map that maps entities from the other world to their copies in this one
+    std::unordered_map<EntityID, EntityID> Merge(const World* other);
 
 private:
     EventBroker* m_EventBroker = nullptr;

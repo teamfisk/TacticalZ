@@ -33,6 +33,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &Client::OnDashAbility);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
@@ -48,16 +49,16 @@ void Client::Connect(std::string address, int port)
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    while (m_Unreliable.IsSocketAvailable()) {
-        // Packet will get real data in receive
-        Packet packet(MessageType::Invalid);
-        m_Unreliable.Receive(packet);
-        if (packet.GetMessageType() == MessageType::Connect) {
-            parseUDPConnect(packet);
-        } else {
-            parseMessageType(packet);
-        }
-    }
+    //while (m_Unreliable.IsSocketAvailable()) {
+    //    // Packet will get real data in receive
+    //    Packet packet(MessageType::Invalid);
+    //    m_Unreliable.Receive(packet);
+    //    if (packet.GetMessageType() == MessageType::Connect) {
+    //        parseUDPConnect(packet);
+    //    } else {
+    //        parseMessageType(packet);
+    //    }
+    //}
     while (m_Reliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -101,8 +102,7 @@ void Client::Update()
 
 void Client::parseMessageType(Packet& packet)
 {
-    // Pop packetSize which is used by TCP Client to
-    // create a packet of the correct size
+    // Pop packetSize
     packet.ReadPrimitive<int>();
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
@@ -144,6 +144,12 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
         break;
+    case MessageType::OnDashEffect:
+        parseDashEffect(packet);
+        break;
+    case MessageType::AmmoPickup:
+        parseAmmoPickup(packet);
+        break;
     default:
         break;
     }
@@ -171,8 +177,8 @@ void Client::parseTCPConnect(Packet& packet)
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
-    m_Unreliable.Send(packet);
-    LOG_INFO("Sent UDP Connect Server");
+ //   m_Unreliable.Send(packet);
+  //  LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -233,7 +239,6 @@ void Client::parseSpawnEvents()
         m_EventBroker->Publish(e);
     }
     m_PlayerSpawnEvents = tempSpawn;
-    // m_PlayerSpawnEvents.clear();
 }
 
 void Client::parsePlayersSpawned(Packet& packet)
@@ -261,7 +266,7 @@ void Client::parseEntityDeletion(Packet & packet)
     if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
         EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
         if (m_World->ValidEntity(localEntity)) {
-            if (m_World->HasComponent(localEntity,"Player")) {
+            if (m_World->HasComponent(localEntity, "Player")) {
                 Events::PlayerDeath e;
                 e.Player = EntityWrapper(m_World, localEntity);
                 m_EventBroker->Publish(e);
@@ -294,6 +299,28 @@ void Client::parseDoubleJump(Packet & packet)
     if (e.entityID != m_LocalPlayer.ID) {
         m_EventBroker->Publish(e);
     }
+}
+
+
+void Client::parseDashEffect(Packet& packet)
+{
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
+    }
+    Events::DashAbility e;
+    e.Player = m_ServerIDToClientID.at(serverID);
+    if (e.Player != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
+    }
+}
+
+void Client::parseAmmoPickup(Packet & packet)
+{
+    Events::AmmoPickup e;
+    e.AmmoGain = packet.ReadPrimitive<int>();
+    e.Player = m_LocalPlayer;
+    m_EventBroker->Publish(e);
 }
 
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)
@@ -379,7 +406,7 @@ void Client::parseSnapshot(Packet& packet)
                     if (m_SnapshotFilter != nullptr) {
                         shouldApply = m_SnapshotFilter->FilterComponent(localEntity, newComponent);
                     }
-                    if (shouldApply) {                        
+                    if (shouldApply) {
                         ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
                         memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
                     }
@@ -449,7 +476,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
             m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
-            m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
+        //    m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -506,6 +533,18 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
     if (e.PlayerID == -1) {
         m_LocalPlayer = e.Player;
     }
+    return true;
+}
+
+
+bool Client::OnDashAbility(const Events::DashAbility& e)
+{
+    if (!clientServerMapsHasEntity(e.Player) || e.Player != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDashEffect);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player));
+    m_Reliable.Send(packet);
     return true;
 }
 
@@ -574,7 +613,7 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
 
-    m_Unreliable.Send(packet);
+    m_Reliable.Send(packet);
 }
 
 void Client::identifyPacketLoss()

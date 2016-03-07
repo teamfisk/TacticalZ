@@ -12,8 +12,8 @@ template <typename EventContext>
 class EditorCameraInputController : public FirstPersonInputController<EventContext>
 {
 public:
-    EditorCameraInputController(EventBroker* eventBroker, unsigned int playerID)
-        : FirstPersonInputController(eventBroker, playerID)
+    EditorCameraInputController(EventBroker* eventBroker, unsigned int playerID, EntityWrapper playerEntity)
+        : FirstPersonInputController(eventBroker, playerID, playerEntity)
     {
         EVENT_SUBSCRIBE_MEMBER(m_EMousePress, &EditorCameraInputController::OnMousePress);
         EVENT_SUBSCRIBE_MEMBER(m_EMouseRelease, &EditorCameraInputController::OnMouseRelease);
@@ -102,6 +102,11 @@ protected:
     bool OnMouseScroll(const Events::MouseScroll& e)
     {
         if (!m_Enabled) {
+            return false;
+        }
+            
+        ImGuiIO& io = ImGui::GetIO();
+        if (io.WantCaptureMouse || io.WantCaptureKeyboard) {
             return false;
         }
 
