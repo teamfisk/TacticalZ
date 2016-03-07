@@ -36,6 +36,7 @@ void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo&
             m_EventBroker->Publish(e);
         } else {
             isReloading = false;
+            playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "Idle");
         }
     }
 
@@ -96,6 +97,9 @@ void DefenderWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     // Start reload
     isReloading = true;
     reloadTimer = reloadTime;
+
+    // Play animation
+    playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "Reload");
 }
 
 void DefenderWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -115,8 +119,40 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
         if (attachment.Valid()) {
             if (e.Value > 0) {
                 SpawnerSystem::Spawn(attachment, attachment);
+
+                EntityWrapper root = wi.FirstPersonEntity.FirstParentWithComponent("Model");
+                if (root.Valid()) {
+                    EntityWrapper subTree = root.FirstChildByName("FinalBlend");
+                    if (subTree.Valid()) {
+                        EntityWrapper animationNode = subTree.FirstChildByName("Shield");
+                        if (animationNode.Valid()) {
+                            Events::AutoAnimationBlend eFireBlend;
+                            eFireBlend.RootNode = root;
+                            eFireBlend.NodeName = "Shield";
+                            eFireBlend.Restart = true;
+                            eFireBlend.Start = true;
+                            m_EventBroker->Publish(eFireBlend);
+                        }
+                    }
+                }
             } else {
                 attachment.DeleteChildren();
+
+                EntityWrapper root = wi.FirstPersonEntity.FirstParentWithComponent("Model");
+                if (root.Valid()) {
+                    EntityWrapper subTree = root.FirstChildByName("FinalBlend");
+                    if (subTree.Valid()) {
+                        EntityWrapper animationNode = subTree.FirstChildByName("ActionBlend");
+                        if (animationNode.Valid()) {
+                            Events::AutoAnimationBlend eFireBlend;
+                            eFireBlend.RootNode = root;
+                            eFireBlend.NodeName = "ActionBlend";
+                            eFireBlend.Restart = true;
+                            eFireBlend.Start = true;
+                            m_EventBroker->Publish(eFireBlend);
+                        }
+                    }
+                }
             }
         }
     }
@@ -194,6 +230,9 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
             dealDamage(cWeapon, wi, direction, pelletDamage);
         }
     }
+
+    // Play animation
+    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeDefenderWeapon", "Fire");
 
     // Sound
     Events::PlaySoundOnEntity e;

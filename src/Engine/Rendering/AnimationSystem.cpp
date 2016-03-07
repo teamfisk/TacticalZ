@@ -133,7 +133,12 @@ void AnimationSystem::UpdateWeights(double dt)
             std::shared_ptr<BlendTree> blendTree = autoBlendQueue.second.GetBlendTree();
 
             if (blendTree != nullptr) {
-                blendJob.BlendInfo.progress = glm::clamp(blendJob.CurrentTime / blendJob.Duration, 0.0, 1.0);
+                if (blendJob.Duration != 0.0) {
+                    blendJob.BlendInfo.progress = glm::clamp(blendJob.CurrentTime / blendJob.Duration, 0.0, 1.0);
+                } else {
+                    blendJob.BlendInfo.progress = 1.0;
+                }
+
                 blendJob.BlendInfo = blendTree->AutoBlendStep(blendJob.BlendInfo);
             }
 
@@ -191,7 +196,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
     abj.BlendInfo.progress = 0.0;
     abj.BlendInfo.Start = e.Start;
     abj.BlendInfo.SingleBlend = e.SingleLevelBlend;
-
+    abj.BlendInfo.Weight = e.Weight;
 
     EntityWrapper nodeEntity = subTreeRoot.FirstChildByName(e.NodeName); // more than one
     if (nodeEntity.Valid()) {

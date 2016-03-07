@@ -11,10 +11,11 @@
 	<RPM>420</RPM>
 	<ViewPunch>0.03</ViewPunch>
 	<ViewReturnSpeed>0.18</ViewReturnSpeed>
-	<ReloadTime>2</ReloadTime>
+	<ReloadTime>1.65</ReloadTime>
 	<EquipTime>0.5</EquipTime>
 	<TriggerHeld>false</TriggerHeld>
 	<FireCooldown>0</FireCooldown>
+	<ReloadQueued>false</ReloadQueued>
 	<IsReloading>false</IsReloading>
 	<ReloadTimer>0</ReloadTimer>
 	<CurrentTravel>0</CurrentTravel>

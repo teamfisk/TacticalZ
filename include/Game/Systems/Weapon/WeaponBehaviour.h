@@ -9,6 +9,7 @@
 #include "Systems/SpawnerSystem.h"
 #include "Rendering/ESetCamera.h"
 #include "Core/ConfigFile.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 template <typename ETYPE>
 class WeaponBehaviour : public PureSystem
@@ -31,6 +32,21 @@ public:
 
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt) override
     {
+        EntityWrapper firstPersonWeapon = entity.FirstChildByName("Hands").FirstChildByName("AssaultWeapon");
+        EntityWrapper thirdPersonWeapon = entity.FirstChildByName("PlayerModel").FirstChildByName("AssaultWeapon");
+        if (IsClient && (firstPersonWeapon.Valid() || thirdPersonWeapon.Valid())) {
+            if (m_ActiveWeapons.count(entity) == 0) {
+
+                WeaponInfo& wi = m_ActiveWeapons[entity];
+                wi.Player = entity;
+                wi.WeaponEntity = entity;
+                wi.FirstPersonEntity = firstPersonWeapon;
+                wi.ThirdPersonEntity = thirdPersonWeapon;
+
+                OnEquip(cWeapon, wi);
+            }
+        }
+
         auto weapon = getActiveWeapon(entity);
         if (!weapon) {
             return;
@@ -92,6 +108,64 @@ protected:
         } else {
             return 100.f;
         }
+    }
+
+    void playAnimation(EntityWrapper weaponModelEntity, const std::string& subTreeName, const std::string& animationNodeName)
+    {
+        EntityWrapper root = weaponModelEntity.FirstParentWithComponent("Model");
+        if (!root.Valid()) {
+            return;
+        }
+
+        EntityWrapper subTree = root.FirstChildByName(subTreeName);
+        if (!subTree.Valid()) {
+            return;
+        }
+
+        EntityWrapper animationNode = subTree.FirstChildByName(animationNodeName);
+        if (!animationNode.Valid()) {
+            return;
+        }
+
+        Events::AutoAnimationBlend eFireBlend;
+        eFireBlend.RootNode = root;
+        eFireBlend.NodeName = animationNodeName;
+        eFireBlend.Restart = true;
+        eFireBlend.Start = true;
+        m_EventBroker->Publish(eFireBlend);
+    }
+
+    void playAnimationAndReturn(EntityWrapper weaponModelEntity, const std::string& subTreeName, const std::string& animationNodeName)
+    {
+        EntityWrapper root = weaponModelEntity.FirstParentWithComponent("Model");
+        if (!root.Valid()) {
+            return;
+        }
+
+        EntityWrapper subTree = root.FirstChildByName(subTreeName);
+        if (!subTree.Valid()) {
+            return;
+        }
+
+        EntityWrapper animationNode = subTree.FirstChildByName(animationNodeName);
+        if (!animationNode.Valid()) {
+            return;
+        }
+
+        Events::AutoAnimationBlend eFireBlend;
+        eFireBlend.RootNode = root;
+        eFireBlend.NodeName = animationNodeName;
+        eFireBlend.Restart = true;
+        eFireBlend.Start = true;
+        m_EventBroker->Publish(eFireBlend);
+
+        Events::AutoAnimationBlend eIdleBlend;
+        eIdleBlend.RootNode = root;
+        eIdleBlend.NodeName = "Idle";
+        eIdleBlend.AnimationEntity = animationNode;
+        eIdleBlend.Delay = -0.2;
+        eIdleBlend.Duration = 0.2;
+        m_EventBroker->Publish(eIdleBlend);
     }
 
 private:
@@ -180,6 +254,10 @@ private:
 
     void selectWeapon(ComponentWrapper cWeapon, EntityWrapper player)
     {
+        if (!IsServer) {
+            return;
+        }
+
         // Don't reselect weapon if it's already active
         if (getActiveWeapon(player)) {
             return;
@@ -209,9 +287,11 @@ private:
         // Spawn the weapon(s)
         EntityWrapper firstPersonWeapon;
         EntityWrapper thirdPersonWeapon;
-        if (firstPersonAttachment.Valid()) {
-            firstPersonWeapon = SpawnerSystem::Spawn(firstPersonAttachment, firstPersonAttachment);
-        }
+        //if (IsClient) {
+            if (firstPersonAttachment.Valid()) {
+                firstPersonWeapon = SpawnerSystem::Spawn(firstPersonAttachment, firstPersonAttachment);
+            }
+        //}
         if (thirdPersonAttachment.Valid()) {
             thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
         }

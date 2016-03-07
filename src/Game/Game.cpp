@@ -112,7 +112,7 @@ Game::Game(int argc, char* argv[])
 
     // Create Octrees
     // TODO: Perhaps the world bounds should be set in some non-arbitrary way instead of this.
-    AABB boxContainingTheWorld(glm::vec3(-300), glm::vec3(300));
+    AABB boxContainingTheWorld = AABB::FromOriginSize(glm::vec3(0.f, 10.7f, 0.f), glm::vec3(140.f, 31.f, 190.f));
     m_OctreeCollision = new Octree<EntityAABB>(boxContainingTheWorld, 4);
     m_OctreeTrigger = new Octree<EntityAABB>(boxContainingTheWorld, 4);
     m_OctreeFrustrumCulling = new Octree<EntityAABB>(boxContainingTheWorld, 4);
@@ -144,7 +144,6 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);

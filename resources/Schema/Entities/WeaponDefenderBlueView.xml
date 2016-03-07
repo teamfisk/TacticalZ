@@ -1,24 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Entity name="WeaponModel" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+<Entity name="DefenderWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:BoneAttachment>
-      <BoneName>R_Arm_Weapon_Joint</BoneName>
-      <PositionOffset X="0" Y="0.0480000004" Z="-0.183000013"/>
-    </c:BoneAttachment>
     <c:Model>
-      <Resource>Models/Weapons/Red/DefenderGunRed.mesh</Resource>
+      <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
     </c:Model>
-    <c:Transform>
-      <Position X="0.120430306" Y="0.775375426" Z="1.36542225"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
     <Entity name="WeaponMuzzle">
       <Components>
         <c:Spawner>
-          <EntityFile>Schema/Entities/RayRed.xml</EntityFile>
+          <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
         </c:Spawner>
         <c:Transform>
           <Position X="0.00191565475" Y="0.0324025005" Z="-0.2021029"/>
@@ -37,9 +31,8 @@
     </Entity>
     <Entity name="AmmunitionHUD">
       <Components>
-        <c:AmmunitionHUD/>
         <c:Transform>
-          <Position X="-0.0490000024" Y="0.0520000011" Z="-0.063000001"/>
+          <Position X="-0.0460000038" Y="0.119000003" Z="-0.162"/>
           <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
         </c:Transform>
       </Components>
@@ -66,10 +59,15 @@
             <Entity name="MagazineAmmo">
               <Components>
                 <c:Text>
-                  <Content>32</Content>
+                  <Content>8</Content>
                   <Resource>Fonts/DroidSans.ttf,64</Resource>
                   <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
                 </c:Text>
+                <c:TextFieldReader>
+                  <ParentEntityName>Player</ParentEntityName>
+                  <ComponentType>DefenderWeapon</ComponentType>
+                  <Field>MagazineAmmo</Field>
+                </c:TextFieldReader>
                 <c:Transform>
                   <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
                 </c:Transform>
@@ -79,10 +77,15 @@
             <Entity name="Ammo">
               <Components>
                 <c:Text>
-                  <Content>360</Content>
+                  <Content>64</Content>
                   <Resource>Fonts/DroidSans.ttf,64</Resource>
                   <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
                 </c:Text>
+                <c:TextFieldReader>
+                  <ParentEntityName>Player</ParentEntityName>
+                  <ComponentType>DefenderWeapon</ComponentType>
+                  <Field>Ammo</Field>
+                </c:TextFieldReader>
                 <c:Transform>
                   <Position X="5.2833886e-05" Y="-0.0407950208" Z="0"/>
                   <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
