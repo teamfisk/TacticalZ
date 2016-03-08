@@ -5,12 +5,6 @@
 #include "Entity.h"
 #include <boost/shared_array.hpp>
 
-enum class DirtySet
-{
-    Transform,
-    Network
-};
-
 struct ComponentInfo
 {
     typedef int EnumType;

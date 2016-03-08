@@ -86,7 +86,7 @@ bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, Entity
     transformEntityToSpawnPoint(spawnedEntity, spawnPoint);
     //Check if the spawned entity collides with anything, and if so, continue to the next spawnpoint.
     EntityAABB spawnedBox = *Collision::EntityAbsoluteAABB(spawnedEntity);
-    const ComponentPool* otherSpawnedEntities = spawnPoint.World->GetComponents(dontCollideComponent);
+    auto otherSpawnedEntities = spawnPoint.World->GetComponents(dontCollideComponent);
     for (const auto& obj : *otherSpawnedEntities) {
         if (spawnedEntity.ID == obj.EntityID) {
             continue;

@@ -29,7 +29,7 @@ void PlayerMovementSystem::Update(double dt)
             return;
         }
         m_SprintEffectTimer = 0.f;
-        const ComponentPool* pool = m_World->GetComponents("SprintAbility");
+        auto pool = m_World->GetComponents("SprintAbility");
         if (pool == nullptr) {
             return;
         }
