@@ -126,19 +126,19 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
     state.Disable(GL_DEPTH_TEST);
     state.Disable(GL_CULL_FACE);
 
-    GLuint shaderHandle_horiz = m_GaussianProgram_horiz->GetHandle();
-    GLuint shaderHandle_vert = m_GaussianProgram_vert->GetHandle();
-
-
-
-    //Horizontal pass, first use the given texture then save it to the horizontal framebuffer.
-    m_GaussianFrameBuffer_horiz.Bind();
     state.Enable(GL_STENCIL_TEST);
     state.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     state.StencilFunc(GL_EQUAL, 1, 0xFF);
     state.StencilMask(0x00);
     state.DepthMask(GL_FALSE);
     state.Enable(GL_SCISSOR_TEST);
+
+    GLuint shaderHandle_horiz = m_GaussianProgram_horiz->GetHandle();
+    GLuint shaderHandle_vert = m_GaussianProgram_vert->GetHandle();
+
+    //Horizontal pass, first use the given texture then save it to the horizontal framebuffer.
+    m_GaussianFrameBuffer_horiz.Bind();
+
     glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     
@@ -153,13 +153,6 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
     for (int i = 1; i < m_Iterations; i++) {
         //Vertical pass
         m_GaussianFrameBuffer_vert.Bind();
-        state.Enable(GL_STENCIL_TEST);
-        state.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        state.StencilFunc(GL_EQUAL, 1, 0xFF);
-        state.StencilMask(0x00);
-        state.DepthMask(GL_FALSE);
-        glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
-        glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
         m_GaussianProgram_vert->Bind();
 
 		glActiveTexture(GL_TEXTURE0);
@@ -171,15 +164,7 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
         //horizontal pass
 		m_GaussianFrameBuffer_vert.Unbind();
-
         m_GaussianFrameBuffer_horiz.Bind();
-        state.Enable(GL_STENCIL_TEST);
-        state.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        state.StencilFunc(GL_EQUAL, 1, 0xFF);
-        state.StencilMask(0x00);
-        state.DepthMask(GL_FALSE);
-        glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
-        glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
         m_GaussianProgram_horiz->Bind();
 
 		glActiveTexture(GL_TEXTURE0);
@@ -195,13 +180,6 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
     //final vertical gaussian after the iterations are done
 
     m_GaussianFrameBuffer_vert.Bind();
-    state.Enable(GL_STENCIL_TEST);
-    state.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    state.StencilFunc(GL_EQUAL, 1, 0xFF);
-    state.StencilMask(0x00);
-    state.DepthMask(GL_FALSE);
-    glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
-    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     m_GaussianProgram_vert->Bind();
 
 	glActiveTexture(GL_TEXTURE0);

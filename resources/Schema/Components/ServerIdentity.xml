@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<ServerIdentity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ServerIdentity.xsd">
+	<IP>0.0.0.0</IP>
+	<Port>0</Port>
+	<ServerName>UnkownServer</ServerName>
+	<PlayersConnected>0</PlayersConnected>
+</ServerIdentity>
