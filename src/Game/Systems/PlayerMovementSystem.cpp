@@ -2,8 +2,11 @@
 
 PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
     : System(params)
+    , m_SprintEffectTimer(0.f)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &PlayerMovementSystem::OnDashAbility);
 }
 
 PlayerMovementSystem::~PlayerMovementSystem()
@@ -16,13 +19,48 @@ PlayerMovementSystem::~PlayerMovementSystem()
 void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
-    if (IsServer) {
-        for (auto& kv : m_PlayerInputControllers) {
-            updateVelocity(kv.first, dt);
-        }
-    } else {
-        if (LocalPlayer.Valid()) {
+    // Only do physics calculations on client and only for themselves.
+    if (IsClient) {
+        if (LocalPlayer.Valid()){
             updateVelocity(LocalPlayer, dt);
+        }
+        m_SprintEffectTimer += dt;
+        if (m_SprintEffectTimer < 0.016f) {
+            return;
+        }
+        m_SprintEffectTimer = 0.f;
+        const ComponentPool* pool = m_World->GetComponents("SprintAbility");
+        if (pool == nullptr) {
+            return;
+        }
+        for (auto cSprint : *pool) {
+            if (cSprint.EntityID != LocalPlayer.ID && (bool)cSprint["Active"]) {
+                // Spawn one afterimage for each player that sprints.
+                EntityWrapper player(m_World, cSprint.EntityID);
+                auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/SprintEffect.xml");
+                EntityWrapper sprintEffect = entityFile->MergeInto(m_World);
+                auto playerModel = player.FirstChildByName("PlayerModel");
+                if (!playerModel.Valid()) {
+                    continue;
+                }
+                if (!playerModel.HasComponent("Model")) {
+                    continue;
+                }
+                if (!playerModel.HasComponent("Animation")) {
+                    continue;
+                }
+                auto playerEntityModel = playerModel["Model"];
+                auto playerEntityAnimation = playerModel["Animation"];
+                playerEntityModel.Copy(sprintEffect["Model"]);
+                playerEntityAnimation.Copy(sprintEffect["Animation"]);
+                sprintEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+                ((glm::vec4&)sprintEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+                sprintEffect["Animation"]["Speed1"] = 0.0;
+                sprintEffect["Animation"]["Speed2"] = 0.0;
+                sprintEffect["Animation"]["Speed3"] = 0.0;
+                sprintEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                sprintEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+            }
         }
     }
 }
@@ -36,7 +74,6 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         if (!player.Valid()) {
             continue;
         }
-
         // Aim pitch
         EntityWrapper cameraEntity = player.FirstChildByName("Camera");
         if (cameraEntity.Valid()) {
@@ -46,11 +83,25 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             cameraOrientation.x = glm::clamp(cameraOrientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
             // Set third person model aim pitch
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+
+            //Third-person aim
             if (playerModel.Valid()) {
-                ComponentWrapper cAnimationOffset = playerModel["AnimationOffset"];
-                float pitch = cameraOrientation.x + 0.2;
-                double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
-                cAnimationOffset["Time"] = time;
+                EntityWrapper aimPrimaryEntity = playerModel.FirstChildByName("AimPrimary");
+                if(aimPrimaryEntity.Valid()){
+                    if(aimPrimaryEntity.HasComponent("Animation")) {
+                        float pitch = cameraOrientation.x + 0.2f;
+                        double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
+                        (double&)aimPrimaryEntity["Animation"]["Time"] = time;
+                    }
+                }
+                EntityWrapper aimSecondaryEntity = playerModel.FirstChildByName("AimSecondary");
+                if (aimSecondaryEntity.Valid()) {
+                    if (aimSecondaryEntity.HasComponent("Animation")) {
+                        float pitch = cameraOrientation.x + 0.2f;
+                        double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
+                        (double&)aimSecondaryEntity["Animation"]["Time"] = time;
+                    }
+                }
             }
         }
 
@@ -61,12 +112,26 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         float playerMovementSpeed = player["Player"]["MovementSpeed"];
         float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
         glm::vec3& wishDirection = player["Player"]["CurrentWishDirection"];
+        auto playerBoostAssaultEntity = player.FirstChildByName("BoostAssault");
+        if (playerBoostAssaultEntity.Valid()) {
+            playerMovementSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+            playerCrouchSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+        }
+        bool sniperSprinting = false;
+        if (player.HasComponent("SprintAbility")) {
+            (bool)player["SprintAbility"]["Active"] = controller->SpecialAbilityKeyDown();
+            if (controller->SpecialAbilityKeyDown()) {
+                playerMovementSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                playerCrouchSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                sniperSprinting = true;
+            }
+        }
 
         if (player.HasComponent("Physics")) {
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check
             if (player.HasComponent("DashAbility")) {
-                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"]);
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"], player.ID);
             }
             wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
@@ -112,29 +177,94 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 //if doubleTapped do Assault Dash - but only boost maximum 50.0f
                 float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
                 accelerationSpeed = glm::min(doubleTapDashBoost*glm::min(accelerationSpeed, addSpeed), 50.0f);
+                //if player has Boost from an Assault class, accelerate the player faster
+                if (playerBoostAssaultEntity.Valid()) {
+                    accelerationSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
+                }
+                if (sniperSprinting) {
+                    accelerationSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
+                }
                 velocity += accelerationSpeed * wishDirection;
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             }
 
-            //you cant jump and dash at the same time - since there is no friction in the air and we would thus dash much further in the air
-            if (!controller->PlayerIsDashing() && controller->Jumping() && !controller->Crouching() && (isOnGround || !controller->DoubleJumping())) {
-                (bool)cPhysics["IsOnGround"] = false;
+            if (isOnGround) {
+                controller->SetDoubleJumping(false);
+            }
+            //If player presses Jump and is not crouching.
+            if (controller->Jumping() && !controller->Crouching()) {
                 if (isOnGround) {
-                    controller->SetDoubleJumping(false);
-                } else {
+                    (bool)cPhysics["IsOnGround"] = false;
+                    velocity.y = player["Player"]["JumpSpeed"];
+
+
+                    if (player.Valid()) {
+                        EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+                        if (playerModel.Valid()) {
+                            {
+                                Events::AutoAnimationBlend aeb;
+                                aeb.Duration = 0.15;
+                                aeb.NodeName = "Jump";
+                                aeb.RootNode = playerModel;
+                                aeb.Start = true;
+                                aeb.Restart = true;
+                                m_EventBroker->Publish(aeb);
+                            }
+                            {
+                                Events::AutoAnimationBlend aeb;
+                                aeb.Duration = 0.25;
+                                aeb.NodeName = "StandCrouchBlend";
+                                aeb.RootNode = playerModel;
+                                aeb.Start = true;
+                                aeb.Restart = false;
+                                aeb.AnimationEntity = playerModel.FirstChildByName("Jump");
+                                m_EventBroker->Publish(aeb);
+                            }
+                        }
+                    }
+
+
+                } else if (player.HasComponent("DoubleJump") && !controller->DoubleJumping()) {
+                    //Enter here if player can double jump and is doing so.
+                    (bool)cPhysics["IsOnGround"] = false;
+                    velocity.y = player["DoubleJump"]["DoubleJumpSpeed"];
+
+                    if (player.Valid()) {
+                        EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+                        if (playerModel.Valid()) {
+                            {
+                                Events::AutoAnimationBlend aeb;
+                                aeb.Duration = 0.15;
+                                aeb.NodeName = "Jump";
+                                aeb.RootNode = playerModel;
+                                aeb.Start = true;
+                                aeb.Restart = true;
+                                m_EventBroker->Publish(aeb);
+                            }
+                            {
+                                Events::AutoAnimationBlend aeb;
+                                aeb.Duration = 0.25;
+                                aeb.NodeName = "StandCrouchBlend";
+                                aeb.RootNode = playerModel;
+                                aeb.Start = true;
+                                aeb.Restart = false;
+                                aeb.AnimationEntity = playerModel.FirstChildByName("Jump");
+                                m_EventBroker->Publish(aeb);
+                            }
+                        }
+                    }
+
+                    // If IsServer and network is off this will not work
                     if (IsClient) {
                         //put a hexagon at the players feet
-                        auto hexagonEffect = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
-                        EntityFileParser parser(hexagonEffect);
-                        EntityID hexagonEffectID = parser.MergeEntities(m_World);
-                        EntityWrapper hexagonEW = EntityWrapper(m_World, hexagonEffectID);
-                        hexagonEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                        spawnHexagon(player);
                         controller->SetDoubleJumping(true);
+                        // Publish event for client to listen to
                         Events::DoubleJump e;
+                        e.entityID = player.ID;
                         m_EventBroker->Publish(e);
                     }
                 }
-                velocity.y = 4.f;
             }
 
             if (player.HasComponent("AABB")) {
@@ -146,81 +276,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 }
             }
 
-            // Animations
-            EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
-            if (playerModel.Valid()) {
-                ComponentWrapper cAnimation = playerModel["Animation"];
-                std::string& animationName1 = cAnimation["AnimationName1"];
-                std::string& animationName2 = cAnimation["AnimationName2"];
-                double& animationTime1 = cAnimation["Time1"];
-                double& animationTime2 = cAnimation["Time2"];
-                double& animationSpeed1 = cAnimation["Speed1"];
-                double& animationSpeed2 = cAnimation["Speed2"];
-                double& animationWeight1 = cAnimation["Weight1"];
-                double& animationWeight2 = cAnimation["Weight2"];
-
-                float movementLength = glm::length(groundVelocity);
-                //TODO: add assault dash animation here
-                if (glm::length(controller->Movement()) > 0.f) {
-                    double forwardMovement = controller->Movement().z;
-                    double strafeMovement = controller->Movement().x;
-
-                    if (controller->Crouching() && animationName1 != "CrouchWalk") {
-                        animationName1 = "CrouchWalk";
-                        animationSpeed1 = 1.0 * -glm::sign(controller->Movement().z);
-                    } else {
-                        if (glm::abs(forwardMovement) > 0) {
-                            if (animationName1 != "Run") {
-                                animationName1 = "Run";
-                                if (animationName2 == "StrafeLeft" || animationName2 == "StrafeRight") {
-                                    animationTime1 = animationTime2;
-                                } else {
-                                    animationTime1 = 0.0;
-                                }
-                            }
-                            animationSpeed1 = 2.f * -glm::sign(forwardMovement);
-                        }
-
-                        if (glm::abs(strafeMovement) > 0) {
-                            if (animationName2 != "StrafeLeft" && animationName2 != "StrafeRight") {
-                                if (strafeMovement < 0) {
-                                    animationName2 = "StrafeLeft";
-                                }
-                                if (strafeMovement > 0) {
-                                    animationName2 = "StrafeRight";
-                                }
-                                if (animationName1 == "Run") {
-                                    animationTime2 = animationTime1;
-                                } else {
-                                    animationTime2 = 0.0;
-                                }
-                            }
-                            animationSpeed2 = 2.f * glm::abs(strafeMovement);
-                        }
-
-                        double strafeWeight = glm::abs(strafeMovement) / (glm::abs(forwardMovement) + glm::abs(strafeMovement));
-                        animationWeight2 = strafeWeight;
-                        animationWeight1 = 1.0 - strafeWeight;
-                    }
-                } else {
-                    if (controller->Crouching()) {
-                        animationName1 = "Crouch";
-                        animationName2 = "";
-                        animationSpeed1 = 1.0;
-                        animationSpeed2 = 0.0;
-                        animationWeight1 = 1.0;
-                        animationWeight2 = 0.0;
-                    } else {
-                        animationName1 = "Idle";
-                        animationName2 = "";
-                        animationSpeed1 = 1.f;
-                        animationSpeed2 = 0.0;
-                        animationWeight1 = 1.0;
-                        animationWeight2 = 0.0;
-                        //cAnimation["AnimationName2"] = "Idle";
-                    }
-                }
-            }
+            // TODO: Animations
         }
 
         controller->Reset();
@@ -288,10 +344,162 @@ void PlayerMovementSystem::playerStep(double dt)
 bool PlayerMovementSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 {
     // When a player spawns, create an input controller for them
-    m_PlayerInputControllers[e.Player] = new FirstPersonInputController<PlayerMovementSystem>(m_EventBroker, e.PlayerID);
+    m_PlayerInputControllers[e.Player] = new FirstPersonInputController<PlayerMovementSystem>(m_EventBroker, e.PlayerID, e.Player);
     if (e.PlayerID == -1) {
         // Keep track of the local player
         m_LocalPlayer = e.Player;
     }
+    return true;
+}
+
+bool PlayerMovementSystem::OnDoubleJump(Events::DoubleJump & e)
+{
+    // If entity does not exist, exit
+    if (!EntityWrapper(m_World, e.entityID).Valid()) {
+        return false;
+    }
+    // If entity IsLocalPlayer, exit
+    if (e.entityID == m_LocalPlayer.ID) {
+        return false;
+    }
+    spawnHexagon(EntityWrapper(m_World, e.entityID));
+    return true;
+}
+
+void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
+{
+    //put a hexagon at the entitys... feet?
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DoubleJumpHexagon.xml");
+    EntityWrapper hexagonEW = entityFile->MergeInto(m_World);
+    hexagonEW["Transform"]["Position"] = (glm::vec3)target["Transform"]["Position"];
+}
+
+bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
+{
+    EntityWrapper player(m_World, e.Player);
+    if (!player.Valid() || !IsClient){// || player.ID == LocalPlayer.ID) {
+        return false;
+    }
+
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
+    EntityWrapper dashEffect = entityFile->MergeInto(m_World);
+    EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+
+    for (auto& kv : m_PlayerInputControllers) {
+        EntityWrapper player = kv.first;
+        auto& controller = kv.second;
+
+        if (!player.Valid()) {
+            continue;
+        }
+
+        if (player.Valid()) {
+            EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+            if (playerModel.Valid()) {
+                if (glm::abs(controller->Movement().x) > glm::abs(controller->Movement().z)) {
+                    if (controller->Movement().x > 0) {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashRight";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    } else {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashLeft";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    }
+                } else {
+                    if (controller->Movement().z < 0) {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashForward";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    } else {
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "DashBackward";
+                            aeb.RootNode = playerModel;
+                            aeb.Restart = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                        {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.3;
+                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.RootNode = playerModel;
+                            aeb.Delay = -0.3;
+                            aeb.Start = true;
+                            aeb.Restart = false;
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            m_EventBroker->Publish(aeb);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+/*
+    auto playerEntityAnimation = playerModel["Animation"];
+
+    playerEntityModel.Copy(dashEffect["Model"]);
+    playerEntityAnimation.Copy(dashEffect["Animation"]);
+    dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+    ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+*/
+
+
+
+
     return true;
 }

@@ -6,12 +6,13 @@
 #include "../Core/ELockMouse.h"
 #include "../Game/Events/EDashAbility.h"
 #include "InputHandler.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 template <typename EventContext>
 class FirstPersonInputController : public InputController<EventContext>
 {
 public:
-    FirstPersonInputController(EventBroker* eventBroker, int playerID);
+    FirstPersonInputController(EventBroker* eventBroker, int playerID, EntityWrapper playerEntity);
 
     virtual const glm::vec3 Movement() const { return m_Movement; }
     virtual const glm::vec3 Rotation() const { return m_Rotation; }
@@ -27,12 +28,15 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override;
     virtual void Reset();
 
-    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer);
+    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID);
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
+    bool SpecialAbilityKeyDown() const { return m_SpecialAbilityKeyDown; }
 
 protected:
     const int m_PlayerID;
+    EntityWrapper m_PlayerEntity;
+
     bool m_MouseLocked = false;
     glm::vec3 m_Rotation;
     glm::vec3 m_Movement;
@@ -41,7 +45,7 @@ protected:
     bool m_Crouching = false;
     //assault dash membervariables - needed to calculate the doubletap- and dashlogic
     double m_AssaultDashDoubleTapDeltaTime = 0.0;
-    double m_AssaultDashCoolDownTimer = 0.0;
+    double m_DashEffectResetTimer = 0.0;
     //i will let m_AssaultDashDoubleTapSensitivityTimer stay hardcoded, its not really a gamevariable (more an inputvariable), 
     //and its very unlikely that someone wants to change that value
     const float m_AssaultDashDoubleTapSensitivityTimer = 0.25f;
@@ -52,7 +56,7 @@ protected:
     bool m_ShiftDashing = false;
     bool m_ValidDoubleTap = false;
 
-    //specialabilitys
+    //specialabilities
     bool m_MovementKeyDown = false;
     bool m_SpecialAbilityKeyDown = false;
     int m_NumberOfMovementKeysDown = 0;
@@ -64,9 +68,10 @@ protected:
 };
 
 template <typename EventContext>
-FirstPersonInputController<EventContext>::FirstPersonInputController(EventBroker* eventBroker, int playerID)
+FirstPersonInputController<EventContext>::FirstPersonInputController(EventBroker* eventBroker, int playerID, EntityWrapper playerEntity)
     : InputController(eventBroker)
     , m_PlayerID(playerID)
+    , m_PlayerEntity(playerEntity)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ELockMouse, &FirstPersonInputController::OnLockMouse);
     EVENT_SUBSCRIBE_MEMBER(m_EUnlockMouse, &FirstPersonInputController::OnUnlockMouse);
@@ -117,13 +122,84 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
         if (e.Command == "Forward") {
             float val = glm::clamp(e.Value, -1.f, 1.f);
             m_Movement.z = -val;
+
+            if (m_PlayerEntity.Valid()) {
+                EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+                if (playerModel.Valid()) {
+                    if (val > 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+
+                        if(m_Crouching) {
+                            aeb.NodeName = "Walk";
+                        } else {
+                            aeb.NodeName = "Run";
+                        }
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    } else if (val < 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        if (m_Crouching) {
+                            aeb.NodeName = "Walk";
+                        } else {
+                            aeb.NodeName = "Run";
+                        }
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        aeb.Reverse = true;
+                        m_EventBroker->Publish(aeb);
+                    } else {
+                        
+                    }
+                }
+            }
         }
         if (e.Command == "Right") {
             float val = glm::clamp(e.Value, -1.f, 1.f);
             m_Movement.x = val;
+
+            if (m_PlayerEntity.Valid()) {
+                EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+
+                if (playerModel.Valid()) {
+                    if (val > 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Right";
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    } else if (val < 0) {
+                        Events::AutoAnimationBlend aeb;
+                        aeb.Duration = 0.1;
+                        aeb.NodeName = "Left";
+                        aeb.RootNode = playerModel;
+                        aeb.Start = true;
+                        m_EventBroker->Publish(aeb);
+                    } else {
+                        
+
+                    }
+                }
+            }
+            
         }
         if (glm::length2(m_Movement) > 0) {
             m_Movement = glm::normalize(m_Movement);
+        } else {
+            if (m_PlayerEntity.Valid()) {
+                EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+
+                if (playerModel.Valid()) {
+                    Events::AutoAnimationBlend aeb;
+                    aeb.Duration = 0.1;
+                    aeb.NodeName = "Idle";
+                    aeb.RootNode = playerModel;
+                    m_EventBroker->Publish(aeb);
+                }
+            }
         }
     }
 
@@ -145,10 +221,10 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
             if (m_NumberOfMovementKeysDown == 0) {
                 m_MovementKeyDown = false;
             }
-                //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
-                m_AssaultDashTapDirection = m_CurrentDirectionVector;
-                m_AssaultDashDoubleTapDeltaTime = 0.f;
-            
+            //you have just released the key, store what key it was and reset the doubletap-sensitivity-timer
+            m_AssaultDashTapDirection = m_CurrentDirectionVector;
+            m_AssaultDashDoubleTapDeltaTime = 0.f;
+
         }
     }
 
@@ -158,20 +234,39 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
 
     if (e.Command == "Crouch") {
         m_Crouching = e.Value > 0;
+
+        if (m_PlayerEntity.Valid()) {
+            EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
+            if (playerModel.Valid()) {
+                if (e.Value == 0.f) {
+                    Events::AutoAnimationBlend aeb;
+                    aeb.Duration = 0.3;
+                    aeb.NodeName = "StandMovement";
+                    aeb.RootNode = playerModel;
+                    aeb.Start = true;
+                    aeb.Restart = true;
+                    aeb.SingleLevelBlend = true;
+                    m_EventBroker->Publish(aeb);
+                } else if(e.Value == 1.0f) {
+                    Events::AutoAnimationBlend aeb;
+                    aeb.Duration = 0.3;
+                    aeb.NodeName = "CrouchMovement";
+                    aeb.RootNode = playerModel;
+                    aeb.Start = true;
+                    aeb.Restart = true;
+                    aeb.SingleLevelBlend = true;
+                    m_EventBroker->Publish(aeb);
+                }
+            }
+        }
+        
     }
 
     if (e.Command == "SpecialAbility") {
-        if (e.Value > 0) {
-            m_SpecialAbilityKeyDown = true;
-        } else {
-            m_SpecialAbilityKeyDown = false;
-        }
+        m_SpecialAbilityKeyDown = e.Value > 0;
     }
-    if (m_SpecialAbilityKeyDown && m_MovementKeyDown) {
-        m_ShiftDashing = true;
-    } else {
-        m_ShiftDashing = false;
-    }
+
+    m_ShiftDashing = m_SpecialAbilityKeyDown && m_MovementKeyDown;
 
     return true;
 }
@@ -191,23 +286,33 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 }
 
 template <typename EventContext>
-void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer) {
+void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID) {
     m_AssaultDashDoubleTapDeltaTime += dt;
-    m_AssaultDashCoolDownTimer -= dt;
+    m_DashEffectResetTimer += dt;
+    assaultDashCoolDownTimer -= dt;
     //cooldown = assaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)
-    if (m_AssaultDashCoolDownTimer > (assaultDashCoolDownMaxTimer - 0.25f)) {
+    if (assaultDashCoolDownTimer > (assaultDashCoolDownMaxTimer - 0.25f)) {
         m_PlayerIsDashing = true;
+        if (m_DashEffectResetTimer > 0.05) {
+            Events::DashAbility e;
+            e.Player = playerID;
+            m_EventBroker->Publish(e);
+            m_DashEffectResetTimer = 0.0;
+        }
     } else {
         m_PlayerIsDashing = false;
     }
 
     //dashing with shift
-    if (m_ShiftDashing && m_AssaultDashCoolDownTimer <= 0.0f) {
+    if (m_ShiftDashing && assaultDashCoolDownTimer <= 0.0f) {
         //player is dashing with shift
         //the wanted-direction is set in playermovement already so we dont need to check what direction we want to dash in!
-        m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
+        assaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
         m_AssaultDashDoubleTapped = true;
         m_AssaultDashDoubleTapDeltaTime = 0.f;
+        Events::DashAbility e;
+        e.Player = playerID;
+        m_EventBroker->Publish(e);
         return;
     }
 
@@ -227,7 +332,7 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     }
     m_ValidDoubleTap = false;
 
-    if (!(m_AssaultDashCoolDownTimer <= 0.0f)) {
+    if (!(assaultDashCoolDownTimer <= 0.0f)) {
         //if we cant dash at the moment, then just reset the tap-sensitivity-timer
         m_AssaultDashDoubleTapDeltaTime = 0.f;
         return;
@@ -235,9 +340,10 @@ void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool 
     //ok, we have a valid tap, lets do it
     m_AssaultDashDoubleTapped = true;
     m_AssaultDashDoubleTapDeltaTime = 0.f;
-    m_AssaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
+    assaultDashCoolDownTimer = assaultDashCoolDownMaxTimer;
 
     Events::DashAbility e;
+    e.Player = playerID;
     m_EventBroker->Publish(e);
 }
 

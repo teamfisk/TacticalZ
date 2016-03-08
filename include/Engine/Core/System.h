@@ -68,7 +68,7 @@ protected:
 
     const std::string m_ComponentType;
 
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cPlayer, double dt) = 0;
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& scoreScreen, double dt) = 0;
 };
 
 class ImpureSystem : public virtual System

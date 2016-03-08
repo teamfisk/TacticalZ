@@ -5,9 +5,8 @@
 #include "../Core/World.h"
 #include "../Core/SystemPipeline.h"
 #include "../Core/ResourceManager.h"
-#include "../Core/EntityFilePreprocessor.h"
-#include "../Core/EntityFileParser.h"
-#include "../Core/EntityFileWriter.h"
+#include "../Core/EntityFile.h"
+#include "../Core/EntityXMLFileWriter.h"
 #include "../Core/EMousePress.h"
 #include "../Input/EInputCommand.h"
 #include "EditorGUI.h"
@@ -56,6 +55,7 @@ private:
     void OnEntityDelete(EntityWrapper entity);
     void OnEntityChangeParent(EntityWrapper entity, EntityWrapper parent);
     void OnEntityChangeName(EntityWrapper entity, const std::string& name);
+    EntityWrapper OnEntityPaste(EntityWrapper entityToCopy, EntityWrapper parent);
     void OnComponentAttach(EntityWrapper entity, const std::string& componentType);
     void OnComponentDelete(EntityWrapper entity, const std::string& componentType);
     void OnWidgetSpace(EditorGUI::WidgetSpace widgetSpace);

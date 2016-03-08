@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="BlendTreeAim" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Blend>
+      <Pose1>AimPrimary</Pose1>
+      <Pose2>AimSecondary</Pose2>
+      <Weight>0</Weight>
+      <SubTreeRoot>true</SubTreeRoot>
+    </c:Blend>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="AimSecondary">
+      <Components>
+        <c:Animation>
+          <AnimationName>AimSecWepA</AnimationName>
+          <Time>0.5</Time>
+          <Loop>false</Loop>
+          <Additive>true</Additive>
+        </c:Animation>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="AimPrimary">
+      <Components>
+        <c:Animation>
+          <AnimationName>AimRifleA</AnimationName>
+          <Time>0.5</Time>
+          <Loop>false</Loop>
+          <Additive>true</Additive>
+        </c:Animation>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

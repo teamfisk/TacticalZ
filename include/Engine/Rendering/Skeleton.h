@@ -6,27 +6,9 @@
 #include "../GLM.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include <imgui/imgui.h>
+#include "../Core/EntityWrapper.h"
 
-//struct Bone
-//{
-//	Bone(std::string name, glm::mat4 offsetMatrix)
-//		: Name(name)
-//		, OffsetMatrix(offsetMatrix)
-//	{ }
-//
-//	~Bone()
-//	{
-//		for (auto kv : Children) {
-//			delete kv.second;
-//		}
-//	}
-//
-//	std::string Name;
-//	glm::mat4 OffsetMatrix;
-//	glm::mat4 LocalMatrix;
-//
-//	std::map<std::string, Bone*> Children;
-//};
+class BlendTree;
 
 class Skeleton
 {
@@ -68,58 +50,43 @@ public:
         std::map<int, std::vector<Keyframe>> JointAnimations;
 	};
 
-    struct AnimationData
-    {
-        const Animation* animation;
-        float time;
-        float weight;
-    };
-
-    struct JointFrameTransform {
-        glm::vec3 PositionInterp = glm::vec3(0);
-        glm::quat RotationInterp = glm::quat();
-        glm::vec3 ScaleInterp = glm::vec3(0);
-        float Weight;
-    };
-
-    struct AnimationOffset {
-        const Animation* animation;
-        float time;
+    struct PoseData {
+        glm::vec3 Translation;
+        glm::quat Orientation;
+        glm::vec3 Scale;
     };
 
 	Skeleton() { }
 	~Skeleton();
 
 	Bone* RootBone;
-
 	std::map<int, Bone*> Bones;
+
+    std::unordered_map<EntityWrapper, std::shared_ptr<BlendTree>> BlendTrees;
 
 	// Attach a new bone to the skeleton
 	// Returns: New bone index
 	int CreateBone(int ID, int parentID, std::string name, glm::mat4 offsetMatrix);
-
 	int GetBoneID(std::string name);
-
-    std::vector<glm::mat4>  GetFrameBones(std::vector<AnimationData> animations, AnimationOffset animationOffset, bool noRootMotion = false);
-    std::vector<glm::mat4>  GetFrameBones(std::vector<AnimationData> animations, bool noRootMotion = false);
-
     const Animation* GetAnimation(std::string name);
 
-    void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
-    void AccumulateBoneTransforms(bool noRootMotion, std::vector<AnimationData> animations, AnimationOffset animationOffset, std::map<int, glm::mat4>& frameBones, const Bone* bone, glm::mat4 parentMatrix);
+    std::map<int, Skeleton::PoseData> GetFrameBones(const Animation* animation, double time, bool additive, bool noRootMotion = false);
+    
+    std::map<int, Skeleton::PoseData> BlendPoses(const std::map<int, PoseData>& pose1, const std::map<int, PoseData>& pose2, double weight);
+    std::map<int, Skeleton::PoseData> OverridePose(const std::map<int, PoseData>& overridePose, const std::map<int, PoseData>& targetPose);
+    std::map<int, Skeleton::PoseData> BlendPoseAdditive(const std::map<int, PoseData>& additivePose, const std::map<int, PoseData>& targetPose);
+    void GetFinalPose(std::map<int, Skeleton::PoseData>& boneMatrices, std::vector<glm::mat4>& finalPose, std::map<int, glm::mat4>& boneTransforms);
+    
+    std::vector<glm::mat4> GetTPose();
 
-    void PrintSkeleton();
-	void PrintSkeleton(const Bone* parent, int depthCount);
-	std::map<std::string, Animation> Animations;
 
-    glm::mat4 GetBoneTransform(const Bone* bone, const Animation* animation, float time, glm::mat4 childMatrix);
-    glm::mat4 GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, AnimationOffset animationOffset, glm::mat4 childMatrix);
-    glm::mat4 GetBoneTransform(bool noRootMotion, const Bone* bone, std::vector<AnimationData> animations, glm::mat4 childMatrix);
-    int GetKeyframe(const Animation& animation, double time);
-
+    std::map<std::string, Animation> Animations;
 private:
-
-    glm::mat4 GetOffsetTransform(const Bone* bone, AnimationOffset animationOffset);
+    Skeleton::PoseData GetAdditiveBonePose(const Bone* bone, const Animation* animation, double time);
+    
+    void AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, std::map<int, Skeleton::PoseData>& poseDatas, std::map<int, glm::mat4>& boneTransforms, const Bone* bone, glm::mat4 parentMatrix);
+    void AdditiveBoneTransforms(const Animation* animation, double time, std::map<int, PoseData>& boneMatrices, const Bone* bone);
+    void AccumulateBoneTransforms(bool noRootMotion, const Animation* animation, double time, std::map<int, PoseData>& boneMatrices, const Bone* bone);
 
 	std::map<std::string, Bone*> m_BonesByName;
     

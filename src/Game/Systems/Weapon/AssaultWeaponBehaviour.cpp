@@ -1,377 +1,271 @@
 #include "Systems/Weapon/AssaultWeaponBehaviour.h"
 
-AssaultWeaponBehaviour::AssaultWeaponBehaviour(SystemParams systemParams, IRenderer* renderer, Octree<EntityAABB>* collisionOctree, EntityWrapper player) 
-    : WeaponBehaviour(systemParams, renderer, collisionOctree, player)
+void AssaultWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt)
 {
-    m_FirstPersonModel = m_Player.FirstChildByName("Hands");
-    m_ThirdPersonModel = m_Player.FirstChildByName("PlayerModel");
-    EVENT_SUBSCRIBE_MEMBER(m_EAnimationComplete, &AssaultWeaponBehaviour::OnAnimationComplete);
+    double& fireCooldown = cWeapon["FireCooldown"];
+    fireCooldown = glm::max(0.0, fireCooldown - dt);
+
+    WeaponBehaviour::UpdateComponent(entity, cWeapon, dt);
 }
 
-void AssaultWeaponBehaviour::Fire()
+void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
-    m_TimeSinceLastFire = 0.0;
-    m_Firing = true;
-    fireRound();
-}
-
-void AssaultWeaponBehaviour::CeaseFire()
-{
-    m_Firing = false;
-}
-
-void AssaultWeaponBehaviour::Reload()
-{
-    if (m_Reloading) {
-        return;
+    // Start reloading automatically if at 0 mag ammo
+    int& magAmmo = cWeapon["MagazineAmmo"];
+    if (m_ConfigAutoReload && magAmmo <= 0) {
+        OnReload(cWeapon, wi);
     }
 
-    ComponentWrapper& cAssaultWeapon = m_Player["AssaultWeapon"];
-    int magAmmo = cAssaultWeapon["MagazineAmmo"];
-    int magSize = cAssaultWeapon["MagazineSize"];
-    int ammo = cAssaultWeapon["Ammo"];
-
-    // Don't reload if we're already fully loaded
-    if (magAmmo == magSize) {
-        return;
+    // Only start reloading once we're done firing
+    bool& reloadQueued = cWeapon["ReloadQueued"];
+    double& fireCooldown = cWeapon["FireCooldown"];
+    bool& isReloading = cWeapon["IsReloading"];
+    if (reloadQueued && fireCooldown <= 0) {
+        reloadQueued = fireCooldown;
+        isReloading = true;
     }
 
-    // Don't reload if we're completly out of ammo
-    if (ammo == 0) {
-        playEmptySound();
-        m_TimeSinceLastFire = -0.0f; // HACK: To make empty sound play with interval
-        return;
+    // Decrement reload timer
+    double& reloadTimer = cWeapon["ReloadTimer"];
+    if (isReloading) {
+        reloadTimer = glm::max(0.0, reloadTimer - dt);
     }
 
-    m_Reloading = true;
-    m_ReloadTimer = cAssaultWeapon["ReloadTime"];
-    playReloadAnimation();
-    Events::PlaySoundOnEntity e;
-    e.EmitterID = cAssaultWeapon.EntityID;
-    e.FilePath = "Audio/weapon/reload.wav";
-    m_EventBroker->Publish(e);
-}
+    // Handle reloading
+    if (isReloading && reloadTimer <= 0.0) {
+        int& magSize = cWeapon["MagazineSize"];
+        int& ammo = cWeapon["Ammo"];
 
-void AssaultWeaponBehaviour::Update(double dt)
-{
-    if (m_Reloading) {
-        m_ReloadTimer -= dt;
-        // Re-enable glow on reload impersonator half-way through the animation
-        if (IsClient) {
-            if (m_ReloadTimer <= (double)m_Player["AssaultWeapon"]["ReloadTime"] / 2.0) {
-                if (m_FirstPersonReloadImpersonator.Valid()) {
-                    m_FirstPersonReloadImpersonator["Model"]["GlowMap"] = true;
-                }
-                if (m_ThirdPersonReloadImpersonator.Valid()) {
-                    m_ThirdPersonReloadImpersonator["Model"]["GlowMap"] = true;
-                }
+        ammo = glm::max(0, ammo - (magSize - magAmmo));
+        magAmmo = glm::min(magSize, ammo);
+        isReloading = false;
+        if (wi.FirstPersonEntity.Valid()) {
+            wi.FirstPersonEntity["Model"]["Visible"] = true;
+        }
+        if (wi.ThirdPersonEntity.Valid()) {
+            wi.ThirdPersonEntity["Model"]["Visible"] = true;
+        }
+    }    
+    
+    // Restore view angle
+    if (IsClient) {
+        float& currentTravel = cWeapon["CurrentTravel"];
+        float& returnSpeed = cWeapon["ViewReturnSpeed"];
+        if (currentTravel > 0) {
+            float change = returnSpeed * dt;
+            currentTravel = glm::max(0.f, currentTravel - change);
+            EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+            if (camera.Valid()) {
+                glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
+                cameraOrientation.x -= change;
             }
         }
-        if (m_ReloadTimer <= 0) {
-            finishReload();
+    }
+
+    // Update first person run animation
+    ComponentWrapper cPlayer = wi.Player["Player"];
+    ComponentWrapper cPhysics = wi.Player["Physics"];
+    const float& movementSpeed = cPlayer["MovementSpeed"];
+    float speed = glm::length((const glm::vec3&)cPhysics["Velocity"]);
+    float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
+    EntityWrapper rootNode = wi.FirstPersonEntity.FirstParentWithComponent("Model");
+    if (rootNode.Valid()) {
+        EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
+        if (blend.Valid()) {
+            (double&)blend["Blend"]["Weight"] = animationWeight;
         }
     }
 
-    if (m_Firing && !m_Reloading) {
-        m_TimeSinceLastFire += dt;
-        ComponentWrapper& cAssaultWeapon = m_Player["AssaultWeapon"];
-        if (m_TimeSinceLastFire >= 1.0 / ((double)cAssaultWeapon["RPM"] / 60.0)) {
-            fireRound();
-        }
-    }
-
-    if (!m_Firing && !m_Reloading) {
-        if (IsClient) {
-            playIdleAnimation();
-        }
-    }
-
-    // Disable glow map on weapon if it's out of ammo
-    // Make real first person weapon model visible again
-    if (IsClient) {
-        EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
-        if (firstPersonWeaponModel.Valid()) {
-            firstPersonWeaponModel["Model"]["GlowMap"] = hasAmmo();
-        }
+    // Fire if we're able to fire
+    if (canFire(cWeapon, wi)) {
+        fireBullet(cWeapon, wi);
     }
 }
 
-bool AssaultWeaponBehaviour::OnAnimationComplete(Events::AnimationComplete& e)
+void AssaultWeaponBehaviour::OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    if (e.Entity != m_FirstPersonModel) {
-        return false;
+    cWeapon["TriggerHeld"] = true;
+    if (canFire(cWeapon, wi)) {
+        fireBullet(cWeapon, wi);
     }
-
-    //if (e.Name == "ShootRifle") {
-    //    if (!m_Firing) {
-    //        playIdleAnimation();
-    //    }
-    //}
-
-    return true;
 }
 
-bool AssaultWeaponBehaviour::hasAmmo()
+void AssaultWeaponBehaviour::OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    ComponentWrapper& cAssaultWeapon = m_Player["AssaultWeapon"];
-    int& magAmmo = cAssaultWeapon["MagazineAmmo"];
-    return magAmmo > 0;
+    cWeapon["TriggerHeld"] = false;
 }
 
-void AssaultWeaponBehaviour::fireRound()
+void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    if (m_Reloading) {
+    bool& reloadQueued = cWeapon["ReloadQueued"];
+    bool& isReloading = cWeapon["IsReloading"];
+    if (reloadQueued || isReloading) {
         return;
     }
 
-    ComponentWrapper& cAssaultWeapon = m_Player["AssaultWeapon"];
-
-    int& magAmmo = cAssaultWeapon["MagazineAmmo"];
-    int ammo = cAssaultWeapon["Ammo"];
-
-    // Reload if our magazine is empty
-    if (magAmmo <= 0) {
-        Reload();
+    int& magAmmo = cWeapon["MagazineAmmo"];
+    int& magSize = cWeapon["MagazineSize"];
+    if (magAmmo >= magSize) {
         return;
-    } 
-
-    // Fire
-    magAmmo -= 1;
-    m_TimeSinceLastFire = 0.0;
-
-    // Effects
-    if (IsClient) {
-        spawnTracer();
-    playFireSound();  
-        viewPunch();
-        playShootAnimation();
-        bool hit = shoot(cAssaultWeapon["BaseDamage"]);
-        if (hit) {
-            showHitMarker();
-        }
     }
-}
-
-void AssaultWeaponBehaviour::spawnTracer()
-{
-    if (!IsClient) {
+    int& ammo = cWeapon["Ammo"];
+    if (ammo <= 0) {
         return;
     }
 
-    EntityWrapper spawner;
-    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
-    if (m_Player == LocalPlayer && !outOfBodyExperience) {
-        spawner = m_Player.FirstChildByName("WeaponMuzzle");
-    } else {
-        spawner = m_Player.FirstChildByName("ThirdPersonWeaponMuzzle");
-    }
+    double reloadTime = cWeapon["ReloadTime"];
+    double& reloadTimer = cWeapon["ReloadTimer"];
+   
+    // Start reload
+    reloadQueued = true;
+    reloadTimer = reloadTime;
 
-    if (!spawner.Valid()) {
-        return;
-    }
-
-    float distance = traceRayDistance(Transform::AbsolutePosition(spawner), Transform::AbsoluteOrientation(spawner) * glm::vec3(0, 0, -1));
-    EntityWrapper ray = SpawnerSystem::Spawn(spawner);
-    ((glm::vec3&)ray["Transform"]["Scale"]).z = (distance / 100.f);
-}
-
-float AssaultWeaponBehaviour::traceRayDistance(glm::vec3 origin, glm::vec3 direction)
-{
-    // TODO: Cast a ray and size tracer appropriately
-    float distance;
-    glm::vec3 pos;
-    auto entity = Collision::EntityFirstHitByRay(Ray(origin, direction), m_CollisionOctree, distance, pos);
-    if (entity) {
-        return distance;
-    } else {
-        return 100.f;
-    }
-}
-
-void AssaultWeaponBehaviour::playFireSound()
-{
-    if (!IsClient) {
-        return;
-    }
-
-    Events::PlaySoundOnEntity e;
-    e.EmitterID = m_Player.ID;
-    e.FilePath = "Audio/laser/laser1.wav";
-    m_EventBroker->Publish(e);
-}
-
-
-void AssaultWeaponBehaviour::playEmptySound()
-{
-    if (!IsClient) {
-        return;
-    }
-
-    Events::PlaySoundOnEntity e;
-    e.EmitterID = m_Player.ID;
-    e.FilePath = "Audio/weapon/zeroAmmo.wav";
-    m_EventBroker->Publish(e);
-}
-
-void AssaultWeaponBehaviour::viewPunch()
-{
-    EntityWrapper playerCamera = m_Player.FirstChildByName("Camera");
-    if (!playerCamera.Valid()) {
-        return;
-    }
-    float viewPunch = m_Player["AssaultWeapon"]["ViewPunch"];
-    ComponentWrapper cTransform = playerCamera["Transform"];
-    glm::vec3& orientation = cTransform["Orientation"];
-    orientation.x += viewPunch;
-}
-
-void AssaultWeaponBehaviour::finishReload()
-{
-    ComponentWrapper& cAssaultWeapon = m_Player["AssaultWeapon"];
-    int& magAmmo = cAssaultWeapon["MagazineAmmo"];
-    int magSize = cAssaultWeapon["MagazineSize"];
-    int& ammo = cAssaultWeapon["Ammo"];
-
-    // Throw away rounds in magazine to incentivise ammo sharing
-    int toLoad = glm::min(magSize, ammo);
-    magAmmo = toLoad;
-    ammo -= toLoad;
-
-    // Make real first person weapon model visible again
-    EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
-    if (firstPersonWeaponModel.Valid()) {
-        firstPersonWeaponModel["Model"]["Visible"] = true;
-    }
-    EntityWrapper thirdPersonWeaponModel = m_Player.FirstChildByName("ThirdPersonWeaponModel");
-    if (thirdPersonWeaponModel.Valid()) {
-        thirdPersonWeaponModel["Model"]["Visible"] = true;
-    }
-
-    m_Reloading = false;
-}
-
-void AssaultWeaponBehaviour::playShootAnimation()
-{
-    ComponentWrapper cAnimation = m_FirstPersonModel["Animation"];
-    if (cAnimation["AnimationName1"] != "ShootRifle") {
-        cAnimation["AnimationName1"] = "ShootRifle";
-        cAnimation["Weight1"] = 1.0;
-        cAnimation["Time1"] = 0.0;
-        cAnimation["Speed1"] = 1.0;
-        cAnimation["Loop1"] = true;
-    }
-}
-
-void AssaultWeaponBehaviour::playIdleAnimation()
-{
-    if (!m_FirstPersonModel.Valid()) {
-        return;
-    }
-
-    ComponentWrapper cAnimation = m_FirstPersonModel["Animation"];
-    std::string& animationName1 = cAnimation["AnimationName1"];
-    double& animationSpeed1 = cAnimation["Speed1"];
-
-    std::string animationToPlay = "Idle";
-    double speedToSet = 1.0;
-
-    ComponentWrapper cPlayer = m_Player["Player"];
-    glm::vec3 movementDirection = cPlayer["CurrentWishDirection"];
-    if (glm::length2(movementDirection) > 0) {
-        animationToPlay = "Run";
-        ComponentWrapper cPhysics = m_Player["Physics"];
-        speedToSet = glm::length((glm::vec3)cPhysics["Velocity"]) / (float)cPlayer["MovementSpeed"];
-    }
-
-    if (animationName1 != animationToPlay) {
-        cAnimation["AnimationName1"] = animationToPlay;
-        cAnimation["Weight1"] = 1.0;
-        cAnimation["Time1"] = 0.0;
-        cAnimation["Loop1"] = true;
-    }
-
-    if (animationSpeed1 != speedToSet) {
-        cAnimation["Speed1"] = speedToSet;
-    }
-}
-
-void AssaultWeaponBehaviour::playReloadAnimation()
-{
     // Play animation
-    // First person
-    if (IsClient)
-    {
-        ComponentWrapper cAnimation = m_FirstPersonModel["Animation"];
-        cAnimation["AnimationName1"] = "ReloadSwitch";
-        cAnimation["Weight1"] = 1.0;
-        cAnimation["Time1"] = 0.0;
-        cAnimation["Speed1"] = 0.5;
-        cAnimation["Loop1"] = true;
+    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Reload");
+    if (IsClient) {
+        // Spawn explosion effect
+        EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("FirstPersonReloadSpawner");
+        if (reloadEffectSpawner.Valid()) {
+            SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+        }
+        if (wi.FirstPersonEntity.Valid()) { 
+            wi.FirstPersonEntity["Model"]["Visible"] = false;
+        }
+        if (wi.ThirdPersonEntity.Valid()) {
+            wi.ThirdPersonEntity["Model"]["Visible"] = false;
+        }
     }
-    // TODO: Third person
-    //{
-    //    ComponentWrapper cAnimation = m_ThirdPersonModel["Animation"];
-    //    cAnimation["AnimationName1"] = "ReloadSwitch";
-    //    cAnimation["Weight1"] = 1.0;
-    //    cAnimation["Time1"] = 0.0;
-    //    cAnimation["Speed1"] = 0.5;
-    //    cAnimation["Loop1"] = true;
-    //}
 
-    // Hide weapon model and spawn the exploding version
-    {
-        EntityWrapper firstPersonWeaponModel = m_Player.FirstChildByName("WeaponModel");
-        EntityWrapper reloadSpawner = m_Player.FirstChildByName("FirstPersonReloadSpawner");
-        if (IsClient) {
-            m_FirstPersonReloadImpersonator = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
-            firstPersonWeaponModel["Model"].Copy(m_FirstPersonReloadImpersonator["Model"]);
-        }
-        firstPersonWeaponModel["Model"]["Visible"] = false;
-    }
-    {
-        EntityWrapper thirdPersonWeaponModel = m_Player.FirstChildByName("ThirdPersonWeaponModel");
-        EntityWrapper reloadSpawner = m_Player.FirstChildByName("ThirdPersonReloadSpawner");
-        if (IsClient) {
-            m_ThirdPersonReloadImpersonator = SpawnerSystem::Spawn(reloadSpawner, reloadSpawner);
-            thirdPersonWeaponModel["Model"].Copy(m_ThirdPersonReloadImpersonator["Model"]);
-        }
-        thirdPersonWeaponModel["Model"]["Visible"] = false;
-    }
+    // Sound
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = wi.Player.ID;
+    e.FilePath = "Audio/weapon/Assault/AssaultWeaponReload.wav";
+    m_EventBroker->Publish(e);
 }
 
-bool AssaultWeaponBehaviour::shoot(double damage)
+void AssaultWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    // Only do shooting clientside
+    cWeapon["FireCooldown"] = (double)cWeapon["EquipTime"];
+}
+
+void AssaultWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    // Make sure the trigger is released if weapon is holstered while firing
+    cWeapon["TriggerHeld"] = false;
+
+    // Cancel any reload
+    cWeapon["IsReloading"] = false;
+    cWeapon["ReloadTimer"] = 0.0;
+}
+
+void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    cWeapon["FireCooldown"] = 60.0 / (double)cWeapon["RPM"];
+
+    // Ammo
+    int& magAmmo = cWeapon["MagazineAmmo"];
+    if (magAmmo <= 0) {
+        return;
+    } else {
+        magAmmo -= 1;
+    }
+
+    // View punch
+    if (IsClient) {
+        EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+        if (camera.Valid()) {
+            glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
+            float viewPunch = cWeapon["ViewPunch"];
+            float maxTravelAngle = cWeapon["MaxTravelAngle"];
+            float& currentTravel = cWeapon["CurrentTravel"];
+            if (currentTravel < maxTravelAngle) {
+                float change = viewPunch;
+                if (currentTravel + change > maxTravelAngle) {
+                    change = maxTravelAngle - currentTravel;
+                }
+                cameraOrientation.x += change;
+                currentTravel += change;
+            }
+        }
+    }
+
+    // Get weapon model based on current person
+    EntityWrapper weaponModelEntity = getRelevantWeaponModelEntity(wi);
+    if (!weaponModelEntity.Valid()) {
+        return;
+    }
+
+    // Tracer
+    EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
+    if (tracerSpawner.Valid()) {
+        glm::vec3 origin = Transform::AbsolutePosition(tracerSpawner);
+        glm::vec3 direction = glm::quat(Transform::AbsoluteOrientationEuler(tracerSpawner)) * glm::vec3(0, 0, -1);
+        float distance = traceRayDistance(origin, direction);
+        EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
+        if (ray.Valid()) {
+            ((glm::vec3&)ray["Transform"]["Scale"]).z = distance;
+        }
+    }
+
+    // Deal damage
+    if (dealDamage(cWeapon, wi)) {
+        // Show hit marker
+        EntityWrapper hitMarkerSpawner = wi.Player.FirstChildByName("HitMarkerSpawner");
+        if (hitMarkerSpawner.Valid()) {
+            SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
+            Events::PlaySoundOnEntity e;
+            e.EmitterID = wi.Player.ID;
+            e.FilePath = "Audio/weapon/hitclick.wav";
+            m_EventBroker->Publish(e);
+        }
+    }
+    
+    // Play animation
+    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Fire");
+
+    // Sound
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = wi.Player.ID;
+    e.FilePath = "Audio/weapon/Assault/AssaultWeaponFire.wav";
+    m_EventBroker->Publish(e);
+}
+
+bool AssaultWeaponBehaviour::canFire(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    bool triggerHeld = cWeapon["TriggerHeld"];
+    bool cooldownPassed = (double)cWeapon["FireCooldown"] <= 0.0;
+    bool isNotReloading = !(bool)cWeapon["IsReloading"];
+    return triggerHeld && cooldownPassed && isNotReloading;
+}
+
+bool AssaultWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    // Only deal damage client side
     if (!IsClient) {
         return false;
     }
 
-    // Only handle shooting for the local player
-    if (m_Player != LocalPlayer) {
+    // Only handle damage for the local player
+    if (wi.Player != LocalPlayer) {
         return false;
     }
 
     // Make sure the player isn't shooting from the grave
-    if (!m_Player.Valid()) {
+    if (!wi.Player.Valid()) {
         return false;
     }
 
-    // Screen center, based on current resolution!
-    Rectangle screenResolution = m_Renderer->GetViewportSize();
-    glm::vec2 centerScreen = glm::vec2(screenResolution.Width / 2, screenResolution.Height / 2);
-
-    // Pick middle of screen
+    // 3D-pick middle of screen
+    Rectangle viewport = m_Renderer->GetViewportSize();
+    glm::vec2 centerScreen(viewport.Width / 2, viewport.Height / 2);
+    // TODO: Some horizontal spread
     PickData pickData = m_Renderer->Pick(centerScreen);
-    if (pickData.Entity == EntityID_Invalid) {
-        return false;
-    }
-
     EntityWrapper victim(m_World, pickData.Entity);
     if (!victim.Valid()) {
         return false;
     }
 
-    // Don't let us shoot ourselves in the foot
+    // Don't let us somehow shoot ourselves in the foot
     if (victim == LocalPlayer) {
         return false;
     }
@@ -384,30 +278,18 @@ bool AssaultWeaponBehaviour::shoot(double damage)
         return false;
     }
 
-    // Check for friendly fire
-    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)m_Player["Team"]["Team"]) {
-        return false;
+    double damage = cWeapon["BaseDamage"];
+    // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
+    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
+        damage = 0;
     }
 
     // Deal damage! 
     Events::PlayerDamage ePlayerDamage;
-    ePlayerDamage.Inflictor = m_Player;
+    ePlayerDamage.Inflictor = wi.Player;
     ePlayerDamage.Victim = victim;
     ePlayerDamage.Damage = damage;
     m_EventBroker->Publish(ePlayerDamage);
 
-    return true;
-}
-
-void AssaultWeaponBehaviour::showHitMarker()
-{
-    // Show hit marker
-    EntityWrapper hitMarkerSpawner = m_Player.FirstChildByName("HitMarkerSpawner");
-    if (hitMarkerSpawner.Valid()) {
-        SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
-        Events::PlaySoundOnEntity e;
-        e.EmitterID = m_Player.ID; 
-        e.FilePath = "Audio/weapon/hitclick.wav";
-        m_EventBroker->Publish(e);
-    }
+    return damage > 0;
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Shield" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Blend>
+      <Pose1>Deploy</Pose1>
+      <Pose2>Idle</Pose2>
+      <Weight>0</Weight>
+    </c:Blend>
+    <c:Model>
+      <Resource>Models/Characters/Defender/DefenderShield.mesh</Resource>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Deploy">
+      <Components>
+        <c:Animation>
+          <AnimationName>ActivateDeactiveShieldF</AnimationName>
+          <Time>1</Time>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Idle">
+      <Components>
+        <c:Animation>
+          <AnimationName>ShieldFrontF</AnimationName>
+          <Speed>1</Speed>
+        </c:Animation>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ScoreBoard_Main_Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Background_Spectator">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="-19" Z="0"/>
+          <Scale X="30" Y="12" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ScoreBoard_Spectators">
+      <Components>
+        <c:ScoreScreen>
+          <Offset X="0" Y="-2" Z="0"/>
+        </c:ScoreScreen>
+        <c:Team/>
+        <c:Transform>
+          <Position X="0" Y="-15.7886772" Z="1.5"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Background_Main">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Scale X="69" Y="25" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Spawner_1">
+      <Components>
+        <c:Spawner>
+          <EntityFile></EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="16.5" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Spawner_2">
+      <Components>
+        <c:Spawner>
+          <EntityFile></EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="-16.5" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

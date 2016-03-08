@@ -6,9 +6,11 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
     , PureSystem("CapturePoint")
 {
     //subscribe/listenTo playerdamage,healthpickup events (using the eventBroker)
-    EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
-    EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
-    EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
+    if (IsServer) {
+        EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
+        EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
+        EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
+    }
 
 }
 
@@ -16,15 +18,22 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
 //NOTE: needs to run each frame, since we're possibly modifying the captureTimer for the capturePoints by dt
 void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, ComponentWrapper& cCapturePoint, double dt)
 {
-    //if (!IsClient) {
-    //    return;
-    //}
+    if (!IsServer) {
+        return;
+    }
     if (m_WinnerWasFound) {
         return;
     }
     const int capturePointNumber = cCapturePoint["CapturePointNumber"];
     const bool hasTeamComponent = capturePointEntity.HasComponent("Team");
 
+    if (m_NumberOfCapturePoints != 0) {
+        if (!m_CapturePointNumberToEntityMap[0].HasComponent("CapturePoint")) {
+            //if map has changed, the capturepoints has changed, now have to redo them
+            m_NumberOfCapturePoints = 0;
+            m_CapturePointNumberToEntityMap.clear();
+        }
+    }
     //if point doesnt have a teamComponent yet, add one. since:
     //what if capture point has no team -> we cant get/use the team enum from it...
     if (!hasTeamComponent) {
@@ -60,6 +69,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     int ownedBy = teamComponent["Team"];
     int redTeamPlayersStandingInside = 0;
     int blueTeamPlayersStandingInside = 0;
+    //note: old color system
     if (capturePointEntity.HasComponent("Model")) {
         //Now sets team color to the capturepoint, or white if it is uncaptured.
         capturePointEntity["Model"]["Color"] = ownedBy == blueTeam ? glm::vec4(0, 0.0f, 1, 0.3) : ownedBy == redTeam ? glm::vec4(1, 0.0f, 0, 0.3) : glm::vec4(1, 1, 1, 0.3);
@@ -92,6 +102,23 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         if ((int)capturePointOwnedBy["Team"] == blueTeam && m_BlueTeamHomeCapturePoint != 0) {
             nextPossibleCapturePoint["Blue"] = i - 1;
         }
+    }
+
+    if (m_RecentlyCapturedNeedNextCapturePointNow) {
+        //change what model is displaying (change all in case 2 capturepoints has been captured on the same frame)
+        for (int i = 0; i < m_NumberOfCapturePoints; i++) {
+            auto owner = (int)m_CapturePointNumberToEntityMap[i]["Team"]["Team"];
+            if (m_CapturePointNumberToEntityMap[i].FirstChildByName("Red").ID != EntityID_Invalid) {
+                (bool&)m_CapturePointNumberToEntityMap[i].FirstChildByName("Red")["Model"]["Visible"] = owner == redTeam ? true : false;
+                (bool&)m_CapturePointNumberToEntityMap[i].FirstChildByName("Blue")["Model"]["Visible"] = owner == blueTeam ? true : false;
+                (bool&)m_CapturePointNumberToEntityMap[i].FirstChildByName("Spectator")["Model"]["Visible"] = owner == spectatorTeam ? true : false;
+            }
+        }
+        //save the next cap points and publish the captured event
+        m_CapturedEvent.BlueTeamNextCapturePoint = m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Blue"]];
+        m_CapturedEvent.RedTeamNextCapturePoint = m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Red"]];
+        m_EventBroker->Publish(m_CapturedEvent);
+        m_RecentlyCapturedNeedNextCapturePointNow = false;
     }
 
     //reset timers and reset the bool that triggers this
@@ -170,8 +197,8 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //if capturePoint is owned by the team, and the other team has been trying to take it, then increase/decrease the timer towards 0.0
-        if ((ownedBy == currentTeam && currentTeam == redTeam && (double)cCapturePoint["CaptureTimer"] < 0.0) ||
-            (ownedBy == currentTeam && currentTeam == blueTeam && (double)cCapturePoint["CaptureTimer"] > 0.0)) {
+        if ((ownedBy == currentTeam && currentTeam == redTeam && (double)cCapturePoint["CaptureTimer"] < captureTimeToTakeOver) ||
+            (ownedBy == currentTeam && currentTeam == blueTeam && (double)cCapturePoint["CaptureTimer"] > -captureTimeToTakeOver)) {
             cCapturePoint["CaptureTimer"] = (double)cCapturePoint["CaptureTimer"] + timerDeltaChange;
         }
         //check if captureTimer > captureTimeToTakeOver and if so change owner and publish the eCaptured event
@@ -179,10 +206,9 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             teamComponent["Team"] = currentTeam;
             cCapturePoint["CaptureTimer"] = glm::sign((double)cCapturePoint["CaptureTimer"])*captureTimeToTakeOver;
             //publish Captured event
-            Events::Captured e;
-            e.CapturePointID = cCapturePoint.EntityID;
-            e.TeamNumberThatCapturedCapturePoint = currentTeam;
-            m_EventBroker->Publish(e);
+            m_RecentlyCapturedNeedNextCapturePointNow = true;
+            m_CapturedEvent.CapturePointTakenID = cCapturePoint.EntityID;
+            m_CapturedEvent.TeamNumberThatCapturedCapturePoint = currentTeam;
             //NextPossibleCapturePoint will be calculated in the next update...
         }
     }

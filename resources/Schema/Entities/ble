@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="AnimationTests" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:SceneLight>
+      <Gamma>0.30000001192092896</Gamma>
+      <Exposure>3</Exposure>
+    </c:SceneLight>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Transform>
+          <Position X="0.100000001" Y="-1.5150001" Z="-3.70500016"/>
+          <Orientation X="0" Y="2.41300011" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:DirectionalLight>
+              <Intensity>0</Intensity>
+            </c:DirectionalLight>
+            <c:Model>
+              <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="2.42800021" Z="-2.80000019"/>
+              <Orientation X="5.60000038" Y="3.14159203" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Light">
+          <Components>
+            <c:PointLight>
+              <Color A="1" B="0.70588237" G="0.70588237" R="1"/>
+              <Radius>8</Radius>
+              <Intensity>0.60000002384185791</Intensity>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="1.32209361" Y="1.37392569" Z="-0.0505663045"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Assault">
+          <Components>
+            <c:BlendAdditive>
+              <Adder></Adder>
+              <Receiver></Receiver>
+            </c:BlendAdditive>
+            <c:Model>
+              <GlowIntensity>5</GlowIntensity>
+              <Resource>Models/Characters/Defender/DefenderBlue.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="WeaponAttachment">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Scale X="1.00000012" Y="1" Z="1.00000012"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="AimBlend">
+              <Components>
+                <c:Blend>
+                  <Pose1>AimPrimary</Pose1>
+                  <Pose2>AimSecondary</Pose2>
+                  <Weight>0</Weight>
+                </c:Blend>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="AimPrimary">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName></AnimationName>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="AimSecondary">
+                  <Components>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Plane">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitPlane.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Scale X="5" Y="1" Z="5"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Light">
+          <Components>
+            <c:PointLight>
+              <Color A="1" B="0.956862748" G="0.960784316" R="0.819607854"/>
+              <Radius>8</Radius>
+              <Intensity>0.60000002384185791</Intensity>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-1.36898434" Y="1.37392569" Z="0.620898128"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Light">
+          <Components>
+            <c:PointLight>
+              <Radius>8</Radius>
+              <Intensity>0.80000001192092896</Intensity>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-0.127636135" Y="1.37392569" Z="-1.52101767"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

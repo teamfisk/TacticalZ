@@ -8,7 +8,6 @@
 
 #include "Network/TCPServer.h"
 #include "Network/UDPServer.h"
-#include "Network/UDPClient.h" //LOL
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
@@ -18,8 +17,13 @@
 #include "Core/EPlayerDamage.h"
 #include "Network/EPlayerDisconnected.h"
 #include "Core/EPlayerSpawned.h"
+#include "../Game/Events/EDoubleJump.h"
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
+#include "Core/EAmmoPickup.h"
+#include "Core/EPlayerDeath.h"
+#include "Network/EPlayerConnected.h"
+#include "Network/EKillDeath.h"
 
 class Server : public Network
 {
@@ -32,7 +36,7 @@ public:
 private:
     // Network channels
     TCPServer m_Reliable;
-    UDPServer m_Unreliable;
+    //UDPServer m_Unreliable;
     UDPServer m_ServerlistRequest;
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
@@ -76,18 +80,21 @@ private:
     void parseOnPlayerDamage(Packet& packet);
     void identifyPacketLoss();
     void kick(PlayerID player);
-    PlayerID GetPlayerIDFromEndpoint();
+    PlayerID getPlayerIDFromEndpoint();
+    PlayerID getPlayerIDFromEntityID(EntityID entityID);
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
     void parsePing();
-    void parseUDPConnect(Packet & packet);
-    void parseTCPConnect(Packet & packet);
+    bool parseDoubleJump(Packet& packet);
+    void parseDashEffect(Packet& packet);
+    void parseUDPConnect(Packet& packet);
+    void parseTCPConnect(Packet& packet);
     void parseDisconnect();
     void parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint);
     bool shouldSendToClient(EntityWrapper childEntity);
 
-    // Debug event
+    // Events
     EventRelay<Server, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
     EventRelay<Server, Events::PlayerSpawned> m_EPlayerSpawned;
@@ -98,6 +105,10 @@ private:
     bool OnComponentDeleted(const Events::ComponentDeleted& e);
     EventRelay<Server, Events::PlayerDamage> m_EPlayerDamage;
     bool OnPlayerDamage(const Events::PlayerDamage& e);
+    EventRelay<Server, Events::AmmoPickup> m_EAmmoPickup;
+    bool OnAmmoPickup(const Events::AmmoPickup& e);
+    EventRelay<Server, Events::PlayerDeath> m_EPlayerDeath;
+    bool OnPlayerDeath(const Events::PlayerDeath& e);
 };
 
 #endif

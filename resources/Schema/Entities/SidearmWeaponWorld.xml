@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="SidearmWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Model>
+      <Resource>Models/Weapons/SecondaryWeapon.mesh</Resource>
+    </c:Model>
+    <c:Transform>
+      <Position X="-0.0160000008" Y="0.0800000057" Z="-0.275000006"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="WeaponMuzzle">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="0.0123999491" Y="0.102453232" Z="-0.273824364"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

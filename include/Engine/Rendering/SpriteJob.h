@@ -17,7 +17,7 @@
 
 struct SpriteJob : RenderJob
 {
-    SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage, bool depthSorted)
+    SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage, bool depthSorted, bool isIndicator)
         : RenderJob()
     {
         Model = ResourceManager::Load<::Model>("Models/Core/UnitQuad.mesh");
@@ -30,7 +30,7 @@ struct SpriteJob : RenderJob
 
         StartIndex = matProp.material->StartIndex;
         EndIndex = matProp.material->EndIndex;
-        Matrix = matrix;
+		Matrix = matrix;
         Color = cSprite["Color"];
         Entity = cSprite.EntityID;
         Position = Transform::AbsolutePosition(world, cSprite.EntityID);
@@ -41,7 +41,8 @@ struct SpriteJob : RenderJob
         }
         World = world;
         Pickable = world->HasComponent(cSprite.EntityID, "Button");
-        
+		IsIndicator = isIndicator;
+
         FillColor = fillColor;
         FillPercentage = fillPercentage;
     };
@@ -61,7 +62,9 @@ struct SpriteJob : RenderJob
     unsigned int StartIndex = 0;
     unsigned int EndIndex = 0;
     World* World;
+
     bool Pickable;
+	bool IsIndicator = false;
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;

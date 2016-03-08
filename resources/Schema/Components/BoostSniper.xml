@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<BoostSniper xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BoostSniper.xsd">
+  <StrengthOfEffect>10</StrengthOfEffect>
+</BoostSniper>
