@@ -67,16 +67,18 @@ bool AmmoPickupSystem::DoesPlayerHaveMaxAmmo(EntityWrapper &player) {
         return false;
     }
 }
-int& AmmoPickupSystem::GetPlayerAmmo(EntityWrapper &player) {
+void AmmoPickupSystem::SetPlayerAmmo(EntityWrapper &player, int ammoGain) {
+    int maxWeaponAmmo = GetPlayerMaxAmmo(player);
+
     PlayerClass playerClass = DetermineClass(player);
     if (playerClass == PlayerClass::Defender) {
-        return (int)player["DefenderWeapon"]["Ammo"];
+        (int&)player["DefenderWeapon"]["Ammo"] = std::min((int)player["DefenderWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
     } else if (playerClass == PlayerClass::Sniper) {
-        return (int)player["SniperWeapon"]["Ammo"];
+        (int&)player["SniperWeapon"]["Ammo"] = std::min((int)player["SniperWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
     } else if (playerClass == PlayerClass::Assault) {
-        return (int)player["AssaultWeapon"]["Ammo"];
+        (int&)player["AssaultWeapon"]["Ammo"] = std::min((int)player["AssaultWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
     } else {
-        //TODO: should really return something here
+        //unknown class - ignore
     }
 }
 int AmmoPickupSystem::GetPlayerMaxAmmo(EntityWrapper &player) {
@@ -141,12 +143,9 @@ bool AmmoPickupSystem::OnAmmoPickup(Events::AmmoPickup & e)
     if (DoesPlayerHaveMaxAmmo(e.Player)) {
         return false;
     }
-    int maxWeaponAmmo = GetPlayerMaxAmmo(e.Player);
-    int& currentAmmo = GetPlayerAmmo(e.Player);
+    SetPlayerAmmo(e.Player, e.AmmoGain);
 
-    currentAmmo = std::min(currentAmmo + e.AmmoGain, maxWeaponAmmo);
-
-    return false;
+    return true;
 }
 
 bool AmmoPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {

@@ -50,7 +50,7 @@ private:
     //helper methods
     bool DoesPlayerHaveMaxAmmo(EntityWrapper &player);
     PlayerClass DetermineClass(EntityWrapper &player);
-    int& GetPlayerAmmo(EntityWrapper &player);
+    void SetPlayerAmmo(EntityWrapper &player, int ammoGain);
     int GetPlayerMaxAmmo(EntityWrapper &player);
 };
 #endif
