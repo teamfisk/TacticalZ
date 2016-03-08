@@ -3,27 +3,32 @@
 
 #include "GLM.h"
 
-#include "Common.h"
-#include "Core/System.h"
-#include "Core/ResourceManager.h"
+#include "../Common.h"
+#include "../Core/System.h"
+#include "../Core/ResourceManager.h"
 #include "Rendering/Model.h"
-#include "Rendering/EAnimationComplete.h"
 #include "Rendering/Skeleton.h"
-#include <imgui/imgui.h>
+#include "Rendering/BlendTree.h"
+#include "Rendering/EAutoAnimationBlend.h"
+#include "../Core/EntityWrapper.h"
+#include "Rendering/AutoBlendQueue.h"
+#include "../Input/EInputCommand.h"
+#include "imgui/imgui.h"
 
-class AnimationSystem : public PureSystem
+class AnimationSystem : public ImpureSystem
 {
 public:
-    AnimationSystem(SystemParams params)
-        : System(params)
-        , PureSystem("Animation")
-    {
-
-    }
+    AnimationSystem(SystemParams params);
     ~AnimationSystem() { }
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& animationComponent, double dt) override;
+    virtual void Update(double dt) override;
 private:
+    void CreateBlendTrees();
+    void UpdateAnimations(double dt);
+    void UpdateWeights(double dt);
 
+    EventRelay<AnimationSystem, Events::AutoAnimationBlend> m_EAutoAnimationBlend;
+    bool OnAutoAnimationBlend(Events::AutoAnimationBlend& e);
+    std::unordered_map<EntityWrapper, AutoBlendQueue> m_AutoBlendQueues;
 };
 
 #endif

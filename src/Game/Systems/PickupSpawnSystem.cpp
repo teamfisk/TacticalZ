@@ -83,6 +83,10 @@ bool PickupSpawnSystem::OnTriggerLeave(Events::TriggerLeave& e)
 }
 void PickupSpawnSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger)
 {
+    //trigger should be valid but if it isnt we just return (to avoid crash)
+    if (!trigger.Valid()) {
+        return;
+    }
     double healthGiven = 0.01*(double)trigger["HealthPickup"]["HealthGain"] * (double)player["Health"]["MaxHealth"];
 
     //only the server will increase the players hp and set it in the next delta

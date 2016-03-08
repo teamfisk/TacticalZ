@@ -12,6 +12,9 @@
 				<xs:element name="StrengthOfEffect" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>This is the strength of the sprint effect</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Active" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>True if currently sprinting.</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

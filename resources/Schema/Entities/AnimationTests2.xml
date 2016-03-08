@@ -2,6 +2,10 @@
 <Entity name="AnimationTests" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:SceneLight>
+      <Gamma>0.30000001192092896</Gamma>
+      <Exposure>3</Exposure>
+    </c:SceneLight>
     <c:Transform/>
   </Components>
 
@@ -9,138 +13,542 @@
     <Entity>
       <Components>
         <c:Transform>
-          <Position X="-0.100000001" Y="-1.11500001" Z="-3.10500026"/>
+          <Position X="0.100000001" Y="-1.5150001" Z="-3.70500016"/>
+          <Orientation X="0" Y="2.41300011" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
         <Entity>
           <Components>
-            <c:DirectionalLight/>
+            <c:DirectionalLight>
+              <Intensity>0</Intensity>
+            </c:DirectionalLight>
             <c:Model>
               <Resource>Models/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
             </c:Model>
             <c:Transform>
               <Position X="0" Y="2.42800021" Z="-2.80000019"/>
-              <Orientation X="5.40800047" Y="3.65100026" Z="0"/>
+              <Orientation X="5.60000038" Y="3.14159203" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
         </Entity>
-        <Entity name="Running">
-          <Components>
-            <c:Animation>
-              <AnimationName1>Run</AnimationName1>
-              <Weight1>0.5</Weight1>
-              <Time1>0.60188997954429357</Time1>
-              <Speed1>-1</Speed1>
-              <Speed2>1</Speed2>
-              <Weight2>0.5</Weight2>
-              <Time2>0.96957233017255007</Time2>
-              <Time3>0.093923612201312068</Time3>
-              <Speed3>1</Speed3>
-            </c:Animation>
-            <c:AnimationOffset>
-              <AnimationName>AimRifle</AnimationName>
-              <Time>0.5</Time>
-            </c:AnimationOffset>
-            <c:Model>
-              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="-0.690088332" Y="0" Z="0"/>
-            </c:Transform>
-          </Components>
-          <Children>
-            <Entity name="R_Arm_Weapon_Joint">
-              <Components>
-                <c:BoneAttachment>
-                  <BoneName>R_Arm_Weapon_Joint</BoneName>
-                  <ScaleOffset X="0.200000003" Y="0.200000003" Z="0.200000003"/>
-                </c:BoneAttachment>
-                <c:Model>
-                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="0.161975682" Y="1.06281972" Z="-0.216630161"/>
-                  <Orientation X="-0.064812161" Y="-0.0739696771" Z="0.143780142"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
-        </Entity>
-        <Entity>
+        <Entity name="Light">
           <Components>
             <c:PointLight>
               <Color A="1" B="0.70588237" G="0.70588237" R="1"/>
-              <Radius>10</Radius>
+              <Radius>8</Radius>
+              <Intensity>0.60000002384185791</Intensity>
             </c:PointLight>
             <c:Transform>
-              <Position X="-0.375567257" Y="2.13093901" Z="-0.718547285"/>
+              <Position X="1.32209361" Y="1.37392569" Z="-0.0505663045"/>
             </c:Transform>
           </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Assault">
+          <Components>
+            <c:BlendAdditive>
+              <Adder>AimBlend</Adder>
+              <Receiver>FinalBlend</Receiver>
+            </c:BlendAdditive>
+            <c:Model>
+              <GlowIntensity>5</GlowIntensity>
+              <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
+            </c:Model>
+            <c:Transform/>
+          </Components>
           <Children>
-            <Entity>
+            <Entity name="WeaponAttachment">
               <Components>
-                <c:PointLight>
-                  <Color A="1" B="1" G="0.70588237" R="0.70588237"/>
-                  <Radius>10</Radius>
-                </c:PointLight>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Model>
+                  <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                </c:Model>
                 <c:Transform>
-                  <Position X="-1.96873236" Y="0" Z="0"/>
+                  <Position X="0.154985309" Y="1.07679462" Z="-0.201120675"/>
+                  <Scale X="1.00000012" Y="1" Z="1.00000012"/>
+                  <Orientation X="-0.0289514996" Y="-0.119508959" Z="0.18072544"/>
                 </c:Transform>
               </Components>
               <Children/>
             </Entity>
+            <Entity name="AimBlend">
+              <Components>
+                <c:Blend>
+                  <Pose1>AimPrimary</Pose1>
+                  <Pose2>AimSecondary</Pose2>
+                  <Weight>0</Weight>
+                </c:Blend>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="AimPrimary">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>AimRifleA</AnimationName>
+                      <Time>0.49999979138374329</Time>
+                      <Loop>false</Loop>
+                      <Additive>true</Additive>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="AimSecondary">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>AimSecWepA</AnimationName>
+                      <Time>0.5</Time>
+                      <Loop>false</Loop>
+                      <Additive>true</Additive>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="FinalBlend">
+              <Components>
+                <c:BlendOverride>
+                  <Master>ReloadSwitchBlend</Master>
+                  <Slave>MovementBlend</Slave>
+                </c:BlendOverride>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="MovementBlend">
+                  <Components>
+                    <c:Blend>
+                      <Pose1>StandCrouchBlend</Pose1>
+                      <Pose2>JumpDashBlend</Pose2>
+                      <Weight>0</Weight>
+                    </c:Blend>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity name="StandCrouchBlend">
+                      <Components>
+                        <c:Blend>
+                          <Pose1>StandMovement</Pose1>
+                          <Pose2>CrouchMovement</Pose2>
+                          <Weight>0</Weight>
+                        </c:Blend>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="StandMovement">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>MovementBlend</Pose1>
+                              <Pose2>Idle</Pose2>
+                              <Weight>0</Weight>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="MovementBlend">
+                              <Components>
+                                <c:Blend>
+                                  <Pose1>RunWalkBlend</Pose1>
+                                  <Pose2>StrafeLRBlend</Pose2>
+                                  <Weight>0</Weight>
+                                </c:Blend>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="RunWalkBlend">
+                                  <Components>
+                                    <c:Blend>
+                                      <Pose1>Walk</Pose1>
+                                      <Pose2>Run</Pose2>
+                                      <Weight>1</Weight>
+                                    </c:Blend>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Walk">
+                                      <Components>
+                                        <c:Animation>
+                                          <AnimationName>WalkF</AnimationName>
+                                        </c:Animation>
+                                        <c:Transform/>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Run">
+                                      <Components>
+                                        <c:Animation>
+                                          <AnimationName>RunF</AnimationName>
+                                          <Time>0.89967686078176468</Time>
+                                          <Speed>1</Speed>
+                                        </c:Animation>
+                                        <c:Transform/>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                                <Entity name="StrafeLRBlend">
+                                  <Components>
+                                    <c:Blend>
+                                      <Pose1>Left</Pose1>
+                                      <Pose2>Right</Pose2>
+                                      <Weight>0</Weight>
+                                    </c:Blend>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Left">
+                                      <Components>
+                                        <c:Animation>
+                                          <AnimationName>StrafeLeftF</AnimationName>
+                                        </c:Animation>
+                                        <c:Transform/>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Right">
+                                      <Components>
+                                        <c:Animation>
+                                          <AnimationName>StrafeRightF</AnimationName>
+                                        </c:Animation>
+                                        <c:Transform/>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Idle">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>IdleF</AnimationName>
+                                  <Time>0.33219857512804407</Time>
+                                  <Speed>1</Speed>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="CrouchMovement">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>MovementBlend</Pose1>
+                              <Pose2>Idle</Pose2>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="MovementBlend">
+                              <Components>
+                                <c:Blend>
+                                  <Pose1>Walk</Pose1>
+                                  <Pose2>StrafeLRBlend</Pose2>
+                                  <Weight>0</Weight>
+                                </c:Blend>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="StrafeLRBlend">
+                                  <Components>
+                                    <c:Blend>
+                                      <Pose1>Left</Pose1>
+                                      <Pose2>Right</Pose2>
+                                      <Weight>0</Weight>
+                                    </c:Blend>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Left">
+                                      <Components>
+                                        <c:Animation>
+                                          <AnimationName>CrouchStrafeLeftF</AnimationName>
+                                        </c:Animation>
+                                        <c:Transform/>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Right">
+                                      <Components>
+                                        <c:Animation>
+                                          <AnimationName>CrouchStrafeRightF</AnimationName>
+                                        </c:Animation>
+                                        <c:Transform/>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                                <Entity name="Walk">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>CrouchWalkF</AnimationName>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Idle">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>CrouchF</AnimationName>
+                                  <Time>0.86553330718370836</Time>
+                                  <Speed>1</Speed>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="JumpDashBlend">
+                      <Components>
+                        <c:Blend>
+                          <Pose1>Jump</Pose1>
+                          <Pose2>DashBlend</Pose2>
+                          <Weight>1</Weight>
+                        </c:Blend>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="Jump">
+                          <Components>
+                            <c:Animation>
+                              <AnimationName>JumpF</AnimationName>
+                              <Time>0.5</Time>
+                            </c:Animation>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="DashBlend">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>DashFBBlend</Pose1>
+                              <Pose2>DashLRBlend</Pose2>
+                              <Weight>0</Weight>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="DashFBBlend">
+                              <Components>
+                                <c:Blend>
+                                  <Pose1>DashForward</Pose1>
+                                  <Pose2>DashBackward</Pose2>
+                                  <Weight>1</Weight>
+                                </c:Blend>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="DashForward">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>DashForwardF</AnimationName>
+                                      <Loop>false</Loop>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="DashBackward">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>DashBackwardF</AnimationName>
+                                      <Time>1</Time>
+                                      <Loop>false</Loop>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="DashLRBlend">
+                              <Components>
+                                <c:Blend>
+                                  <Pose1>DashLeft</Pose1>
+                                  <Pose2>DashRight</Pose2>
+                                  <Weight>0</Weight>
+                                </c:Blend>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="DashLeft">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>DashLeftF</AnimationName>
+                                      <Time>1</Time>
+                                      <Loop>false</Loop>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="DashRight">
+                                  <Components>
+                                    <c:Animation>
+                                      <AnimationName>DashRightF</AnimationName>
+                                      <Loop>false</Loop>
+                                    </c:Animation>
+                                    <c:Transform/>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="ReloadSwitchBlend">
+                  <Components>
+                    <c:Blend>
+                      <Pose1>ReloadSwitch</Pose1>
+                      <Pose2>WeaponActionBlend</Pose2>
+                      <Weight>1</Weight>
+                    </c:Blend>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity name="ReloadSwitch">
+                      <Components>
+                        <c:Animation>
+                          <AnimationName>ReloadSwitchU</AnimationName>
+                          <Time>0.86721706215490468</Time>
+                          <Speed>1</Speed>
+                        </c:Animation>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="WeaponActionBlend">
+                      <Components>
+                        <c:Blend>
+                          <Pose1>IdleBlend</Pose1>
+                          <Pose2>ShootBlend</Pose2>
+                          <Weight>1</Weight>
+                        </c:Blend>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="IdleBlend">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>IdlePrimary</Pose1>
+                              <Pose2>IdleSecondary</Pose2>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="IdlePrimary">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>IdleAssaultRifleU</AnimationName>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="IdleSecondary">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>IdleSecWepU</AnimationName>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ShootBlend">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>ShootPrimary</Pose1>
+                              <Pose2>ShootSecondary</Pose2>
+                              <Weight>0</Weight>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="ShootPrimary">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootFastRifleU</AnimationName>
+                                  <Time>0.19605135393254369</Time>
+                                  <Speed>1</Speed>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="ShootSecondary">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootSecWepFastU</AnimationName>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
           </Children>
         </Entity>
-        <Entity>
+        <Entity name="Plane">
           <Components>
             <c:Model>
               <Resource>Models/Core/UnitPlane.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Scale X="10" Y="1" Z="10"/>
+              <Scale X="5" Y="1" Z="5"/>
             </c:Transform>
           </Components>
           <Children/>
         </Entity>
-        <Entity>
+        <Entity name="Light">
           <Components>
-            <c:Animation>
-              <AnimationName1>ShootFastRifle</AnimationName1>
-              <Time1>0.056234247235838808</Time1>
-              <Speed1>1</Speed1>
-              <Speed2>1</Speed2>
-              <AnimationName2>Idl</AnimationName2>
-              <Weight2>0.5</Weight2>
-              <Time2>1.8308673495784191</Time2>
-              <AnimationName3>StrafeRigh</AnimationName3>
-              <Weight3>0.5</Weight3>
-              <Time3>0.32167823998061529</Time3>
-              <Speed3>1</Speed3>
-            </c:Animation>
-            <c:Model>
-              <Resource>Models/Characters/Assault/AssaultAnimations.mesh</Resource>
-            </c:Model>
-            <c:Transform/>
+            <c:PointLight>
+              <Color A="1" B="0.956862748" G="0.960784316" R="0.819607854"/>
+              <Radius>8</Radius>
+              <Intensity>0.60000002384185791</Intensity>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-1.36898434" Y="1.37392569" Z="0.620898128"/>
+            </c:Transform>
           </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:BoneAttachment>
-                  <BoneName>R_Arm_Weapon_Joint</BoneName>
-                </c:BoneAttachment>
-                <c:Model>
-                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="0" Y="0.803468645" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
+          <Children/>
+        </Entity>
+        <Entity name="Light">
+          <Components>
+            <c:PointLight>
+              <Radius>8</Radius>
+              <Intensity>0.80000001192092896</Intensity>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-0.127636135" Y="1.37392569" Z="-1.52101767"/>
+            </c:Transform>
+          </Components>
+          <Children/>
         </Entity>
       </Children>
     </Entity>

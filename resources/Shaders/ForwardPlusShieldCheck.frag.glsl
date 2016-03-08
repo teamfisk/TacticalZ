@@ -178,7 +178,7 @@ void main()
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
-	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
+	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	

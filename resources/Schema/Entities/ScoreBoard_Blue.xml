@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ScoreBoard_Blue_Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="BlueSide">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Color A="1" B="1" G="0.505882382" R="0"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0" Z="0.5"/>
+          <Scale X="32" Y="23" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ScoreBoard_Blue">
+      <Components>
+        <c:ScoreScreen>
+          <Offset X="0" Y="-3" Z="0"/>
+        </c:ScoreScreen>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="0" Y="7" Z="1.5"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="IDText">
+          <Components>
+            <c:Text>
+              <Content>ID</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:Transform>
+              <Position X="-13" Y="2.5" Z="0"/>
+              <Scale X="2" Y="2" Z="2"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="NameText">
+          <Components>
+            <c:Text>
+              <Content>Name</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:Transform>
+              <Position X="-10" Y="2.5" Z="0"/>
+              <Scale X="2" Y="2" Z="2"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="KDText">
+          <Components>
+            <c:Text>
+              <Content>KD</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:Transform>
+              <Position X="1.28838646" Y="2.5" Z="0"/>
+              <Scale X="2" Y="2" Z="2"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="KillsText">
+          <Components>
+            <c:Text>
+              <Content>Kills</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:Transform>
+              <Position X="4.6874299" Y="2.5" Z="0"/>
+              <Scale X="2" Y="2" Z="2"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="DeathsText">
+          <Components>
+            <c:Text>
+              <Content>Deaths</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:Transform>
+              <Position X="8.9577198" Y="2.5" Z="0"/>
+              <Scale X="2" Y="2" Z="2"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

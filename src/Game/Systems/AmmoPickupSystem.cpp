@@ -96,6 +96,7 @@ bool AmmoPickupSystem::OnAmmoPickup(Events::AmmoPickup & e)
     }
 
     currentAmmo = std::min(currentAmmo + e.AmmoGain, maxWeaponAmmo);
+
     return false;
 }
 
@@ -114,17 +115,17 @@ bool AmmoPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
 }
 
 void AmmoPickupSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger) {
+    //trigger should be valid but if it isnt we just return (to avoid crash)
+    if (!trigger.Valid()) {
+        return;
+    }
     int maxWeaponAmmo = (int)player["AssaultWeapon"]["MaxAmmo"];
-    int& currentAmmo = (int)player["AssaultWeapon"]["Ammo"];
     int ammoGiven = 0.01*(double)trigger["AmmoPickup"]["AmmoGain"] * maxWeaponAmmo;
 
     Events::AmmoPickup ePlayerAmmoPickup;
     ePlayerAmmoPickup.AmmoGain = ammoGiven;
     ePlayerAmmoPickup.Player = player;
     m_EventBroker->Publish(ePlayerAmmoPickup);
-
-    //immediately give the player the ammo (on server)
-    currentAmmo = std::min(currentAmmo + ammoGiven, maxWeaponAmmo);
 
     //copy position, ammogain, respawntimer (twice since one of the values will be counted down to 0, the other will be set in the new object)
     //we need to copy all values since each value can be different for each ammoPickup

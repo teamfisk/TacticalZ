@@ -9,8 +9,8 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
-				<xs:element name="CoolDownMaxTimer" type="t:double" minOccurs="0">
-					<xs:annotation><xs:documentation>This is the cooldown on shield</xs:documentation></xs:annotation>
+				<xs:element name="Active" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If the shield is active or not</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>
