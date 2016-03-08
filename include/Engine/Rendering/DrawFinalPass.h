@@ -52,11 +52,11 @@ private:
 
     FrameBuffer m_FinalPassFrameBuffer;
 	FrameBuffer m_ShieldDepthFrameBuffer;
-    GLuint m_BloomTexture;
-    GLuint m_SceneTexture;
-    GLuint m_DepthBuffer;
-	GLuint m_ShieldBuffer;
-    GLuint m_CubeMapTexture;
+    GLuint m_BloomTexture = 0;
+    GLuint m_SceneTexture = 0;
+    GLuint m_DepthBuffer = 0;
+	GLuint m_ShieldBuffer = 0;
+    GLuint m_CubeMapTexture = 0;
 
     //maqke this component based i guess?
     GLuint m_ShieldPixelRate = 16;
