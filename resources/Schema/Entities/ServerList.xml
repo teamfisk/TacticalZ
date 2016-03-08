@@ -2,7 +2,9 @@
 <Entity name="ServerList" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:ServerList/>
+    <c:ServerList>
+      <Offset X="0" Y="-2" Z="0"/>
+    </c:ServerList>
     <c:Transform/>
   </Components>
 
@@ -10,10 +12,23 @@
     <Entity name="Identities_Origin">
       <Components>
         <c:Transform>
-          <Position X="-0.128615797" Y="0.181182757" Z="0"/>
+          <Position X="-0.13636373" Y="0.181182757" Z="0"/>
         </c:Transform>
       </Components>
-      <Children/>
+      <Children>
+        <Entity name="ServerIdentitySpawner">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/ServerIdentity.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0" Y="0" Z="0.00999999978"/>
+              <Scale X="0.0149999997" Y="0.0149999997" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
     <Entity name="Background">
       <Components>
@@ -38,6 +53,10 @@
           <GlowMap></GlowMap>
           <Color A="0.588235319" B="1" G="1" R="1"/>
         </c:Sprite>
+        <c:InputCmdButton>
+          <Command>RefreshServerList</Command>
+          <PressValue>1</PressValue>
+        </c:InputCmdButton>
         <c:Transform>
           <Position X="0.120867848" Y="0.222928733" Z="0.0189953279"/>
           <Scale X="0.0149999997" Y="0.0149999997" Z="1"/>

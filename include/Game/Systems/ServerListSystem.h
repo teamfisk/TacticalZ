@@ -6,8 +6,10 @@
 #include "Core/ResourceManager.h"
 #include "Core/Event.h"
 #include "Systems/SpawnerSystem.h"
+#include "Core/EventBroker.h"
 
 #include "Network/ESearchForServers.h"
+#include "Network/EDisplayServerlist.h"
 
 class ServerListSystem : public PureSystem
 {
@@ -20,8 +22,8 @@ public:
 private:
     IRenderer* m_Renderer;
 
-    //EventRelay<ServerListSystem, Events::SomeEventLol> m_EServerListRecieved;
-    //bool OnServerListRecieved(const Events::SomeEventLol& e)
+    EventRelay<ServerListSystem, Events::DisplayServerlist> m_EServerListRecieved;
+    bool OnServerListRecieved(const Events::DisplayServerlist& e);
 };
 
 #endif

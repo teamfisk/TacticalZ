@@ -5,7 +5,7 @@ ServerListSystem::ServerListSystem(SystemParams params, IRenderer* renderer)
     , PureSystem("ServerList")
     , m_Renderer(renderer)
 {
-    //Subscribe to OnServerListRecieved
+    EVENT_SUBSCRIBE_MEMBER(m_EServerListRecieved, &ServerListSystem::OnServerListRecieved);
 }
 
 void ServerListSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cServerList, double dt)
@@ -15,6 +15,39 @@ void ServerListSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& 
 
 void ServerListSystem::RefreshList()
 {
-    //Send out request for a server list.
+    Events::SearchForServers event;
+    m_EventBroker->Publish(event);
 }
 
+
+bool ServerListSystem::OnServerListRecieved(const Events::DisplayServerlist& e)
+{
+    if (e.Serverlist.size() == 0) {
+        return 1;
+    }
+    auto serverLists = m_World->GetComponents("ServerList");
+    if (serverLists == nullptr)
+        return 1;
+    for (auto& cServerList : *serverLists) {
+        EntityWrapper serverListEntity = EntityWrapper(m_World, cServerList.EntityID);
+        EntityWrapper identitySpawner = serverListEntity.FirstChildByName("ServerIdentitySpawner");
+        identitySpawner.DeleteChildren();
+
+        (int&)cServerList["TotalIdentities"] = (int)e.Serverlist.size();
+        for (int i = 0; i < e.Serverlist.size(); i++) {
+            //Create Identities for each server and place them on the right position.
+            EntityWrapper newIdentity = SpawnerSystem::Spawn(identitySpawner, identitySpawner);
+
+            glm::vec3 offset = (glm::vec3)serverListEntity["ServerList"]["Offset"];
+            (glm::vec3&)newIdentity["Transform"]["Position"] = offset * (float)i;
+
+            auto& cIdentity = newIdentity["ServerIdentity"];
+            (std::string&)cIdentity["IP"] = e.Serverlist[i].Address;
+            (std::string&)cIdentity["ServerName"] = e.Serverlist[i].Name;
+            (int&)cIdentity["Port"] = e.Serverlist[i].Port;
+            (int&)cIdentity["PlayersConnected"] = e.Serverlist[i].PlayersConnected;
+        }
+    }
+
+    return 1;
+}

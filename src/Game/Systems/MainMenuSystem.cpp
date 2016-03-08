@@ -71,6 +71,8 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
                     return 0;
                 }
                 m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+                Events::SearchForServers event;
+                m_EventBroker->Publish(event);
                 break;
             }
 
@@ -86,15 +88,19 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
                     return 0;
                 }
                 m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+                Events::SearchForServers event;
+                m_EventBroker->Publish(event);
+                break;
             }
-
-
         } else {
             //Serverlist submenu is open, close it.
             printf("\n\nMenuShit\n\n");
             m_World->DeleteEntity(m_OpenSubMenu.ID);
             m_OpenSubMenu = EntityWrapper::Invalid;
         }
+    } else if (e.Command == "RefreshServerList" && e.Value == 1){
+        Events::SearchForServers event;
+        m_EventBroker->Publish(event);
     }
     return true;
 }

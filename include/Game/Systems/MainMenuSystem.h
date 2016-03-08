@@ -12,6 +12,7 @@
 #include "GUI/EButtonPressed.h"
 #include "GUI/EButtonReleased.h"
 #include "Input/EInputCommand.h"
+#include "Network/ESearchForServers.h"
 
 
 class MainMenuSystem : public ImpureSystem
