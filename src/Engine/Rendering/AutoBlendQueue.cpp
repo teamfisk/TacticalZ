@@ -75,7 +75,6 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
         }
     }
 
-
     m_BlendQueue.clear();
     m_BlendQueue.push_back(blendNode);
 }
@@ -124,7 +123,7 @@ bool AutoBlendQueue::HasActiveBlendJob()
             try {
                 model = ResourceManager::Load<::Model, true>(blendJob.RootNode["Model"]["Resource"]);
             } catch (const std::exception&) {
-                m_BlendQueue.pop_front();
+                //m_BlendQueue.pop_front();
                 return HasActiveBlendJob();
             }
 

@@ -321,6 +321,8 @@ Skeleton::~Skeleton()
     for (auto &kv : Bones) {
         delete kv.second;
     }
+
+    BlendTrees.clear();
 }
 
 const Skeleton::Animation* Skeleton::GetAnimation(std::string name)

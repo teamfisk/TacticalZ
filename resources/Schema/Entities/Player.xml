@@ -875,7 +875,7 @@
                                     <c:Animation>
                                       <AnimationName>RunF</AnimationName>
                                       <Time>0.34392228616198395</Time>
-                                      <Speed>1</Speed>
+                                      <Speed>1.5</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
                                     <c:Transform/>
@@ -899,7 +899,7 @@
                                     <c:Animation>
                                       <AnimationName>StrafeRightF</AnimationName>
                                       <Time>0.27701693305173336</Time>
-                                      <Speed>1</Speed>
+                                      <Speed>2</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
                                     <c:Transform/>
@@ -911,7 +911,7 @@
                                     <c:Animation>
                                       <AnimationName>StrafeLeftF</AnimationName>
                                       <Time>0.25350140317161873</Time>
-                                      <Speed>1</Speed>
+                                      <Speed>2</Speed>
                                       <Play>true</Play>
                                     </c:Animation>
                                     <c:Transform/>
@@ -986,7 +986,7 @@
                                 <c:Animation>
                                   <AnimationName>DashForwardF</AnimationName>
                                   <Time>1</Time>
-                                  <Speed>2</Speed>
+                                  <Speed>3</Speed>
                                   <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>
@@ -998,7 +998,7 @@
                                 <c:Animation>
                                   <AnimationName>DashBackwardF</AnimationName>
                                   <Time>1</Time>
-                                  <Speed>2</Speed>
+                                  <Speed>3</Speed>
                                   <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>
@@ -1022,7 +1022,7 @@
                                 <c:Animation>
                                   <AnimationName>DashLeftF</AnimationName>
                                   <Time>1</Time>
-                                  <Speed>2</Speed>
+                                  <Speed>3</Speed>
                                   <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>
@@ -1034,7 +1034,7 @@
                                 <c:Animation>
                                   <AnimationName>DashRightF</AnimationName>
                                   <Time>1</Time>
-                                  <Speed>2</Speed>
+                                  <Speed>3</Speed>
                                   <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>
