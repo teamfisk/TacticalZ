@@ -27,6 +27,16 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
+                  <Resource>Models/Props/Highground1.mesh</Resource>
+                </c:Model>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
                   <Resource>Models/Props/Highground2.mesh</Resource>
                 </c:Model>
                 <c:Transform/>
@@ -72,16 +82,6 @@
                 <c:Collidable/>
                 <c:Model>
                   <Resource>Models/Props/Highground4.mesh</Resource>
-                </c:Model>
-                <c:Transform/>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Highground1.mesh</Resource>
                 </c:Model>
                 <c:Transform/>
               </Components>
@@ -1843,6 +1843,954 @@
             </Entity>
           </Children>
         </Entity>
+        <Entity name="Bridges">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-47.6850471" Y="7.0585866" Z="38.1646194"/>
+                  <Orientation X="0" Y="0.597000003" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-9.79273701" Y="4.23927069" Z="-20.5460548"/>
+                  <Orientation X="0.155000001" Y="2.03299999" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="16.2577343" Y="5.24232578" Z="-71.1721954"/>
+                  <Orientation X="5.91200018" Y="5.79500008" Z="0.0160000008"/>
+                  <Scale X="1" Y="1" Z="1.60000002"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="38.565815" Y="1.78125501" Z="-12.5027514"/>
+                  <Orientation X="3.06700015" Y="5.85900021" Z="0"/>
+                  <Scale X="2.5" Y="2.5" Z="2.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-41.0066338" Y="6.08244133" Z="75.8575821"/>
+                  <Orientation X="0" Y="2.92200017" Z="0"/>
+                  <Scale X="0.899999976" Y="0.899999976" Z="0.899999976"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="2.02681065" Y="-1.01835084" Z="2.92769241"/>
+                      <Orientation X="0" Y="4.5880003" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Collidable/>
+                        <c:Model>
+                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="-1.96250451" Y="0" Z="0.108926408"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Collidable/>
+                            <c:Model>
+                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="-1.85260701" Y="0" Z="0.340662181"/>
+                              <Orientation X="0" Y="0.142000005" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Collidable/>
+                                <c:Model>
+                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="-1.83422697" Y="0" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-2.05343437" Y="-0.817824244" Z="2.89228034"/>
+                      <Orientation X="0" Y="1.52900004" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Collidable/>
+                        <c:Model>
+                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="1.9744426" Y="0" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Collidable/>
+                            <c:Model>
+                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="1.89133775" Y="0" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Collidable/>
+                                <c:Model>
+                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="1.93167973" Y="0" Z="-0.0598336607"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-25.9571095" Y="6.43997049" Z="41.7452164"/>
+                  <Orientation X="0" Y="2.78500009" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Pillars/SciFiBridgePillar1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-23.6694527" Y="-0.162040144" Z="35.3689957"/>
+                  <Orientation X="0" Y="1.21400011" Z="0"/>
+                  <Scale X="1.14999998" Y="1.14999998" Z="1.14999998"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="25.2147388" Y="6.4451251" Z="-41.7257042"/>
+                  <Orientation X="0" Y="2.72400022" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-35.0514908" Y="1.31594038" Z="14.3308191"/>
+                  <Orientation X="6.21200037" Y="0.357000023" Z="3.18900013"/>
+                  <Scale X="2.5" Y="2.5" Z="2.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="45.3988762" Y="6.10456753" Z="-73.9011993"/>
+                  <Orientation X="0" Y="2.54200006" Z="0"/>
+                  <Scale X="0.899999976" Y="0.899999976" Z="0.899999976"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="2.06068087" Y="-0.704975307" Z="-2.7707541"/>
+                      <Orientation X="0" Y="4.65500021" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Collidable/>
+                        <c:Model>
+                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="1.80583596" Y="0" Z="-0.0662016794"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Collidable/>
+                            <c:Model>
+                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="1.92975175" Y="0" Z="-0.246409908"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Collidable/>
+                                <c:Model>
+                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="1.90471327" Y="0" Z="-0.0366260633"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Collidable/>
+                    <c:Model>
+                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-2.12194037" Y="-0.910161376" Z="-2.91662836"/>
+                      <Orientation X="0" Y="1.51400006" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Collidable/>
+                        <c:Model>
+                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                        </c:Model>
+                        <c:Transform>
+                          <Position X="-1.90262771" Y="0" Z="0.157715589"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Collidable/>
+                            <c:Model>
+                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="-2.00626397" Y="0" Z="0.0953077674"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Collidable/>
+                                <c:Model>
+                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="-1.84841895" Y="0" Z="0.120156199"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Pillars/SciFiBridgePillar1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-51.6690636" Y="-0.394736767" Z="32.3927002"/>
+                  <Orientation X="0" Y="0.601000011" Z="0"/>
+                  <Scale X="1.29999995" Y="1.29999995" Z="1.29999995"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="46.3167992" Y="6.36057663" Z="-37.5957794"/>
+                  <Orientation X="0" Y="0.449000031" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Flora">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-2.41990042" Y="2.58699584" Z="19.9124165"/>
+                  <Scale X="3" Y="1" Z="3"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="16.3593407" Y="4.03186893" Z="-54.4961166"/>
+                  <Orientation X="0.800000012" Y="1.54200006" Z="0.950000048"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-33.3682251" Y="1.29794216" Z="-5.1068635"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-4.12231922" Y="0" Z="0.0734748542"/>
+                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0.825131297" Y="0.0392211899" Z="-2.68803668"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-3.18869925" Y="-0.0465571098" Z="-0.156896129"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-1.50829625" Y="0" Z="-1.36683047"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-6.6609869" Y="-0.0822908431" Z="0.497708082"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-16.086235" Y="1.14612257" Z="-58.653511"/>
+                  <Orientation X="0" Y="0" Z="0.368000031"/>
+                  <Scale X="5" Y="0.5" Z="4"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="36.8391495" Y="0.354240507" Z="-36.1228752"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Flora/TreeLog.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-16.9453087" Y="5.87534618" Z="70.2123871"/>
+                  <Orientation X="6.16200018" Y="2.69900012" Z="0"/>
+                  <Scale X="1" Y="1" Z="1.9000001"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-39.7359962" Y="7.07301474" Z="44.503479"/>
+                  <Orientation X="0" Y="2.77400017" Z="0"/>
+                  <Scale X="5" Y="1.20000005" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-16.1163445" Y="2.64729095" Z="13.7721815"/>
+                  <Scale X="4" Y="1" Z="4"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-37.1739006" Y="-0.42142114" Z="20.2114239"/>
+                  <Orientation X="0" Y="2.78500009" Z="0"/>
+                  <Scale X="3" Y="1" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-34.0606956" Y="1.351318" Z="-9.3299942"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-1.26497173" Y="0" Z="-0.770973921"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-5.07476997" Y="-0.226556212" Z="1.06996441"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-3.51634121" Y="0" Z="0.361474007"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-2.01497531" Y="0" Z="0.529605865"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-6.99046469" Y="0" Z="2.41139221"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="37.5247917" Y="-0.0470023267" Z="44.616066"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-0.944169402" Y="-0.115016744" Z="2.55453658"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="2.23344159" Y="5.81031799" Z="49.3508453"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="1.33421552" Y="-0.314844221" Z="2.08641219"/>
+                      <Orientation X="6.15800047" Y="2.13600016" Z="6.05900049"/>
+                      <Scale X="3" Y="0.600000024" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-39.0984802" Y="-0.108596213" Z="-44.3850861"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0.961832285" Y="-0.076986894" Z="1.68568408"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0.79823947" Y="0" Z="0.768518806"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-0.65692234" Y="0" Z="-0.820335329"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-32.1996002" Y="-0.0544338152" Z="-45.6432495"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="-0.180973515" Y="0" Z="-1.24658465"/>
+                      <Orientation X="0" Y="1.45400012" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0.439413577" Y="-0.0554550402" Z="-2.04467154"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="5.20403671" Y="3.92516422" Z="50.8952713"/>
+                  <Orientation X="5.35500002" Y="5.59300041" Z="5.46000004"/>
+                  <Scale X="5" Y="0.5" Z="4"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="10.088026" Y="3.82045817" Z="58.594841"/>
+                  <Orientation X="0" Y="0" Z="5.95900011"/>
+                  <Scale X="6" Y="0.5" Z="4"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-48.6960449" Y="-0.303518057" Z="38.1689491"/>
+                  <Orientation X="0" Y="2.30900002" Z="0.165000007"/>
+                  <Scale X="8" Y="1" Z="3"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-11.3790789" Y="2.99803734" Z="-59.0326385"/>
+                  <Orientation X="0" Y="0" Z="0.407000005"/>
+                  <Scale X="5" Y="0.5" Z="4"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="31.6653385" Y="0" Z="48.5894928"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0.704392493" Y="-0.102173261" Z="2.3578465"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="0.77298075"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                      <Transparent>true</Transparent>
+                    </c:Model>
+                    <c:Transform>
+                      <Position X="0.173719227" Y="-0.137990117" Z="1.62556207"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
+                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-15.8430891" Y="2.84977508" Z="55.3108711"/>
+                  <Orientation X="6.06900024" Y="5.06900024" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-11.8932762" Y="2.56066394" Z="17.0684566"/>
+                  <Orientation X="0" Y="2.30900002" Z="0"/>
+                  <Scale X="4" Y="0.800000012" Z="4"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-29.6445026" Y="6.56799507" Z="49.7146225"/>
+                  <Orientation X="0" Y="2.6400001" Z="6.18300009"/>
+                  <Scale X="8" Y="1" Z="3"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
+                  <Transparent>true</Transparent>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-0.947859526" Y="5.96373081" Z="-51.2143593"/>
+                  <Orientation X="0" Y="5.36600018" Z="0"/>
+                  <Scale X="6" Y="1" Z="4"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
         <Entity name="Stones">
           <Components>
             <c:Transform/>
@@ -3288,34 +4236,6 @@
                   <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="5.96433973" Y="6.23201704" Z="-40.7198601"/>
-                  <Orientation X="0" Y="5.40500021" Z="0.291000009"/>
-                  <Scale X="1.29999995" Y="1.29999995" Z="1.29999995"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="5.3391571" Y="5.16256142" Z="-67.1743546"/>
-                  <Orientation X="0" Y="3.49300027" Z="0.252000004"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="44.7766609" Y="3.13732195" Z="-8.09564495"/>
                   <Orientation X="0" Y="2.77000022" Z="0"/>
                 </c:Transform>
@@ -3398,6 +4318,34 @@
                   <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
                 </c:Model>
                 <c:Transform>
+                  <Position X="5.96433973" Y="6.23201704" Z="-40.7198601"/>
+                  <Orientation X="0" Y="5.40500021" Z="0.291000009"/>
+                  <Scale X="1.29999995" Y="1.29999995" Z="1.29999995"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-5.4498558" Y="6.01383257" Z="40.6495552"/>
+                  <Orientation X="0" Y="2.13600016" Z="6.05900049"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
+                </c:Model>
+                <c:Transform>
                   <Position X="-24.6467285" Y="3.93005633" Z="59.5345383"/>
                   <Orientation X="0" Y="1.5710001" Z="0"/>
                 </c:Transform>
@@ -3425,8 +4373,8 @@
                   <Resource>Models/Props/Stones/AssaultHolder.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-5.4498558" Y="6.01383257" Z="40.6495552"/>
-                  <Orientation X="0" Y="2.13600016" Z="6.05900049"/>
+                  <Position X="5.3391571" Y="5.16256142" Z="-67.1743546"/>
+                  <Orientation X="0" Y="3.49300027" Z="0.252000004"/>
                   <Scale X="2" Y="2" Z="2"/>
                 </c:Transform>
               </Components>
@@ -3448,959 +4396,24 @@
             </Entity>
           </Children>
         </Entity>
-        <Entity name="Flora">
-          <Components>
-            <c:Transform/>
-          </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="37.5247917" Y="-0.0470023267" Z="44.616066"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-0.944169402" Y="-0.115016744" Z="2.55453658"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="2.23344159" Y="5.81031799" Z="49.3508453"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="1.33421552" Y="-0.314844221" Z="2.08641219"/>
-                      <Orientation X="6.15800047" Y="2.13600016" Z="6.05900049"/>
-                      <Scale X="3" Y="0.600000024" Z="2"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-39.0984802" Y="-0.108596213" Z="-44.3850861"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0.79823947" Y="0" Z="0.768518806"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-0.65692234" Y="0" Z="-0.820335329"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0.961832285" Y="-0.076986894" Z="1.68568408"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-32.1996002" Y="-0.0544338152" Z="-45.6432495"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-0.180973515" Y="0" Z="-1.24658465"/>
-                      <Orientation X="0" Y="1.45400012" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0.439413577" Y="-0.0554550402" Z="-2.04467154"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-34.0606956" Y="1.351318" Z="-9.3299942"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-3.51634121" Y="0" Z="0.361474007"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-5.07476997" Y="-0.226556212" Z="1.06996441"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-2.01497531" Y="0" Z="0.529605865"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-1.26497173" Y="0" Z="-0.770973921"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-6.99046469" Y="0" Z="2.41139221"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-37.1739006" Y="-0.42142114" Z="20.2114239"/>
-                  <Orientation X="0" Y="2.78500009" Z="0"/>
-                  <Scale X="3" Y="1" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="5.20403671" Y="3.92516422" Z="50.8952713"/>
-                  <Orientation X="5.35500002" Y="5.59300041" Z="5.46000004"/>
-                  <Scale X="5" Y="0.5" Z="4"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-33.3682251" Y="1.29794216" Z="-5.1068635"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-3.18869925" Y="-0.0465571098" Z="-0.156896129"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0.825131297" Y="0.0392211899" Z="-2.68803668"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-1.50829625" Y="0" Z="-1.36683047"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-4.12231922" Y="0" Z="0.0734748542"/>
-                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-6.6609869" Y="-0.0822908431" Z="0.497708082"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
-                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
-                </c:Model>
-                <c:Transform>
-                  <Position X="16.3593407" Y="4.03186893" Z="-54.4961166"/>
-                  <Orientation X="0.800000012" Y="1.54200006" Z="0.950000048"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="10.088026" Y="3.82045817" Z="58.594841"/>
-                  <Orientation X="0" Y="0" Z="5.95900011"/>
-                  <Scale X="6" Y="0.5" Z="4"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Flora/TreeLog.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-16.9453087" Y="5.87534618" Z="70.2123871"/>
-                  <Orientation X="6.16200018" Y="2.69900012" Z="0"/>
-                  <Scale X="1" Y="1" Z="1.9000001"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-48.6960449" Y="-0.303518057" Z="38.1689491"/>
-                  <Orientation X="0" Y="2.30900002" Z="0.165000007"/>
-                  <Scale X="8" Y="1" Z="3"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-16.086235" Y="1.14612257" Z="-58.653511"/>
-                  <Orientation X="0" Y="0" Z="0.368000031"/>
-                  <Scale X="5" Y="0.5" Z="4"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-11.3790789" Y="2.99803734" Z="-59.0326385"/>
-                  <Orientation X="0" Y="0" Z="0.407000005"/>
-                  <Scale X="5" Y="0.5" Z="4"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-2.41990042" Y="2.58699584" Z="19.9124165"/>
-                  <Scale X="3" Y="1" Z="3"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="31.6653385" Y="0" Z="48.5894928"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0.704392493" Y="-0.102173261" Z="2.3578465"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0.173719227" Y="-0.137990117" Z="1.62556207"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Model>
-                      <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                      <Transparent>true</Transparent>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="0" Y="0" Z="0.77298075"/>
-                    </c:Transform>
-                  </Components>
-                  <Children/>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
-                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-15.8430891" Y="2.84977508" Z="55.3108711"/>
-                  <Orientation X="6.06900024" Y="5.06900024" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-39.7359962" Y="7.07301474" Z="44.503479"/>
-                  <Orientation X="0" Y="2.77400017" Z="0"/>
-                  <Scale X="5" Y="1.20000005" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-11.8932762" Y="2.56066394" Z="17.0684566"/>
-                  <Orientation X="0" Y="2.30900002" Z="0"/>
-                  <Scale X="4" Y="0.800000012" Z="4"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Flora/SpecialRoot.mesh</Resource>
-                  <Color A="1" B="1" G="7.84313726" R="7.84313726"/>
-                </c:Model>
-                <c:Transform>
-                  <Position X="36.8391495" Y="0.354240507" Z="-36.1228752"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-29.6445026" Y="6.56799507" Z="49.7146225"/>
-                  <Orientation X="0" Y="2.6400001" Z="6.18300009"/>
-                  <Scale X="8" Y="1" Z="3"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-16.1163445" Y="2.64729095" Z="13.7721815"/>
-                  <Scale X="4" Y="1" Z="4"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Flora/AliveBush.mesh</Resource>
-                  <Transparent>true</Transparent>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-0.947859526" Y="5.96373081" Z="-51.2143593"/>
-                  <Orientation X="0" Y="5.36600018" Z="0"/>
-                  <Scale X="6" Y="1" Z="4"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
-        </Entity>
-        <Entity name="Bridges">
-          <Components>
-            <c:Transform/>
-          </Components>
-          <Children>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Pillars/SciFiBridgePillar1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-23.6694527" Y="-0.162040144" Z="35.3689957"/>
-                  <Orientation X="0" Y="1.21400011" Z="0"/>
-                  <Scale X="1.14999998" Y="1.14999998" Z="1.14999998"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-47.6850471" Y="7.0585866" Z="38.1646194"/>
-                  <Orientation X="0" Y="0.597000003" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="25.2147388" Y="6.4451251" Z="-41.7257042"/>
-                  <Orientation X="0" Y="2.72400022" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="16.2577343" Y="5.24232578" Z="-71.1721954"/>
-                  <Orientation X="5.91200018" Y="5.79500008" Z="0.0160000008"/>
-                  <Scale X="1" Y="1" Z="1.60000002"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-35.0514908" Y="1.31594038" Z="14.3308191"/>
-                  <Orientation X="6.21200037" Y="0.357000023" Z="3.18900013"/>
-                  <Scale X="2.5" Y="2.5" Z="2.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-9.79273701" Y="4.23927069" Z="-20.5460548"/>
-                  <Orientation X="0.155000001" Y="2.03299999" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="45.3988762" Y="6.10456753" Z="-73.9011993"/>
-                  <Orientation X="0" Y="2.54200006" Z="0"/>
-                  <Scale X="0.899999976" Y="0.899999976" Z="0.899999976"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-2.12194037" Y="-0.910161376" Z="-2.91662836"/>
-                      <Orientation X="0" Y="1.51400006" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Collidable/>
-                        <c:Model>
-                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="-1.90262771" Y="0" Z="0.157715589"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity>
-                          <Components>
-                            <c:Collidable/>
-                            <c:Model>
-                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="-2.00626397" Y="0" Z="0.0953077674"/>
-                            </c:Transform>
-                          </Components>
-                          <Children>
-                            <Entity>
-                              <Components>
-                                <c:Collidable/>
-                                <c:Model>
-                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                                </c:Model>
-                                <c:Transform>
-                                  <Position X="-1.84841895" Y="0" Z="0.120156199"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="2.06068087" Y="-0.704975307" Z="-2.7707541"/>
-                      <Orientation X="0" Y="4.65500021" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Collidable/>
-                        <c:Model>
-                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="1.80583596" Y="0" Z="-0.0662016794"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity>
-                          <Components>
-                            <c:Collidable/>
-                            <c:Model>
-                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="1.92975175" Y="0" Z="-0.246409908"/>
-                            </c:Transform>
-                          </Components>
-                          <Children>
-                            <Entity>
-                              <Components>
-                                <c:Collidable/>
-                                <c:Model>
-                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                                </c:Model>
-                                <c:Transform>
-                                  <Position X="1.90471327" Y="0" Z="-0.0366260633"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-41.0066338" Y="6.08244133" Z="75.8575821"/>
-                  <Orientation X="0" Y="2.92200017" Z="0"/>
-                  <Scale X="0.899999976" Y="0.899999976" Z="0.899999976"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="2.02681065" Y="-1.01835084" Z="2.92769241"/>
-                      <Orientation X="0" Y="4.5880003" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Collidable/>
-                        <c:Model>
-                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="-1.96250451" Y="0" Z="0.108926408"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity>
-                          <Components>
-                            <c:Collidable/>
-                            <c:Model>
-                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="-1.85260701" Y="0" Z="0.340662181"/>
-                              <Orientation X="0" Y="0.142000005" Z="0"/>
-                            </c:Transform>
-                          </Components>
-                          <Children>
-                            <Entity>
-                              <Components>
-                                <c:Collidable/>
-                                <c:Model>
-                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                                </c:Model>
-                                <c:Transform>
-                                  <Position X="-1.83422697" Y="0" Z="0"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-                <Entity>
-                  <Components>
-                    <c:Collidable/>
-                    <c:Model>
-                      <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                    </c:Model>
-                    <c:Transform>
-                      <Position X="-2.05343437" Y="-0.817824244" Z="2.89228034"/>
-                      <Orientation X="0" Y="1.52900004" Z="0"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity>
-                      <Components>
-                        <c:Collidable/>
-                        <c:Model>
-                          <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="1.9744426" Y="0" Z="0"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity>
-                          <Components>
-                            <c:Collidable/>
-                            <c:Model>
-                              <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                            </c:Model>
-                            <c:Transform>
-                              <Position X="1.89133775" Y="0" Z="0"/>
-                            </c:Transform>
-                          </Components>
-                          <Children>
-                            <Entity>
-                              <Components>
-                                <c:Collidable/>
-                                <c:Model>
-                                  <Resource>Models/Props/Bridges/SciFiBridgeDefense.mesh</Resource>
-                                </c:Model>
-                                <c:Transform>
-                                  <Position X="1.93167973" Y="0" Z="-0.0598336607"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Pillars/SciFiBridgePillar1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-51.6690636" Y="-0.394736767" Z="32.3927002"/>
-                  <Orientation X="0" Y="0.601000011" Z="0"/>
-                  <Scale X="1.29999995" Y="1.29999995" Z="1.29999995"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge1Blue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-25.9571095" Y="6.43997049" Z="41.7452164"/>
-                  <Orientation X="0" Y="2.78500009" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/SciFiBridge1Red.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="46.3167992" Y="6.36057663" Z="-37.5957794"/>
-                  <Orientation X="0" Y="0.449000031" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Bridges/WoodenBridge.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="38.565815" Y="1.78125501" Z="-12.5027514"/>
-                  <Orientation X="3.06700015" Y="5.85900021" Z="0"/>
-                  <Scale X="2.5" Y="2.5" Z="2.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
-        </Entity>
         <Entity name="SciFiHolders">
           <Components>
             <c:Transform/>
           </Components>
           <Children>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="9.57436943" Y="6.18593979" Z="-41.2254105"/>
+                  <Orientation X="0" Y="0.0980000049" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
             <Entity>
               <Components>
                 <c:Collidable/>
@@ -4486,19 +4499,6 @@
                   <Resource>Models/Props/SciFiHolder1.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="9.57436943" Y="6.18593979" Z="-41.2254105"/>
-                  <Orientation X="0" Y="0.0980000049" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/SciFiHolder1.mesh</Resource>
-                </c:Model>
-                <c:Transform>
                   <Position X="28.546957" Y="5.7377243" Z="-49.1212616"/>
                   <Orientation X="0" Y="5.87300014" Z="0"/>
                 </c:Transform>
@@ -4512,74 +4512,6 @@
             <c:Transform/>
           </Components>
           <Children>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-45.0137024" Y="5.75969839" Z="48.6178436"/>
-                  <Orientation X="5.59300041" Y="0.833000064" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-42.1386566" Y="0.844538689" Z="-14.1157408"/>
-                  <Orientation X="0" Y="0" Z="5.73600006"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="28.9290161" Y="-0.0643097907" Z="59.6764565"/>
-                  <Orientation X="5.85600042" Y="5.85600042" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-19.1108952" Y="1.41463315" Z="15.0962811"/>
-                  <Orientation X="0" Y="4.92700005" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-40.4708786" Y="0.452676624" Z="-31.320673"/>
-                  <Orientation X="0" Y="2.64700007" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
             <Entity>
               <Components>
                 <c:Collidable/>
@@ -4598,94 +4530,11 @@
               <Components>
                 <c:Collidable/>
                 <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-17.0007591" Y="1.49978495" Z="-28.1909218"/>
-                  <Orientation X="0" Y="1.65800011" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
                   <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-11.7034636" Y="-0.0491730012" Z="76.0223083"/>
-                  <Orientation X="0.495000035" Y="2.88000011" Z="0.432000011"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="-29.5323219" Y="5.70502806" Z="61.5454369"/>
-                  <Orientation X="0" Y="1.37000012" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="14.539196" Y="4.56123304" Z="-44.0134811"/>
-                  <Orientation X="5.32700014" Y="4.1170001" Z="0"/>
-                  <Scale X="3" Y="3" Z="2.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="45.3390808" Y="5.87882566" Z="-48.1003838"/>
-                  <Orientation X="2.8670001" Y="5.31100035" Z="2.35000014"/>
-                  <Scale X="2" Y="2" Z="2.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="10.9524012" Y="-0.298019737" Z="-76.0087204"/>
-                  <Orientation X="6.0800004" Y="3.92200017" Z="0"/>
-                  <Scale X="2" Y="2" Z="2"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity>
-              <Components>
-                <c:Collidable/>
-                <c:Model>
-                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
-                </c:Model>
-                <c:Transform>
-                  <Position X="6.82107449" Y="4.28142357" Z="60.6378365"/>
-                  <Orientation X="6.02100039" Y="0.727000058" Z="0"/>
+                  <Position X="-19.1108952" Y="1.41463315" Z="15.0962811"/>
+                  <Orientation X="0" Y="4.92700005" Z="0"/>
                   <Scale X="2" Y="2" Z="2"/>
                 </c:Transform>
               </Components>
@@ -4711,8 +4560,35 @@
                   <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
                 </c:Model>
                 <c:Transform>
-                  <Position X="-12.0868664" Y="1.3156178" Z="-1.37526762"/>
-                  <Orientation X="0" Y="1.01800001" Z="0.202000007"/>
+                  <Position X="-11.7034636" Y="-0.0491730012" Z="76.0223083"/>
+                  <Orientation X="0.495000035" Y="2.88000011" Z="0.432000011"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-42.1386566" Y="0.844538689" Z="-14.1157408"/>
+                  <Orientation X="0" Y="0" Z="5.73600006"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="10.9524012" Y="-0.298019737" Z="-76.0087204"/>
+                  <Orientation X="6.0800004" Y="3.92200017" Z="0"/>
                   <Scale X="2" Y="2" Z="2"/>
                 </c:Transform>
               </Components>
@@ -4739,6 +4615,130 @@
                   <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
                 </c:Model>
                 <c:Transform>
+                  <Position X="14.539196" Y="4.56123304" Z="-44.0134811"/>
+                  <Orientation X="5.32700014" Y="4.1170001" Z="0"/>
+                  <Scale X="3" Y="3" Z="2.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-45.0137024" Y="5.75969839" Z="48.6178436"/>
+                  <Orientation X="5.59300041" Y="0.833000064" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="28.9290161" Y="-0.0643097907" Z="59.6764565"/>
+                  <Orientation X="5.85600042" Y="5.85600042" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-40.4708786" Y="0.452676624" Z="-31.320673"/>
+                  <Orientation X="0" Y="2.64700007" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-17.0007591" Y="1.49978495" Z="-28.1909218"/>
+                  <Orientation X="0" Y="1.65800011" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-29.5323219" Y="5.70502806" Z="61.5454369"/>
+                  <Orientation X="0" Y="1.37000012" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="45.3390808" Y="5.87882566" Z="-48.1003838"/>
+                  <Orientation X="2.8670001" Y="5.31100035" Z="2.35000014"/>
+                  <Scale X="2" Y="2" Z="2.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="6.82107449" Y="4.28142357" Z="60.6378365"/>
+                  <Orientation X="6.02100039" Y="0.727000058" Z="0"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalBlue.mesh</Resource>
+                </c:Model>
+                <c:Transform>
+                  <Position X="-12.0868664" Y="1.3156178" Z="-1.37526762"/>
+                  <Orientation X="0" Y="1.01800001" Z="0.202000007"/>
+                  <Scale X="2" Y="2" Z="2"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Collidable/>
+                <c:Model>
+                  <Resource>Models/Props/Stones/ShinyStoneCrystalRed.mesh</Resource>
+                </c:Model>
+                <c:Transform>
                   <Position X="-29.8569813" Y="1.11728144" Z="-54.4840736"/>
                   <Orientation X="6.28300047" Y="3.00100017" Z="6.08900023"/>
                   <Scale X="2" Y="2" Z="2"/>
@@ -4747,6 +4747,76 @@
               <Children/>
             </Entity>
           </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="SpawnerBlueTeam">
+      <Components>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:PlayerSpawn/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="60.0169258" Y="5.78000021" Z="76.2893906"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="SpawnPointRedTeam">
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="2.02889442" Y="0.194165871" Z="-1.17950201"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="SpawnPointRedTeam">
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="1.64179754" Y="0.634559035" Z="4.27690458"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="SpawnPointRedTeam">
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="-9.04242706" Y="1.82531989" Z="-0.421615779"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="SpawnPointRedTeam">
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="-6.58577824" Y="1.97348273" Z="-2.86768818"/>
+            </c:Transform>
+          </Components>
+          <Children/>
         </Entity>
       </Children>
     </Entity>
@@ -4955,6 +5025,19 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
+              <Position X="9.3347702" Y="2.70210314" Z="2.33294678"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="SpawnPointRedTeam">
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
               <Position X="5.59104443" Y="2.14147282" Z="6.07936668"/>
             </c:Transform>
           </Components>
@@ -4981,19 +5064,6 @@
               <Visible>false</Visible>
             </c:Model>
             <c:Transform>
-              <Position X="9.3347702" Y="2.70210314" Z="2.33294678"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="SpawnPointRedTeam">
-          <Components>
-            <c:SpawnPoint/>
-            <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
-              <Visible>false</Visible>
-            </c:Model>
-            <c:Transform>
               <Position X="-2.2788806" Y="0" Z="3.17202592"/>
             </c:Transform>
           </Components>
@@ -5006,28 +5076,6 @@
         <c:Transform/>
       </Components>
       <Children>
-        <Entity name="Directional">
-          <Components>
-            <c:DirectionalLight>
-              <Intensity>1</Intensity>
-            </c:DirectionalLight>
-            <c:Transform>
-              <Orientation X="0" Y="1.16600001" Z="2.08000016"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:PointLight>
-              <Radius>10</Radius>
-            </c:PointLight>
-            <c:Transform>
-              <Position X="-38.6936989" Y="2.9200933" Z="-61.8637123"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
         <Entity>
           <Components>
             <c:PointLight>
@@ -5041,10 +5089,23 @@
         </Entity>
         <Entity>
           <Components>
-            <c:SceneLight>
-              <Gamma>1</Gamma>
-            </c:SceneLight>
-            <c:Transform/>
+            <c:PointLight>
+              <Radius>10</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="0" Y="3.14644003" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Directional">
+          <Components>
+            <c:DirectionalLight>
+              <Intensity>1</Intensity>
+            </c:DirectionalLight>
+            <c:Transform>
+              <Orientation X="0" Y="1.16600001" Z="2.08000016"/>
+            </c:Transform>
           </Components>
           <Children/>
         </Entity>
@@ -5077,8 +5138,17 @@
               <Radius>10</Radius>
             </c:PointLight>
             <c:Transform>
-              <Position X="0" Y="3.14644003" Z="0"/>
+              <Position X="-38.6936989" Y="2.9200933" Z="-61.8637123"/>
             </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SceneLight>
+              <Gamma>1</Gamma>
+            </c:SceneLight>
+            <c:Transform/>
           </Components>
           <Children/>
         </Entity>
@@ -5101,8 +5171,8 @@
               <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="-9.85184956" Y="8.25567532" Z="39.6119232"/>
-              <Orientation X="0" Y="165.167038" Z="0"/>
+              <Position X="49.2257118" Y="7.39368248" Z="-31.1810112"/>
+              <Orientation X="0" Y="166.826935" Z="0"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
             </c:Transform>
           </Components>
@@ -5120,46 +5190,8 @@
               <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
             </c:Model>
             <c:Transform>
-              <Position X="-51.6792374" Y="8.44526482" Z="32.5153465"/>
-              <Orientation X="0" Y="167.989212" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:HealthPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="54.7225227" Y="6.51863909" Z="29.0052128"/>
-              <Orientation X="0" Y="168.540482" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:HealthPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="-1.13644195" Y="1.38919806" Z="38.9768829"/>
-              <Orientation X="0" Y="168.226532" Z="0"/>
+              <Position X="-9.85184956" Y="8.25567532" Z="39.6119232"/>
+              <Orientation X="0" Y="169.615891" Z="0"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
             </c:Transform>
           </Components>
@@ -5178,7 +5210,64 @@
             </c:Model>
             <c:Transform>
               <Position X="-42.3974304" Y="7.28327894" Z="81.9305344"/>
-              <Orientation X="0" Y="166.11824" Z="0"/>
+              <Orientation X="0" Y="170.567093" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="54.7225227" Y="6.51863909" Z="29.0052128"/>
+              <Orientation X="0" Y="172.989334" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:AmmoPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-51.6792374" Y="8.44526482" Z="32.5153465"/>
+              <Orientation X="0" Y="172.438065" Z="0"/>
+              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:HealthPickup/>
+            <c:Trigger/>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Model>
+              <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-1.13644195" Y="1.38919806" Z="38.9768829"/>
+              <Orientation X="0" Y="172.675385" Z="0"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
             </c:Transform>
           </Components>
@@ -5197,26 +5286,7 @@
             </c:Model>
             <c:Transform>
               <Position X="-59.3499641" Y="7.46932745" Z="-20.6276321"/>
-              <Orientation X="0" Y="170.618805" Z="0"/>
-              <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity>
-          <Components>
-            <c:AmmoPickup/>
-            <c:Trigger/>
-            <c:RaptorCopter>
-              <Speed>0.10000000149011612</Speed>
-              <Axis X="0" Y="1" Z="0"/>
-            </c:RaptorCopter>
-            <c:Model>
-              <Resource>Models/Props/PickUps/AmmoPickUp.mesh</Resource>
-            </c:Model>
-            <c:Transform>
-              <Position X="49.2257118" Y="7.39368248" Z="-31.1810112"/>
-              <Orientation X="0" Y="162.378082" Z="0"/>
+              <Orientation X="0" Y="175.067657" Z="0"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
             </c:Transform>
           </Components>
@@ -5235,78 +5305,8 @@
             </c:Model>
             <c:Transform>
               <Position X="48.9189453" Y="7.06223536" Z="-78.9347992"/>
-              <Orientation X="0" Y="173.964676" Z="0"/>
+              <Orientation X="0" Y="178.413528" Z="0"/>
               <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
-    </Entity>
-    <Entity name="SpawnerBlueTeam">
-      <Components>
-        <c:Team>
-          <Team>
-            <Blue/>
-          </Team>
-        </c:Team>
-        <c:PlayerSpawn/>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/Player.xml</EntityFile>
-        </c:Spawner>
-        <c:Transform>
-          <Position X="60.0169258" Y="5.78000021" Z="76.2893906"/>
-        </c:Transform>
-      </Components>
-      <Children>
-        <Entity name="SpawnPointRedTeam">
-          <Components>
-            <c:SpawnPoint/>
-            <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
-              <Visible>false</Visible>
-            </c:Model>
-            <c:Transform>
-              <Position X="-9.04242706" Y="1.82531989" Z="-0.421615779"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="SpawnPointRedTeam">
-          <Components>
-            <c:SpawnPoint/>
-            <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
-              <Visible>false</Visible>
-            </c:Model>
-            <c:Transform>
-              <Position X="1.64179754" Y="0.634559035" Z="4.27690458"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="SpawnPointRedTeam">
-          <Components>
-            <c:SpawnPoint/>
-            <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
-              <Visible>false</Visible>
-            </c:Model>
-            <c:Transform>
-              <Position X="-6.58577824" Y="1.97348273" Z="-2.86768818"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="SpawnPointRedTeam">
-          <Components>
-            <c:SpawnPoint/>
-            <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
-              <Visible>false</Visible>
-            </c:Model>
-            <c:Transform>
-              <Position X="2.02889442" Y="0.194165871" Z="-1.17950201"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -5321,6 +5321,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="0" Y="-4" Z="0"/>
+          <Orientation X="0" Y="48.0439224" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -5345,41 +5346,27 @@
                     </c:Transform>
                   </Components>
                   <Children>
-                    <Entity name="ClassPickText">
-                      <Components>
-                        <c:Text>
-                          <Content>Pick Class</Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
-                          <Color A="1" B="0" G="1" R="0.784313738"/>
-                        </c:Text>
-                        <c:Transform>
-                          <Position X="0" Y="0.0799999982" Z="0"/>
-                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="AssaultClassPick">
+                    <Entity name="DefenderClassPick">
                       <Components>
                         <c:Button/>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Icons/Classes/Assault-01.png</DiffuseTexture>
+                          <DiffuseTexture>Textures/Icons/Classes/Defender-01.png</DiffuseTexture>
                           <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:InputCmdButton>
                           <Command>PickClass</Command>
-                          <PressValue>1</PressValue>
+                          <PressValue>2</PressValue>
                         </c:InputCmdButton>
                         <c:Transform>
-                          <Position X="-0.150000006" Y="-0.0500000007" Z="0"/>
+                          <Position X="0" Y="-0.0500000007" Z="0"/>
                           <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
                         </c:Transform>
                       </Components>
                       <Children>
-                        <Entity name="AssaultText">
+                        <Entity name="DefenderText">
                           <Components>
                             <c:Text>
-                              <Content>Assault</Content>
+                              <Content>Defender</Content>
                               <Resource>Fonts/DroidSans.ttf,64</Resource>
                               <Color A="1" B="0" G="1" R="0.784313738"/>
                             </c:Text>
@@ -5425,33 +5412,93 @@
                         </Entity>
                       </Children>
                     </Entity>
-                    <Entity name="DefenderClassPick">
+                    <Entity name="AssaultClassPick">
                       <Components>
                         <c:Button/>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Icons/Classes/Defender-01.png</DiffuseTexture>
+                          <DiffuseTexture>Textures/Icons/Classes/Assault-01.png</DiffuseTexture>
                           <GlowMap></GlowMap>
                         </c:Sprite>
                         <c:InputCmdButton>
                           <Command>PickClass</Command>
-                          <PressValue>2</PressValue>
+                          <PressValue>1</PressValue>
                         </c:InputCmdButton>
                         <c:Transform>
-                          <Position X="0" Y="-0.0500000007" Z="0"/>
+                          <Position X="-0.150000006" Y="-0.0500000007" Z="0"/>
                           <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
                         </c:Transform>
                       </Components>
                       <Children>
-                        <Entity name="DefenderText">
+                        <Entity name="AssaultText">
                           <Components>
                             <c:Text>
-                              <Content>Defender</Content>
+                              <Content>Assault</Content>
                               <Resource>Fonts/DroidSans.ttf,64</Resource>
                               <Color A="1" B="0" G="1" R="0.784313738"/>
                             </c:Text>
                             <c:Transform>
                               <Position X="0" Y="0.800000012" Z="0"/>
                               <Scale X="0.310000002" Y="0.310000002" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="ClassPickText">
+                      <Components>
+                        <c:Text>
+                          <Content>Pick Class</Content>
+                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Color A="1" B="0" G="1" R="0.784313738"/>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="0.0799999982" Z="0"/>
+                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="ToTeamPick">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="1" B="0" G="1" R="0.509803951"/>
+                        </c:Sprite>
+                        <c:InputCmdButton>
+                          <Command>SwapToTeamPick</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="0.349999994" Y="-0.180000007" Z="0"/>
+                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ChangeText">
+                          <Components>
+                            <c:Text>
+                              <Content>Change</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="TeamText">
+                          <Components>
+                            <c:Text>
+                              <Content>Team</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
                             </c:Transform>
                           </Components>
                           <Children/>
@@ -5475,6 +5522,20 @@
                     </c:Transform>
                   </Components>
                   <Children>
+                    <Entity name="TeamPickText">
+                      <Components>
+                        <c:Text>
+                          <Content>Pick Team</Content>
+                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Color A="1" B="0" G="1" R="0.784313738"/>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="0.0799999982" Z="0"/>
+                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
                     <Entity name="SpectatorPick">
                       <Components>
                         <c:Button/>
@@ -5526,7 +5587,7 @@
                         </c:Transform>
                       </Components>
                       <Children>
-                        <Entity>
+                        <Entity name="RedText">
                           <Components>
                             <c:Text>
                               <Content>Red</Content>
@@ -5574,19 +5635,54 @@
                         </Entity>
                       </Children>
                     </Entity>
-                    <Entity name="TeamPickText">
+                    <Entity name="ToClassPick">
                       <Components>
-                        <c:Text>
-                          <Content>Pick Team</Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
-                          <Color A="1" B="0" G="1" R="0.784313738"/>
-                        </c:Text>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="1" B="0" G="1" R="0.509803951"/>
+                          <Visible>false</Visible>
+                        </c:Sprite>
+                        <c:InputCmdButton>
+                          <Command>SwapToClassPick</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
                         <c:Transform>
-                          <Position X="0" Y="0.0799999982" Z="0"/>
-                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                          <Position X="0.349999994" Y="-0.0800000057" Z="0"/>
+                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
                         </c:Transform>
                       </Components>
-                      <Children/>
+                      <Children>
+                        <Entity name="ChangeText">
+                          <Components>
+                            <c:Text>
+                              <Content>Change</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Visible>false</Visible>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ClassText">
+                          <Components>
+                            <c:Text>
+                              <Content>Class</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Visible>false</Visible>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
                     </Entity>
                   </Children>
                 </Entity>
@@ -5605,6 +5701,20 @@
                     </c:Transform>
                   </Components>
                   <Children>
+                    <Entity name="RespawnTimer">
+                      <Components>
+                        <c:Text>
+                          <Content>1</Content>
+                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Color A="1" B="0" G="1" R="0.784313738"/>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="0.178199276" Z="0"/>
+                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
                     <Entity name="CapturePointHUD">
                       <Components>
                         <c:Transform>
@@ -5618,10 +5728,10 @@
                             <c:Sprite>
                               <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                               <GlowMap></GlowMap>
-                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                              <Color A="0.300000012" B="1" G="1" R="1"/>
                             </c:Sprite>
                             <c:Transform>
-                              <Position X="1.62788737" Y="0.919596612" Z="0"/>
+                              <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -5631,7 +5741,7 @@
                                   <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                                 </c:Fill>
                                 <c:CapturePointHUD>
-                                  <CapturePointNumber>4</CapturePointNumber>
+                                  <CapturePointNumber>3</CapturePointNumber>
                                 </c:CapturePointHUD>
                                 <c:Sprite>
                                   <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
@@ -5652,10 +5762,10 @@
                             <c:Sprite>
                               <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                               <GlowMap></GlowMap>
-                              <Color A="0.300000012" B="1" G="1" R="1"/>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                             </c:Sprite>
                             <c:Transform>
-                              <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
+                              <Position X="1.62788737" Y="0.919596612" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -5665,7 +5775,7 @@
                                   <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                                 </c:Fill>
                                 <c:CapturePointHUD>
-                                  <CapturePointNumber>3</CapturePointNumber>
+                                  <CapturePointNumber>4</CapturePointNumber>
                                 </c:CapturePointHUD>
                                 <c:Sprite>
                                   <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
@@ -5720,38 +5830,6 @@
                             <c:Sprite>
                               <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                               <GlowMap></GlowMap>
-                              <Color A="0.699999988" B="0" G="0" R="1"/>
-                            </c:Sprite>
-                            <c:Transform>
-                              <Position X="-1.58304751" Y="0.919596612" Z="0"/>
-                            </c:Transform>
-                          </Components>
-                          <Children>
-                            <Entity name="ProgressionHexagon">
-                              <Components>
-                                <c:Fill>
-                                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
-                                </c:Fill>
-                                <c:CapturePointHUD/>
-                                <c:Sprite>
-                                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                                  <GlowMap></GlowMap>
-                                </c:Sprite>
-                                <c:Transform>
-                                  <Position X="0" Y="0" Z="0.00999999978"/>
-                                  <Orientation X="0" Y="0" Z="1.57079637"/>
-                                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                        <Entity name="BackgroundHexagon">
-                          <Components>
-                            <c:Sprite>
-                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <Color A="0.300000012" B="1" G="1" R="1"/>
                             </c:Sprite>
                             <c:Transform>
@@ -5782,21 +5860,131 @@
                             </Entity>
                           </Children>
                         </Entity>
+                        <Entity name="BackgroundHexagon">
+                          <Components>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                              <Color A="0.699999988" B="0" G="0" R="1"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="-1.58304751" Y="0.919596612" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ProgressionHexagon">
+                              <Components>
+                                <c:Fill>
+                                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                </c:Fill>
+                                <c:CapturePointHUD/>
+                                <c:Sprite>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                  <GlowMap></GlowMap>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00999999978"/>
+                                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
                       </Children>
                     </Entity>
-                    <Entity name="RespawnTimer">
+                    <Entity name="ToTeamPick">
                       <Components>
-                        <c:Text>
-                          <Content>16</Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
-                          <Color A="1" B="0" G="1" R="0.784313738"/>
-                        </c:Text>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="1" B="0" G="1" R="0.509803951"/>
+                        </c:Sprite>
+                        <c:InputCmdButton>
+                          <Command>SwapToTeamPick</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
                         <c:Transform>
-                          <Position X="0" Y="0.178199276" Z="0"/>
-                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                          <Position X="0.349999994" Y="-0.180000007" Z="0"/>
+                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
                         </c:Transform>
                       </Components>
-                      <Children/>
+                      <Children>
+                        <Entity name="ChangeText">
+                          <Components>
+                            <c:Text>
+                              <Content>Change</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="TeamText">
+                          <Components>
+                            <c:Text>
+                              <Content>Team</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="ToClassPick">
+                      <Components>
+                        <c:Button/>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <Color A="1" B="0" G="1" R="0.509803951"/>
+                        </c:Sprite>
+                        <c:InputCmdButton>
+                          <Command>SwapToClassPick</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="0.349999994" Y="-0.0800000057" Z="0"/>
+                          <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ChangeText">
+                          <Components>
+                            <c:Text>
+                              <Content>Change</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ClassText">
+                          <Components>
+                            <c:Text>
+                              <Content>Class</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                              <Scale X="0.25" Y="0.25" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
                     </Entity>
                   </Children>
                 </Entity>

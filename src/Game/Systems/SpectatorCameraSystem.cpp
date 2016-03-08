@@ -60,6 +60,25 @@ bool SpectatorCameraSystem::OnInputCommand(const Events::InputCommand& e)
     EntityWrapper spectatorCam = m_World->GetFirstEntityByName(camName);
     // Set the camera as active, if it exists.
     if (spectatorCam.Valid() && spectatorCam.HasComponent("Camera")) {
+        // Set the class pick button visible if a blue or red team is picked, else invisible.
+        EntityWrapper HUD;
+        if (camName == "SpectatorCamera") {
+            HUD = spectatorCam.FirstChildByName("SpectatorHUD");
+        } else if (camName == "PickTeamCamera") {
+            HUD = spectatorCam.FirstChildByName("PickTeamHUD");
+        }
+        // If we are at the class pick already, or if HUD is invalid for any other reason, do nothing.
+        if (HUD.Valid()) {
+            EntityWrapper toClassButton = spectatorCam.FirstChildByName("ToClassPick");
+            if (toClassButton.Valid()) {
+                // Set ClassButton as invisible if spectator, else visible.
+                bool visible = m_PickedTeam != 1;   // TODO: 1 Signifies spectator.
+                toClassButton["Sprite"]["Visible"] = visible;
+                for (auto& child : toClassButton.ChildrenWithComponent("Text")) {
+                    child["Text"]["Visible"] = visible;
+                }
+            }
+        }
         Events::SetCamera eSetCamera;
         eSetCamera.CameraEntity = spectatorCam;
         m_EventBroker->Publish(eSetCamera);
