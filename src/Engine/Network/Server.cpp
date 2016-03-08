@@ -162,7 +162,7 @@ void Server::unreliableBroadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
         packet.ChangePacketID(kv.second.PacketID);
-//        m_Unreliable.Send(packet, kv.second);
+        //        m_Unreliable.Send(packet, kv.second);
     }
 }
 
@@ -649,13 +649,14 @@ bool Server::shouldSendToClient(EntityWrapper childEntity)
             return true;
         }
     }
-    return childEntity.HasComponent("Player") 
+    return childEntity.HasComponent("Player")
         || childEntity.FirstParentWithComponent("Player").Valid()
-        || childEntity.HasComponent("CapturePoint") 
+        || childEntity.HasComponent("CapturePoint")
         || childEntity.HasComponent("HealthPickup")
         || childEntity.HasComponent("AmmoPickup")
         || childEntity.HasComponent("ScoreScreen")
-        || childEntity.FirstParentWithComponent("ScoreScreen").Valid();
+        || childEntity.FirstParentWithComponent("ScoreScreen").Valid()
+        || childEntity.FirstParentWithComponent("CapturePoint").Valid();
 }
 
 PlayerID Server::getPlayerIDFromEndpoint()
@@ -674,7 +675,7 @@ PlayerID Server::getPlayerIDFromEndpoint()
 
 PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
 {
-    for(auto& kv : m_ConnectedPlayers) {
+    for (auto& kv : m_ConnectedPlayers) {
         if (entityID == kv.second.EntityID) {
             return kv.first;
         }
