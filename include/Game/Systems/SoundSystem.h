@@ -2,6 +2,7 @@
 #define Systems_SoundSystem_h__
 
 #include <random>
+#include <chrono>
 
 #include "../Engine/Core/System.h"
 #include "../Engine/Core/ResourceManager.h"
@@ -34,9 +35,10 @@ public:
 private:
     std::string m_Announcer = "";
     // Logic for playing a sound when a player jumps
-    void playerJumps();
+    void playerJumps(EntityWrapper player);
 
-    std::default_random_engine generator;
+    std::default_random_engine m_RandomGenerator;
+    std::uniform_int_distribution<int> m_RandIntDistribution;
 
     EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned &e);

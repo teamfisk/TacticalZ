@@ -6,14 +6,15 @@ SoundSystem::SoundSystem(SystemParams params)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Announcer = ResourceManager::Load<ConfigFile>("Config.ini")->Get<std::string>("Sound.Announcer", "female");
-
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    m_RandomGenerator = std::default_random_engine(seed);
+    m_RandIntDistribution = std::uniform_int_distribution<int>(1, 12);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &SoundSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &SoundSystem::OnPlayerDeath);
-
 }
 
 void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt)
@@ -42,24 +43,28 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "Jump" && e.Value > 0) {
-        if (e.PlayerID == -1) { // local player
-            playerJumps();
-            return true;
+        if (e.PlayerID == -1) {
+            playerJumps(LocalPlayer);
+        } else {
+            playerJumps(e.Player);
         }
-    } 
+        return true;
+    }
     return false;
 }
 
-void SoundSystem::playerJumps()
+void SoundSystem::playerJumps(EntityWrapper player)
 {
     if (!IsClient) { // Only play for clients
         return;
     }
-
-    bool grounded = (bool)m_World->GetComponent(LocalPlayer.ID, "Physics")["IsOnGround"];
+    if(!player.HasComponent("Physics")) {
+        return;
+    }
+    bool grounded = (bool)player["Physics"]["IsOnGround"];
     if (grounded) {
         Events::PlaySoundOnEntity e;
-        e.Emitter = LocalPlayer;
+        e.Emitter = player;
         e.FilePath = "Audio/Jump/Jump1.wav";
         m_EventBroker->Publish(e);
     }
@@ -76,7 +81,7 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     if (team == homeTeam) {
         ev.FilePath = "Audio/Announcer/" + m_Announcer + "/ObjectiveAchieved.wav";
     } else {
-        ev.FilePath = "Audio/Announcer/" + m_Announcer + "/ObjectiveFailed.wav"; 
+        ev.FilePath = "Audio/Announcer/" + m_Announcer + "/ObjectiveFailed.wav";
     }
     m_EventBroker->Publish(ev);
     return false;
@@ -88,13 +93,12 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     if (!IsClient) { // Only play for clients
         return false;
     }
-    if(!e.Victim.Valid()) {
+    if (!e.Victim.Valid()) {
         return false;
     }
-    std::uniform_int_distribution<int> dist(1, 12);
-    int rand = dist(generator);
+
     std::vector<std::string> paths;
-    paths.push_back("Audio/Hurt/Hurt" + std::to_string(rand) + ".wav");
+    paths.push_back("Audio/Hurt/Hurt" + std::to_string(m_RandIntDistribution(m_RandomGenerator)) + ".wav");
 
     Events::PlayQueueOnEntity ev;
     ev.Emitter = e.Victim;
