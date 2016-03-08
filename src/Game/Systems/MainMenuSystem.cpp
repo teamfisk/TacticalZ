@@ -1,4 +1,4 @@
-#include "GUI/MainMenuSystem.h"
+#include "../Game/Systems/MainMenuSystem.h"
 
 MainMenuSystem::MainMenuSystem(SystemParams params, IRenderer* renderer)
     : System(params)
@@ -8,6 +8,7 @@ MainMenuSystem::MainMenuSystem(SystemParams params, IRenderer* renderer)
     EVENT_SUBSCRIBE_MEMBER(m_EPressed, &MainMenuSystem::OnButtonPress);
     EVENT_SUBSCRIBE_MEMBER(m_EReleased, &MainMenuSystem::OnButtonRelease);
     EVENT_SUBSCRIBE_MEMBER(m_EClicked, &MainMenuSystem::OnButtonClick);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &MainMenuSystem::OnInputCommand);
 }
 
 void MainMenuSystem::Update(double dt)
@@ -18,7 +19,8 @@ void MainMenuSystem::Update(double dt)
 bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
 {
     if(e.EntityName == "Play") {
-        //Run play code
+        //OpenServerList
+
     } else if(e.EntityName == "Connect") {
         //Run connect code
     } else if(e.EntityName == "Host") {
@@ -52,3 +54,31 @@ bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
     return true;
 }
 
+bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
+{
+    if(e.Command == "Play") {
+        if (m_OpenSubMenu == EntityWrapper::Invalid) {
+            //No submenu is open, open one.
+
+        } else if(!m_OpenSubMenu.HasComponent("ServerList")) {
+            //Menu is open, but not the right one, delete the old one and open a new one.
+
+        } else {
+            //Serverlist submenu is open, close it.
+        }
+        //Create new entity through the spawner. Should also despawn all other menus.
+        auto menus = m_World->GetComponents("Menu");
+        if(menus == nullptr) {
+            return 0;
+        }
+        for (auto& menu : *menus) {
+            EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
+            auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
+            if(!serverListSpawner.HasComponent("Spawner")) {
+                return 0;
+            }
+            m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+        }
+    }
+    return true;
+}

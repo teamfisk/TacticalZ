@@ -1,17 +1,17 @@
 #ifndef MainMenuSystem_h__
 #define MainMenuSystem_h__
 
-#include "../Core/System.h"
-#include "../Rendering/IRenderer.h"
-#include "../Core/ResourceManager.h"
-#include "../Core/Event.h"
+#include "Core/System.h"
+#include "Rendering/IRenderer.h"
+#include "Core/ResourceManager.h"
+#include "Core/Event.h"
 #include "Systems/SpawnerSystem.h"
 
 
-#include "EButtonClicked.h"
-#include "EButtonPressed.h"
-#include "EButtonReleased.h"
-#include "../Input/EInputCommand.h"
+#include "GUI/EButtonClicked.h"
+#include "GUI/EButtonPressed.h"
+#include "GUI/EButtonReleased.h"
+#include "Input/EInputCommand.h"
 
 
 class MainMenuSystem : public ImpureSystem
@@ -33,6 +33,7 @@ private:
     bool OnInputCommand(const Events::InputCommand& e);
 
     std::string m_CurrentCommand = "";
+    EntityWrapper m_OpenSubMenu = EntityWrapper::Invalid;
 
 };
 
