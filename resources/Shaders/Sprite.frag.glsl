@@ -3,8 +3,6 @@
 uniform vec4 Color;
 uniform vec4 FillColor;
 uniform float FillPercentage;
-uniform mat4 M;
-uniform mat4 V;
 uniform mat4 P;
 
 layout (binding = 1) uniform sampler2D DiffuseTexture;

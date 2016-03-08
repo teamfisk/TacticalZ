@@ -63,7 +63,6 @@ void PickingPass::Draw(RenderScene& scene)
     GLuint shaderHandle = m_PickingProgram->GetHandle();
     GLuint shaderSkinnedHandle = m_PickingSkinnedProgram->GetHandle();
     m_PickingProgram->Bind();
-
     if (scene.ClearDepth) {
         //glClear(GL_DEPTH_BUFFER_BIT);
 		state->Disable(GL_DEPTH_TEST);
@@ -100,9 +99,7 @@ void PickingPass::Draw(RenderScene& scene)
 
             if (modelJob->Model->IsSkinned()) {
                 m_PickingSkinnedProgram->Bind();
-                glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-                glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-                glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+                glUniformMatrix4fv(100, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
                 std::vector<glm::mat4> frameBones;
@@ -116,9 +113,7 @@ void PickingPass::Draw(RenderScene& scene)
 
             } else {
                 m_PickingProgram->Bind();
-                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+				glUniformMatrix4fv(100, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
                 glUniform2fv(glGetUniformLocation(shaderHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
             }
 

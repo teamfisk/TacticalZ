@@ -961,9 +961,8 @@ void DrawFinalPass::DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob
         if(modelJob->Model->IsSkinned()) {
             m_FillDepthStencilBufferSkinnedProgram->Bind();
             GLuint shaderHandle = m_FillDepthStencilBufferSkinnedProgram->GetHandle();
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+			glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
+			GLERROR("Bind PVM uniform");
 
             std::vector<glm::mat4> frameBones;
             if (modelJob->BlendTree != nullptr) {
@@ -976,9 +975,8 @@ void DrawFinalPass::DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob
         } else {
             m_FillDepthStencilBufferProgram->Bind();
             GLuint shaderHandle = m_FillDepthStencilBufferProgram->GetHandle();
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+			glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
+			GLERROR("Bind PVM uniform");
         }
 
 
@@ -1008,8 +1006,8 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
             if(spriteJob->Depth == 0) {
                 jobState.Disable(GL_DEPTH_TEST);
             }
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * spriteJob->Matrix));
+
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
             glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPos"), 1, glm::value_ptr(scene.Camera->Position()));
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(spriteJob->Color));
@@ -1049,6 +1047,12 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 	GLERROR("Bind 3 uniform");
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
 	GLERROR("Bind 4 uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind PVM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "VM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind VM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "TIM"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(job->Matrix))));
+	GLERROR("Bind TIM uniform");
 
     glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 	GLERROR("Bind 5 uniform");
@@ -1101,6 +1105,12 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 	GLint Location_P = glGetUniformLocation(shaderHandle, "P");
 	glUniformMatrix4fv(Location_P, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
 	GLERROR("Bind 4 uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind PVM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "VM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind VM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "TIM"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(job->Matrix))));
+	GLERROR("Bind TIM uniform");
 
 	GLint Location_ScreenDimensions = glGetUniformLocation(shaderHandle, "ScreenDimensions");
 	glUniform2f(Location_ScreenDimensions, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
