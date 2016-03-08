@@ -49,16 +49,16 @@ void Client::Connect(std::string address, int port)
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    while (m_Unreliable.IsSocketAvailable()) {
-        // Packet will get real data in receive
-        Packet packet(MessageType::Invalid);
-        m_Unreliable.Receive(packet);
-        if (packet.GetMessageType() == MessageType::Connect) {
-            parseUDPConnect(packet);
-        } else {
-            parseMessageType(packet);
-        }
-    }
+    //while (m_Unreliable.IsSocketAvailable()) {
+    //    // Packet will get real data in receive
+    //    Packet packet(MessageType::Invalid);
+    //    m_Unreliable.Receive(packet);
+    //    if (packet.GetMessageType() == MessageType::Connect) {
+    //        parseUDPConnect(packet);
+    //    } else {
+    //        parseMessageType(packet);
+    //    }
+    //}
     while (m_Reliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -177,8 +177,8 @@ void Client::parseTCPConnect(Packet& packet)
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
-    m_Unreliable.Send(packet);
-    LOG_INFO("Sent UDP Connect Server");
+ //   m_Unreliable.Send(packet);
+  //  LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -476,7 +476,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
             m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
-            m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
+        //    m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -613,7 +613,7 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
 
-    m_Unreliable.Send(packet);
+    m_Reliable.Send(packet);
 }
 
 void Client::identifyPacketLoss()

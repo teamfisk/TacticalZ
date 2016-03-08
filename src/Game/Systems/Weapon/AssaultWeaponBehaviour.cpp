@@ -39,7 +39,17 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         ammo = glm::max(0, ammo - (magSize - magAmmo));
         magAmmo = glm::min(magSize, ammo);
         isReloading = false;
+        if (wi.FirstPersonEntity.Valid()) {
+            wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = true;
+        }
+        if (wi.ThirdPersonEntity.Valid()) {
+            wi.ThirdPersonEntity["Model"]["Visible"] = true;
+        }
     }    
+    double reloadTime = cWeapon["ReloadTime"];
+    if (isReloading && reloadTimer <= reloadTime / 2) {
+
+    }
     
     // Restore view angle
     if (IsClient) {
@@ -53,6 +63,20 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
                 glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
                 cameraOrientation.x -= change;
             }
+        }
+    }
+
+    // Update first person run animation
+    ComponentWrapper cPlayer = wi.Player["Player"];
+    ComponentWrapper cPhysics = wi.Player["Physics"];
+    const float& movementSpeed = cPlayer["MovementSpeed"];
+    float speed = glm::length((const glm::vec3&)cPhysics["Velocity"]);
+    float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
+    EntityWrapper rootNode = wi.FirstPersonEntity.FirstParentWithComponent("Model");
+    if (rootNode.Valid()) {
+        EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
+        if (blend.Valid()) {
+            (double&)blend["Blend"]["Weight"] = animationWeight;
         }
     }
 
@@ -101,26 +125,34 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     reloadTimer = reloadTime;
 
     // Play animation
-    EntityWrapper modelEntity = wi.FirstPersonEntity.Parent().Parent();
-    if (modelEntity.Valid()) {
-        EntityWrapper blendTree = modelEntity.FirstChildByName("BlendTreeAssaultWeapon");
-        EntityWrapper reloadBlend = blendTree.FirstChildByName("Reload");
-
-        Events::AutoAnimationBlend eFireBlend;
-        eFireBlend.RootNode = modelEntity;
-        eFireBlend.NodeName = "Reload";
-        eFireBlend.Restart = true;
-        eFireBlend.Start = true;
-        m_EventBroker->Publish(eFireBlend);
-
-        Events::AutoAnimationBlend eIdleBlend;
-        eIdleBlend.RootNode = modelEntity;
-        eIdleBlend.NodeName = "Idle";
-        eIdleBlend.AnimationEntity = reloadBlend;
-        eIdleBlend.Delay = -0.2;
-        eIdleBlend.Duration = 0.2;
-        m_EventBroker->Publish(eIdleBlend);
+    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Reload");
+    // Spawn explosion effect
+    if (wi.FirstPersonEntity.Valid()) {
+        if (IsClient) {
+            EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("ReloadSpawner");
+            if (reloadEffectSpawner.Valid()) {
+                reloadEffectSpawner.DeleteChildren();
+                SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+            }
+        }
+        wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = false;
     }
+    if (wi.ThirdPersonEntity.Valid()) {
+        if (IsServer) {
+            EntityWrapper reloadEffectSpawner = wi.ThirdPersonEntity.FirstChildByName("ReloadSpawner");
+            if (reloadEffectSpawner.Valid()) {
+                reloadEffectSpawner.DeleteChildren();
+                SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+            }
+        }
+        wi.ThirdPersonEntity["Model"]["Visible"] = false;
+    }
+
+    // Sound
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = wi.Player.ID;
+    e.FilePath = "Audio/weapon/Assault/AssaultWeaponReload.wav";
+    m_EventBroker->Publish(e);
 }
 
 void AssaultWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -170,7 +202,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     }
 
     // Get weapon model based on current person
-    EntityWrapper weaponModelEntity = getRelevantWeaponModelEntity(wi);
+    EntityWrapper weaponModelEntity = getRelevantWeaponEntity(wi);
     if (!weaponModelEntity.Valid()) {
         return;
     }
@@ -201,26 +233,13 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     }
     
     // Play animation
-    EntityWrapper modelEntity = wi.FirstPersonEntity.Parent().Parent();
-    if (modelEntity.Valid()) {
-        EntityWrapper blendTree = modelEntity.FirstChildByName("BlendTreeAssaultWeapon");
-        EntityWrapper fireBlend = blendTree.FirstChildByName("Fire");
+    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Fire");
 
-        Events::AutoAnimationBlend eFireBlend;
-        eFireBlend.RootNode = modelEntity;
-        eFireBlend.NodeName = "Fire";
-        eFireBlend.Restart = true;
-        eFireBlend.Start = true;
-        m_EventBroker->Publish(eFireBlend);
-
-        Events::AutoAnimationBlend eIdleBlend;
-        eIdleBlend.RootNode = modelEntity;
-        eIdleBlend.NodeName = "Idle";
-        eIdleBlend.AnimationEntity = fireBlend;
-        eIdleBlend.Delay = -0.2;
-        eIdleBlend.Duration = 0.2;
-        m_EventBroker->Publish(eIdleBlend);
-    }
+    // Sound
+    Events::PlaySoundOnEntity e;
+    e.EmitterID = wi.Player.ID;
+    e.FilePath = "Audio/weapon/Assault/AssaultWeaponFire.wav";
+    m_EventBroker->Publish(e);
 }
 
 bool AssaultWeaponBehaviour::canFire(ComponentWrapper cWeapon, WeaponInfo& wi)

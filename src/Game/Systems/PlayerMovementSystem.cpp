@@ -2,6 +2,7 @@
 
 PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
     : System(params)
+    , m_SprintEffectTimer(0.f)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
@@ -19,8 +20,48 @@ void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
     // Only do physics calculations on client and only for themselves.
-    if (IsClient && LocalPlayer.Valid()) {
-        updateVelocity(LocalPlayer, dt);
+    if (IsClient) {
+        if (LocalPlayer.Valid()){
+            updateVelocity(LocalPlayer, dt);
+        }
+        m_SprintEffectTimer += dt;
+        if (m_SprintEffectTimer < 0.016f) {
+            return;
+        }
+        m_SprintEffectTimer = 0.f;
+        const ComponentPool* pool = m_World->GetComponents("SprintAbility");
+        if (pool == nullptr) {
+            return;
+        }
+        for (auto cSprint : *pool) {
+            if (cSprint.EntityID != LocalPlayer.ID && (bool)cSprint["Active"]) {
+                // Spawn one afterimage for each player that sprints.
+                EntityWrapper player(m_World, cSprint.EntityID);
+                auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/SprintEffect.xml");
+                EntityWrapper sprintEffect = entityFile->MergeInto(m_World);
+                auto playerModel = player.FirstChildByName("PlayerModel");
+                if (!playerModel.Valid()) {
+                    continue;
+                }
+                if (!playerModel.HasComponent("Model")) {
+                    continue;
+                }
+                if (!playerModel.HasComponent("Animation")) {
+                    continue;
+                }
+                auto playerEntityModel = playerModel["Model"];
+                auto playerEntityAnimation = playerModel["Animation"];
+                playerEntityModel.Copy(sprintEffect["Model"]);
+                playerEntityAnimation.Copy(sprintEffect["Animation"]);
+                sprintEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+                ((glm::vec4&)sprintEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+                sprintEffect["Animation"]["Speed1"] = 0.0;
+                sprintEffect["Animation"]["Speed2"] = 0.0;
+                sprintEffect["Animation"]["Speed3"] = 0.0;
+                sprintEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                sprintEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+            }
+        }
     }
 }
 
@@ -78,6 +119,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         }
         bool sniperSprinting = false;
         if (player.HasComponent("SprintAbility")) {
+            (bool)player["SprintAbility"]["Active"] = controller->SpecialAbilityKeyDown();
             if (controller->SpecialAbilityKeyDown()) {
                 playerMovementSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
                 playerCrouchSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];

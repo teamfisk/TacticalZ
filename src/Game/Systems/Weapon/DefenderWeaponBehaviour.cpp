@@ -36,6 +36,7 @@ void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo&
             m_EventBroker->Publish(e);
         } else {
             isReloading = false;
+            playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "ReloadEnd");
         }
     }
 
@@ -96,6 +97,23 @@ void DefenderWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     // Start reload
     isReloading = true;
     reloadTimer = reloadTime;
+
+    // Play animation
+    if (wi.FirstPersonEntity.Valid()) {
+        Events::AutoAnimationBlend eBlendStart;
+        eBlendStart.RootNode = wi.FirstPersonEntity;
+        eBlendStart.NodeName = "ReloadStart";
+        eBlendStart.Restart = true;
+        eBlendStart.Start = true;
+        m_EventBroker->Publish(eBlendStart);
+        Events::AutoAnimationBlend eBlendLoop;
+        eBlendLoop.RootNode = wi.FirstPersonEntity;
+        eBlendLoop.NodeName = "ReloadLoop";
+        eBlendLoop.Restart = true;
+        eBlendLoop.Start = true;
+        eBlendLoop.AnimationEntity = wi.FirstPersonEntity.FirstChildByName("ReloadStart");
+        m_EventBroker->Publish(eBlendLoop);
+    }
 }
 
 void DefenderWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -110,13 +128,51 @@ void DefenderWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi
 
 bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e)
 {
-    if (e.Command == "SpecialAbility" && IsServer) {
+    if (e.Command == "SpecialAbility") {
         EntityWrapper attachment = wi.Player.FirstChildByName("ShieldAttachment");
         if (attachment.Valid()) {
             if (e.Value > 0) {
-                SpawnerSystem::Spawn(attachment, attachment);
+                if (IsServer) {
+                    SpawnerSystem::Spawn(attachment, attachment);
+                }
+
+                if (IsClient) {
+                    EntityWrapper root = wi.FirstPersonEntity;
+                    if (root.Valid()) {
+                        EntityWrapper subTree = root.FirstChildByName("FinalBlend");
+                        if (subTree.Valid()) {
+                            EntityWrapper animationNode = subTree.FirstChildByName("Shield");
+                            if (animationNode.Valid()) {
+                                Events::AutoAnimationBlend eFireBlend;
+                                eFireBlend.RootNode = root;
+                                eFireBlend.NodeName = "Shield";
+                                eFireBlend.Restart = true;
+                                eFireBlend.Start = true;
+                                m_EventBroker->Publish(eFireBlend);
+                            }
+                        }
+                    }
+                }
             } else {
                 attachment.DeleteChildren();
+
+                if (IsClient) {
+                    EntityWrapper root = wi.FirstPersonEntity;
+                    if (root.Valid()) {
+                        EntityWrapper subTree = root.FirstChildByName("FinalBlend");
+                        if (subTree.Valid()) {
+                            EntityWrapper animationNode = subTree.FirstChildByName("ActionBlend");
+                            if (animationNode.Valid()) {
+                                Events::AutoAnimationBlend eFireBlend;
+                                eFireBlend.RootNode = root;
+                                eFireBlend.NodeName = "ActionBlend";
+                                eFireBlend.Restart = true;
+                                eFireBlend.Start = true;
+                                m_EventBroker->Publish(eFireBlend);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -194,6 +250,9 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
             dealDamage(cWeapon, wi, direction, pelletDamage);
         }
     }
+
+    // Play animation
+    playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "Fire");
 
     // Sound
     Events::PlaySoundOnEntity e;

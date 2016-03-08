@@ -18,7 +18,7 @@ public:
     
     void LoadBindings(std::string file);
 	void Update(double dt);
-    void Process();
+    void Process(bool suppressNewEvents = false);
     template <typename T>
     void AddHandler();
     void Publish(const Events::InputCommand& e);

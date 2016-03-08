@@ -7,17 +7,21 @@ void TextFieldReader::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     }
 
     // Find the entity to read from
-    const std::string& parentEntityName = cAmmunitionHUD["ParentEntityName"];
+    const std::string& entityName = cAmmunitionHUD["ParentEntityName"];
+    const std::string& componentType = cAmmunitionHUD["ComponentType"];
     EntityWrapper readEntity = entity;
-    if (!parentEntityName.empty()) {
-        readEntity = entity.FirstParentByName(parentEntityName);
-        if (!readEntity.Valid()) {
-            return;
+    if (entityName.empty()) {
+        if (!readEntity.HasComponent(componentType)) {
+            readEntity = readEntity.FirstParentWithComponent(componentType);
         }
+    } else {
+        readEntity = entity.FirstParentByName(entityName);
+    }
+    if (!readEntity.Valid()) {
+        return;
     }
 
     // Find the component to read from
-    const std::string& componentType = cAmmunitionHUD["ComponentType"];
     if (componentType.empty() || !readEntity.HasComponent(componentType)) {
         return;
     }
@@ -35,9 +39,17 @@ void TextFieldReader::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     if (field.Type == "int") {
         text = boost::lexical_cast<std::string>((const int&)component[fieldName]);
     } else if (field.Type == "float") {
-        text = boost::lexical_cast<std::string>((const float&)component[fieldName]);
+        std::ostringstream ss;
+        float f = (float)component[fieldName];
+        ss << std::fixed << std::setprecision(2);
+        ss << f;
+        text = ss.str();
     } else if (field.Type == "double") {
-        text = boost::lexical_cast<std::string>((const double&)component[fieldName]);
+        std::ostringstream ss;
+        double d = (double)component[fieldName];
+        ss << std::fixed << std::setprecision(1);
+        ss << d;
+        text = ss.str();
     } else if (field.Type == "bool") {
         text = boost::lexical_cast<std::string>((const bool&)component[fieldName]);
     } else if (field.Type == "string") {
