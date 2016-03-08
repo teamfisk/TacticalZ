@@ -38,11 +38,14 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
             double animationSpeed = (double)autoBlendJob.AnimationEntity["Animation"]["Speed"];
             double animationTime = (double)autoBlendJob.AnimationEntity["Animation"]["Time"];
 
-
-            if ((bool)autoBlendJob.AnimationEntity["Animation"]["Reverse"]) {
-                AnimationDuration = (animation->Duration * animationSpeed) - (animation->Duration - animationTime);
+            if (animationSpeed != 0) {
+                if ((bool)autoBlendJob.AnimationEntity["Animation"]["Reverse"]) {
+                    AnimationDuration = (animation->Duration / animationSpeed) - (animation->Duration - animationTime);
+                } else {
+                    AnimationDuration = (animation->Duration / animationSpeed) - animationTime;
+                }
             } else {
-                AnimationDuration = (animation->Duration * animationSpeed) - animationTime;
+                return;
             }
 
             blendNode.StartTime += AnimationDuration;

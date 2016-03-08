@@ -358,7 +358,7 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                     if (controller->Movement().x > 0) {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashRight";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -367,19 +367,19 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.2;
                             aeb.NodeName = "StandCrouchBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
+                            aeb.Delay = 0.2;
                             aeb.Start = true;
                             aeb.Restart = false;
-                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashRight");
                             m_EventBroker->Publish(aeb);
                         }
                     } else {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashLeft";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -388,13 +388,13 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.2;
                             aeb.NodeName = "StandCrouchBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
+                            aeb.Delay = 0.2;
                             aeb.Start = true;
                             aeb.Restart = false;
-                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashLeft");
                             m_EventBroker->Publish(aeb);
                         }
                     }
@@ -402,7 +402,7 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                     if (controller->Movement().z < 0) {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashForward";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -411,10 +411,10 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.2;
                             aeb.NodeName = "StandCrouchBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
+                            aeb.Delay = 0.2;
                             aeb.Start = true;
                             aeb.Restart = false;
                             aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
@@ -423,7 +423,7 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                     } else {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashBackward";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -432,29 +432,30 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.2;
                             aeb.NodeName = "StandCrouchBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
+                            aeb.Delay = 0.2;
                             aeb.Start = true;
                             aeb.Restart = false;
-                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashBackward");
                             m_EventBroker->Publish(aeb);
                         }
                     }
                 }
 
 
-               /* EntityWrapper dashEffectModel;
-                dashEffectModel = playerModel.Clone(dashEffect);
+                EntityWrapper dashEffectModel;
+                dashEffectModel = playerModel.Clone();
                 player["Transform"].Copy(dashEffectModel["Transform"]);
 
 
-                dashEffectModel.AttachComponent("ExplosionEffect");
+              /*  dashEffectModel.AttachComponent("ExplosionEffect");
                 dashEffectModel["ExplosionEffect"]["EndColor"] = (glm::vec4)playerModel["Model"]["Color"];
                 ((glm::vec4&)dashEffectModel["ExplosionEffect"]["EndColor"]).w = 0.f;
                 (double&)dashEffectModel["ExplosionEffect"]["ExplosionDuration"] = dashEffect["Lifetime"]["Lifetime"];
                 (glm::vec3&)dashEffectModel["ExplosionEffect"]["ExplosionOrigin"] = glm::vec3(0, 1, 0) + (0.2f * controller->Movement());
+*/
 
 
                 
@@ -462,18 +463,9 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                 
                 for (auto animationEntity : animationChildren) {
                     (bool&)animationEntity["Animation"]["Play"] = false;
-                }*/
+                }
             }
         }
     }
-
-
-
-
-
-
-
-
-
     return true;
 }
