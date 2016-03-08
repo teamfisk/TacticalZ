@@ -4,14 +4,39 @@
   <Components>
     <c:AABB/>
     <c:CapturePoint/>
-    <c:Model>
-      <Resource>Models/Core/UnitSphere.mesh</Resource>
-    </c:Model>
     <c:Team/>
-    <c:Transform/>
     <c:Trigger/>
+    <c:Transform/>
   </Components>
 
-  <Children/>
+  <Children>
+    <Entity name="Red">
+      <Components>
+        <c:Model>
+          <Resource>models/core/unitcube.mesh</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Blue">
+      <Components>
+        <c:Model>
+          <Resource>models/core/unitcube.mesh</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Spectator">
+      <Components>
+        <c:Model>
+          <Resource>models/core/unitcube.mesh</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
 
 </Entity>
