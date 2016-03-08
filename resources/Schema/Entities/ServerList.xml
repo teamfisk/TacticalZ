@@ -2,7 +2,7 @@
 <Entity name="ServerList" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:ServerIdentity/>
+    <c:ServerList/>
     <c:Transform/>
   </Components>
 

@@ -36,7 +36,7 @@
 #include "Game/Systems/BoostIconsHUDSystem.h"
 #include "Game/Systems/ScoreScreenSystem.h"
 #include "GUI/ButtonSystem.h"
-#include "GUI/MainMenuSystem.h"
+#include "Game/Systems/MainMenuSystem.h"
 
 
 Game::Game(int argc, char* argv[])

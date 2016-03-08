@@ -56,28 +56,44 @@ bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 
 bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
 {
-    if(e.Command == "Play") {
+    if(e.Command == "Play" && e.Value == 1) {
+        auto menus = m_World->GetComponents("Menu");
+        if (menus == nullptr) {
+            return 0;
+        }
+
         if (m_OpenSubMenu == EntityWrapper::Invalid) {
             //No submenu is open, open one.
+            for (auto& menu : *menus) {
+                EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
+                auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
+                if (!serverListSpawner.HasComponent("Spawner")) {
+                    return 0;
+                }
+                m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+                break;
+            }
 
         } else if(!m_OpenSubMenu.HasComponent("ServerList")) {
             //Menu is open, but not the right one, delete the old one and open a new one.
+            m_World->DeleteEntity(m_OpenSubMenu.ID);
+            m_OpenSubMenu = EntityWrapper::Invalid;
+
+            for (auto& menu : *menus) {
+                EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
+                auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
+                if (!serverListSpawner.HasComponent("Spawner")) {
+                    return 0;
+                }
+                m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+            }
+
 
         } else {
             //Serverlist submenu is open, close it.
-        }
-        //Create new entity through the spawner. Should also despawn all other menus.
-        auto menus = m_World->GetComponents("Menu");
-        if(menus == nullptr) {
-            return 0;
-        }
-        for (auto& menu : *menus) {
-            EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
-            auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
-            if(!serverListSpawner.HasComponent("Spawner")) {
-                return 0;
-            }
-            m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+            printf("\n\nMenuShit\n\n");
+            m_World->DeleteEntity(m_OpenSubMenu.ID);
+            m_OpenSubMenu = EntityWrapper::Invalid;
         }
     }
     return true;
