@@ -30,7 +30,7 @@ struct ComponentWrapper
     ComponentWrapper(const ComponentInfo& componentInfo, char* data)
         : Info(componentInfo)
         , EntityID(*reinterpret_cast<::EntityID*>(data))
-        , Data(data + sizeof(::EntityID))
+        , Data(data + componentInfo.GetHeaderSize())
     { }
 
     const ComponentInfo& Info;
@@ -43,7 +43,7 @@ struct ComponentWrapper
     }
 
     template <typename T>
-    T& Field(std::string name)
+    T& Field(const std::string& name)
     {
         const ComponentInfo::Field_t& field = Info.Fields.at(name);
         if (sizeof(T) > field.Stride) {
@@ -55,13 +55,13 @@ struct ComponentWrapper
     }
 
     template <typename T>
-    void SetField(std::string name, const T value) { Field<T>(name) = value; }
+    void SetField(const std::string& name, const T value) { Field<T>(name) = value; }
     //template <typename T>
     //void SetField(std::string name, T& value) { Field<T>(name) = value; }
 
     // Specialization for string literals
     template <std::size_t N>
-    void SetField(std::string name, const char(&value)[N]) { Field<std::string>(name) = std::string(value); }
+    void SetField(const std::string& name, const char(&value)[N]) { Field<std::string>(name) = std::string(value); }
 
     void Copy(ComponentWrapper& destination)
     {
@@ -121,7 +121,7 @@ struct ComponentWrapper
         template <std::size_t N>
         void operator=(const char(&val)[N]) { m_Component->SetField<N>(m_PropertyName, val); }
     };
-    SubscriptProxy operator[](std::string propertyName) { return SubscriptProxy(this, propertyName); }
+    SubscriptProxy operator[](const std::string& propertyName) { return SubscriptProxy(this, propertyName); }
 };
 
 // A component wrapper that "owns" its data through a shared pointer

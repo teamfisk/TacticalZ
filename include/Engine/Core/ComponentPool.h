@@ -44,7 +44,7 @@ public:
 
     ComponentPool(const ::ComponentInfo& ci) 
         : m_ComponentInfo(ci)
-        , m_Pool(ci.Meta->Allocation, sizeof(EntityID) + ci.Stride)
+        , m_Pool(ci.Meta->Allocation, ci.GetHeaderSize() + ci.Stride)
     { }
     ~ComponentPool();
 	ComponentPool(const ComponentPool& other);
