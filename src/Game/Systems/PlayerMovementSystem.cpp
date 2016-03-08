@@ -444,18 +444,18 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                     }
                 }
 
-
+/*
                 EntityWrapper dashEffectModel;
                 dashEffectModel = playerModel.Clone();
                 player["Transform"].Copy(dashEffectModel["Transform"]);
 
 
-              /*  dashEffectModel.AttachComponent("ExplosionEffect");
+                dashEffectModel.AttachComponent("ExplosionEffect");
                 dashEffectModel["ExplosionEffect"]["EndColor"] = (glm::vec4)playerModel["Model"]["Color"];
                 ((glm::vec4&)dashEffectModel["ExplosionEffect"]["EndColor"]).w = 0.f;
                 (double&)dashEffectModel["ExplosionEffect"]["ExplosionDuration"] = dashEffect["Lifetime"]["Lifetime"];
                 (glm::vec3&)dashEffectModel["ExplosionEffect"]["ExplosionOrigin"] = glm::vec3(0, 1, 0) + (0.2f * controller->Movement());
-*/
+
 
 
                 
@@ -464,7 +464,9 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                 for (auto animationEntity : animationChildren) {
                     (bool&)animationEntity["Animation"]["Play"] = false;
                 }
+                */
             }
+            
         }
     }
     return true;
