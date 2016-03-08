@@ -43,7 +43,12 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
                 0);
             packetDataSent = bytesSent - splitPacket.HeaderSize();
             ++sequenceNumber;
-            int sizeasdasd = splitPacket.ReadPrimitive<int>();
+            int packetsise = splitPacket.ReadPrimitive<int>();
+            int groopOffset = splitPacket.ReadPrimitive<int>();
+            int groopIndes = splitPacket.ReadPrimitive<int>();
+            int groopSiseOffset = splitPacket.ReadPrimitive<int>();
+            int mezzagetype = splitPacket.ReadPrimitive<int>();
+            int pakketIDOffset = splitPacket.ReadPrimitive<int>();
         }
     } catch (const boost::system::system_error& e) {
         LOG_INFO(e.what());

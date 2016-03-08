@@ -1,6 +1,6 @@
 #ifndef UDPClient_h__
 #define UDPClient_h__
-#include <unordered_map>
+#include <map>
 
 #include <boost/asio.hpp>
 #include "Network/NetworkClient.h"
@@ -25,7 +25,8 @@ private:
     boost::shared_ptr<boost::asio::ip::udp::socket> m_Socket;
     int readBuffer();
     PacketID m_SendPacketID = 0;
-    std::unordered_map<unsigned int, boost::shared_ptr<char>> packetSegmentMap;
+    //map:(packetGroup, vector:(pair:(groupIndex, packetData)))
+    std::map<unsigned int, std::vector<std::pair<unsigned int, boost::shared_ptr<char>>>> packetSegmentMap;
 };
 
 #endif

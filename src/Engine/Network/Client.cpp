@@ -104,10 +104,7 @@ void Client::Update()
 void Client::parseMessageType(Packet& packet)
 {
     // Pop packetSize, sequenceNumber and packetsInSequence.
-    // create a packet of the correct size
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+    popNetworkSegmentOfHeader(packet);
 
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
@@ -170,10 +167,8 @@ void Client::parseUDPConnect(Packet& packet)
 void Client::parseTCPConnect(Packet& packet)
 {
     LOG_INFO("Received TCP connect from server");
-    // Pop packetSize, sequenceNumber and packetsInSequence.
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+    // Pop packetSize, group, groupIndex and groupSize.
+    popNetworkSegmentOfHeader(packet);
 
     int messageType = packet.ReadPrimitive<int>();
     // Read packet ID 
@@ -213,10 +208,8 @@ void Client::parsePing()
 
 void Client::parseServerlist(Packet& packet)
 {
-    // Pop size, message type, and ID
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+    // Pop packetSize, group, groupIndex and groupSize.
+    popNetworkSegmentOfHeader(packet);
     std::string address = packet.ReadString();
     int port = packet.ReadPrimitive<int>();
     std::string serverName = packet.ReadString();
@@ -682,6 +675,15 @@ void Client::displayServerlist()
         ServerInfo si = m_Serverlist[i];
         LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
+}
+
+void Client::popNetworkSegmentOfHeader(Packet & packet)
+{
+    // Pop packetSize, group, groupIndex and groupSize.
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

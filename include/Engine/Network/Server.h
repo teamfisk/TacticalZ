@@ -82,6 +82,7 @@ private:
     void kick(PlayerID player);
     PlayerID getPlayerIDFromEndpoint();
     PlayerID getPlayerIDFromEntityID(EntityID entityID);
+    void popNetworkSegmentOfHeader(Packet & packet);
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();

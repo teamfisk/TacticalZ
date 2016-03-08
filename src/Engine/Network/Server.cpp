@@ -109,9 +109,7 @@ void Server::parseMessageType(Packet& packet)
 {
     // Pop packetSize, sequenceNumber and packetsInSequence.
     // create a packet of the correct size
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+    popNetworkSegmentOfHeader(packet);
 
     int messageType = packet.ReadPrimitive<int>(); // Read what type off message was sent from server
     // Read packet ID 
@@ -163,7 +161,6 @@ void Server::reliableBroadcast(Packet& packet)
 void Server::unreliableBroadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
-        packet.ChangePacketID(kv.second.PacketID);
         m_Unreliable.Send(packet, kv.second);
     }
 }
@@ -325,9 +322,7 @@ void Server::checkForTimeOuts()
 void Server::parseUDPConnect(Packet & packet)
 {
     //Pop packetSize, sequenceNumber and packetsInSequence.
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+    popNetworkSegmentOfHeader(packet);
     int messageType = packet.ReadPrimitive<int>();
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
@@ -350,9 +345,7 @@ void Server::parseUDPConnect(Packet & packet)
 void Server::parseTCPConnect(Packet & packet)
 {
     // Pop packetSize, sequenceNumber and packetsInSequence.
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+    popNetworkSegmentOfHeader(packet);
 
     int messageType = packet.ReadPrimitive<int>();
     // Read packet ID 
@@ -687,4 +680,13 @@ PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
         }
     }
     return -1;
+}
+
+void Server::popNetworkSegmentOfHeader(Packet & packet)
+{
+    // Pop packetSize, group, groupIndex and groupSize.
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
 }

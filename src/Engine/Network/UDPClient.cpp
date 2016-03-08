@@ -39,12 +39,15 @@ int UDPClient::readBuffer()
         return 0;
     }
     boost::system::error_code error;
-    // Peek size of packet
+    // Peek header
      m_Socket->receive(boost
-        ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
+        ::asio::buffer((void*)m_ReadBuffer, 5 * sizeof(int)),
          boost::asio::ip::udp::socket::message_peek, error);
     int sizeOfPacket = 0;
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
+    int packetID = 0;
+    memcpy(&packetID, m_ReadBuffer + 4 * sizeof(int), sizeof(int));
+
     if (sizeOfPacket > m_Socket->available()) {
         LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
         // return;
@@ -63,7 +66,7 @@ int UDPClient::readBuffer()
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
-
+    // new char [sizeOfPacket] save in map with packetID as key
     return bytesReceived;
 }
 

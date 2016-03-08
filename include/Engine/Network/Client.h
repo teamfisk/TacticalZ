@@ -119,6 +119,7 @@ private:
     void sendLocalPlayerTransform();
     void becomePlayer();
     void displayServerlist();
+    void popNetworkSegmentOfHeader(Packet& packet);
     // Mapping Logic
     // Returns if local EntityID exist in map
     bool clientServerMapsHasEntity(EntityID clientEntityID);

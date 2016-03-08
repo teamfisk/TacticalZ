@@ -17,7 +17,8 @@ public:
     Packet(MessageType type);
     ~Packet();
     void Init(MessageType type, unsigned int& packetID,
-        int sequenceNumber, int totalAmountOfPackets);
+        int sequenceNumber, int totalAmountOfPackets,
+        int packetGroup);
 
     // Add primitive types like int, float, char...
     template<typename T>
@@ -65,9 +66,9 @@ public:
     size_t DataReadSize() { return m_ReturnDataOffset; }
     size_t MaxSize() { return m_MaxPacketSize; }
     size_t HeaderSize() { return m_HeaderSize; }
-    size_t SequenceNumber();
-    size_t SequenceLength();
-
+    size_t GroupIndex();
+    size_t GroupSize();
+    size_t PacketID();
 private:
     char* m_Data;
     size_t m_ReturnDataOffset = 0;
@@ -76,6 +77,13 @@ private:
     size_t m_HeaderSize = 0;
     void resizeData();
     void resizeData(int size);
+
+    size_t packetSizeOffset = 0;
+    size_t groupOffset = 0;
+    size_t groupIndexOffset = 0;
+    size_t groupSizeOffset = 0;
+    size_t messageTypeOffset = 0;
+    size_t packetIDOffset = 0;
 };
 
 #endif

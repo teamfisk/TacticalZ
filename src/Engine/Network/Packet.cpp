@@ -3,7 +3,7 @@
 Packet::Packet(MessageType type, unsigned int& packetID)
 {
     m_Data = new char[m_MaxPacketSize];
-    Init(type, packetID, 1, 1);
+    Init(type, packetID, 1, 1 , -1);
 }
 
 // Create message
@@ -21,7 +21,7 @@ Packet::Packet(MessageType type)
 {
     m_Data = new char[m_MaxPacketSize];
     unsigned int dummy = 0;
-    Init(type, dummy, 1, 1);
+    Init(type, dummy, 1, 1, -1);
 }
 
 Packet::~Packet()
@@ -30,21 +30,29 @@ Packet::~Packet()
 }
 
 void Packet::Init(MessageType type, unsigned int & packetID,
-    int sequenceNumber, int totalAmountOfPackets)
+    int groupIndex, int packetGroupSize, int packetGroup)
 {
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
-    // If you add things before here be sure to change in GetMessageType()
-    // SequenceNumber(), SequenceLength(), ChangePacketID()
     // allocate memory for size of packet, sequenceNumber and totalPacketesInSequence
+    packetSizeOffset = m_Offset;
     WritePrimitive<int>(0);
-    // SequenceNumber and totalAmountOfPackets position in array is hard coded
-    WritePrimitive(sequenceNumber);
-    WritePrimitive(totalAmountOfPackets);
+    // packetGroup is the gorup the packet is in
+    groupOffset = m_Offset;
+    WritePrimitive<int>(packetGroup);
+    // What index the packet has in the packetGroup
+    groupIndexOffset = m_Offset;
+    WritePrimitive(groupIndex);
+    // The total amount of packets in a packetGroup
+    groupSizeOffset = m_Offset;
+    WritePrimitive(packetGroupSize);
     // Add message type
     int messageType = static_cast<int>(type);
+    messageTypeOffset = m_Offset;
     WritePrimitive<int>(messageType);
+    // Packet ID
+    packetIDOffset = m_Offset;
     WritePrimitive<int>(packetID);
     packetID++;
     m_HeaderSize = m_Offset;
@@ -129,37 +137,41 @@ void Packet::ChangePacketID(unsigned int & packetID)
 {
     packetID = packetID + 1;
     // Overwrite old PacketID
-    memcpy(m_Data + 4 * sizeof(int), &packetID, sizeof(int));
+    memcpy(m_Data + packetIDOffset, &packetID, sizeof(int));
 }
 
-void Packet::ChangeSequenceNumber(int sequenceNumber, int sequenceLength)
+void Packet::ChangeSequenceNumber(int groupIndex, int groupSize)
 {
-    memcpy(&sequenceNumber, m_Data + sizeof(int), sizeof(int));
-    memcpy(&sequenceLength, m_Data + 2 * sizeof(int), sizeof(int));
+    memcpy(&groupIndex, m_Data + groupIndexOffset, sizeof(int));
+    memcpy(&groupSize, m_Data + groupSizeOffset, sizeof(int));
 }
 
 MessageType Packet::GetMessageType()
 {
     MessageType messagType;
-    memcpy(&messagType, m_Data + 3 * sizeof(int), sizeof(int));
+    memcpy(&messagType, m_Data + messageTypeOffset, sizeof(int));
     return messagType;
 }
 
-//WritePrimitive(sequenceNumber);
-//WritePrimitive(totalAmountOfPackets);
-
-size_t Packet::SequenceNumber()
+size_t Packet::GroupIndex()
 {
-    size_t sequenceNumber;
-    memcpy(&sequenceNumber, m_Data + sizeof(int), sizeof(int));
-    return sequenceNumber;
+    size_t groupIndex;
+    memcpy(&groupIndex, m_Data + groupIndexOffset, sizeof(int));
+    return groupIndex;
 }
 
-size_t Packet::SequenceLength()
+size_t Packet::GroupSize()
 {
-    size_t sequenceLength;
-    memcpy(&sequenceLength, m_Data + 2 * sizeof(int), sizeof(int));
-    return sequenceLength;
+    size_t groupSize;
+    memcpy(&groupSize, m_Data + groupSizeOffset, sizeof(int));
+    return groupSize;
+}
+
+size_t Packet::PacketID()
+{
+    size_t packetID;
+    memcpy(&packetID, m_Data + packetIDOffset, sizeof(int));
+    return packetID;
 }
 
 void Packet::resizeData()
