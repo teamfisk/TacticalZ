@@ -5,16 +5,15 @@
 #include "MemoryPool.h"
 #include "ComponentInfo.h"
 #include "ComponentWrapper.h"
+#include "DirtySet.h"
 
+
+class ComponentPool;
 class ComponentPoolForwardIterator
 	: public std::iterator<std::forward_iterator_tag, ComponentWrapper>
 {
 public:
-    ComponentPoolForwardIterator(const ComponentInfo& componentInfo, const MemoryPool<char>::iterator begin, const MemoryPool<char>::iterator end) 
-        : m_ComponentInfo(componentInfo)
-        , m_MemoryPoolIterator(begin)
-        , m_MemoryPoolEnd(end)
-    { }
+    ComponentPoolForwardIterator(ComponentPool* pool);
 
 	ComponentPoolForwardIterator(const ComponentPoolForwardIterator& other) = default;
 	ComponentPoolForwardIterator(ComponentPoolForwardIterator&& other) = default;
@@ -27,6 +26,7 @@ public:
 	ComponentWrapper operator*() const;
 
 private:
+    ComponentPool* m_ComponentPool;
     const ComponentInfo& m_ComponentInfo;
 	MemoryPool<char>::iterator m_MemoryPoolIterator;
 	const MemoryPool<char>::iterator m_MemoryPoolEnd;
@@ -34,6 +34,7 @@ private:
 
 class ComponentPool
 {
+    friend class ComponentPoolForwardIterator;
 public:
 	typedef ComponentPoolForwardIterator iterator;
 	typedef ptrdiff_t difference_type;
@@ -41,6 +42,7 @@ public:
     typedef ComponentWrapper value_type;
 	typedef ComponentWrapper* pointer;
 	typedef ComponentWrapper& reference;
+    typedef std::unordered_map<EntityID, std::set<decltype(ComponentInfo::Field_t::Index)>> DirtySet_t;
 
     ComponentPool(const ::ComponentInfo& ci) 
         : m_ComponentInfo(ci)
@@ -61,8 +63,8 @@ public:
     // Delete a component and free its memory
     void Delete(ComponentWrapper& wrapper);
 
-	iterator begin() const;
-	iterator end() const;
+    iterator begin();
+	iterator end();
     size_t size() const;
 
 	//Dumps information about what the pool memory looks like right now 
@@ -80,6 +82,7 @@ private:
     ::ComponentInfo m_ComponentInfo;
     MemoryPool<char> m_Pool;
     std::unordered_map<EntityID, char*> m_EntityToComponent;
+    DirtySet m_DirtySet;
 };
 
 #endif

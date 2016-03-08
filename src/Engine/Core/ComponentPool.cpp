@@ -1,9 +1,17 @@
 #include "Core/ComponentPool.h"
 
+ComponentPoolForwardIterator::ComponentPoolForwardIterator(ComponentPool* pool) 
+    : m_ComponentPool(pool)
+    , m_ComponentInfo(pool->m_ComponentInfo)
+    , m_MemoryPoolIterator(pool->m_Pool.begin())
+    , m_MemoryPoolEnd(pool->m_Pool.end())
+{ }
+
 ComponentWrapper ComponentPoolForwardIterator::operator*() const
 {
     char* data = &(*m_MemoryPoolIterator);
-    ComponentWrapper wrapper(m_ComponentInfo, data);
+    EntityID entity = *reinterpret_cast<EntityID*>(data);
+    ComponentWrapper wrapper(m_ComponentInfo, data, &m_ComponentPool->m_DirtySet[entity]);
     return wrapper;
 }
 
@@ -71,7 +79,7 @@ ComponentWrapper ComponentPool::Allocate(EntityID entity)
     memcpy(data, &entity, sizeof(EntityID));
 
     m_EntityToComponent[entity] = data;
-    ComponentWrapper component(m_ComponentInfo, data);
+    ComponentWrapper component(m_ComponentInfo, data, &m_DirtySet[entity]);
 
     // Copy defaults
     memcpy(component.Data, m_ComponentInfo.Defaults.get(), m_ComponentInfo.Stride);
@@ -82,7 +90,9 @@ ComponentWrapper ComponentPool::Allocate(EntityID entity)
 
 ComponentWrapper ComponentPool::GetByEntity(EntityID ent)
 {
-     return ComponentWrapper(m_ComponentInfo, m_EntityToComponent.at(ent));
+    auto data = m_EntityToComponent.at(ent);
+    auto bitField = &m_DirtySet[ent];
+    return ComponentWrapper(m_ComponentInfo, data, bitField);
 }
 
 bool ComponentPool::KnowsEntity(EntityID ent)
@@ -95,16 +105,17 @@ void ComponentPool::Delete(ComponentWrapper& wrapper)
     ComponentWrapper::Destroy(wrapper.Info, wrapper.Data);
     m_EntityToComponent.erase(wrapper.EntityID);
     m_Pool.Free(wrapper.Data - sizeof(EntityID));
+    m_DirtySet.erase(wrapper.EntityID);
 }
 
-ComponentPool::iterator ComponentPool::begin() const
+ComponentPool::iterator ComponentPool::begin()
 {
-    return iterator(m_ComponentInfo, m_Pool.begin(), m_Pool.end());
+    return iterator(this);
 }
 
-ComponentPool::iterator ComponentPool::end() const
+ComponentPool::iterator ComponentPool::end()
 {
-    return iterator(m_ComponentInfo, m_Pool.end(), m_Pool.end());
+    return iterator(this);
 }
 
 size_t ComponentPool::size() const
