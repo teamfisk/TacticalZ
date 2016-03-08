@@ -44,7 +44,8 @@ void BlurHUD::InitializeShaderPrograms()
         m_CombineTexturesProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/CombineTexture.vert.glsl")));
         m_CombineTexturesProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/CombineTexture.frag.glsl")));
         m_CombineTexturesProgram->Compile();
-        m_CombineTexturesProgram->BindFragDataLocation(0, "fragmentColor");
+        m_CombineTexturesProgram->BindFragDataLocation(0, "sceneColor");
+        m_CombineTexturesProgram->BindFragDataLocation(1, "bloomColor");
         m_CombineTexturesProgram->Link();
     }
     GLERROR("Creating DepthFill program");
@@ -53,11 +54,13 @@ void BlurHUD::InitializeShaderPrograms()
 void BlurHUD::InitializeBuffers()
 {
     glm::vec2 res = glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glm::vec2 res2 = glm::vec2(m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
+
 
     CommonFunctions::GenerateTexture(&m_DepthStencil_horiz, GL_CLAMP_TO_BORDER, GL_NEAREST,
-        res, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, 
-        res, GL_RGB16F, GL_RGB, GL_FLOAT);
+        res2, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_NEAREST, 
+        res2, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
 	if (m_GaussianFrameBuffer_horiz.GetHandle() == 0) {
         m_GaussianFrameBuffer_horiz.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthStencil_horiz, GL_DEPTH_STENCIL_ATTACHMENT)));
@@ -66,9 +69,9 @@ void BlurHUD::InitializeBuffers()
 	m_GaussianFrameBuffer_horiz.Generate();
 
     CommonFunctions::GenerateTexture(&m_DepthStencil_vert, GL_CLAMP_TO_BORDER, GL_NEAREST,
-        res, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, 
-        res, GL_RGB16F, GL_RGB, GL_FLOAT);
+        res2, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_NEAREST,
+        res2, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
 	if (m_GaussianFrameBuffer_vert.GetHandle() == 0) {
         m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthStencil_vert, GL_DEPTH_STENCIL_ATTACHMENT)));
@@ -92,11 +95,15 @@ void BlurHUD::ClearBuffer()
     m_GaussianFrameBuffer_horiz.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClearStencil(0x00);
+    glStencilMask(~0);
+    glDisable(GL_SCISSOR_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     m_GaussianFrameBuffer_horiz.Unbind();
     m_GaussianFrameBuffer_vert.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClearStencil(0x00);
+    glStencilMask(~0);
+    glDisable(GL_SCISSOR_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     m_GaussianFrameBuffer_vert.Unbind();
 
@@ -114,7 +121,10 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 
     FillStencil(scene);
 
-    DrawBloomPassState state;
+    RenderState state;
+    state.Disable(GL_BLEND);
+    state.Disable(GL_DEPTH_TEST);
+    state.Disable(GL_CULL_FACE);
 
     GLuint shaderHandle_horiz = m_GaussianProgram_horiz->GetHandle();
     GLuint shaderHandle_vert = m_GaussianProgram_vert->GetHandle();
@@ -128,6 +138,10 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
     state.StencilFunc(GL_EQUAL, 1, 0xFF);
     state.StencilMask(0x00);
     state.DepthMask(GL_FALSE);
+    state.Enable(GL_SCISSOR_TEST);
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
+    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    
     m_GaussianProgram_horiz->Bind();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -144,6 +158,8 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
         state.StencilFunc(GL_EQUAL, 1, 0xFF);
         state.StencilMask(0x00);
         state.DepthMask(GL_FALSE);
+        glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
+        glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
         m_GaussianProgram_vert->Bind();
 
 		glActiveTexture(GL_TEXTURE0);
@@ -162,6 +178,8 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
         state.StencilFunc(GL_EQUAL, 1, 0xFF);
         state.StencilMask(0x00);
         state.DepthMask(GL_FALSE);
+        glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
+        glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
         m_GaussianProgram_horiz->Bind();
 
 		glActiveTexture(GL_TEXTURE0);
@@ -182,6 +200,8 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
     state.StencilFunc(GL_EQUAL, 1, 0xFF);
     state.StencilMask(0x00);
     state.DepthMask(GL_FALSE);
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
+    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     m_GaussianProgram_vert->Bind();
 
 	glActiveTexture(GL_TEXTURE0);
@@ -192,6 +212,9 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
         , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 
     GLERROR("DrawBloomPass::Draw: END");
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+    glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+
 
     return m_GaussianTexture_vert;
 }
@@ -199,9 +222,9 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 
 void BlurHUD::OnWindowResize()
 {
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality), GL_RGB16F, GL_RGB, GL_FLOAT);
     m_GaussianFrameBuffer_vert.Generate();
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality), GL_RGB16F, GL_RGB, GL_FLOAT);
     m_GaussianFrameBuffer_horiz.Generate();
 }
 
@@ -216,6 +239,7 @@ void BlurHUD::FillStencil(RenderScene& scene)
     state.StencilFunc(GL_ALWAYS, 1, 0xFF);
     state.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     state.StencilMask(0xFF);
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
 
     m_FillDepthStencilProgram->Bind();
 
@@ -254,16 +278,16 @@ void BlurHUD::FillStencil(RenderScene& scene)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
         glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
     }
-
+    glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 }
 
 //Texture 1 will be used if texture 2 is black at that texel, else texture 2 is used.
 GLuint BlurHUD::CombineTextures(GLuint texture1, GLuint texture2)
 {
-    RenderState state;
-    state.BindFramebuffer(m_CombinedTextureBuffer.GetHandle());
-    state.Disable(GL_DEPTH_TEST);
-    state.Disable(GL_STENCIL_TEST);
+    //RenderState state;
+    //state.BindFramebuffer(m_CombinedTextureBuffer.GetHandle());
+    //state.Disable(GL_DEPTH_TEST);
+    //state.Disable(GL_STENCIL_TEST);
 
     m_CombineTexturesProgram->Bind();
 

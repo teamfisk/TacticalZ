@@ -48,6 +48,7 @@ private:
     //const LightCullingPass* m_LightCullingPass 
     int m_Iterations = 3;
 	int m_Quality = 0;
+    float m_BlurQuality = 2.f;
 
     GLuint m_GaussianTexture_horiz = 0;
     GLuint m_GaussianTexture_vert = 0;

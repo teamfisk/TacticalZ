@@ -57,8 +57,6 @@ private:
     Texture* m_ErrorTexture;
     Texture* m_WhiteTexture;
 
-    GLuint m_CombinedTexture;
-
     Model* m_ScreenQuad;
     Model* m_UnitQuad;
     Model* m_UnitSphere;

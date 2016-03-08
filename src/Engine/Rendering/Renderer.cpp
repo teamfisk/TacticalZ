@@ -162,7 +162,6 @@ void Renderer::Draw(RenderFrame& frame)
 		m_DrawFinalPass->Draw(*scene, m_BlurHUDPass);
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
-        m_CombinedTexture = m_BlurHUDPass->CombineTextures(m_DrawFinalPass->SceneTexture(), m_DrawFinalPass->FullBlurredTexture());
 
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Text");
         m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());

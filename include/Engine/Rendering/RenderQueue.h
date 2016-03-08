@@ -33,6 +33,7 @@ struct RenderScene
 
     Rectangle Viewport;
     bool ClearDepth = false;
+    bool ShouldBlur = false;
     glm::vec4 AmbientColor;
 
 	void Clear()
