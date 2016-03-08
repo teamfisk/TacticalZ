@@ -48,6 +48,7 @@ void TCPServer::Send(Packet & packet, PlayerDefinition & playerDefinition)
 {
     packet.UpdateSize();
     try {
+        // Crashed once TCPSocket was NULL
         int bytesSent = playerDefinition.TCPSocket->send(
             boost::asio::buffer(packet.Data(), packet.Size()),
             0);

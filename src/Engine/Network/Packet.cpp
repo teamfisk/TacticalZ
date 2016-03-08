@@ -35,11 +35,13 @@ void Packet::Init(MessageType type, unsigned int & packetID,
     m_ReturnDataOffset = 0;
     m_Offset = 0;
     // Create message header
+    // If you add things before here be sure to change in GetMessageType()
+    // SequenceNumber(), SequenceLength(), ChangePacketID()
     // allocate memory for size of packet, sequenceNumber and totalPacketesInSequence
     WritePrimitive<int>(0);
+    // SequenceNumber and totalAmountOfPackets position in array is hard coded
     WritePrimitive(sequenceNumber);
     WritePrimitive(totalAmountOfPackets);
-    // If you add things before here be sure to change in GetMessageType()
     // Add message type
     int messageType = static_cast<int>(type);
     WritePrimitive<int>(messageType);
@@ -127,7 +129,13 @@ void Packet::ChangePacketID(unsigned int & packetID)
 {
     packetID = packetID + 1;
     // Overwrite old PacketID
-    memcpy(m_Data + 2*sizeof(int), &packetID, sizeof(int));
+    memcpy(m_Data + 4 * sizeof(int), &packetID, sizeof(int));
+}
+
+void Packet::ChangeSequenceNumber(int sequenceNumber, int sequenceLength)
+{
+    memcpy(&sequenceNumber, m_Data + sizeof(int), sizeof(int));
+    memcpy(&sequenceLength, m_Data + 2 * sizeof(int), sizeof(int));
 }
 
 MessageType Packet::GetMessageType()
@@ -135,6 +143,23 @@ MessageType Packet::GetMessageType()
     MessageType messagType;
     memcpy(&messagType, m_Data + 3 * sizeof(int), sizeof(int));
     return messagType;
+}
+
+//WritePrimitive(sequenceNumber);
+//WritePrimitive(totalAmountOfPackets);
+
+size_t Packet::SequenceNumber()
+{
+    size_t sequenceNumber;
+    memcpy(&sequenceNumber, m_Data + sizeof(int), sizeof(int));
+    return sequenceNumber;
+}
+
+size_t Packet::SequenceLength()
+{
+    size_t sequenceLength;
+    memcpy(&sequenceLength, m_Data + 2 * sizeof(int), sizeof(int));
+    return sequenceLength;
 }
 
 void Packet::resizeData()

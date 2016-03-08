@@ -3,6 +3,7 @@
 
 #include "NetworkServer.h"
 #include <boost/asio/ip/udp.hpp>
+#define MAXPACKETSIZE 32000
 
 class UDPServer : public NetworkServer
 {

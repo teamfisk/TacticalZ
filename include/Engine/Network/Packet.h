@@ -58,12 +58,15 @@ public:
     void UpdateSize();
     char* ReadData(int SizeOfData);
     void ChangePacketID(unsigned int& packetID);
+    void ChangeSequenceNumber(int sequenceNumber, int sequenceLength);
     size_t Size() { return m_Offset; };
     char* Data() { return m_Data; };
     MessageType GetMessageType();
     size_t DataReadSize() { return m_ReturnDataOffset; }
     size_t MaxSize() { return m_MaxPacketSize; }
     size_t HeaderSize() { return m_HeaderSize; }
+    size_t SequenceNumber();
+    size_t SequenceLength();
 
 private:
     char* m_Data;

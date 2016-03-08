@@ -17,11 +17,34 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
 {
     packet.UpdateSize();
     try {
-        int bytesSent = m_Socket->send_to(
-            boost::asio::buffer(packet.Data(), packet.Size()),
-            playerDefinition.Endpoint,
-            0);
-        LOG_INFO("Size of packet is %i", bytesSent);
+        // Remove header from packet.
+        packet.ReadData(packet.HeaderSize());
+        int bytesSent = 0;
+        int sequenceNumber = 1;
+        int totalMessages = std::ceil(packet.Size() / MAXPACKETSIZE);
+        int packetDataSent = 0;
+        int packetDataSize = packet.Size() - packet.HeaderSize();
+        while (packetDataSize > packetDataSent) {
+           
+            Packet splitPacket(packet.GetMessageType(), playerDefinition.PacketID);
+            splitPacket.ChangeSequenceNumber(sequenceNumber, totalMessages);
+            int amountToSend = packetDataSize - packetDataSent;
+            if (amountToSend > MAXPACKETSIZE) {
+                amountToSend = MAXPACKETSIZE;
+            }
+            splitPacket.WriteData(packet.ReadData(amountToSend), amountToSend);
+            splitPacket.UpdateSize();
+            // Remove header size from bytes sent soo that we only
+            // count data in the packet
+
+            bytesSent += m_Socket->send_to(
+                boost::asio::buffer(splitPacket.Data() + bytesSent, splitPacket.Size()),
+                playerDefinition.Endpoint,
+                0);
+            packetDataSent = bytesSent - splitPacket.HeaderSize();
+            ++sequenceNumber;
+            int sizeasdasd = splitPacket.ReadPrimitive<int>();
+        }
     } catch (const boost::system::system_error& e) {
         LOG_INFO(e.what());
         // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
@@ -33,13 +56,13 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
 void UDPServer::Send(Packet & packet)
 {
     packet.UpdateSize();
-     size_t bytesSent = m_Socket->send_to(
+    size_t bytesSent = m_Socket->send_to(
         boost::asio::buffer(
             packet.Data(),
             packet.Size()),
         m_ReceiverEndpoint,
         0);
-     LOG_INFO("Size of packet is %i", bytesSent);
+    LOG_INFO("Size of packet is %i", bytesSent);
 }
 
 // Broadcasting respond specific logic
@@ -64,7 +87,7 @@ void UDPServer::Broadcast(Packet & packet, int port)
         boost::asio::buffer(
             packet.Data(),
             packet.Size()),
-        boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4().broadcast(),port),
+        boost::asio::ip::udp::endpoint(boost::asio::ip::address_v4().broadcast(), port),
         0);
     m_Socket->set_option(boost::asio::socket_base::broadcast(false));
 }
@@ -91,7 +114,7 @@ int UDPServer::readBuffer()
     int addasdasd = m_Socket->available();
     boost::system::error_code error;
     // Read size of packet
-     m_Socket->receive_from(boost
+    m_Socket->receive_from(boost
         ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
         m_ReceiverEndpoint, boost::asio::ip::udp::socket::message_peek, error);
     unsigned int sizeOfPacket = 0;
@@ -114,13 +137,13 @@ int UDPServer::readBuffer()
         ::asio::buffer((void*)(m_ReadBuffer),
             sizeOfPacket),
         m_ReceiverEndpoint, 0, error);
-        if (error) {
-            //LOG_ERROR("receive: %s", error.message().c_str());
-        }
-        if (sizeOfPacket > 1000000)
-            LOG_WARNING("The packets received are bigger than 1MB");
+    if (error) {
+        //LOG_ERROR("receive: %s", error.message().c_str());
+    }
+    if (sizeOfPacket > 1000000)
+        LOG_WARNING("The packets received are bigger than 1MB");
 
-        return bytesReceived;
+    return bytesReceived;
 }
 
 void UDPServer::AcceptNewConnections(int& nextPlayerID, std::map<PlayerID, PlayerDefinition>& connectedPlayers)

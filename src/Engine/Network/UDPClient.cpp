@@ -39,7 +39,7 @@ int UDPClient::readBuffer()
         return 0;
     }
     boost::system::error_code error;
-    // Read size of packet
+    // Peek size of packet
      m_Socket->receive(boost
         ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
          boost::asio::ip::udp::socket::message_peek, error);
@@ -47,7 +47,7 @@ int UDPClient::readBuffer()
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
     if (sizeOfPacket > m_Socket->available()) {
         LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
-        //return 0;
+        // return;
     }
     // if the buffer is to small increase the size of it
     if (sizeOfPacket > m_BufferSize) {
@@ -55,9 +55,7 @@ int UDPClient::readBuffer()
         m_ReadBuffer = new char[sizeOfPacket];
         m_BufferSize = sizeOfPacket;
     }
-
-    size_t availableData = m_Socket->available();
-    // Read the rest of the message
+    // Read the message
     size_t bytesReceived = m_Socket->receive_from(boost
         ::asio::buffer((void*)(m_ReadBuffer),
             sizeOfPacket),
@@ -65,8 +63,6 @@ int UDPClient::readBuffer()
     if (error) {
         //LOG_ERROR("receive: %s", error.message().c_str());
     }
-    if (sizeOfPacket > 1000000)
-        LOG_WARNING("The packets received are bigger than 1MB");
 
     return bytesReceived;
 }
