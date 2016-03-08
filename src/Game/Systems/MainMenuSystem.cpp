@@ -18,39 +18,26 @@ void MainMenuSystem::Update(double dt)
 
 bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
 {
-    if(e.EntityName == "Play") {
-        //OpenServerList
-
-    } else if(e.EntityName == "Connect") {
-        //Run connect code
-    } else if(e.EntityName == "Host") {
-        //Run host code
-    } else if(e.EntityName == "Quit") {
-        printf("No, you stay");
-    } else if (e.EntityName == "Res1080") {
-        glfwSetWindowSize(m_Renderer->Window(), 1920, 1080);
-    } else if (e.EntityName == "Res720") {
-        glfwSetWindowSize(m_Renderer->Window(), 1280, 720);
-        glViewport(0, 0, 1280, 720);
-    } else if (e.EntityName == "Res480") {
-        glfwSetWindowSize(m_Renderer->Window(), 854, 480);
-        glViewport(0, 0, 854, 480);
-    } else if (e.EntityName == "FullScreen") {
-        printf("No fullscreen for now");
+    if (e.EntityName == "ServerIdentityConnect") {
+        EntityWrapper entity = e.Entity;
+        EntityWrapper serverIdentityEntity = entity.FirstParentWithComponent("ServerIdentity");
+        if(serverIdentityEntity.Valid()) {
+            Events::ConnectRequest event;
+            event.IP = (std::string)entity["ServerIdentity"]["IP"];
+            event.Port = (int)entity["ServerIdentity"]["Port"];
+            m_EventBroker->Publish(event);
+        }
     }
-
     return true;
 }
 
 bool MainMenuSystem::OnButtonRelease(const Events::ButtonReleased& e)
 {
-
     return true;
 }
 
 bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 {
-
     return true;
 }
 

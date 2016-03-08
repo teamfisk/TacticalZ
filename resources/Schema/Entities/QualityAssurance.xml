@@ -3,7 +3,7 @@
 
   <Components>
     <c:CapturePointGameMode>
-      <RespawnTime>0.8333591884066891</RespawnTime>
+      <RespawnTime>3.6154132075906489</RespawnTime>
     </c:CapturePointGameMode>
     <c:Transform>
       <Position X="0" Y="-1" Z="0"/>
@@ -85,7 +85,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="2882.12329" Z="0"/>
+                  <Orientation X="0" Y="2907.64526" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -141,7 +141,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="9090.23535" Z="0"/>
+              <Orientation X="0" Y="9141.29785" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -194,7 +194,7 @@
         </c:Model>
         <c:Transform>
           <Position X="2.1529963" Y="6.59221172" Z="0.169116676"/>
-          <Orientation X="4.16300011" Y="18929.4199" Z="0"/>
+          <Orientation X="4.16300011" Y="18980.4727" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -222,7 +222,7 @@
               <Axis X="1" Y="1" Z="1"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="17519.9004" Y="17519.9004" Z="17519.9004"/>
+              <Orientation X="17570.9531" Y="17570.9531" Z="17570.9531"/>
             </c:Transform>
           </Components>
           <Children>
@@ -286,7 +286,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="17315.8965" Z="0"/>
+              <Orientation X="0" Y="17366.9492" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -318,7 +318,7 @@
                       <Axis X="0.699999988" Y="1" Z="0.300000012"/>
                     </c:RaptorCopter>
                     <c:Transform>
-                      <Orientation X="12666.7588" Y="18043.3066" Z="5399.21436"/>
+                      <Orientation X="12702.4932" Y="18094.3594" Z="5414.53027"/>
                     </c:Transform>
                   </Components>
                   <Children>
@@ -668,7 +668,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1179.89148" Z="0"/>
+                  <Orientation X="0" Y="1205.41614" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -715,7 +715,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1179.89148" Z="0"/>
+                  <Orientation X="0" Y="1205.41614" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -775,7 +775,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1179.89148" Z="0"/>
+                  <Orientation X="0" Y="1205.41614" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -822,7 +822,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1179.89148" Z="0"/>
+                  <Orientation X="0" Y="1205.41614" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -868,7 +868,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1179.89148" Z="0"/>
+                  <Orientation X="0" Y="1205.41614" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -915,7 +915,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1179.89148" Z="0"/>
+                  <Orientation X="0" Y="1205.41614" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -962,7 +962,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1179.89148" Z="0"/>
+                  <Orientation X="0" Y="1205.41614" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1376,7 +1376,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1713.61841" Z="0"/>
+                  <Orientation X="0" Y="1739.14307" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1385,7 +1385,7 @@
                     <c:ExplosionEffect>
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                      <TimeSinceDeath>0.66694876855613217</TimeSinceDeath>
+                      <TimeSinceDeath>1.5712751414989441</TimeSinceDeath>
                       <ExplosionDuration>3.7999999523162842</ExplosionDuration>
                       <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
                       <Randomness>true</Randomness>
@@ -1432,7 +1432,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1713.61841" Z="0"/>
+                  <Orientation X="0" Y="1739.14307" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1441,7 +1441,7 @@
                     <c:ExplosionEffect>
                       <Velocity X="0.5" Y="1" Z="0"/>
                       <ExplosionOrigin X="0" Y="0.900000036" Z="0"/>
-                      <TimeSinceDeath>2.0168132214141465</TimeSinceDeath>
+                      <TimeSinceDeath>0.85439856235552725</TimeSinceDeath>
                     </c:ExplosionEffect>
                     <c:Model>
                       <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
@@ -1484,7 +1484,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1713.61841" Z="0"/>
+                  <Orientation X="0" Y="1739.14307" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1497,7 +1497,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0.300000012" Y="2" Z="0"/>
                       <ExplosionOrigin X="0" Y="1.30000007" Z="-0.200000003"/>
-                      <TimeSinceDeath>2.0168132214141465</TimeSinceDeath>
+                      <TimeSinceDeath>0.85439856235552725</TimeSinceDeath>
                       <EndColor A="0" B="0.333333343" G="0.933333337" R="3.92156863"/>
                       <Randomness>true</Randomness>
                     </c:ExplosionEffect>
@@ -1542,7 +1542,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1721.39856" Z="0"/>
+                  <Orientation X="0" Y="1746.92322" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1552,7 +1552,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="0" Y="0.699999988" Z="0"/>
                       <ExplosionOrigin X="0" Y="-1.10000002" Z="0"/>
-                      <TimeSinceDeath>6.6002622626005092</TimeSinceDeath>
+                      <TimeSinceDeath>7.5223549108000043</TimeSinceDeath>
                       <ExplosionDuration>10</ExplosionDuration>
                       <EndColor A="1" B="0" G="0" R="1"/>
                       <RandomnessScalar>3</RandomnessScalar>
@@ -1600,7 +1600,7 @@
                   <Axis X="0" Y="1" Z="0"/>
                 </c:RaptorCopter>
                 <c:Transform>
-                  <Orientation X="0" Y="1319.51306" Z="0"/>
+                  <Orientation X="0" Y="1345.03772" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -1610,7 +1610,7 @@
                       <ColorByDistance>true</ColorByDistance>
                       <Velocity X="6" Y="0.100000001" Z="0"/>
                       <ExplosionOrigin X="0" Y="-10" Z="0"/>
-                      <TimeSinceDeath>0.1169253453956216</TimeSinceDeath>
+                      <TimeSinceDeath>0.39702717854592606</TimeSinceDeath>
                       <ExponentialAccelaration>true</ExponentialAccelaration>
                       <ExplosionDuration>5</ExplosionDuration>
                       <Randomness>true</Randomness>
@@ -1793,7 +1793,7 @@
                         <c:ExplosionEffect>
                           <ColorByDistance>true</ColorByDistance>
                           <Velocity X="0.800000012" Y="0.0379999988" Z="0"/>
-                          <TimeSinceDeath>0.66694876855613217</TimeSinceDeath>
+                          <TimeSinceDeath>1.5712751414989441</TimeSinceDeath>
                           <ExplosionDuration>3.7999999523162842</ExplosionDuration>
                           <EndColor A="0" B="23.5294113" G="11.7647057" R="0"/>
                           <Randomness>true</Randomness>
@@ -2156,7 +2156,17 @@
               <Position X="0" Y="1.32321239" Z="0"/>
             </c:Transform>
           </Components>
-          <Children/>
+          <Children>
+            <Entity name="Spawner">
+              <Components>
+                <c:Spawner>
+                  <EntityFile></EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>
