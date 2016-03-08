@@ -6,6 +6,7 @@ PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerDeathSystem::OnPlayerDeath);
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &PlayerDeathSystem::OnEntityDeleted);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &PlayerDeathSystem::OnInputCommand);
 }
 
 void PlayerDeathSystem::Update(double dt)
@@ -89,4 +90,15 @@ void PlayerDeathSystem::setSpectatorCamera()
     m_EventBroker->Publish(eSetCamera);
     Events::UnlockMouse unlock;
     m_EventBroker->Publish(unlock);
+}
+
+bool PlayerDeathSystem::OnInputCommand(Events::InputCommand& e)
+{
+    if (e.Value == 0 ||  e.Command != "SwapToTeamPick" && e.Command != "SwapToClassPick") {
+        return false;
+    }
+
+    // Ensure that we don't set spectator camera if the player deliberately changes to class/team pick.
+    m_LocalPlayerDeathEffect = EntityWrapper::Invalid;
+    return true;
 }

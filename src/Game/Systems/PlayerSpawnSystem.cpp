@@ -134,16 +134,12 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
     auto iter = m_SpawnRequests.begin();
     for (; iter != m_SpawnRequests.end(); ++iter) {
         if (iter->PlayerID == e.PlayerID) {
-            // If player wants to switch team, remove their spawn request.
-            if (e.Command == "SwapToTeamPick") {
-                m_SpawnRequests.erase(iter);
-            } else if (e.Command == "SwapToClassPick") {
-                // If player wants to switch class, remove their selected class so they don't spawn.
+            // If player wants to switch team or class , remove their selected class so they don't spawn.
+            if (e.Command == "SwapToTeamPick" || e.Command == "SwapToClassPick") {
                 iter->Class = -1;
-            } else {
-                break;
+                return true;
             }
-            return true;
+            break;
         }
     }
 
