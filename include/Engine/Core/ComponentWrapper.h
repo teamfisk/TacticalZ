@@ -108,6 +108,7 @@ struct ComponentWrapper
         // Return the integer value of an enum type key for this field
         ComponentInfo::EnumType Enum(const char* enumKey) { return m_Component->Enum(m_PropertyName.c_str(), enumKey); }
         bool Dirty(DirtySet set) { return true; }
+        void SetDirty(bool dirty = true) { }
 
         template <typename T>
         operator T&() { return m_Component->Field<T>(m_PropertyName); }
