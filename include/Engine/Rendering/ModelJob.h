@@ -111,7 +111,7 @@ struct ModelJob : RenderJob
         Color = modelComponent["Color"];
         GlowIntensity = ((double)modelComponent["GlowIntensity"]);
         Entity = modelComponent.EntityID;
-        glm::vec3 abspos = Transform::AbsolutePosition(world, modelComponent.EntityID);
+        glm::vec3 abspos = glm::vec3(matrix[3][0], matrix[3][1], matrix[3][2]);
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
         Depth = worldpos.z;
         World = world;
@@ -164,7 +164,9 @@ struct ModelJob : RenderJob
 	bool IsShielded;
     void CalculateHash() override
     {
-        Hash = ShaderID << 20 + ModelID << 10 + TextureID;
+		Hash = TextureID;
+		Hash += ModelID << 10;
+		Hash += ShaderID << 20;
     }
 };
 

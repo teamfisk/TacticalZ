@@ -23,8 +23,8 @@ bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
         EntityWrapper serverIdentityEntity = entity.FirstParentWithComponent("ServerIdentity");
         if(serverIdentityEntity.Valid()) {
             Events::ConnectRequest event;
-            event.IP = (std::string)entity["ServerIdentity"]["IP"];
-            event.Port = (int)entity["ServerIdentity"]["Port"];
+            event.IP = (std::string)serverIdentityEntity["ServerIdentity"]["IP"];
+            event.Port = (int)serverIdentityEntity["ServerIdentity"]["Port"];
             printf("\n ----Request Server Connect----\nIP: %s\nPort: %i\n ------------------------------", event.IP, event.Port);
             m_EventBroker->Publish(event);
         }
@@ -82,7 +82,6 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
             }
         } else {
             //Serverlist submenu is open, close it.
-            printf("\n\nMenuShit\n\n");
             m_World->DeleteEntity(m_OpenSubMenu.ID);
             m_OpenSubMenu = EntityWrapper::Invalid;
         }

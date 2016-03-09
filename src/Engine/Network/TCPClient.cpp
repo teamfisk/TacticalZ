@@ -10,7 +10,7 @@ TCPClient::~TCPClient()
 {
 }
 
-void TCPClient::Connect(std::string playerName, std::string address, int port)
+bool TCPClient::Connect(std::string playerName, std::string address, int port)
 {
     if (m_Socket) {
         if (m_IsConnected) {
@@ -19,6 +19,7 @@ void TCPClient::Connect(std::string playerName, std::string address, int port)
             Send(packet);
             LOG_INFO("Connect message sent again!");
         }
+        return true;
     }
     else if (!m_IsConnected) {
         boost::system::error_code error = boost::asio::error::host_not_found;
@@ -34,11 +35,13 @@ void TCPClient::Connect(std::string playerName, std::string address, int port)
             packet.WriteString(playerName);
             Send(packet);
             LOG_INFO("Connect message sent!");
+            return true;
         }
         // If error
         else {
             m_Socket->close();
             m_Socket = nullptr;
+            return false;
         }
     }
 }

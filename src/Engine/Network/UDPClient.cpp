@@ -10,14 +10,15 @@ UDPClient::~UDPClient()
 { 
 }
 
-void UDPClient::Connect(std::string playerName, std::string address, int port)
+bool UDPClient::Connect(std::string playerName, std::string address, int port)
 {
     if (m_Socket) {
-        return;
+        return false;
     }
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address().from_string(address), port);
     m_Socket = boost::shared_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService));
     m_Socket->open(boost::asio::ip::udp::v4());
+    return true;
 }
 
 void UDPClient::Disconnect()
