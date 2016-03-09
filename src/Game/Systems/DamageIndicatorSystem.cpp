@@ -8,7 +8,7 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &DamageIndicatorSystem::OnSetCamera);
 
     //load texture to cache
-    auto texture = CommonFunctions::LoadTexture("Textures/DamageIndicator.png", false);
+    auto texture = CommonFunctions::TryLoadResource<Texture, false>("Textures/DamageIndicator.png");
     auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/DamageIndicator.xml");
     m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }

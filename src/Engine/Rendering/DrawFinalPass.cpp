@@ -22,11 +22,11 @@ DrawFinalPass::~DrawFinalPass(){
 
 void DrawFinalPass::InitializeTextures()
 {
-    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
-    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
-    m_NeutralNormalTexture = CommonFunctions::LoadTexture("Textures/Core/NeutralNormalMap.png", false);
-    m_GreyTexture = CommonFunctions::LoadTexture("Textures/Core/Grey.png", false);
-    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
+    m_WhiteTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/White.png");
+    m_BlackTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Black.png");
+    m_NeutralNormalTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/NeutralNormalMap.png");
+    m_GreyTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Grey.png");
+    m_ErrorTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/ErrorTexture.png");
 }
 
 void DrawFinalPass::InitializeFrameBuffers()

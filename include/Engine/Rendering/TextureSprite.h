@@ -1,19 +1,20 @@
-#ifndef Texture_h__
-#define Texture_h__
+#ifndef TextureSprite_h__
+#define TextureSprite_h__
 
 #include "../OpenGL.h"
 #include "BaseTexture.h"
+#include "Texture.h"
 #include "PNG.h"
 
-class Texture : public BaseTexture
+class TextureSprite : public Texture
 {
 	friend class ResourceManager;
 
 protected:
-	Texture(std::string path);
+	TextureSprite(std::string path);
 
 public:
-	~Texture();
+	~TextureSprite();
 
 	void Bind(GLenum textureUnit = GL_TEXTURE0);
 
