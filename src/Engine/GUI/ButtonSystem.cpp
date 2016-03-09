@@ -40,7 +40,7 @@ bool ButtonSystem::OnMousePress(const Events::MousePress& e)
                 //You have clicked on a button entity, send pressed event.
                 if (m_World->HasComponent(m_PickData.Entity, "InputCmdButton")) {
                     Events::InputCommand eInputCmd;
-                    eInputCmd.PlayerID = LocalPlayer.ID;
+                    eInputCmd.PlayerID = -1;
                     eInputCmd.Player = LocalPlayer;
                     EntityWrapper button = EntityWrapper(m_World, m_PickData.Entity);
                     eInputCmd.Command = (std::string)button["InputCmdButton"]["Command"];
@@ -68,7 +68,7 @@ bool ButtonSystem::OnMouseRelease(const Events::MouseRelease& e)
 
             if (m_World->HasComponent(m_PickData.Entity, "InputCmdButton")) {
                 Events::InputCommand eInputCmd;
-                eInputCmd.PlayerID = LocalPlayer.ID;
+                eInputCmd.PlayerID = -1;
                 eInputCmd.Player = LocalPlayer;
                 EntityWrapper button = EntityWrapper(m_World, m_PickData.Entity);
                 eInputCmd.Command = (std::string)button["InputCmdButton"]["Command"];

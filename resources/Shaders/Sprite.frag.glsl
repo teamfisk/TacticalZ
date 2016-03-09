@@ -33,7 +33,8 @@ void main()
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 
 	//bloomColor = vec4(clamp((glowTexel.xyz*3) - 1.0, 0, 100), 1.0);
-	bloomColor = vec4(1.0, 1.0, 1.0, 0.0);
+	bloomColor = vec4(max(color_result.xyz - 1.0, 0.0), clamp(color_result.a, 0, 1));
+	//bloomColor = vec4(1.0, 1.0, 1.0, 0.0);
 }
 
 

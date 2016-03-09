@@ -1,10 +1,12 @@
 #include "Systems/PlayerDeathSystem.h"
+#include "Core/ELockMouse.h"
 
 PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
     : System(params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerDeathSystem::OnPlayerDeath);
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &PlayerDeathSystem::OnEntityDeleted);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &PlayerDeathSystem::OnInputCommand);
 }
 
 void PlayerDeathSystem::Update(double dt)
@@ -33,10 +35,10 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 
     //components that we need from player
     auto playerModel = player.FirstChildByName("PlayerModel");
-    if (!playerModel.Valid()) {
-        return;
-    }
     if (!playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
+        if (player == LocalPlayer) {
+            setSpectatorCamera();
+        }
         return;
     }
     auto playerEntityModel = playerModel["Model"];
@@ -68,14 +70,35 @@ bool PlayerDeathSystem::OnEntityDeleted(Events::EntityDeleted& e)
     if (m_LocalPlayerDeathEffect.ID != e.DeletedEntity) {
         return false;
     }
-    
+
+    // If the player hasn't spawned already, activate the spectator camera.
+    if (!LocalPlayer.Valid()) {
+        setSpectatorCamera();
+    }
+    return true;
+}
+
+void PlayerDeathSystem::setSpectatorCamera()
+{
     // Look for the spectator camera entity in the level.
     EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
-    if (!spectatorCam.Valid() || !spectatorCam.HasComponent("Camera") || LocalPlayer.Valid()) {
-        return false;
+    if (!spectatorCam.HasComponent("Camera")) {
+        return;
     }
     Events::SetCamera eSetCamera;
     eSetCamera.CameraEntity = spectatorCam;
     m_EventBroker->Publish(eSetCamera);
+    Events::UnlockMouse unlock;
+    m_EventBroker->Publish(unlock);
+}
+
+bool PlayerDeathSystem::OnInputCommand(Events::InputCommand& e)
+{
+    if (e.Value == 0 ||  e.Command != "SwapToTeamPick" && e.Command != "SwapToClassPick") {
+        return false;
+    }
+
+    // Ensure that we don't set spectator camera if the player deliberately changes to class/team pick.
+    m_LocalPlayerDeathEffect = EntityWrapper::Invalid;
     return true;
 }

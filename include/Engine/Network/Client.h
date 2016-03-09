@@ -29,18 +29,7 @@
 #include "Core/EAmmoPickup.h"
 #include "Network/ESearchForServers.h"
 #include "../Game/Events/EDashAbility.h"
-
-struct ServerInfo
-{
-    ServerInfo(std::string a, int b, std::string c, int d)
-    {
-        Address = a; Port = b; Name = c; PlayersConnected = d;
-    }
-    std::string Address = "";
-    int Port = 0;
-    std::string Name = "";
-    int PlayersConnected = 0;
-};
+#include "Network/EDisplayServerlist.h"
 
 class Client : public Network
 {

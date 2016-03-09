@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="MainMenuOrigin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Menu/>
+    <c:Transform>
+      <Position X="0" Y="0" Z="-0.5"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Side_Origin">
+      <Components>
+        <c:Transform>
+          <Position X="-0.377000004" Y="0.0400000028" Z="0"/>
+          <Orientation X="0" Y="0.797000051" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="ButtonPos_3">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="-0.140000001" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Button_3">
+              <Components>
+                <c:Button/>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <GlowMap></GlowMap>
+                  <Color A="0.588235319" B="1" G="1" R="1"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Credits</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="0" G="0" R="0"/>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.075000003" Y="-0.0150000006" Z="0.00100000005"/>
+                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ButtonPos_1">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Button_1">
+              <Components>
+                <c:Button/>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <GlowMap></GlowMap>
+                  <Color A="0.588235319" B="1" G="1" R="1"/>
+                </c:Sprite>
+                <c:InputCmdButton>
+                  <Command>Play</Command>
+                  <PressValue>1</PressValue>
+                </c:InputCmdButton>
+                <c:Transform>
+                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Play</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="0" G="0" R="0"/>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.075000003" Y="-0.0150000006" Z="0.00100000005"/>
+                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ButtonPos_2">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="-0.0700000003" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Button_2">
+              <Components>
+                <c:Button/>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <GlowMap></GlowMap>
+                  <Color A="0.588235319" B="1" G="1" R="1"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Option</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="0" G="0" R="0"/>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.075000003" Y="-0.0150000006" Z="0.00100000005"/>
+                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ButtonPos_4">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="-0.209999993" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Button_4">
+              <Components>
+                <c:Button/>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <GlowMap></GlowMap>
+                  <Color A="0.588235319" B="1" G="1" R="1"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Quit</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="0" G="0" R="0"/>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.075000003" Y="-0.0150000006" Z="0.00100000005"/>
+                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Popup_Origin">
+      <Components>
+        <c:Transform>
+          <Position X="-0.103822395" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="PlaySpawner">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/ServerList.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

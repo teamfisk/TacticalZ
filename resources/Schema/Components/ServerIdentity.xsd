@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+	<xs:element name="ServerIdentity">
+		<xs:annotation><xs:documentation>A component for tracking the data of servers in the serverlist.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="IP" type="t:string" minOccurs="0">
+				<xs:annotation><xs:documentation>The IP adress of the server.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Port" type="t:int" minOccurs="0">
+				<xs:annotation><xs:documentation>Port used to connect to the server.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="ServerName" type="t:string" minOccurs="0">
+				<xs:annotation><xs:documentation>Name of the server.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="PlayersConnected" type="t:int" minOccurs="0">
+				<xs:annotation><xs:documentation>Amount of players connected to the server.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
