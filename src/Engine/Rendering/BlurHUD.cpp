@@ -10,7 +10,7 @@ BlurHUD::BlurHUD(IRenderer* renderer)
 
 void BlurHUD::InitializeTextures()
 {
-    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+    m_BlackTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Black.png");
     m_ScreenQuad = ResourceManager::Load<Model>("Models/Core/ScreenQuad.mesh");
 }
 

@@ -2,6 +2,19 @@
 
 std::unordered_map<GLFWwindow*, Renderer*> Renderer::m_WindowToRenderer;
 
+Renderer::~Renderer() {
+	delete m_PickingPass;
+	delete m_LightCullingPass;
+	delete m_ImGuiRenderPass;
+	delete m_DrawFinalPass;
+	delete m_DrawScreenQuadPass;
+	delete m_DrawBloomPass;
+	delete m_DrawColorCorrectionPass;
+	delete m_SSAOPass;
+	delete m_CubeMapPass;
+	delete m_TextPass;
+}
+
 void Renderer::Initialize()
 {
 	m_SSAO_Quality = m_Config->Get<int>("SSAO.Quality", 0);
@@ -220,8 +233,8 @@ PickData Renderer::Pick(glm::vec2 screenCoord)
 
 void Renderer::InitializeTextures()
 {
-    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
-    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
+    m_ErrorTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/ErrorTexture.png");
+    m_WhiteTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/White.png");
 }
 
 

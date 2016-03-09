@@ -1,5 +1,6 @@
 #version 430
-
+uniform mat4 PVM;
+uniform mat4 TIM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -22,8 +23,8 @@ out VertexData{
 
 void main()
 {
-	gl_Position = P*V*M * vec4(Position, 1.0);
-	mat4 TIM = transpose(inverse(M));
+	gl_Position = PVM * vec4(Position, 1.0);
+	//mat4 TIM = transpose(inverse(M));
 	Output.Position = Position;
 	Output.TextureCoordinate = TextureCoords;
 	Output.Normal = vec3(TIM * vec4(Normal, 0.0));
