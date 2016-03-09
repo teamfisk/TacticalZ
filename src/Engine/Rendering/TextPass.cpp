@@ -16,7 +16,7 @@ void TextPass::Initialize()
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
+	
     m_TextProgram = ResourceManager::Load<ShaderProgram>("#TextProgram");
     m_TextProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Text.vert.glsl")));
     m_TextProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Text.frag.glsl")));
@@ -46,6 +46,83 @@ void TextPass::Draw(RenderScene& scene, FrameBuffer& frameBuffer)
     delete state;
 }
 
+std::string TextPass::parseColors(std::string text, std::map<int, glm::vec4>& colorChanges, glm::vec4 originalColor)
+{
+	std::string parsedString = text;
+	glm::vec4 newColor = originalColor;
+	bool colorChange = false;
+
+	for (std::string::const_iterator c = parsedString.begin(); c != parsedString.end(); c++) {
+		if (*c == char(92)) { // Backlash
+			if (*(c + 1) == char('C')) { // C for Color 
+				bool hasCorrectFormat = true;
+
+				for (std::string::const_iterator colorC = c + 2; colorC != c + 8; colorC++) {
+					if (*colorC < '0' || *colorC > 'F') {
+						hasCorrectFormat = false;
+						break;
+					}
+				}
+
+				if (hasCorrectFormat == true) {
+					colorChange = true;
+
+					std::array<int, 3> hexToInt = {
+						std::stoi(std::string(c + 2, c + 4), 0, 16),
+						std::stoi(std::string(c + 4, c + 6), 0, 16),
+						std::stoi(std::string(c + 6, c + 8), 0, 16)
+					};
+
+					newColor = glm::vec4(
+						float(hexToInt[0]) / 255.f,
+						float(hexToInt[1]) / 255.f,
+						float(hexToInt[2]) / 255.f,
+						newColor.a);
+
+					parsedString.erase(c, (c + 8));
+				}
+			}
+
+			if (*(c + 1) == char('A')) { // A for Alpha
+				bool hasCorrectFormat = true;
+
+				for (std::string::const_iterator colorC = c + 2; colorC != c + 4; colorC++) {
+					if (*colorC < '0' || *colorC > 'F') {
+						hasCorrectFormat = false;
+						break;
+					}
+
+					if (hasCorrectFormat == true) {
+						colorChange = true;
+
+						int hexToInt = std::stoi(std::string(c + 2, c + 4), 0, 16);
+
+						newColor = glm::vec4(
+							newColor.r,
+							newColor.g,
+							newColor.b,
+							float(hexToInt) / 255.f);
+
+						parsedString.erase(c, (c + 4));
+					}
+				}
+			}
+
+			if (*(c + 1) > '0' && *(c + 1) < '9') { // Icons
+				parsedString.replace(c, (c + 2), 1, (*(c + 1) - 48));
+			}
+
+			if (colorChange) {
+				colorChanges[c - parsedString.begin()] = newColor;
+			}
+		}
+	}
+
+
+
+	return parsedString;
+}
+
 void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
     GLfloat penX = 0;
@@ -54,10 +131,13 @@ void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum a
 
     GLfloat stringWidth = 0.f;
 
-    for (std::string::const_iterator c = text.begin(); c != text.end(); c++) {
-        Font::Character ch = font->m_Characters[*c];
-        stringWidth += (ch.Advance >> 6) * scale;
-    }
+	std::map<int, glm::vec4> colorChanges;
+	std::string parsedText = parseColors(text, colorChanges, color);
+
+	for (std::string::const_iterator c = parsedText.begin(); c != parsedText.end(); c++) {
+		Font::Character ch = font->m_Characters[*c];
+		stringWidth += (ch.Advance >> 6) * scale;
+	}
 
     if(alignment == TextJob::AlignmentEnum::Center) {
         penX = -stringWidth/2.f;
@@ -78,7 +158,13 @@ void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum a
     glBindVertexArray(VAO);
 
 
-    for (std::string::const_iterator c = text.begin(); c != text.end(); c++) {
+    for (std::string::const_iterator c = parsedText.begin(); c != parsedText.end(); c++) {
+
+		auto it = colorChanges.find(c - parsedText.begin());
+		if (it != colorChanges.end()) {
+			glUniform4fv(glGetUniformLocation(m_TextProgram->GetHandle(), "textColor"), 1, glm::value_ptr(it->second));
+		}
+
         Font::Character ch = font->m_Characters[*c];
 
         GLfloat xpos = penX + ch.Bearing.x * scale;
