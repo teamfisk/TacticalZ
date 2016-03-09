@@ -20,7 +20,7 @@
       </Components>
       <Children/>
     </Entity>
-    <Entity name="ThirdPersonReloadSpawner">
+    <Entity name="ReloadSpawner">
       <Components>
         <c:Spawner>
           <EntityFile>Schema/Entities/ReloadEffectWorld.xml</EntityFile>
