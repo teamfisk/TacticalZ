@@ -233,7 +233,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 	
 }
 
-void DrawFinalPass::Draw(RenderScene& scene)
+void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 {
     GLERROR("Pre");
 	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer.GetHandle());
@@ -280,16 +280,32 @@ void DrawFinalPass::Draw(RenderScene& scene)
 	DrawModelRenderQueuesWithShieldCheck(scene.Jobs.TransparentObjects, scene); //might need changing
     GLERROR("Shielded Transparent objects");
 
+    //Generate blur texture.
+    delete state;
+    if (scene.ShouldBlur) {
+        //This needs to be drawn only when the full scene is being renderd, and then let be, otherwise sprite and other shit will show on it.
+        m_FullBlurredTexture = blurHUDPass->Draw(m_SceneTexture, scene);
+    }
+
+        DrawFinalPassState* stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
+    if(scene.ShouldBlur) {
+        //Combine nonblur and blur texture
+        stateSprite->Disable(GL_DEPTH_TEST);
+        stateSprite->Disable(GL_STENCIL_TEST);
+        m_CombinedTexture = blurHUDPass->CombineTextures(m_SceneTexture, m_FullBlurredTexture);
+
+    }
 	//Draw Transparen objects
 	//state->BlendFunc(GL_ONE, GL_ONE);
 	//state->StencilFunc(GL_EQUAL, 1, 0xFF);
 	//DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
 	GLERROR("TransparentObjects");
 	//state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    stateSprite->Enable(GL_DEPTH_TEST);
 	DrawSprites(scene.Jobs.SpriteJob, scene);
 	GLERROR("SpriteJobs");
 
-	delete state;
+	delete stateSprite;
     GLERROR("END");
     
 }
