@@ -25,6 +25,7 @@ bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
             Events::ConnectRequest event;
             event.IP = (std::string)entity["ServerIdentity"]["IP"];
             event.Port = (int)entity["ServerIdentity"]["Port"];
+            printf("\n ----Request Server Connect----\nIP: %s\nPort: %i\n ------------------------------", event.IP, event.Port);
             m_EventBroker->Publish(event);
         }
     }
