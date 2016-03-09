@@ -707,7 +707,7 @@ void Client::removeWorld()
 
 void Client::createMainMenu()
 {
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/MainMenu.xml");
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/StartMenu.xml");
     entityFile->MergeInto(m_World);
 }
 
