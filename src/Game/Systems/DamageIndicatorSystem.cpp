@@ -41,6 +41,11 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
         return false;
     }
 
+    //friendly fire - return
+    if (e.Damage < 0.1f) {
+        return false;
+    }
+
     glm::vec3 inflictorPos = e.Inflictor["Transform"]["Position"];
     //if testing
 #ifdef INDICATOR_TEST
@@ -55,10 +60,6 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
     m_World->SetParent(sprite.ID, m_CurrentCamera);
     //simply set the rotation z-wise to the angleBetweenVectors
     sprite["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);
-    //friendly fire - change color of the marker
-    if (e.Damage < 0.1f) {
-        sprite["Sprite"]["Color"] = glm::vec4(0.0, 1.0f, 1.0f, 1.0f);
-    }
 
     if (!IsServer || !m_NetworkEnabled) {
         updateDamageIndicatorVector.emplace_back(sprite, inflictorPos);
