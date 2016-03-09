@@ -3,16 +3,22 @@
 Packet::Packet(MessageType type, unsigned int& packetID)
 {
     m_Data = new char[m_MaxPacketSize];
-    Init(type, packetID, 1, 1 , -1);
+    Init(type, packetID, 1, 1, -1);
 }
 
 // Create message
 Packet::Packet(char* data, const size_t sizeOfPacket)
 {
+    // Create message header
+    // allocate memory for size of packet, sequenceNumber and totalPacketesInSequence
+    m_ReturnDataOffset = 0;
+    m_Offset = 0;
     // Resize message
     m_MaxPacketSize = sizeOfPacket;
     // Copy data newly allocated memory
     m_Data = new char[sizeOfPacket];
+    unsigned int dummy = 0;
+    Init(MessageType::Invalid, dummy, 0, 0, 0);
     memcpy(m_Data, data, sizeOfPacket);
     m_Offset = sizeOfPacket;
 }
@@ -119,7 +125,7 @@ void Packet::ReconstructFromData(char * data, size_t sizeOfData)
 void Packet::UpdateSize()
 {
     int whatisoffset = m_Offset;
-    memcpy(m_Data, &m_Offset, sizeof(int));
+    memcpy(m_Data + packetSizeOffset, &m_Offset, sizeof(int));
 }
 
 char * Packet::ReadData(int sizeOfData)
@@ -140,10 +146,11 @@ void Packet::ChangePacketID(unsigned int & packetID)
     memcpy(m_Data + packetIDOffset, &packetID, sizeof(int));
 }
 
-void Packet::ChangeSequenceNumber(int groupIndex, int groupSize)
+void Packet::ChangeSequenceNumber(int groupIndex, int groupSize, int groupNumber)
 {
-    memcpy(&groupIndex, m_Data + groupIndexOffset, sizeof(int));
-    memcpy(&groupSize, m_Data + groupSizeOffset, sizeof(int));
+    memcpy(m_Data + groupIndexOffset, &groupIndex, sizeof(int));
+    memcpy(m_Data + groupSizeOffset, &groupSize, sizeof(int));
+    memcpy(m_Data + groupOffset, &groupNumber, sizeof(int));
 }
 
 MessageType Packet::GetMessageType()
@@ -151,6 +158,13 @@ MessageType Packet::GetMessageType()
     MessageType messagType;
     memcpy(&messagType, m_Data + messageTypeOffset, sizeof(int));
     return messagType;
+}
+
+size_t Packet::Group()
+{
+    size_t groupNumber;
+    memcpy(&groupNumber, m_Data + groupOffset, sizeof(int));
+    return groupNumber;
 }
 
 size_t Packet::GroupIndex()

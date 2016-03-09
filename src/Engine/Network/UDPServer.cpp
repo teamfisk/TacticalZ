@@ -12,22 +12,25 @@ UDPServer::UDPServer(int port)
 
 UDPServer::~UDPServer()
 { }
-
+// TODO: Fix correct groups
 void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
 {
     packet.UpdateSize();
     try {
+        //Debug
+        int debugTheSixeOfpacket = packet.Size();
+        //Debug end
         // Remove header from packet.
         packet.ReadData(packet.HeaderSize());
-        int bytesSent = 0;
+        int totalBytesSent = 0;
         int sequenceNumber = 1;
-        int totalMessages = std::ceil(packet.Size() / MAXPACKETSIZE);
+        int totalMessages = std::ceil((float)packet.Size() / MAXPACKETSIZE);
         int packetDataSent = 0;
         int packetDataSize = packet.Size() - packet.HeaderSize();
+
         while (packetDataSize > packetDataSent) {
-           
             Packet splitPacket(packet.GetMessageType(), playerDefinition.PacketID);
-            splitPacket.ChangeSequenceNumber(sequenceNumber, totalMessages);
+            splitPacket.ChangeSequenceNumber(sequenceNumber, totalMessages, playerDefinition.PacketGroup);
             int amountToSend = packetDataSize - packetDataSent;
             if (amountToSend > MAXPACKETSIZE) {
                 amountToSend = MAXPACKETSIZE;
@@ -36,26 +39,22 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
             splitPacket.UpdateSize();
             // Remove header size from bytes sent soo that we only
             // count data in the packet
-
-            bytesSent += m_Socket->send_to(
-                boost::asio::buffer(splitPacket.Data() + bytesSent, splitPacket.Size()),
+            int bytesSent = 0;
+            bytesSent = m_Socket->send_to(
+                boost::asio::buffer(splitPacket.Data(), splitPacket.Size()),
                 playerDefinition.Endpoint,
                 0);
-            packetDataSent = bytesSent - splitPacket.HeaderSize();
+            packetDataSent += bytesSent - splitPacket.HeaderSize();
+            totalBytesSent += bytesSent;
+           // LOG_INFO("bytesSent size %i, groupIndex: %i. Number of packets: %i", bytesSent, sequenceNumber, totalMessages);
             ++sequenceNumber;
-            int packetsise = splitPacket.ReadPrimitive<int>();
-            int groopOffset = splitPacket.ReadPrimitive<int>();
-            int groopIndes = splitPacket.ReadPrimitive<int>();
-            int groopSiseOffset = splitPacket.ReadPrimitive<int>();
-            int mezzagetype = splitPacket.ReadPrimitive<int>();
-            int pakketIDOffset = splitPacket.ReadPrimitive<int>();
         }
+        playerDefinition.PacketGroup++;
     } catch (const boost::system::system_error& e) {
         LOG_INFO(e.what());
         // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
         playerDefinition.Endpoint = boost::asio::ip::udp::endpoint();
     }
-
 }
 // Send back to endpoint of received packet
 void UDPServer::Send(Packet & packet)

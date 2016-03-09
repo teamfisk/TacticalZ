@@ -171,6 +171,7 @@ void Server::sendSnapshot()
     Packet packet(MessageType::Snapshot);
     addInputCommandsToPacket(packet);
     addPlayersToPacket(packet, EntityID_Invalid);
+    //addChildrenToPacket(packet, EntityID_Invalid);
     unreliableBroadcast(packet);
 }
 

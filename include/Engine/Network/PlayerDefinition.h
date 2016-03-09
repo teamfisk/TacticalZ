@@ -14,6 +14,7 @@ struct PlayerDefinition {
     unsigned short TCPPort;
     // use for tcp connections
     boost::shared_ptr<boost::asio::ip::tcp::socket> TCPSocket;
+    int PacketGroup = 1;
 };
 
 #endif

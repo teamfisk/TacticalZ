@@ -50,13 +50,15 @@ void Client::Update()
 {
     m_EventBroker->Process<Client>();
     while (m_Unreliable.IsSocketAvailable()) {
-        // Packet will get real data in receive
-        Packet packet(MessageType::Invalid);
-        m_Unreliable.Receive(packet);
-        if (packet.GetMessageType() == MessageType::Connect) {
-            parseUDPConnect(packet);
+        m_Unreliable.ReceivePackets();
+    }
+    // Packet will get real data in GetNextPacket()
+    Packet parsedPacket(MessageType::Invalid);
+    while (m_Unreliable.GetNextPacket(parsedPacket)) {
+        if (parsedPacket.GetMessageType() == MessageType::Connect) {
+            parseUDPConnect(parsedPacket);
         } else {
-            parseMessageType(packet);
+            parseMessageType(parsedPacket);
         }
     }
 
