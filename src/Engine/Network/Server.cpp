@@ -656,7 +656,8 @@ bool Server::shouldSendToClient(EntityWrapper childEntity)
         || childEntity.HasComponent("HealthPickup")
         || childEntity.HasComponent("AmmoPickup")
         || childEntity.HasComponent("ScoreScreen")
-        || childEntity.FirstParentWithComponent("ScoreScreen").Valid();
+        || childEntity.FirstParentWithComponent("ScoreScreen").Valid()
+        || childEntity.FirstParentWithComponent("CapturePoint").Valid();
 }
 
 PlayerID Server::getPlayerIDFromEndpoint()

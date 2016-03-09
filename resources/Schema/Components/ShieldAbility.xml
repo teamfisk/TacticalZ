@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <ShieldAbility xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ShieldAbility.xsd">
-	<CoolDownMaxTimer>2.0</CoolDownMaxTimer>
+	<Active>false</Active>
 </ShieldAbility>
