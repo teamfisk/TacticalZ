@@ -97,14 +97,14 @@ void BlurHUD::ClearBuffer()
     glClearStencil(0x00);
     glStencilMask(~0);
     glDisable(GL_SCISSOR_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_GaussianFrameBuffer_horiz.Unbind();
     m_GaussianFrameBuffer_vert.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClearStencil(0x00);
     glStencilMask(~0);
     glDisable(GL_SCISSOR_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_GaussianFrameBuffer_vert.Unbind();
 
     m_CombinedTextureBuffer.Bind();
@@ -211,12 +211,16 @@ void BlurHUD::FillStencil(RenderScene& scene)
     RenderState state;
 
     state.BindFramebuffer(m_GaussianFrameBuffer_horiz.GetHandle());
-    state.Disable(GL_DEPTH_TEST);
+    state.Enable(GL_DEPTH_TEST);
     state.Enable(GL_CULL_FACE);
     state.Enable(GL_STENCIL_TEST);
     state.StencilFunc(GL_ALWAYS, 1, 0xFF);
     state.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     state.StencilMask(0xFF);
+
+    state.AlphaFunc(GL_GEQUAL, 0.95f);
+    state.Enable(GL_ALPHA_TEST);
+
     glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
 
     m_FillDepthStencilProgram->Bind();

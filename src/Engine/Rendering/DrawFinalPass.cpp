@@ -302,6 +302,8 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 	GLERROR("TransparentObjects");
 	//state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     stateSprite->Enable(GL_DEPTH_TEST);
+    stateSprite->AlphaFunc(GL_GEQUAL, 0.05f);
+    stateSprite->Enable(GL_ALPHA_TEST);
 	DrawSprites(scene.Jobs.SpriteJob, scene);
 	GLERROR("SpriteJobs");
 
