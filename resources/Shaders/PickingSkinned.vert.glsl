@@ -1,6 +1,5 @@
 #version 430
-#include "StandarUniform.glsl"
-layout(location = PVM_UNIFORM_LOCATION) uniform mat4 PVM;
+uniform mat4 PVM;
 uniform mat4 Bones[100];
 
 layout(location = 0) in vec3 Position;

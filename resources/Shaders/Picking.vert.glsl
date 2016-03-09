@@ -1,6 +1,5 @@
 #version 430
-#include "StandarUniform.glsl"
-layout(location = PVM_UNIFORM_LOCATION) uniform mat4 PVM;
+uniform mat4 PVM;
 
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
