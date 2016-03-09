@@ -72,7 +72,7 @@
         <Entity name="Idle">
           <Components>
             <c:Animation>
-              <AnimationName>IdelF</AnimationName>
+              <AnimationName>IdleF</AnimationName>
               <Play>true</Play>
               <Additive>true</Additive>
             </c:Animation>
