@@ -3,6 +3,8 @@
 	<ExplosionOrigin X="0" Y="0" Z="0"/>
 	<TimeSinceDeath>0</TimeSinceDeath>
 	<ExplosionDuration>2</ExplosionDuration>
+	<Speed>1</Speed>
+	<Delay>0</Delay>
 	<!--<Gravity>1</Gravity>-->
 	<!--<GravityForce>1</GravityForce>-->
 	<!--<ObjectRadius>2</ObjectRadius>-->

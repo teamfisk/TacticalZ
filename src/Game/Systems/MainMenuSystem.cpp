@@ -82,7 +82,6 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
             }
         } else {
             //Serverlist submenu is open, close it.
-            printf("\n\nMenuShit\n\n");
             m_World->DeleteEntity(m_OpenSubMenu.ID);
             m_OpenSubMenu = EntityWrapper::Invalid;
         }

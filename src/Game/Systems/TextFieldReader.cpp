@@ -7,17 +7,21 @@ void TextFieldReader::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     }
 
     // Find the entity to read from
-    const std::string& parentEntityName = cAmmunitionHUD["ParentEntityName"];
+    const std::string& entityName = cAmmunitionHUD["ParentEntityName"];
+    const std::string& componentType = cAmmunitionHUD["ComponentType"];
     EntityWrapper readEntity = entity;
-    if (!parentEntityName.empty()) {
-        readEntity = entity.FirstParentByName(parentEntityName);
-        if (!readEntity.Valid()) {
-            return;
+    if (entityName.empty()) {
+        if (!readEntity.HasComponent(componentType)) {
+            readEntity = readEntity.FirstParentWithComponent(componentType);
         }
+    } else {
+        readEntity = entity.FirstParentByName(entityName);
+    }
+    if (!readEntity.Valid()) {
+        return;
     }
 
     // Find the component to read from
-    const std::string& componentType = cAmmunitionHUD["ComponentType"];
     if (componentType.empty() || !readEntity.HasComponent(componentType)) {
         return;
     }
