@@ -470,6 +470,7 @@ bool AABBvsTriangle(const AABB& box,
     }
 
     glm::vec3 cornerResolution = (1+t) * diagonal;
+    cornerResolution = glm::dot(cornerResolution, triNormal) * triNormal;
     //Overwrite the smallest resolution if cornerResolution is smaller.
     float lenSq = glm::length2(cornerResolution);
     if (lenSq < resolveShortest.DistanceSq) {

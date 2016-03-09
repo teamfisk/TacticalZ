@@ -66,7 +66,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                 }
             }
         }
-        bool& jitterGuard = (bool&)entity["Collidable"]["JitterGuard"];
+
         // Collide against octree items
         m_OctreeResult.clear();
         m_Octree->ObjectsInSameRegion(*boundingBox, m_OctreeResult);
@@ -88,12 +88,11 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                 glm::mat4 modelMatrix = Transform::ModelMatrix(boxB.Entity);
 
                 glm::vec3 inOutVelocity = (glm::vec3)cPhysics["Velocity"];
-                bool notMovingxz = glm::all(glm::lessThan(glm::abs(glm::vec2(inOutVelocity.x, inOutVelocity.z)), glm::vec2(0.01f))) && prevPosIt != m_PrevPositions.end();
                 bool isOnGround = (bool)cPhysics["IsOnGround"];
                 float verticalStepHeight = (float)(double)cPhysics["VerticalStepHeight"];
                 if (Collision::AABBvsTriangles(boxA, model->Vertices(), model->m_Indices, modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
                     //Move the position to previous position if it is not moving in the xz-plane, else resolve with the resolution vector.
-                    (glm::vec3&)cTransform["Position"] += jitterGuard && notMovingxz ? prevPosIt->second - boxA.Origin() : resolutionVector;
+                    (glm::vec3&)cTransform["Position"] += resolutionVector;
                     boxA = *Collision::EntityAbsoluteAABB(entity);
                     cPhysics["Velocity"] = inOutVelocity;
                     if (isOnGround) {
@@ -118,7 +117,6 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
             (bool)cPhysics["IsOnGround"] = false;
         }
 
-        jitterGuard = true;
         m_PrevPositions[entity] = boxA.Origin();
     }
 }
