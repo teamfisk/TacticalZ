@@ -34,7 +34,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="74.1606216" Z="0"/>
+              <Orientation X="0" Y="75.6741409" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -46,11 +46,11 @@
                 </c:RaptorCopter>
                 <c:Transform>
                   <Position X="0" Y="26" Z="40"/>
-                  <Orientation X="0" Y="-65.2195206" Z="0"/>
+                  <Orientation X="0" Y="-68.2463989" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
-                <Entity name="Overview_Camera">
+                <Entity name="Overview_Camera_Start_Menu">
                   <Components>
                     <c:Camera/>
                     <c:Transform>

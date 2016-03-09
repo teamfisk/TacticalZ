@@ -5,6 +5,7 @@
 #include "Core/ResourceManager.h"
 #include "Core/Event.h"
 #include "Core/EventBroker.h"
+#include "Rendering/ESetCamera.h"
 
 class StartSystem : public ImpureSystem
 {
@@ -13,6 +14,10 @@ public:
     virtual void Update(double dt) override;
 
 private:
+    EntityWrapper m_activeCamera = EntityWrapper::Invalid;
+    
+    EventRelay<StartSystem, Events::SetCamera> m_ECameraActivated;
+    bool OnCameraActivated(const Events::SetCamera& e);
 };
 
 #endif
