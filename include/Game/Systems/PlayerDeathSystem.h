@@ -24,7 +24,10 @@ private:
     bool OnPlayerDeath(Events::PlayerDeath& e);
     EventRelay<PlayerDeathSystem, Events::EntityDeleted> m_EEntityDeleted;
     bool OnEntityDeleted(Events::EntityDeleted& e);
+    EventRelay<PlayerDeathSystem, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(Events::InputCommand& e);
 
+    void setSpectatorCamera();
     void createDeathEffect(EntityWrapper player);
 
 };

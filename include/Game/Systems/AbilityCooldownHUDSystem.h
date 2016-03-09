@@ -12,6 +12,7 @@ public:
     { }
 
     virtual void Update(double dt) override;
+private:
 };
 
 #endif

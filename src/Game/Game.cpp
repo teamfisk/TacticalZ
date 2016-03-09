@@ -35,8 +35,10 @@
 #include "Game/Systems/BoostSystem.h"
 #include "Game/Systems/BoostIconsHUDSystem.h"
 #include "Game/Systems/ScoreScreenSystem.h"
+#include "Game/Systems/SpectatorCameraSystem.h"
 #include "GUI/ButtonSystem.h"
-#include "GUI/MainMenuSystem.h"
+#include "Game/Systems/MainMenuSystem.h"
+#include "Game/Systems/ServerListSystem.h"
 
 
 Game::Game(int argc, char* argv[])
@@ -137,25 +139,20 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<TextFieldReader>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<TextFieldReader>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<BoostSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<BoostIconsHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ScoreScreenSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<SpectatorCameraSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ServerListSystem>(updateOrderLevel, m_Renderer);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");

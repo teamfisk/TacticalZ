@@ -435,6 +435,7 @@ void RenderSystem::Update(double dt)
     }
 
     RenderScene scene;
+    scene.ShouldBlur = true;
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
 

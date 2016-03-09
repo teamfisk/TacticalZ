@@ -162,7 +162,7 @@ void Server::unreliableBroadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
         packet.ChangePacketID(kv.second.PacketID);
-//        m_Unreliable.Send(packet, kv.second);
+        //        m_Unreliable.Send(packet, kv.second);
     }
 }
 
@@ -641,21 +641,7 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    auto children = m_World->GetDirectChildren(childEntity.ID);
-    for (auto it = children.first; it != children.second; it++) {
-        EntityWrapper child(m_World, it->second);
-        if (child.HasComponent("CapturePoint") || child.HasComponent("HealthPickup")
-            || child.HasComponent("AmmoPickup")) {
-            return true;
-        }
-    }
-    return childEntity.HasComponent("Player") 
-        || childEntity.FirstParentWithComponent("Player").Valid()
-        || childEntity.HasComponent("CapturePoint") 
-        || childEntity.HasComponent("HealthPickup")
-        || childEntity.HasComponent("AmmoPickup")
-        || childEntity.HasComponent("ScoreScreen")
-        || childEntity.FirstParentWithComponent("ScoreScreen").Valid();
+    return childEntity.HasComponent("NetworkComponent") || childEntity.FirstParentWithComponent("NetworkComponent").Valid();
 }
 
 PlayerID Server::getPlayerIDFromEndpoint()
@@ -674,7 +660,7 @@ PlayerID Server::getPlayerIDFromEndpoint()
 
 PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
 {
-    for(auto& kv : m_ConnectedPlayers) {
+    for (auto& kv : m_ConnectedPlayers) {
         if (entityID == kv.second.EntityID) {
             return kv.first;
         }
