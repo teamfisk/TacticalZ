@@ -437,6 +437,7 @@ void RenderSystem::Update(double dt)
     }
 
     RenderScene scene;
+    scene.ShouldBlur = true;
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
 
@@ -450,7 +451,7 @@ void RenderSystem::Update(double dt)
     fillModels(scene.Jobs);
     fillPointLights(scene.Jobs.PointLight, m_World);
     //TODO: Make sure all objects needed are also sorted.
-	scene.Jobs.OpaqueObjects.sort();
+	scene.Jobs.OpaqueObjects.sort([](auto& a, auto& b) {return *a < *b; });
     fillSprites(scene.Jobs.SpriteJob, m_World);
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);

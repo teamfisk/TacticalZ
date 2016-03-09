@@ -37,6 +37,8 @@ public:
     std::shared_ptr<BlendTree> GetBlendTree();
 
     AutoBlendQueue::AutoBlendJob& GetActiveBlendJob();
+
+    bool Empty() { return m_BlendQueue.empty(); }
 private:
      std::list<AutoblendNode> m_BlendQueue;
     
