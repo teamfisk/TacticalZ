@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Collidable/>
+    <c:Model>
+      <Resource>Models/Props/Bridges/SciFi_Bridge_Support_Top_Red.mesh</Resource>
+    </c:Model>
+    <c:Transform>
+      <Position X="0" Y="-6.44986534" Z="-6.68222857"/>
+      <Scale X="1.10000002" Y="1.10000002" Z="1.10000002"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Props/Bridges/SciFi_Bridge_Support_Bot_Red.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0.215699792" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:FloatingEffect>
+          <Period>12</Period>
+          <Time>513.93462028501312</Time>
+          <Axis X="0" Y="0.100000001" Z="0"/>
+        </c:FloatingEffect>
+        <c:Transform>
+          <Position X="-0" Y="-0.0882625133" Z="-0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Collidable/>
+            <c:Model>
+              <Resource>Models/Props/Bridges/SciFi_Bridge_Support_Middle_Red.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.121641584" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>
