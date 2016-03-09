@@ -215,7 +215,7 @@ void Game::Tick()
     PerformanceTimer::StartTimerAndStopPrevious("InputProxy");
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
-    m_InputProxy->Process();
+    m_InputProxy->Process(ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse);
     m_EventBroker->Swap();
 
     PerformanceTimer::StartTimerAndStopPrevious("SoundManager");

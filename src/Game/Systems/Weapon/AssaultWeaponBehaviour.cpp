@@ -40,12 +40,16 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         magAmmo = glm::min(magSize, ammo);
         isReloading = false;
         if (wi.FirstPersonEntity.Valid()) {
-            wi.FirstPersonEntity["Model"]["Visible"] = true;
+            wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = true;
         }
         if (wi.ThirdPersonEntity.Valid()) {
             wi.ThirdPersonEntity["Model"]["Visible"] = true;
         }
     }    
+    double reloadTime = cWeapon["ReloadTime"];
+    if (isReloading && reloadTimer <= reloadTime / 2) {
+
+    }
     
     // Restore view angle
     if (IsClient) {
@@ -68,7 +72,7 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     const float& movementSpeed = cPlayer["MovementSpeed"];
     float speed = glm::length((const glm::vec3&)cPhysics["Velocity"]);
     float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
-    EntityWrapper rootNode = wi.FirstPersonEntity.FirstParentWithComponent("Model");
+    EntityWrapper rootNode = wi.FirstPersonEntity;
     if (rootNode.Valid()) {
         EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
         if (blend.Valid()) {
@@ -121,19 +125,40 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     reloadTimer = reloadTime;
 
     // Play animation
-    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Reload");
-    if (IsClient) {
-        // Spawn explosion effect
-        EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("FirstPersonReloadSpawner");
-        if (reloadEffectSpawner.Valid()) {
-            SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+    playAnimationAndReturn(wi.FirstPersonEntity, "ActionBlend", "Reload");
+    // Third person anim
+    Events::AutoAnimationBlend b1;
+    b1.RootNode = wi.ThirdPersonPlayerModel;
+    b1.NodeName = "Reload";
+    b1.Restart = true;
+    b1.Start = true;
+    m_EventBroker->Publish(b1);
+    Events::AutoAnimationBlend b2;
+    b2.RootNode = wi.ThirdPersonPlayerModel;
+    b2.NodeName = "MovementBlend";
+    b2.AnimationEntity = wi.ThirdPersonPlayerModel.FirstChildByName("AssaultWeaponBlend").FirstChildByName("Reload");
+    m_EventBroker->Publish(b2);
+
+    // Spawn explosion effect
+    if (wi.FirstPersonEntity.Valid()) {
+        if (IsClient) {
+            EntityWrapper reloadEffectSpawner = wi.FirstPersonEntity.FirstChildByName("ReloadSpawner");
+            if (reloadEffectSpawner.Valid()) {
+                reloadEffectSpawner.DeleteChildren();
+                SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+            }
         }
-        if (wi.FirstPersonEntity.Valid()) { 
-            wi.FirstPersonEntity["Model"]["Visible"] = false;
+        wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = false;
+    }
+    if (wi.ThirdPersonEntity.Valid()) {
+        if (IsServer) {
+            EntityWrapper reloadEffectSpawner = wi.ThirdPersonEntity.FirstChildByName("ReloadSpawner");
+            if (reloadEffectSpawner.Valid()) {
+                reloadEffectSpawner.DeleteChildren();
+                SpawnerSystem::Spawn(reloadEffectSpawner, reloadEffectSpawner);
+            }
         }
-        if (wi.ThirdPersonEntity.Valid()) {
-            wi.ThirdPersonEntity["Model"]["Visible"] = false;
-        }
+        wi.ThirdPersonEntity["Model"]["Visible"] = false;
     }
 
     // Sound
@@ -190,7 +215,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     }
 
     // Get weapon model based on current person
-    EntityWrapper weaponModelEntity = getRelevantWeaponModelEntity(wi);
+    EntityWrapper weaponModelEntity = getRelevantWeaponEntity(wi);
     if (!weaponModelEntity.Valid()) {
         return;
     }
@@ -221,7 +246,19 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     }
     
     // Play animation
-    playAnimationAndReturn(wi.FirstPersonEntity, "BlendTreeAssaultWeapon", "Fire");
+    playAnimationAndReturn(wi.FirstPersonEntity, "ActionBlend", "Fire");
+    // Third person anim
+    Events::AutoAnimationBlend b1;
+    b1.RootNode = wi.ThirdPersonPlayerModel;
+    b1.NodeName = "Fire";
+    b1.Restart = true;
+    b1.Start = true;
+    m_EventBroker->Publish(b1);
+    Events::AutoAnimationBlend b2;
+    b2.RootNode = wi.ThirdPersonPlayerModel;
+    b2.NodeName = "MovementBlend";
+    b2.AnimationEntity = wi.ThirdPersonPlayerModel.FirstChildByName("AssaultWeaponBlend").FirstChildByName("Fire");
+    m_EventBroker->Publish(b2);
 
     // Sound
     Events::PlaySoundOnEntity e;
