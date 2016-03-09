@@ -1,9 +1,10 @@
 #include "Rendering/DrawFinalPass.h"
-DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass)
+DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass)
 	: m_Renderer(renderer)
 	, m_LightCullingPass(lightCullingPass)
 	, m_CubeMapPass(cubeMapPass)
 	, m_SSAOPass(ssaoPass)
+	, m_ShadowPass(shadowPass)
 {
     //TODO: Make sure that uniforms are not sent into shader if not needed.
     m_ShieldPixelRate = 8;
@@ -368,6 +369,13 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_SSAOPass->SSAOTexture());
+
+	glActiveTexture(GL_TEXTURE30);
+	if (m_ShadowPass->DepthMap() != NULL) {
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_ShadowPass->DepthMap());
+	} else {
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_WhiteTexture->m_Texture);
+	}
 
     for (auto &job : jobs) {
         auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
@@ -1339,6 +1347,10 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
     glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), job->FillPercentage);
 	GLERROR("Bind 19 uniform");
     glUniform1f(glGetUniformLocation(shaderHandle, "GlowIntensity"), job->GlowIntensity);
+
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
+	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
     GLERROR("END");
 }
 
@@ -1366,8 +1378,11 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 	GLint Location_Color = glGetUniformLocation(shaderHandle, "Color");
 	glUniform4fv(Location_Color, 1, glm::value_ptr(job->Color));
     GLint Location_GlowIntensity = glGetUniformLocation(shaderHandle, "GlowIntensity");
+	glUniform1f(Location_GlowIntensity, job->GlowIntensity);
 
-    glUniform1f(Location_GlowIntensity, job->GlowIntensity);
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
+	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
 
 	GLERROR("END");
 }
