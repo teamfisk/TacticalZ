@@ -5,7 +5,7 @@
 #include "Rendering/IRenderer.h"
 #include "Core/ResourceManager.h"
 #include "Core/Event.h"
-#include "Systems/SpawnerSystem.h"
+#include "Core/SpawnerSystem.h"
 
 
 #include "GUI/EButtonClicked.h"

@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "GLM.h"
 #include "Core/System.h"
-#include "Events/ESpawnerSpawn.h"
+#include "Core/ESpawnerSpawn.h"
 #include "Core/Transform.h"
 #include "Core/EntityFile.h"
 

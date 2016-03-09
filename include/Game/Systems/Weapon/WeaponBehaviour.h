@@ -6,7 +6,7 @@
 #include "Core/Octree.h"
 #include "Collision/EntityAABB.h"
 #include "Input/EInputCommand.h"
-#include "Systems/SpawnerSystem.h"
+#include "Core/SpawnerSystem.h"
 #include "Rendering/ESetCamera.h"
 #include "Core/ConfigFile.h"
 #include "Rendering/EAutoAnimationBlend.h"

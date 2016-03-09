@@ -7,7 +7,7 @@
 #include "Systems/RaptorCopterSystem.h"
 #include "Systems/HealthSystem.h"
 #include "Systems/PlayerMovementSystem.h"
-#include "Systems/SpawnerSystem.h"
+#include "Core/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Systems/PlayerDeathSystem.h"
 #include "Systems/FloatingEffectSystem.h"
