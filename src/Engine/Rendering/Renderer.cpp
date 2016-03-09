@@ -2,6 +2,19 @@
 
 std::unordered_map<GLFWwindow*, Renderer*> Renderer::m_WindowToRenderer;
 
+Renderer::~Renderer() {
+	delete m_PickingPass;
+	delete m_LightCullingPass;
+	delete m_ImGuiRenderPass;
+	delete m_DrawFinalPass;
+	delete m_DrawScreenQuadPass;
+	delete m_DrawBloomPass;
+	delete m_DrawColorCorrectionPass;
+	delete m_SSAOPass;
+	delete m_CubeMapPass;
+	delete m_TextPass;
+}
+
 void Renderer::Initialize()
 {
 	m_SSAO_Quality = m_Config->Get<int>("SSAO.Quality", 0);

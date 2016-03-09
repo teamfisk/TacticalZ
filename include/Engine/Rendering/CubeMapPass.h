@@ -15,7 +15,7 @@ public:
     void GenerateCubeMapTexture();
 
     //GLuint CubeMapTexture() const { return m_CubeMapTexture; }
-    GLuint m_CubeMapTexture = -1;
+    GLuint m_CubeMapTexture = 0;
 
 private:
     IRenderer* m_Renderer;

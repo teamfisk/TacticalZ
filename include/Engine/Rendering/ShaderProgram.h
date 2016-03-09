@@ -21,6 +21,8 @@ public:
 	std::string GetFileName() const;
 	GLuint GetHandle() const;
 	bool IsCompiled() const;
+    static std::string ReadFile(std::string fileName);
+private:
 protected:
 	GLenum m_ShaderType;
 	std::string m_FileName;
