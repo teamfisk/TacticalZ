@@ -242,6 +242,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "ActionBlend", "Fire");
+
     // Third person anim
     Events::AutoAnimationBlend b1;
     b1.RootNode = wi.ThirdPersonPlayerModel;
