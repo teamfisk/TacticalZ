@@ -65,4 +65,5 @@
 	<xs:include schemaLocation="Components/InputCmdButton.xsd"/>
 	<xs:include schemaLocation="Components/ScoreScreen.xsd"/>
 	<xs:include schemaLocation="Components/ScoreIdentity.xsd"/>
+	<xs:include schemaLocation="Components/NetworkComponent.xsd"/>
 </xs:schema>
