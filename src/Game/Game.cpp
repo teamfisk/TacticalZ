@@ -40,6 +40,7 @@
 #include "Game/Systems/MainMenuSystem.h"
 #include "Game/Systems/ServerListSystem.h"
 #include "Game/Systems/StartSystem.h"
+#include "Core/RespawnSystem.h"
 #include "Rendering/TextureSprite.h"
 
 
@@ -135,6 +136,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<RespawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AssaultWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<DefenderWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);

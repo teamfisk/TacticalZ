@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Respawn">
+		<xs:annotation>
+			<xs:documentation>Triggers a Spawner component after its last spawned entity is destroyed with an optional delay.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Delay" type="t:double" minOccurs="0"/>
+				<xs:element name="_RespawnCountdown" type="t:double" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
