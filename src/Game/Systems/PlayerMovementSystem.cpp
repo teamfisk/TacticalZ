@@ -81,23 +81,22 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             cameraOrientation.x += controller->Rotation().x;
             // Limit camera pitch so we don't break our necks
             cameraOrientation.x = glm::clamp(cameraOrientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
+
             // Set third person model aim pitch
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
-
-            //Third-person aim
             if (playerModel.Valid()) {
                 EntityWrapper aimPrimaryEntity = playerModel.FirstChildByName("AimPrimary");
                 if(aimPrimaryEntity.Valid()){
                     if(aimPrimaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x + 0.2f;
-                        double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
+                        float pitch = cameraOrientation.x;
+                        double time = ((pitch + glm::half_pi<float>()) / glm::pi<float>());
                         (double&)aimPrimaryEntity["Animation"]["Time"] = time;
                     }
                 }
                 EntityWrapper aimSecondaryEntity = playerModel.FirstChildByName("AimSecondary");
                 if (aimSecondaryEntity.Valid()) {
                     if (aimSecondaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x + 0.2f;
+                        float pitch = cameraOrientation.x;
                         double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
                         (double&)aimSecondaryEntity["Animation"]["Time"] = time;
                     }
