@@ -7,5 +7,10 @@
 		<xs:annotation>
 			<xs:documentation>Needs a Model or AABB component to work, uses AABB if both are attached.</xs:documentation>
 		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="JitterGuard" type="t:bool" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
 	</xs:element>
 </xs:schema>
