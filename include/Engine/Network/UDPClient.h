@@ -10,7 +10,7 @@ public:
     UDPClient();
     ~UDPClient();
 
-    void Connect(std::string playerName, std::string address, int port);
+    bool Connect(std::string playerName, std::string address, int port);
     void Disconnect();
     void Receive(Packet& packet);
     void Send(Packet & packet);

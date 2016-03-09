@@ -49,6 +49,5 @@ bool ServerListSystem::OnServerListRecieved(const Events::DisplayServerlist& e)
             (int&)cIdentity["PlayersConnected"] = e.Serverlist[i].PlayersConnected;
         }
     }
-
     return 1;
 }
