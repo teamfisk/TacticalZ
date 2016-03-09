@@ -10,10 +10,11 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
     //load texture to cache
     auto texture = CommonFunctions::LoadTexture("Textures/DamageIndicator.png", false);
     auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/DamageIndicator.xml");
+    m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }
 
 void DamageIndicatorSystem::Update(double dt) {
-    if (!IsServer && LocalPlayer.Valid()) {
+    if ((!IsServer || !m_NetworkEnabled) && LocalPlayer.Valid()) {
         for (auto& iter = updateDamageIndicatorVector.begin(); iter != updateDamageIndicatorVector.end(); iter++) {
             if (!iter->spriteEntity.Valid()) {
                 updateDamageIndicatorVector.erase(iter);
@@ -40,10 +41,15 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
         return false;
     }
 
+    //friendly fire - return
+    if (e.Damage < 0.1f) {
+        return false;
+    }
+
     glm::vec3 inflictorPos = e.Inflictor["Transform"]["Position"];
     //if testing
 #ifdef INDICATOR_TEST
-        inflictorPos = DamageIndicatorTest(e.Victim);
+    inflictorPos = DamageIndicatorTest(e.Victim);
 #endif
 
     float angleBetweenVectors = CalculateAngle(e.Victim, inflictorPos);
@@ -55,7 +61,7 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
     //simply set the rotation z-wise to the angleBetweenVectors
     sprite["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);
 
-    if (!IsServer) {
+    if (!IsServer || !m_NetworkEnabled) {
         updateDamageIndicatorVector.emplace_back(sprite, inflictorPos);
     }
 
@@ -122,7 +128,7 @@ glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
     }
     m_TestVar++;
 
-     auto inflictorPos = glm::vec3(currentPos.x + testVar*6.0f, currentPos.y, currentPos.z + testVar2*6.0f);
+    auto inflictorPos = glm::vec3(currentPos.x + testVar*6.0f, currentPos.y, currentPos.z + testVar2*6.0f);
 
     //load the explosioneffect XML
     auto deathEffect = ResourceManager::Load<EntityXMLFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
