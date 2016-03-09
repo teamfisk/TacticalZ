@@ -48,6 +48,13 @@ struct SpriteJob : RenderJob
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;
+
+        if((bool)cSprite["KeepRatioX"] == true) {
+            ScaleX = Transform::AbsoluteScale(world, cSprite.EntityID).x;
+        }
+        if ((bool)cSprite["KeepRatioZ"] == true) {
+            ScaleY = Transform::AbsoluteScale(world, cSprite.EntityID).y;
+        }
     };
 
     unsigned int TextureID;
@@ -69,6 +76,8 @@ struct SpriteJob : RenderJob
     bool Pickable;
 	bool IsIndicator = false;
     bool BlurBackground = false;
+    float ScaleX = 1;
+    float ScaleY = 1;
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;

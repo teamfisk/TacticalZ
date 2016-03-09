@@ -1284,6 +1284,8 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(spriteJob->Color));
             glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(spriteJob->FillColor));
             glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), spriteJob->FillPercentage);
+            glUniform1f(glGetUniformLocation(shaderHandle, "ScaleX"), spriteJob->ScaleX);
+            glUniform1f(glGetUniformLocation(shaderHandle, "ScaleY"), spriteJob->ScaleY);
 
             glActiveTexture(GL_TEXTURE1);
             if (spriteJob->DiffuseTexture != nullptr) {
