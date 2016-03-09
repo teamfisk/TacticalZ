@@ -561,7 +561,7 @@ bool Client::OnConnectRequest(const Events::ConnectRequest& e)
 {
     removeWorld();
     if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) {
-        m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
+        m_Unreliable.Connect(m_PlayerName, e.IP, e.Port);
         // The client sent a successful connect message
         return true;
 
