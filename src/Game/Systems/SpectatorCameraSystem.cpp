@@ -15,7 +15,7 @@ void SpectatorCameraSystem::Update(double dt)
     if (!m_CamSetToTeamPick && IsClient) {
         // Find the class pick camera and set them to it, since they need to pick a team before they can leave the screen.
         EntityWrapper spectatorCam = m_World->GetFirstEntityByName("PickTeamCamera");
-        if (spectatorCam.Valid() && spectatorCam.HasComponent("Camera")) {
+        if (spectatorCam.HasComponent("Camera")) {
             m_CamSetToTeamPick = true;
             Events::SetCamera eSetCamera;
             eSetCamera.CameraEntity = spectatorCam;
@@ -59,7 +59,7 @@ bool SpectatorCameraSystem::OnInputCommand(const Events::InputCommand& e)
     }
     EntityWrapper spectatorCam = m_World->GetFirstEntityByName(camName);
     // Set the camera as active, if it exists.
-    if (spectatorCam.Valid() && spectatorCam.HasComponent("Camera")) {
+    if (spectatorCam.HasComponent("Camera")) {
         // Set the class pick button visible if a blue or red team is picked, else invisible.
         EntityWrapper HUD;
         if (camName == "SpectatorCamera") {

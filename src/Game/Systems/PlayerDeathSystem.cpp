@@ -35,7 +35,7 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 
     //components that we need from player
     auto playerModel = player.FirstChildByName("PlayerModel");
-    if (!playerModel.Valid() || !playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
+    if (!playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
         if (player == LocalPlayer) {
             setSpectatorCamera();
         }
@@ -82,7 +82,7 @@ void PlayerDeathSystem::setSpectatorCamera()
 {
     // Look for the spectator camera entity in the level.
     EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
-    if (!spectatorCam.Valid() || !spectatorCam.HasComponent("Camera")) {
+    if (!spectatorCam.HasComponent("Camera")) {
         return;
     }
     Events::SetCamera eSetCamera;
