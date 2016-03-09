@@ -156,7 +156,12 @@ void ShadowPass::InitializeShaderPrograms()
 	m_ShadowProgram->BindFragDataLocation(0, "ShadowMap");
 	m_ShadowProgram->Link();
 
-
+    m_ShadowProgramSkinned = ResourceManager::Load<ShaderProgram>("#ShadowProgramSkinned");
+    m_ShadowProgramSkinned->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ShadowSkinned.vert.glsl")));
+    m_ShadowProgramSkinned->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Shadow.frag.glsl")));
+    m_ShadowProgramSkinned->Compile();
+    m_ShadowProgramSkinned->BindFragDataLocation(0, "ShadowMap");
+    m_ShadowProgramSkinned->Link();
 }
 
 void ShadowPass::ClearBuffer()
@@ -212,8 +217,7 @@ void ShadowPass::Draw(RenderScene & scene)
 
 		ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
 
-		m_ShadowProgram->Bind();
-		GLuint shaderHandle = m_ShadowProgram->GetHandle();
+		
 		glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight);
 
 		for (int i = 0; i < m_CurrentNrOfSplits; i++) {
@@ -221,7 +225,11 @@ void ShadowPass::Draw(RenderScene & scene)
 
 			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
 
+
+            GLuint shaderHandle;
+
 			for (auto &job : scene.Jobs.DirectionalLight) {
+
 				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
 				if (directionalLightJob) {
@@ -232,8 +240,18 @@ void ShadowPass::Draw(RenderScene & scene)
 					//RadiusToLightspace(m_shadowFrusta[i]);
 					m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[LEFT], m_shadowFrusta[i].LRBT[RIGHT], m_shadowFrusta[i].LRBT[BOTTOM], m_shadowFrusta[i].LRBT[TOP], m_NearFarPlane[NEAR], m_NearFarPlane[FAR]);
 
+
+                    m_ShadowProgram->Bind();
+                    shaderHandle = m_ShadowProgram->GetHandle();
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
 					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
+
+                    m_ShadowProgramSkinned->Bind();
+                    shaderHandle = m_ShadowProgramSkinned->GetHandle();
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
+                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
+
+
 
 					GLERROR("ShadowLight ERROR");
 
@@ -244,6 +262,23 @@ void ShadowPass::Draw(RenderScene & scene)
 							if (!modelJob->Shadow) {
 								continue;
 							}
+
+                            if(modelJob->Model->IsSkinned()) {
+                                m_ShadowProgramSkinned->Bind();
+                                shaderHandle = m_ShadowProgramSkinned->GetHandle();
+
+                                std::vector<glm::mat4> frameBones;
+                                if (modelJob->BlendTree != nullptr) {
+                                    frameBones = modelJob->BlendTree->GetFinalPose();
+                                } else {
+                                    frameBones = modelJob->Skeleton->GetTPose();
+                                }
+                                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+                            } else {
+                                m_ShadowProgram->Bind();
+                                shaderHandle = m_ShadowProgram->GetHandle();
+                            }
 
 							glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 							glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), 1.f);
@@ -264,6 +299,23 @@ void ShadowPass::Draw(RenderScene & scene)
 								if (!modelJob->Shadow) {
 									continue;
 								}
+
+                                if (modelJob->Model->IsSkinned()) {
+                                    m_ShadowProgramSkinned->Bind();
+                                    shaderHandle = m_ShadowProgramSkinned->GetHandle();
+
+                                    std::vector<glm::mat4> frameBones;
+                                    if (modelJob->BlendTree != nullptr) {
+                                        frameBones = modelJob->BlendTree->GetFinalPose();
+                                    } else {
+                                        frameBones = modelJob->Skeleton->GetTPose();
+                                    }
+                                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+                                } else {
+                                    m_ShadowProgram->Bind();
+                                    shaderHandle = m_ShadowProgram->GetHandle();
+                                }
 
 								glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
 								glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
