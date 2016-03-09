@@ -30,6 +30,7 @@
 #include "Network/ESearchForServers.h"
 #include "../Game/Events/EDashAbility.h"
 #include "Network/EDisplayServerlist.h"
+#include "Network/EConnectRequest.h"
 
 class Client : public Network
 {
@@ -128,6 +129,8 @@ private:
     bool OnDoubleJump(Events::DoubleJump & e);
     EventRelay<Client, Events::DashAbility> m_EDashAbility;
     bool OnDashAbility(const Events::DashAbility& e);
+    EventRelay<Client, Events::ConnectRequest> m_EConnectRequest;
+    bool OnConnectRequest(const Events::ConnectRequest& e);
 
     bool OnSearchForServers(const Events::SearchForServers& e);
     UDPClient m_ServerlistRequest;

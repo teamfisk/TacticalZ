@@ -35,6 +35,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &Client::OnDashAbility);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
+    EVENT_SUBSCRIBE_MEMBER(m_EConnectRequest, &Client::OnConnectRequest);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
     if (address.empty()) {
@@ -472,7 +473,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
+            //m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
         //    m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -543,6 +544,22 @@ bool Client::OnDashAbility(const Events::DashAbility& e)
     packet.WritePrimitive(m_ClientIDToServerID.at(e.Player));
     m_Reliable.Send(packet);
     return true;
+}
+
+
+bool Client::OnConnectRequest(const Events::ConnectRequest& e)
+{
+    if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) { 
+        // The client send a successful connect message
+        auto rootEntities = m_World->GetDirectChildren(EntityID_Invalid);
+        for (auto it = rootEntities.first; it != rootEntities.second; it++) {
+            m_World->DeleteEntity(it->first);
+        }
+
+    } else {
+        // The client could not send a successful connect message
+    }
+    return false;
 }
 
 bool Client::OnSearchForServers(const Events::SearchForServers& e)
