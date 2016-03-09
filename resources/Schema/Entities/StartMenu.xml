@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="StartMenu_Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Background_Map_Origin">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Background_Spawner">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/CP_Rocky.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Spectator_Camera_Origin">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Rotation_Anchor">
+          <Components>
+            <c:RaptorCopter>
+              <Speed>0.10000000149011612</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Orientation X="0" Y="65.3543472" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="RotationAnchor_Small">
+              <Components>
+                <c:RaptorCopter>
+                  <Speed>0.20000000298023224</Speed>
+                  <Axis X="0" Y="-1" Z="0"/>
+                </c:RaptorCopter>
+                <c:Transform>
+                  <Position X="0" Y="26" Z="40"/>
+                  <Orientation X="0" Y="-47.6068382" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Camera">
+                  <Components>
+                    <c:Camera/>
+                    <c:Transform>
+                      <Orientation X="5.78618526" Y="0" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="Menu_Origin">
+                      <Components>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="Menu_Spawner">
+                          <Components>
+                            <c:Spawner>
+                              <EntityFile>Schema/Entities/MainMenu.xml</EntityFile>
+                            </c:Spawner>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>
