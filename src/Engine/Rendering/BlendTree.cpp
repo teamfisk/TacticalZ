@@ -214,7 +214,6 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
                 }
             }
         }
-
         return blendInfo;
     }
 
@@ -333,7 +332,6 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
                 }
             }
         }
-
     }
 
     return blendInfo;

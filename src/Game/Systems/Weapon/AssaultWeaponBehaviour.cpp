@@ -133,11 +133,6 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     b1.Restart = true;
     b1.Start = true;
     m_EventBroker->Publish(b1);
-    Events::AutoAnimationBlend b2;
-    b2.RootNode = wi.ThirdPersonPlayerModel;
-    b2.NodeName = "MovementBlend";
-    b2.AnimationEntity = wi.ThirdPersonPlayerModel.FirstChildByName("AssaultWeaponBlend").FirstChildByName("Reload");
-    m_EventBroker->Publish(b2);
 
     // Spawn explosion effect
     if (wi.FirstPersonEntity.Valid()) {
@@ -247,6 +242,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "ActionBlend", "Fire");
+
     // Third person anim
     Events::AutoAnimationBlend b1;
     b1.RootNode = wi.ThirdPersonPlayerModel;
@@ -254,11 +250,6 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     b1.Restart = true;
     b1.Start = true;
     m_EventBroker->Publish(b1);
-    Events::AutoAnimationBlend b2;
-    b2.RootNode = wi.ThirdPersonPlayerModel;
-    b2.NodeName = "MovementBlend";
-    b2.AnimationEntity = wi.ThirdPersonPlayerModel.FirstChildByName("AssaultWeaponBlend").FirstChildByName("Fire");
-    m_EventBroker->Publish(b2);
 
     // Sound
     Events::PlaySoundOnEntity e;

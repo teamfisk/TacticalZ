@@ -153,6 +153,31 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                         m_EventBroker->Publish(aeb);
                     }
                 }
+
+
+                EntityWrapper firstPersonModel = m_PlayerEntity.FirstChildByName("Hands");
+                if (firstPersonModel.Valid()) {
+                    if (val > 0) {  // Walk/Run
+                        if (!m_Crouching) {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.1;
+                            aeb.NodeName = "Run";
+                            aeb.RootNode = firstPersonModel;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                    } else if (val < 0) {   // Walk/run Backwards
+                        if (!m_Crouching) {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.1;
+                            aeb.NodeName = "Run";
+                            aeb.RootNode = firstPersonModel;
+                            aeb.Start = true;
+                            aeb.Reverse = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                    }
+                }
             }
         }
         if (e.Command == "Right") {
@@ -187,27 +212,36 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
     }
 
     //Animation
-    if (glm::length2(m_Movement) < 0.1f) {
+    if (glm::length2(m_Movement) < 0.25f) {
         //Blend to Idle
         if (m_PlayerEntity.Valid()) {
             EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 Events::AutoAnimationBlend aeb;
-                aeb.Duration = 0.2;
+                aeb.Duration = 0.1;
                 aeb.NodeName = "Idle";
                 aeb.RootNode = playerModel;
+                aeb.Start = true;
+                m_EventBroker->Publish(aeb);
+            }
+            EntityWrapper firstPersonModel = m_PlayerEntity.FirstChildByName("Hands");
+            if (firstPersonModel.Valid()) {
+                Events::AutoAnimationBlend aeb;
+                aeb.Duration = 0.1;
+                aeb.NodeName = "Idle";
+                aeb.RootNode = firstPersonModel;
+                aeb.Start = true;
                 m_EventBroker->Publish(aeb);
             }
         }
     } else {
-
         //Blend to movement
         if (m_PlayerEntity.Valid()) {
             EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 Events::AutoAnimationBlend aeb;
-                aeb.Duration = 0.2;
-                aeb.NodeName = "MovementBlend";
+                aeb.Duration = 0.1;
+                aeb.NodeName = "DirectionBlend";
                 aeb.RootNode = playerModel;
                 m_EventBroker->Publish(aeb);
             }
@@ -226,7 +260,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                 glm::vec2 direction = glm::normalize(glm::vec2(m_Movement.x, m_Movement.z));
                 double weight = glm::abs(glm::dot(glm::vec2(1, 0), direction));
                 Events::SetBlendWeight sbw;
-                sbw.NodeName = "MovementBlend";
+                sbw.NodeName = "DirectionBlend";
                 sbw.Weight = weight;
                 sbw.RootNode = playerModel;
                 m_EventBroker->Publish(sbw);
