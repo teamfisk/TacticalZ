@@ -52,8 +52,8 @@ private:
 
     std::unordered_map<glm::ivec2, PickingInfo> m_PickingColorsToEntity;
 
-    GLuint m_PickingTexture;
-    GLuint m_DepthBuffer;
+    GLuint m_PickingTexture = 0;
+    GLuint m_DepthBuffer = 0;
 
     FrameBuffer m_PickingBuffer;
 

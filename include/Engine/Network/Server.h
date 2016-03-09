@@ -60,6 +60,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers
     std::clock_t m_StartPingTime;
+    std::string m_ServerName = "";
 
     // Packet loss logic
     PacketID m_PacketID = 0;

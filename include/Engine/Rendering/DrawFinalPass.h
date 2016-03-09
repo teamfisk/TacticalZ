@@ -17,7 +17,7 @@ class DrawFinalPass
 {
 public:
     DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass);
-    ~DrawFinalPass() { }
+	~DrawFinalPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
@@ -57,11 +57,11 @@ private:
 
     FrameBuffer m_FinalPassFrameBuffer;
 	FrameBuffer m_ShieldDepthFrameBuffer;
-    GLuint m_BloomTexture;
-    GLuint m_SceneTexture;
-    GLuint m_DepthBuffer;
-	GLuint m_ShieldBuffer;
-    GLuint m_CubeMapTexture;
+    GLuint m_BloomTexture = 0;
+    GLuint m_SceneTexture = 0;
+    GLuint m_DepthBuffer = 0;
+	GLuint m_ShieldBuffer = 0;
+    GLuint m_CubeMapTexture = 0;
     GLuint m_FullBlurredTexture;
     GLuint m_CombinedTexture; //This can be removed for less memory usage, just set m_sceneTexture to the return from m_BlurHUDPass.CombineTextures 
 
