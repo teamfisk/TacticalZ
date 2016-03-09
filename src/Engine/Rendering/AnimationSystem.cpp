@@ -284,7 +284,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
 
 bool AnimationSystem::OnEntityDeleted(Events::EntityDeleted& e)
 {
-    EntityWrapper entity = EntityWrapper(m_World, e.DeletedEntity);
+    EntityWrapper entity = e.DeletedEntity;
 
     if (entity.HasComponent("Model")) {
         Model* model;

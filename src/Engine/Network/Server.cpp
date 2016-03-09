@@ -489,7 +489,7 @@ bool Server::OnEntityDeleted(const Events::EntityDeleted & e)
 {
     if (!e.Cascaded) {
         Packet packet = Packet(MessageType::EntityDeleted);
-        packet.WritePrimitive<EntityID>(e.DeletedEntity);
+        packet.WritePrimitive<EntityID>(e.DeletedEntity.ID);
         reliableBroadcast(packet);
     }
     return false;

@@ -223,7 +223,7 @@ void World::deleteEntityRecursive(EntityID entity, bool cascaded /*= false*/)
 
     if (m_EventBroker != nullptr) {
         Events::EntityDeleted e;
-        e.DeletedEntity = entity;
+        e.DeletedEntity = EntityWrapper(this, entity);
         e.Cascaded = cascaded;
         m_EventBroker->Publish(e);
     }
