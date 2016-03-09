@@ -27,9 +27,7 @@
         <Entity name="Shield">
           <Components>
             <c:Animation>
-              <AnimationName>ActivateDeactiveShieldF</AnimationName>
-              <Time>1</Time>
-              <Speed>1</Speed>
+              <AnimationName>ActivateDeactivateShieldF</AnimationName>
               <Loop>false</Loop>
             </c:Animation>
             <c:Transform/>
@@ -50,7 +48,6 @@
               <Components>
                 <c:Animation>
                   <AnimationName>ShootShotgunF</AnimationName>
-                  <Speed>1</Speed>
                   <Loop>false</Loop>
                 </c:Animation>
                 <c:Transform/>
@@ -71,7 +68,6 @@
                   <Components>
                     <c:Animation>
                       <AnimationName>ShotgunReloadTwoF</AnimationName>
-                      <Speed>1</Speed>
                     </c:Animation>
                     <c:Transform/>
                   </Components>
@@ -91,7 +87,6 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>ShotgunReloadOneF</AnimationName>
-                          <Speed>1</Speed>
                           <Loop>false</Loop>
                         </c:Animation>
                         <c:Transform/>
@@ -102,7 +97,6 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>ShotgunReloadThreeF</AnimationName>
-                          <Speed>1</Speed>
                           <Loop>false</Loop>
                         </c:Animation>
                         <c:Transform/>
@@ -132,7 +126,6 @@
           <Components>
             <c:Animation>
               <AnimationName>IdleF</AnimationName>
-              <Speed>1</Speed>
               <Play>true</Play>
               <Additive>true</Additive>
             </c:Animation>
@@ -144,7 +137,6 @@
           <Components>
             <c:Animation>
               <AnimationName>RunF</AnimationName>
-              <Speed>1</Speed>
               <Play>true</Play>
               <Additive>true</Additive>
             </c:Animation>
@@ -163,8 +155,8 @@
           <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0.120748252" Y="-0.228437155" Z="-0.181454688"/>
-          <Orientation X="0.0104048811" Y="-0.00268213497" Z="0.0428443402"/>
+          <Position X="0.120748043" Y="-0.228436321" Z="-0.151475549"/>
+          <Orientation X="0.0104044285" Y="-0.00268185162" Z="0.0428444184"/>
         </c:Transform>
       </Components>
       <Children>
@@ -197,9 +189,9 @@
           <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Transform>
-          <Position X="0.0540265739" Y="-0.095435515" Z="-0.255526066"/>
-          <Orientation X="0.000684314175" Y="0.0774238482" Z="0.00118648494"/>
-          <Scale X="1.00000012" Y="1.00000048" Z="1.00000048"/>
+          <Position X="0.0540262833" Y="-0.0954347998" Z="-0.225546911"/>
+          <Orientation X="0.000683821447" Y="0.0774240941" Z="-1.56960988"/>
+          <Scale X="0.500000179" Y="0.500000179" Z="0.499999911"/>
         </c:Transform>
       </Components>
       <Children>

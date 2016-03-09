@@ -60,7 +60,9 @@ protected:
         EntityWrapper Player;
         EntityWrapper WeaponEntity;
         EntityWrapper FirstPersonEntity;
+        EntityWrapper FirstPersonPlayerModel;
         EntityWrapper ThirdPersonEntity;
+        EntityWrapper ThirdPersonPlayerModel;
     };
 
     IRenderer* m_Renderer;
@@ -301,7 +303,9 @@ private:
         wi.Player = player;
         wi.WeaponEntity = player;
         wi.FirstPersonEntity = firstPersonWeapon;
+        wi.FirstPersonPlayerModel = firstPersonWeapon;
         wi.ThirdPersonEntity = thirdPersonWeapon;
+        wi.ThirdPersonPlayerModel = thirdPersonWeapon.FirstParentWithComponent("Model");
         
         OnEquip(cWeapon, wi);
     }

@@ -4,7 +4,7 @@
   <Components>
     <c:BlendAdditive>
       <Adder>MovementBlend</Adder>
-      <Receiver>FinalBlend</Receiver>
+      <Receiver>ActionBlend</Receiver>
     </c:BlendAdditive>
     <c:Model>
       <Resource>Models/Characters/Assault/FirstPersonAssaultBlue.mesh</Resource>
@@ -13,54 +13,34 @@
   </Components>
 
   <Children>
-    <Entity name="FinalBlend">
+    <Entity name="ActionBlend">
       <Components>
         <c:Blend>
-          <Pose1>BlendTreeAssaultWeapon</Pose1>
-          <Pose2>BlendTreeSecondaryWeapon</Pose2>
+          <Pose1>Fire</Pose1>
+          <Pose2>Reload</Pose2>
           <Weight>0</Weight>
           <SubTreeRoot>true</SubTreeRoot>
         </c:Blend>
         <c:Transform/>
       </Components>
       <Children>
-        <Entity name="BlendTreeAssaultWeapon">
+        <Entity name="Reload">
           <Components>
-            <c:Blend>
-              <Pose1>Fire</Pose1>
-              <Pose2>Reload</Pose2>
-              <Weight>0</Weight>
-              <SubTreeRoot>true</SubTreeRoot>
-            </c:Blend>
+            <c:Animation>
+              <AnimationName>ReloadSwitchF</AnimationName>
+              <Speed>0.5</Speed>
+              <Loop>false</Loop>
+            </c:Animation>
             <c:Transform/>
           </Components>
-          <Children>
-            <Entity name="Reload">
-              <Components>
-                <c:Animation>
-                  <AnimationName>ReloadSwitchF</AnimationName>
-                  <Speed>0.5</Speed>
-                  <Loop>false</Loop>
-                </c:Animation>
-                <c:Transform/>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="Fire">
-              <Components>
-                <c:Animation>
-                  <AnimationName>ShootRifleF</AnimationName>
-                  <Speed>1</Speed>
-                  <Loop>false</Loop>
-                </c:Animation>
-                <c:Transform/>
-              </Components>
-              <Children/>
-            </Entity>
-          </Children>
+          <Children/>
         </Entity>
-        <Entity name="BlendTreeSecondaryWeapon">
+        <Entity name="Fire">
           <Components>
+            <c:Animation>
+              <AnimationName>ShootRifleF</AnimationName>
+              <Loop>false</Loop>
+            </c:Animation>
             <c:Transform/>
           </Components>
           <Children/>
@@ -78,11 +58,10 @@
         <c:Transform/>
       </Components>
       <Children>
-        <Entity name="Idle">
+        <Entity name="Run">
           <Components>
             <c:Animation>
-              <AnimationName>IdleF</AnimationName>
-              <Speed>1</Speed>
+              <AnimationName>RunF</AnimationName>
               <Play>true</Play>
               <Additive>true</Additive>
             </c:Animation>
@@ -90,11 +69,10 @@
           </Components>
           <Children/>
         </Entity>
-        <Entity name="Run">
+        <Entity name="Idle">
           <Components>
             <c:Animation>
-              <AnimationName>RunF</AnimationName>
-              <Speed>1</Speed>
+              <AnimationName>IdleF</AnimationName>
               <Play>true</Play>
               <Additive>true</Additive>
             </c:Animation>
@@ -113,8 +91,8 @@
           <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0.120748274" Y="-0.228437141" Z="-0.181454718"/>
-          <Orientation X="0.0104048206" Y="-0.00268219248" Z="0.0428443849"/>
+          <Position X="0.118469834" Y="-0.231588811" Z="-0.181454763"/>
+          <Orientation X="0.0104042515" Y="-0.00268274755" Z="0.0428440832"/>
         </c:Transform>
       </Components>
       <Children>
@@ -149,9 +127,9 @@
           <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Transform>
-          <Position X="0.0540266186" Y="-0.0954354703" Z="-0.255526125"/>
-          <Orientation X="0.000684258412" Y="0.077423811" Z="0.00118651299"/>
-          <Scale X="0.50000006" Y="0.500000477" Z="1.00000083"/>
+          <Position X="0.0517482236" Y="-0.0985872298" Z="-0.255526245"/>
+          <Orientation X="0.000683688093" Y="0.0774232447" Z="0.0011862258"/>
+          <Scale X="0.25" Y="0.250000119" Z="0.500000238"/>
         </c:Transform>
       </Components>
       <Children>
