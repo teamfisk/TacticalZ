@@ -78,7 +78,7 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
 
         if (it == m_PlayerIdentities.end()) {
             break;
-        }
+        }  
 
         if(found == false) {
             if(it->second.Team != currentTeam) {

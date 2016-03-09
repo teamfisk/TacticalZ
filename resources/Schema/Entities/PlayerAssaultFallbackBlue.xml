@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Player" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:NetworkComponent/>
+    <c:AABB>
+      <Origin X="0" Y="0.772000015" Z="0"/>
+      <Size X="1" Y="1.60000002" Z="1"/>
+    </c:AABB>
+    <c:AssaultWeapon/>
+    <c:Collidable/>
+    <c:DashAbility/>
+    <c:DoubleJump/>
+    <c:Health/>
+    <c:Physics>
+      <Velocity X="2.30999646e-23" Y="0" Z="1.05272533e-23"/>
+    </c:Physics>
+    <c:Player>
+      <MovementSpeed>5</MovementSpeed>
+      <CurrentWeapon></CurrentWeapon>
+    </c:Player>
+    <c:Team>
+      <Team>
+        <Blue/>
+      </Team>
+    </c:Team>
+    <c:Transform>
+      <Position X="0" Y="0.0288832188" Z="2.64144421"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Camera">
+      <Components>
+        <c:Camera>
+          <NearClip>0.10000000149011612</NearClip>
+          <FarClip>300</FarClip>
+        </c:Camera>
+        <c:Transform>
+          <Position X="0" Y="1.27700007" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="CameraModel">
+          <Components>
+            <c:Model>
+              <Resource>Models/Widgets/Camera.mesh</Resource>
+              <Visible>false</Visible>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.0331346765" Z="-0.0792061687"/>
+              <Scale X="1.30000007" Y="1.50000012" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="HUD">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-0.5"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Crosshair">
+              <Components>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Weapons/Crosshair/SmallThickHoleDot.png</DiffuseTexture>
+                  <GlowMap></GlowMap>
+                  <DepthSort>false</DepthSort>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.200000003"/>
+                  <Scale X="0.0250000004" Y="0.0250000004" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="HitMarkerSpawner">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/HitMarker.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="HealthHUD">
+              <Components>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="HealthBar">
+                  <Components>
+                    <c:Fill>
+                      <Percentage>1</Percentage>
+                      <Color A="0.301960796" B="1" G="0" R="0"/>
+                    </c:Fill>
+                    <c:HealthHUD/>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HealthHUD3.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                      <Color A="0.588235319" B="0" G="0" R="0"/>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="-0.263000011" Y="-0.185000002" Z="0"/>
+                      <Orientation X="5.87300014" Y="0" Z="4.71200037"/>
+                      <Scale X="0.106000006" Y="0.333000004" Z="0.150000006"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="BoostIcons">
+                      <Components>
+                        <c:BoostIconsHUD/>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="Assault">
+                          <Components>
+                            <c:Fill>
+                              <Color A="1" B="0.533333361" G="1" R="0.329411775"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                              <DepthSort>false</DepthSort>
+                              <Color A="0.588235319" B="0.0392156877" G="0.184313729" R="0"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0.225000009" Y="0.168000013" Z="0"/>
+                              <Scale X="0.27700001" Y="0.100000001" Z="0.200000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="Defender">
+                          <Components>
+                            <c:Fill>
+                              <Color A="1" B="1" G="0.58431375" R="0.105882354"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                              <DepthSort>false</DepthSort>
+                              <Color A="0.588235319" B="0.34117648" G="0.192156866" R="0"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0.224999994" Y="0.27700001" Z="0"/>
+                              <Scale X="0.27700001" Y="0.100000001" Z="0.200000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="Sniper">
+                          <Components>
+                            <c:Fill>
+                              <Color A="1" B="0.345098048" G="0" R="1"/>
+                            </c:Fill>
+                            <c:Sprite>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <GlowMap></GlowMap>
+                              <DepthSort>false</DepthSort>
+                              <Color A="0.588235319" B="0.121568628" G="0" R="0.443137258"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0.225000009" Y="0.38500002" Z="0"/>
+                              <Scale X="0.27700001" Y="0.100000001" Z="0.200000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="ShiftAbility">
+                      <Components>
+                        <c:AbilityCooldownHUD/>
+                        <c:Fill>
+                          <Color A="1" B="0.392156869" G="0.392156869" R="0.392156869"/>
+                        </c:Fill>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                          <DepthSort>false</DepthSort>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0.224999994" Y="0.00400000019" Z="0"/>
+                          <Scale X="0.27700001" Y="0.190000013" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Cooldown">
+                          <Components>
+                            <c:Text>
+                              <Content>0.0</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="0" G="0" R="0"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0.146000013" Y="0.00900000054" Z="0.0560000017"/>
+                              <Orientation X="0" Y="0" Z="1.57099998"/>
+                              <Scale X="0.515000045" Y="0.704000056" Z="0.431000024"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="HealthText">
+                  <Components>
+                    <c:Fill>
+                      <Percentage>1</Percentage>
+                      <Color A="1" B="1" G="0" R="0"/>
+                    </c:Fill>
+                    <c:Text>
+                      <Content>100/100</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Color A="0.505882382" B="3.92156863" G="1.17647064" R="0"/>
+                    </c:Text>
+                    <c:HealthHUD/>
+                    <c:Transform>
+                      <Position X="-0.355000019" Y="-0.203000009" Z="0.0410000011"/>
+                      <Orientation X="0" Y="0.410000026" Z="0"/>
+                      <Scale X="0.0350000001" Y="0.0350000001" Z="0.0350000001"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="CapturePointHUD">
+              <Components>
+                <c:Transform>
+                  <Position X="0" Y="0.190541431" Z="0"/>
+                  <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="BackgroundHexagon">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                      <Color A="0.300000012" B="1" G="1" R="1"/>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0" Y="0.919596612" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="ProgressionHexagon">
+                      <Components>
+                        <c:CapturePointHUD>
+                          <CapturePointNumber>2</CapturePointNumber>
+                        </c:CapturePointHUD>
+                        <c:Fill>
+                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                        </c:Fill>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0" Z="0.00999999978"/>
+                          <Orientation X="0" Y="0" Z="1.57079637"/>
+                          <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="BackgroundHexagon">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                      <Color A="0.300000012" B="1" G="1" R="1"/>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="ProgressionHexagon">
+                      <Components>
+                        <c:CapturePointHUD>
+                          <CapturePointNumber>3</CapturePointNumber>
+                        </c:CapturePointHUD>
+                        <c:Fill>
+                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                        </c:Fill>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0" Z="0.00999999978"/>
+                          <Orientation X="0" Y="0" Z="1.57079637"/>
+                          <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="BackgroundHexagon">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                      <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="1.62788737" Y="0.919596612" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="ProgressionHexagon">
+                      <Components>
+                        <c:CapturePointHUD>
+                          <CapturePointNumber>4</CapturePointNumber>
+                        </c:CapturePointHUD>
+                        <c:Fill>
+                          <Percentage>1</Percentage>
+                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                        </c:Fill>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0" Z="0.00999999978"/>
+                          <Orientation X="0" Y="0" Z="1.57079637"/>
+                          <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="BackgroundHexagon">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                      <Color A="0.300000012" B="1" G="1" R="1"/>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="-0.820431828" Y="0.441878349" Z="-0.100000001"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="ProgressionHexagon">
+                      <Components>
+                        <c:CapturePointHUD>
+                          <CapturePointNumber>1</CapturePointNumber>
+                        </c:CapturePointHUD>
+                        <c:Fill>
+                          <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                        </c:Fill>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0" Z="0.00999999978"/>
+                          <Orientation X="0" Y="0" Z="1.57079637"/>
+                          <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="BackgroundHexagon">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                      <Color A="0.699999988" B="0" G="0" R="1"/>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="-1.58304751" Y="0.919596612" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="ProgressionHexagon">
+                      <Components>
+                        <c:CapturePointHUD/>
+                        <c:Fill>
+                          <Percentage>1</Percentage>
+                          <Color A="0.699999988" B="0" G="0" R="1"/>
+                        </c:Fill>
+                        <c:Sprite>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <GlowMap></GlowMap>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0" Z="0.00999999978"/>
+                          <Orientation X="0" Y="0" Z="4.71238899"/>
+                          <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="KillFeed">
+              <Components>
+                <c:KillFeed/>
+                <c:Transform>
+                  <Position X="0.486000031" Y="0.26000002" Z="0"/>
+                  <Scale X="0.0149999997" Y="0.0149999997" Z="0.0149999997"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="KillFeed1">
+                  <Components>
+                    <c:Text>
+                      <Content></Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Right/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KillFeed2">
+                  <Components>
+                    <c:Text>
+                      <Content></Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Right/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="0" Y="-1" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KillFeed3">
+                  <Components>
+                    <c:Text>
+                      <Content></Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Right/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="0" Y="-2" Z="0"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="CapturePointArrow">
+              <Components>
+                <c:CapturePointArrowHUD/>
+                <c:Model>
+                  <Resource>Models/Widgets/Arrows/Arrow5.mesh</Resource>
+                </c:Model>
+                <c:Team>
+                  <Team>
+                    <Blue/>
+                  </Team>
+                </c:Team>
+                <c:Transform>
+                  <Position X="0" Y="0.714000046" Z="-1.30000007"/>
+                  <Orientation X="0.405680239" Y="0.369605929" Z="0"/>
+                  <Scale X="0.200000003" Y="0.200000003" Z="0.200000003"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Hands">
+          <Components>
+            <c:Animation>
+              <AnimationName1>Idle</AnimationName1>
+              <Time1>1.8348644854054612</Time1>
+              <Speed1>1</Speed1>
+              <AnimationName2></AnimationName2>
+              <AnimationName3></AnimationName3>
+            </c:Animation>
+            <c:Model>
+              <Resource>Models/Characters/Assault/Test/FirstPerson.mesh</Resource>
+              <Color A="1" B="1" G="0.294117659" R="0"/>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="PrimaryAttachment">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:WeaponAttachment>
+                  <Weapon>AssaultWeapon</Weapon>
+                </c:WeaponAttachment>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/WeaponAssaultBlueView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.120430619" Y="-0.229639441" Z="-0.181454554"/>
+                  <Orientation X="0.0104045719" Y="-0.00268170005" Z="0.0428441055"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SecondaryAttachment">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:WeaponAttachment>
+                  <Weapon>SidearmWeapon</Weapon>
+                </c:WeaponAttachment>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/SidearmWeaponView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.120430619" Y="-0.229639441" Z="-0.181454554"/>
+                  <Orientation X="0.0104045719" Y="-0.00268170005" Z="0.0428441055"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="ThirdPersonCamera">
+      <Components>
+        <c:Camera>
+          <NearClip>0.10000000149011612</NearClip>
+          <FarClip>300</FarClip>
+        </c:Camera>
+        <c:Model>
+          <Resource>Models/Widgets/Camera.mesh</Resource>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Transform>
+          <Position X="-0.284000009" Y="1.83800006" Z="1.18900001"/>
+          <Orientation X="5.95600033" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlayerModel">
+      <Components>
+        <c:Animation>
+          <AnimationName1>IdleF</AnimationName1>
+          <Speed1>1</Speed1>
+          <AnimationName2></AnimationName2>
+          <AnimationName3></AnimationName3>
+        </c:Animation>
+        <c:AnimationOffset>
+          <AnimationName>AimRifle</AnimationName>
+          <Time>0.5</Time>
+        </c:AnimationOffset>
+        <c:Shielded/>
+        <c:HiddenForLocalPlayer/>
+        <c:Model>
+          <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
+          <Color A="1" B="1" G="0.952941179" R="1"/>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="PrimaryAttachment">
+          <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
+            <c:WeaponAttachment>
+              <Weapon>AssaultWeapon</Weapon>
+              <Person>
+                <ThirdPerson/>
+              </Person>
+            </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/WeaponAssaultBlueWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0.15691258" Y="1.04389966" Z="-0.213815808"/>
+              <Orientation X="-0.00425229501" Y="-0.0330814682" Z="0.137528151"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="SecondaryAttachment">
+          <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
+            <c:WeaponAttachment>
+              <Weapon>SidearmWeapon</Weapon>
+              <Person>
+                <ThirdPerson/>
+              </Person>
+            </c:WeaponAttachment>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/SidearmWeaponWorld.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0.15691258" Y="1.04389966" Z="-0.213815808"/>
+              <Orientation X="-0.00425229501" Y="-0.0330814682" Z="0.137528151"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="AABBStanding">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Color A="0.427450985" B="1" G="1" R="1"/>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0.772000015" Z="0"/>
+          <Scale X="1" Y="1.60000002" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="AABBCrouching">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Color A="0.745098054" B="1" G="0" R="1"/>
+          <Visible>false</Visible>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="0.772000015" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlayerName">
+      <Components>
+        <c:Text>
+          <Content>Insert name here</Content>
+          <Resource>Fonts/DroidSans.ttf,100</Resource>
+          <Color A="1" B="0" G="1" R="0"/>
+        </c:Text>
+        <c:Transform>
+          <Position X="0.100000001" Y="1.50176644" Z="-0.248000011"/>
+          <Orientation X="0" Y="3.14199996" Z="0"/>
+          <Scale X="0.100000001" Y="0.113000005" Z="0.5"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Indicator">
+      <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
+          <GlowMap></GlowMap>
+          <DepthSort>false</DepthSort>
+          <Color A="1" B="1" G="0.309803933" R="0"/>
+        </c:Sprite>
+        <c:HiddenForLocalPlayer/>
+        <c:SpriteIndicator>
+          <MinScale>50</MinScale>
+          <VisibleForSingleTeamOnly>true</VisibleForSingleTeamOnly>
+        </c:SpriteIndicator>
+        <c:Transform>
+          <Position X="0" Y="1.84019077" Z="0"/>
+          <Scale X="0.300000012" Y="0.300000012" Z="0.300000012"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ShieldAttachment">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/DefenderShield.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="0" Y="0.859000027" Z="-0.976999998"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

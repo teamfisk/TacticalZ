@@ -110,7 +110,7 @@ void Renderer::Draw(RenderFrame& frame)
 {
     GLERROR("PRE");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking\0Ambient Occlusion");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking\0Ambient Occlusion\0Combined Scene Texture\0Full Blurred Texture");
     ImGui::Combo("CubeMap", &m_CubeMapTexture, "Nevada(512)\0Sky(1024)");
     if(m_CubeMapTexture == 0) {
         m_CubeMapPass->LoadTextures("Nevada");
@@ -133,6 +133,7 @@ void Renderer::Draw(RenderFrame& frame)
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
 	m_SSAOPass->ClearBuffer();
+    m_BlurHUDPass->ClearBuffer();
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
     GLERROR("ClearBuffers");
 	for (auto scene : frame.RenderScenes) {
@@ -158,7 +159,7 @@ void Renderer::Draw(RenderFrame& frame)
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
 		PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
-		m_DrawFinalPass->Draw(*scene);
+		m_DrawFinalPass->Draw(*scene, m_BlurHUDPass);
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
@@ -194,6 +195,12 @@ void Renderer::Draw(RenderFrame& frame)
 	if (m_DebugTextureToDraw == 5) {
 		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
 	}
+    if (m_DebugTextureToDraw == 6) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->CombinedSceneTexture());
+    }
+    if (m_DebugTextureToDraw == 7) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->FullBlurredTexture());
+    }
 	PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
 
     PerformanceTimer::StartTimer("Renderer-ImGuiRenderPass");
@@ -244,9 +251,10 @@ void Renderer::InitializeRenderPasses()
     m_LightCullingPass = new LightCullingPass(this);
     m_CubeMapPass = new CubeMapPass(this);
 	m_SSAOPass = new SSAOPass(this, m_Config);
+    m_BlurHUDPass = new BlurHUD(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
-  
+
 }

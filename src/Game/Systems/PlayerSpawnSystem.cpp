@@ -1,4 +1,5 @@
 #include "Systems/PlayerSpawnSystem.h"
+#include "Core/ELockMouse.h"
 
 PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params)
     : System(params)
@@ -59,7 +60,15 @@ void PlayerSpawnSystem::Update(double dt)
     }
 
     int numSpawnedPlayers = 0;
-    for (auto& req : m_SpawnRequests) {
+    int playersSpectating = 0;
+    const int numRequestsToHandle = (int)m_SpawnRequests.size();
+    for (auto it = m_SpawnRequests.begin(); it != m_SpawnRequests.end(); ++it) {
+        // It is valid if they didn't pick class yet
+        // but don't spawn anything, goto next spawnrequest.
+        if (it->Class == PlayerClass::None) {
+            ++playersSpectating;
+            continue;
+        }
         for (auto& cPlayerSpawn : *playerSpawns) {
             EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
             if (!spawner.HasComponent("Spawner")) {
@@ -69,61 +78,54 @@ void PlayerSpawnSystem::Update(double dt)
             // If the spawner has a team affiliation, check it
             if (spawner.HasComponent("Team")) {
                 auto cSpawnerTeam = spawner["Team"];
-                if ((int)cSpawnerTeam["Team"] != req.Team) {
-                    // Increase num spawned players if someone picks spectator, since it is valid to pick spectator
-                    // but don't spawn anything, goto next spawnrequest.
-                    if (req.Team == (int)cSpawnerTeam["Team"].Enum("Spectator")) {
-                        ++numSpawnedPlayers;
+                if ((int)cSpawnerTeam["Team"] != it->Team) {
+                    // If they somehow has a valid class as spectator, don't spawn them.
+                    if (it->Team == cSpawnerTeam["Team"].Enum("Spectator")) {
+                        ++playersSpectating;
                         break;
                     }
                     continue;
                 }
             }
 
+            // TODO: Choose a different spawner depending on class picked?
+
             // Spawn the player!
             EntityWrapper player = SpawnerSystem::Spawn(spawner, EntityWrapper::Invalid, "Player");
             // Set the player team affiliation
-            player["Team"]["Team"] = req.Team;
+            player["Team"]["Team"] = it->Team;
 
             // Publish a PlayerSpawned event
             Events::PlayerSpawned e;
-            e.PlayerID = req.PlayerID;
+            e.PlayerID = it->PlayerID;
             e.Player = player;
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
             ++numSpawnedPlayers;
+            it = m_SpawnRequests.erase(it);
+            break;
+        }
+        if (it == m_SpawnRequests.end()) {
             break;
         }
     }
-    if (numSpawnedPlayers != (int)m_SpawnRequests.size()) {
-        LOG_DEBUG("%i players were supposed to be spawned or set as spectator, but only %i was handled.", (int)m_SpawnRequests.size(), numSpawnedPlayers);
+    if (numSpawnedPlayers != numRequestsToHandle - playersSpectating) {
+        LOG_DEBUG("%i players were supposed to be spawned, but only %i was successfully.", numRequestsToHandle - playersSpectating, numSpawnedPlayers);
     } else {
-        LOG_DEBUG("%i players were spawned or set as spectator.", numSpawnedPlayers);
+        std::string dbg = numSpawnedPlayers != 0 ? std::to_string(numSpawnedPlayers) + " players were spawned. " : "";
+        dbg += playersSpectating != 0 ? std::to_string(playersSpectating) + " players are spectating/picking class. " : "";
+        LOG_DEBUG(dbg.c_str());
     }
-    m_SpawnRequests.clear();
 }
 
 bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
 {
-    if (e.Command != "PickTeam" && e.Command != "SwapToClassPick") {
+    if (e.Command != "PickTeam" && e.Command != "PickClass" && e.Command != "SwapToTeamPick" && e.Command != "SwapToClassPick") {
         return false;
     }
 
     if (e.Value == 0) {
         return false;
-    }
-
-    // A dead client should be able to swap to the overwatch camera.
-    if (IsClient && !LocalPlayer.Valid()) {
-        // Set the camera as active, if it exists.
-        // Find the respawn camera or class pick camera.
-        std::string camName = e.Command == "SwapToClassPick" ? "PickClassCamera" : "SpectatorCamera";
-        EntityWrapper spectatorCam = m_World->GetFirstEntityByName(camName);
-        if (spectatorCam.Valid() && spectatorCam.HasComponent("Camera")) {
-            Events::SetCamera eSetCamera;
-            eSetCamera.CameraEntity = spectatorCam;
-            m_EventBroker->Publish(eSetCamera);
-        }
     }
 
     // Team picks should be processed ONLY server-side!
@@ -136,27 +138,38 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
     auto iter = m_SpawnRequests.begin();
     for (; iter != m_SpawnRequests.end(); ++iter) {
         if (iter->PlayerID == e.PlayerID) {
-            // If player wants to switch class, remove their spawn request.
-            if (e.Command == "SwapToClassPick") {
-                m_SpawnRequests.erase(iter);
+            // If player wants to switch team or class , remove their selected class so they don't spawn.
+            if (e.Command == "SwapToTeamPick" || e.Command == "SwapToClassPick") {
+                iter->Class = PlayerClass::None;
+                return true;
             }
             break;
         }
     }
 
-    if (e.Command == "SwapToClassPick") {
-        return true;
-    }
+    //If we get here we got a PickTeam or PickClass, so add or alter a spawn request.
 
     if (iter != m_SpawnRequests.end()) {
-        // If player is in queue to spawn, then change their team affiliation in the request.
-        iter->Team = (ComponentInfo::EnumType)e.Value;
+        // If player is in queue to spawn, then change their team affiliation or class in the request.
+        if (e.Command == "PickTeam") {
+            iter->Team = (ComponentInfo::EnumType)e.Value;
+        } else {
+            iter->Class = static_cast<PlayerClass>((int)e.Value);
+        }
     } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
         // If player is not in queue to spawn, then create a spawn request, 
         // but only if they are spectating and/or just connected.
         SpawnRequest req;
         req.PlayerID = e.PlayerID;
-        req.Team = (ComponentInfo::EnumType)e.Value;
+        if (e.Command == "PickTeam") {
+            req.Team = (ComponentInfo::EnumType)e.Value;
+            req.Class = PlayerClass::None;
+        } else {
+            // Should never get here, since you should have picked a team before you ever get a chance to pick class.
+            LOG_WARNING("Sequence error: Should not be able to pick class before team");
+            req.Team = 1;           // TODO: 1 Signifies spectator, should probably have real enum here later.
+            req.Class = static_cast<PlayerClass>((int)e.Value);
+        }
         m_SpawnRequests.push_back(req);
     } else {
         return false;
@@ -191,6 +204,8 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         Events::SetCamera e;
         e.CameraEntity = cameraEntity;
         m_EventBroker->Publish(e);
+        Events::LockMouse lock;
+        m_EventBroker->Publish(lock);
     }
 
     // HACK: Set the player model color to team color
@@ -210,7 +225,7 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 
 bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
-    //Only spawn request if network is disabled or we are server.
+    // Only spawn request if network is disabled or we are server.
     if (!IsServer && m_NetworkEnabled) {
         return false;
     }
@@ -218,10 +233,6 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
         return false;
     }
     ComponentWrapper cTeam = e.Player["Team"];
-    //A spectator can't die anyway
-    if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Spectator")) {
-        return false;
-    }
 
     if (m_PlayerIDs.count(e.Player.ID) == 0) {
         return false;
@@ -230,6 +241,16 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
     SpawnRequest req;
     req.PlayerID = m_PlayerIDs.at(e.Player.ID);
     req.Team = cTeam["Team"];
+    // TODO: Something better than temp class state code, if we ever add class enums in .xml
+    if (e.Player.HasComponent("DashAbility")) {
+        req.Class = PlayerClass::Assault;
+    } else if (e.Player.HasComponent("SprintAbility")) {
+        req.Class = PlayerClass::Sniper;
+    } else if (e.Player.HasComponent("ShieldAbility")) {
+        req.Class = PlayerClass::Defender;
+    } else {
+        req.Class = PlayerClass::None;
+    }
     m_SpawnRequests.push_back(req);
 
     return true;
