@@ -146,7 +146,9 @@ void Renderer::Draw(RenderFrame& frame)
     m_DrawFinalPass->ClearBuffer();
     m_DrawBloomPass->ClearBuffer();
 	m_SSAOPass->ClearBuffer();
+	m_ShadowPass->ClearBuffer();
     m_BlurHUDPass->ClearBuffer();
+	m_ShadowPass->DebugGUI();
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
     GLERROR("ClearBuffers");
 	for (auto scene : frame.RenderScenes) {
@@ -162,6 +164,9 @@ void Renderer::Draw(RenderFrame& frame)
         PerformanceTimer::StartTimer("Renderer-Depth");
         SortRenderJobsByDepth(*scene);
         GLERROR("SortByDepth");
+		PerformanceTimer::StartTimerAndStopPrevious("Draw shadow maps");
+		m_ShadowPass->Draw(*scene);
+		GLERROR("Draw shadow maps");
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Generate Frustrums");
         m_LightCullingPass->GenerateNewFrustum(*scene);
         GLERROR("Generate frustums");
@@ -264,8 +269,9 @@ void Renderer::InitializeRenderPasses()
     m_LightCullingPass = new LightCullingPass(this);
     m_CubeMapPass = new CubeMapPass(this);
 	m_SSAOPass = new SSAOPass(this, m_Config);
+	m_ShadowPass = new ShadowPass(this);
     m_BlurHUDPass = new BlurHUD(this);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
