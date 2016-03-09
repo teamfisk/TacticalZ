@@ -549,15 +549,22 @@ bool Client::OnDashAbility(const Events::DashAbility& e)
 
 bool Client::OnConnectRequest(const Events::ConnectRequest& e)
 {
+    std::vector<EntityID> childrenToBeDeleted;
+    auto rootEntites = m_World->GetDirectChildren(EntityID_Invalid);
+    for (auto it = rootEntites.first; it != rootEntites.second; it++) {
+        childrenToBeDeleted.push_back(it->second);
+    }
+    for (int i = 0; i < childrenToBeDeleted.size(); ++i) {
+        m_World->DeleteEntity(childrenToBeDeleted[i]);
+    }
     if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) { 
         // The client send a successful connect message
-        auto rootEntities = m_World->GetDirectChildren(EntityID_Invalid);
-        for (auto it = rootEntities.first; it != rootEntities.second; it++) {
-            m_World->DeleteEntity(it->first);
-        }
+        return true;
 
     } else {
         // The client could not send a successful connect message
+        return false;
+        // Load the main menu again ? 
     }
     return false;
 }
