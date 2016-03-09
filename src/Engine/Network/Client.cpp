@@ -181,8 +181,8 @@ void Client::parseTCPConnect(Packet& packet)
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
- //   m_Unreliable.Send(packet);
-  //  LOG_INFO("Sent UDP Connect Server");
+    //   m_Unreliable.Send(packet);
+     //  LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -457,12 +457,14 @@ void Client::parseSnapshot(Packet& packet)
 
 void Client::disconnect()
 {
+    removeWorld();
     m_IsConnected = false;
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
     m_Reliable.Send(packet);
     m_Reliable.Disconnect();
+    createMainMenu();
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
@@ -549,22 +551,16 @@ bool Client::OnDashAbility(const Events::DashAbility& e)
 
 bool Client::OnConnectRequest(const Events::ConnectRequest& e)
 {
-    std::vector<EntityID> childrenToBeDeleted;
-    auto rootEntites = m_World->GetDirectChildren(EntityID_Invalid);
-    for (auto it = rootEntites.first; it != rootEntites.second; it++) {
-        childrenToBeDeleted.push_back(it->second);
-    }
-    for (int i = 0; i < childrenToBeDeleted.size(); ++i) {
-        m_World->DeleteEntity(childrenToBeDeleted[i]);
-    }
-    if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) { 
-        // The client send a successful connect message
+    removeWorld();
+    if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) {
+        // The client sent a successful connect message
         return true;
 
     } else {
         // The client could not send a successful connect message
+        createMainMenu();
+        // Load the main menu again ?
         return false;
-        // Load the main menu again ? 
     }
     return false;
 }
@@ -693,6 +689,26 @@ void Client::displayServerlist()
         ServerInfo si = m_Serverlist[i];
         LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
+}
+
+
+void Client::removeWorld()
+{
+    std::vector<EntityID> childrenToBeDeleted;
+    auto rootEntites = m_World->GetDirectChildren(EntityID_Invalid);
+    for (auto it = rootEntites.first; it != rootEntites.second; it++) {
+        childrenToBeDeleted.push_back(it->second);
+    }
+    for (int i = 0; i < childrenToBeDeleted.size(); ++i) {
+        m_World->DeleteEntity(childrenToBeDeleted[i]);
+    }
+}
+
+
+void Client::createMainMenu()
+{
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/MainMenu.xml");
+    entityFile->MergeInto(m_World);
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

@@ -17,6 +17,7 @@
 #include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
+#include "Core/EntityFile.h"
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
 #include "Core/EPlayerDeath.h"
@@ -31,7 +32,6 @@
 #include "../Game/Events/EDashAbility.h"
 #include "Network/EDisplayServerlist.h"
 #include "Network/EConnectRequest.h"
-
 class Client : public Network
 {
 public:
@@ -109,6 +109,8 @@ private:
     void sendLocalPlayerTransform();
     void becomePlayer();
     void displayServerlist();
+    void removeWorld();
+    void createMainMenu();
     // Mapping Logic
     // Returns if local EntityID exist in map
     bool clientServerMapsHasEntity(EntityID clientEntityID);
