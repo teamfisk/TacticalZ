@@ -14,7 +14,7 @@ public:
     virtual void Update(double dt) override;
 
 private:
-    EntityWrapper m_activeCamera = EntityWrapper::Invalid;
+    EntityWrapper m_ActiveCamera = EntityWrapper::Invalid;
     
     EventRelay<StartSystem, Events::SetCamera> m_ECameraActivated;
     bool OnCameraActivated(const Events::SetCamera& e);

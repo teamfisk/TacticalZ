@@ -15,7 +15,7 @@ void StartSystem::Update(double dt)
     }
     for(auto& cCamera: *cameras) {
         EntityWrapper cameraEntity = EntityWrapper(m_World, cCamera.EntityID);
-        if(cameraEntity == m_activeCamera){
+        if(cameraEntity == m_ActiveCamera){
             return;
         }
         if(cameraEntity.Name() == "Overview_Camera_Start_Menu") {
@@ -28,6 +28,6 @@ void StartSystem::Update(double dt)
 
 bool StartSystem::OnCameraActivated(const Events::SetCamera& e)
 {
-    m_activeCamera = e.CameraEntity;
+    m_ActiveCamera = e.CameraEntity;
     return 1;
 }
