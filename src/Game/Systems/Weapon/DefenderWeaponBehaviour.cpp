@@ -139,17 +139,14 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                 if (IsClient) {
                     EntityWrapper root = wi.FirstPersonEntity;
                     if (root.Valid()) {
-                        EntityWrapper subTree = root.FirstChildByName("FinalBlend");
-                        if (subTree.Valid()) {
-                            EntityWrapper animationNode = subTree.FirstChildByName("Shield");
-                            if (animationNode.Valid()) {
-                                Events::AutoAnimationBlend eFireBlend;
-                                eFireBlend.RootNode = root;
-                                eFireBlend.NodeName = "Shield";
-                                eFireBlend.Restart = true;
-                                eFireBlend.Start = true;
-                                m_EventBroker->Publish(eFireBlend);
-                            }
+                        EntityWrapper animationNode = root.FirstChildByName("Shield");
+                        if (animationNode.Valid()) {
+                            Events::AutoAnimationBlend eFireBlend;
+                            eFireBlend.RootNode = root;
+                            eFireBlend.NodeName = "Shield";
+                            eFireBlend.Restart = true;
+                            eFireBlend.Start = true;
+                            m_EventBroker->Publish(eFireBlend);
                         }
                     }
                 }
@@ -159,17 +156,14 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                 if (IsClient) {
                     EntityWrapper root = wi.FirstPersonEntity;
                     if (root.Valid()) {
-                        EntityWrapper subTree = root.FirstChildByName("FinalBlend");
-                        if (subTree.Valid()) {
-                            EntityWrapper animationNode = subTree.FirstChildByName("ActionBlend");
-                            if (animationNode.Valid()) {
-                                Events::AutoAnimationBlend eFireBlend;
-                                eFireBlend.RootNode = root;
-                                eFireBlend.NodeName = "ActionBlend";
-                                eFireBlend.Restart = true;
-                                eFireBlend.Start = true;
-                                m_EventBroker->Publish(eFireBlend);
-                            }
+                        EntityWrapper animationNode = root.FirstChildByName("ActionBlend");
+                        if (animationNode.Valid()) {
+                            Events::AutoAnimationBlend eFireBlend;
+                            eFireBlend.RootNode = root;
+                            eFireBlend.NodeName = "ActionBlend";
+                            eFireBlend.Restart = true;
+                            eFireBlend.Start = true;
+                            m_EventBroker->Publish(eFireBlend);
                         }
                     }
                 }
