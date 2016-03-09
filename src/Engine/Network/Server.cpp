@@ -7,6 +7,8 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
     pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
+    m_ServerName = config->Get<std::string>("Networking.Name", "Unnamed");
+
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
@@ -410,7 +412,7 @@ void Server::parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint)
     Packet packet(MessageType::ServerlistRequest);
     packet.WriteString(m_Reliable.Address());
     packet.WritePrimitive<int>(m_Reliable.Port());
-    packet.WriteString("SERVERNAME");
+    packet.WriteString(m_ServerName);
     packet.WritePrimitive<int>(m_ConnectedPlayers.size());
     m_ServerlistRequest.Send(packet);
 }
