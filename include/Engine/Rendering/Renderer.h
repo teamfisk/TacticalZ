@@ -37,6 +37,7 @@ public:
 		: m_EventBroker(eventBroker)
 		, m_Config(config)
     { }
+	~Renderer();
 
     virtual void Initialize() override;
     virtual void Update(double dt) override;
