@@ -32,6 +32,8 @@ struct SpriteJob : RenderJob
         EndIndex = matProp.material->EndIndex;
 		Matrix = matrix;
         Color = cSprite["Color"];
+        BlurBackground = (bool)cSprite["BlurBackground"];
+
         Entity = cSprite.EntityID;
         Position = Transform::AbsolutePosition(world, cSprite.EntityID);
         Depth = 0;
@@ -65,6 +67,7 @@ struct SpriteJob : RenderJob
 
     bool Pickable;
 	bool IsIndicator = false;
+    bool BlurBackground = false;
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;

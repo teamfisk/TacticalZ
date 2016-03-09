@@ -69,6 +69,8 @@
 							<xs:element ref="c:ScoreScreen" minOccurs="0"/>
 							<xs:element ref="c:ScoreIdentity" minOccurs="0"/>
 							<xs:element ref="c:NetworkComponent" minOccurs="0"/>
+							<xs:element ref="c:ServerIdentity" minOccurs="0"/>
+							<xs:element ref="c:ServerList" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>
