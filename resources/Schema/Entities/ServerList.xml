@@ -36,7 +36,7 @@
           <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
           <BlurBackground>true</BlurBackground>
           <GlowMap></GlowMap>
-          <Color A="0.588235319" B="0" G="0" R="0"/>
+          <Color A="0.196078435" B="0" G="0" R="0"/>
         </c:Sprite>
         <c:Transform>
           <Scale X="0.300000012" Y="0.5" Z="1"/>

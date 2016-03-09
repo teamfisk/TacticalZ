@@ -4,7 +4,7 @@ SSAOPass::SSAOPass(IRenderer* renderer, ConfigFile* config)
 	: m_Renderer(renderer)
 	, m_Config(config)
 {
-	m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
+	m_WhiteTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/White.png");
 
 	ChangeQuality(m_Config->Get<int>("SSAO.Quality", 0));
 

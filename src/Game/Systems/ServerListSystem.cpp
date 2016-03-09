@@ -37,11 +37,12 @@ bool ServerListSystem::OnServerListRecieved(const Events::DisplayServerlist& e)
         for (int i = 0; i < e.Serverlist.size(); i++) {
             //Create Identities for each server and place them on the right position.
             EntityWrapper newIdentity = SpawnerSystem::Spawn(identitySpawner, identitySpawner);
+            EntityWrapper serverIdentityEntity = newIdentity.FirstChildByName("ServerIdentity");
 
             glm::vec3 offset = (glm::vec3)serverListEntity["ServerList"]["Offset"];
-            (glm::vec3&)newIdentity["Transform"]["Position"] = offset * (float)i;
+            (glm::vec3&)serverIdentityEntity["Transform"]["Position"] = offset * (float)i;
 
-            auto& cIdentity = newIdentity["ServerIdentity"];
+            auto& cIdentity = serverIdentityEntity["ServerIdentity"];
             (std::string&)cIdentity["IP"] = e.Serverlist[i].Address;
             (std::string&)cIdentity["ServerName"] = e.Serverlist[i].Name;
             (int&)cIdentity["Port"] = e.Serverlist[i].Port;
