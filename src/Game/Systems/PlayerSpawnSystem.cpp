@@ -154,7 +154,7 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         if (e.Command == "PickTeam") {
             iter->Team = (ComponentInfo::EnumType)e.Value;
         } else {
-            iter->Class = static_cast<PlayerClass>(e.Value);
+            iter->Class = static_cast<PlayerClass>((int)e.Value);
         }
     } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
         // If player is not in queue to spawn, then create a spawn request, 
@@ -168,7 +168,7 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
             // Should never get here, since you should have picked a team before you ever get a chance to pick class.
             LOG_WARNING("Sequence error: Should not be able to pick class before team");
             req.Team = 1;           // TODO: 1 Signifies spectator, should probably have real enum here later.
-            req.Class = static_cast<PlayerClass>(e.Value);
+            req.Class = static_cast<PlayerClass>((int)e.Value);
         }
         m_SpawnRequests.push_back(req);
     } else {
