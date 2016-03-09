@@ -108,7 +108,7 @@ std::string TextPass::parseColors(std::string text, std::map<int, glm::vec4>& co
 				}
 			}
 
-			if ((*(c + 1) >= '1' && *(c + 1) <= '9') || *(c + 1) <= 'B' || *(c + 1) <= 'E' || *(c + 1) <= 'F') { // Icons
+			if ((*(c + 1) >= '1' && *(c + 1) <= '9') || *(c + 1) == 'B' || *(c + 1) == 'E' || *(c + 1) == 'F') { // Icons
 				if (*(c + 1) >= '1' && *(c + 1) <= '9') {
 					parsedString.replace(c, (c + 2), 1, (*(c + 1) - 48));
 				} else {
