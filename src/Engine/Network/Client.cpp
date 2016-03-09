@@ -188,6 +188,7 @@ void Client::parseTCPConnect(Packet& packet)
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
     m_Unreliable.Send(packet);
+
      //  LOG_INFO("Sent UDP Connect Server");
 }
 
@@ -216,6 +217,9 @@ void Client::parseServerlist(Packet& packet)
 {
     // Pop packetSize, group, groupIndex and groupSize.
     popNetworkSegmentOfHeader(packet);
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+
     std::string address = packet.ReadString();
     int port = packet.ReadPrimitive<int>();
     std::string serverName = packet.ReadString();
@@ -479,7 +483,7 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            //m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
+            m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
             m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -557,6 +561,7 @@ bool Client::OnConnectRequest(const Events::ConnectRequest& e)
 {
     removeWorld();
     if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) {
+        m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         // The client sent a successful connect message
         return true;
 

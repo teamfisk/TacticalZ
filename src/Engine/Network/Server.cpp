@@ -69,7 +69,11 @@ void Server::Update()
         localArea.Endpoint = boost::asio::ip::udp::endpoint();
         m_ServerlistRequest.Receive(packet, localArea);
         if (packet.GetMessageType() == MessageType::ServerlistRequest) {
+            // Pop header
             popNetworkSegmentOfHeader(packet);
+            packet.ReadPrimitive<int>();
+            packet.ReadPrimitive<int>();
+
             int port = packet.ReadPrimitive<int>();
             std::string address = localArea.Endpoint.address().to_string();
             parseServerlistRequest(boost::asio::ip::udp::endpoint(boost::asio::ip::address().from_string(address), port));
