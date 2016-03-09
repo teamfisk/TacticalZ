@@ -10,31 +10,31 @@ Model::Model(std::string fileName)
 		case RawModel::MaterialType::SingleTextures:
 		{
 			RawModel::MaterialSingleTextures* materialSingleTexture = static_cast<RawModel::MaterialSingleTextures*>(materialProperty.material);
-            materialSingleTexture->ColorMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->ColorMap.TexturePath, false);
-            materialSingleTexture->NormalMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->NormalMap.TexturePath, false);
-            materialSingleTexture->SpecularMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->SpecularMap.TexturePath, false);
-            materialSingleTexture->IncandescenceMap.Texture = CommonFunctions::LoadTexture(materialSingleTexture->IncandescenceMap.TexturePath, false);
+            materialSingleTexture->ColorMap.Texture = CommonFunctions::TryLoadResource<Texture, false>(materialSingleTexture->ColorMap.TexturePath);
+            materialSingleTexture->NormalMap.Texture = CommonFunctions::TryLoadResource<Texture, false>(materialSingleTexture->NormalMap.TexturePath);
+            materialSingleTexture->SpecularMap.Texture = CommonFunctions::TryLoadResource<Texture, false>(materialSingleTexture->SpecularMap.TexturePath);
+            materialSingleTexture->IncandescenceMap.Texture = CommonFunctions::TryLoadResource<Texture, false>(materialSingleTexture->IncandescenceMap.TexturePath);
 		}
 			break;
 		case RawModel::MaterialType::SplatMapping:
 		{
 			RawModel::MaterialSplatMapping* materialSplatMapping = static_cast<RawModel::MaterialSplatMapping*>(materialProperty.material);
-			materialSplatMapping->SplatMap.Texture = CommonFunctions::LoadTexture(materialSplatMapping->SplatMap.TexturePath, false);
+			materialSplatMapping->SplatMap.Texture = CommonFunctions::TryLoadResource<Texture, false>(materialSplatMapping->SplatMap.TexturePath);
 			for (auto& texture : materialSplatMapping->ColorMaps)
 			{
-				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
+				texture.Texture = CommonFunctions::TryLoadResource<Texture, false>(texture.TexturePath);
 			}
 			for (auto& texture : materialSplatMapping->NormalMaps)
 			{
-				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
+				texture.Texture = CommonFunctions::TryLoadResource<Texture, false>(texture.TexturePath);
 			}
 			for (auto& texture : materialSplatMapping->SpecularMaps)
 			{
-				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
+				texture.Texture = CommonFunctions::TryLoadResource<Texture, false>(texture.TexturePath);
 			}
 			for (auto& texture : materialSplatMapping->IncandescenceMaps)
 			{
-				texture.Texture = CommonFunctions::LoadTexture(texture.TexturePath, false);
+				texture.Texture = CommonFunctions::TryLoadResource<Texture, false>(texture.TexturePath);
 			}
 		}
 			break;

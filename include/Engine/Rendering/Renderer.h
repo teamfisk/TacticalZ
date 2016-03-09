@@ -18,6 +18,7 @@
 #include "DrawColorCorrectionPass.h"
 #include "SSAOPass.h"
 #include "CubeMapPass.h"
+#include "BlurHUD.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
@@ -36,6 +37,7 @@ public:
 		: m_EventBroker(eventBroker)
 		, m_Config(config)
     { }
+	~Renderer();
 
     virtual void Initialize() override;
     virtual void Update(double dt) override;
@@ -75,6 +77,7 @@ private:
     DrawColorCorrectionPass* m_DrawColorCorrectionPass;
 	SSAOPass* m_SSAOPass;
     CubeMapPass* m_CubeMapPass;
+    BlurHUD* m_BlurHUDPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();

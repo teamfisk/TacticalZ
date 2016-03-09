@@ -8,14 +8,15 @@ UDPClient::UDPClient()
 UDPClient::~UDPClient()
 { }
 
-void UDPClient::Connect(std::string playerName, std::string address, int port)
+bool UDPClient::Connect(std::string playerName, std::string address, int port)
 {
     if (m_Socket) {
-        return;
+        return false;
     }
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address().from_string(address), port);
     m_Socket = boost::shared_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService));
     m_Socket->open(boost::asio::ip::udp::v4());
+    return true;
 }
 
 void UDPClient::Disconnect()
@@ -25,22 +26,59 @@ void UDPClient::Disconnect()
 
 void UDPClient::Receive(Packet& packet)
 {
-    // int bytesRead = readBuffer();
-     //if (bytesRead > 0) {
-     //    packet.ReconstructFromData(m_ReadBuffer, bytesRead);
-     //}
+    int bytesRead = readBuffer();
+    if (bytesRead > 0) {
+        packet.ReconstructFromData(m_ReadBuffer, bytesRead);
+    }
 }
 
 void UDPClient::ReceivePackets()
 {
-    readBuffer();
+    readPartOfPacket();
 }
-
 
 int UDPClient::readBuffer()
 {
     if (!m_Socket) {
         return 0;
+    }
+    boost::system::error_code error;
+    // Read size of packet
+    m_Socket->receive(boost
+        ::asio::buffer((void*)m_ReadBuffer, sizeof(int)),
+        boost::asio::ip::udp::socket::message_peek, error);
+    int sizeOfPacket = 0;
+    memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
+    if (sizeOfPacket > m_Socket->available()) {
+        LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
+        //return 0;
+    }
+    // if the buffer is to small increase the size of it
+    if (sizeOfPacket > m_BufferSize) {
+        delete[] m_ReadBuffer;
+        m_ReadBuffer = new char[sizeOfPacket];
+        m_BufferSize = sizeOfPacket;
+    }
+
+    size_t availableData = m_Socket->available();
+    // Read the rest of the message
+    size_t bytesReceived = m_Socket->receive_from(boost
+        ::asio::buffer((void*)(m_ReadBuffer),
+            sizeOfPacket),
+        m_ReceiverEndpoint, 0, error);
+    if (error) {
+        //LOG_ERROR("receive: %s", error.message().c_str());
+    }
+    if (sizeOfPacket > 1000000)
+        LOG_WARNING("The packets received are bigger than 1MB");
+
+    return bytesReceived;
+}
+
+void UDPClient::readPartOfPacket()
+{
+    if (!m_Socket) {
+        return;
     }
     boost::system::error_code error;
     // Peek header
@@ -51,7 +89,7 @@ int UDPClient::readBuffer()
     int sizeOfPacket = 0;
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
     if (sizeOfPacket == 0) {
-        return 0;
+        return;
     }
     int packetGroup = 0;
     memcpy(&packetGroup, m_ReadBuffer + sizeof(int), sizeof(int));
@@ -80,7 +118,7 @@ int UDPClient::readBuffer()
     // Might want to do this earlier when i figure out a good way to 
     // remove data from network buffer.
     if (hasReceivedPacket(packetGroup, packetGroupIndex)) {
-        return 0;
+        return;
     }
     //std::map<unsigned int, std::vector<std::pair<unsigned int, boost::shared_ptr<char>>>> packetSegmentMap;
     // If group exists
@@ -89,7 +127,7 @@ int UDPClient::readBuffer()
     } else { // Create group and add element
         m_PacketSegmentMap[packetGroup].push_back(std::make_pair(packetGroupIndex, std::move(packetData)));
     }
-    return bytesReceived;
+    return;
 }
 
 bool UDPClient::hasReceivedPacket(int packetGroup, int groupIndex)
@@ -154,9 +192,9 @@ bool UDPClient::GetNextPacket(Packet & packet)
             continue;
         }
         if (headerInfoPacket.GetMessageType() == MessageType::Snapshot && lastReceivedSnapshotGroup > headerInfoPacket.Group()) {
-           it = m_PacketSegmentMap.erase(it);
-           continue;
-           //LOG_INFO("Deleted old entry");
+            it = m_PacketSegmentMap.erase(it);
+            continue;
+            //LOG_INFO("Deleted old entry");
         }
         if (currentVector.size() == groupSize) {
             std::sort(currentVector.begin(), currentVector.end());

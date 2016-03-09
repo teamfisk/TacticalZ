@@ -38,11 +38,14 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
             double animationSpeed = (double)autoBlendJob.AnimationEntity["Animation"]["Speed"];
             double animationTime = (double)autoBlendJob.AnimationEntity["Animation"]["Time"];
 
-
-            if ((bool)autoBlendJob.AnimationEntity["Animation"]["Reverse"]) {
-                AnimationDuration = (animation->Duration * animationSpeed) - (animation->Duration - animationTime);
+            if (animationSpeed != 0) {
+                if ((bool)autoBlendJob.AnimationEntity["Animation"]["Reverse"]) {
+                    AnimationDuration = (animation->Duration / animationSpeed) - (animation->Duration - animationTime);
+                } else {
+                    AnimationDuration = (animation->Duration / animationSpeed) - animationTime;
+                }
             } else {
-                AnimationDuration = (animation->Duration * animationSpeed) - animationTime;
+                return;
             }
 
             blendNode.StartTime += AnimationDuration;
@@ -74,7 +77,6 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
             }
         }
     }
-
 
     m_BlendQueue.clear();
     m_BlendQueue.push_back(blendNode);
@@ -124,7 +126,7 @@ bool AutoBlendQueue::HasActiveBlendJob()
             try {
                 model = ResourceManager::Load<::Model, true>(blendJob.RootNode["Model"]["Resource"]);
             } catch (const std::exception&) {
-                m_BlendQueue.pop_front();
+                //m_BlendQueue.pop_front();
                 return HasActiveBlendJob();
             }
 

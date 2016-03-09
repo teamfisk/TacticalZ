@@ -37,8 +37,7 @@ void AmmoPickupSystem::Update(double dt)
 
                 //erase the current element (somePickup)
                 it = m_ETriggerTouchVector.erase(it);
-            }
-            else { 
+            } else {
                 it++;
             }
         }
@@ -48,13 +47,65 @@ void AmmoPickupSystem::Update(double dt)
                 m_PickupAtMaximum.erase(it);
                 break;
             }
-            if ((int)it->player["AssaultWeapon"]["Ammo"] < (int)it->player["AssaultWeapon"]["MaxAmmo"]) {
+            if (!DoesPlayerHaveMaxAmmo(it->player)) {
                 DoPickup(it->player, it->trigger);
                 m_PickupAtMaximum.erase(it);
                 break;
             }
         }
     }
+}
+bool AmmoPickupSystem::DoesPlayerHaveMaxAmmo(EntityWrapper &player) {
+    PlayerClass playerClass = DetermineClass(player);
+    if (playerClass == PlayerClass::Defender) {
+        return !((int)player["DefenderWeapon"]["Ammo"] < (int)player["DefenderWeapon"]["MaxAmmo"]);
+    } else if (playerClass == PlayerClass::Sniper) {
+        return !((int)player["SniperWeapon"]["Ammo"] < (int)player["SniperWeapon"]["MaxAmmo"]);
+    } else if (playerClass == PlayerClass::Assault) {
+        return !((int)player["AssaultWeapon"]["Ammo"] < (int)player["AssaultWeapon"]["MaxAmmo"]);
+    } else {
+        return false;
+    }
+}
+void AmmoPickupSystem::SetPlayerAmmo(EntityWrapper &player, int ammoGain) {
+    int maxWeaponAmmo = GetPlayerMaxAmmo(player);
+
+    PlayerClass playerClass = DetermineClass(player);
+    if (playerClass == PlayerClass::Defender) {
+        (int&)player["DefenderWeapon"]["Ammo"] = std::min((int)player["DefenderWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
+    } else if (playerClass == PlayerClass::Sniper) {
+        (int&)player["SniperWeapon"]["Ammo"] = std::min((int)player["SniperWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
+    } else if (playerClass == PlayerClass::Assault) {
+        (int&)player["AssaultWeapon"]["Ammo"] = std::min((int)player["AssaultWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
+    } else {
+        //unknown class - ignore
+    }
+}
+int AmmoPickupSystem::GetPlayerMaxAmmo(EntityWrapper &player) {
+    PlayerClass playerClass = DetermineClass(player);
+    if (playerClass == PlayerClass::Defender) {
+        return (int)player["DefenderWeapon"]["MaxAmmo"];
+    } else if (playerClass == PlayerClass::Sniper) {
+        return (int)player["SniperWeapon"]["MaxAmmo"];
+    } else if (playerClass == PlayerClass::Assault) {
+        return (int)player["AssaultWeapon"]["MaxAmmo"];
+    } else {
+        return -1;
+    }
+}
+AmmoPickupSystem::PlayerClass AmmoPickupSystem::DetermineClass(EntityWrapper &player)
+{
+    //determine the class based on what component the inflictor-player has
+    if (m_World->HasComponent(player.ID, "DashAbility")) {
+        return PlayerClass::Assault;
+    }
+    if (m_World->HasComponent(player.ID, "ShieldAbility")) {
+        return PlayerClass::Defender;
+    }
+    if (m_World->HasComponent(player.ID, "SprintAbility")) {
+        return PlayerClass::Sniper;
+    }
+    return PlayerClass::None;
 }
 
 bool AmmoPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
@@ -63,7 +114,7 @@ bool AmmoPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
         return false;
     }
     //TODO: add other weapontypes
-    if (!e.Entity.HasComponent("AssaultWeapon")) {
+    if (DetermineClass(e.Entity) == PlayerClass::None) {
         return false;
     }
     if (!e.Trigger.HasComponent("AmmoPickup")) {
@@ -71,7 +122,7 @@ bool AmmoPickupSystem::OnTriggerTouch(Events::TriggerTouch& e)
     }
 
     //if at maxammo, save the trigger-touch to a vector since standing inside it will not re-trigger the trigger
-    if ((int)e.Entity["AssaultWeapon"]["Ammo"] >= (int)e.Entity["AssaultWeapon"]["MaxAmmo"]) {
+    if (DoesPlayerHaveMaxAmmo(e.Entity)) {
         m_PickupAtMaximum.push_back({ e.Entity, e.Trigger });
         return false;
     }
@@ -85,19 +136,16 @@ bool AmmoPickupSystem::OnAmmoPickup(Events::AmmoPickup & e)
         return false;
     }
     //TODO: add other weapontypes
-    if (!e.Player.HasComponent("AssaultWeapon")) {
+    if (DetermineClass(e.Player) == PlayerClass::None) {
         return false;
     }
-    int maxWeaponAmmo = (int)e.Player["AssaultWeapon"]["MaxAmmo"];
-    int& currentAmmo = (int)e.Player["AssaultWeapon"]["Ammo"];
     //cant pick up ammopacks if you are already at MaxAmmo
-    if (currentAmmo >= maxWeaponAmmo) {
+    if (DoesPlayerHaveMaxAmmo(e.Player)) {
         return false;
     }
+    SetPlayerAmmo(e.Player, e.AmmoGain);
 
-    currentAmmo = std::min(currentAmmo + e.AmmoGain, maxWeaponAmmo);
-
-    return false;
+    return true;
 }
 
 bool AmmoPickupSystem::OnTriggerLeave(Events::TriggerLeave& e) {
@@ -119,7 +167,7 @@ void AmmoPickupSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger) {
     if (!trigger.Valid()) {
         return;
     }
-    int maxWeaponAmmo = (int)player["AssaultWeapon"]["MaxAmmo"];
+    int maxWeaponAmmo = GetPlayerMaxAmmo(player);
     int ammoGiven = 0.01*(double)trigger["AmmoPickup"]["AmmoGain"] * maxWeaponAmmo;
 
     Events::AmmoPickup ePlayerAmmoPickup;

@@ -9,9 +9,14 @@ DrawBloomPass::DrawBloomPass(IRenderer* renderer, ConfigFile* config)
 	ChangeQuality(m_Config->Get<int>("GLOW.Quality", 2));
 }
 
+DrawBloomPass::~DrawBloomPass() {
+	CommonFunctions::DeleteTexture(&m_GaussianTexture_horiz);
+	CommonFunctions::DeleteTexture(&m_GaussianTexture_vert);
+}
+
 void DrawBloomPass::InitializeTextures()
 {
-    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+    m_BlackTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Black.png");
 }
 
 void DrawBloomPass::ChangeQuality(int quality)

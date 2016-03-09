@@ -13,7 +13,7 @@ public:
     UDPClient();
     ~UDPClient();
 
-    void Connect(std::string playerName, std::string address, int port);
+    bool Connect(std::string playerName, std::string address, int port);
     void Disconnect();
     void Receive(Packet& packet);
     void ReceivePackets();
@@ -29,6 +29,7 @@ private:
     boost::shared_ptr<boost::asio::ip::udp::socket> m_Socket;
     int lastReceivedSnapshotGroup = 0;
     int readBuffer();
+    void readPartOfPacket();
     PacketID m_SendPacketID = 0;
     //map:(packetGroup, vector:(pair:(groupIndex, packetData)))
     std::map<unsigned int, std::vector<std::pair<int, boost::shared_ptr<char>>>> m_PacketSegmentMap;
