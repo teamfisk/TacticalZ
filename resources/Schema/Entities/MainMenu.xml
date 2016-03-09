@@ -13,7 +13,7 @@
       <Components>
         <c:Transform>
           <Position X="-0.443000019" Y="0.0400000028" Z="0"/>
-          <Orientation X="0" Y="1.08500004" Z="0"/>
+          <Orientation X="0" Y="0.867000043" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -30,7 +30,7 @@
                   <BlurBackground>true</BlurBackground>
                   <GlowMap></GlowMap>
                   <DepthSort>false</DepthSort>
-                  <Color A="0.196078435" B="0" G="0" R="0"/>
+                  <Color A="0.392156869" B="0" G="0" R="0"/>
                 </c:Sprite>
                 <c:InputCmdButton>
                   <Command>Play</Command>
@@ -52,52 +52,45 @@
                   </Alignment>
                 </c:Text>
                 <c:Transform>
-                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00100000005"/>
+                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00499999989"/>
                   <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
                 </c:Transform>
               </Components>
               <Children/>
             </Entity>
-          </Children>
-        </Entity>
-        <Entity name="ButtonPos_2">
-          <Components>
-            <c:Transform>
-              <Position X="0" Y="-0.0700000003" Z="0"/>
-            </c:Transform>
-          </Components>
-          <Children>
-            <Entity name="Button_2">
+            <Entity name="ButtonCorner_Origin">
               <Components>
-                <c:Button/>
-                <c:Sprite>
-                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-                  <BlurBackground>true</BlurBackground>
-                  <GlowMap></GlowMap>
-                  <DepthSort>false</DepthSort>
-                  <Color A="0.196078435" B="0" G="0" R="0"/>
-                </c:Sprite>
-                <c:Transform>
-                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
-                </c:Transform>
+                <c:Transform/>
               </Components>
-              <Children/>
-            </Entity>
-            <Entity name="Text">
-              <Components>
-                <c:Text>
-                  <Content>Option</Content>
-                  <Resource>Fonts/DroidSans.ttf,64</Resource>
-                  <Alignment>
-                    <Right/>
-                  </Alignment>
-                </c:Text>
-                <c:Transform>
-                  <Position X="0.0920000076" Y="-0.0150000006" Z="0.00100000005"/>
-                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
-                </c:Transform>
-              </Components>
-              <Children/>
+              <Children>
+                <Entity name="TopRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="BottomRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
+                      <Orientation X="0" Y="0" Z="4.71199989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
             </Entity>
           </Children>
         </Entity>
@@ -116,7 +109,7 @@
                   <BlurBackground>true</BlurBackground>
                   <GlowMap></GlowMap>
                   <DepthSort>false</DepthSort>
-                  <Color A="0.196078435" B="0" G="0" R="0"/>
+                  <Color A="0.392156869" B="0" G="0" R="0"/>
                 </c:Sprite>
                 <c:Transform>
                   <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
@@ -134,11 +127,120 @@
                   </Alignment>
                 </c:Text>
                 <c:Transform>
-                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00100000005"/>
+                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00499999989"/>
                   <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
                 </c:Transform>
               </Components>
               <Children/>
+            </Entity>
+            <Entity name="ButtonCorner_Origin">
+              <Components>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="TopRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="BottomRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
+                      <Orientation X="0" Y="0" Z="4.71199989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ButtonPos_2">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="-0.0700000003" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Button_2">
+              <Components>
+                <c:Button/>
+                <c:Sprite>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <GlowMap></GlowMap>
+                  <DepthSort>false</DepthSort>
+                  <Color A="0.392156869" B="0" G="0" R="0"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Option</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Alignment>
+                    <Right/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0.0920000076" Y="-0.0150000006" Z="0.00499999989"/>
+                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="ButtonCorner_Origin">
+              <Components>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="TopRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="BottomRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
+                      <Orientation X="0" Y="0" Z="4.71199989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
             </Entity>
           </Children>
         </Entity>
@@ -156,7 +258,8 @@
                   <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
                   <BlurBackground>true</BlurBackground>
                   <GlowMap></GlowMap>
-                  <Color A="0.196078435" B="0" G="0" R="0"/>
+                  <DepthSort>false</DepthSort>
+                  <Color A="0.392156869" B="0" G="0" R="0"/>
                 </c:Sprite>
                 <c:Transform>
                   <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
@@ -174,11 +277,45 @@
                   </Alignment>
                 </c:Text>
                 <c:Transform>
-                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00100000005"/>
+                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00499999989"/>
                   <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
                 </c:Transform>
               </Components>
               <Children/>
+            </Entity>
+            <Entity name="ButtonCorner_Origin">
+              <Components>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="TopRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="BottomRight">
+                  <Components>
+                    <c:Sprite>
+                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                      <GlowMap></GlowMap>
+                    </c:Sprite>
+                    <c:Transform>
+                      <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
+                      <Orientation X="0" Y="0" Z="4.71199989"/>
+                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
             </Entity>
           </Children>
         </Entity>

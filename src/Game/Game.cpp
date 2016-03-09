@@ -40,6 +40,7 @@
 #include "Game/Systems/MainMenuSystem.h"
 #include "Game/Systems/ServerListSystem.h"
 #include "Game/Systems/StartSystem.h"
+#include "Rendering/TextureSprite.h"
 
 
 Game::Game(int argc, char* argv[])
@@ -51,6 +52,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
+    ResourceManager::RegisterType<TextureSprite>("TextureSprite");
     ResourceManager::RegisterType<PNG>("Png");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");

@@ -11,7 +11,7 @@ DrawBloomPass::DrawBloomPass(IRenderer* renderer, ConfigFile* config)
 
 void DrawBloomPass::InitializeTextures()
 {
-    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+    m_BlackTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Black.png");
 }
 
 void DrawBloomPass::ChangeQuality(int quality)
