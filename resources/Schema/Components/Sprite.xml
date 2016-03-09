@@ -7,5 +7,6 @@
 	<DepthSort>true</DepthSort>
 	<KeepRatioX>false</KeepRatioX>
 	<KeepRatioY>false</KeepRatioY>
+	<KeepRatio>false</KeepRatio>
 	<BlurBackground>false</BlurBackground>
 </Sprite>

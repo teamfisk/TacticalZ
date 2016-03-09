@@ -49,11 +49,22 @@ struct SpriteJob : RenderJob
         FillColor = fillColor;
         FillPercentage = fillPercentage;
 
+        glm::vec3 scale = Transform::AbsoluteScale(world, cSprite.EntityID);
+
         if((bool)cSprite["KeepRatioX"] == true) {
-            ScaleX = Transform::AbsoluteScale(world, cSprite.EntityID).x;
+            ScaleX = scale.x;
         }
-        if ((bool)cSprite["KeepRatioZ"] == true) {
-            ScaleY = Transform::AbsoluteScale(world, cSprite.EntityID).y;
+        if ((bool)cSprite["KeepRatioY"] == true) {
+            ScaleY = scale.y;
+        }
+        if((bool)cSprite["KeepRatio"] == true) {
+            if(scale.y >= scale.x) {
+                ScaleY = (scale.x)/(scale.y);
+                ScaleX = 1;
+            } else {
+                ScaleY = 1;
+                ScaleX = (scale.x)/(scale.y);
+            }
         }
     };
 
