@@ -15,8 +15,8 @@
 
 struct ExplosionEffectJob : ModelJob
 {
-    ExplosionEffectJob(ComponentWrapper explosionEffectComponent, ::Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matGroup, ComponentWrapper modelComponent, ::World* world, glm::vec4 fillColor, float fillPercentage)
-        : ModelJob(model, camera, matrix, matGroup, modelComponent, world, fillColor, fillPercentage)
+    ExplosionEffectJob(ComponentWrapper explosionEffectComponent, ::Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matGroup, ComponentWrapper modelComponent, ::World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded, bool shadow)
+        : ModelJob(model, camera, matrix, matGroup, modelComponent, world, fillColor, fillPercentage, isShielded, shadow)
     {
         ExplosionOrigin = (glm::vec3)explosionEffectComponent["ExplosionOrigin"];
         TimeSinceDeath = (double)explosionEffectComponent["TimeSinceDeath"];

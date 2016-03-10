@@ -1,20 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+<Entity name="RayRed" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
     <c:Lifetime>
-      <Lifetime>0.25</Lifetime>
+      <Lifetime>0.10000000149011612</Lifetime>
     </c:Lifetime>
-    <c:Model>
-      <Resource>Models/Effects/CylinderShot.mesh</Resource>
-      <Color A="0.149019614" B="0" G="0" R="39.2156868"/>
-      <Transparent>true</Transparent>
-    </c:Model>
     <c:Transform>
-      <Scale X="0.0690000057" Y="0.0690000057" Z="100"/>
+      <Scale X="0" Y="1" Z="1"/>
     </c:Transform>
   </Components>
 
-  <Children/>
+  <Children>
+    <Entity>
+      <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+          <GlowMap></GlowMap>
+          <Color A="0.419607848" B="0" G="0.0470588244" R="3.92156863"/>
+        </c:Sprite>
+        <c:Transform>
+          <Position X="0" Y="0" Z="-0.5"/>
+          <Orientation X="0" Y="-1.57099998" Z="0"/>
+          <Scale X="1" Y="0.0260000005" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+          <GlowMap></GlowMap>
+          <Color A="0.419607848" B="0" G="0.0470588244" R="3.92156863"/>
+        </c:Sprite>
+        <c:Transform>
+          <Position X="0" Y="0" Z="-0.5"/>
+          <Orientation X="0" Y="4.71218538" Z="3.14199996"/>
+          <Scale X="1" Y="0.0260000005" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
 
 </Entity>

@@ -43,6 +43,16 @@ public:
     ~RenderBuffer();
 };
 
+class Texture2DArray : public ResourceType<GL_TEXTURE_2D_ARRAY>
+{
+public:
+	Texture2DArray(GLuint* resourceHandle, GLenum attachment)
+		: ResourceType(resourceHandle, attachment)
+	{ };
+
+	~Texture2DArray();
+};
+
 class FrameBuffer
 {
 public:

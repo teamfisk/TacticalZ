@@ -12,18 +12,6 @@ Texture::Texture(std::string path)
         throw Resource::FailedLoadingException("Texture extension is not .png nor .dds");
     }
 
-    //PNG image(path);
-
-    //if (img->Width == 0 && img->Height == 0 || img->Format == Image::ImageFormat::Unknown) {
-    //    //image = PNG("Textures/Core/ErrorTexture.png");
-    //    //return; // Temporary fix to remove crash
-
-    //    if (img->Width == 0 && img->Height == 0 || img->Format == Image::ImageFormat::Unknown) {
-    //        LOG_ERROR("Couldn't even load the error texture. This is a dark day indeed.");
-    //        return;
-    //    }
-    //}
-
     this->Width = img->Width;
     this->Height = img->Height;
 
@@ -38,6 +26,7 @@ Texture::Texture(std::string path)
     }
 
     // Construct the OpenGL texture
+
     glGenTextures(1, &m_Texture);
     glBindTexture(GL_TEXTURE_2D, m_Texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

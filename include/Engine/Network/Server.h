@@ -21,6 +21,9 @@
 #include "Core/EEntityDeleted.h"
 #include "Core/EComponentDeleted.h"
 #include "Core/EAmmoPickup.h"
+#include "Core/EPlayerDeath.h"
+#include "Network/EPlayerConnected.h"
+#include "Network/EKillDeath.h"
 
 class Server : public Network
 {
@@ -33,7 +36,7 @@ public:
 private:
     // Network channels
     TCPServer m_Reliable;
-    UDPServer m_Unreliable;
+    //UDPServer m_Unreliable;
     UDPServer m_ServerlistRequest;
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
@@ -57,6 +60,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers
     std::clock_t m_StartPingTime;
+    std::string m_ServerName = "";
 
     // Packet loss logic
     PacketID m_PacketID = 0;
@@ -77,12 +81,14 @@ private:
     void parseOnPlayerDamage(Packet& packet);
     void identifyPacketLoss();
     void kick(PlayerID player);
-    PlayerID GetPlayerIDFromEndpoint();
+    PlayerID getPlayerIDFromEndpoint();
+    PlayerID getPlayerIDFromEntityID(EntityID entityID);
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
     void parsePing();
     bool parseDoubleJump(Packet& packet);
+    void parseDashEffect(Packet& packet);
     void parseUDPConnect(Packet& packet);
     void parseTCPConnect(Packet& packet);
     void parseDisconnect();
@@ -102,6 +108,8 @@ private:
     bool OnPlayerDamage(const Events::PlayerDamage& e);
     EventRelay<Server, Events::AmmoPickup> m_EAmmoPickup;
     bool OnAmmoPickup(const Events::AmmoPickup& e);
+    EventRelay<Server, Events::PlayerDeath> m_EPlayerDeath;
+    bool OnPlayerDeath(const Events::PlayerDeath& e);
 };
 
 #endif

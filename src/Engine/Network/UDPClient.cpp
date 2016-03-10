@@ -10,14 +10,15 @@ UDPClient::~UDPClient()
 { 
 }
 
-void UDPClient::Connect(std::string playerName, std::string address, int port)
+bool UDPClient::Connect(std::string playerName, std::string address, int port)
 {
     if (m_Socket) {
-        return;
+        return false;
     }
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address().from_string(address), port);
     m_Socket = boost::shared_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService));
     m_Socket->open(boost::asio::ip::udp::v4());
+    return true;
 }
 
 void UDPClient::Disconnect()
@@ -45,7 +46,10 @@ int UDPClient::readBuffer()
          boost::asio::ip::udp::socket::message_peek, error);
     int sizeOfPacket = 0;
     memcpy(&sizeOfPacket, m_ReadBuffer, sizeof(int));
-
+    if (sizeOfPacket > m_Socket->available()) {
+        LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
+        //return 0;
+    }
     // if the buffer is to small increase the size of it
     if (sizeOfPacket > m_BufferSize) {
         delete[] m_ReadBuffer;

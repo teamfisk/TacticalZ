@@ -11,7 +11,7 @@ class Texture : public BaseTexture
 {
 	friend class ResourceManager;
 
-private:
+protected:
 	Texture(std::string path);
 
 public:

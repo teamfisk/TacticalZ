@@ -24,6 +24,13 @@ RenderBuffer::~RenderBuffer()
     }
 }
 
+Texture2DArray::~Texture2DArray()
+{
+	if (m_ResourceHandle != 0) {
+		glDeleteTextures(1, m_ResourceHandle);
+	}
+}
+
 
 FrameBuffer::~FrameBuffer()
 {
@@ -53,11 +60,14 @@ void FrameBuffer::Generate()
 		case GL_TEXTURE_2D:
 			glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
 			GLERROR("FrameBuffer generate: glFramebufferTexture2D");
-
 			break;
 		case GL_RENDERBUFFER:
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle);
 			GLERROR("FrameBuffer generate: glFramebufferRenderbuffer");
+			break;
+		case GL_TEXTURE_2D_ARRAY:
+			glFramebufferTexture(GL_FRAMEBUFFER, (*it)->m_Attachment, *(*it)->m_ResourceHandle, 0);
+			GLERROR("FrameBuffer generate: glFramebufferTexture2DArray");
 			break;
 		}
 		GLERROR("2");
@@ -70,7 +80,7 @@ void FrameBuffer::Generate()
 	}
 	GLERROR("3");
 
-    GLenum* bufferTextures = &attachments[0];
+    GLenum* bufferTextures = attachments.data();
     glDrawBuffers(attachments.size(), bufferTextures);
     if (GLERROR("GLBufferAttachement error")) {
         printf(": AttachmentSize %i", attachments.size());

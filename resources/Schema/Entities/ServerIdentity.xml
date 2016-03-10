@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ServerIdentity_Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="ServerIdentity">
+      <Components>
+        <c:ServerIdentity/>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="IP">
+          <Components>
+            <c:Text>
+              <Content>123.123.123.123</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Color A="1" B="0" G="0" R="0"/>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:TextFieldReader>
+              <ParentEntityName>ServerIdentity</ParentEntityName>
+              <ComponentType>ServerIdentity</ComponentType>
+              <Field>IP</Field>
+            </c:TextFieldReader>
+            <c:Transform>
+              <Position X="-0.200000003" Y="-0.100000001" Z="0"/>
+              <Scale X="0.649999976" Y="0.649999976" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Port">
+          <Components>
+            <c:Text>
+              <Content>65999</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Color A="1" B="0" G="0" R="0"/>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:TextFieldReader>
+              <ParentEntityName>ServerIdentity</ParentEntityName>
+              <ComponentType>ServerIdentity</ComponentType>
+              <Field>Port</Field>
+            </c:TextFieldReader>
+            <c:Transform>
+              <Position X="4.70000029" Y="-0.100000001" Z="0"/>
+              <Scale X="0.649999976" Y="0.649999976" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="ServerName">
+          <Components>
+            <c:Text>
+              <Content>UnkownServer</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Color A="1" B="0" G="0" R="0"/>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:TextFieldReader>
+              <ParentEntityName>ServerIdentity</ParentEntityName>
+              <ComponentType>ServerIdentity</ComponentType>
+              <Field>ServerName</Field>
+            </c:TextFieldReader>
+            <c:Transform>
+              <Position X="-8.60000038" Y="-0.100000001" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlayersConnected">
+          <Components>
+            <c:Text>
+              <Content>0</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Color A="1" B="0" G="0" R="0"/>
+              <Alignment>
+                <Left/>
+              </Alignment>
+            </c:Text>
+            <c:TextFieldReader>
+              <ParentEntityName>ServerIdentity</ParentEntityName>
+              <ComponentType>ServerIdentity</ComponentType>
+              <Field>PlayersConnected</Field>
+            </c:TextFieldReader>
+            <c:Transform>
+              <Position X="7.80000019" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="ServerIdentityConnect">
+          <Components>
+            <c:Button/>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <BlurBackground>true</BlurBackground>
+              <GlowMap></GlowMap>
+              <DepthSort>false</DepthSort>
+              <Color A="0.588235319" B="1" G="1" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0.100000001" Y="0.496000022" Z="0"/>
+              <Scale X="18.1000004" Y="2" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -9,9 +9,14 @@ DrawBloomPass::DrawBloomPass(IRenderer* renderer, ConfigFile* config)
 	ChangeQuality(m_Config->Get<int>("GLOW.Quality", 2));
 }
 
+DrawBloomPass::~DrawBloomPass() {
+	CommonFunctions::DeleteTexture(&m_GaussianTexture_horiz);
+	CommonFunctions::DeleteTexture(&m_GaussianTexture_vert);
+}
+
 void DrawBloomPass::InitializeTextures()
 {
-    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
+    m_BlackTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Black.png");
 }
 
 void DrawBloomPass::ChangeQuality(int quality)
@@ -45,6 +50,7 @@ void DrawBloomPass::InitializeShaderPrograms()
 		m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_horiz.vert.glsl")));
 		m_GaussianProgram_horiz->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_horiz.frag.glsl")));
 		m_GaussianProgram_horiz->Compile();
+        m_GaussianProgram_horiz->BindFragDataLocation(0, "fragmentColor");
 		m_GaussianProgram_horiz->Link();
 	}
 
@@ -53,6 +59,7 @@ void DrawBloomPass::InitializeShaderPrograms()
 		m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/Gaussian_vert.vert.glsl")));
 		m_GaussianProgram_vert->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Gaussian_vert.frag.glsl")));
 		m_GaussianProgram_vert->Compile();
+        m_GaussianProgram_vert->BindFragDataLocation(0, "fragmentColor");
 		m_GaussianProgram_vert->Link();
 	}
 }

@@ -33,7 +33,9 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &Client::OnDashAbility);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
+    EVENT_SUBSCRIBE_MEMBER(m_EConnectRequest, &Client::OnConnectRequest);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
     if (address.empty()) {
@@ -48,16 +50,16 @@ void Client::Connect(std::string address, int port)
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    while (m_Unreliable.IsSocketAvailable()) {
-        // Packet will get real data in receive
-        Packet packet(MessageType::Invalid);
-        m_Unreliable.Receive(packet);
-        if (packet.GetMessageType() == MessageType::Connect) {
-            parseUDPConnect(packet);
-        } else {
-            parseMessageType(packet);
-        }
-    }
+    //while (m_Unreliable.IsSocketAvailable()) {
+    //    // Packet will get real data in receive
+    //    Packet packet(MessageType::Invalid);
+    //    m_Unreliable.Receive(packet);
+    //    if (packet.GetMessageType() == MessageType::Connect) {
+    //        parseUDPConnect(packet);
+    //    } else {
+    //        parseMessageType(packet);
+    //    }
+    //}
     while (m_Reliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -81,7 +83,10 @@ void Client::Update()
     if (m_SearchingForServers) {
         if (m_SearchingTime < (1000* (std::clock() - m_StartSearchTime) / (double)CLOCKS_PER_SEC)) {
             m_SearchingForServers = false;
-            displayServerlist();
+            //displayServerlist();
+            Events::DisplayServerlist e;
+            e.Serverlist = m_Serverlist;
+            m_EventBroker->Publish(e);
         }
     }
 
@@ -143,6 +148,9 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
         break;
+    case MessageType::OnDashEffect:
+        parseDashEffect(packet);
+        break;
     case MessageType::AmmoPickup:
         parseAmmoPickup(packet);
         break;
@@ -173,8 +181,8 @@ void Client::parseTCPConnect(Packet& packet)
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
-    m_Unreliable.Send(packet);
-    LOG_INFO("Sent UDP Connect Server");
+    //   m_Unreliable.Send(packet);
+     //  LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -262,7 +270,7 @@ void Client::parseEntityDeletion(Packet & packet)
     if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
         EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
         if (m_World->ValidEntity(localEntity)) {
-            if (m_World->HasComponent(localEntity,"Player")) {
+            if (m_World->HasComponent(localEntity, "Player")) {
                 Events::PlayerDeath e;
                 e.Player = EntityWrapper(m_World, localEntity);
                 m_EventBroker->Publish(e);
@@ -297,8 +305,22 @@ void Client::parseDoubleJump(Packet & packet)
     }
 }
 
+
+void Client::parseDashEffect(Packet& packet)
+{
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
+    }
+    Events::DashAbility e;
+    e.Player = m_ServerIDToClientID.at(serverID);
+    if (e.Player != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
+    }
+}
+
 void Client::parseAmmoPickup(Packet & packet)
-{ 
+{
     Events::AmmoPickup e;
     e.AmmoGain = packet.ReadPrimitive<int>();
     e.Player = m_LocalPlayer;
@@ -388,7 +410,7 @@ void Client::parseSnapshot(Packet& packet)
                     if (m_SnapshotFilter != nullptr) {
                         shouldApply = m_SnapshotFilter->FilterComponent(localEntity, newComponent);
                     }
-                    if (shouldApply) {                        
+                    if (shouldApply) {
                         ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
                         memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
                     }
@@ -435,30 +457,26 @@ void Client::parseSnapshot(Packet& packet)
 
 void Client::disconnect()
 {
+    removeWorld();
     m_IsConnected = false;
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
     m_Reliable.Send(packet);
     m_Reliable.Disconnect();
+    createMainMenu();
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    // TEMP
-    if (e.Command == "SearchForServers" && e.Value > 0) {
-        Events::SearchForServers e;
-        m_EventBroker->Publish(e);
-    }
-
     if (e.PlayerID != -1) {
         return false;
     }
 
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
-            m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
+            //m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
+        //    m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -518,12 +536,40 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
     return true;
 }
 
+
+bool Client::OnDashAbility(const Events::DashAbility& e)
+{
+    if (!clientServerMapsHasEntity(e.Player) || e.Player != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDashEffect);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player));
+    m_Reliable.Send(packet);
+    return true;
+}
+
+
+bool Client::OnConnectRequest(const Events::ConnectRequest& e)
+{
+    removeWorld();
+    if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) {
+        // The client sent a successful connect message
+        return true;
+
+    } else {
+        // The client could not send a successful connect message
+        createMainMenu();
+        // Load the main menu again ?
+        return false;
+    }
+    return false;
+}
+
 bool Client::OnSearchForServers(const Events::SearchForServers& e)
 {
     m_SearchingForServers = true;
     m_StartSearchTime = std::clock();
     m_Serverlist.clear();
-    LOG_INFO("Searching for LAN servers...\n");
     Packet packet(MessageType::ServerlistRequest);
     m_ServerlistRequest.Broadcast(packet, 13); // TODO: Config
     return true;
@@ -583,7 +629,7 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
 
-    m_Unreliable.Send(packet);
+    m_Reliable.Send(packet);
 }
 
 void Client::identifyPacketLoss()
@@ -643,6 +689,26 @@ void Client::displayServerlist()
         ServerInfo si = m_Serverlist[i];
         LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
+}
+
+
+void Client::removeWorld()
+{
+    std::vector<EntityID> childrenToBeDeleted;
+    auto rootEntites = m_World->GetDirectChildren(EntityID_Invalid);
+    for (auto it = rootEntites.first; it != rootEntites.second; it++) {
+        childrenToBeDeleted.push_back(it->second);
+    }
+    for (int i = 0; i < childrenToBeDeleted.size(); ++i) {
+        m_World->DeleteEntity(childrenToBeDeleted[i]);
+    }
+}
+
+
+void Client::createMainMenu()
+{
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/StartMenu.xml");
+    entityFile->MergeInto(m_World);
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

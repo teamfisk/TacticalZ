@@ -17,6 +17,7 @@
 #include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
+#include "Core/EntityFile.h"
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
 #include "Core/EPlayerDeath.h"
@@ -28,19 +29,9 @@
 #include "Core/EPlayerSpawned.h"
 #include "Core/EAmmoPickup.h"
 #include "Network/ESearchForServers.h"
-
-struct ServerInfo
-{
-    ServerInfo(std::string a, int b, std::string c, int d)
-    {
-        Address = a; Port = b; Name = c; PlayersConnected = d;
-    }
-    std::string Address = "";
-    int Port = 0;
-    std::string Name = "";
-    int PlayersConnected = 0;
-};
-
+#include "../Game/Events/EDashAbility.h"
+#include "Network/EDisplayServerlist.h"
+#include "Network/EConnectRequest.h"
 class Client : public Network
 {
 public:
@@ -51,7 +42,7 @@ public:
     void Connect(std::string address, int port);
     void Update() override;
 private:
-    UDPClient m_Unreliable;
+    //UDPClient m_Unreliable;
     TCPClient m_Reliable;
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();
@@ -107,6 +98,7 @@ private:
     void parsePlayerDamage(Packet& packet);
     void parseComponentDeletion(Packet& packet);
     void parseDoubleJump(Packet& packet);
+    void parseDashEffect(Packet& packet);
     void parseAmmoPickup(Packet& packet);
     void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
@@ -117,6 +109,8 @@ private:
     void sendLocalPlayerTransform();
     void becomePlayer();
     void displayServerlist();
+    void removeWorld();
+    void createMainMenu();
     // Mapping Logic
     // Returns if local EntityID exist in map
     bool clientServerMapsHasEntity(EntityID clientEntityID);
@@ -135,6 +129,11 @@ private:
     EventRelay< Client, Events::SearchForServers> m_ESearchForServers;
     EventRelay<Client, Events::DoubleJump> m_EDoubleJump;
     bool OnDoubleJump(Events::DoubleJump & e);
+    EventRelay<Client, Events::DashAbility> m_EDashAbility;
+    bool OnDashAbility(const Events::DashAbility& e);
+    EventRelay<Client, Events::ConnectRequest> m_EConnectRequest;
+    bool OnConnectRequest(const Events::ConnectRequest& e);
+
     bool OnSearchForServers(const Events::SearchForServers& e);
     UDPClient m_ServerlistRequest;
     std::vector<ServerInfo> m_Serverlist;

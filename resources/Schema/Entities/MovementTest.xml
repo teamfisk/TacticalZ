@@ -2,21 +2,23 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Transform/>
+    <c:Transform>
+      <Position X="0" Y="-0.872543275" Z="-2.49763942"/>
+    </c:Transform>
   </Components>
 
   <Children>
     <Entity name="RedSpawn">
       <Components>
-        <c:PlayerSpawn/>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/PlayerRed.xml</EntityFile>
-        </c:Spawner>
         <c:Team>
           <Team>
             <Red/>
           </Team>
         </c:Team>
+        <c:PlayerSpawn/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/PlayerDefenderBlue.xml</EntityFile>
+        </c:Spawner>
         <c:Transform>
           <Position X="0.300000012" Y="0.0270000007" Z="0"/>
         </c:Transform>
@@ -26,7 +28,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultRed.mesh</Resource>
               <Color A="1" B="0" G="0" R="1"/>
             </c:Model>
             <c:Transform>
@@ -39,7 +41,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultRed.mesh</Resource>
               <Color A="1" B="0.0117647061" G="0" R="1"/>
             </c:Model>
             <c:Transform>
@@ -52,7 +54,10 @@
     </Entity>
     <Entity name="DirectionalLight">
       <Components>
-        <c:SceneLight/>
+        <c:SceneLight>
+          <Gamma>0.49999982118606567</Gamma>
+          <Exposure>2.5599997043609619</Exposure>
+        </c:SceneLight>
         <c:DirectionalLight/>
         <c:Model>
           <Resource>sModels/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
@@ -76,15 +81,15 @@
     </Entity>
     <Entity name="BlueSpawn">
       <Components>
-        <c:PlayerSpawn/>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/Player.xml</EntityFile>
-        </c:Spawner>
         <c:Team>
           <Team>
             <Blue/>
           </Team>
         </c:Team>
+        <c:PlayerSpawn/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/PlayerAssaultBlue.xml</EntityFile>
+        </c:Spawner>
         <c:Transform>
           <Position X="0.300000012" Y="0.0270000007" Z="6.67400026"/>
         </c:Transform>
@@ -94,11 +99,11 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.800000012" Y="0" Z="0"/>
+              <Position X="-0.600000024" Y="0" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -107,11 +112,53 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.600000024" Y="0" Z="0"/>
+              <Position X="0.800000012" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Arms">
+      <Components>
+        <c:Blend>
+          <Pose1>ActivateDeactive</Pose1>
+          <Pose2></Pose2>
+        </c:Blend>
+        <c:Model>
+          <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="1.30585015" Z="2.01450038"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="ActivateDeactive">
+          <Components>
+            <c:Animation>
+              <AnimationName>ActivateDeactiveShieldF</AnimationName>
+              <Time>0.44649605185380015</Time>
+              <Play>true</Play>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Weapon">
+          <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
+            <c:Model>
+              <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.00681143999" Y="-0.204994932" Z="-0.209244296"/>
+              <Orientation X="-0.581807375" Y="0.562133908" Z="-0.0719003305"/>
             </c:Transform>
           </Components>
           <Children/>
