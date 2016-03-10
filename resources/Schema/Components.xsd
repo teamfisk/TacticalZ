@@ -68,4 +68,5 @@
 	<xs:include schemaLocation="Components/NetworkComponent.xsd"/>
 	<xs:include schemaLocation="Components/ServerIdentity.xsd"/>
 	<xs:include schemaLocation="Components/ServerList.xsd"/>
+	<xs:include schemaLocation="Components/Unpickable.xsd"/>
 </xs:schema>
