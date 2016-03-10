@@ -25,6 +25,7 @@ void CommonFunctions::GenerateMultiSampleTexture(GLuint* texture, int numSamples
 
 void CommonFunctions::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps)
 {
+    glDeleteTextures(1, texture);
 	glGenTextures(1, texture);
 	glBindTexture(GL_TEXTURE_2D, *texture);
 	glTexStorage2D(GL_TEXTURE_2D, numMipMaps, GL_RGBA8, dimensions.x, dimensions.y);
