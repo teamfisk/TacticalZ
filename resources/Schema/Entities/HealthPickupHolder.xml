@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform>
+      <Position X="0" Y="-0.871185362" Z="1.77631724"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Props/PickUps/PickUpHolder.mesh</Resource>
+          <Shadow>false</Shadow>
+        </c:Model>
+        <c:Transform>
+          <Scale X="0.479999989" Y="0.479999989" Z="0.479999989"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Transform>
+          <Position X="0" Y="1.41138339" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Respawn>
+              <Delay>3</Delay>
+            </c:Respawn>
+            <c:RaptorCopter>
+              <Speed>1</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:FloatingEffect>
+              <Period>2</Period>
+              <Time>75.797556530109119</Time>
+              <Axis X="0" Y="0.200000003" Z="0"/>
+            </c:FloatingEffect>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/HealthPickup.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="-0" Y="-0.118795805" Z="-0"/>
+              <Orientation X="0" Y="13.0735149" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>
