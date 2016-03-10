@@ -9,15 +9,23 @@ RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, Rende
     , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
+    EVENT_SUBSCRIBE_MEMBER(m_EResolutionChanged, &RenderSystem::OnResolutionChanged);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &RenderSystem::OnPlayerSpawned);
 
-    m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_Camera = new Camera((float)m_Renderer->GetViewportSize().Width / m_Renderer->GetViewportSize().Height, glm::radians(45.f), 0.01f, 5000.f);
 }
 
 RenderSystem::~RenderSystem()
 {
     delete m_Camera;
+}
+
+bool RenderSystem::OnResolutionChanged(Events::ResolutionChanged& e)
+{
+    // Update camera aspect ration on resolution change
+    m_Camera->SetAspectRatio((float)e.NewResolution.Width / e.NewResolution.Height);
+    return true;
 }
 
 bool RenderSystem::OnSetCamera(Events::SetCamera& e)
