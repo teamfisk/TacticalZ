@@ -1271,14 +1271,15 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
 	glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPos"), 1, glm::value_ptr(scene.Camera->Position()));
+    RenderState* jobState = new RenderState();
+
 
     for(auto& job : jobs) {
         auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
-        RenderState jobState;
 
         if (spriteJob) {
             if(spriteJob->Depth == 0) {
-                jobState.Disable(GL_DEPTH_TEST);
+                jobState->Disable(GL_DEPTH_TEST);
             }
             glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * spriteJob->Matrix));
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(spriteJob->Color));
@@ -1294,6 +1295,8 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
                 glBindTexture(GL_TEXTURE_2D, m_ErrorTexture->m_Texture);
             }
 
+
+
             glActiveTexture(GL_TEXTURE2);
             if (spriteJob->IncandescenceTexture != nullptr) {
                 glBindTexture(GL_TEXTURE_2D, spriteJob->IncandescenceTexture->m_Texture);
@@ -1307,6 +1310,7 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
             glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
         }
     }
+    delete jobState;
    // m_SpriteProgram->Unbind();
 }
 

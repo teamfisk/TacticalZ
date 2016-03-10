@@ -21,13 +21,22 @@ struct SpriteJob : RenderJob
     SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage, bool depthSorted, bool isIndicator)
         : RenderJob()
     {
-        Model = ResourceManager::Load<::Model>("Models/Core/UnitQuad.mesh");
+        Model = ResourceManager::Load<::Model>((std::string)cSprite["Model"]);
         ::RawModel::MaterialProperties matProp = Model->MaterialGroups().front();
         TextureID = 0;
 
         DiffuseTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["DiffuseTexture"]);
-
         IncandescenceTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["GlowMap"]);
+
+        if ((bool)cSprite["Linear"]) {
+            glBindTexture(GL_TEXTURE_2D, DiffuseTexture->m_Texture);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        } else {
+            glBindTexture(GL_TEXTURE_2D, DiffuseTexture->m_Texture);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
 
         StartIndex = matProp.material->StartIndex;
         EndIndex = matProp.material->EndIndex;
@@ -89,6 +98,7 @@ struct SpriteJob : RenderJob
     bool BlurBackground = false;
     float ScaleX = 1;
     float ScaleY = 1;
+    bool Linear = false;
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;
