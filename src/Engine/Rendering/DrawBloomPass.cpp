@@ -200,8 +200,6 @@ void DrawBloomPass::GaussianLodPass(GLuint mipMap, GLuint texture)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
 
-        glBindVertexArray(m_ScreenQuad->VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
         //horizontal pass
@@ -213,8 +211,6 @@ void DrawBloomPass::GaussianLodPass(GLuint mipMap, GLuint texture)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_vert);
 
-        glBindVertexArray(m_ScreenQuad->VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
         m_GaussianFrameBuffer_horiz[mipMap].Unbind();
@@ -227,8 +223,7 @@ void DrawBloomPass::GaussianLodPass(GLuint mipMap, GLuint texture)
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
-    glBindVertexArray(m_ScreenQuad->VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
+
     glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
         , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 
