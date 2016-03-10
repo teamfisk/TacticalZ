@@ -8,7 +8,7 @@
     </c:RaptorCopter>
     <c:Transform>
       <Position X="0" Y="-4" Z="0"/>
-      <Orientation X="0" Y="55.3495064" Z="0"/>
+      <Orientation X="0" Y="58.3794823" Z="0"/>
     </c:Transform>
   </Components>
 
@@ -34,13 +34,49 @@
                 </c:Transform>
               </Components>
               <Children>
+                <Entity name="AssaultClassPick">
+                  <Components>
+                    <c:Button/>
+                    <c:Sprite>
+                      <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Icons/Classes/Assault-01.png</DiffuseTexture>
+                    </c:Sprite>
+                    <c:InputCmdButton>
+                      <Command>PickClass</Command>
+                      <PressValue>1</PressValue>
+                    </c:InputCmdButton>
+                    <c:Transform>
+                      <Position X="-0.150000006" Y="-0.0500000007" Z="0"/>
+                      <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="AssaultText">
+                      <Components>
+                        <c:Text>
+                          <Content>Assault</Content>
+                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Color A="1" B="0" G="1" R="0.784313738"/>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="0.800000012" Z="0"/>
+                          <Scale X="0.310000002" Y="0.310000002" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
                 <Entity name="DefenderClassPick">
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Icons/Classes/Defender-01.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Icons/Classes/Defender-01.png</DiffuseTexture>
                     </c:Sprite>
                     <c:InputCmdButton>
                       <Command>PickClass</Command>
@@ -72,9 +108,10 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Icons/Classes/Sniper-01.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Icons/Classes/Sniper-01.png</DiffuseTexture>
                     </c:Sprite>
                     <c:InputCmdButton>
                       <Command>PickClass</Command>
@@ -90,40 +127,6 @@
                       <Components>
                         <c:Text>
                           <Content>Sniper</Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
-                          <Color A="1" B="0" G="1" R="0.784313738"/>
-                        </c:Text>
-                        <c:Transform>
-                          <Position X="0" Y="0.800000012" Z="0"/>
-                          <Scale X="0.310000002" Y="0.310000002" Z="1"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
-                <Entity name="AssaultClassPick">
-                  <Components>
-                    <c:Button/>
-                    <c:Sprite>
-                      <DiffuseTexture>Textures/Icons/Classes/Assault-01.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
-                      <DepthSort>false</DepthSort>
-                    </c:Sprite>
-                    <c:InputCmdButton>
-                      <Command>PickClass</Command>
-                      <PressValue>1</PressValue>
-                    </c:InputCmdButton>
-                    <c:Transform>
-                      <Position X="-0.150000006" Y="-0.0500000007" Z="0"/>
-                      <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
-                    </c:Transform>
-                  </Components>
-                  <Children>
-                    <Entity name="AssaultText">
-                      <Components>
-                        <c:Text>
-                          <Content>Assault</Content>
                           <Resource>Fonts/DroidSans.ttf,64</Resource>
                           <Color A="1" B="0" G="1" R="0.784313738"/>
                         </c:Text>
@@ -154,9 +157,10 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0" G="1" R="0.509803951"/>
                     </c:Sprite>
                     <c:InputCmdButton>
@@ -232,9 +236,10 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0" G="1" R="0.509803951"/>
                     </c:Sprite>
                     <c:InputCmdButton>
@@ -266,10 +271,11 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
                       <GlowMap></GlowMap>
-                      <DepthSort>false</DepthSort>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0" G="0.294117659" R="0.980392158"/>
+                      <Linear>true</Linear>
                     </c:Sprite>
                     <c:InputCmdButton>
                       <Command>PickTeam</Command>
@@ -300,10 +306,12 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0.980392158" G="0.294117659" R="0"/>
+                      <Linear>true</Linear>
                     </c:Sprite>
                     <c:InputCmdButton>
                       <Command>PickTeam</Command>
@@ -334,9 +342,10 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0" G="1" R="0.509803951"/>
                       <Visible>false</Visible>
                     </c:Sprite>
@@ -422,9 +431,10 @@
                     <Entity name="BackgroundHexagon">
                       <Components>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
                           <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.300000012" B="1" G="1" R="1"/>
                         </c:Sprite>
                         <c:Transform>
@@ -441,9 +451,10 @@
                               <CapturePointNumber>3</CapturePointNumber>
                             </c:CapturePointHUD>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -458,9 +469,10 @@
                     <Entity name="BackgroundHexagon">
                       <Components>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
                           <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                         </c:Sprite>
                         <c:Transform>
@@ -477,9 +489,10 @@
                               <CapturePointNumber>4</CapturePointNumber>
                             </c:CapturePointHUD>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -494,9 +507,10 @@
                     <Entity name="BackgroundHexagon">
                       <Components>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
                           <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.300000012" B="1" G="1" R="1"/>
                         </c:Sprite>
                         <c:Transform>
@@ -513,9 +527,10 @@
                               <CapturePointNumber>2</CapturePointNumber>
                             </c:CapturePointHUD>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -530,9 +545,10 @@
                     <Entity name="BackgroundHexagon">
                       <Components>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
                           <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.300000012" B="1" G="1" R="1"/>
                         </c:Sprite>
                         <c:Transform>
@@ -550,9 +566,10 @@
                               <CapturePointNumber>1</CapturePointNumber>
                             </c:CapturePointHUD>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -567,9 +584,10 @@
                     <Entity name="BackgroundHexagon">
                       <Components>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
                           <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.699999988" B="0" G="0" R="1"/>
                         </c:Sprite>
                         <c:Transform>
@@ -584,9 +602,10 @@
                             </c:Fill>
                             <c:CapturePointHUD/>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -604,9 +623,10 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0" G="1" R="0.509803951"/>
                     </c:Sprite>
                     <c:InputCmdButton>
@@ -651,9 +671,10 @@
                   <Components>
                     <c:Button/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                      <GlowMap></GlowMap>
                       <DepthSort>false</DepthSort>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
+                      <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0" G="1" R="0.509803951"/>
                     </c:Sprite>
                     <c:InputCmdButton>
