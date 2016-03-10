@@ -122,6 +122,7 @@ void Renderer::InputUpdate(double dt)
 
 void Renderer::setWindowSize(Rectangle size)
 {
+    m_Resolution = size;
     glfwSetWindowSize(m_Window, size.Width, size.Height);
 }
 
