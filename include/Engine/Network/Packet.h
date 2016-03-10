@@ -27,7 +27,8 @@ public:
         // Check if we are trying to add more than the package can fit.
         if (m_MaxPacketSize < m_Offset + sizeof(T)) {
             if (m_MaxPacketSize >= 32000) {
-                LOG_WARNING("Package::WritePrimitive(): New size is huge %i bytes\n", m_MaxPacketSize*2);
+                // This will spam couse 8 players are over 100 000 bytes
+                //LOG_WARNING("Package::WritePrimitive(): New size is huge %i bytes\n", m_MaxPacketSize*2);
             }
             resizeData();
         }
