@@ -28,15 +28,7 @@ struct SpriteJob : RenderJob
         DiffuseTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["DiffuseTexture"]);
         IncandescenceTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["GlowMap"]);
 
-        if ((bool)cSprite["Linear"]) {
-            glBindTexture(GL_TEXTURE_2D, DiffuseTexture->m_Texture);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        } else {
-            glBindTexture(GL_TEXTURE_2D, DiffuseTexture->m_Texture);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        }
+        Linear = (bool)cSprite["Linear"];
 
         StartIndex = matProp.material->StartIndex;
         EndIndex = matProp.material->EndIndex;
@@ -60,21 +52,23 @@ struct SpriteJob : RenderJob
 
         glm::vec3 scale = Transform::AbsoluteScale(world, cSprite.EntityID);
 
-        if((bool)cSprite["KeepRatioX"] == true) {
-            ScaleX = scale.x;
-        }
-        if ((bool)cSprite["KeepRatioY"] == true) {
-            ScaleY = scale.y;
-        }
         if((bool)cSprite["KeepRatio"] == true) {
             if(scale.y >= scale.x) {
                 ScaleY = (scale.x)/(scale.y);
-                ScaleX = 1;
+                ScaleX = 1.f;
             } else {
-                ScaleY = 1;
+                ScaleY = 1.f;
                 ScaleX = (scale.x)/(scale.y);
             }
+        } else {
+            if ((bool)cSprite["KeepRatioX"] == true) {
+                ScaleX = scale.x;
+            }
+            if ((bool)cSprite["KeepRatioY"] == true) {
+                ScaleY = scale.y;
+            }
         }
+
     };
 
     unsigned int TextureID;
