@@ -47,6 +47,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
         Enable();
     } else {
         Disable();
+        m_EventBroker->Publish(Events::UnlockMouse());
     }
 }
 
