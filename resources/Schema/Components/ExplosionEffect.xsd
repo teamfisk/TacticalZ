@@ -18,6 +18,8 @@
 				<xs:element name="ExplosionDuration" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>How many seconds the death animation should be</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="Speed" type="t:double" minOccurs="0"/>
+				<xs:element name="Delay" type="t:double" minOccurs="0"/>
 				<!--<xs:element name="Gravity" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Enable/disable gravity</xs:documentation></xs:annotation>
 				</xs:element>-->

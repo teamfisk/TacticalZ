@@ -1,7 +1,9 @@
 #version 430
 
 #define MIN_AMBIENT_LIGHT 0.3
+#define MAX_SPLITS 4
 
+uniform mat4 VM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -84,6 +86,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;
@@ -190,7 +193,7 @@ void main()
 	 									 GlowUVRepeat1, GlowUVRepeat2, GlowUVRepeat3);
 	vec4 specularTexel = CalcBlendedTexel(splatTexel, SpecularMapTexture1, SpecularMapTexture2, SpecularMapTexture3,
 										 SpecularUVRepeat1, SpecularUVRepeat2, SpecularUVRepeat3);
-	vec4 position = V * M * vec4(Input.Position, 1.0); 
+	vec4 position = VM * vec4(Input.Position, 1.0); 
 	//vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, SplatMapTexture);
 	vec4 normal = V * CalcBlendedNormal(splatTexel, NormalMapTexture1, NormalMapTexture2, NormalMapTexture3,
 		   								NormalUVRepeat1, NormalUVRepeat2, NormalUVRepeat3);

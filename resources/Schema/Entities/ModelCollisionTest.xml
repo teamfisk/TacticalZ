@@ -2,63 +2,167 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Transform>
-      <Position X="0" Y="0" Z="-0.313012958"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
-    <Entity>
+    <Entity name="RedSpawn">
       <Components>
-        <c:Camera/>
-        <c:Listener/>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
+        <c:PlayerSpawn/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/PlayerAssaultFallbackRed.xml</EntityFile>
+        </c:Spawner>
         <c:Transform>
-          <Position X="2.56531811" Y="0.637967348" Z="0.202344239"/>
-          <Orientation X="2.68780756" Y="1.36143553" Z="3.14159179"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity>
-      <Components>
-        <c:Collidable/>
-        <c:Model>
-          <Resource>../assets/Models/Core/Tri.obj</Resource>
-          <Color A="1" B="1" G="0.392156869" R="0"/>
-        </c:Model>
-        <c:Transform>
-          <Scale X="2" Y="2" Z="0.200000003"/>
-          <Orientation X="2.70100021" Y="2.37000012" Z="0.266000003"/>
+          <Position X="0.300000012" Y="0.0270000007" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
         <Entity>
           <Components>
+            <c:SpawnPoint/>
             <c:Model>
-              <Resource>../assets/Models/Core/Tri.obj</Resource>
+              <Resource>Models/Characters/Assault/AssaultRed.mesh</Resource>
               <Color A="1" B="0" G="0" R="1"/>
             </c:Model>
             <c:Transform>
-              <Orientation X="0" Y="3.14159274" Z="4.71238899"/>
+              <Position X="0.800000012" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultRed.mesh</Resource>
+              <Color A="1" B="0.0117647061" G="0" R="1"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.600000024" Y="0" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
         </Entity>
       </Children>
     </Entity>
-    <Entity>
+    <Entity name="DirectionalLight">
       <Components>
-        <c:AABB/>
-        <c:Collidable/>
+        <c:SceneLight>
+          <Gamma>0.5</Gamma>
+          <Exposure>4</Exposure>
+        </c:SceneLight>
+        <c:DirectionalLight/>
         <c:Model>
-          <Resource>../assets/Models/Core/UnitCube.obj</Resource>
+          <Resource>sModels/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
         </c:Model>
-        <c:Physics/>
         <c:Transform>
-          <Position X="-1.95333278" Y="0.296304941" Z="2.56487775"/>
+          <Position X="-6.00145912" Y="1.42697716" Z="3.04144025"/>
+          <Orientation X="5.69400024" Y="841.179565" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
+    </Entity>
+    <Entity name="ObstacleCourse">
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <Resource>Models/Test/ObstacleCourse.mesh</Resource>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="BlueSpawn">
+      <Components>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:PlayerSpawn/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="0.300000012" Y="0.0270000007" Z="6.67400026"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
+              <Color A="1" B="1" G="0.254901975" R="0"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.600000024" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity>
+          <Components>
+            <c:SpawnPoint/>
+            <c:Model>
+              <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
+              <Color A="1" B="1" G="0.254901975" R="0"/>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.800000012" Y="0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Arms">
+      <Components>
+        <c:Blend>
+          <Pose1>ActivateDeactive</Pose1>
+          <Pose2></Pose2>
+        </c:Blend>
+        <c:Model>
+          <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="1.30585015" Z="2.01450038"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="ActivateDeactive">
+          <Components>
+            <c:Animation>
+              <AnimationName>ActivateDeactiveShieldF</AnimationName>
+              <Time>0.68323420867830964</Time>
+              <Speed>1</Speed>
+              <Play>true</Play>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Weapon">
+          <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
+            <c:Model>
+              <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="-0.0621522591" Y="-0.169021279" Z="-0.219918266"/>
+              <Orientation X="-0.709758997" Y="1.22785306" Z="-0.154755235"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
   </Children>
 

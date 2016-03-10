@@ -7,6 +7,7 @@
 #include "../GLM.h"
 #include "../Core/ComponentWrapper.h"
 #include "Texture.h"
+#include "TextureSprite.h"
 #include "Model.h"
 #include "RenderJob.h"
 #include "../Core/ResourceManager.h"
@@ -24,14 +25,16 @@ struct SpriteJob : RenderJob
         ::RawModel::MaterialProperties matProp = Model->MaterialGroups().front();
         TextureID = 0;
 
-        DiffuseTexture = CommonFunctions::LoadTexture(cSprite["DiffuseTexture"], true);
+        DiffuseTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["DiffuseTexture"]);
 
-        IncandescenceTexture = CommonFunctions::LoadTexture(cSprite["GlowMap"], true);
+        IncandescenceTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["GlowMap"]);
 
         StartIndex = matProp.material->StartIndex;
         EndIndex = matProp.material->EndIndex;
 		Matrix = matrix;
         Color = cSprite["Color"];
+        BlurBackground = (bool)cSprite["BlurBackground"];
+
         Entity = cSprite.EntityID;
         Position = Transform::AbsolutePosition(world, cSprite.EntityID);
         Depth = 0;
@@ -65,6 +68,7 @@ struct SpriteJob : RenderJob
 
     bool Pickable;
 	bool IsIndicator = false;
+    bool BlurBackground = false;
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;

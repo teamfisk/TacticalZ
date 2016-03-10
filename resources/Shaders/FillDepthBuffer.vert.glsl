@@ -1,8 +1,6 @@
 #version 430
 
-uniform mat4 M;
-uniform mat4 V;
-uniform mat4 P;
+uniform mat4 PVM;
 
 layout(location = 0) in vec3 Position;
 layout(location = 5) in vec4 BoneIndices;
@@ -15,7 +13,7 @@ out VertexData{
 
 void main()
 {
-	gl_Position = P * V * M * vec4(Position, 1.0);
+	gl_Position = PVM * vec4(Position, 1.0);
 
 	Output.Position = Position;
 }

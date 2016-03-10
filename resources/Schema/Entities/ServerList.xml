@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ServerList" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:ServerList>
+      <Offset X="0" Y="-2.20000005" Z="0"/>
+    </c:ServerList>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Identities_Origin">
+      <Components>
+        <c:Transform>
+          <Position X="0" Y="0.181182757" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="ServerIdentitySpawner">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/ServerIdentity.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0" Y="0" Z="0.00999999978"/>
+              <Scale X="0.0149999997" Y="0.0149999997" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Background">
+      <Components>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+          <BlurBackground>true</BlurBackground>
+          <GlowMap></GlowMap>
+          <Color A="0.196078435" B="0" G="0" R="0"/>
+        </c:Sprite>
+        <c:Transform>
+          <Scale X="0.300000012" Y="0.5" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="RefreshButton">
+      <Components>
+        <c:Button/>
+        <c:Sprite>
+          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+          <BlurBackground>true</BlurBackground>
+          <GlowMap></GlowMap>
+          <Color A="0.588235319" B="1" G="1" R="1"/>
+        </c:Sprite>
+        <c:InputCmdButton>
+          <Command>RefreshServerList</Command>
+          <PressValue>1</PressValue>
+        </c:InputCmdButton>
+        <c:Transform>
+          <Position X="0.120867848" Y="0.222928733" Z="0.0189953279"/>
+          <Scale X="0.0149999997" Y="0.0149999997" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="RefreshIcon">
+          <Components>
+            <c:Sprite>
+              <DiffuseTexture>Textures/Icons/rotate.png</DiffuseTexture>
+              <GlowMap></GlowMap>
+              <Color A="1" B="1" G="0" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0" Y="-0.245000005" Z="0.00999999978"/>
+              <Scale X="0.690000057" Y="1.37600005" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

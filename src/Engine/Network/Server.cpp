@@ -7,6 +7,8 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
     pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
+    m_ServerName = config->Get<std::string>("Networking.Name", "Unnamed");
+
     // Subscribe to events
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &Server::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Server::OnPlayerSpawned);
@@ -162,7 +164,7 @@ void Server::unreliableBroadcast(Packet& packet)
 {
     for (auto& kv : m_ConnectedPlayers) {
         packet.ChangePacketID(kv.second.PacketID);
-//        m_Unreliable.Send(packet, kv.second);
+        //        m_Unreliable.Send(packet, kv.second);
     }
 }
 
@@ -410,7 +412,7 @@ void Server::parseServerlistRequest(boost::asio::ip::udp::endpoint endpoint)
     Packet packet(MessageType::ServerlistRequest);
     packet.WriteString(m_Reliable.Address());
     packet.WritePrimitive<int>(m_Reliable.Port());
-    packet.WriteString("SERVERNAME");
+    packet.WriteString(m_ServerName);
     packet.WritePrimitive<int>(m_ConnectedPlayers.size());
     m_ServerlistRequest.Send(packet);
 }
@@ -641,21 +643,7 @@ void Server::parsePlayerTransform(Packet& packet)
 
 bool Server::shouldSendToClient(EntityWrapper childEntity)
 {
-    auto children = m_World->GetDirectChildren(childEntity.ID);
-    for (auto it = children.first; it != children.second; it++) {
-        EntityWrapper child(m_World, it->second);
-        if (child.HasComponent("CapturePoint") || child.HasComponent("HealthPickup")
-            || child.HasComponent("AmmoPickup")) {
-            return true;
-        }
-    }
-    return childEntity.HasComponent("Player") 
-        || childEntity.FirstParentWithComponent("Player").Valid()
-        || childEntity.HasComponent("CapturePoint") 
-        || childEntity.HasComponent("HealthPickup")
-        || childEntity.HasComponent("AmmoPickup")
-        || childEntity.HasComponent("ScoreScreen")
-        || childEntity.FirstParentWithComponent("ScoreScreen").Valid();
+    return childEntity.HasComponent("NetworkComponent") || childEntity.FirstParentWithComponent("NetworkComponent").Valid();
 }
 
 PlayerID Server::getPlayerIDFromEndpoint()
@@ -674,7 +662,7 @@ PlayerID Server::getPlayerIDFromEndpoint()
 
 PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
 {
-    for(auto& kv : m_ConnectedPlayers) {
+    for (auto& kv : m_ConnectedPlayers) {
         if (entityID == kv.second.EntityID) {
             return kv.first;
         }

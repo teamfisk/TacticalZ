@@ -1,5 +1,7 @@
 #version 430
 
+#define MAX_SPLITS 4
+
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -27,6 +29,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input[];
 
 out VertexData{
@@ -37,6 +40,7 @@ out VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Output;
 
 layout(triangles) in;
@@ -161,6 +165,14 @@ void main()
 
 		// pass through vertex data
 		PassThingsThrough(i);
+			for (int j = 0; j < MAX_SPLITS; j++)
+			{
+				Output.PositionLightSpace[j] = Input[i].PositionLightSpace[j];
+			}
+			for (int j = 0; j < MAX_SPLITS; j++)
+			{
+				Output.PositionLightSpace[j] = Input[i].PositionLightSpace[j];
+			}
 		
 		// convert to window space 
 		gl_Position = P * V * M * vec4(ExplodedPosition, 1.0);

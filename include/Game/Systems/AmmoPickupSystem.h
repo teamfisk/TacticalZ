@@ -40,5 +40,17 @@ private:
     };
     std::vector<EntityAtMaxValuePickupStruct> m_PickupAtMaximum;
     void DoPickup(EntityWrapper &player, EntityWrapper &trigger);
+    //class
+    enum class PlayerClass {
+        Assault,
+        Defender,
+        Sniper,
+        None
+    };
+    //helper methods
+    bool DoesPlayerHaveMaxAmmo(EntityWrapper &player);
+    PlayerClass DetermineClass(EntityWrapper &player);
+    void SetPlayerAmmo(EntityWrapper &player, int ammoGain);
+    int GetPlayerMaxAmmo(EntityWrapper &player);
 };
 #endif
