@@ -49,7 +49,7 @@ private:
     //const LightCullingPass* m_LightCullingPass 
     int m_Iterations;
 	int m_Quality = 0;
-    int m_BloomLod = 4;
+    int m_BloomLod = 5;
 
     GLuint m_GaussianTexture_horiz = 0;
     GLuint m_GaussianTexture_vert = 0;
