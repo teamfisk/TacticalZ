@@ -258,7 +258,8 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     m_World, 
                     fillColor, 
                     fillPercentage,
-					isShielded
+					isShielded,
+					false
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
                     explosionEffectJob->CalculateHash();
@@ -296,7 +297,8 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     m_World, 
                     fillColor, 
                     fillPercentage,
-					isShielded
+					isShielded,
+					(bool)cModel["Shadow"]
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
                     modelJob->CalculateHash();

@@ -219,7 +219,7 @@ void PickingPass::Draw(RenderScene& scene)
 					m_PickingSkinnedProgram->Bind();
 					lastShader = m_PickingSkinnedProgram->GetHandle();
 				}
-				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
+				glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
                 glUniform2fv(glGetUniformLocation(shaderSkinnedHandle, "PickingColor"), 1, glm::value_ptr(glm::vec2(pickColor[0], pickColor[1])));
 
                 std::vector<glm::mat4> frameBones;

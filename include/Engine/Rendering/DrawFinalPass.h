@@ -11,12 +11,13 @@
 #include "Util/UnorderedMapVec2.h"
 #include "Util/CommonFunctions.h"
 #include "Texture.h"
+#include "ShadowPass.h"
 #include "BlurHUD.h"
 
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass);
 	~DrawFinalPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -72,6 +73,7 @@ private:
     const LightCullingPass* m_LightCullingPass;
     const CubeMapPass* m_CubeMapPass;
 	const SSAOPass* m_SSAOPass;
+	const ShadowPass* m_ShadowPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;

@@ -208,18 +208,6 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         m_EventBroker->Publish(lock);
     }
 
-    // HACK: Set the player model color to team color
-    EntityWrapper playerModel = e.Player.FirstChildByName("PlayerModel");
-    if (playerModel.Valid() && e.Player.HasComponent("Team")) {
-        ComponentWrapper cTeam = e.Player["Team"];
-        ComponentWrapper cModel = playerModel["Model"];
-        if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Red")) {
-            cModel["Color"] = glm::vec3(1.f, 0.f, 0.f);
-        } else if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Blue")) {
-            cModel["Color"] = glm::vec3(0.f, 0.25f, 1.f);
-        }
-    }
-
     return true;
 }
 
