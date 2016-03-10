@@ -108,7 +108,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         //change what model is displaying (change all in case 2 capturepoints has been captured on the same frame)
         for (int i = 0; i < m_NumberOfCapturePoints; i++) {
             auto owner = (int)m_CapturePointNumberToEntityMap[i]["Team"]["Team"];
-            if (m_CapturePointNumberToEntityMap[i].FirstChildByName("Red").ID != EntityID_Invalid) {
+            if (m_CapturePointNumberToEntityMap[i].FirstChildByName("Red").Valid()) {
                 ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Red"), owner == redTeam);
                 ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Blue"), owner == blueTeam);
                 ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Spectator"), owner == spectatorTeam);
