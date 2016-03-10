@@ -2,11 +2,12 @@
 #include "Rendering/FrameBuffer.h"
 
 
-BufferResource::BufferResource(GLuint* resourceHandle, GLenum resourceType, GLenum attachment)
+BufferResource::BufferResource(GLuint* resourceHandle, GLenum resourceType, GLenum attachment, GLuint mipMapLod)
 {
     m_ResourceHandle = resourceHandle;
     m_ResourceType = resourceType;
     m_Attachment = attachment;
+    m_MipMapLod = mipMapLod;
 }
 
 Texture2D::~Texture2D()
@@ -58,7 +59,7 @@ void FrameBuffer::Generate()
 	for (auto it = m_Resources.begin(); it != m_Resources.end(); it++) {
 		switch ((*it)->m_ResourceType) {
 		case GL_TEXTURE_2D:
-			glFramebufferTexture2D(GL_FRAMEBUFFER, (*it)->m_Attachment, (*it)->m_ResourceType, *(*it)->m_ResourceHandle, 0);
+			glFramebufferTexture(GL_FRAMEBUFFER, (*it)->m_Attachment, *(*it)->m_ResourceHandle, (*it)->m_MipMapLod);
 			GLERROR("FrameBuffer generate: glFramebufferTexture2D");
 			break;
 		case GL_RENDERBUFFER:

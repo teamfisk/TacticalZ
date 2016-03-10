@@ -66,18 +66,31 @@ void DrawBloomPass::InitializeShaderPrograms()
 
 void DrawBloomPass::InitializeBuffers()
 {
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+    CommonFunctions::GenerateMipMapTexture(
+        &m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
+        , GL_RGB, GL_FLOAT, m_BloomLod);
+    CommonFunctions::GenerateMipMapTexture(
+        &m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
+        , GL_RGB, GL_FLOAT, m_BloomLod);
 
-	if (m_GaussianFrameBuffer_horiz.GetHandle() == 0) {
-		m_GaussianFrameBuffer_horiz.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_horiz, GL_COLOR_ATTACHMENT0)));
-	}
-	m_GaussianFrameBuffer_horiz.Generate();
+    if(m_GaussianFrameBuffer_horiz == nullptr) {
+        m_GaussianFrameBuffer_horiz = new FrameBuffer[m_BloomLod];
+    }
+    if (m_GaussianFrameBuffer_vert == nullptr) {
+        m_GaussianFrameBuffer_vert = new FrameBuffer[m_BloomLod];
+    }
 
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-	if (m_GaussianFrameBuffer_vert.GetHandle() == 0) {
-		m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_vert, GL_COLOR_ATTACHMENT0)));
-	}
-	m_GaussianFrameBuffer_vert.Generate();
+    for (int i = 0; i < m_BloomLod; i++) {
+        if(m_GaussianFrameBuffer_horiz[i].GetHandle() == 0) {
+            m_GaussianFrameBuffer_horiz[i].AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_horiz, GL_COLOR_ATTACHMENT0, i)));
+        }
+        m_GaussianFrameBuffer_horiz[i].Generate();
+
+        if (m_GaussianFrameBuffer_vert[i].GetHandle() == 0) {
+            m_GaussianFrameBuffer_vert[i].AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_vert, GL_COLOR_ATTACHMENT0, i)));
+        }
+        m_GaussianFrameBuffer_vert[i].Generate();
+    }
 }
 
 
@@ -87,22 +100,53 @@ void DrawBloomPass::ClearBuffer()
 		return;
 	}
     GLERROR("PRE");
-    m_GaussianFrameBuffer_horiz.Bind();
-    glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    m_GaussianFrameBuffer_horiz.Unbind();
-    m_GaussianFrameBuffer_vert.Bind();
-    glClearColor(0.f, 0.f, 0.f, 0.f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    m_GaussianFrameBuffer_vert.Unbind();
+    for (int i = 0; i < m_BloomLod; i++) {
+        m_GaussianFrameBuffer_horiz[i].Bind();
+        glClearColor(0.f, 0.f, 0.f, 0.f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        m_GaussianFrameBuffer_horiz[i].Unbind();
+        m_GaussianFrameBuffer_vert[i].Bind();
+        glClearColor(0.f, 0.f, 0.f, 0.f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        m_GaussianFrameBuffer_vert[i].Unbind();
+    }
+
     GLERROR("END");
 }
 
 void DrawBloomPass::Draw(GLuint texture)
 {
+    if (m_Quality == 0) {
+        return;
+    }
+
+    for (int i = 0; i < m_BloomLod; i++) {
+        GaussianLodPass(i, texture);
+    }
+}
+
+
+void DrawBloomPass::OnWindowResize()
+{
 	if (m_Quality == 0) {
 		return;
 	}
+    CommonFunctions::GenerateMipMapTexture(
+        &m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
+        , GL_RGB, GL_FLOAT, m_BloomLod);
+    CommonFunctions::GenerateMipMapTexture(
+        &m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
+        , GL_RGB, GL_FLOAT, m_BloomLod);
+    for (int i = 0; i < m_BloomLod; i++) {
+        m_GaussianFrameBuffer_vert[i].Generate();
+        m_GaussianFrameBuffer_horiz[i].Generate();
+
+    }
+
+}
+
+void DrawBloomPass::GaussianLodPass(GLuint mipMap, GLuint texture)
+{
     GLERROR("DrawBloomPass::Draw: Pre");
 
     DrawBloomPassState state;
@@ -110,10 +154,14 @@ void DrawBloomPass::Draw(GLuint texture)
     GLuint shaderHandle_horiz = m_GaussianProgram_horiz->GetHandle();
     GLuint shaderHandle_vert = m_GaussianProgram_vert->GetHandle();
 
-
     //Horizontal pass, first use the given texture then save it to the horizontal framebuffer.
-    m_GaussianFrameBuffer_horiz.Bind();
+    m_GaussianFrameBuffer_horiz[mipMap].Bind();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, mipMap);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipMap);
     m_GaussianProgram_horiz->Bind();
+    glUniform1i(glGetUniformLocation(shaderHandle_horiz, "Lod"), mipMap);
+
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(m_ScreenQuad->VAO);
@@ -123,10 +171,12 @@ void DrawBloomPass::Draw(GLuint texture)
     //Iterate some times to make it more gaussian.
     for (int i = 1; i < m_Iterations; i++) {
         //Vertical pass
-        m_GaussianFrameBuffer_vert.Bind();
+        m_GaussianFrameBuffer_vert[mipMap].Bind();
         m_GaussianProgram_vert->Bind();
+        glUniform1i(glGetUniformLocation(shaderHandle_vert, "Lod"), mipMap);
 
-		glActiveTexture(GL_TEXTURE0);
+
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
 
         glBindVertexArray(m_ScreenQuad->VAO);
@@ -134,27 +184,29 @@ void DrawBloomPass::Draw(GLuint texture)
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
         //horizontal pass
-		m_GaussianFrameBuffer_vert.Unbind();
+        m_GaussianFrameBuffer_vert[mipMap].Unbind();
 
-        m_GaussianFrameBuffer_horiz.Bind();
+        m_GaussianFrameBuffer_horiz[mipMap].Bind();
         m_GaussianProgram_horiz->Bind();
+        glUniform1i(glGetUniformLocation(shaderHandle_horiz, "Lod"), mipMap);
 
-		glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_vert);
 
         glBindVertexArray(m_ScreenQuad->VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
-		m_GaussianFrameBuffer_horiz.Unbind();
+        m_GaussianFrameBuffer_horiz[mipMap].Unbind();
     }
 
     //final vertical gaussian after the iterations are done
 
-    m_GaussianFrameBuffer_vert.Bind();
+    m_GaussianFrameBuffer_vert[mipMap].Bind();
     m_GaussianProgram_vert->Bind();
+    glUniform1i(glGetUniformLocation(shaderHandle_vert, "Lod"), mipMap);
 
-	glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
@@ -162,16 +214,6 @@ void DrawBloomPass::Draw(GLuint texture)
         , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 
     GLERROR("DrawBloomPass::Draw: END");
-}
+    m_GaussianFrameBuffer_vert[mipMap].Unbind();
 
-
-void DrawBloomPass::OnWindowResize()
-{
-	if (m_Quality == 0) {
-		return;
-	}
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_GaussianFrameBuffer_vert.Generate();
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_GaussianFrameBuffer_horiz.Generate();
 }

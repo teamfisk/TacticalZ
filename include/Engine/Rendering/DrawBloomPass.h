@@ -39,6 +39,7 @@ public:
 
 
 private:
+    void GaussianLodPass(GLuint mipMap, GLuint texture);
     Texture* m_BlackTexture;
     Model* m_ScreenQuad;
 
@@ -47,12 +48,13 @@ private:
     //const LightCullingPass* m_LightCullingPass 
     int m_Iterations;
 	int m_Quality = 0;
+    int m_BloomLod = 4;
 
     GLuint m_GaussianTexture_horiz = 0;
     GLuint m_GaussianTexture_vert = 0;
 
-    FrameBuffer m_GaussianFrameBuffer_horiz;
-    FrameBuffer m_GaussianFrameBuffer_vert;
+    FrameBuffer* m_GaussianFrameBuffer_horiz = nullptr;
+    FrameBuffer* m_GaussianFrameBuffer_vert = nullptr;
 
     ShaderProgram* m_GaussianProgram_horiz;
     ShaderProgram* m_GaussianProgram_vert;
