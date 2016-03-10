@@ -13,7 +13,7 @@ UDPServer::UDPServer(int port)
 UDPServer::~UDPServer()
 { }
 // TODO: Fix correct groups
-void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
+void UDPServer::Send(Packet& packet, PlayerDefinition& playerDefinition)
 {
     packet.UpdateSize();
     try {
@@ -23,14 +23,16 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
         // Remove header from packet.
         packet.ReadData(packet.HeaderSize());
         int totalBytesSent = 0;
-        int sequenceNumber = 1;
-        int totalMessages = std::ceil((float)packet.Size() / MAXPACKETSIZE);
+        int groupIndex = 1;
+        int groupSize = std::ceil((float)packet.Size() / MAXPACKETSIZE);
         int packetDataSent = 0;
         int packetDataSize = packet.Size() - packet.HeaderSize();
 
         while (packetDataSize > packetDataSent) {
             Packet splitPacket(packet.GetMessageType(), playerDefinition.PacketID);
-            splitPacket.ChangeSequenceNumber(sequenceNumber, totalMessages, playerDefinition.PacketGroup);
+            splitPacket.ChangeGroupIndex(groupIndex);
+            splitPacket.ChangeGroupSize(groupSize);
+            splitPacket.ChangeGroup(playerDefinition.PacketGroup);
             int amountToSend = packetDataSize - packetDataSent;
             if (amountToSend > MAXPACKETSIZE) {
                 amountToSend = MAXPACKETSIZE;
@@ -46,8 +48,8 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
                 0);
             packetDataSent += bytesSent - splitPacket.HeaderSize();
             totalBytesSent += bytesSent;
-           // LOG_INFO("bytesSent size %i, groupIndex: %i. Number of packets: %i", bytesSent, sequenceNumber, totalMessages);
-            ++sequenceNumber;
+            //LOG_INFO("bytesSent size %i, groupIndex: %i. Number of packets: %i", bytesSent, sequenceNumber, totalMessages);
+            ++groupIndex;
         }
         playerDefinition.PacketGroup++;
     } catch (const boost::system::system_error& e) {
@@ -56,6 +58,60 @@ void UDPServer::Send(Packet& packet, PlayerDefinition & playerDefinition)
         playerDefinition.Endpoint = boost::asio::ip::udp::endpoint();
     }
 }
+
+void UDPServer::SendToConnectedPlayers(Packet& packet, std::map<PlayerID, PlayerDefinition>& playersTosendTo)
+{
+    // Work in progress
+    packet.UpdateSize();
+
+    //Debug
+    int debugTheSixeOfpacket = packet.Size();
+    //Debug end
+    // Remove header from packet.
+    packet.ReadData(packet.HeaderSize());
+    int totalBytesSent = 0;
+    int groupIndex = 1;
+    int groupSize = std::ceil((float)packet.Size() / MAXPACKETSIZE);
+    int packetDataSent = 0;
+    int packetDataSize = packet.Size() - packet.HeaderSize();
+
+    while (packetDataSize > packetDataSent) {
+        Packet splitPacket(packet.GetMessageType());
+        splitPacket.ChangeGroupIndex(groupIndex);
+        splitPacket.ChangeGroupSize(groupSize);
+        int amountToSend = packetDataSize - packetDataSent;
+        if (amountToSend > MAXPACKETSIZE) {
+            amountToSend = MAXPACKETSIZE;
+        }
+        splitPacket.WriteData(packet.ReadData(amountToSend), amountToSend);
+        splitPacket.UpdateSize();
+        // Remove header size from bytes sent soo that we only
+        // count data in the packet
+        int bytesSent = 0;
+        for (auto& kv : playersTosendTo) {
+            try {
+                splitPacket.ChangeGroup(kv.second.PacketGroup);
+                bytesSent = m_Socket->send_to(
+                    boost::asio::buffer(splitPacket.Data(), splitPacket.Size()),
+                    kv.second.Endpoint,
+                    0);
+            } catch (const boost::system::system_error& e) {
+                LOG_INFO(e.what());
+                // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
+                kv.second.Endpoint = boost::asio::ip::udp::endpoint();
+            }
+        }
+            packetDataSent += splitPacket.Size() - splitPacket.HeaderSize();
+            totalBytesSent += splitPacket.Size();
+
+            //LOG_INFO("bytesSent size %i, groupIndex: %i. Number of packets: %i", bytesSent, sequenceNumber, totalMessages);
+            ++groupIndex;
+    }
+    for (auto& kv : playersTosendTo) {
+        kv.second.PacketGroup++;
+    }
+}
+
 // Send back to endpoint of received packet
 void UDPServer::Send(Packet & packet)
 {

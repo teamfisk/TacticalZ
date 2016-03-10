@@ -146,11 +146,19 @@ void Packet::ChangePacketID(unsigned int & packetID)
     memcpy(m_Data + packetIDOffset, &packetID, sizeof(int));
 }
 
-void Packet::ChangeSequenceNumber(int groupIndex, int groupSize, int groupNumber)
+void Packet::ChangeGroupIndex(int groupIndex)
 {
     memcpy(m_Data + groupIndexOffset, &groupIndex, sizeof(int));
+}
+
+void Packet::ChangeGroupSize(int groupSize)
+{ 
     memcpy(m_Data + groupSizeOffset, &groupSize, sizeof(int));
-    memcpy(m_Data + groupOffset, &groupNumber, sizeof(int));
+}
+
+void Packet::ChangeGroup(int group)
+{ 
+    memcpy(m_Data + groupOffset, &group, sizeof(int));
 }
 
 MessageType Packet::GetMessageType()

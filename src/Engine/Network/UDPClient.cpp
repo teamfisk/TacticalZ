@@ -1,4 +1,5 @@
 #include "Network/UDPClient.h"
+#include "boost/asio/basic_datagram_socket.hpp"
 
 using namespace boost::asio::ip;
 
@@ -15,9 +16,9 @@ bool UDPClient::Connect(std::string playerName, std::string address, int port)
     }
     m_ReceiverEndpoint = udp::endpoint(boost::asio::ip::address().from_string(address), port);
     m_Socket = boost::shared_ptr<boost::asio::ip::udp::socket>(new boost::asio::ip::udp::socket(m_IOService));
+    m_Socket->open(boost::asio::ip::udp::v4());
     boost::asio::socket_base::receive_buffer_size option(819200);
     m_Socket->set_option(option);
-    m_Socket->open(boost::asio::ip::udp::v4());
     return true;
 }
 

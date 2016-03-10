@@ -60,7 +60,9 @@ public:
     void UpdateSize();
     char* ReadData(int SizeOfData);
     void ChangePacketID(unsigned int& packetID);
-    void ChangeSequenceNumber(int sequenceNumber, int sequenceLength, int groupNumber);
+    void ChangeGroupIndex(int groupIndex);
+    void ChangeGroupSize(int groupSize);
+    void ChangeGroup(int group);
     size_t Size() { return m_Offset; };
     char* Data() { return m_Data; };
     MessageType GetMessageType();

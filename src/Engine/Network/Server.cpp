@@ -164,9 +164,7 @@ void Server::reliableBroadcast(Packet& packet)
 
 void Server::unreliableBroadcast(Packet& packet)
 {
-    for (auto& kv : m_ConnectedPlayers) {
-        m_Unreliable.Send(packet, kv.second);
-    }
+    m_Unreliable.SendToConnectedPlayers(packet, m_ConnectedPlayers);
 }
 
 // Send snapshot fields
