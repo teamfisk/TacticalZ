@@ -284,3 +284,8 @@ int Game::parseArgs(int argc, char* argv[])
 
     return 0;
 }
+
+bool Game::OnBecomeServer(const Events::BecomeServer& e)
+{
+
+}

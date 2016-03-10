@@ -70,6 +70,8 @@ private:
     bool m_IsServer = false;
 
     int parseArgs(int argc, char* argv[]);
+    EventRelay<Game, Events::BecomeServer> m_EBecomeServer;
+    bool OnBecomeServer(const Events::BecomeServer& e);
 };
 
 #endif

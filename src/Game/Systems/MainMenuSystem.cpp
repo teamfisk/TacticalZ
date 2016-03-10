@@ -21,7 +21,7 @@ bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
     if (e.EntityName == "ServerIdentityConnect") {
         EntityWrapper entity = e.Entity;
         EntityWrapper serverIdentityEntity = entity.FirstParentWithComponent("ServerIdentity");
-        if(serverIdentityEntity.Valid()) {
+        if (serverIdentityEntity.Valid()) {
             Events::ConnectRequest event;
             event.IP = (std::string)serverIdentityEntity["ServerIdentity"]["IP"];
             event.Port = (int)serverIdentityEntity["ServerIdentity"]["Port"];
@@ -44,7 +44,10 @@ bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 
 bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
 {
-    if(e.Command == "Play" && e.Value == 1) {
+    if (e.Command == "Host" && e.Value == 1) {
+        m_EventBroker->Publish(Events::BecomeServer());
+    }
+    if (e.Command == "Play" && e.Value == 1) {
         auto menus = m_World->GetComponents("Menu");
         if (menus == nullptr) {
             return 0;
@@ -64,7 +67,7 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
                 break;
             }
 
-        } else if(!m_OpenSubMenu.HasComponent("ServerList")) {
+        } else if (!m_OpenSubMenu.HasComponent("ServerList")) {
             //Menu is open, but not the right one, delete the old one and open a new one.
             m_World->DeleteEntity(m_OpenSubMenu.ID);
             m_OpenSubMenu = EntityWrapper::Invalid;
@@ -85,7 +88,7 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
             m_World->DeleteEntity(m_OpenSubMenu.ID);
             m_OpenSubMenu = EntityWrapper::Invalid;
         }
-    } else if (e.Command == "RefreshServerList" && e.Value == 1){
+    } else if (e.Command == "RefreshServerList" && e.Value == 1) {
         Events::SearchForServers event;
         m_EventBroker->Publish(event);
     }
