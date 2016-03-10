@@ -13,7 +13,7 @@ class DrawBloomPass
 {
 public:
     DrawBloomPass(IRenderer* renderer, ConfigFile* config);
-    ~DrawBloomPass() { }
+	~DrawBloomPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();

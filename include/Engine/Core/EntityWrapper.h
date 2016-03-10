@@ -23,7 +23,7 @@ struct EntityWrapper
 
     static const EntityWrapper Invalid;
 
-    const std::string Name();
+    const std::string Name() const;
     bool HasComponent(const std::string& componentType);
     void AttachComponent(const char* componentName);
     EntityWrapper Parent();

@@ -18,6 +18,7 @@
 #include "DrawColorCorrectionPass.h"
 #include "SSAOPass.h"
 #include "CubeMapPass.h"
+#include "BlurHUD.h"
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
@@ -27,23 +28,27 @@
 #include "Util/CommonFunctions.h"
 #include "Core/PerformanceTimer.h"
 #include "ShadowPass.h"
+#include "EResolutionChanged.h"
 
 class Renderer : public IRenderer
 {
     static void glfwFrameBufferCallback(GLFWwindow* window, int width, int height);
+    static void glfwWindowSizeCallback(GLFWwindow* window, int width, int height);
 
 public:
 	Renderer(EventBroker* eventBroker, ConfigFile* config)
 		: m_EventBroker(eventBroker)
 		, m_Config(config)
     { }
+	~Renderer();
+
+    virtual void SetResolution(const Rectangle& resolution) override;
 
     virtual void Initialize() override;
     virtual void Update(double dt) override;
     virtual void Draw(RenderFrame& frame) override;
 
     virtual PickData Pick(glm::vec2 screenCoord) override;
-
 
 private:
     //----------------------Variables----------------------//
@@ -77,6 +82,7 @@ private:
 	SSAOPass* m_SSAOPass;
     CubeMapPass* m_CubeMapPass;
 	ShadowPass* m_ShadowPass;
+    BlurHUD* m_BlurHUDPass;
 
     //----------------------Functions----------------------//
     void InitializeWindow();
@@ -87,11 +93,14 @@ private:
     void InputUpdate(double dt);
     //void PickingPass(RenderQueueCollection& rq);
     //void DrawScreenQuad(GLuint textureToDraw);
+    void setWindowSize(Rectangle size);
+    void updateFramebufferSize();
 
     static bool DepthSort(const std::shared_ptr<RenderJob> &i, const std::shared_ptr<RenderJob> &j) { return (i->Depth < j->Depth); }
     void SortRenderJobsByDepth(RenderScene &scene);
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
-	//--------------------ShaderPrograms-------------------//
+
+    //--------------------ShaderPrograms-------------------//
     ShaderProgram* m_BasicForwardProgram;
     ShaderProgram* m_ExplosionEffectProgram;
 

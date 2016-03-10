@@ -3,7 +3,7 @@
 
 const EntityWrapper EntityWrapper::Invalid = EntityWrapper(nullptr, EntityID_Invalid);
 
-const std::string EntityWrapper::Name()
+const std::string EntityWrapper::Name() const
 {
     return World->GetName(ID);
 }

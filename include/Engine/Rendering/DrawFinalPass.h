@@ -12,16 +12,17 @@
 #include "Util/CommonFunctions.h"
 #include "Texture.h"
 #include "ShadowPass.h"
+#include "BlurHUD.h"
 
 class DrawFinalPass
 {
 public:
     DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass);
-    ~DrawFinalPass() { }
+	~DrawFinalPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
-    void Draw(RenderScene& scene);
+    void Draw(RenderScene& scene, BlurHUD* blurHUDPass);
     void ClearBuffer();
     void OnWindowResize();
 
@@ -29,6 +30,10 @@ public:
     GLuint BloomTexture() const { return m_BloomTexture; }
     //Return the texture with diffuse and lighting of the scene.
     GLuint SceneTexture() const { return m_SceneTexture; }
+    //Return the SceneTexture with the blurred HUD bits.
+    GLuint CombinedSceneTexture() const { return m_CombinedTexture; }
+    //Return the blurred scene texture.
+    GLuint FullBlurredTexture() const { return m_FullBlurredTexture; }
     //Return the framebuffer used in the scene rendering stage.
     FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
 
@@ -53,11 +58,13 @@ private:
 
     FrameBuffer m_FinalPassFrameBuffer;
 	FrameBuffer m_ShieldDepthFrameBuffer;
-    GLuint m_BloomTexture;
-    GLuint m_SceneTexture;
-    GLuint m_DepthBuffer;
-	GLuint m_ShieldBuffer;
-    GLuint m_CubeMapTexture;
+    GLuint m_BloomTexture = 0;
+    GLuint m_SceneTexture = 0;
+    GLuint m_DepthBuffer = 0;
+	GLuint m_ShieldBuffer = 0;
+    GLuint m_CubeMapTexture = 0;
+    GLuint m_FullBlurredTexture;
+    GLuint m_CombinedTexture; //This can be removed for less memory usage, just set m_sceneTexture to the return from m_BlurHUDPass.CombineTextures 
 
     //maqke this component based i guess?
     GLuint m_ShieldPixelRate = 16;

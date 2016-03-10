@@ -2,6 +2,19 @@
 
 std::unordered_map<GLFWwindow*, Renderer*> Renderer::m_WindowToRenderer;
 
+Renderer::~Renderer() {
+	delete m_PickingPass;
+	delete m_LightCullingPass;
+	delete m_ImGuiRenderPass;
+	delete m_DrawFinalPass;
+	delete m_DrawScreenQuadPass;
+	delete m_DrawBloomPass;
+	delete m_DrawColorCorrectionPass;
+	delete m_SSAOPass;
+	delete m_CubeMapPass;
+	delete m_TextPass;
+}
+
 void Renderer::Initialize()
 {
 	m_SSAO_Quality = m_Config->Get<int>("SSAO.Quality", 0);
@@ -23,16 +36,24 @@ void Renderer::Initialize()
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
 }
 
+void Renderer::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+    m_WindowToRenderer[window]->setWindowSize(Rectangle(width, height));
+}
+
 void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height)
 {
-    glViewport(0, 0, width, height);
-    Renderer* currentRenderer = m_WindowToRenderer[window];
-    currentRenderer->m_ViewportSize = Rectangle(width, height);
-	currentRenderer->m_PickingPass->OnWindowResize();
-    currentRenderer->m_DrawFinalPass->OnWindowResize();
-    currentRenderer->m_LightCullingPass->OnWindowResize();
-    currentRenderer->m_DrawBloomPass->OnWindowResize();
-	currentRenderer->m_SSAOPass->OnWindowResize();
+    m_WindowToRenderer[window]->updateFramebufferSize();
+}
+
+void Renderer::SetResolution(const Rectangle& resolution)
+{
+    m_Resolution = resolution;
+
+    if (m_Window != nullptr) {
+        setWindowSize(resolution);
+        updateFramebufferSize();
+    }
 }
 
 void Renderer::InitializeWindow()
@@ -54,6 +75,7 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLFW: Failed to create window");
 		exit(EXIT_FAILURE);
 	}
+    glfwSetWindowSizeCallback(m_Window, &glfwWindowSizeCallback);
     glfwSetFramebufferSizeCallback(m_Window, &glfwFrameBufferCallback);
 	glfwMakeContextCurrent(m_Window);
 
@@ -98,6 +120,31 @@ void Renderer::InputUpdate(double dt)
    
 }
 
+void Renderer::setWindowSize(Rectangle size)
+{
+    m_Resolution = size;
+    glfwSetWindowSize(m_Window, size.Width, size.Height);
+}
+
+void Renderer::updateFramebufferSize()
+{
+    Events::ResolutionChanged e;
+    e.OldResolution = m_ViewportSize;
+
+    int width, height;
+    glfwGetFramebufferSize(m_Window, &width, &height);
+    glViewport(0, 0, width, height);
+    m_ViewportSize = Rectangle(width, height);
+    m_PickingPass->OnWindowResize();
+    m_DrawFinalPass->OnWindowResize();
+    m_LightCullingPass->OnWindowResize();
+    m_DrawBloomPass->OnWindowResize();
+    m_SSAOPass->OnWindowResize();
+    
+    e.NewResolution = m_ViewportSize;
+    m_EventBroker->Publish(e);
+}
+
 void Renderer::Update(double dt)
 {
     m_EventBroker->Process<Renderer>();
@@ -110,7 +157,7 @@ void Renderer::Draw(RenderFrame& frame)
 {
     GLERROR("PRE");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking\0Ambient Occlusion");
+    ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking\0Ambient Occlusion\0Combined Scene Texture\0Full Blurred Texture");
     ImGui::Combo("CubeMap", &m_CubeMapTexture, "Nevada(512)\0Sky(1024)");
     if(m_CubeMapTexture == 0) {
         m_CubeMapPass->LoadTextures("Nevada");
@@ -134,6 +181,7 @@ void Renderer::Draw(RenderFrame& frame)
     m_DrawBloomPass->ClearBuffer();
 	m_SSAOPass->ClearBuffer();
 	m_ShadowPass->ClearBuffer();
+    m_BlurHUDPass->ClearBuffer();
 	m_ShadowPass->DebugGUI();
     PerformanceTimer::StopTimer("Renderer-ClearBuffers");
     GLERROR("ClearBuffers");
@@ -163,7 +211,7 @@ void Renderer::Draw(RenderFrame& frame)
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
 		PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
-		m_DrawFinalPass->Draw(*scene);
+		m_DrawFinalPass->Draw(*scene, m_BlurHUDPass);
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
@@ -199,6 +247,12 @@ void Renderer::Draw(RenderFrame& frame)
 	if (m_DebugTextureToDraw == 5) {
 		m_DrawScreenQuadPass->Draw(m_SSAOPass->SSAOTexture());
 	}
+    if (m_DebugTextureToDraw == 6) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->CombinedSceneTexture());
+    }
+    if (m_DebugTextureToDraw == 7) {
+        m_DrawScreenQuadPass->Draw(m_DrawFinalPass->FullBlurredTexture());
+    }
 	PerformanceTimer::StopTimer("Renderer-Misc Debug Draws");
 
     PerformanceTimer::StartTimer("Renderer-ImGuiRenderPass");
@@ -218,8 +272,8 @@ PickData Renderer::Pick(glm::vec2 screenCoord)
 
 void Renderer::InitializeTextures()
 {
-    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
-    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
+    m_ErrorTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/ErrorTexture.png");
+    m_WhiteTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/White.png");
 }
 
 
@@ -243,6 +297,7 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     GLERROR("Texture initialization failed");
 }
 
+
 void Renderer::InitializeRenderPasses()
 {
     m_PickingPass = new PickingPass(this, m_EventBroker);
@@ -250,9 +305,10 @@ void Renderer::InitializeRenderPasses()
     m_CubeMapPass = new CubeMapPass(this);
 	m_SSAOPass = new SSAOPass(this, m_Config);
 	m_ShadowPass = new ShadowPass(this);
+    m_BlurHUDPass = new BlurHUD(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);
-  
+
 }

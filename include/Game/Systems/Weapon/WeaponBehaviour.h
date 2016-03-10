@@ -32,20 +32,19 @@ public:
 
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt) override
     {
-        EntityWrapper firstPersonWeapon = entity.FirstChildByName("Hands").FirstChildByName("AssaultWeapon");
-        EntityWrapper thirdPersonWeapon = entity.FirstChildByName("PlayerModel").FirstChildByName("AssaultWeapon");
-        if (IsClient && (firstPersonWeapon.Valid() || thirdPersonWeapon.Valid())) {
-            if (m_ActiveWeapons.count(entity) == 0) {
+        /* EntityWrapper firstPersonWeapon = entity.FirstChildByName("Hands").FirstChildByName("AssaultWeapon");
+         EntityWrapper thirdPersonWeapon = entity.FirstChildByName("PlayerModel").FirstChildByName("AssaultWeapon");
+         if (IsClient && (firstPersonWeapon.Valid() || thirdPersonWeapon.Valid())) {
+             if (m_ActiveWeapons.count(entity) == 0) {
+                 WeaponInfo& wi = m_ActiveWeapons[entity];
+                 wi.Player = entity;
+                 wi.WeaponEntity = entity;
+                 wi.FirstPersonEntity = firstPersonWeapon;
+                 wi.ThirdPersonEntity = thirdPersonWeapon;
 
-                WeaponInfo& wi = m_ActiveWeapons[entity];
-                wi.Player = entity;
-                wi.WeaponEntity = entity;
-                wi.FirstPersonEntity = firstPersonWeapon;
-                wi.ThirdPersonEntity = thirdPersonWeapon;
-
-                OnEquip(cWeapon, wi);
-            }
-        }
+                 OnEquip(cWeapon, wi);
+             }
+         }*/
 
         auto weapon = getActiveWeapon(entity);
         if (!weapon) {
@@ -61,7 +60,9 @@ protected:
         EntityWrapper Player;
         EntityWrapper WeaponEntity;
         EntityWrapper FirstPersonEntity;
+        EntityWrapper FirstPersonPlayerModel;
         EntityWrapper ThirdPersonEntity;
+        EntityWrapper ThirdPersonPlayerModel;
     };
 
     IRenderer* m_Renderer;
@@ -89,7 +90,7 @@ protected:
 
     // Returns wi.FirstPersonEntity or wi.ThirdPersonEntity depending on
     // if the player is in first person mode or not.
-    EntityWrapper getRelevantWeaponModelEntity(WeaponInfo& wi)
+    EntityWrapper getRelevantWeaponEntity(WeaponInfo& wi)
     {
         if (isPlayerInFirstPerson(wi.Player)) {
             return wi.FirstPersonEntity;
@@ -137,7 +138,7 @@ protected:
 
     void playAnimationAndReturn(EntityWrapper weaponModelEntity, const std::string& subTreeName, const std::string& animationNodeName)
     {
-        EntityWrapper root = weaponModelEntity.FirstParentWithComponent("Model");
+        EntityWrapper root = weaponModelEntity;
         if (!root.Valid()) {
             return;
         }
@@ -254,9 +255,9 @@ private:
 
     void selectWeapon(ComponentWrapper cWeapon, EntityWrapper player)
     {
-        if (!IsServer) {
-            return;
-        }
+        //if (!IsServer) {
+        //    return;
+        //}
 
         // Don't reselect weapon if it's already active
         if (getActiveWeapon(player)) {
@@ -287,11 +288,11 @@ private:
         // Spawn the weapon(s)
         EntityWrapper firstPersonWeapon;
         EntityWrapper thirdPersonWeapon;
-        //if (IsClient) {
+        if (IsClient) {
             if (firstPersonAttachment.Valid()) {
                 firstPersonWeapon = SpawnerSystem::Spawn(firstPersonAttachment, firstPersonAttachment);
             }
-        //}
+        }
         if (thirdPersonAttachment.Valid()) {
             thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
         }
@@ -300,7 +301,9 @@ private:
         wi.Player = player;
         wi.WeaponEntity = player;
         wi.FirstPersonEntity = firstPersonWeapon;
+        wi.FirstPersonPlayerModel = firstPersonWeapon;
         wi.ThirdPersonEntity = thirdPersonWeapon;
+        wi.ThirdPersonPlayerModel = thirdPersonWeapon.FirstParentWithComponent("Model");
         
         OnEquip(cWeapon, wi);
     }

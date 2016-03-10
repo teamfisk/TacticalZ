@@ -2,6 +2,8 @@
 
 #define MAX_SPLITS 4
 
+uniform mat4 PVM;
+uniform mat4 TIM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -39,7 +41,7 @@ void main()
 				  + BoneWeights[3] * Bones[int(BoneIndices[3])];
 	}
 
-	gl_Position = P*V*M*boneTransform * vec4(Position, 1.0);
+	gl_Position = PVM*boneTransform * vec4(Position, 1.0);
 	
 	Output.Position = (boneTransform * vec4(Position, 1.0)).xyz;
 	Output.TextureCoordinate = TextureCoords;

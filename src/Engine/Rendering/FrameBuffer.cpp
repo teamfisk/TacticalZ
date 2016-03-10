@@ -24,6 +24,13 @@ RenderBuffer::~RenderBuffer()
     }
 }
 
+Texture2DArray::~Texture2DArray()
+{
+	if (m_ResourceHandle != 0) {
+		glDeleteTextures(1, m_ResourceHandle);
+	}
+}
+
 
 FrameBuffer::~FrameBuffer()
 {
@@ -65,8 +72,7 @@ void FrameBuffer::Generate()
 		}
 		GLERROR("2");
 
-		// Need GL_DEPTH_ATTACHMENT for shadows
-		if (/*(*it)->m_Attachment != GL_DEPTH_ATTACHMENT &&*/ (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
+		if ((*it)->m_Attachment != GL_DEPTH_ATTACHMENT && (*it)->m_Attachment != GL_STENCIL_ATTACHMENT && (*it)->m_Attachment != GL_DEPTH_STENCIL_ATTACHMENT) {
 			attachments.push_back((*it)->m_Attachment);
 		}
 		GLERROR("Attachment");
