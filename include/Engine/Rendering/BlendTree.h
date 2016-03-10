@@ -75,7 +75,6 @@ public:
     std::vector<glm::mat4> GetFinalPose() { return m_FinalPose; }
     glm::mat4 GetBoneTransform(int boneID);
     bool IsValid() { return  (m_Root == nullptr ? false : true); }
-
     void PrintTree();
     BlendTree::AutoBlendInfo AutoBlendStep(AutoBlendInfo blendInfo);
 
@@ -84,16 +83,20 @@ public:
 
     EntityWrapper GetSubTreeRoot(std::string nodeName);
 
+    std::vector<EntityWrapper> GetSingleLevelRoots(std::string name);
+    std::vector<EntityWrapper> GetEntitesByName(std::string name);
+
+    void SetWeightByName(std::string name, double weight);
+
 private:
     Skeleton* m_Skeleton = nullptr;
     Node* m_Root = nullptr;
 
     std::vector<glm::mat4> m_FinalPose;
     std::map<int, glm::mat4> m_FinalBoneTransforms;
-
+    std::vector<BlendTree::Node*> FindNodesByName(std::string name);
     std::vector<glm::mat4> AccumulateFinalPose();
     BlendTree::Node* FillTreeByName(Node* parentNode, std::string name, EntityWrapper parentEntity);
-    std::vector<BlendTree::Node*> FindNodesByName(std::string name);
 
     void Blend(std::map<int, Skeleton::PoseData>& pose);
 };

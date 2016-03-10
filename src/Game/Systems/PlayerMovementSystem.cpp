@@ -81,25 +81,16 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             cameraOrientation.x += controller->Rotation().x;
             // Limit camera pitch so we don't break our necks
             cameraOrientation.x = glm::clamp(cameraOrientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
+
             // Set third person model aim pitch
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
-
-            //Third-person aim
             if (playerModel.Valid()) {
-                EntityWrapper aimPrimaryEntity = playerModel.FirstChildByName("AimPrimary");
+                EntityWrapper aimPrimaryEntity = playerModel.FirstChildByName("Aim");
                 if(aimPrimaryEntity.Valid()){
                     if(aimPrimaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x + 0.2f;
-                        double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
+                        float pitch = cameraOrientation.x;
+                        double time = ((pitch + glm::half_pi<float>()) / glm::pi<float>());
                         (double&)aimPrimaryEntity["Animation"]["Time"] = time;
-                    }
-                }
-                EntityWrapper aimSecondaryEntity = playerModel.FirstChildByName("AimSecondary");
-                if (aimSecondaryEntity.Valid()) {
-                    if (aimSecondaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x + 0.2f;
-                        double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
-                        (double&)aimSecondaryEntity["Animation"]["Time"] = time;
                     }
                 }
             }
@@ -213,7 +204,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                             {
                                 Events::AutoAnimationBlend aeb;
                                 aeb.Duration = 0.25;
-                                aeb.NodeName = "StandCrouchBlend";
+                                aeb.NodeName = "MovementBlend";
                                 aeb.RootNode = playerModel;
                                 aeb.Start = true;
                                 aeb.Restart = false;
@@ -244,11 +235,11 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                             {
                                 Events::AutoAnimationBlend aeb;
                                 aeb.Duration = 0.25;
-                                aeb.NodeName = "StandCrouchBlend";
+                                aeb.NodeName = "MovementBlend";
                                 aeb.RootNode = playerModel;
                                 aeb.Start = true;
                                 aeb.Restart = false;
-                                aeb.AnimationEntity = playerModel.FirstChildByName("Jump");
+                                aeb.AnimationEntity = playerModel.FirstChildByName("BlendTreeLower").FirstChildByName("Jump");
                                 m_EventBroker->Publish(aeb);
                             }
                         }
@@ -376,12 +367,12 @@ void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
 bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
 {
     EntityWrapper player(m_World, e.Player);
-    if (!player.Valid() || !IsClient){// || player.ID == LocalPlayer.ID) {
+    if (!player.Valid()){// || !IsClient || player.ID == LocalPlayer.ID) {
         return false;
     }
 
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
-    EntityWrapper dashEffect = entityFile->MergeInto(m_World);
+//    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
+  //  EntityWrapper dashEffect = entityFile->MergeInto(m_World);
     EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
 
     for (auto& kv : m_PlayerInputControllers) {
@@ -399,7 +390,7 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                     if (controller->Movement().x > 0) {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashRight";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -408,19 +399,18 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
-                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.Duration = 0.2;
+                            aeb.NodeName = "MovementBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
                             aeb.Start = true;
                             aeb.Restart = false;
-                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashRight");
                             m_EventBroker->Publish(aeb);
                         }
                     } else {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashLeft";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -429,13 +419,12 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
-                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.Duration = 0.2;
+                            aeb.NodeName = "MovementBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
                             aeb.Start = true;
                             aeb.Restart = false;
-                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashLeft");
                             m_EventBroker->Publish(aeb);
                         }
                     }
@@ -443,7 +432,7 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                     if (controller->Movement().z < 0) {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashForward";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -452,10 +441,9 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
-                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.Duration = 0.2;
+                            aeb.NodeName = "MovementBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
                             aeb.Start = true;
                             aeb.Restart = false;
                             aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
@@ -464,7 +452,7 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                     } else {
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
+                            aeb.Duration = 0.1;
                             aeb.NodeName = "DashBackward";
                             aeb.RootNode = playerModel;
                             aeb.Restart = true;
@@ -473,32 +461,41 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
                         }
                         {
                             Events::AutoAnimationBlend aeb;
-                            aeb.Duration = 0.3;
-                            aeb.NodeName = "StandCrouchBlend";
+                            aeb.Duration = 0.2;
+                            aeb.NodeName = "MovementBlend";
                             aeb.RootNode = playerModel;
-                            aeb.Delay = -0.3;
                             aeb.Start = true;
                             aeb.Restart = false;
-                            aeb.AnimationEntity = playerModel.FirstChildByName("DashForward");
+                            aeb.AnimationEntity = playerModel.FirstChildByName("DashBackward");
                             m_EventBroker->Publish(aeb);
                         }
                     }
                 }
-            }
-        }
-    }
 
 /*
-    auto playerEntityAnimation = playerModel["Animation"];
-
-    playerEntityModel.Copy(dashEffect["Model"]);
-    playerEntityAnimation.Copy(dashEffect["Animation"]);
-    dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
-    ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
-*/
+                EntityWrapper dashEffectModel;
+                dashEffectModel = playerModel.Clone();
+                player["Transform"].Copy(dashEffectModel["Transform"]);
 
 
+                dashEffectModel.AttachComponent("ExplosionEffect");
+                dashEffectModel["ExplosionEffect"]["EndColor"] = (glm::vec4)playerModel["Model"]["Color"];
+                ((glm::vec4&)dashEffectModel["ExplosionEffect"]["EndColor"]).w = 0.f;
+                (double&)dashEffectModel["ExplosionEffect"]["ExplosionDuration"] = dashEffect["Lifetime"]["Lifetime"];
+                (glm::vec3&)dashEffectModel["ExplosionEffect"]["ExplosionOrigin"] = glm::vec3(0, 1, 0) + (0.2f * controller->Movement());
 
 
+
+                
+                auto animationChildren = dashEffectModel.ChildrenWithComponent("Animation");
+                
+                for (auto animationEntity : animationChildren) {
+                    (bool&)animationEntity["Animation"]["Play"] = false;
+                }
+                */
+            }
+            
+        }
+    }
     return true;
 }
