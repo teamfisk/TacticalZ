@@ -6,9 +6,12 @@ Texture::Texture(std::string path)
     Image* img;
     if (ext == ".png") {
         img = ResourceManager::Load<PNG, true>(path);
+		m_Type = TextureType::PNG;
     } else if (ext == ".dds") {
         img = ResourceManager::Load<DDS, true>(path);
+		m_Type = TextureType::DDS;
     } else {
+		m_Type = TextureType::Invalid;
         throw Resource::FailedLoadingException("Texture extension is not .png nor .dds");
     }
 

@@ -20,7 +20,9 @@ public:
 	void Bind(GLenum textureUnit = GL_TEXTURE0);
 
 	GLuint m_Texture = 0;
-    
+
+	enum TextureType : GLint { Invalid = 0, DDS = 1, PNG = 2};
+	TextureType m_Type;
 };
 
 #endif
