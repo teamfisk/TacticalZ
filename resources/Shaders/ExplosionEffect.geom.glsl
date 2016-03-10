@@ -42,27 +42,27 @@ out VertexData{
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-vec3 EqualTo(vec3 x, vec3 y) {
+float EqualTo(float x, float y) {
   return 1.0 - abs(sign(x - y));
 }
 
-vec3 NotEqualTo(vec3 x, vec3 y) {
+float NotEqualTo(float x, float y) {
   return abs(sign(x - y));
 }
 
-vec3 GreaterThan(vec3 x, vec3 y) {
+float GreaterThan(float x, float y) {
   return max(sign(x - y), 0.0);
 }
 
-vec3 LessThan(vec3 x, vec3 y) {
+float LessThan(float x, float y) {
   return max(sign(y - x), 0.0);
 }
 
-vec3 GreaterEqualTo(vec3 x, vec3 y) {
+float GreaterEqualTo(float x, float y) {
   return 1.0 - LessThan(x, y);
 }
 
-vec3 LessEqualTo(vec3 x, vec3 y) {
+float LessEqualTo(float x, float y) {
   return 1.0 - GreaterThan(x, y);
 }
 
@@ -118,7 +118,7 @@ void main()
 	float timePercetage = TimeSinceDeath / ExplosionDuration;
 	
 	// get a random number if randomness is enabled, otherwise the random distance will be zero and won't affect the other algorithms
-	float randomDistance = GetRandomNumber(gl_PrimitiveIDIn) * RandomnessScalar * float(Randomness);
+	float randomDistance = float(Randomness) * GetRandomNumber(gl_PrimitiveIDIn) * RandomnessScalar;
 	
 	vec2 randomVelocity = Velocity * (randomDistance + 1.0);
 	
@@ -137,7 +137,7 @@ void main()
 	vec3 triangleCenter2ExplosionRadius = (normalizedOrigin2TriangleCenterVector * blastWave) - (normalizedOrigin2TriangleCenterVector * origin2TriangleCenterDistanceWithRandomness);
 
 	// if the triangle is inside the blast's radius...
-	float isInsideBlastRadius = LessEqualTo(vec3(origin2TriangleCenterDistanceWithRandomness), vec3(blastWave)).x;
+	float isInsideBlastRadius = LessEqualTo(origin2TriangleCenterDistanceWithRandomness, blastWave);
 	
 	// calculate the max distance (s) the triangle will move
 	float accelaration = (randomVelocity.y - randomVelocity.x) / ExplosionDuration;
