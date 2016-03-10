@@ -16,7 +16,7 @@ inline bool _GLERROR(const char* info, const char* file, const char* func, unsig
 	return false;
 }
 
-#ifndef DEBUG
+#ifdef DEBUG
 #define GLERROR(function) \
 	_GLERROR(function, __BASE_FILE__, __func__, __LINE__)
 #else
