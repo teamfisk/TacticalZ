@@ -86,7 +86,7 @@ bool EditorRenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
-    m_EditorCamera->SetFOV(static_cast<float>((double)cCamera["FOV"]));
+    m_EditorCamera->SetFOV(glm::radians(static_cast<float>((double)cCamera["FOV"])));
     m_EditorCamera->SetNearClip(static_cast<float>((double)cCamera["NearClip"]));
     m_EditorCamera->SetFarClip(static_cast<float>((double)cCamera["FarClip"]));
     m_EditorCamera->SetPosition(cTransform["Position"]);
