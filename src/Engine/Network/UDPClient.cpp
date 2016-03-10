@@ -24,7 +24,13 @@ bool UDPClient::Connect(std::string playerName, std::string address, int port)
 
 void UDPClient::Disconnect()
 {
+    m_Socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    m_Socket->close();
+    m_Socket = nullptr;
 
+    int lastReceivedSnapshotGroup = 0;
+    m_PacketSegmentMap.clear();
+    PacketID m_SendPacketID = 0;
 }
 
 void UDPClient::Receive(Packet& packet)
@@ -100,9 +106,7 @@ void UDPClient::readPartOfPacket()
     memcpy(&packetGroupIndex, m_ReadBuffer + 2 * sizeof(int), sizeof(int));
     int packetGroupSize = 0;
     memcpy(&packetGroupSize, m_ReadBuffer + 3 * sizeof(int), sizeof(int));
-    //LOG_INFO("Packet group: %i. Group index: %i. Group size: %i", packetGroup, packetGroupIndex, packetGroupSize);
-    //LOG_INFO("Packet size: %i.", sizeOfPacket);
-
+    LOG_INFO("Packet group: %i. Group index: %i. Group size: %i. Packet size: %i.", packetGroup, packetGroupIndex, packetGroupSize, sizeOfPacket);
     if (sizeOfPacket > m_Socket->available()) {
         LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
         // return;
@@ -213,7 +217,7 @@ bool UDPClient::GetNextPacket(Packet & packet)
                 lastReceivedSnapshotGroup = packet.Group();
             }
             // No need to get next it as we are returning.
-            //LOG_INFO("Packet parsed");
+            LOG_INFO("Packet parsed");
             m_PacketSegmentMap.erase(it);
             return true;
         } else {

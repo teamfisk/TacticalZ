@@ -95,6 +95,7 @@ void UDPServer::SendToConnectedPlayers(Packet& packet, std::map<PlayerID, Player
                     boost::asio::buffer(splitPacket.Data(), splitPacket.Size()),
                     kv.second.Endpoint,
                     0);
+                LOG_INFO("bytesSent: %i", bytesSent);
             } catch (const boost::system::system_error& e) {
                 LOG_INFO(e.what());
                 // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
