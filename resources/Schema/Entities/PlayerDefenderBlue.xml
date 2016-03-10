@@ -41,9 +41,10 @@
     <Entity name="Indicator">
       <Components>
         <c:Sprite>
-          <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
-          <GlowMap></GlowMap>
           <DepthSort>false</DepthSort>
+          <Model>Models/Core/UnitQuad.mesh</Model>
+          <GlowMap></GlowMap>
+          <DiffuseTexture>Textures/Icons/Arrow.png</DiffuseTexture>
           <Color A="1" B="1" G="0.309803933" R="0"/>
         </c:Sprite>
         <c:HiddenForLocalPlayer/>
@@ -93,9 +94,10 @@
             <Entity name="Crosshair">
               <Components>
                 <c:Sprite>
-                  <DiffuseTexture>Textures/Weapons/Crosshair/SmallThickHoleDot.png</DiffuseTexture>
-                  <GlowMap></GlowMap>
                   <DepthSort>false</DepthSort>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Weapons/Crosshair/SmallThickHoleDot.png</DiffuseTexture>
                 </c:Sprite>
                 <c:Transform>
                   <Position X="0" Y="0" Z="0.200000003"/>
@@ -126,8 +128,9 @@
                     </c:Fill>
                     <c:HealthHUD/>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/HealthHUD3.png</DiffuseTexture>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
                       <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/HealthHUD3.png</DiffuseTexture>
                       <Color A="0.588235319" B="0" G="0" R="0"/>
                     </c:Sprite>
                     <c:Transform>
@@ -149,9 +152,10 @@
                               <Color A="1" B="0.533333361" G="1" R="0.329411775"/>
                             </c:Fill>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
                               <Color A="0.588235319" B="0.0392156877" G="0.184313729" R="0"/>
                             </c:Sprite>
                             <c:Transform>
@@ -167,9 +171,10 @@
                               <Color A="1" B="1" G="0.58431375" R="0.105882354"/>
                             </c:Fill>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
                               <Color A="0.588235319" B="0.34117648" G="0.192156866" R="0"/>
                             </c:Sprite>
                             <c:Transform>
@@ -185,9 +190,10 @@
                               <Color A="1" B="0.345098048" G="0" R="1"/>
                             </c:Fill>
                             <c:Sprite>
-                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-                              <GlowMap></GlowMap>
                               <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
                               <Color A="0.588235319" B="0.121568628" G="0" R="0.443137258"/>
                             </c:Sprite>
                             <c:Transform>
@@ -207,9 +213,10 @@
                           <Color A="1" B="0.392156869" G="0.392156869" R="0.392156869"/>
                         </c:Fill>
                         <c:Sprite>
-                          <DiffuseTexture>Textures\Icons\Abilities\SheildDots-01.png</DiffuseTexture>
-                          <GlowMap></GlowMap>
                           <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures\Icons\Abilities\SheildDots-01.png</DiffuseTexture>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0.224999994" Y="0.00400000019" Z="0"/>
@@ -269,8 +276,9 @@
                 <Entity name="BackgroundHexagon">
                   <Components>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
                       <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -287,8 +295,9 @@
                           <CapturePointNumber>2</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
                           <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -303,8 +312,9 @@
                 <Entity name="BackgroundHexagon">
                   <Components>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
                       <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -321,8 +331,9 @@
                           <CapturePointNumber>3</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
                           <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -337,8 +348,9 @@
                 <Entity name="BackgroundHexagon">
                   <Components>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
                       <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
                     </c:Sprite>
                     <c:Transform>
@@ -356,8 +368,9 @@
                           <CapturePointNumber>4</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
                           <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -372,8 +385,9 @@
                 <Entity name="BackgroundHexagon">
                   <Components>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
                       <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="0.300000012" B="1" G="1" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -390,8 +404,9 @@
                           <CapturePointNumber>1</CapturePointNumber>
                         </c:CapturePointHUD>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
                           <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -406,8 +421,9 @@
                 <Entity name="BackgroundHexagon">
                   <Components>
                     <c:Sprite>
-                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                      <Model>Models/Core/UnitQuad.mesh</Model>
                       <GlowMap></GlowMap>
+                      <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="0.699999988" B="0" G="0" R="1"/>
                     </c:Sprite>
                     <c:Transform>
@@ -423,8 +439,9 @@
                         </c:Fill>
                         <c:CapturePointHUD/>
                         <c:Sprite>
-                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
                           <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0" Y="0" Z="0.00999999978"/>
@@ -848,8 +865,8 @@
               <EntityFile>Schema/Entities/WeaponDefenderBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.165197983" Y="1.08182514" Z="-0.221089929"/>
-              <Orientation X="-0.0420843698" Y="-0.113664418" Z="0.168160081"/>
+              <Position X="0.163660914" Y="1.07968235" Z="-0.222407654"/>
+              <Orientation X="-0.0403533019" Y="-0.111228764" Z="0.167455986"/>
             </c:Transform>
             <c:WeaponAttachment>
               <Weapon>DefenderWeapon</Weapon>
@@ -869,8 +886,8 @@
               <EntityFile>Schema/Entities/WeaponDefenderBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.165197983" Y="1.08182514" Z="-0.221089929"/>
-              <Orientation X="-0.0420843698" Y="-0.113664418" Z="0.168160081"/>
+              <Position X="0.163660914" Y="1.07968235" Z="-0.222407654"/>
+              <Orientation X="-0.0403533019" Y="-0.111228764" Z="0.167455986"/>
             </c:Transform>
             <c:WeaponAttachment>
               <Weapon>DefenderWeapon</Weapon>
@@ -884,7 +901,7 @@
         <Entity name="BlendTreeUpper">
           <Components>
             <c:Blend>
-              <Pose1>AssaultWeaponBlend</Pose1>
+              <Pose1>DefenderWeaponBlend</Pose1>
               <Pose2>SidearmWeapon</Pose2>
               <Weight>0</Weight>
               <SubTreeRoot>true</SubTreeRoot>
@@ -892,7 +909,7 @@
             <c:Transform/>
           </Components>
           <Children>
-            <Entity name="AssaultWeaponBlend">
+            <Entity name="DefenderWeaponBlend">
               <Components>
                 <c:BlendAdditive>
                   <Adder>Aim</Adder>
@@ -904,45 +921,12 @@
                 <Entity name="WeaponBlend">
                   <Components>
                     <c:BlendAdditive>
-                      <Adder>MovementBlend</Adder>
-                      <Receiver>ActionBlend</Receiver>
+                      <Adder>MovementBlend2</Adder>
+                      <Receiver>FinalBlend</Receiver>
                     </c:BlendAdditive>
                     <c:Transform/>
                   </Components>
                   <Children>
-                    <Entity name="ActionBlend">
-                      <Components>
-                        <c:Blend>
-                          <Pose1>Fire</Pose1>
-                          <Pose2>Reload</Pose2>
-                          <Weight>1</Weight>
-                        </c:Blend>
-                        <c:Transform/>
-                      </Components>
-                      <Children>
-                        <Entity name="Reload">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>ReloadSwitchU</AnimationName>
-                              <Speed>0.5</Speed>
-                              <Loop>false</Loop>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="Fire">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>ShootFastRifleU</AnimationName>
-                              <Loop>false</Loop>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
                     <Entity name="MovementBlend2">
                       <Components>
                         <c:Blend>
@@ -976,6 +960,80 @@
                             <c:Transform/>
                           </Components>
                           <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="FinalBlend">
+                      <Components>
+                        <c:Blend>
+                          <Pose1>ShieldBlend</Pose1>
+                          <Pose2>ActionBlend</Pose2>
+                        </c:Blend>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="ActionBlend">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Fire</Pose1>
+                              <Pose2>Reload</Pose2>
+                              <Weight>1</Weight>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="Reload">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootgunReloadU</AnimationName>
+                                  <Speed>0.5</Speed>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Fire">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootRifleU</AnimationName>
+                                  <Loop>false</Loop>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ShieldBlend">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>ActivateShield</Pose1>
+                              <Pose2>SheildFront</Pose2>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="SheildFront">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShieldFrontU</AnimationName>
+                                  <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="ActivateShield">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ActivateShieldU</AnimationName>
+                                  <Loop>false</Loop>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
                         </Entity>
                       </Children>
                     </Entity>
