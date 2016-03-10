@@ -9,5 +9,5 @@
 	<SpecularMap>true</SpecularMap>
 	<GlowMap>true</GlowMap>
 	<Shadow>true</Shadow>
-	<GlowIntensity>3.0</GlowIntensity>
+	<GlowIntensity>1.0</GlowIntensity>
 </Model>
