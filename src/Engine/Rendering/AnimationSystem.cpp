@@ -127,8 +127,8 @@ void AnimationSystem::UpdateAnimations(double dt)
 void AnimationSystem::UpdateWeights(double dt)
 {
     for (auto it = m_AutoBlendQueues.begin(); it != m_AutoBlendQueues.end(); ) {
-        LOG_INFO("%s", it->first.Name().c_str());
-        it->second.PrintQueue();
+       /* LOG_INFO("%s", it->first.Name().c_str());
+        it->second.PrintQueue();*/
         
         if(it->second.HasActiveBlendJob()) {
             AutoBlendQueue::AutoBlendJob& blendJob = it->second.GetActiveBlendJob();
