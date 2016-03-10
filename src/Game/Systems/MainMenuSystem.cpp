@@ -45,7 +45,9 @@ bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
 {
     if (e.Command == "Host" && e.Value == 1) {
+        printf("Sending event...\n");
         m_EventBroker->Publish(Events::BecomeServer());
+        return true;
     }
     if (e.Command == "Play" && e.Value == 1) {
         auto menus = m_World->GetComponents("Menu");

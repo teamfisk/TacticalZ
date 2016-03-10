@@ -6,9 +6,9 @@
 namespace Events 
 {
 
-struct BecomeServer : public Event { };
+struct BecomeServer : public Event
+{ };
 
 }
-
 
 #endif

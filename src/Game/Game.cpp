@@ -58,7 +58,6 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<EntityFile>("EntityFile");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<Font>("FontFile");
-
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
@@ -99,21 +98,7 @@ Game::Game(int argc, char* argv[])
     // Create the sound manager
     m_SoundManager = new SoundManager(m_World, m_EventBroker);
 
-    // Initialize network
-    if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
-        if (m_IsServer) {
-            m_NetworkServer = new Server(m_World, m_EventBroker, m_NetworkPort);
-            m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " SERVER");
-        } else if (m_IsClient) {
-            m_NetworkClient = new Client(m_World, m_EventBroker, std::make_unique<MultiplayerSnapshotFilter>(m_EventBroker));
-            m_NetworkClient->Connect(m_NetworkAddress, m_NetworkPort);
-            m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " CLIENT");
-        }
-    } else {
-        // If network is disabled, pretend we're a server
-        m_IsClient = true;
-        m_IsServer = true;
-    }
+
 
     // Create Octrees
     // TODO: Perhaps the world bounds should be set in some non-arbitrary way instead of this.
@@ -179,6 +164,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     m_LastTime = glfwGetTime();
+    EVENT_SUBSCRIBE_MEMBER(m_EBecomeServer, &Game::OnBecomeServer);
+
 }
 
 Game::~Game()
@@ -210,6 +197,7 @@ void Game::Tick()
     double dt = currentTime - m_LastTime;
     m_LastTime = currentTime;
 
+    m_EventBroker->Process<Game>();
     // Handle input in a weird looking but responsive way
     m_EventBroker->Process<InputManager>();
     m_EventBroker->Swap();
@@ -287,5 +275,21 @@ int Game::parseArgs(int argc, char* argv[])
 
 bool Game::OnBecomeServer(const Events::BecomeServer& e)
 {
-
+    //// Initialize network
+    //if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
+    //    if (m_IsServer) {
+    //        m_NetworkServer = new Server(m_World, m_EventBroker, m_NetworkPort);
+    //        m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " SERVER");
+    //    } else if (m_IsClient) {
+    //        m_NetworkClient = new Client(m_World, m_EventBroker, std::make_unique<MultiplayerSnapshotFilter>(m_EventBroker));
+    //        m_NetworkClient->Connect(m_NetworkAddress, m_NetworkPort);
+    //        m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " CLIENT");
+    //    }
+    //} else {
+    //    // If network is disabled, pretend we're a server
+    //    m_IsClient = true;
+    //    m_IsServer = true;
+    //}
+    //printf("Event received LOL\n");
+    //return false;
 }

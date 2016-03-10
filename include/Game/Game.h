@@ -29,6 +29,7 @@
 #include "Network/Network.h"
 #include "Network/Server.h"
 #include "Network/Client.h"
+#include "Network/EBecomeServer.h"
 
 // Sound
 #include "Sound/SoundManager.h"
@@ -70,6 +71,7 @@ private:
     bool m_IsServer = false;
 
     int parseArgs(int argc, char* argv[]);
+
     EventRelay<Game, Events::BecomeServer> m_EBecomeServer;
     bool OnBecomeServer(const Events::BecomeServer& e);
 };
