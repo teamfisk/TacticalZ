@@ -3,7 +3,7 @@
 
   <Components>
     <c:Lifetime>
-      <Lifetime>1</Lifetime>
+      <Lifetime>10</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
       <Velocity X="2" Y="2.30000019" Z="0"/>

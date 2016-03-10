@@ -32,6 +32,7 @@ private:
     // Weapon functions
     void fireShell(ComponentWrapper cWeapon, WeaponInfo& wi);
     void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, const std::vector<glm::vec2>& pattern);
+    void spawnTracers(ComponentWrapper cWeapon, WeaponInfo& wi, std::vector<glm::vec2> pattern);
     bool canFire(ComponentWrapper cWeapon, WeaponInfo& wi);
 
     // Utility

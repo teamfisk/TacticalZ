@@ -3,7 +3,7 @@
 
   <Components>
     <c:Lifetime>
-      <Lifetime>0.10000000149011612</Lifetime>
+      <Lifetime>10</Lifetime>
     </c:Lifetime>
     <c:Transform>
       <Scale X="0" Y="1" Z="1"/>

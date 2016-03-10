@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <DefenderWeapon xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DefenderWeapon.xsd">
 	<Slot><Primary/></Slot>
-	<MagazineAmmo>8</MagazineAmmo>
+	<MagazineAmmo>9999</MagazineAmmo>
 	<MagazineSize>8</MagazineSize>
 	<Ammo>64</Ammo>
 	<MaxAmmo>64</MaxAmmo>
