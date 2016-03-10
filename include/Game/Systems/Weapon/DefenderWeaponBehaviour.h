@@ -27,9 +27,11 @@ private:
     std::random_device m_RandomDevice;
     std::mt19937 m_RandomEngine;
 
+
+
     // Weapon functions
     void fireShell(ComponentWrapper cWeapon, WeaponInfo& wi);
-    void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage);
+    void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, const std::vector<glm::vec2>& pattern);
     bool canFire(ComponentWrapper cWeapon, WeaponInfo& wi);
 
     // Utility
