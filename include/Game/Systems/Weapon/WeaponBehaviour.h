@@ -293,10 +293,8 @@ private:
                 firstPersonWeapon = SpawnerSystem::Spawn(firstPersonAttachment, firstPersonAttachment);
             }
         }
-        if (IsServer) {
-            if (thirdPersonAttachment.Valid()) {
-                thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
-            }
+        if (thirdPersonAttachment.Valid()) {
+            thirdPersonWeapon = SpawnerSystem::Spawn(thirdPersonAttachment, thirdPersonAttachment);
         }
 
         WeaponInfo& wi = m_ActiveWeapons[player];

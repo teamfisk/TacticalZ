@@ -91,8 +91,8 @@
           <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0.118469834" Y="-0.231588811" Z="-0.181454763"/>
-          <Orientation X="0.0104042515" Y="-0.00268274755" Z="0.0428440832"/>
+          <Position X="0.120748274" Y="-0.228437141" Z="-0.181454718"/>
+          <Orientation X="0.0102804415" Y="-0.00312523148" Z="0.0428143665"/>
         </c:Transform>
       </Components>
       <Children>
@@ -127,9 +127,9 @@
           <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Transform>
-          <Position X="0.0517482236" Y="-0.0985872298" Z="-0.255526245"/>
-          <Orientation X="0.000683688093" Y="0.0774232447" Z="0.0011862258"/>
-          <Scale X="0.25" Y="0.250000119" Z="0.500000238"/>
+          <Position X="0.0540266186" Y="-0.0954354703" Z="-0.255526125"/>
+          <Orientation X="0.000778362213" Y="0.0774229616" Z="0.00124316185"/>
+          <Scale X="0.25000003" Y="0.250000238" Z="0.500000417"/>
         </c:Transform>
       </Components>
       <Children>
