@@ -1,5 +1,7 @@
 #version 430
 
+#include "Shaders/Util/CommonNormalFunc.glsl" 
+
 #define MIN_AMBIENT_LIGHT 0.3
 #define MAX_SPLITS 4
 
@@ -17,6 +19,7 @@ uniform float GlowIntensity;
 uniform vec3 CameraPosition;
 uniform int SSAOQuality;
 
+uniform int NormalTextureType;
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
 uniform vec2 SpecularUVRepeat;
@@ -121,13 +124,6 @@ LightResult CalcDirectionalLightSource(vec4 direction, vec4 color, float intensi
 	return result;
 }
 
-vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textureCoordinate, sampler2D normalMap)
-{
-	mat3 TBN = mat3(tangent, bitangent, normal);
-	vec3 NormalMap = texture(normalMap, textureCoordinate).xyz * 2.0 - vec3(1.0);
-	return vec4(TBN * normalize(NormalMap), 0.0);
-}
-
 void main()
 {
 	float shieldDepthValue = texelFetch(ShieldBuffer, ivec2(gl_FragCoord.xy), 0).r;
@@ -142,7 +138,7 @@ void main()
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate * SpecularUVRepeat);
 	vec4 position = VM * vec4(Input.Position, 1.0); 
-	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
+	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture, NormalTextureType);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position);

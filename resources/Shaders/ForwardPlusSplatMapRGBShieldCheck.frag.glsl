@@ -1,5 +1,7 @@
 #version 430
 
+#include "Shaders/Util/CommonNormalFunc.glsl" 
+
 #define MIN_AMBIENT_LIGHT 0.3
 #define MAX_SPLITS 4
 
@@ -16,6 +18,10 @@ uniform vec4 AmbientColor;
 uniform int SSAOQuality;
 
 //Get bineded at the same time as the textures
+uniform int NormalTextureType1;
+uniform int NormalTextureType2;
+uniform int NormalTextureType3;
+
 uniform vec2 DiffuseUVRepeat1;
 uniform vec2 DiffuseUVRepeat2;
 uniform vec2 DiffuseUVRepeat3;
@@ -161,11 +167,12 @@ vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
 }
 
 vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
-					   vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues){
+					   vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues
+					   int R_TextureType, int G_TextureType, int B_TextureType) {
 	mat3 TBN = mat3(Input.Tangent, Input.BiTangent, Input.Normal);
-	vec3 R_Channel = texture(R, Input.TextureCoordinate * R_TileValues).xyz * 2.0 - vec3(1.0);
-	vec3 G_Channel = texture(G, Input.TextureCoordinate * G_TileValues).xyz * 2.0 - vec3(1.0);
-	vec3 B_Channel = texture(B, Input.TextureCoordinate * B_TileValues).xyz * 2.0 - vec3(1.0);
+	vec3 R_Channel = NormalMapValue(Input.TextureCoordinate * R_TileValues, R, R_TextureType);
+	vec3 G_Channel = NormalMapValue(Input.TextureCoordinate * G_TileValues, G, G_TextureType);
+	vec3 B_Channel = NormalMapValue(Input.TextureCoordinate * B_TileValues, B, B_TextureType);
 
 	float total = blendValue.r + blendValue.g + blendValue.b + blendValue.a;
 	float totalDiv = 1 / total;
@@ -196,7 +203,8 @@ void main()
 	vec4 position = VM * vec4(Input.Position, 1.0); 
 	//vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, SplatMapTexture);
 	vec4 normal = V * CalcBlendedNormal(splatTexel, NormalMapTexture1, NormalMapTexture2, NormalMapTexture3,
-		   								NormalUVRepeat1, NormalUVRepeat2, NormalUVRepeat3);
+		   								NormalUVRepeat1, NormalUVRepeat2, NormalUVRepeat3,
+		   								NormalTextureType1, NormalTextureType2, NormalTextureType3);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
 	vec4 viewVec = normalize(-position); 
