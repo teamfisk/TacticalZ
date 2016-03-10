@@ -30,6 +30,7 @@ private:
     bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e);
     EventRelay<CapturePointSystem, Events::Captured> m_ECaptured;
     bool CapturePointSystem::OnCaptured(const Events::Captured& e);
+    void ChangeCapturePointModelsVisibility(EntityWrapper &capturePointModels, bool isOwner);
 
     bool m_WinnerWasFound = false;
     //need to track these variables for the captureSystem to work as per design!
