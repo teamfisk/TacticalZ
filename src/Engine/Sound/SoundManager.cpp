@@ -377,7 +377,6 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
     return false;
 }
 
-
 bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
 {
     Source* source = createSource(*e.FilePaths.begin());
@@ -398,6 +397,8 @@ bool SoundManager::OnChangeBGM(const Events::ChangeBGM &e)
         stopSound(m_CurrentBGM); 
     }
     m_CurrentBGM = createSource(e.FilePath);
+    m_CurrentBGM->Type = SoundType::BGM;
+    alSourcei(m_CurrentBGM->ALsource, AL_LOOPING, 1);
     playSound(m_CurrentBGM);
     return true;
 }
