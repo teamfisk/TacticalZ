@@ -83,3 +83,12 @@ void Network::updateNetworkData()
         m_NetworkData.DataReceivedThisInterval = 0;
     }
 }
+
+void Network::popNetworkSegmentOfHeader(Packet & packet)
+{
+    // Pop packetSize, group, groupIndex and groupSize.
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+}

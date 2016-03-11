@@ -3,25 +3,14 @@
 using namespace boost::asio::ip;
 
 TCPClient::TCPClient()
-{
-}
+{ }
 
 TCPClient::~TCPClient()
-{
-}
+{ }
 
 bool TCPClient::Connect(std::string playerName, std::string address, int port)
 {
-    if (m_Socket) {
-        if (m_IsConnected) {
-            Packet packet(MessageType::Connect, m_SendPacketID);
-            packet.WriteString(playerName);
-            Send(packet);
-            LOG_INFO("Connect message sent again!");
-        }
-        return true;
-    }
-    else if (!m_IsConnected) {
+    if (!m_Socket) {
         boost::system::error_code error = boost::asio::error::host_not_found;
         m_Endpoint = tcp::endpoint(boost::asio::ip::address::from_string(address), port);
         m_Socket = std::unique_ptr<tcp::socket>(new tcp::socket(m_IOService));
@@ -36,9 +25,7 @@ bool TCPClient::Connect(std::string playerName, std::string address, int port)
             Send(packet);
             LOG_INFO("Connect message sent!");
             return true;
-        }
-        // If error
-        else {
+        } else { // If error
             m_Socket->close();
             m_Socket = nullptr;
             return false;
@@ -47,14 +34,10 @@ bool TCPClient::Connect(std::string playerName, std::string address, int port)
 }
 
 void TCPClient::Disconnect()
-{ 
-    if (!m_IsConnected) {
-        return;
-    }
+{
     m_Socket->shutdown(boost::asio::ip::tcp::socket::shutdown_both);
     m_Socket->close();
     m_Socket = nullptr;
-    m_IsConnected = false;
 }
 
 void TCPClient::Receive(Packet& packet)
@@ -66,7 +49,7 @@ void TCPClient::Receive(Packet& packet)
 }
 
 size_t TCPClient::readBuffer()
-{ 
+{
     if (!m_Socket) {
         return 0;
     }
@@ -92,7 +75,7 @@ size_t TCPClient::readBuffer()
     while (sizeOfPacket > bytesReceived) {
         // Read the rest of the message
         bytesReceived += m_Socket->read_some(boost
-            ::asio::buffer((void*)(m_ReadBuffer), sizeOfPacket - bytesReceived),
+            ::asio::buffer((void*)(m_ReadBuffer + bytesReceived), sizeOfPacket - bytesReceived),
             error);
         if (error) {
             //LOG_ERROR("receive: %s", error.message().c_str());
