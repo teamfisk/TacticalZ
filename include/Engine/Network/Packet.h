@@ -17,7 +17,7 @@ public:
     Packet(MessageType type);
     ~Packet();
     void Init(MessageType type, unsigned int& packetID,
-        int sequenceNumber, int totalAmountOfPackets,
+        int groupIndex, int groupSize,
         int packetGroup);
 
     // Add primitive types like int, float, char...

@@ -36,7 +36,7 @@ Packet::~Packet()
 }
 
 void Packet::Init(MessageType type, unsigned int & packetID,
-    int groupIndex, int packetGroupSize, int packetGroup)
+    int groupIndex, int groupSize, int group)
 {
     m_ReturnDataOffset = 0;
     m_Offset = 0;
@@ -46,13 +46,13 @@ void Packet::Init(MessageType type, unsigned int & packetID,
     WritePrimitive<int>(0);
     // packetGroup is the gorup the packet is in
     groupOffset = m_Offset;
-    WritePrimitive<int>(packetGroup);
+    WritePrimitive<int>(group);
     // What index the packet has in the packetGroup
     groupIndexOffset = m_Offset;
     WritePrimitive(groupIndex);
     // The total amount of packets in a packetGroup
     groupSizeOffset = m_Offset;
-    WritePrimitive(packetGroupSize);
+    WritePrimitive(groupSize);
     // Add message type
     int messageType = static_cast<int>(type);
     messageTypeOffset = m_Offset;
