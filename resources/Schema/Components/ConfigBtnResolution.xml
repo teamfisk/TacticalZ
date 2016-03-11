@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<ConfigBtnResolution xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ConfigBtnResolution.xsd">
+	<Header></Header>
+	<Field></Field>
+	<PressValue></PressValue>
+</ConfigBtnResolution>

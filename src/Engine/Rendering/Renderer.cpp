@@ -140,6 +140,7 @@ void Renderer::updateFramebufferSize()
     m_LightCullingPass->OnWindowResize();
     m_DrawBloomPass->OnWindowResize();
     m_SSAOPass->OnWindowResize();
+	m_BlurHUDPass->OnWindowResize();
     
     e.NewResolution = m_ViewportSize;
     m_EventBroker->Publish(e);
