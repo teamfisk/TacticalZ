@@ -71,11 +71,10 @@ void EditorSystem::Update(double dt)
         m_EditorGUI->Draw();
         m_EditorStats->Draw(actualDelta);
 
-        if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
-            return;
-        }
         if (m_CurrentSelection.Valid() && m_Widget.Valid()) {
-
+            if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
+                return;
+            }
             (glm::vec3&)m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection);
             if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
                 (glm::vec3&)m_Widget["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(m_CurrentSelection);
