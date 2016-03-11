@@ -22,7 +22,7 @@
             <Entity>
               <Components>
                 <c:CapturePointGameMode>
-                  <RespawnTime>4.7191051568560454</RespawnTime>
+                  <RespawnTime>0.53338721940212963</RespawnTime>
                 </c:CapturePointGameMode>
                 <c:Transform/>
               </Components>
@@ -2828,7 +2828,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="25838.0078" Z="0"/>
+                                          <Orientation X="0" Y="26060.2324" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -2870,7 +2870,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="90362.9844" Z="0"/>
+                                          <Orientation X="0" Y="90593.4219" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -2912,7 +2912,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="90301.125" Z="0"/>
+                                          <Orientation X="0" Y="90531.5625" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -2954,7 +2954,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36800003" Z="0"/>
-                                          <Orientation X="0" Y="71417.3281" Z="0"/>
+                                          <Orientation X="0" Y="71647.7656" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -2996,7 +2996,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36800003" Z="0"/>
-                                          <Orientation X="0" Y="25768.3613" Z="0"/>
+                                          <Orientation X="0" Y="25990.5859" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -3038,7 +3038,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="80968.2656" Z="0"/>
+                                          <Orientation X="0" Y="81198.7031" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -3080,7 +3080,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="78705.4375" Z="0"/>
+                                          <Orientation X="0" Y="78935.875" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -3122,7 +3122,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="90362.9844" Z="0"/>
+                                          <Orientation X="0" Y="90593.4219" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -3164,7 +3164,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="78705.4375" Z="0"/>
+                                          <Orientation X="0" Y="78935.875" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -5261,7 +5261,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36800003" Z="0"/>
-                                          <Orientation X="0" Y="71264.125" Z="0"/>
+                                          <Orientation X="0" Y="71494.5625" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -5303,7 +5303,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="47321.9336" Z="0"/>
+                                          <Orientation X="0" Y="47550.7578" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -6869,7 +6869,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36800003" Z="0"/>
-                                          <Orientation X="0" Y="71387.9063" Z="0"/>
+                                          <Orientation X="0" Y="71618.3438" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -6911,7 +6911,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="90329.8594" Z="0"/>
+                                          <Orientation X="0" Y="90560.2969" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -6953,7 +6953,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="78672.3125" Z="0"/>
+                                          <Orientation X="0" Y="78902.75" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -6995,7 +6995,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="80935.1406" Z="0"/>
+                                          <Orientation X="0" Y="81165.5781" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -7037,7 +7037,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="90268" Z="0"/>
+                                          <Orientation X="0" Y="90498.4375" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -7079,7 +7079,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="25805.2559" Z="0"/>
+                                          <Orientation X="0" Y="26027.4805" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -7121,7 +7121,7 @@
                                         </c:Model>
                                         <c:Transform>
                                           <Position X="0" Y="2.36784196" Z="0"/>
-                                          <Orientation X="0" Y="90329.8594" Z="0"/>
+                                          <Orientation X="0" Y="90560.2969" Z="0"/>
                                           <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                                         </c:Transform>
                                       </Components>
@@ -8796,7 +8796,7 @@
               <Axis X="0" Y="1" Z="0"/>
             </c:RaptorCopter>
             <c:Transform>
-              <Orientation X="0" Y="103.331795" Z="0"/>
+              <Orientation X="0" Y="165.48909" Z="0"/>
             </c:Transform>
           </Components>
           <Children>
@@ -8808,7 +8808,7 @@
                 </c:RaptorCopter>
                 <c:Transform>
                   <Position X="0" Y="26" Z="40"/>
-                  <Orientation X="0" Y="-123.565147" Z="0"/>
+                  <Orientation X="0" Y="-247.882935" Z="0"/>
                 </c:Transform>
               </Components>
               <Children>
@@ -8854,44 +8854,6 @@
                                         <c:Transform/>
                                       </Components>
                                       <Children>
-                                        <Entity name="ButtonCorner_Origin">
-                                          <Components>
-                                            <c:Transform/>
-                                          </Components>
-                                          <Children>
-                                            <Entity name="TopRight">
-                                              <Components>
-                                                <c:Sprite>
-                                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                                  <GlowMap></GlowMap>
-                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                                  <Linear>false</Linear>
-                                                </c:Sprite>
-                                                <c:Transform>
-                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
-                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                                </c:Transform>
-                                              </Components>
-                                              <Children/>
-                                            </Entity>
-                                            <Entity name="BottomRight">
-                                              <Components>
-                                                <c:Sprite>
-                                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                                  <GlowMap></GlowMap>
-                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                                  <Linear>false</Linear>
-                                                </c:Sprite>
-                                                <c:Transform>
-                                                  <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
-                                                  <Orientation X="0" Y="0" Z="4.71199989"/>
-                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                                </c:Transform>
-                                              </Components>
-                                              <Children/>
-                                            </Entity>
-                                          </Children>
-                                        </Entity>
                                         <Entity name="Button_1">
                                           <Components>
                                             <c:Button/>
@@ -8912,6 +8874,44 @@
                                             </c:Transform>
                                           </Components>
                                           <Children/>
+                                        </Entity>
+                                        <Entity name="ButtonCorner_Origin">
+                                          <Components>
+                                            <c:Transform/>
+                                          </Components>
+                                          <Children>
+                                            <Entity name="BottomRight">
+                                              <Components>
+                                                <c:Sprite>
+                                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                                  <GlowMap></GlowMap>
+                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                                  <Linear>false</Linear>
+                                                </c:Sprite>
+                                                <c:Transform>
+                                                  <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
+                                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                                </c:Transform>
+                                              </Components>
+                                              <Children/>
+                                            </Entity>
+                                            <Entity name="TopRight">
+                                              <Components>
+                                                <c:Sprite>
+                                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                                  <GlowMap></GlowMap>
+                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                                  <Linear>false</Linear>
+                                                </c:Sprite>
+                                                <c:Transform>
+                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
+                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                                </c:Transform>
+                                              </Components>
+                                              <Children/>
+                                            </Entity>
+                                          </Children>
                                         </Entity>
                                         <Entity name="Text">
                                           <Components>
@@ -8976,6 +8976,21 @@
                                             <c:Transform/>
                                           </Components>
                                           <Children>
+                                            <Entity name="TopRight">
+                                              <Components>
+                                                <c:Sprite>
+                                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                                  <GlowMap></GlowMap>
+                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                                  <Linear>false</Linear>
+                                                </c:Sprite>
+                                                <c:Transform>
+                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
+                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                                </c:Transform>
+                                              </Components>
+                                              <Children/>
+                                            </Entity>
                                             <Entity name="BottomRight">
                                               <Components>
                                                 <c:Sprite>
@@ -8987,21 +9002,6 @@
                                                 <c:Transform>
                                                   <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
                                                   <Orientation X="0" Y="0" Z="4.71199989"/>
-                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                                </c:Transform>
-                                              </Components>
-                                              <Children/>
-                                            </Entity>
-                                            <Entity name="TopRight">
-                                              <Components>
-                                                <c:Sprite>
-                                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                                  <GlowMap></GlowMap>
-                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                                  <Linear>false</Linear>
-                                                </c:Sprite>
-                                                <c:Transform>
-                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
                                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                                 </c:Transform>
                                               </Components>
@@ -9023,21 +9023,6 @@
                                             <c:Transform/>
                                           </Components>
                                           <Children>
-                                            <Entity name="TopRight">
-                                              <Components>
-                                                <c:Sprite>
-                                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                                  <GlowMap></GlowMap>
-                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                                  <Linear>false</Linear>
-                                                </c:Sprite>
-                                                <c:Transform>
-                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
-                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                                </c:Transform>
-                                              </Components>
-                                              <Children/>
-                                            </Entity>
                                             <Entity name="BottomRight">
                                               <Components>
                                                 <c:Sprite>
@@ -9049,6 +9034,21 @@
                                                 <c:Transform>
                                                   <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
                                                   <Orientation X="0" Y="0" Z="4.71199989"/>
+                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                                </c:Transform>
+                                              </Components>
+                                              <Children/>
+                                            </Entity>
+                                            <Entity name="TopRight">
+                                              <Components>
+                                                <c:Sprite>
+                                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                                  <GlowMap></GlowMap>
+                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                                  <Linear>false</Linear>
+                                                </c:Sprite>
+                                                <c:Transform>
+                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
                                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                                 </c:Transform>
                                               </Components>
@@ -9067,6 +9067,10 @@
                                               <BlurBackground>true</BlurBackground>
                                               <Color A="0.392156869" B="0" G="0" R="0"/>
                                             </c:Sprite>
+                                            <c:InputCmdButton>
+                                              <Command>Options</Command>
+                                              <PressValue>1</PressValue>
+                                            </c:InputCmdButton>
                                             <c:Transform>
                                               <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
                                             </c:Transform>
@@ -9076,7 +9080,7 @@
                                         <Entity name="Text">
                                           <Components>
                                             <c:Text>
-                                              <Content>Option</Content>
+                                              <Content>Options</Content>
                                               <Resource>Fonts/DroidSans.ttf,64</Resource>
                                               <Alignment>
                                                 <Right/>
@@ -9136,6 +9140,21 @@
                                             <c:Transform/>
                                           </Components>
                                           <Children>
+                                            <Entity name="TopRight">
+                                              <Components>
+                                                <c:Sprite>
+                                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                                  <GlowMap></GlowMap>
+                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                                  <Linear>false</Linear>
+                                                </c:Sprite>
+                                                <c:Transform>
+                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
+                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                                </c:Transform>
+                                              </Components>
+                                              <Children/>
+                                            </Entity>
                                             <Entity name="BottomRight">
                                               <Components>
                                                 <c:Sprite>
@@ -9147,21 +9166,6 @@
                                                 <c:Transform>
                                                   <Position X="0.0970000029" Y="-0.0219999999" Z="0.00499999989"/>
                                                   <Orientation X="0" Y="0" Z="4.71199989"/>
-                                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                                </c:Transform>
-                                              </Components>
-                                              <Children/>
-                                            </Entity>
-                                            <Entity name="TopRight">
-                                              <Components>
-                                                <c:Sprite>
-                                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                                  <GlowMap></GlowMap>
-                                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                                  <Linear>false</Linear>
-                                                </c:Sprite>
-                                                <c:Transform>
-                                                  <Position X="0.0970000029" Y="0.0220000017" Z="0.00499999989"/>
                                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                                 </c:Transform>
                                               </Components>
@@ -9184,6 +9188,15 @@
                                       <Components>
                                         <c:Spawner>
                                           <EntityFile>Schema/Entities/ServerList.xml</EntityFile>
+                                        </c:Spawner>
+                                        <c:Transform/>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="OptionsSpawner">
+                                      <Components>
+                                        <c:Spawner>
+                                          <EntityFile>Schema/Entities/OptionMenu.xml</EntityFile>
                                         </c:Spawner>
                                         <c:Transform/>
                                       </Components>
