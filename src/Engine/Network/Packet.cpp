@@ -70,7 +70,7 @@ void Packet::WriteString(const std::string& str)
     size_t sizeOfString = str.size() + 1;
     if (m_Offset + sizeOfString > m_MaxPacketSize) {
         if (m_MaxPacketSize >= 32000) {
-            LOG_WARNING("Package::WriteString(): New size is huge %i bytes\n", m_MaxPacketSize*2);
+            //LOG_WARNING("Package::WriteString(): New size is huge %i bytes\n", m_MaxPacketSize*2);
         }
         resizeData();
     }
@@ -85,7 +85,7 @@ void Packet::WriteData(char * data, int sizeOfData)
 
     if (m_Offset + sizeOfData > m_MaxPacketSize) {
         if (m_MaxPacketSize >= 32000) {
-            LOG_WARNING("Package::WriteData(): New size is huge %i bytes\n", m_MaxPacketSize*2);
+            //LOG_WARNING("Package::WriteData(): New size is huge %i bytes\n", m_MaxPacketSize*2);
         }
         while (m_Offset + sizeOfData > m_MaxPacketSize) {
             resizeData();
