@@ -39,6 +39,7 @@ protected:
     void logReceivedData(int bytesReceived);
     void saveToFile();
     void updateNetworkData();
+    void popNetworkSegmentOfHeader(Packet& packet);
 };
 
 #endif

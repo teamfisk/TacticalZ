@@ -299,8 +299,6 @@ void Server::sendPing()
     reliableBroadcast(packet);
 }
 
-
-
 void Server::checkForTimeOuts()
 {
     double startPing = 1000 * m_StartPingTime
@@ -332,10 +330,6 @@ void Server::parseUDPConnect(Packet & packet)
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
     // parse player id and other stuff
     PlayerID playerID = packet.ReadPrimitive<int>();
-    if (!EntityWrapper(m_World, playerID).Valid()) {
-
-    }
-    // Do something here?
     boost::asio::ip::udp::endpoint endpoint(m_Address, m_Port);
     m_ConnectedPlayers.at(playerID).Endpoint = endpoint;
     LOG_INFO("parseUDPConnect: Spectator \"%s\" connected on IP: %s", m_ConnectedPlayers.at(playerID).Name.c_str(), m_ConnectedPlayers.at(playerID).Endpoint.address().to_string().c_str());
@@ -357,7 +351,6 @@ void Server::parseTCPConnect(Packet & packet)
 
     LOG_INFO("Parsing connections");
     // Check if player is already connected
-    // Ska vara till lagd i TCPServer receive
     PlayerID playerID = getPlayerIDFromEndpoint();
     if (playerID == -1) {
         LOG_INFO("Server::parseTCPConnect: Not connected");
@@ -670,13 +663,4 @@ PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
         }
     }
     return -1;
-}
-
-void Server::popNetworkSegmentOfHeader(Packet & packet)
-{
-    // Pop packetSize, group, groupIndex and groupSize.
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
 }

@@ -81,7 +81,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    size_t  receive(char* data);
+    size_t receive(char* data);
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
@@ -109,7 +109,6 @@ private:
     void sendLocalPlayerTransform();
     void becomePlayer();
     void displayServerlist();
-    void popNetworkSegmentOfHeader(Packet& packet);
     void removeWorld();
     void createMainMenu();
     // Mapping Logic

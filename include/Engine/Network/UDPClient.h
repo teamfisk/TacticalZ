@@ -8,7 +8,6 @@
 
 class UDPClient : public NetworkClient
 {
-    // TODO: add packets to map.
 public:
     UDPClient();
     ~UDPClient();
@@ -34,6 +33,8 @@ private:
     //map:(packetGroup, vector:(pair:(groupIndex, packetData)))
     std::map<unsigned int, std::vector<std::pair<int, boost::shared_ptr<char>>>> m_PacketSegmentMap;
     bool hasReceivedPacket(int packetGroup, int groupIndex);
+    // 2^19
+    const int m_SizeOfSocketBuffer = 524288;
 };
 
 #endif

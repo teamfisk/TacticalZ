@@ -44,7 +44,7 @@ void Packet::Init(MessageType type, unsigned int & packetID,
     // allocate memory for size of packet, sequenceNumber and totalPacketesInSequence
     packetSizeOffset = m_Offset;
     WritePrimitive<int>(0);
-    // packetGroup is the gorup the packet is in
+    // packetGroup is the group the packet is in
     groupOffset = m_Offset;
     WritePrimitive<int>(group);
     // What index the packet has in the packetGroup

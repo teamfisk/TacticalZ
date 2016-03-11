@@ -706,15 +706,6 @@ void Client::displayServerlist()
     }
 }
 
-void Client::popNetworkSegmentOfHeader(Packet & packet)
-{
-    // Pop packetSize, group, groupIndex and groupSize.
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
-}
-
 void Client::removeWorld()
 {
     std::vector<EntityID> childrenToBeDeleted;
