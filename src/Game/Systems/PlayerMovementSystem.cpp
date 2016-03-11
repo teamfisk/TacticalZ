@@ -264,6 +264,11 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                     size = glm::vec3(1.f, 1.f, 1.f);
                 } else {
                     size = glm::vec3(1.f, 1.6f, 1.f);
+                    if (controller->CrouchingLastFrame() && isOnGround) {
+                        // The collision should resolve this anyway, but 
+                        // this is more reliable, since the box gets larger.
+                        ((glm::vec3&)cTransform["Position"]).y += 0.3f;
+                    }
                 }
             }
 

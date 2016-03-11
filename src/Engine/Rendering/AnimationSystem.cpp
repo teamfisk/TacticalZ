@@ -132,7 +132,7 @@ void AnimationSystem::UpdateWeights(double dt)
         
         if(it->second.HasActiveBlendJob()) {
             AutoBlendQueue::AutoBlendJob& blendJob = it->second.GetActiveBlendJob();
-            LOG_INFO("%s", blendJob.RootNode.Name().c_str());
+            //LOG_INFO("%s", blendJob.RootNode.Name().c_str());
             std::shared_ptr<BlendTree> blendTree = it->second.GetBlendTree();
             if (blendTree != nullptr) {
                 if (blendJob.Duration != 0.0) {

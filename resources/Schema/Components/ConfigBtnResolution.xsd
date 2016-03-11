@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+	<xs:element name="ConfigBtnResolution">
+		<xs:annotation><xs:documentation>Used with a Button component, this button will change a variable in the config file.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Width" type="t:int" minOccurs="0">
+					<xs:annotation><xs:documentation>Value of the resolution width.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Height" type="t:int" minOccurs="0">
+					<xs:annotation><xs:documentation>Value of the resolution height.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

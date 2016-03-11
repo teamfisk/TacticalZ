@@ -13,6 +13,7 @@
         <c:Model>
           <Resource>models/core/unitcube.mesh</Resource>
           <Color A="1" B="0.980392158" G="1" R="1"/>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
           <Position X="-0.100000001" Y="0" Z="0"/>
@@ -28,6 +29,7 @@
         <c:Model>
           <Resource>models/core/unitcube.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
           <Position X="-14.500001" Y="1.50000012" Z="16.9222012"/>
@@ -52,6 +54,7 @@
         <c:Model>
           <Resource>models/core/unitcube.mesh</Resource>
           <Color A="1" B="1" G="0" R="0"/>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
           <Position X="-14.500001" Y="1.50000012" Z="-17.6888409"/>
@@ -67,6 +70,7 @@
         <c:Model>
           <Resource>models/core/unitcube.mesh</Resource>
           <Color A="1" B="0" G="0" R="1"/>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
           <Position X="12.1000004" Y="1.50000012" Z="16.9222012"/>
@@ -82,6 +86,7 @@
         <c:Model>
           <Resource>models/core/unitcube.mesh</Resource>
           <Color A="1" B="1" G="0" R="0"/>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
           <Position X="12.1228638" Y="1.50000012" Z="-17.9642811"/>
@@ -99,7 +104,7 @@
         </c:Team>
         <c:PlayerSpawn/>
         <c:Spawner>
-          <EntityFile>Schema/Entities/Player.xml</EntityFile>
+          <EntityFile>Schema/Entities/PlayerRed.xml</EntityFile>
         </c:Spawner>
         <c:Transform/>
       </Components>
@@ -198,6 +203,7 @@
         <c:Model>
           <Resource>models/core/unitcube.mesh</Resource>
           <Color A="1" B="39.2156868" G="0" R="3.13725495"/>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
           <Scale X="-70" Y="-70" Z="-70"/>
@@ -210,7 +216,7 @@
         <c:Transform/>
       </Components>
       <Children>
-        <Entity name="-">
+        <Entity name="CapP">
           <Components>
             <c:AABB/>
             <c:CapturePoint>
@@ -225,6 +231,11 @@
               </Team>
             </c:Team>
             <c:Trigger/>
+            <c:Model>
+              <Resource></Resource>
+              <Color A="0.300000012" B="0" G="0" R="1"/>
+              <Visible>false</Visible>
+            </c:Model>
             <c:Transform>
               <Position X="0" Y="0" Z="-4.10000038"/>
             </c:Transform>
@@ -239,7 +250,24 @@
                   <Scale X="2.70000005" Y="3.4000001" Z="4.60000038"/>
                 </c:Transform>
               </Components>
-              <Children/>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource></Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity>
+                  <Components>
+                    <c:PointLight/>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
             </Entity>
             <Entity name="Blue">
               <Components>
@@ -250,7 +278,25 @@
                   <Scale X="3.4000001" Y="4.70000029" Z="0.700000048"/>
                 </c:Transform>
               </Components>
-              <Children/>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource></Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:PointLight/>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
             </Entity>
             <Entity name="Spectator">
               <Components>
@@ -261,7 +307,43 @@
                   <Scale X="1" Y="5.70000029" Z="1"/>
                 </c:Transform>
               </Components>
-              <Children/>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:PointLight/>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Model>
+                          <Resource></Resource>
+                        </c:Model>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:PointLight/>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Model>
+                                  <Resource></Resource>
+                                </c:Model>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
             </Entity>
           </Children>
         </Entity>
@@ -272,11 +354,11 @@
         <c:Transform/>
       </Components>
       <Children>
-        <Entity name="-">
+        <Entity name="CapP">
           <Components>
             <c:AABB/>
             <c:CapturePoint>
-              <CaptureTimer>-15</CaptureTimer>
+              <CaptureTimer>12</CaptureTimer>
               <HomePointForTeam>
                 <Blue/>
               </HomePointForTeam>
@@ -302,7 +384,38 @@
                   <Scale X="4.4000001" Y="2" Z="3.70000029"/>
                 </c:Transform>
               </Components>
-              <Children/>
+              <Children>
+                <Entity>
+                  <Components>
+                    <c:Model>
+                      <Resource></Resource>
+                    </c:Model>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity>
+                      <Components>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity>
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity>
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
             </Entity>
             <Entity name="Blue">
               <Components>

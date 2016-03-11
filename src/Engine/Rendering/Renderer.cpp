@@ -36,16 +36,24 @@ void Renderer::Initialize()
     m_ImGuiRenderPass = new ImGuiRenderPass(this, m_EventBroker);
 }
 
+void Renderer::glfwWindowSizeCallback(GLFWwindow* window, int width, int height)
+{
+    m_WindowToRenderer[window]->setWindowSize(Rectangle(width, height));
+}
+
 void Renderer::glfwFrameBufferCallback(GLFWwindow* window, int width, int height)
 {
-    glViewport(0, 0, width, height);
-    Renderer* currentRenderer = m_WindowToRenderer[window];
-    currentRenderer->m_ViewportSize = Rectangle(width, height);
-	currentRenderer->m_PickingPass->OnWindowResize();
-    currentRenderer->m_DrawFinalPass->OnWindowResize();
-    currentRenderer->m_LightCullingPass->OnWindowResize();
-    currentRenderer->m_DrawBloomPass->OnWindowResize();
-	currentRenderer->m_SSAOPass->OnWindowResize();
+    m_WindowToRenderer[window]->updateFramebufferSize();
+}
+
+void Renderer::SetResolution(const Rectangle& resolution)
+{
+    m_Resolution = resolution;
+
+    if (m_Window != nullptr) {
+        setWindowSize(resolution);
+        updateFramebufferSize();
+    }
 }
 
 void Renderer::InitializeWindow()
@@ -67,6 +75,7 @@ void Renderer::InitializeWindow()
 		LOG_ERROR("GLFW: Failed to create window");
 		exit(EXIT_FAILURE);
 	}
+    glfwSetWindowSizeCallback(m_Window, &glfwWindowSizeCallback);
     glfwSetFramebufferSizeCallback(m_Window, &glfwFrameBufferCallback);
 	glfwMakeContextCurrent(m_Window);
 
@@ -109,6 +118,32 @@ void Renderer::InitializeShaders()
 void Renderer::InputUpdate(double dt)
 {
    
+}
+
+void Renderer::setWindowSize(Rectangle size)
+{
+    m_Resolution = size;
+    glfwSetWindowSize(m_Window, size.Width, size.Height);
+}
+
+void Renderer::updateFramebufferSize()
+{
+    Events::ResolutionChanged e;
+    e.OldResolution = m_ViewportSize;
+
+    int width, height;
+    glfwGetFramebufferSize(m_Window, &width, &height);
+    glViewport(0, 0, width, height);
+    m_ViewportSize = Rectangle(width, height);
+    m_PickingPass->OnWindowResize();
+    m_DrawFinalPass->OnWindowResize();
+    m_LightCullingPass->OnWindowResize();
+    m_DrawBloomPass->OnWindowResize();
+    m_SSAOPass->OnWindowResize();
+	m_BlurHUDPass->OnWindowResize();
+    
+    e.NewResolution = m_ViewportSize;
+    m_EventBroker->Publish(e);
 }
 
 void Renderer::Update(double dt)
@@ -262,6 +297,7 @@ void Renderer::GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filterin
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, dimensions.x, dimensions.y, 0, format, type, nullptr);//TODO: Renderer: Fix the precision and Resolution
     GLERROR("Texture initialization failed");
 }
+
 
 void Renderer::InitializeRenderPasses()
 {

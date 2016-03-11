@@ -1,4 +1,5 @@
 #include "Network/Client.h"
+#include "Network/EPlayerDisconnected.h"
 using namespace boost::asio::ip;
 
 Client::Client(World* world, EventBroker* eventBroker)
@@ -50,16 +51,19 @@ void Client::Connect(std::string address, int port)
 void Client::Update()
 {
     m_EventBroker->Process<Client>();
-    //while (m_Unreliable.IsSocketAvailable()) {
-    //    // Packet will get real data in receive
-    //    Packet packet(MessageType::Invalid);
-    //    m_Unreliable.Receive(packet);
-    //    if (packet.GetMessageType() == MessageType::Connect) {
-    //        parseUDPConnect(packet);
-    //    } else {
-    //        parseMessageType(packet);
-    //    }
-    //}
+    while (m_Unreliable.IsSocketAvailable()) {
+        m_Unreliable.ReceivePackets();
+    }
+    // Packet will get real data in GetNextPacket()
+    Packet parsedPacket(MessageType::Invalid);
+    while (m_Unreliable.GetNextPacket(parsedPacket)) {
+        if (parsedPacket.GetMessageType() == MessageType::Connect) {
+            parseUDPConnect(parsedPacket);
+        } else {
+            parseMessageType(parsedPacket);
+        }
+    }
+
     while (m_Reliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -106,8 +110,9 @@ void Client::Update()
 
 void Client::parseMessageType(Packet& packet)
 {
-    // Pop packetSize
-    packet.ReadPrimitive<int>();
+    // Pop packetSize, sequenceNumber and packetsInSequence.
+    popNetworkSegmentOfHeader(packet);
+
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
         return;
@@ -162,26 +167,29 @@ void Client::parseMessageType(Packet& packet)
 void Client::parseUDPConnect(Packet& packet)
 {
     // Map ServerEntityID and your PlayerID
+    // TODO: If this is not received send a new connect message.
     LOG_INFO("I be connected PogChamp");
 }
 
 void Client::parseTCPConnect(Packet& packet)
 {
     LOG_INFO("Received TCP connect from server");
-    // Pop size of message int
-    packet.ReadPrimitive<int>();
+    // Pop packetSize, group, groupIndex and groupSize.
+    popNetworkSegmentOfHeader(packet);
+
     int messageType = packet.ReadPrimitive<int>();
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
     // parse player id and other stuff
     m_PlayerID = packet.ReadPrimitive<int>();
-    m_PlayerID = packet.ReadPrimitive<int>();
     LOG_INFO("A Player connected");
+    // TODO: If this is not received send a new connect message.
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
-    //   m_Unreliable.Send(packet);
+    m_Unreliable.Send(packet);
+
      //  LOG_INFO("Sent UDP Connect Server");
 }
 
@@ -208,10 +216,11 @@ void Client::parsePing()
 
 void Client::parseServerlist(Packet& packet)
 {
-    // Pop size, message type, and ID
+    // Pop packetSize, group, groupIndex and groupSize.
+    popNetworkSegmentOfHeader(packet);
     packet.ReadPrimitive<int>();
     packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+
     std::string address = packet.ReadString();
     int port = packet.ReadPrimitive<int>();
     std::string serverName = packet.ReadString();
@@ -224,7 +233,7 @@ void Client::parseServerlist(Packet& packet)
 void Client::parseKick()
 {
     LOG_WARNING("You have been kicked from the server.");
-    m_IsConnected = false;
+    disconnect();
 }
 
 void Client::parseSpawnEvents()
@@ -463,7 +472,12 @@ void Client::disconnect()
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
     m_Reliable.Send(packet);
+    m_Unreliable.Disconnect();
     m_Reliable.Disconnect();
+    Events::PlayerDisconnected e;
+    e.Entity = m_LocalPlayer.ID;
+    e.PlayerID = -1;
+    m_EventBroker->Publish(e);
     createMainMenu();
 }
 
@@ -475,8 +489,8 @@ bool Client::OnInputCommand(const Events::InputCommand & e)
 
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            //m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
-        //    m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
+            m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
+            m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
         return true;
@@ -553,6 +567,7 @@ bool Client::OnConnectRequest(const Events::ConnectRequest& e)
 {
     removeWorld();
     if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) {
+        m_Unreliable.Connect(m_PlayerName, e.IP, e.Port);
         // The client sent a successful connect message
         return true;
 
@@ -629,7 +644,7 @@ void Client::sendLocalPlayerTransform()
         packet.WritePrimitive((int)cAssaultWeapon["Ammo"]);
     }
 
-    m_Reliable.Send(packet);
+    m_Unreliable.Send(packet);
 }
 
 void Client::identifyPacketLoss()
@@ -690,7 +705,6 @@ void Client::displayServerlist()
         LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
 }
-
 
 void Client::removeWorld()
 {
