@@ -16,7 +16,7 @@ void MainMenuSystem::Update(double dt)
 
 }
 
-void MainMenuSystem::OnPlay(const Events::InputCommand& e)
+void MainMenuSystem::OpenSubMenu(const Events::InputCommand& e)
 {
     auto menus = m_World->GetComponents("Menu");
     if (menus == nullptr) {
@@ -37,7 +37,7 @@ void MainMenuSystem::OnPlay(const Events::InputCommand& e)
             break;
         }
 
-    } else if (!m_OpenSubMenu.HasComponent("ServerList")) {
+    } else if (m_OpenSubMenu.Name().compare(e.Command) != 0) {
         //Menu is open, but not the right one, delete the old one and open a new one.
         m_World->DeleteEntity(m_OpenSubMenu.ID);
         m_OpenSubMenu = EntityWrapper::Invalid;
@@ -60,21 +60,10 @@ void MainMenuSystem::OnPlay(const Events::InputCommand& e)
     }
 }
 
-
-void MainMenuSystem::OnOptions(const Events::InputCommand& e)
-{
-
-}
-
-void MainMenuSystem::OpenSubMenu(const Events::InputCommand& e)
-{
-  
-}
-
 bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
 {
-    if (e.EntityName == "ServerIdentityConnect") {
-        EntityWrapper entity = e.Entity;
+    EntityWrapper entity = e.Entity;
+    if (entity.Name() == "ServerIdentityConnect") {
         EntityWrapper serverIdentityEntity = entity.FirstParentWithComponent("ServerIdentity");
         if(serverIdentityEntity.Valid()) {
             Events::ConnectRequest event;
@@ -83,6 +72,9 @@ bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
             printf("\n ----Request Server Connect----\nIP: %s\nPort: %i\n ------------------------------", event.IP, event.Port);
             m_EventBroker->Publish(event);
         }
+    } else if (entity.HasComponent("ConfigBtnResolution")) {
+        
+        m_Renderer->SetResolution(Rectangle((int)entity["ConfigBtnResolution"]["Width"], (int)entity["ConfigBtnResolution"]["Height"]));
     }
     return true;
 }
@@ -100,12 +92,12 @@ bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
 {
     if(e.Command == "Play" && e.Value == 1) {
-        OnPlay(e);
+        OpenSubMenu(e);
     } else if (e.Command == "RefreshServerList" && e.Value == 1){
         Events::SearchForServers event;
         m_EventBroker->Publish(event);
     } else if (e.Command == "Options" && e.Value == 1) {
-        OnOptions(e);
+        OpenSubMenu(e);
     }
     return true;
 }
