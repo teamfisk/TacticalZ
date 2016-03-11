@@ -71,7 +71,8 @@ void AnimationSystem::UpdateAnimations(double dt)
 
         Model* model;
         try {
-            model = ResourceManager::Load<::Model, true>(modelEntity["Model"]["Resource"]);
+            Field<std::string> res = modelEntity["Model"]["Resource"];
+            model = ResourceManager::Load<::Model, true>(res);
         } catch (const std::exception&) {
             return;
         }
@@ -87,23 +88,23 @@ void AnimationSystem::UpdateAnimations(double dt)
             continue;;
         }
 
-        double animationSpeed = (double)animationC["Speed"];
+        double animationSpeed = (const double&)animationC["Speed"];
 
-        if((bool)animationC["Reverse"]) {
+        if((const bool&)animationC["Reverse"]) {
             animationSpeed *= -1;
         }
 
 
-        if ((bool)animationC["Play"]) {
+        if ((const bool&)animationC["Play"]) {
 
-            double nextTime = (double)animationC["Time"] + animationSpeed * dt;
-            if (!(bool)animationC["Loop"]) {
+            double nextTime = (Field<double>)animationC["Time"] + animationSpeed * dt;
+            if (!(Field<bool>)animationC["Loop"]) {
                 if (nextTime > animation->Duration) {
                     nextTime = animation->Duration;
-                    (bool&)animationC["Play"] = false;
+                    (Field<bool>)animationC["Play"] = false;
                 } else if (nextTime < 0) {
                     nextTime = 0;
-                    (bool&)animationC["Play"] = false;
+                    (Field<bool>)animationC["Play"] = false;
                 }
             } else {
                 if (nextTime > animation->Duration) {
@@ -117,7 +118,7 @@ void AnimationSystem::UpdateAnimations(double dt)
                     }
                 }
             }
-            (double&)animationC["Time"] = nextTime;
+            (Field<double>)animationC["Time"] = nextTime;
         }
     }
 }
@@ -202,15 +203,15 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
     if (nodeEntity.Valid()) {
         if (nodeEntity.HasComponent("Animation")) {
             const Skeleton::Animation* animation = skeleton->GetAnimation(nodeEntity["Animation"]["AnimationName"]);
-            (bool&)nodeEntity["Animation"]["Reverse"] = e.Reverse;
+            (Field<bool>)nodeEntity["Animation"]["Reverse"] = e.Reverse;
 
             if (e.Restart) {
                 if (animation != nullptr) {
                     if (e.Restart) {
                         if (e.Reverse) {
-                            (double&)nodeEntity["Animation"]["Time"] = animation->Duration;
+                            (Field<double>)nodeEntity["Animation"]["Time"] = animation->Duration;
                         } else {
-                            (double&)nodeEntity["Animation"]["Time"] = 0.0;
+                            (Field<double>)nodeEntity["Animation"]["Time"] = 0.0;
                         }
                     }
                 }

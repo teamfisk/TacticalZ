@@ -109,9 +109,9 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         for (int i = 0; i < m_NumberOfCapturePoints; i++) {
             auto owner = (int)m_CapturePointNumberToEntityMap[i]["Team"]["Team"];
             if (m_CapturePointNumberToEntityMap[i].FirstChildByName("Red").ID != EntityID_Invalid) {
-                (bool&)m_CapturePointNumberToEntityMap[i].FirstChildByName("Red")["Model"]["Visible"] = owner == redTeam ? true : false;
-                (bool&)m_CapturePointNumberToEntityMap[i].FirstChildByName("Blue")["Model"]["Visible"] = owner == blueTeam ? true : false;
-                (bool&)m_CapturePointNumberToEntityMap[i].FirstChildByName("Spectator")["Model"]["Visible"] = owner == spectatorTeam ? true : false;
+                m_CapturePointNumberToEntityMap[i].FirstChildByName("Red")["Model"]["Visible"] = owner == redTeam ? true : false;
+                m_CapturePointNumberToEntityMap[i].FirstChildByName("Blue")["Model"]["Visible"] = owner == blueTeam ? true : false;
+                m_CapturePointNumberToEntityMap[i].FirstChildByName("Spectator")["Model"]["Visible"] = owner == spectatorTeam ? true : false;
             }
         }
         //save the next cap points and publish the captured event

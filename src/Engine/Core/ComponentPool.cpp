@@ -52,7 +52,7 @@ ComponentPool::ComponentPool(const ComponentPool& other)
     // Duplicate strings
     for (auto& name : m_ComponentInfo.StringFields) {
         for (auto& c : *this) {
-            std::string& val = c[name];
+            Field<std::string> val = c[name];
             ComponentWrapper::SolidifyStrings(c);
         }
     }

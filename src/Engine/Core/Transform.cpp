@@ -5,7 +5,7 @@ glm::mat4 Transform::AbsoluteTransformation(EntityWrapper entity)
     glm::mat4 t = glm::mat4(1.f);
 
     while (entity.Valid()) {
-        t = glm::translate((glm::vec3&)entity["Transform"]["Position"]) * glm::toMat4(glm::quat((glm::vec3&)entity["Transform"]["Orientation"])) * glm::scale((glm::vec3&)entity["Transform"]["Scale"]) * t;
+        t = glm::translate((const glm::vec3&)entity["Transform"]["Position"]) * glm::toMat4(glm::quat((const glm::vec3&)entity["Transform"]["Orientation"])) * glm::scale((const glm::vec3&)entity["Transform"]["Scale"]) * t;
         entity = entity.Parent();
     }
 
@@ -24,7 +24,7 @@ glm::vec3 Transform::AbsolutePosition(World* world, EntityID entity)
     while (entity != EntityID_Invalid) {
         ComponentWrapper transform = world->GetComponent(entity, "Transform");
         EntityID parent = world->GetParent(entity);
-        position += Transform::AbsoluteOrientation(world, parent) * (glm::vec3)transform["Position"];
+        position += Transform::AbsoluteOrientation(world, parent) * (const glm::vec3&)transform["Position"];
         entity = parent;
     }
 
@@ -37,7 +37,7 @@ glm::vec3 Transform::AbsoluteOrientationEuler(EntityWrapper entity)
 
     while (entity.Valid()) {
         ComponentWrapper transform = entity["Transform"];
-        orientation += (glm::vec3)transform["Orientation"];
+        orientation += (Field<glm::vec3>)transform["Orientation"];
         entity = entity.Parent();
     }
 

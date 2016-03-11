@@ -155,13 +155,13 @@ void CapturePointArrowHUDSystem::Update(double dt)
             pos = m_BlueTeamCurrentTarget;
         }
 
-        glm::vec3& arrowOri = arrowEntity["Transform"]["Orientation"];
+        Field<glm::vec3> arrowOri = arrowEntity["Transform"]["Orientation"];
         glm::vec3 lookVector = glm::normalize(Transform::AbsolutePosition(arrowEntity) - pos); //Maybe should be player instead
         float pitch = std::asin(-lookVector.y);
         float yaw = std::atan2(lookVector.x, lookVector.z);
-        arrowOri.x = pitch;
-        arrowOri.y = yaw;
-        arrowOri.z = 0.f;
+        arrowOri.x(pitch);
+        arrowOri.y(yaw);
+        arrowOri.z(0.f);
         EntityWrapper parent = arrowEntity.Parent();
         if (parent.Valid()) {
             arrowOri -= Transform::AbsoluteOrientationEuler(parent);

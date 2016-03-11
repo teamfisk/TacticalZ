@@ -54,7 +54,7 @@ void PlayerMovementSystem::Update(double dt)
                 playerEntityModel.Copy(sprintEffect["Model"]);
                 playerEntityAnimation.Copy(sprintEffect["Animation"]);
                 sprintEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
-                ((glm::vec4&)sprintEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+                ((Field<glm::vec4>)sprintEffect["ExplosionEffect"]["EndColor"]).w(0.f);
                 sprintEffect["Animation"]["Speed1"] = 0.0;
                 sprintEffect["Animation"]["Speed2"] = 0.0;
                 sprintEffect["Animation"]["Speed3"] = 0.0;
@@ -77,10 +77,10 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
         // Aim pitch
         EntityWrapper cameraEntity = player.FirstChildByName("Camera");
         if (cameraEntity.Valid()) {
-            glm::vec3& cameraOrientation = cameraEntity["Transform"]["Orientation"];
-            cameraOrientation.x += controller->Rotation().x;
+            Field<glm::vec3> cameraOrientation = cameraEntity["Transform"]["Orientation"];
+            cameraOrientation.x(cameraOrientation.x() + controller->Rotation().x);
             // Limit camera pitch so we don't break our necks
-            cameraOrientation.x = glm::clamp(cameraOrientation.x, -glm::half_pi<float>(), glm::half_pi<float>());
+            cameraOrientation.x(glm::clamp(cameraOrientation.x(), -glm::half_pi<float>(), glm::half_pi<float>()));
             // Set third person model aim pitch
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
 
@@ -89,29 +89,29 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 EntityWrapper aimPrimaryEntity = playerModel.FirstChildByName("AimPrimary");
                 if(aimPrimaryEntity.Valid()){
                     if(aimPrimaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x + 0.2f;
+                        float pitch = cameraOrientation.x() + 0.2f;
                         double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
-                        (double&)aimPrimaryEntity["Animation"]["Time"] = time;
+                        (Field<double>)aimPrimaryEntity["Animation"]["Time"] = time;
                     }
                 }
                 EntityWrapper aimSecondaryEntity = playerModel.FirstChildByName("AimSecondary");
                 if (aimSecondaryEntity.Valid()) {
                     if (aimSecondaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x + 0.2f;
+                        float pitch = cameraOrientation.x() + 0.2f;
                         double time = (pitch + glm::half_pi<float>()) / glm::pi<float>();
-                        (double&)aimSecondaryEntity["Animation"]["Time"] = time;
+                        (Field<double>)aimSecondaryEntity["Animation"]["Time"] = time;
                     }
                 }
             }
         }
 
         ComponentWrapper& cTransform = player["Transform"];
-        glm::vec3& ori = cTransform["Orientation"];
-        ori.y += controller->Rotation().y;
+        Field<glm::vec3> ori = cTransform["Orientation"];
+        ori.y(ori.y() + controller->Rotation().y);
 
         float playerMovementSpeed = player["Player"]["MovementSpeed"];
         float playerCrouchSpeed = player["Player"]["CrouchSpeed"];
-        glm::vec3& wishDirection = player["Player"]["CurrentWishDirection"];
+        Field<glm::vec3> wishDirection = player["Player"]["CurrentWishDirection"];
         auto playerBoostAssaultEntity = player.FirstChildByName("BoostAssault");
         if (playerBoostAssaultEntity.Valid()) {
             playerMovementSpeed *= (double)playerBoostAssaultEntity["BoostAssault"]["StrengthOfEffect"];
@@ -131,7 +131,8 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             ComponentWrapper cPhysics = player["Physics"];
             //Assault Dash Check
             if (player.HasComponent("DashAbility")) {
-                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], player["DashAbility"]["CoolDownTimer"], player.ID);
+                Field<double> coolDownTimer = player["DashAbility"]["CoolDownTimer"];
+                controller->AssaultDashCheck(dt, ((glm::vec3)cPhysics["Velocity"]).y != 0.0f, player["DashAbility"]["CoolDownMaxTimer"], coolDownTimer, player.ID);
             }
             wishDirection = controller->Movement() * glm::inverse(glm::quat(ori));
             //this makes sure you can only dash in the 4 directions: forw,backw,left,right
@@ -145,21 +146,21 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 wishSpeed = playerMovementSpeed;
             }
             if (player.ID == m_LocalPlayer.ID) {
-                if (glm::length(wishDirection) == 0) {
+                if (glm::length((glm::vec3)wishDirection) == 0) {
                     // If no key is pressed, reset the distance moved since last step.
                     m_DistanceMoved = 0;
                 }
             }
-            glm::vec3& velocity = cPhysics["Velocity"];
+            Field<glm::vec3> velocity = cPhysics["Velocity"];
             bool isOnGround = (bool)cPhysics["IsOnGround"];
             //ImGui::Text(isOnGround ? "On ground" : "In air");
             //ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
             glm::vec3 groundVelocity(0.f, 0.f, 0.f);
-            groundVelocity.x = velocity.x;
-            groundVelocity.z = velocity.z;
+            groundVelocity.x = velocity.x();
+            groundVelocity.z = velocity.z();
             //ImGui::Text("groundVelocity: (%f, %f, %f) |%f|", groundVelocity.x, groundVelocity.y, groundVelocity.z, glm::length(groundVelocity));
             //ImGui::Text("wishDirection: (%f, %f, %f) |%f|", wishDirection.x, wishDirection.y, wishDirection.z, glm::length(wishDirection));
-            float currentSpeedProj = glm::dot(groundVelocity, wishDirection);
+            float currentSpeedProj = glm::dot(groundVelocity, (glm::vec3)wishDirection);
             float addSpeed = wishSpeed - currentSpeedProj;
             //ImGui::Text("currentSpeedProj: %f", currentSpeedProj);
             //ImGui::Text("wishSpeed: %f", wishSpeed);
@@ -184,8 +185,8 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 if (sniperSprinting) {
                     accelerationSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
                 }
-                velocity += accelerationSpeed * wishDirection;
-                ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x, velocity.y, velocity.z, glm::length(velocity));
+                velocity += accelerationSpeed * (glm::vec3)wishDirection;
+                ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x(), velocity.y(), velocity.z(), glm::length((glm::vec3)velocity));
             }
 
             if (isOnGround) {
@@ -195,7 +196,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             if (controller->Jumping() && !controller->Crouching()) {
                 if (isOnGround) {
                     (bool)cPhysics["IsOnGround"] = false;
-                    velocity.y = player["Player"]["JumpSpeed"];
+                    velocity.y(player["Player"]["JumpSpeed"]);
 
 
                     if (player.Valid()) {
@@ -227,7 +228,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                 } else if (player.HasComponent("DoubleJump") && !controller->DoubleJumping()) {
                     //Enter here if player can double jump and is doing so.
                     (bool)cPhysics["IsOnGround"] = false;
-                    velocity.y = player["DoubleJump"]["DoubleJumpSpeed"];
+                    velocity.y(player["DoubleJump"]["DoubleJumpSpeed"]);
 
                     if (player.Valid()) {
                         EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
@@ -268,7 +269,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             }
 
             if (player.HasComponent("AABB")) {
-                glm::vec3& size = player["AABB"]["Size"];
+                Field<glm::vec3> size = player["AABB"]["Size"];
                 if (controller->Crouching()) {
                     size = glm::vec3(1.f, 1.f, 1.f);
                 } else {
@@ -290,11 +291,11 @@ void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
     // Only apply velocity to local player
     ComponentWrapper& cTransform = player["Transform"];
     ComponentWrapper& cPhysics = player["Physics"];
-    glm::vec3& velocity = cPhysics["Velocity"];
+    Field<glm::vec3> velocity = cPhysics["Velocity"];
     bool isOnGround = (bool)cPhysics["IsOnGround"];
 
     // Ground friction
-    float speed = glm::length(velocity);
+    float speed = glm::length((glm::vec3)velocity);
     static float groundFriction = 7.f;
     ImGui::InputFloat("groundFriction", &groundFriction);
     static float airFriction = 2.f;
@@ -304,16 +305,16 @@ void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
     if (speed > 0) {
         float drop = speed * friction * (float)dt;
         float multiplier = glm::max(speed - drop, 0.f) / speed;
-        velocity.x *= multiplier;
-        velocity.z *= multiplier;
+        velocity.x(velocity.x() * multiplier);
+        velocity.z(velocity.z() * multiplier);
     }
 
     // Gravity
     if (cPhysics["Gravity"]) {
-        velocity.y -= 9.82f * (float)dt;
+        velocity.y(velocity.y() - (9.82f * (float)dt));
     }
 
-    glm::vec3& position = cTransform["Position"];
+    Field<glm::vec3> position = cTransform["Position"];
     position += velocity * (float)dt;
 }
 
@@ -495,7 +496,7 @@ bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
     playerEntityModel.Copy(dashEffect["Model"]);
     playerEntityAnimation.Copy(dashEffect["Animation"]);
     dashEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
-    ((glm::vec4&)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
+    ((Field<glm::vec4>)dashEffect["ExplosionEffect"]["EndColor"]).w = 0.f;
 */
 
 
