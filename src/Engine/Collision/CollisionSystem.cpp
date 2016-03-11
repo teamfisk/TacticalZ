@@ -37,6 +37,10 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                     bool hit;
                     float dist;
                     if (boxB.Entity.HasComponent("Model")) {
+                        if (!((bool)boxB.Entity["Model"]["Visible"])) {
+                            // Don't collide against invisible models.
+                            continue;
+                        }
                         RawModel* model;
                         std::string res = (std::string)boxB.Entity["Model"]["Resource"];
                         try {
@@ -77,7 +81,11 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
             }
 
             if (boxB.Entity.HasComponent("Model") && Collision::AABBVsAABB(boxA, boxB)) {
-                //Here we know boxB is a entity with Collideable, AABB, and Model.
+                // Here we know boxB is a entity with Collideable, AABB, and Model.
+                if (!((bool)boxB.Entity["Model"]["Visible"])) {
+                    // Don't collide against invisible models.
+                    continue;
+                }
                 RawModel* model;
                 try {
                     model = ResourceManager::Load<RawModel, true>(boxB.Entity["Model"]["Resource"]);
