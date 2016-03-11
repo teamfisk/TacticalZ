@@ -227,9 +227,7 @@ void BlurHUD::FillStencil(RenderScene& scene)
     m_FillDepthStencilProgram->Bind();
 
     GLuint shaderHandle = m_FillDepthStencilProgram->GetHandle();
-
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+    glm::mat4 VP = scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix();
 
     for (auto& job : scene.Jobs.SpriteJob) {
         auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
@@ -239,7 +237,10 @@ void BlurHUD::FillStencil(RenderScene& scene)
         if (!spriteJob->BlurBackground) {
             continue;
         }
-        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
+
+        glm::mat4 MVP = VP * spriteJob->Matrix;
+        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(MVP));
+
 
         glBindVertexArray(spriteJob->Model->VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
@@ -255,7 +256,8 @@ void BlurHUD::FillStencil(RenderScene& scene)
         if(!spriteJob->BlurBackground) {
             continue;
         }
-        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
+        glm::mat4 MVP = VP * spriteJob->Matrix;
+        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(MVP));
 
         glBindVertexArray(spriteJob->Model->VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
