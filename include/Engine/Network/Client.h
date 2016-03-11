@@ -42,7 +42,7 @@ public:
     void Connect(std::string address, int port);
     void Update() override;
 private:
-    //UDPClient m_Unreliable;
+    UDPClient m_Unreliable;
     TCPClient m_Reliable;
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();
@@ -81,7 +81,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    size_t  receive(char* data);
+    size_t receive(char* data);
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
@@ -139,7 +139,7 @@ private:
     std::vector<ServerInfo> m_Serverlist;
     bool m_SearchingForServers = false;
     std::clock_t m_StartSearchTime;
-    double m_SearchingTime = 2000; // Config I guess
+    double m_SearchingTime = 200; // Config I guess
 };
 
 #endif
