@@ -2,9 +2,7 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Transform>
-      <Position X="1.70262027" Y="0.261695802" Z="-3.26634645"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
@@ -32,8 +30,8 @@
         <Entity name="Deploy">
           <Components>
             <c:Animation>
-              <AnimationName>ActivateDeactiveShieldF</AnimationName>
-              <Play>true</Play>
+              <AnimationName>ActivateShieldU</AnimationName>
+              <Loop>false</Loop>
             </c:Animation>
             <c:Transform/>
           </Components>
@@ -42,7 +40,8 @@
         <Entity name="Idle">
           <Components>
             <c:Animation>
-              <AnimationName>ShieldFrontF</AnimationName>
+              <AnimationName>ShieldFrontU</AnimationName>
+              <Play>true</Play>
             </c:Animation>
             <c:Transform/>
           </Components>
@@ -67,14 +66,15 @@
           <SpecularMap>false</SpecularMap>
           <GlowMap>false</GlowMap>
         </c:Model>
+        <c:Shield/>
         <c:Transform/>
       </Components>
       <Children>
         <Entity name="Deploy">
           <Components>
             <c:Animation>
-              <AnimationName>ActivateDeactiveShieldF</AnimationName>
-              <Play>true</Play>
+              <AnimationName>ActivateShieldU</AnimationName>
+              <Loop>false</Loop>
             </c:Animation>
             <c:Transform/>
           </Components>
@@ -83,7 +83,8 @@
         <Entity name="Idle">
           <Components>
             <c:Animation>
-              <AnimationName>ShieldFrontF</AnimationName>
+              <AnimationName>ShieldFrontU</AnimationName>
+              <Loop>false</Loop>
             </c:Animation>
             <c:Transform/>
           </Components>

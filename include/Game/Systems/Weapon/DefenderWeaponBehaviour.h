@@ -22,6 +22,8 @@ public:
     void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
+    void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+
 
 private:
     std::random_device m_RandomDevice;

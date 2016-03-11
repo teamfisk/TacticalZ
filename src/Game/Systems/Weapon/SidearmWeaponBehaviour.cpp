@@ -35,6 +35,14 @@ void SidearmWeaponBehaviour::OnCeasePrimaryFire(ComponentWrapper cWeapon, Weapon
 void SidearmWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
     cWeapon["FireCooldown"] = (double)cWeapon["EquipTime"];
+
+    if(wi.ThirdPersonPlayerModel.Valid()) {
+        Events::AutoAnimationBlend b1;
+        b1.RootNode = wi.ThirdPersonPlayerModel;
+        b1.NodeName = "SidearmWeapon";
+        b1.SingleLevelBlend = true;
+        m_EventBroker->Publish(b1);
+    }
 }
 
 void SidearmWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -64,7 +72,23 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         glm::vec3 direction = Transform::AbsoluteOrientation(tracerSpawner) * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
         EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
-        ((glm::vec3&)ray["Transform"]["Scale"]).z = (distance / 100.f);
+        if (ray.Valid()) {
+            ((glm::vec3&)ray["Transform"]["Scale"]).z = (distance / 100.f);
+        }
+    }
+
+
+    // Play animation
+    playAnimationAndReturn(wi.FirstPersonEntity, "ActionBlend", "Fire");
+
+    // Third person anim
+    if (wi.ThirdPersonPlayerModel.Valid()) {
+        Events::AutoAnimationBlend b1;
+        b1.RootNode = wi.ThirdPersonPlayerModel;
+        b1.NodeName = "Fire";
+        b1.Restart = true;
+        b1.Start = true;
+        m_EventBroker->Publish(b1);
     }
 }
 

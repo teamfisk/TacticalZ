@@ -4,7 +4,7 @@
   <Components>
     <c:BlendAdditive>
       <Adder>MovementBlend</Adder>
-      <Receiver>FinalBlend</Receiver>
+      <Receiver>ActionBlend</Receiver>
     </c:BlendAdditive>
     <c:Model>
       <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
@@ -13,110 +13,12 @@
   </Components>
 
   <Children>
-    <Entity name="FinalBlend">
-      <Components>
-        <c:Blend>
-          <Pose1>ActionBlend</Pose1>
-          <Pose2>Shield</Pose2>
-          <Weight>0</Weight>
-          <SubTreeRoot>true</SubTreeRoot>
-        </c:Blend>
-        <c:Transform/>
-      </Components>
-      <Children>
-        <Entity name="Shield">
-          <Components>
-            <c:Animation>
-              <AnimationName>ActivateShieldF</AnimationName>
-              <Loop>false</Loop>
-            </c:Animation>
-            <c:Transform/>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="ActionBlend">
-          <Components>
-            <c:Blend>
-              <Pose1>Fire</Pose1>
-              <Pose2>ReloadBlend</Pose2>
-              <Weight>0</Weight>
-            </c:Blend>
-            <c:Transform/>
-          </Components>
-          <Children>
-            <Entity name="Fire">
-              <Components>
-                <c:Animation>
-                  <AnimationName>ShootShotgunF</AnimationName>
-                  <Loop>false</Loop>
-                </c:Animation>
-                <c:Transform/>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="ReloadBlend">
-              <Components>
-                <c:Blend>
-                  <Pose1>ReloadLoop</Pose1>
-                  <Pose2>ReloadTransitionBlend</Pose2>
-                  <Weight>1</Weight>
-                </c:Blend>
-                <c:Transform/>
-              </Components>
-              <Children>
-                <Entity name="ReloadLoop">
-                  <Components>
-                    <c:Animation>
-                      <AnimationName>ShotgunReloadTwoF</AnimationName>
-                    </c:Animation>
-                    <c:Transform/>
-                  </Components>
-                  <Children/>
-                </Entity>
-                <Entity name="ReloadTransitionBlend">
-                  <Components>
-                    <c:Blend>
-                      <Pose1>ReloadStart</Pose1>
-                      <Pose2>ReloadEnd</Pose2>
-                      <Weight>0</Weight>
-                    </c:Blend>
-                    <c:Transform/>
-                  </Components>
-                  <Children>
-                    <Entity name="ReloadStart">
-                      <Components>
-                        <c:Animation>
-                          <AnimationName>ShotgunReloadOneF</AnimationName>
-                          <Loop>false</Loop>
-                        </c:Animation>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="ReloadEnd">
-                      <Components>
-                        <c:Animation>
-                          <AnimationName>ShotgunReloadThreeF</AnimationName>
-                          <Loop>false</Loop>
-                        </c:Animation>
-                        <c:Transform/>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
-          </Children>
-        </Entity>
-      </Children>
-    </Entity>
     <Entity name="MovementBlend">
       <Components>
         <c:Blend>
           <Pose1>Idle</Pose1>
           <Pose2>Run</Pose2>
-          <Weight>0</Weight>
+          <Weight>1</Weight>
           <SubTreeRoot>true</SubTreeRoot>
         </c:Blend>
         <c:Transform/>
@@ -125,7 +27,7 @@
         <Entity name="Idle">
           <Components>
             <c:Animation>
-              <AnimationName>IdleF</AnimationName>
+              <AnimationName>IdleSecF</AnimationName>
               <Play>true</Play>
               <Additive>true</Additive>
             </c:Animation>
@@ -136,7 +38,7 @@
         <Entity name="Run">
           <Components>
             <c:Animation>
-              <AnimationName>RunF</AnimationName>
+              <AnimationName>RunSecF</AnimationName>
               <Play>true</Play>
               <Additive>true</Additive>
             </c:Animation>
@@ -152,11 +54,11 @@
           <BoneName>R_Arm_Weapon_Joint</BoneName>
         </c:BoneAttachment>
         <c:Model>
-          <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
+          <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0.120748043" Y="-0.228436321" Z="-0.151475549"/>
-          <Orientation X="0.0102800643" Y="-0.00312487315" Z="0.0428144038"/>
+          <Position X="0.18578662" Y="-0.216220587" Z="-0.382728696"/>
+          <Orientation X="0.010279973" Y="-0.00312555139" Z="0.0428142436"/>
         </c:Transform>
       </Components>
       <Children>
@@ -189,9 +91,9 @@
           <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Transform>
-          <Position X="0.0540262833" Y="-0.0954347998" Z="-0.225546911"/>
-          <Orientation X="0.00124507793" Y="0.077417776" Z="0.00737103401"/>
-          <Scale X="0.5" Y="0.50000006" Z="0.499999911"/>
+          <Position X="0.109812573" Y="-0.0832190216" Z="-0.373473197"/>
+          <Orientation X="0.00118373742" Y="0.077411525" Z="0.00458352407"/>
+          <Scale X="0.500000119" Y="0.5" Z="0.500000119"/>
         </c:Transform>
       </Components>
       <Children>
@@ -224,7 +126,7 @@
                 </c:Text>
                 <c:TextFieldReader>
                   <ParentEntityName></ParentEntityName>
-                  <ComponentType>DefenderWeapon</ComponentType>
+                  <ComponentType>Sidearm</ComponentType>
                   <Field>Ammo</Field>
                 </c:TextFieldReader>
                 <c:Transform>
@@ -243,7 +145,7 @@
                 </c:Text>
                 <c:TextFieldReader>
                   <ParentEntityName></ParentEntityName>
-                  <ComponentType>DefenderWeapon</ComponentType>
+                  <ComponentType>Sidearm</ComponentType>
                   <Field>MagazineAmmo</Field>
                 </c:TextFieldReader>
                 <c:Transform>
@@ -253,6 +155,38 @@
               <Children/>
             </Entity>
           </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="ActionBlend">
+      <Components>
+        <c:Blend>
+          <Pose1>Fire</Pose1>
+          <Pose2>Reload</Pose2>
+          <Weight>0</Weight>
+        </c:Blend>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Fire">
+          <Components>
+            <c:Animation>
+              <AnimationName>ShootSecF</AnimationName>
+              <Loop>false</Loop>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Reload">
+          <Components>
+            <c:Animation>
+              <AnimationName>ReloadSwitchSecF</AnimationName>
+              <Loop>false</Loop>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
         </Entity>
       </Children>
     </Entity>
