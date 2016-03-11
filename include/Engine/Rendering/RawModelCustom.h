@@ -18,6 +18,7 @@
 #include "../Core/ResourceManager.h"
 #include "Texture.h"
 #include "Skeleton.h"
+#include "ShaderProgram.h"
 
 #include "boost\endian\buffers.hpp"
 
@@ -87,6 +88,7 @@ public:
 	struct MaterialProperties {
 		MaterialType type;
 		MaterialBasic* material;
+		unsigned int ShaderID = 0;
 	};
 
 	const Vertex*	Vertices() const {
