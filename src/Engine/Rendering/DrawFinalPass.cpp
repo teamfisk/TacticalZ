@@ -242,7 +242,7 @@ void DrawFinalPass::InitializeShaderPrograms()
 	
 }
 
-void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
+void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass, TextPass* textPass)
 {
     GLERROR("Pre");
 	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer.GetHandle());
@@ -282,10 +282,36 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 	//state->StencilMask(0x00);
 	DrawModelRenderQueues(scene.Jobs.OpaqueObjects, scene);
 	GLERROR("OpaqueObjects");
+    delete state;
+   
+    DrawFinalPassState* stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
+    if (scene.ShouldBlur) {
+        //Combine nonblur and blur texture
+        stateSprite->Disable(GL_DEPTH_TEST);
+        stateSprite->Disable(GL_STENCIL_TEST);
+        m_CombinedTexture = blurHUDPass->CombineTextures(m_SceneTexture, m_FullBlurredTexture);
+
+    }
+    //Draw Transparen objects
+    //state->BlendFunc(GL_ONE, GL_ONE);
+    //state->StencilFunc(GL_EQUAL, 1, 0xFF);
+    //DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
+    GLERROR("TransparentObjects");
+    //state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    stateSprite->Enable(GL_DEPTH_TEST);
+    //stateSprite->AlphaFunc(GL_GEQUAL, 0.05f);
+    //stateSprite->Enable(GL_ALPHA_TEST);
+    DrawSprites(scene.Jobs.SpriteJob, scene);
+    GLERROR("SpriteJobs");
+
+    delete stateSprite;
+
+    state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
 
 	//state->Disable(GL_STENCIL_TEST);
     //Draw Transparen Shielded objects
 	state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    textPass->Draw(scene, m_FinalPassFrameBuffer);
 	DrawModelRenderQueuesWithShieldCheck(scene.Jobs.TransparentObjects, scene); //might need changing
     GLERROR("Shielded Transparent objects");
 
@@ -296,27 +322,7 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
         m_FullBlurredTexture = blurHUDPass->Draw(m_SceneTexture, scene);
     }
 
-        DrawFinalPassState* stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
-    if(scene.ShouldBlur) {
-        //Combine nonblur and blur texture
-        stateSprite->Disable(GL_DEPTH_TEST);
-        stateSprite->Disable(GL_STENCIL_TEST);
-        m_CombinedTexture = blurHUDPass->CombineTextures(m_SceneTexture, m_FullBlurredTexture);
-
-    }
-	//Draw Transparen objects
-	//state->BlendFunc(GL_ONE, GL_ONE);
-	//state->StencilFunc(GL_EQUAL, 1, 0xFF);
-	//DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
-	GLERROR("TransparentObjects");
-	//state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    stateSprite->Enable(GL_DEPTH_TEST);
-    //stateSprite->AlphaFunc(GL_GEQUAL, 0.05f);
-    //stateSprite->Enable(GL_ALPHA_TEST);
-	DrawSprites(scene.Jobs.SpriteJob, scene);
-	GLERROR("SpriteJobs");
-
-	delete stateSprite;
+    
     GLERROR("END");
     
 }

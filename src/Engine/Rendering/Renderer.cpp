@@ -210,14 +210,15 @@ void Renderer::Draw(RenderFrame& frame)
         PerformanceTimer::StartTimerAndStopPrevious("Renderer-Light Culling");
         m_LightCullingPass->CullLights(*scene);
         GLERROR("LightCulling");
+        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Text");
+        //m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
+        GLERROR("Draw Text");
 		PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Geometry+Light");
-		m_DrawFinalPass->Draw(*scene, m_BlurHUDPass);
+		m_DrawFinalPass->Draw(*scene, m_BlurHUDPass, m_TextPass);
         GLERROR("Draw Geometry+Light");
         //m_DrawScenePass->Draw(*scene);
 
-        PerformanceTimer::StartTimerAndStopPrevious("Renderer-Draw Text");
-        m_TextPass->Draw(*scene, *m_DrawFinalPass->FinalPassFrameBuffer());
-        GLERROR("Draw Text");
+        
         PerformanceTimer::StopTimer("Renderer-Draw Text");
     }
 

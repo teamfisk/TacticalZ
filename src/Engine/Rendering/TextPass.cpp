@@ -34,7 +34,7 @@ void TextPass::Update()
 void TextPass::Draw(RenderScene& scene, FrameBuffer& frameBuffer)
 {
     GLERROR("Derp1");
-    TextPassState* state = new TextPassState(frameBuffer.GetHandle());
+    //TextPassState* state = new TextPassState(frameBuffer.GetHandle());
     for (auto &job : scene.Jobs.Text) {
         auto textJob = std::dynamic_pointer_cast<TextJob>(job);
         if (textJob) {
@@ -43,7 +43,7 @@ void TextPass::Draw(RenderScene& scene, FrameBuffer& frameBuffer)
         }
     }
     GLERROR("Derp2");
-    delete state;
+  //  delete state;
 }
 
 void TextPass::renderText(std::string text, Font* font, TextJob::AlignmentEnum alignment, glm::vec4 color, glm::mat4 modelMatrix, glm::mat4 projectionMatrix, glm::mat4 viewMatrix)

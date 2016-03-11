@@ -13,6 +13,7 @@
 #include "Texture.h"
 #include "ShadowPass.h"
 #include "BlurHUD.h"
+#include "TextPass.h"
 
 class DrawFinalPass
 {
@@ -22,7 +23,7 @@ public:
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
-    void Draw(RenderScene& scene, BlurHUD* blurHUDPass);
+    void Draw(RenderScene& scene, BlurHUD* blurHUDPass, TextPass* textPass);
     void ClearBuffer();
     void OnWindowResize();
 
