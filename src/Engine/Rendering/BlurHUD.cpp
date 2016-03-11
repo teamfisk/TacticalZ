@@ -201,10 +201,7 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 
 void BlurHUD::OnWindowResize()
 {
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_GaussianFrameBuffer_vert.Generate();
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_GaussianFrameBuffer_horiz.Generate();
+	InitializeBuffers();
 }
 
 void BlurHUD::FillStencil(RenderScene& scene)
