@@ -30,6 +30,10 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundManager::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayQueueOnEntity, &SoundManager::OnPlayQueueOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EChangeBGM, &SoundManager::OnChangeBGM);
+
+    Events::ChangeBGM e;
+    e.FilePath = "Audio/bgm/MenuMusic.wav";
+    m_EventBroker->Publish(e);
 }
 
 SoundManager::~SoundManager()
@@ -63,7 +67,7 @@ void SoundManager::Update(double dt)
     deleteInactiveEmitters();
     updateEmitters(dt);
     updateListener(dt);
-    if (m_TempPleaseDeleteMeASAP)
+    if (m_DrumLoopHasBeenStarted)
         matchBGMLoop();
 }
 
@@ -359,7 +363,7 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
     if (e.PlayerID == -1) { // Local player
         m_LocalPlayer = e.Player;
-        if (m_TempPleaseDeleteMeASAP) {
+        if (m_DrumLoopHasBeenStarted) {
             return true;
         }
         m_CurrentBGMCombo = createSource("Audio/BGM/Layer2.wav");
@@ -367,7 +371,7 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
         alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
         setGain(m_CurrentBGMCombo, 0);
         playSound(m_CurrentBGMCombo);
-        m_TempPleaseDeleteMeASAP = true;
+        m_DrumLoopHasBeenStarted = true;
         return true;
     }
     return false;
@@ -390,10 +394,9 @@ bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
 
 bool SoundManager::OnChangeBGM(const Events::ChangeBGM &e)
 {
-    if (m_CurrentBGM == nullptr) {
-        return false;
+    if (m_CurrentBGM != nullptr) {
+        stopSound(m_CurrentBGM); 
     }
-    stopSound(m_CurrentBGM);
     m_CurrentBGM = createSource(e.FilePath);
     playSound(m_CurrentBGM);
     return true;

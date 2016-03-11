@@ -89,9 +89,9 @@ private:
     Source* createSource(std::string filePath);
     std::unordered_map<EntityID, Source*> m_Sources;
     void matchBGMLoop();
-    Source* m_CurrentBGM;
-    Source* m_CurrentBGMCombo;
-    bool m_TempPleaseDeleteMeASAP = false;
+    Source* m_CurrentBGM = nullptr;
+    Source* m_CurrentBGMCombo = nullptr;
+    bool m_DrumLoopHasBeenStarted = false;
 
     // Logic
     World* m_World = nullptr;

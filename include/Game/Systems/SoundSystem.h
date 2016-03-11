@@ -24,7 +24,7 @@
 #include "../Engine/Sound/EPlayAnnouncerVoice.h"
 #include "../Game/Events/EDoubleJump.h"
 #include "../Game/Events/EDashAbility.h"
-
+#include "../Engine/Sound/EChangeBGM.h"
 
 class SoundSystem : public PureSystem, ImpureSystem
 {
