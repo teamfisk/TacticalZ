@@ -14,7 +14,7 @@
 #include "Input/EInputCommand.h"
 #include "Network/ESearchForServers.h"
 #include "Network/EConnectRequest.h"
-#include "Network/EBecomeServer.h"
+#include "Network/EBecomeServerOrClient.h"
 
 
 class MainMenuSystem : public ImpureSystem

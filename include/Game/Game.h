@@ -29,7 +29,7 @@
 #include "Network/Network.h"
 #include "Network/Server.h"
 #include "Network/Client.h"
-#include "Network/EBecomeServer.h"
+#include "Network/EBecomeServerOrClient.h"
 
 // Sound
 #include "Sound/SoundManager.h"
@@ -74,6 +74,8 @@ private:
 
     EventRelay<Game, Events::BecomeServer> m_EBecomeServer;
     bool OnBecomeServer(const Events::BecomeServer& e);
+    EventRelay<Game, Events::BecomeClient> m_EBecomeClient;
+    bool OnBecomeClient(const Events::BecomeClient& e);
 };
 
 #endif

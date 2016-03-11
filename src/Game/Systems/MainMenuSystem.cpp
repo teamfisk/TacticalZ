@@ -50,6 +50,7 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
         return true;
     }
     if (e.Command == "Play" && e.Value == 1) {
+        m_EventBroker->Publish(Events::BecomeClient());
         auto menus = m_World->GetComponents("Menu");
         if (menus == nullptr) {
             return 0;

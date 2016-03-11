@@ -65,6 +65,8 @@ Game::Game(int argc, char* argv[])
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
+    EVENT_SUBSCRIBE_MEMBER(m_EBecomeServer, &Game::OnBecomeServer);
+    EVENT_SUBSCRIBE_MEMBER(m_EBecomeClient, &Game::OnBecomeClient);
 
     // Create the renderer
     m_Renderer = new Renderer(m_EventBroker, m_Config);
@@ -75,7 +77,7 @@ Game::Game(int argc, char* argv[])
         0,
         m_Config->Get<int>("Video.Width", 1280),
         m_Config->Get<int>("Video.Height", 720)
-    ));
+        ));
     m_Renderer->Initialize();
     //m_Renderer->Camera()->SetFOV(glm::radians(m_Config->Get<float>("Video.FOV", 90.f)));
     m_RenderFrame = new RenderFrame();
@@ -164,8 +166,6 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<EditorSystem>(updateOrderLevel, m_Renderer, m_RenderFrame);
 
     m_LastTime = glfwGetTime();
-    EVENT_SUBSCRIBE_MEMBER(m_EBecomeServer, &Game::OnBecomeServer);
-
 }
 
 Game::~Game()
@@ -175,11 +175,12 @@ Game::~Game()
     delete m_OctreeCollision;
     delete m_OctreeTrigger;
     delete m_SoundManager;
+    m_EventBroker->Unsubscribe(m_EBecomeServer);
+    m_EventBroker->Unsubscribe(m_EBecomeClient);
     if (m_NetworkClient != nullptr) {
         delete m_NetworkClient;
     }
     if (m_NetworkServer != nullptr) {
-        m_EventBroker->Unsubscribe(m_EBecomeServer);
         delete m_NetworkServer;
     }
     delete m_World;
@@ -276,8 +277,7 @@ int Game::parseArgs(int argc, char* argv[])
 
 bool Game::OnBecomeServer(const Events::BecomeServer& e)
 {
-    //// Initialize network
-    //if (m_Config->Get<bool>("Networking.StartNetwork", false)) {
+
     //    if (m_IsServer) {
     //        m_NetworkServer = new Server(m_World, m_EventBroker, m_NetworkPort);
     //        m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " SERVER");
@@ -286,14 +286,28 @@ bool Game::OnBecomeServer(const Events::BecomeServer& e)
     //        m_NetworkClient->Connect(m_NetworkAddress, m_NetworkPort);
     //        m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " CLIENT");
     //    }
-    //} else {
-    //    // If network is disabled, pretend we're a server
-    //    m_IsClient = true;
-    //    m_IsServer = true;
-    //}
-    //printf("Event received LOL\n");
-    //return false;
+
+    if (m_NetworkServer != nullptr) {
+        delete m_NetworkServer;
+    }
+    if (m_NetworkClient != nullptr) {
+        delete m_NetworkClient;
+    }
     m_NetworkServer = new Server(m_World, m_EventBroker, m_NetworkPort);
     m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " SERVER");
+    return true;
+}
+
+bool Game::OnBecomeClient(const Events::BecomeClient& e)
+{
+    if (m_NetworkServer != nullptr) {
+        delete m_NetworkServer;
+    }
+    if (m_NetworkClient != nullptr) {
+        delete m_NetworkClient;
+    }
+    m_NetworkClient = new Client(m_World, m_EventBroker, std::make_unique<MultiplayerSnapshotFilter>(m_EventBroker));
+    m_NetworkClient->Connect(m_NetworkAddress, m_NetworkPort);
+    m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " CLIENT");
     return true;
 }
