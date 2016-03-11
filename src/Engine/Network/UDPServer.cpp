@@ -61,6 +61,8 @@ void UDPServer::Send(Packet& packet, PlayerDefinition& playerDefinition)
 
 void UDPServer::SendToConnectedPlayers(Packet& packet, std::map<PlayerID, PlayerDefinition>& playersTosendTo)
 {
+    // Remove a player if hen crashes.
+    // Return a vector with disconnected players.
     // Work in progress
     packet.UpdateSize();
 
@@ -95,18 +97,18 @@ void UDPServer::SendToConnectedPlayers(Packet& packet, std::map<PlayerID, Player
                     boost::asio::buffer(splitPacket.Data(), splitPacket.Size()),
                     kv.second.Endpoint,
                     0);
-                LOG_INFO("bytesSent: %i", bytesSent);
+                // LOG_INFO("bytesSent: %i", bytesSent);
             } catch (const boost::system::system_error& e) {
-                LOG_INFO(e.what());
+                LOG_INFO("UDPServer::SendToConnectedPlayers: Disconnected client. %s", e.what());
                 // TODO: Clean up invalid endpoints out of m_ConnectedPlayers later
                 kv.second.Endpoint = boost::asio::ip::udp::endpoint();
             }
         }
-            packetDataSent += splitPacket.Size() - splitPacket.HeaderSize();
-            totalBytesSent += splitPacket.Size();
+        packetDataSent += splitPacket.Size() - splitPacket.HeaderSize();
+        totalBytesSent += splitPacket.Size();
 
-            //LOG_INFO("bytesSent size %i, groupIndex: %i. Number of packets: %i", bytesSent, sequenceNumber, totalMessages);
-            ++groupIndex;
+        //LOG_INFO("bytesSent size %i, groupIndex: %i. Number of packets: %i", bytesSent, sequenceNumber, totalMessages);
+        ++groupIndex;
     }
     for (auto& kv : playersTosendTo) {
         kv.second.PacketGroup++;
@@ -123,7 +125,7 @@ void UDPServer::Send(Packet & packet)
             packet.Size()),
         m_ReceiverEndpoint,
         0);
-    LOG_INFO("Size of packet is %i", bytesSent);
+    //LOG_INFO("Size of packet is %i", bytesSent);
 }
 
 // Broadcasting respond specific logic
@@ -136,7 +138,7 @@ void UDPServer::Send(Packet & packet, boost::asio::ip::udp::endpoint endpoint)
             packet.Size()),
         endpoint,
         0);
-    LOG_INFO("Size of packet is %i", bytesSent);
+    //LOG_INFO("Size of packet is %i", bytesSent);
 }
 
 // Broadcasting

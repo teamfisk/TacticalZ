@@ -28,7 +28,7 @@ void UDPClient::Disconnect()
     m_Socket->close();
     m_Socket = nullptr;
 
-    int lastReceivedSnapshotGroup = 0;
+    m_LastReceivedSnapshotGroup = 0;
     m_PacketSegmentMap.clear();
     PacketID m_SendPacketID = 0;
 }
@@ -106,7 +106,7 @@ void UDPClient::readPartOfPacket()
     memcpy(&packetGroupIndex, m_ReadBuffer + 2 * sizeof(int), sizeof(int));
     int packetGroupSize = 0;
     memcpy(&packetGroupSize, m_ReadBuffer + 3 * sizeof(int), sizeof(int));
-    LOG_INFO("Packet group: %i. Group index: %i. Group size: %i. Packet size: %i.", packetGroup, packetGroupIndex, packetGroupSize, sizeOfPacket);
+    //LOG_INFO("Packet group: %i. Group index: %i. Group size: %i. Packet size: %i.", packetGroup, packetGroupIndex, packetGroupSize, sizeOfPacket);
     if (sizeOfPacket > m_Socket->available()) {
         LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
         // return;
@@ -120,7 +120,7 @@ void UDPClient::readPartOfPacket()
             sizeOfPacket),
         m_ReceiverEndpoint, 0, error);
     if (error) {
-        LOG_ERROR("receive: %s", error.message().c_str());
+        LOG_ERROR("UDPClient::readPartOfPacket: %s", error.message().c_str());
     }
     // Might want to do this earlier when i figure out a good way to 
     // remove data from network buffer.
@@ -198,7 +198,7 @@ bool UDPClient::GetNextPacket(Packet & packet)
             LOG_INFO("The map is increasing in size, size is %i", mapSize);
             continue;
         }
-        if (headerInfoPacket.GetMessageType() == MessageType::Snapshot && lastReceivedSnapshotGroup > headerInfoPacket.Group()) {
+        if (headerInfoPacket.GetMessageType() == MessageType::Snapshot && m_LastReceivedSnapshotGroup > headerInfoPacket.Group()) {
             it = m_PacketSegmentMap.erase(it);
             continue;
             //LOG_INFO("Deleted old entry");
@@ -214,10 +214,9 @@ bool UDPClient::GetNextPacket(Packet & packet)
                 packet.WriteData(currentVector.at(i).second.get() + packet.HeaderSize(), sizeOfData - packet.HeaderSize());
             }
             if (headerInfoPacket.GetMessageType() == MessageType::Snapshot) {
-                lastReceivedSnapshotGroup = packet.Group();
+                m_LastReceivedSnapshotGroup = packet.Group();
             }
             // No need to get next it as we are returning.
-            LOG_INFO("Packet parsed");
             m_PacketSegmentMap.erase(it);
             return true;
         } else {

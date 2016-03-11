@@ -164,7 +164,7 @@ void Server::reliableBroadcast(Packet& packet)
 
 void Server::unreliableBroadcast(Packet& packet)
 {
-    m_Unreliable.SendToConnectedPlayers(packet, m_ConnectedPlayers);
+   m_Unreliable.SendToConnectedPlayers(packet, m_ConnectedPlayers);
 }
 
 // Send snapshot fields
@@ -317,7 +317,7 @@ void Server::checkForTimeOuts()
             }
         }
     }
-    for (size_t i = 0; i < playersToRemove.size(); i++) {
+    for (int i = playersToRemove.size() - 1; i >= 0; i--) {
         disconnect(playersToRemove.at(i));
     }
 }
@@ -360,6 +360,7 @@ void Server::parseTCPConnect(Packet & packet)
     // Ska vara till lagd i TCPServer receive
     PlayerID playerID = getPlayerIDFromEndpoint();
     if (playerID == -1) {
+        LOG_INFO("Server::parseTCPConnect: Not connected");
         return;
     }
     // Create a new player
@@ -382,7 +383,7 @@ void Server::parseTCPConnect(Packet & packet)
     Packet connnectPacket(MessageType::Connect, m_ConnectedPlayers.at(playerID).PacketID);
     // Write playerID to packet
     connnectPacket.WritePrimitive(playerID);
-    m_Reliable.Send(connnectPacket);
+    m_Reliable.Send(connnectPacket, m_ConnectedPlayers.at(playerID));
 
     Packet firstSnapshot(MessageType::Snapshot);
     addInputCommandsToPacket(firstSnapshot);

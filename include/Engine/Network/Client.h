@@ -140,7 +140,7 @@ private:
     std::vector<ServerInfo> m_Serverlist;
     bool m_SearchingForServers = false;
     std::clock_t m_StartSearchTime;
-    double m_SearchingTime = 2000; // Config I guess
+    double m_SearchingTime = 200; // Config I guess
 };
 
 #endif

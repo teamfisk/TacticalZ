@@ -381,7 +381,6 @@ void Client::ignoreFields(Packet& packet, const ComponentInfo& componentInfo)
 
 void Client::parseSnapshot(Packet& packet)
 {
-    LOG_INFO("Snapshot received");
     // Read input commands
     std::size_t numInputCommands = packet.ReadPrimitive<std::size_t>();
     for (std::size_t i = 0; i < numInputCommands; ++i) {
