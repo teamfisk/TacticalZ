@@ -100,12 +100,9 @@ void UDPClient::readPartOfPacket()
     if (sizeOfPacket == 0) {
         return;
     }
-    int packetGroup = 0;
-    memcpy(&packetGroup, m_ReadBuffer + sizeof(int), sizeof(int));
-    int packetGroupIndex = 0;
-    memcpy(&packetGroupIndex, m_ReadBuffer + 2 * sizeof(int), sizeof(int));
-    int packetGroupSize = 0;
-    memcpy(&packetGroupSize, m_ReadBuffer + 3 * sizeof(int), sizeof(int));
+    int packetGroup = *reinterpret_cast<int*>(m_ReadBuffer + sizeof(int));
+    int packetGroupIndex = *reinterpret_cast<int*>(m_ReadBuffer + 2 * sizeof(int));
+    int packetGroupSize = *reinterpret_cast<int*>(m_ReadBuffer + 3 * sizeof(int));
     //LOG_INFO("Packet group: %i. Group index: %i. Group size: %i. Packet size: %i.", packetGroup, packetGroupIndex, packetGroupSize, sizeOfPacket);
     if (sizeOfPacket > m_Socket->available()) {
         LOG_WARNING("UDPClient::readBuffer(): We haven't got the whole packet yet.");
@@ -127,10 +124,11 @@ void UDPClient::readPartOfPacket()
     if (hasReceivedPacket(packetGroup, packetGroupIndex)) {
         return;
     }
-    //std::map<unsigned int, std::vector<std::pair<unsigned int, boost::shared_ptr<char>>>> packetSegmentMap;
     // If group exists
-    if (m_PacketSegmentMap.find(packetGroup) != m_PacketSegmentMap.end()) {
-        m_PacketSegmentMap.at(packetGroup).push_back(std::make_pair(packetGroupIndex, std::move(packetData)));
+    PacketMap::iterator it;
+    it = m_PacketSegmentMap.find(packetGroup);
+    if (it != m_PacketSegmentMap.end()) {
+        it->second.push_back(std::make_pair(packetGroupIndex, std::move(packetData)));
     } else { // Create group and add element
         m_PacketSegmentMap[packetGroup].push_back(std::make_pair(packetGroupIndex, std::move(packetData)));
     }
@@ -139,8 +137,10 @@ void UDPClient::readPartOfPacket()
 
 bool UDPClient::hasReceivedPacket(int packetGroup, int groupIndex)
 {
-    if (m_PacketSegmentMap.find(packetGroup) != m_PacketSegmentMap.end()) {
-        const std::vector<std::pair<int, boost::shared_ptr<char>>>& loopPacketGroup = m_PacketSegmentMap.at(packetGroup);
+    PacketMap::iterator it;
+    it = m_PacketSegmentMap.find(packetGroup);
+    if (it != m_PacketSegmentMap.end()) {
+        const std::vector<std::pair<int, boost::shared_ptr<char>>>& loopPacketGroup = it->second;
         for (size_t i = 0; i < loopPacketGroup.size(); i++) {
             if (loopPacketGroup.at(i).first == groupIndex) {
                 return true;
@@ -184,7 +184,7 @@ bool UDPClient::GetNextPacket(Packet & packet)
     // A duplicate packet should not be present in the vector!
     // Soo we will assume that this is true and only look if size
     // of vector is correct.
-    std::map<unsigned int, std::vector<std::pair<int, boost::shared_ptr<char>>>>::iterator it = m_PacketSegmentMap.begin();
+    PacketMap::iterator it = m_PacketSegmentMap.begin();
     while (it != m_PacketSegmentMap.end()) {
         // pair(Group index, packetData)
         std::vector<std::pair<int, boost::shared_ptr<char>>>& currentVector = it->second;
@@ -209,9 +209,9 @@ bool UDPClient::GetNextPacket(Packet & packet)
             packet.ReconstructFromData(currentVector.at(0).second.get(), packet.HeaderSize());
             // Add the rest of the packets.
             int sizeOfData = 0;
-            for (size_t i = 0; i < currentVector.size(); i++) {
-                memcpy(&sizeOfData, currentVector.at(i).second.get(), sizeof(int));
-                packet.WriteData(currentVector.at(i).second.get() + packet.HeaderSize(), sizeOfData - packet.HeaderSize());
+            for (auto& packetSegment : currentVector) {
+                memcpy(&sizeOfData, packetSegment.second.get(), sizeof(int));
+                packet.WriteData(packetSegment.second.get() + packet.HeaderSize(), sizeOfData - packet.HeaderSize());
             }
             if (headerInfoPacket.GetMessageType() == MessageType::Snapshot) {
                 m_LastReceivedSnapshotGroup = packet.Group();

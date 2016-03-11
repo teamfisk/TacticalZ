@@ -6,6 +6,8 @@
 #include <boost/asio.hpp>
 #include "Network/NetworkClient.h"
 
+typedef std::map<unsigned int, std::vector<std::pair<int, boost::shared_ptr<char>>>> PacketMap;
+
 class UDPClient : public NetworkClient
 {
 public:
@@ -31,7 +33,7 @@ private:
     void readPartOfPacket();
     PacketID m_SendPacketID = 0;
     //map:(packetGroup, vector:(pair:(groupIndex, packetData)))
-    std::map<unsigned int, std::vector<std::pair<int, boost::shared_ptr<char>>>> m_PacketSegmentMap;
+    PacketMap m_PacketSegmentMap;
     bool hasReceivedPacket(int packetGroup, int groupIndex);
     // 2^19
     const int m_SizeOfSocketBuffer = 524288;

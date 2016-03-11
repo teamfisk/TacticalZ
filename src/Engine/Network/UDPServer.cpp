@@ -17,9 +17,6 @@ void UDPServer::Send(Packet& packet, PlayerDefinition& playerDefinition)
 {
     packet.UpdateSize();
     try {
-        //Debug
-        int debugTheSixeOfpacket = packet.Size();
-        //Debug end
         // Remove header from packet.
         packet.ReadData(packet.HeaderSize());
         int totalBytesSent = 0;
@@ -61,14 +58,7 @@ void UDPServer::Send(Packet& packet, PlayerDefinition& playerDefinition)
 
 void UDPServer::SendToConnectedPlayers(Packet& packet, std::map<PlayerID, PlayerDefinition>& playersTosendTo)
 {
-    // Remove a player if hen crashes.
-    // Return a vector with disconnected players.
-    // Work in progress
     packet.UpdateSize();
-
-    //Debug
-    int debugTheSixeOfpacket = packet.Size();
-    //Debug end
     // Remove header from packet.
     packet.ReadData(packet.HeaderSize());
     int totalBytesSent = 0;
