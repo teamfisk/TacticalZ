@@ -16,7 +16,6 @@ void MainMenuSystem::Update(double dt)
 
 }
 
-
 void MainMenuSystem::OnPlay(const Events::InputCommand& e)
 {
     auto menus = m_World->GetComponents("Menu");
@@ -61,6 +60,11 @@ void MainMenuSystem::OnPlay(const Events::InputCommand& e)
     }
 }
 
+
+void MainMenuSystem::OnOptions(const Events::InputCommand& e)
+{
+
+}
 
 void MainMenuSystem::OpenSubMenu(const Events::InputCommand& e)
 {
