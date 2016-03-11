@@ -16,6 +16,57 @@ void MainMenuSystem::Update(double dt)
 
 }
 
+
+void MainMenuSystem::OnPlay(const Events::InputCommand& e)
+{
+    auto menus = m_World->GetComponents("Menu");
+    if (menus == nullptr) {
+        return;
+    }
+
+    if (m_OpenSubMenu == EntityWrapper::Invalid) {
+        //No submenu is open, open one.
+        for (auto& menu : *menus) {
+            EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
+            auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
+            if (!serverListSpawner.HasComponent("Spawner")) {
+                return;
+            }
+            m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+            Events::SearchForServers event;
+            m_EventBroker->Publish(event);
+            break;
+        }
+
+    } else if (!m_OpenSubMenu.HasComponent("ServerList")) {
+        //Menu is open, but not the right one, delete the old one and open a new one.
+        m_World->DeleteEntity(m_OpenSubMenu.ID);
+        m_OpenSubMenu = EntityWrapper::Invalid;
+
+        for (auto& menu : *menus) {
+            EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
+            auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
+            if (!serverListSpawner.HasComponent("Spawner")) {
+                return;
+            }
+            m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
+            Events::SearchForServers event;
+            m_EventBroker->Publish(event);
+            break;
+        }
+    } else {
+        //Serverlist submenu is open, close it.
+        m_World->DeleteEntity(m_OpenSubMenu.ID);
+        m_OpenSubMenu = EntityWrapper::Invalid;
+    }
+}
+
+
+void MainMenuSystem::OpenSubMenu(const Events::InputCommand& e)
+{
+  
+}
+
 bool MainMenuSystem::OnButtonClick(const Events::ButtonClicked& e)
 {
     if (e.EntityName == "ServerIdentityConnect") {
@@ -45,49 +96,12 @@ bool MainMenuSystem::OnButtonPress(const Events::ButtonPressed& e)
 bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
 {
     if(e.Command == "Play" && e.Value == 1) {
-        auto menus = m_World->GetComponents("Menu");
-        if (menus == nullptr) {
-            return 0;
-        }
-
-        if (m_OpenSubMenu == EntityWrapper::Invalid) {
-            //No submenu is open, open one.
-            for (auto& menu : *menus) {
-                EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
-                auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
-                if (!serverListSpawner.HasComponent("Spawner")) {
-                    return 0;
-                }
-                m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
-                Events::SearchForServers event;
-                m_EventBroker->Publish(event);
-                break;
-            }
-
-        } else if(!m_OpenSubMenu.HasComponent("ServerList")) {
-            //Menu is open, but not the right one, delete the old one and open a new one.
-            m_World->DeleteEntity(m_OpenSubMenu.ID);
-            m_OpenSubMenu = EntityWrapper::Invalid;
-
-            for (auto& menu : *menus) {
-                EntityWrapper menuEntity = EntityWrapper(m_World, menu.EntityID);
-                auto serverListSpawner = menuEntity.FirstChildByName(e.Command + "Spawner");
-                if (!serverListSpawner.HasComponent("Spawner")) {
-                    return 0;
-                }
-                m_OpenSubMenu = SpawnerSystem::Spawn(serverListSpawner, serverListSpawner);
-                Events::SearchForServers event;
-                m_EventBroker->Publish(event);
-                break;
-            }
-        } else {
-            //Serverlist submenu is open, close it.
-            m_World->DeleteEntity(m_OpenSubMenu.ID);
-            m_OpenSubMenu = EntityWrapper::Invalid;
-        }
+        OnPlay(e);
     } else if (e.Command == "RefreshServerList" && e.Value == 1){
         Events::SearchForServers event;
         m_EventBroker->Publish(event);
+    } else if (e.Command == "Options" && e.Value == 1) {
+        OnOptions(e);
     }
     return true;
 }
