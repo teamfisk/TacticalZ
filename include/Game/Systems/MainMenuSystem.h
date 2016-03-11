@@ -25,6 +25,7 @@ private:
     IRenderer* m_Renderer;
     void OnPlay(const Events::InputCommand& e);
     void OnOptions(const Events::InputCommand& e);
+    void OpenSubMenu(const Events::InputCommand& e);
 
     EventRelay<MainMenuSystem, Events::ButtonClicked> m_EClicked;
     bool OnButtonClick(const Events::ButtonClicked& e);
