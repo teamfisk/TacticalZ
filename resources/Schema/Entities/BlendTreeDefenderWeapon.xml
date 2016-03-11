@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Hands" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:BlendAdditive>
+      <Adder>MovementBlend</Adder>
+      <Receiver>FinalBlend</Receiver>
+    </c:BlendAdditive>
+    <c:Model>
+      <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="FinalBlend">
+      <Components>
+        <c:Blend>
+          <Pose1>BlendTreeDefenderWeapon</Pose1>
+          <Pose2>BlendTreeSecondaryWeapon</Pose2>
+          <Weight>0</Weight>
+          <SubTreeRoot>true</SubTreeRoot>
+        </c:Blend>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="BlendTreeDefenderWeapon">
+          <Components>
+            <c:Blend>
+              <Pose1>ActionBlend</Pose1>
+              <Pose2>Shield</Pose2>
+              <Weight>0</Weight>
+              <SubTreeRoot>true</SubTreeRoot>
+            </c:Blend>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Shield">
+              <Components>
+                <c:Animation>
+                  <AnimationName>ActivateDeactiveShieldF</AnimationName>
+                  <Time>1</Time>
+                  <Speed>1</Speed>
+                  <Loop>false</Loop>
+                </c:Animation>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="ActionBlend">
+              <Components>
+                <c:Blend>
+                  <Pose1>Idle</Pose1>
+                  <Pose2>ActionBlend2</Pose2>
+                  <Weight>0</Weight>
+                  <SubTreeRoot>true</SubTreeRoot>
+                </c:Blend>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="Idle">
+                  <Components>
+                    <c:Animation>
+                      <AnimationName>IdleF</AnimationName>
+                    </c:Animation>
+                    <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="ActionBlend2">
+                  <Components>
+                    <c:Blend>
+                      <Pose1>Fire</Pose1>
+                      <Pose2>Reload</Pose2>
+                      <Weight>0</Weight>
+                    </c:Blend>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity name="Fire">
+                      <Components>
+                        <c:Animation>
+                          <AnimationName>ShootShotgunF</AnimationName>
+                          <Time>0.5</Time>
+                          <Speed>1</Speed>
+                          <Loop>false</Loop>
+                        </c:Animation>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="Reload">
+                      <Components>
+                        <c:Animation>
+                          <AnimationName>ShotgunReloadTwoF</AnimationName>
+                          <Time>0.23333333432674408</Time>
+                          <Speed>1</Speed>
+                          <Loop>false</Loop>
+                        </c:Animation>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="BlendTreeSecondaryWeapon">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="MovementBlend">
+      <Components>
+        <c:Blend>
+          <Pose1>Idle</Pose1>
+          <Pose2>Run</Pose2>
+          <Weight>0</Weight>
+          <SubTreeRoot>true</SubTreeRoot>
+        </c:Blend>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Run">
+          <Components>
+            <c:Animation>
+              <AnimationName>RunF</AnimationName>
+              <Time>0.93061516164344571</Time>
+              <Speed>1</Speed>
+              <Play>true</Play>
+              <Additive>true</Additive>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Idle">
+          <Components>
+            <c:Animation>
+              <AnimationName>IdleF</AnimationName>
+              <Time>0.11396167157691739</Time>
+              <Speed>1</Speed>
+              <Play>true</Play>
+              <Additive>true</Additive>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

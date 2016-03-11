@@ -13,6 +13,8 @@
 #include "../Core/EntityWrapper.h"
 #include "Rendering/AutoBlendQueue.h"
 #include "../Input/EInputCommand.h"
+#include "../Core/EEntityDeleted.h"
+#include "Rendering/ESetBlendWeight.h"
 #include "imgui/imgui.h"
 
 class AnimationSystem : public ImpureSystem
@@ -28,6 +30,13 @@ private:
 
     EventRelay<AnimationSystem, Events::AutoAnimationBlend> m_EAutoAnimationBlend;
     bool OnAutoAnimationBlend(Events::AutoAnimationBlend& e);
+
+    EventRelay<AnimationSystem, Events::EntityDeleted> m_EEntityDeleted;
+    bool OnEntityDeleted(Events::EntityDeleted& e);
+
+    EventRelay<AnimationSystem, Events::SetBlendWeight> m_ESetBlendWeight;
+    bool OnSetBlendWeight(Events::SetBlendWeight& e);
+
     std::unordered_map<EntityWrapper, AutoBlendQueue> m_AutoBlendQueues;
 };
 

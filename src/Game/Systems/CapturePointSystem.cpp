@@ -69,6 +69,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     int ownedBy = teamComponent["Team"];
     int redTeamPlayersStandingInside = 0;
     int blueTeamPlayersStandingInside = 0;
+    //note: old color system
     if (capturePointEntity.HasComponent("Model")) {
         //Now sets team color to the capturepoint, or white if it is uncaptured.
         capturePointEntity["Model"]["Color"] = ownedBy == blueTeam ? glm::vec4(0, 0.0f, 1, 0.3) : ownedBy == redTeam ? glm::vec4(1, 0.0f, 0, 0.3) : glm::vec4(1, 1, 1, 0.3);
@@ -102,7 +103,18 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
             nextPossibleCapturePoint["Blue"] = i - 1;
         }
     }
+
     if (m_RecentlyCapturedNeedNextCapturePointNow) {
+        //change what model is displaying (change all in case 2 capturepoints has been captured on the same frame)
+        for (int i = 0; i < m_NumberOfCapturePoints; i++) {
+            auto owner = (int)m_CapturePointNumberToEntityMap[i]["Team"]["Team"];
+            if (m_CapturePointNumberToEntityMap[i].FirstChildByName("Red").Valid()) {
+                ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Red"), owner == redTeam);
+                ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Blue"), owner == blueTeam);
+                ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Spectator"), owner == spectatorTeam);
+            }
+        }
+        //save the next cap points and publish the captured event
         m_CapturedEvent.BlueTeamNextCapturePoint = m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Blue"]];
         m_CapturedEvent.RedTeamNextCapturePoint = m_CapturePointNumberToEntityMap[nextPossibleCapturePoint["Red"]];
         m_EventBroker->Publish(m_CapturedEvent);
@@ -218,6 +230,14 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         m_WinnerWasFound = true;
     }
 
+}
+
+void CapturePointSystem::ChangeCapturePointModelsVisibility(EntityWrapper &capturePointModels, bool isOwner) {
+    (bool&)capturePointModels["Model"]["Visible"] = isOwner;
+    for (auto& capModel : capturePointModels.ChildrenWithComponent("Model"))
+    {
+        (bool&)capModel["Model"]["Visible"] = isOwner;
+    }
 }
 
 bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e)

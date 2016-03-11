@@ -1,7 +1,9 @@
 #version 430
 
 #define MIN_AMBIENT_LIGHT 0.3
+#define MAX_SPLITS 4
 
+uniform mat4 VM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -11,9 +13,10 @@ uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
-uniform float GlowIntensity = 10;
+uniform float GlowIntensity;
 uniform vec3 CameraPosition;
 uniform int SSAOQuality;
+uniform float FarDistance[MAX_SPLITS];
 
 uniform vec2 DiffuseUVRepeat;
 uniform vec2 NormalUVRepeat;
@@ -25,6 +28,7 @@ layout (binding = 2) uniform sampler2D NormalMapTexture;
 layout (binding = 3) uniform sampler2D SpecularMapTexture;
 layout (binding = 4) uniform sampler2D GlowMapTexture;
 layout (binding = 5) uniform samplerCube CubeMap;
+layout (binding = 30) uniform sampler2DArrayShadow DepthMap;
 
 #define TILE_SIZE 16
 
@@ -59,7 +63,6 @@ layout (std430, binding = 4) buffer LightIndexBuffer
 	float LightIndex[];
 };
 
-
 in VertexData{
 	vec3 Position;
 	vec3 Normal;
@@ -68,6 +71,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;
@@ -77,6 +81,25 @@ struct LightResult {
 	vec4 Diffuse;
 	vec4 Specular;
 };
+
+vec2 poissonDisk[16] = vec2[]( 
+	vec2( -0.94201624, -0.39906216 ), 
+	vec2( 0.94558609, -0.76890725 ), 
+	vec2( -0.094184101, -0.92938870 ), 
+	vec2( 0.34495938, 0.29387760 ), 
+	vec2( -0.91588581, 0.45771432 ), 
+	vec2( -0.81544232, -0.87912464 ), 
+	vec2( -0.38277543, 0.27676845 ), 
+	vec2( 0.97484398, 0.75648379 ), 
+	vec2( 0.44323325, -0.97511554 ), 
+	vec2( 0.53742981, -0.47373420 ), 
+	vec2( -0.26496911, -0.41893023 ), 
+	vec2( 0.79197514, 0.19090188 ), 
+	vec2( -0.24188840, 0.99706507 ), 
+	vec2( -0.81409955, 0.91437590 ), 
+	vec2( 0.19984126, 0.78641367 ), 
+	vec2( 0.14383161, -0.14100790 ) 
+	);
 
 float CalcAttenuation(float radius, float dist, float falloff) {
 	return 1.0 - smoothstep(radius * falloff, radius, dist);
@@ -124,6 +147,154 @@ vec4 CalcNormalMappedValue(vec3 normal, vec3 tangent, vec3 bitangent, vec2 textu
 	return vec4(TBN * normalize(NormalMap), 0.0);
 }
 
+// Returns a "random" value.
+float Random(vec3 seed, int i)
+{
+	vec4 seed4 = vec4(seed, i);
+	float dot_product = dot(seed4, vec4(12.9898, 78.233, 45.164, 94.673));
+	return fract(sin(dot_product) * 43758.5453);
+}
+
+int getShadowIndex(float far_distance[1])
+{
+	return 0;
+}
+
+int getShadowIndex(float far_distance[2])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 1;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+
+	return index;
+}
+
+int getShadowIndex(float far_distance[3])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 2;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+	else if ( depth < far_distance[1] && depth > far_distance[0] )
+	{
+		index = 1;
+	}
+
+	return index;
+}
+
+int getShadowIndex(float far_distance[4])
+{
+	float depth = gl_FragCoord.z / gl_FragCoord.w;
+	
+	int index = 3;
+	if ( depth < far_distance[0] )
+	{
+		index = 0;
+	}
+	else if ( depth < far_distance[1] && depth > far_distance[0] )
+	{
+		index = 1;
+	}
+	else if ( depth < far_distance[2] && depth > far_distance[1] )
+	{
+		index = 2;
+	}
+
+	return index;
+}
+
+// Standard hardware-calculated PCF method
+float PCFShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index)
+{
+	return texture(depth_texture_array, vec4(projection_coords.xy, layer_index, projection_coords.z));
+}
+
+// PCF + Poisson model method
+float PoissonShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index, int taps, float spread)
+{
+	int loop;
+	float multiplier = 1.0 / float(taps);
+	float shadowMapDepth;
+	
+    for (int i = 0; i < taps; i++)
+	{
+		loop = i;
+		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * (1.0 + layer_index));
+		shadowMapDepth += multiplier * texture(depth_texture_array, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
+	}
+	
+	return shadowMapDepth;
+}
+
+// PCF + Poisson + RandomSample model method
+float PoissonDotShadow(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index, int taps, float spread)
+{
+	int loop;
+	float multiplier = 1.0 / float(taps);
+	float shadowMapDepth;
+	
+    for (int i = 0; i < taps; i++)
+	{
+		loop = int(16.0 * Random(gl_FragCoord.xyy, i)) % 16;
+		vec3 newProjCoords = projection_coords + vec3(poissonDisk[loop], 0.0) / (spread * (1.0 + layer_index));
+		shadowMapDepth += multiplier * texture(depth_texture_array, vec4(newProjCoords.xy, layer_index, newProjCoords.z));
+	}
+	
+	return shadowMapDepth;
+}
+
+// Hardware PCF + Additional software PCF method
+float SoftwarePCF(sampler2DArrayShadow depth_texture_array, vec3 projection_coords, int layer_index, float bias)
+{
+	float shadow = 0.0;
+	
+	vec3 texelSize = 1.0 / textureSize(depth_texture_array, 0);
+	for(int x = -1; x <= 1; x++)
+	{
+		for(int y = -1; y <= 1; y++)
+		{
+			shadow += texture(depth_texture_array, vec4(projection_coords.xy + vec2(x, y) * texelSize.xy / (1.0 + layer_index), layer_index, projection_coords.z)); 
+		}    
+	}
+	
+	return shadow / 9.0;
+}
+
+float CalcShadowValue(vec4 light_space_pos, vec3 normal, vec3 light_dir, sampler2DArrayShadow depth_texture_array, int layer_index)
+{
+	float shadowMapDepth;
+	float bias = 0.005;
+	
+	// Various bias methods.
+	
+	//bias = max(0.05 * (1.0 - dot(normal, light_dir)), bias);
+	//bias = bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
+	bias = bias + bias * tan(acos(clamp(dot(normal, -light_dir), 0.0, 1.0)));
+	
+	// Calculate coordinates in projection space.
+	
+    vec3 projCoords = vec3(light_space_pos.xy, light_space_pos.z + bias) / light_space_pos.w;
+    projCoords = projCoords * 0.5 + 0.5;
+	//projCoords = (floor(projCoords * 255.0)) / 255.0;
+	
+	// Various methods for shadow calculation in fastest to slowest order.
+	
+	//shadowMapDepth = PCFShadow(depth_texture_array, projCoords, layer_index);
+	//shadowMapDepth = PoissonShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS - 1]);
+	//shadowMapDepth = PoissonDotShadow(depth_texture_array, projCoords, layer_index, 4, 25.0 * FarDistance[MAX_SPLITS - 1]);
+	shadowMapDepth = SoftwarePCF(depth_texture_array, projCoords, layer_index, bias);
+
+    return shadowMapDepth;
+}
+
 void main()
 {
 	float ao = texelFetch(AOTexture, ivec2(gl_FragCoord.xy) >> int(SSAOQuality), 0).r;
@@ -131,7 +302,7 @@ void main()
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate * SpecularUVRepeat);
-	vec4 position = V * M * vec4(Input.Position, 1.0); 
+	vec4 position = VM * vec4(Input.Position, 1.0); 
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
@@ -151,6 +322,8 @@ void main()
 
 	int start = int(LightGrids.Data[currentTile].Start);
 	int amount = int(LightGrids.Data[currentTile].Amount);
+	
+	float shadowFactor = 0.0;
 
 	for(int i = start; i < start + amount; i++) {
 
@@ -162,16 +335,21 @@ void main()
 		if(light.Type == 1) { // point
 			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
+			int DepthMapIndex = getShadowIndex(FarDistance);
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
+			shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap, DepthMapIndex);
 		}
 		totalLighting.Diffuse += vec4(light_result.Diffuse.rgb * ao, light_result.Diffuse.a);
 		totalLighting.Specular += vec4(light_result.Specular.rgb * ao, light_result.Specular.a);
 	}
+	
+	totalLighting.Diffuse *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
+	totalLighting.Specular *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
 
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
-	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
+	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	
@@ -182,6 +360,7 @@ void main()
 		color_result += FillColor;
 	}
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
+	//sceneColor = CommonUniforms.testColour;
 	//sceneColor = vec4(reflectionColor.xyz, 1);
 	color_result.xyz += glowTexel.xyz*GlowIntensity;
 

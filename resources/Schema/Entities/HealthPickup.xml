@@ -2,6 +2,7 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:NetworkComponent/>
     <c:HealthPickup/>
     <c:Model>
       <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>

@@ -84,6 +84,18 @@ bool AABBvsTriangles(const AABB& box,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix);
 
+enum Output
+{
+    OutContained,
+    OutSeparated,
+    OutIntersecting
+};
+//Detects intersection and containment.
+Output AABBvsTrianglesWContainment(const AABB& box,
+    const RawModel::Vertex* modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix);
+
 //Return true if the boxes are intersecting.
 bool AABBVsAABB(const AABB& a, const AABB& b);
 //Return true if the boxes are intersecting.

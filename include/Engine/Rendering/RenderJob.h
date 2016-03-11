@@ -16,16 +16,15 @@ struct RenderJob
 public:
     float Depth;
 
+	bool operator<(const RenderJob& rhs)
+	{
+		return this->Hash < rhs.Hash;
+	}
+
 protected:
     uint64_t Hash;
 
     virtual void CalculateHash() = 0;
-
-    bool operator<(const RenderJob& rhs)
-    {
-        return this->Hash < rhs.Hash;
-    }
-
 };
 
 #endif

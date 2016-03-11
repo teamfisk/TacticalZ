@@ -1,4 +1,5 @@
 #include "Network/Client.h"
+#include "Network/EPlayerDisconnected.h"
 using namespace boost::asio::ip;
 
 Client::Client(World* world, EventBroker* eventBroker)
@@ -35,6 +36,7 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
     EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &Client::OnDashAbility);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
+    EVENT_SUBSCRIBE_MEMBER(m_EConnectRequest, &Client::OnConnectRequest);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
     if (address.empty()) {
@@ -82,7 +84,10 @@ void Client::Update()
     if (m_SearchingForServers) {
         if (m_SearchingTime < (1000* (std::clock() - m_StartSearchTime) / (double)CLOCKS_PER_SEC)) {
             m_SearchingForServers = false;
-            displayServerlist();
+            //displayServerlist();
+            Events::DisplayServerlist e;
+            e.Serverlist = m_Serverlist;
+            m_EventBroker->Publish(e);
         }
     }
 
@@ -177,8 +182,8 @@ void Client::parseTCPConnect(Packet& packet)
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
- //   m_Unreliable.Send(packet);
-  //  LOG_INFO("Sent UDP Connect Server");
+    //   m_Unreliable.Send(packet);
+     //  LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -220,7 +225,7 @@ void Client::parseServerlist(Packet& packet)
 void Client::parseKick()
 {
     LOG_WARNING("You have been kicked from the server.");
-    m_IsConnected = false;
+    disconnect();
 }
 
 void Client::parseSpawnEvents()
@@ -453,29 +458,29 @@ void Client::parseSnapshot(Packet& packet)
 
 void Client::disconnect()
 {
+    removeWorld();
     m_IsConnected = false;
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
     m_Reliable.Send(packet);
     m_Reliable.Disconnect();
+    Events::PlayerDisconnected e;
+    e.Entity = m_LocalPlayer.ID;
+    e.PlayerID = -1;
+    m_EventBroker->Publish(e);
+    createMainMenu();
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    // TEMP
-    if (e.Command == "SearchForServers" && e.Value > 0) {
-        Events::SearchForServers e;
-        m_EventBroker->Publish(e);
-    }
-
     if (e.PlayerID != -1) {
         return false;
     }
 
     if (e.Command == "ConnectToServer") { // Connect for now
         if (e.Value > 0) {
-            m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
+            //m_Reliable.Connect(m_PlayerName, m_Address, m_Port);
         //    m_Unreliable.Connect(m_PlayerName, m_Address, m_Port);
         }
         //LOG_DEBUG("Client::OnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);
@@ -548,12 +553,28 @@ bool Client::OnDashAbility(const Events::DashAbility& e)
     return true;
 }
 
+
+bool Client::OnConnectRequest(const Events::ConnectRequest& e)
+{
+    removeWorld();
+    if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) {
+        // The client sent a successful connect message
+        return true;
+
+    } else {
+        // The client could not send a successful connect message
+        createMainMenu();
+        // Load the main menu again ?
+        return false;
+    }
+    return false;
+}
+
 bool Client::OnSearchForServers(const Events::SearchForServers& e)
 {
     m_SearchingForServers = true;
     m_StartSearchTime = std::clock();
     m_Serverlist.clear();
-    LOG_INFO("Searching for LAN servers...\n");
     Packet packet(MessageType::ServerlistRequest);
     m_ServerlistRequest.Broadcast(packet, 13); // TODO: Config
     return true;
@@ -673,6 +694,26 @@ void Client::displayServerlist()
         ServerInfo si = m_Serverlist[i];
         LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
+}
+
+
+void Client::removeWorld()
+{
+    std::vector<EntityID> childrenToBeDeleted;
+    auto rootEntites = m_World->GetDirectChildren(EntityID_Invalid);
+    for (auto it = rootEntites.first; it != rootEntites.second; it++) {
+        childrenToBeDeleted.push_back(it->second);
+    }
+    for (int i = 0; i < childrenToBeDeleted.size(); ++i) {
+        m_World->DeleteEntity(childrenToBeDeleted[i]);
+    }
+}
+
+
+void Client::createMainMenu()
+{
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/StartMenu.xml");
+    entityFile->MergeInto(m_World);
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

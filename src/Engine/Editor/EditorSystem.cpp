@@ -47,6 +47,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
         Enable();
     } else {
         Disable();
+        m_EventBroker->Publish(Events::UnlockMouse());
     }
 }
 
@@ -210,14 +211,21 @@ bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
         }
         if (m_WidgetSpace == EditorGUI::WidgetSpace::Global) {
             glm::quat parentOrientation;
+            glm::vec3 parentScale(1.f);
             EntityWrapper parent = m_CurrentSelection.Parent();
             if (parent.Valid()) {
                 parentOrientation = glm::inverse(Transform::AbsoluteOrientation(parent));
+                parentScale = Transform::AbsoluteScale(parent);
             }
-            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation;
+            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation / parentScale;
         } else if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
+            glm::vec3 parentScale(1.f);
+            EntityWrapper parent = m_CurrentSelection.Parent();
+            if (parent.Valid()) {
+                parentScale = Transform::AbsoluteScale(parent);
+            }
             glm::quat selectionOri = glm::quat((glm::vec3)m_CurrentSelection["Transform"]["Orientation"]);
-            glm::vec3 localTranslation = selectionOri * e.Translation;
+            glm::vec3 localTranslation = selectionOri * e.Translation / parentScale;
             (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += localTranslation;
         }
         m_EditorGUI->SetDirty(m_CurrentSelection);
