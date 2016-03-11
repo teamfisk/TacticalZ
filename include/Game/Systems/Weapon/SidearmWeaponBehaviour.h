@@ -4,6 +4,8 @@
 #include "WeaponBehaviour.h"
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
+#include "Sound/EPlaySoundOnEntity.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 class SidearmWeaponBehaviour : public WeaponBehaviour<SidearmWeaponBehaviour>
 {
@@ -18,6 +20,7 @@ public:
     void UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt) override;
     void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
 
@@ -32,6 +35,15 @@ private:
     // Utility
     bool canFire(ComponentWrapper cWeapon);
     bool playerInFirstPerson(EntityWrapper player);
+
+    bool dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi);
+    void giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver);
+
+
+    void CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi);
+    void RemoveFrindlyAmmoHUD(WeaponInfo& wi);
+
+
     //float traceRayDistance(glm::vec3 origin, glm::vec3 direction);
 };
 

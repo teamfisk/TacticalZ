@@ -75,18 +75,18 @@ void AnimationSystem::UpdateAnimations(double dt)
         try {
             model = ResourceManager::Load<::Model, true>(modelEntity["Model"]["Resource"]);
         } catch (const std::exception&) {
-            return;
+            continue;
         }
 
         Skeleton* skeleton = model->m_RawModel->m_Skeleton;
         if (skeleton == nullptr) {
-            return;
+            continue;
         }
 
         const Skeleton::Animation* animation = skeleton->GetAnimation(animationC["AnimationName"]);
 
         if (animation == nullptr) {
-            continue;;
+            continue;
         }
 
         double animationSpeed = (double)animationC["Speed"];

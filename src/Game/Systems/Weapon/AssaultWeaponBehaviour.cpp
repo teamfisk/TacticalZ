@@ -166,6 +166,14 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 void AssaultWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
     cWeapon["FireCooldown"] = (double)cWeapon["EquipTime"];
+
+    if (wi.ThirdPersonPlayerModel.Valid()) {
+        Events::AutoAnimationBlend b1;
+        b1.RootNode = wi.ThirdPersonPlayerModel;
+        b1.NodeName = "AssaultWeapon";
+        b1.SingleLevelBlend = true;
+        m_EventBroker->Publish(b1);
+    }
 }
 
 void AssaultWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)

@@ -44,6 +44,7 @@
 				</xs:element>
 				<xs:element name="TriggerHeld" type="t:bool" minOccurs="0"/>
 				<xs:element name="FireCooldown" type="t:double" minOccurs="0"/>
+				<xs:element name="ReloadQueued" type="t:bool" minOccurs="0"/>
 				<xs:element name="IsReloading" type="t:bool" minOccurs="0"/>
 				<xs:element name="ReloadTimer" type="t:double" minOccurs="0"/>
 			</xs:all>
