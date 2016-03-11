@@ -621,7 +621,7 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
         ComponentWrapper& cAABB = entity["AABB"];
         modelSpaceBox = EntityAABB::FromOriginSize((glm::vec3)cAABB["Origin"], (glm::vec3)cAABB["Size"]);
     } else if (entity.HasComponent("Model")) {
-        std::string res = entity["Model"]["Resource"];
+        const std::string& res = entity["Model"]["Resource"];
         if (res.empty()) {
             return boost::none;
         }
@@ -638,7 +638,7 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
         return boost::none;
     }
 
-    glm::mat4 modelMat = Transform::AbsoluteTransformation(entity);
+    glm::mat4 modelMat = Transform::ModelMatrix(entity);
     glm::vec3 mini(INFINITY);
     glm::vec3 maxi(-INFINITY);
     glm::vec3 maxCorner = modelSpaceBox.MaxCorner();

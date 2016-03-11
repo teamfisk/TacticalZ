@@ -184,7 +184,7 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
     }
 
     // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    bool outOfBodyExperience = false; // ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false); // APPARENTLY THIS IS REALLY SLOW
     if (
         (entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) 
         && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) 

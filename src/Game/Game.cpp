@@ -42,7 +42,6 @@
 #include "Game/Systems/StartSystem.h"
 #include "Rendering/TextureSprite.h"
 
-
 Game::Game(int argc, char* argv[])
 {
     parseArgs(argc, argv);
@@ -159,6 +158,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<StartSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<Transform::ClearCache>(updateOrderLevel);
+    ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeTrigger, "Player");
     m_SystemPipeline->AddSystem<AnimationSystem>(updateOrderLevel);
@@ -173,6 +174,8 @@ Game::Game(int argc, char* argv[])
     // Octree for frustum culling must be updated after collisions, otherwise players frustum may be moved after tree is filled, and wrong things are culled.
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillFrustumOctreeSystem>(updateOrderLevel, m_OctreeFrustrumCulling);
+    ++updateOrderLevel;
+    m_SystemPipeline->AddSystem<Transform::ClearCache>(updateOrderLevel);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<RenderSystem>(updateOrderLevel, m_Renderer, m_RenderFrame, m_OctreeFrustrumCulling);
     ++updateOrderLevel;

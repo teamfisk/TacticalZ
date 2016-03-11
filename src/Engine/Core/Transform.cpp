@@ -1,16 +1,6 @@
 #include "Core/Transform.h"
 
-glm::mat4 Transform::AbsoluteTransformation(EntityWrapper entity)
-{
-    glm::mat4 t = glm::mat4(1.f);
-
-    while (entity.Valid()) {
-        t = glm::translate((glm::vec3&)entity["Transform"]["Position"]) * glm::toMat4(glm::quat((glm::vec3&)entity["Transform"]["Orientation"])) * glm::scale((glm::vec3&)entity["Transform"]["Scale"]) * t;
-        entity = entity.Parent();
-    }
-
-    return t;
-}
+static std::unordered_map<EntityWrapper, glm::mat4> MatrixCache;
 
 glm::vec3 Transform::AbsolutePosition(EntityWrapper entity)
 {
@@ -80,24 +70,36 @@ glm::vec3 Transform::AbsoluteScale(World* world, EntityID entity)
     return scale;
 }
 
-glm::mat4 Transform::ModelMatrix(EntityWrapper entity)
-{
-    return ModelMatrix(entity.ID, entity.World);
-}
-
 glm::mat4 Transform::ModelMatrix(EntityID entity, World* world)
 {
-    return AbsoluteTransformation(EntityWrapper(world, entity));
-
-    //glm::vec3 position = Transform::AbsolutePosition(world, entity);
-    //glm::quat orientation = Transform::AbsoluteOrientation(world, entity);
-    //glm::vec3 scale = Transform::AbsoluteScale(world, entity);
-
-    //glm::mat4 modelMatrix = glm::translate(glm::mat4(), position) * glm::toMat4(orientation) * glm::scale(scale);
-    //return modelMatrix;
+    return ModelMatrix(EntityWrapper(world, entity));
 }
 
 glm::vec3 Transform::TransformPoint(const glm::vec3& point, const glm::mat4& matrix)
 {
     return glm::vec3(matrix * glm::vec4(point.x, point.y, point.z, 1));
+}
+
+glm::mat4 Transform::ModelMatrix(EntityWrapper entity)
+{
+    auto cacheIt = MatrixCache.find(entity);
+    if (cacheIt != MatrixCache.end()) {
+        return cacheIt->second;
+    }
+
+    ComponentWrapper cTransform = entity["Transform"];
+    glm::mat4 t = glm::translate((const glm::vec3&)cTransform["Position"]) * glm::toMat4(glm::quat((const glm::vec3&)cTransform["Orientation"])) * glm::scale((const glm::vec3&)cTransform["Scale"]);
+
+    EntityWrapper parent = entity.Parent();
+    if (parent.Valid()) {
+        t = ModelMatrix(parent) * t;
+    }
+
+    MatrixCache[entity] = t;
+    return t;
+}
+
+void Transform::ClearCache::Update(double dt)
+{
+    MatrixCache.clear();
 }
