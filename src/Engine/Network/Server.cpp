@@ -22,7 +22,8 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
         port = config->Get<float>("Networking.Port", 27666);
     }
     m_Port = port;
-    LOG_INFO("Server initialized and bound to port %i", port);
+    printf("Server initialized and bound to port %i\n", port);
+    
 }
 
 Server::~Server()

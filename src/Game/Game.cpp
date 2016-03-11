@@ -179,6 +179,7 @@ Game::~Game()
         delete m_NetworkClient;
     }
     if (m_NetworkServer != nullptr) {
+        m_EventBroker->Unsubscribe(m_EBecomeServer);
         delete m_NetworkServer;
     }
     delete m_World;
@@ -292,4 +293,7 @@ bool Game::OnBecomeServer(const Events::BecomeServer& e)
     //}
     //printf("Event received LOL\n");
     //return false;
+    m_NetworkServer = new Server(m_World, m_EventBroker, m_NetworkPort);
+    m_Renderer->SetWindowTitle(m_Renderer->WindowTitle() + " SERVER");
+    return true;
 }
