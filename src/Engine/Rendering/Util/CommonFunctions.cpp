@@ -17,8 +17,9 @@ void CommonFunctions::GenerateMultiSampleTexture(GLuint* texture, int numSamples
 {
 	glDeleteTextures(1, texture);
 	glGenTextures(1, texture);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, *texture);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, numSamples, internalFormat, dimensions.x, dimensions.y, false);
+	glBindTexture(GL_TEXTURE_2D, *texture);
+	GLERROR("Texture initialization failed 1");
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, numSamples, internalFormat, dimensions.x, dimensions.y, GL_FALSE);
 	GLERROR("Texture initialization failed");
 }
 

@@ -8,6 +8,9 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
 {
     //TODO: Make sure that uniforms are not sent into shader if not needed.
     m_ShieldPixelRate = 8;
+	m_FinalPassFrameBuffer = new FrameBuffer();
+	m_ShieldDepthFrameBuffer = new FrameBuffer();
+
     InitializeTextures();
     InitializeShaderPrograms();
     InitializeFrameBuffers();
@@ -19,6 +22,9 @@ DrawFinalPass::~DrawFinalPass(){
 	CommonFunctions::DeleteTexture(&m_DepthBuffer);
 	CommonFunctions::DeleteTexture(&m_ShieldBuffer);
 	CommonFunctions::DeleteTexture(&m_CubeMapTexture);
+
+	delete m_FinalPassFrameBuffer;
+	delete m_ShieldDepthFrameBuffer;
 }
 
 void DrawFinalPass::InitializeTextures()
@@ -32,26 +38,78 @@ void DrawFinalPass::InitializeTextures()
 
 void DrawFinalPass::InitializeFrameBuffers()
 {
-	CommonFunctions::GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-	CommonFunctions::GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
-    //GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
+	if (m_MSAA) {
+		CommonFunctions::GenerateTexture(&m_AntiAliasedTexture, GL_CLAMP_TO_BORDER, GL_NEAREST,
+			glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
 
-	CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+		if (m_AntiAliasedFrameBuffer == nullptr) {
+			m_AntiAliasedFrameBuffer = new FrameBuffer();
+			m_AntiAliasedFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_AntiAliasedTexture, GL_COLOR_ATTACHMENT0)));
+		}
+		m_AntiAliasedFrameBuffer->Generate();
 
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
-    //m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
-    m_FinalPassFrameBuffer.Generate();
+		glGenRenderbuffers(1, &m_SceneTexture);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_SceneTexture);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+
+		glGenRenderbuffers(1, &m_BloomTexture);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_BloomTexture);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+
+		glGenRenderbuffers(1, &m_DepthBuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+
+		glGenRenderbuffers(1, &m_ShieldBuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_ShieldBuffer);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_DEPTH_COMPONENT32F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+
+		//CommonFunctions::GenerateMultiSampleTexture(&m_SceneTexture, m_MSAA, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F);
+		//CommonFunctions::GenerateMultiSampleTexture(&m_BloomTexture, m_MSAA, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F);
+		
+		//CommonFunctions::GenerateMultiSampleTexture(&m_DepthBuffer, m_MSAA,
+			//glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8);
+
+		//CommonFunctions::GenerateMultiSampleTexture(&m_ShieldBuffer, m_MSAA,
+			//glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32F);
+	} else {
+		CommonFunctions::GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+		//GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+		CommonFunctions::GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+		//GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
+		//GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
+
+		CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
+			glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+
+		CommonFunctions::GenerateTexture(&m_ShieldBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
+			glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
+	}
+
+	if (m_FinalPassFrameBuffer->GetHandle() == 0) {
+		if (m_MSAA) {
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+			//m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
+		} else {
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+			//m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
+		}
+	}
+    m_FinalPassFrameBuffer->Generate();
     GLERROR("FBO generation");
 
-	CommonFunctions::GenerateTexture(&m_ShieldBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
-	m_ShieldDepthFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
-	m_ShieldDepthFrameBuffer.Generate();
+	if (m_ShieldDepthFrameBuffer->GetHandle() == 0) {
+		if (m_MSAA) {
+			m_ShieldDepthFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
+		} else {
+			m_ShieldDepthFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
+		}
+	}
+	m_ShieldDepthFrameBuffer->Generate();
 }
 
 void DrawFinalPass::InitializeShaderPrograms()
@@ -245,14 +303,14 @@ void DrawFinalPass::InitializeShaderPrograms()
 void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 {
     GLERROR("Pre");
-	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer.GetHandle());
+	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer->GetHandle());
 	//Draw shields to stencil
 	DrawToDepthStencilBuffer(scene.Jobs.ShieldObjects, scene);
 	GLERROR("StencilPass");
 	delete stateDethp;
 
 
-	DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
+	DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
     if (scene.ClearDepth) {
         //glClear(GL_DEPTH_BUFFER_BIT);
 		state->Disable(GL_DEPTH_TEST);
@@ -293,16 +351,21 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
     delete state;
     if (scene.ShouldBlur) {
         //This needs to be drawn only when the full scene is being renderd, and then let be, otherwise sprite and other shit will show on it.
-        m_FullBlurredTexture = blurHUDPass->Draw(m_SceneTexture, scene);
+		GLuint sceneTexture = SceneTexture();
+		GLERROR("SceneTexture() 1");
+        m_FullBlurredTexture = blurHUDPass->Draw(sceneTexture, scene);
     }
 
-        DrawFinalPassState* stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
+    DrawFinalPassState* stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
     if(scene.ShouldBlur) {
         //Combine nonblur and blur texture
         stateSprite->Disable(GL_DEPTH_TEST);
         stateSprite->Disable(GL_STENCIL_TEST);
-        m_CombinedTexture = blurHUDPass->CombineTextures(m_SceneTexture, m_FullBlurredTexture);
-
+		GLuint sceneTexture = SceneTexture();
+		GLERROR("SceneTexture() 2");
+		delete stateSprite;
+		stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
+        m_CombinedTexture = blurHUDPass->CombineTextures(sceneTexture, m_FullBlurredTexture);
     }
 	//Draw Transparen objects
 	//state->BlendFunc(GL_ONE, GL_ONE);
@@ -325,30 +388,37 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 void DrawFinalPass::ClearBuffer()
 {
     GLERROR("PRE");
-	m_ShieldDepthFrameBuffer.Bind();
+	m_ShieldDepthFrameBuffer->Bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	m_ShieldDepthFrameBuffer.Unbind();
-    m_FinalPassFrameBuffer.Bind();
+	m_ShieldDepthFrameBuffer->Unbind();
+    m_FinalPassFrameBuffer->Bind();
     GLERROR("Bind HighRes");
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     GLERROR("ViewPort,Scissor LowRes");
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_FinalPassFrameBuffer.Unbind();
+    m_FinalPassFrameBuffer->Unbind();
     GLERROR("END");
 }
 
 
 void DrawFinalPass::OnWindowResize()
 {
-    //InitializeFrameBuffers();
-	CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
-    CommonFunctions::GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-	CommonFunctions::GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_FinalPassFrameBuffer.Generate();
+	if (m_FinalPassFrameBuffer->MultiSampling() != (bool)m_MSAA) {
+		delete m_FinalPassFrameBuffer;
+		delete m_ShieldDepthFrameBuffer;
+		m_FinalPassFrameBuffer = new FrameBuffer();
+		m_ShieldDepthFrameBuffer = new FrameBuffer();
+	}
 
+	if (!m_MSAA) {
+		if (m_AntiAliasedFrameBuffer != nullptr) {
+			delete m_AntiAliasedFrameBuffer;
+		}
+	}
+
+    InitializeFrameBuffers();
     GLERROR("Error changing texture resolutions");
 }
 
