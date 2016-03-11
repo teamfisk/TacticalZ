@@ -54,7 +54,7 @@ private:
     struct Frustum {
         Plane Planes[4];
     };
-    Frustum* m_Frustums;
+    Frustum* m_Frustums = nullptr;
 
     //This should be a component
     struct LightSource {
@@ -74,11 +74,11 @@ private:
         glm::vec2 Padding = glm::vec2(1.f, 2.f);
     };
 
-    LightGrid* m_LightGrid;
+    LightGrid* m_LightGrid = nullptr;
 
     int m_LightOffset = 0;
 
-    float* m_LightIndex;
+    float* m_LightIndex = nullptr;
 };
 
 
