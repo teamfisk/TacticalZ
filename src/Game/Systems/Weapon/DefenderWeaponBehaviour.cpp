@@ -190,60 +190,50 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
         magAmmo -= 1;
     }
 
-    int numPellets = cWeapon["NumPellets"];
-    float spreadAngle = cWeapon["SpreadAngle"];
-    std::uniform_real_distribution<float> randomSpreadAngle(-spreadAngle, spreadAngle);
-
-    // Calculate pellet angles
-    // HACK: Random for now?
-    // TODO: Make distribution even for each quadrant
-    std::vector<glm::vec2> pelletAngles;
-    for (int i = 0; i < numPellets; i++) {
-        pelletAngles.push_back(glm::vec2(randomSpreadAngle(m_RandomEngine), randomSpreadAngle(m_RandomEngine)));
+    // We can't really do any valuable calculations without a valid camera
+    if (!m_CurrentCamera.Valid()) {
+        return;
     }
 
-    double pelletDamage = (double)cWeapon["BaseDamage"] / numPellets;
+    int numPellets = cWeapon["NumPellets"];
+
+    // Create a spread pattern
+    std::vector<glm::vec2> pattern;
+    // The first pellet is always centered
+    pattern.push_back(glm::vec2(0, 0));
+    // Any additional pellets form circles around the middle
+    int numOuterPellets = numPellets - 1;
+    float angleIncrement = glm::two_pi<float>() / numOuterPellets;
+    for (int i = 0; i < numOuterPellets; ++i) {
+        float angle = angleIncrement * i;
+        glm::vec2 pellet = glm::vec2(glm::cos(angle), glm::sin(angle));
+        pattern.push_back(pellet);
+    }
+
+    // Deal damage (clientside)
+    dealDamage(cWeapon, wi, pattern);
+
+    // Spawn tracers
+    spawnTracers(cWeapon, wi, pattern);
 
     // View punch
-    if (IsClient) {
-        EntityWrapper camera = wi.Player.FirstChildByName("Camera");
-        if (camera.Valid()) {
-            glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
-            float viewPunch = cWeapon["ViewPunch"];
-            float maxTravelAngle = cWeapon["MaxTravelAngle"];
-            float& currentTravel = cWeapon["CurrentTravel"];
-            if (currentTravel < maxTravelAngle) {
-                float change = viewPunch;
-                if (currentTravel + change > maxTravelAngle) {
-                    change = maxTravelAngle - currentTravel;
-                }
-                cameraOrientation.x += change;
-                currentTravel += change;
-            }
-        }
-    }
-
-    // Tracers
-    EntityWrapper weaponModelEntity;
-    if (wi.Player == LocalPlayer) {
-        weaponModelEntity = wi.FirstPersonEntity;
-    } else {
-        weaponModelEntity = wi.ThirdPersonEntity;
-    }
-    if (weaponModelEntity.Valid()) {
-        EntityWrapper spawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
-        for (auto& angles : pelletAngles) {
-            glm::vec3 direction = Transform::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
-            float distance = traceRayDistance(Transform::AbsolutePosition(spawner), direction);
-            EntityWrapper ray = SpawnerSystem::Spawn(spawner);
-            ((glm::vec3&)ray["Transform"]["Scale"]).z = (distance / 100.f);
-            glm::vec3& orientation = ray["Transform"]["Orientation"];
-            orientation.x += angles.x;
-            orientation.y += angles.y;
-            glm::vec3 trajectory = direction * distance;
-            dealDamage(cWeapon, wi, direction, pelletDamage);
-        }
-    }
+    //if (IsClient) {
+    //    EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+    //    if (camera.Valid()) {
+    //        glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
+    //        float viewPunch = cWeapon["ViewPunch"];
+    //        float maxTravelAngle = cWeapon["MaxTravelAngle"];
+    //        float& currentTravel = cWeapon["CurrentTravel"];
+    //        if (currentTravel < maxTravelAngle) {
+    //            float change = viewPunch;
+    //            if (currentTravel + change > maxTravelAngle) {
+    //                change = maxTravelAngle - currentTravel;
+    //            }
+    //            cameraOrientation.x += change;
+    //            currentTravel += change;
+    //        }
+    //    }
+    //}
 
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "Fire");
@@ -255,7 +245,35 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     m_EventBroker->Publish(e);
 }
 
-void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage)
+void DefenderWeaponBehaviour::spawnTracers(ComponentWrapper cWeapon, WeaponInfo& wi, std::vector<glm::vec2> pattern)
+{
+    EntityWrapper muzzle = getRelevantWeaponEntity(wi).FirstChildByName("WeaponMuzzle");
+    if (!muzzle.Valid()) {
+        return;
+    }
+
+    float spreadAngle = glm::radians((float)cWeapon["SpreadAngle"]);
+
+    for (auto& pellet : pattern) {
+        glm::quat pelletRotation = glm::quat(Transform::AbsoluteOrientationEuler(wi.Player.FirstChildByName("Camera"))) * glm::quat(glm::vec3(pellet.y, pellet.x, 0) * spreadAngle);
+        glm::vec3 origin = Transform::AbsolutePosition(wi.Player.FirstChildByName("Camera"));
+        glm::vec3 direction = pelletRotation * glm::vec3(0, 0, -1);
+        float distance = traceRayDistance(origin, direction);
+        EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
+        if (ray.Valid()) {
+            ComponentWrapper cTransform = ray["Transform"];
+            glm::vec3& position = cTransform["Position"];
+            glm::vec3& orientation = cTransform["Orientation"];
+            glm::vec3& scale = cTransform["Scale"];
+
+            position = Transform::AbsolutePosition(wi.Player.FirstChildByName("Camera"));
+            orientation = glm::eulerAngles(pelletRotation);
+            scale.z = distance;
+        }
+    }
+}
+
+void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, const std::vector<glm::vec2>& pattern)
 {
     // Only deal damage client side
     if (!IsClient) {
@@ -271,47 +289,76 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
     if (!wi.Player.Valid()) {
         return;
     }
-    
-    glm::vec3 maxRange = direction * 2.f;
-    EntityWrapper camera = wi.Player.FirstChildByName("Camera");
-    glm::vec3 cameraPosition = Transform::AbsolutePosition(camera);
-    if (!camera.Valid()) {
-        return;
-    }
-    Rectangle screenResolution = m_Renderer->GetViewportSize();
-    glm::vec2 centerScreen = glm::vec2(screenResolution.Width / 2, screenResolution.Height / 2);
-    glm::vec2 screenCoords = cameraFromEntity(m_CurrentCamera).WorldToScreen(cameraPosition + maxRange, m_Renderer->GetViewportSize());
-    PickData pickData = m_Renderer->Pick(centerScreen + screenCoords);
-    EntityWrapper victim(m_World, pickData.Entity);
-    if (!victim.Valid()) {
-        return;
+
+    // Convert the spread angle to screen coordinates, taking FOV into account
+    Rectangle res = m_Renderer->GetViewportSize();
+    float spreadAngle = glm::radians((float)cWeapon["SpreadAngle"]);
+    float nearClip = (double)m_CurrentCamera["Camera"]["NearClip"];
+    float farClip = (double)m_CurrentCamera["Camera"]["FarClip"];
+    float yFOV = glm::radians((double)m_CurrentCamera["Camera"]["FOV"]);
+    //float yRefFOV = glm::radians(59.f);
+    //float yRef = glm::tan(yRefFOV) * nearClip;
+    //float yRatio = yRef / (glm::tan(yFOV) * nearClip);
+    //float yMax = (yRatio / 2.f) * spreadAngle * (res.Height / 2.f);
+    float yRefFOV = glm::radians(59.f);
+    float yRef = glm::tan(yRefFOV) * nearClip;
+    float yRatio = yRef / (glm::tan(yFOV) * nearClip);
+    float yMax = yRatio * (glm::tan(spreadAngle) * farClip);
+
+    LOG_DEBUG("Ratio: %f", yRatio);
+    LOG_DEBUG("fatClip: %f", farClip);
+    LOG_DEBUG("yMax: %f", yMax);
+    double pelletDamage = (double)cWeapon["BaseDamage"] / pattern.size();
+
+    // Pick!
+    std::unordered_map<EntityWrapper, double> damageSum;
+    glm::vec2 screenCenter(res.Width / 2.f, res.Height / 2.f);
+    for (auto& pellet : pattern) {
+        glm::vec2 pickCoord = screenCenter + (pellet * glm::vec2(yMax, yMax));
+        PickData pick = m_Renderer->Pick(pickCoord);        
+
+        EntityWrapper victim(m_World, pick.Entity);
+        if (!victim.Valid()) {
+            continue;
+        }
+
+        // Temp hit decal
+        EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
+        hit["Transform"]["Position"] = pick.Position;
+
+        // Don't let us shoot ourselves in the foot somehow
+        if (victim == LocalPlayer) {
+            continue;
+        }
+
+        // Only care about players being hit
+        if (!victim.HasComponent("Player")) {
+            victim = victim.FirstParentWithComponent("Player");
+            if (!victim.Valid()) {
+                continue;
+            }
+        }
+
+        // Check for friendly fire
+        if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
+            // TODO: Ammo sharing
+            continue;
+        }
+
+        damageSum[victim] += pelletDamage;
+        ((glm::vec3&)hit["Model"]["Color"]).b = 1.f;
     }
 
-    // Don't let us shoot ourselves in the foot somehow
-    if (victim == LocalPlayer) {
-        return;
+    // Deal damage!
+    for (auto& kv : damageSum) {
+        // Deal damage! 
+        Events::PlayerDamage ePlayerDamage;
+        ePlayerDamage.Inflictor = wi.Player;
+        ePlayerDamage.Victim = kv.first;
+        ePlayerDamage.Damage = kv.second;
+        m_EventBroker->Publish(ePlayerDamage);
+        LOG_DEBUG("Dealt %f damage to #%i", kv.second, kv.first.ID);
     }
-
-    // Only care about players being hit
-    if (!victim.HasComponent("Player")) {
-        victim = victim.FirstParentWithComponent("Player");
-    }
-    if (!victim.Valid()) {
-        return;
-    }
-
-    // Check for friendly fire
-    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
-        return;
-    }
-
-    // Deal damage! 
-    Events::PlayerDamage ePlayerDamage;
-    ePlayerDamage.Inflictor = wi.Player;
-    ePlayerDamage.Victim = victim;
-    ePlayerDamage.Damage = damage;
-    m_EventBroker->Publish(ePlayerDamage);
-    LOG_DEBUG("Damage: %f", damage);
 }
 
 bool DefenderWeaponBehaviour::canFire(ComponentWrapper cWeapon, WeaponInfo& wi)
