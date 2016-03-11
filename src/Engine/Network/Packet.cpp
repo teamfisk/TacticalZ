@@ -124,7 +124,6 @@ void Packet::ReconstructFromData(char * data, size_t sizeOfData)
 
 void Packet::UpdateSize()
 {
-    int whatisoffset = m_Offset;
     memcpy(m_Data + packetSizeOffset, &m_Offset, sizeof(int));
 }
 
@@ -163,37 +162,27 @@ void Packet::ChangeGroup(int group)
 
 MessageType Packet::GetMessageType()
 {
-    MessageType messagType;
-    memcpy(&messagType, m_Data + messageTypeOffset, sizeof(int));
-    return messagType;
+    return *reinterpret_cast<MessageType*>(m_Data + messageTypeOffset);
 }
 
 size_t Packet::Group()
 {
-    size_t groupNumber;
-    memcpy(&groupNumber, m_Data + groupOffset, sizeof(int));
-    return groupNumber;
+    return *reinterpret_cast<size_t*>(m_Data + groupOffset);
 }
 
 size_t Packet::GroupIndex()
 {
-    size_t groupIndex;
-    memcpy(&groupIndex, m_Data + groupIndexOffset, sizeof(int));
-    return groupIndex;
+    return *reinterpret_cast<size_t*>(m_Data + groupIndexOffset);
 }
 
 size_t Packet::GroupSize()
 {
-    size_t groupSize;
-    memcpy(&groupSize, m_Data + groupSizeOffset, sizeof(int));
-    return groupSize;
+    return *reinterpret_cast<size_t*>(m_Data + groupSizeOffset);
 }
 
 size_t Packet::PacketID()
 {
-    size_t packetID;
-    memcpy(&packetID, m_Data + packetIDOffset, sizeof(int));
-    return packetID;
+    return *reinterpret_cast<size_t*>(m_Data + packetIDOffset);
 }
 
 void Packet::resizeData()
