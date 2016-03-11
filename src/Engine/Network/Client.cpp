@@ -1,4 +1,5 @@
 #include "Network/Client.h"
+#include "Network/EPlayerDisconnected.h"
 using namespace boost::asio::ip;
 
 Client::Client(World* world, EventBroker* eventBroker)
@@ -232,7 +233,7 @@ void Client::parseServerlist(Packet& packet)
 void Client::parseKick()
 {
     LOG_WARNING("You have been kicked from the server.");
-    m_IsConnected = false;
+    disconnect();
 }
 
 void Client::parseSpawnEvents()
@@ -473,6 +474,10 @@ void Client::disconnect()
     m_Reliable.Send(packet);
     m_Unreliable.Disconnect();
     m_Reliable.Disconnect();
+    Events::PlayerDisconnected e;
+    e.Entity = m_LocalPlayer.ID;
+    e.PlayerID = -1;
+    m_EventBroker->Publish(e);
     createMainMenu();
 }
 

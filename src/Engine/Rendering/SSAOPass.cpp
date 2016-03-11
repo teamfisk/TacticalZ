@@ -233,6 +233,11 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 	GLuint shaderHandle_horiz = m_GaussianProgram_horiz->GetHandle();
 	GLuint shaderHandle_vert = m_GaussianProgram_vert->GetHandle();
 
+    m_GaussianProgram_vert->Bind();
+    glUniform1i(glGetUniformLocation(shaderHandle_vert, "Lod"), 0);
+    m_GaussianProgram_horiz->Bind();
+    glUniform1i(glGetUniformLocation(shaderHandle_horiz, "Lod"), 0);
+
 	m_GaussianFrameBuffer_horiz.Bind();
 	m_GaussianProgram_horiz->Bind();
 
@@ -252,8 +257,6 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_Gaussian_horiz);
 
-		glBindVertexArray(m_ScreenQuad->VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
 		glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex + 1
 			, GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 		//horizontal pass
@@ -265,8 +268,6 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_Gaussian_vert);
 
-		glBindVertexArray(m_ScreenQuad->VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
 		glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex + 1
 			, GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 		m_GaussianFrameBuffer_horiz.Unbind();
@@ -279,8 +280,7 @@ void SSAOPass::Draw(GLuint depthBuffer, Camera* camera)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_Gaussian_horiz);
-	glBindVertexArray(m_ScreenQuad->VAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
+
 	glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex + 1
 		, GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 
