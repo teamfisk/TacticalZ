@@ -19,6 +19,7 @@ public:
     virtual const glm::vec3 Rotation() const { return m_Rotation; }
     virtual bool Jumping() const { return m_Jumping; }
     virtual bool Crouching() const { return m_Crouching; }
+    virtual bool CrouchingLastFrame() const { return m_CrouchingLastFrame; }
     virtual bool DoubleJumping() const { return m_DoubleJumping; }
     virtual void SetDoubleJumping(bool isDoubleJumping) {
         m_DoubleJumping = isDoubleJumping;
@@ -44,6 +45,7 @@ protected:
     bool m_Jumping = false;
     bool m_DoubleJumping = false;
     bool m_Crouching = false;
+    bool m_CrouchingLastFrame = false;
     //assault dash membervariables - needed to calculate the doubletap- and dashlogic
     double m_AssaultDashDoubleTapDeltaTime = 0.0;
     //i will let m_AssaultDashDoubleTapSensitivityTimer stay hardcoded, its not really a gamevariable (more an inputvariable), 
@@ -82,6 +84,7 @@ void FirstPersonInputController<EventContext>::Reset()
 {
     m_Rotation = glm::vec3(0.f, 0.f, 0.f);
     m_Jumping = false;
+    m_CrouchingLastFrame = m_Crouching;
 }
 
 template <typename EventContext>

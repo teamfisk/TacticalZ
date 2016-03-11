@@ -10,6 +10,16 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
         return;
     }
 
+    RawModel* triggerModel = nullptr;
+    glm::mat4 triggerModelMat;
+    if (triggerEntity.HasComponent("Model")) {
+        try {
+            triggerModel = ResourceManager::Load<RawModel, true>(triggerEntity["Model"]["Resource"]);
+            triggerModelMat = Transform::ModelMatrix(triggerEntity);
+        } catch (const std::exception&) {
+        }
+    }
+
     m_OctreeOut.clear();
     m_Octree->ObjectsInSameRegion(*triggerBox, m_OctreeOut);
 
@@ -22,7 +32,17 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
             if (colliderFitsInTrigger) {
                 completelyInsideBox = AABB::FromOriginSize((*triggerBox).Origin(), (*triggerBox).Size() - 2.0f * colliderBox.Size());
             }
-            if (colliderFitsInTrigger && Collision::AABBVsAABB(completelyInsideBox, colliderBox)) {
+
+            // We know the entity is inside the trigger box, but perhaps not the model yet.
+            Collision::Output out = triggerModel == nullptr 
+                ? Collision::Output::OutContained 
+                : Collision::AABBvsTrianglesWContainment(
+                colliderBox,
+                triggerModel->Vertices(),
+                triggerModel->m_Indices,
+                triggerModelMat);
+
+            if (colliderFitsInTrigger && Collision::AABBVsAABB(completelyInsideBox, colliderBox) && out == Collision::Output::OutContained) {
                 // Entity is completely inside the trigger.
                 // If it was only touching before, it is erased.
                 m_EntitiesTouchingTrigger[triggerEntity].erase(colliderEntity);
@@ -32,7 +52,8 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
                     completeSet.insert(colliderEntity);
                     publish<Events::TriggerEnter>(colliderEntity, triggerEntity);
                 }
-            } else {
+                continue;
+            } else if (out != Collision::Output::OutSeparated) {
                 // Entity is only touching the trigger.
                 auto& touchSet = m_EntitiesTouchingTrigger[triggerEntity];
                 auto& completeSet = m_EntitiesCompletelyInTrigger[triggerEntity];
@@ -47,17 +68,17 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
                     touchSet.insert(colliderEntity);
                 }
                 // Else, it was touching the trigger last frame too and nothing is done.
-            }
-        } else {
-            // Entity is not touching the trigger,
-            // Throw event if it was previously.
-            if (throwLeaveIfWasInTrigger(m_EntitiesTouchingTrigger[triggerEntity], colliderEntity, triggerEntity)) {
                 continue;
             }
-            // This only occurs if the entity was completely inside the trigger one frame, 
-            // then completely outside the trigger, e.g. when dying and respawning.
-            throwLeaveIfWasInTrigger(m_EntitiesCompletelyInTrigger[triggerEntity], colliderEntity, triggerEntity);
         }
+        // Only get here if entity is not touching the trigger,
+        // throw event if it was touching previously.
+        if (throwLeaveIfWasInTrigger(m_EntitiesTouchingTrigger[triggerEntity], colliderEntity, triggerEntity)) {
+            continue;
+        }
+        // This only occurs if the entity was completely inside the trigger one frame, 
+        // then completely outside the trigger, e.g. when dying and respawning.
+        throwLeaveIfWasInTrigger(m_EntitiesCompletelyInTrigger[triggerEntity], colliderEntity, triggerEntity);
     }
 }
 

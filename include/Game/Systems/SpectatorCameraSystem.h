@@ -3,6 +3,7 @@
 
 #include "Core/System.h"
 #include "Input/EInputCommand.h"
+#include "Network/EPlayerDisconnected.h"
 
 class SpectatorCameraSystem : public ImpureSystem
 {
@@ -17,6 +18,8 @@ private:
 
     EventRelay<SpectatorCameraSystem, Events::InputCommand> m_EInputCommand;
     bool OnInputCommand(const Events::InputCommand& e);
+    EventRelay<SpectatorCameraSystem, Events::PlayerDisconnected> m_EDisconnect;
+    bool OnDisconnect(const Events::PlayerDisconnected& e);
 };
 
 #endif
