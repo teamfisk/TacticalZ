@@ -22,8 +22,8 @@ public:
     // Returns false if no packets are available
     bool GetNextPacket(Packet& packet);
 private:
-    // Assio UDP logic
     typedef std::map<unsigned int, std::vector<std::pair<int, boost::shared_ptr<char>>>> PacketMap;
+    // Assio UDP logic
     boost::asio::io_service m_IOService;
     boost::asio::ip::udp::endpoint m_ReceiverEndpoint;
     boost::shared_ptr<boost::asio::ip::udp::socket> m_Socket;
