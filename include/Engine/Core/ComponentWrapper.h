@@ -4,10 +4,12 @@
 #include <boost/shared_array.hpp>
 #include <boost/any.hpp>
 #include "../Common.h"
+#include "../GLM.h"
 #include "Entity.h"
 #include "ComponentInfo.h"
 #include "DirtySet.h"
 #include "Util/Any.h"
+
 
 struct ComponentWrapper
 {
@@ -105,7 +107,8 @@ struct ComponentWrapper
     struct SubscriptProxy
     {
         friend struct ComponentWrapper;
-    private:
+  
+    public:
         SubscriptProxy(ComponentWrapper* component, std::string fieldName)
             : m_Component(component)
             , m_FieldName(fieldName)
@@ -120,11 +123,53 @@ struct ComponentWrapper
         bool Dirty(DirtySetType type) { return m_Component->Dirty(type, m_FieldName); }
         void SetDirty(DirtySetType type, bool dirty = true) { m_Component->SetDirty(type, m_FieldName, dirty); }
 
-        template <typename T>
-        operator T&() { return m_Component->Field<T>(m_FieldName); }
+        //template <
+        //    typename T,
+        //    typename = typename std::enable_if<!std::is_base_of<::FIELDLOL, T>::value>::type
+        //>
+       // operator const T&() { return m_Component->Field<T>(m_FieldName); }
+        operator const double&() { return m_Component->Field<double>(m_FieldName); }
+        operator const float&() { return m_Component->Field<float>(m_FieldName); }
+        operator const int&() { return m_Component->Field<int>(m_FieldName); }
+        operator const glm::vec3&() { return m_Component->Field<glm::vec3>(m_FieldName); }
+        operator const glm::vec4&() { return m_Component->Field<glm::vec4>(m_FieldName); }
+        operator const glm::quat&() { return m_Component->Field<glm::quat>(m_FieldName); }
+        operator const bool&() { return m_Component->Field<bool>(m_FieldName); }
+        operator const std::string&() { return m_Component->Field<std::string>(m_FieldName); }
+
+        template <
+            typename T,
+            typename = typename std::enable_if<!std::is_base_of<::FIELDLOL, T>::value>::type
+        >
+        //operator T&() { static_assert(constexpr(false), "FU"); }
+        operator T&() = delete;
+
+       /* template <
+            typename T,
+            typename = typename std::enable_if<!std::is_base_of<::FIELDLOL, T>::value>::type
+        >
+        operator T&() { static_assert(constexpr(false), "FU"); }*/
+
+        //template <typename T>
+        //operator typename std::enable_if<!std::is_base_of<::FIELDLOL, T>::value, T>::type() { return m_Component->Field<T>(m_FieldName); }
+
+        //template <typename T>
+        //operator Field<T>() 
+        //{
+        //    return ::Field<T>(m_Component->Field<T>(m_FieldName)); 
+        //}
+
+        //operator std::string() { return m_Component->Field<std::string>(m_FieldName); }
+        //operator glm::vec3() { return m_Component->Field<glm::vec3>(m_FieldName); }
+
+        //template <typename T>
+        //operator glm::vec3() { return m_Component->Field<glm::vec3>(m_FieldName); }
+
+        //template <typename T>
+        //operator const T&() { return m_Component->Field<T>(m_FieldName); }
 
         template <typename T>
-        void operator=(const T val) { m_Component->SetField<T>(m_FieldName, val); }
+        void operator=(const T& val) { m_Component->SetField<T>(m_FieldName, val); }
         // TODO: Pass by reference and rvalue (universal reference?)
         //template <typename T>
         //void operator=(T& val) { m_Component->SetField<T>(m_PropertyName, val); }
@@ -135,6 +180,114 @@ struct ComponentWrapper
     };
     SubscriptProxy operator[](const std::string& propertyName) { return SubscriptProxy(this, propertyName); }
 };
+
+struct FIELDLOL {};
+
+template <typename T>
+struct FieldBase : FIELDLOL
+{
+    FieldBase(ComponentWrapper::SubscriptProxy& proxy)
+        : Data(proxy.m_Component->Field<T>(proxy.m_FieldName))
+    { }
+
+    FieldBase& operator=(const FieldBase& rhs) { Data = rhs.Data; return *this; }
+    FieldBase& operator=(const T& rhs) { Data = rhs; return *this; }
+
+    template <typename T2> FieldBase& operator+=(const T2& rhs) { Data += rhs; return *this; }
+    template <typename T2> FieldBase& operator-=(const T2& rhs) { Data -= rhs; return *this; }
+    template <typename T2> FieldBase& operator*=(const T2& rhs) { Data *= rhs; return *this; }
+    template <typename T2> FieldBase& operator/=(const T2& rhs) { Data /= rhs; return *this; }
+    template <typename T2> FieldBase& operator%=(const T2& rhs) { Data %= rhs; return *this; }
+    template <typename T2> FieldBase& operator&=(const T2& rhs) { Data &= rhs; return *this; }
+    template <typename T2> FieldBase& operator|=(const T2& rhs) { Data |= rhs; return *this; }
+    template <typename T2> FieldBase& operator^=(const T2& rhs) { Data ^= rhs; return *this; }
+    template <typename T2> FieldBase& operator<<=(const T2& rhs) { Data <<= rhs; return *this; }
+    template <typename T2> FieldBase& operator>>=(const T2& rhs) { Data >>= rhs; return *this; }
+
+    T operator+() const { return +Data; }
+    T operator-() const { return -Data; }
+    T operator~() const { return ~Data; }
+
+    FieldBase& operator++() { Data++; return *this; }
+    T operator++(int) { T tmp = Data; operator++(); return tmp; }
+    FieldBase& operator--() { Data--; return *this; }
+    T operator--(int) { T tmp = Data; operator--(); return tmp; }
+
+    operator const T&() const { return Data; }
+    const T& operator*() const { return operator const T&(); }
+
+protected:
+    T& Data;
+};
+
+template <typename T>
+struct Field : FieldBase<T>
+{
+    //Field(T& Data)
+    //    : FieldBase(Data)
+    //{ }
+    using FieldBase<T>::FieldBase;
+    using FieldBase<T>::operator=;
+};
+
+template <>
+struct Field<glm::vec3> : FieldBase<glm::vec3>
+{
+    //Field(glm::vec3& Data)
+    //    : FieldBase(Data)
+    //{ }
+    using FieldBase<glm::vec3>::FieldBase;
+    using FieldBase<glm::vec3>::operator=;
+
+    glm::vec3::value_type x() { return Data.x; }
+    void x(glm::vec3::value_type val) { Data.x = val; }
+    glm::vec3::value_type y() { return Data.y; }
+    void y(glm::vec3::value_type val) { Data.y = val; }
+    glm::vec3::value_type z() { return Data.z; }
+    void z(glm::vec3::value_type val) { Data.z = val; }
+
+    template <typename T> friend glm::vec3 operator+(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) + glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator-(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) - glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator*(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) * glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator/(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) / glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator+(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) + static_cast<glm::vec3>(rhs); }
+    template <typename T> friend glm::vec3 operator-(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) - static_cast<glm::vec3>(rhs); }
+    template <typename T> friend glm::vec3 operator*(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) * static_cast<glm::vec3>(rhs); }
+    template <typename T> friend glm::vec3 operator/(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) / static_cast<glm::vec3>(rhs); }
+
+    friend glm::vec3& operator+=(glm::vec3& lhs, const Field<glm::vec3>& rhs) { lhs += *rhs; return lhs; }
+};
+
+template <>
+struct Field<glm::vec4> : FieldBase<glm::vec4>
+{
+    //Field(glm::vec4& Data)
+    //    : FieldBase(Data)
+    //{ }
+    using FieldBase<glm::vec4>::FieldBase;
+    using FieldBase<glm::vec4>::operator=;
+
+    glm::vec4::value_type x() { return Data.x; }
+    void x(glm::vec4::value_type val) { Data.x = val; }
+    glm::vec4::value_type y() { return Data.y; }
+    void y(glm::vec4::value_type val) { Data.y = val; }
+    glm::vec4::value_type z() { return Data.z; }
+    void z(glm::vec4::value_type val) { Data.z = val; }
+    glm::vec4::value_type w() { return Data.w; }
+    void w(glm::vec4::value_type val) { Data.w = val; }
+
+    template <typename T> friend glm::vec4 operator+(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) + glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator-(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) - glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator*(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) * glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator/(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) / glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator+(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) + static_cast<glm::vec4>(rhs); }
+    template <typename T> friend glm::vec4 operator-(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) - static_cast<glm::vec4>(rhs); }
+    template <typename T> friend glm::vec4 operator*(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) * static_cast<glm::vec4>(rhs); }
+    template <typename T> friend glm::vec4 operator/(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) / static_cast<glm::vec4>(rhs); }
+
+    friend glm::vec4& operator+=(glm::vec4& lhs, const Field<glm::vec4>& rhs) { lhs += *rhs; return lhs; }
+};
+
 
 // A component wrapper that "owns" its data through a shared pointer
 struct SharedComponentWrapper : ComponentWrapper
