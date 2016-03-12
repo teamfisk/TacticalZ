@@ -227,7 +227,8 @@ void Renderer::Draw(RenderFrame& frame)
 
     if (m_DebugTextureToDraw == 0) {
         PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
+		GLuint test = m_DrawFinalPass->SceneTexture();
+        m_DrawColorCorrectionPass->Draw(test, m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
         PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
 

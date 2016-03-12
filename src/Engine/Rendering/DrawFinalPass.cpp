@@ -352,7 +352,6 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
     if (scene.ShouldBlur) {
         //This needs to be drawn only when the full scene is being renderd, and then let be, otherwise sprite and other shit will show on it.
 		GLuint sceneTexture = SceneTexture();
-		GLERROR("SceneTexture() 1");
         m_FullBlurredTexture = blurHUDPass->Draw(sceneTexture, scene);
     }
 
@@ -362,7 +361,6 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
         stateSprite->Disable(GL_DEPTH_TEST);
         stateSprite->Disable(GL_STENCIL_TEST);
 		GLuint sceneTexture = SceneTexture();
-		GLERROR("SceneTexture() 2");
 		delete stateSprite;
 		stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
         m_CombinedTexture = blurHUDPass->CombineTextures(sceneTexture, m_FullBlurredTexture);

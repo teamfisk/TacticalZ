@@ -27,7 +27,7 @@ public:
     void OnWindowResize();
 
     //Return the texture that is used in later stages to apply the bloom effect
-	GLuint BloomTexture() const {
+	GLuint BloomTexture() {
 		if (m_MSAA){
 			m_AntiAliasedFrameBuffer->Bind();
 			glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -40,35 +40,29 @@ public:
 				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
 				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
 				GL_COLOR_BUFFER_BIT, GL_NEAREST);
-			glReadBuffer(GL_BACK);
 			return m_AntiAliasedTexture;
 		}
 		return m_BloomTexture; }
     //Return the texture with diffuse and lighting of the scene.
-    GLuint SceneTexture() const { 
+	GLuint DrawFinalPass::SceneTexture() {
 		if (m_MSAA) {
 			m_AntiAliasedFrameBuffer->Bind();
 			glClearColor(0.f, 0.f, 0.f, 0.f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			m_AntiAliasedFrameBuffer->Unbind();
-			GLERROR("SceneTexture() 11");
 			m_FinalPassFrameBuffer->Read();
-			GLERROR("SceneTexture() 12");
 			glReadBuffer(GL_COLOR_ATTACHMENT0);
-			GLERROR("SceneTexture() 13");
 			m_AntiAliasedFrameBuffer->Draw();
-			GLERROR("SceneTexture() 14");
 			glBlitFramebuffer(
 				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
 				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
 				GL_COLOR_BUFFER_BIT, GL_NEAREST);
-			GLERROR("SceneTexture() 15");
-			glReadBuffer(GL_BACK);
 			return m_AntiAliasedTexture;
 		}
-		return m_SceneTexture; }
+		return m_SceneTexture;
+	}
     //Return the SceneTexture with the blurred HUD bits.
-    GLuint CombinedSceneTexture() const {
+    GLuint CombinedSceneTexture() {
 		if (m_MSAA) {
 			m_AntiAliasedFrameBuffer->Bind();
 			glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -84,7 +78,7 @@ public:
 		}
 		return m_CombinedTexture; }
     //Return the blurred scene texture.
-    GLuint FullBlurredTexture() const { 
+    GLuint FullBlurredTexture() { 
 		if (m_MSAA) {
 			m_AntiAliasedFrameBuffer->Bind();
 			glClearColor(0.f, 0.f, 0.f, 0.f);
