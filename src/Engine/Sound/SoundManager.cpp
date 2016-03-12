@@ -123,8 +123,8 @@ void SoundManager::updateEmitters(double dt)
         setSoundProperties(it->second, &emitter);
 
         // Path changed
-        if (it->second->SoundResource->Path() != (std::string)emitter["FilePath"]) {
-            it->second->SoundResource = ResourceManager::Load<Sound>((std::string)emitter["FilePath"]);
+        if (it->second->SoundResource->Path() != (const std::string&)emitter["FilePath"]) {
+            it->second->SoundResource = ResourceManager::Load<Sound>((const std::string&)emitter["FilePath"]);
             if (it->second->SoundResource->Buffer() != 0) {
                 playSound(it->second);
             }
@@ -205,14 +205,14 @@ bool SoundManager::OnPlaySoundOnPosition(const Events::PlaySoundOnPosition & e)
     Source* source = createSource(e.FilePath);
     auto emitterID = m_World->CreateEntity();
     auto transform = m_World->AttachComponent(emitterID, "Transform");
-    (glm::vec3&)transform["Position"] = e.Position;
+    transform["Position"] = e.Position;
     auto emitter = m_World->AttachComponent(emitterID, "SoundEmitter");
-    (float&)(double)emitter["Gain"] = e.Gain;
-    (float&)(double)emitter["Pitch"] = e.Pitch;
-    (bool&)emitter["Loop"] = e.Loop;
-    (float&)(double)emitter["MaxDistance"] = e.MaxDistance;
-    (float&)(double)emitter["RollOffFactor"] = e.RollOffFactor;
-    (float&)(double)emitter["ReferenceDistance"] = e.ReferenceDistance;
+    emitter["Gain"] = e.Gain;
+    emitter["Pitch"] = e.Pitch;
+    emitter["Loop"] = e.Loop;
+    emitter["MaxDistance"] = e.MaxDistance;
+    emitter["RollOffFactor"] = e.RollOffFactor;
+    emitter["ReferenceDistance"] = e.ReferenceDistance;
     source->Type = SoundType::SFX;
     m_Sources[emitterID] = source;
     playSound(source);
@@ -246,8 +246,8 @@ bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
-        (bool&)emitter["Loop"] = true;
-        (std::string&)emitter["FilePath"] = e.FilePath;
+        emitter["Loop"] = true;
+        emitter["FilePath"] = e.FilePath;
         m_World->AttachComponent(emitterChild, "Transform");
         Source* source = createSource(e.FilePath);
         source->Type = SoundType::BGM;

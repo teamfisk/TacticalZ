@@ -619,9 +619,9 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
     AABB modelSpaceBox;
     if (entity.HasComponent("AABB") && !takeModelBox) {
         ComponentWrapper& cAABB = entity["AABB"];
-        modelSpaceBox = EntityAABB::FromOriginSize((glm::vec3)cAABB["Origin"], (glm::vec3)cAABB["Size"]);
+        modelSpaceBox = EntityAABB::FromOriginSize((const glm::vec3&)cAABB["Origin"], (const glm::vec3&)cAABB["Size"]);
     } else if (entity.HasComponent("Model")) {
-        std::string res = entity["Model"]["Resource"];
+        const std::string& res = entity["Model"]["Resource"];
         if (res.empty()) {
             return boost::none;
         }
@@ -667,7 +667,7 @@ boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity)
     if (!modelBox) {
         return boost::none;
     }
-    bool isRandom = (bool)entity["ExplosionEffect"]["Randomness"];
+    Field<bool> isRandom = entity["ExplosionEffect"]["Randomness"];
     float random = isRandom ? (float)(double)entity["ExplosionEffect"]["RandomnessScalar"] : 0;
     glm::vec3 origin = (glm::vec3)entity["ExplosionEffect"]["ExplosionOrigin"];
     glm::vec3 randomVel = (glm::vec3)entity["ExplosionEffect"]["Velocity"];

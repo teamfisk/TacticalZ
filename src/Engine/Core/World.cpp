@@ -95,7 +95,7 @@ void World::DeleteComponent(EntityID entity, const std::string& componentType)
     }
 }
 
-const ComponentPool* World::GetComponents(const std::string& componentType)
+ComponentPool* World::GetComponents(const std::string& componentType)
 {
     auto it = m_ComponentPools.find(componentType);
     return (it != m_ComponentPools.end()) ? it->second : nullptr;

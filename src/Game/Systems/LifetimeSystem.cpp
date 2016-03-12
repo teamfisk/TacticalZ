@@ -18,7 +18,7 @@ void LifetimeSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cL
         return;
     }
 
-    double& lifetime = cLifetime["Lifetime"];
+    Field<double> lifetime = cLifetime["Lifetime"];
     lifetime -= dt;
 
     if (lifetime <= 0.0) {

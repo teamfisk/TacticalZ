@@ -2,10 +2,11 @@
 
 void ExplosionEffectSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
-    if ((double)component["TimeSinceDeath"] > (double)component["ExplosionDuration"]) {
-        (double)component["TimeSinceDeath"] = 0.f;
+    Field<double> timeSinceDeath = component["TimeSinceDeath"];
+    if (timeSinceDeath > (double)component["ExplosionDuration"]) {
+        timeSinceDeath = 0.f;
     }
-    (double&)component["TimeSinceDeath"] += dt;
+    timeSinceDeath += dt;
 
     //if ((bool)Component["Gravity"] == true) {
     //    (bool)Component["ExponentialAccelaration"] = false;

@@ -71,21 +71,21 @@ void EditorSystem::Update(double dt)
         m_EditorStats->Draw(actualDelta);
 
         if (m_CurrentSelection.Valid() && m_Widget.Valid()) {
-            (glm::vec3&)m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection);
+            m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection);
             if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
-                (glm::vec3&)m_Widget["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(m_CurrentSelection);
+                m_Widget["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(m_CurrentSelection);
             } else {
-                (glm::vec3&)m_Widget["Transform"]["Orientation"] = glm::vec3(0, 0, 0);
+                m_Widget["Transform"]["Orientation"] = glm::vec3(0, 0, 0);
             }
         }
 
         m_EditorWorldSystemPipeline->Update(actualDelta);
 
         ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
-        glm::vec3& ori = cameraTransform["Orientation"];
-        ori.x = m_EditorCameraInputController->Rotation().x;
-        ori.y = m_EditorCameraInputController->Rotation().y;
-        glm::vec3& pos = cameraTransform["Position"];
+        Field<glm::vec3> ori = cameraTransform["Orientation"];
+        ori.x(m_EditorCameraInputController->Rotation().x);
+        ori.y(m_EditorCameraInputController->Rotation().y);
+        Field<glm::vec3> pos = cameraTransform["Position"];
         pos += m_EditorCameraInputController->Movement() * glm::inverse(glm::quat(ori)) * (float)actualDelta;
     }
 }
@@ -101,7 +101,7 @@ void EditorSystem::Enable()
     eSetCamera.CameraEntity = m_EditorCamera;
     m_EventBroker->Publish(eSetCamera);
     if (m_ActualCamera.Valid()) {
-        (glm::vec3&)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
+        (Field<glm::vec3>)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
     }
 
     // Pause the world we're editing
@@ -208,11 +208,11 @@ bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
             if (parent.Valid()) {
                 parentOrientation = glm::inverse(Transform::AbsoluteOrientation(parent));
             }
-            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation;
+            (Field<glm::vec3>)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation;
         } else if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
             glm::quat selectionOri = glm::quat((glm::vec3)m_CurrentSelection["Transform"]["Orientation"]);
             glm::vec3 localTranslation = selectionOri * e.Translation;
-            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += localTranslation;
+            (Field<glm::vec3>)m_CurrentSelection["Transform"]["Position"] += localTranslation;
         }
         m_EditorGUI->SetDirty(m_CurrentSelection);
     }

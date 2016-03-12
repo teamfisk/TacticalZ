@@ -16,7 +16,7 @@ BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
         m_Root = new Node();
         m_Root->Entity = ModelEntity;
         m_Root->Name = ModelEntity.Name();
-        m_Root->Pose = m_Skeleton->GetFrameBones(animation, (double)ModelEntity["Animation"]["Time"], (bool)ModelEntity["Animation"]["Additive"]);
+        m_Root->Pose = m_Skeleton->GetFrameBones(animation, (const double&)ModelEntity["Animation"]["Time"], (const bool&)ModelEntity["Animation"]["Additive"]);
         m_Root->Parent = nullptr;
         m_Root->Type = NodeType::Animation;
 
@@ -26,9 +26,9 @@ BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
         m_Root->Name = ModelEntity.Name();
         m_Root->Parent = nullptr;
         m_Root->Type = NodeType::Blend;
-        m_Root->Weight = (double)ModelEntity["Blend"]["Weight"];
-        m_Root->SubTreeRoot = (bool)ModelEntity["Blend"]["SubTreeRoot"];
-        (double&)ModelEntity["Blend"]["Weight"] = glm::clamp((double)ModelEntity["Blend"]["Weight"], 0.0, 1.0);
+        m_Root->Weight = (const double&)ModelEntity["Blend"]["Weight"];
+        m_Root->SubTreeRoot = (const bool&)ModelEntity["Blend"]["SubTreeRoot"];
+        ModelEntity["Blend"]["Weight"] = glm::clamp((const double&)ModelEntity["Blend"]["Weight"], 0.0, 1.0);
         m_Root->Child[0] = FillTreeByName(m_Root, (std::string)ModelEntity["Blend"]["Pose1"], ModelEntity);
         m_Root->Child[1] = FillTreeByName(m_Root, (std::string)ModelEntity["Blend"]["Pose2"], ModelEntity);
 
@@ -120,7 +120,7 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         Node* node = new Node();
         node->Entity = childEntity;
         node->Name = childEntity.Name();
-        node->Pose = m_Skeleton->GetFrameBones(animation, (double)childEntity["Animation"]["Time"], (bool)childEntity["Animation"]["Additive"]);
+        node->Pose = m_Skeleton->GetFrameBones(animation, (const double&)childEntity["Animation"]["Time"], (const bool&)childEntity["Animation"]["Additive"]);
         node->Parent = parentNode;
         node->Type = NodeType::Animation;
         return node;
@@ -131,9 +131,9 @@ BlendTree::Node* BlendTree::FillTreeByName(Node* parentNode, std::string name, E
         node->Name = childEntity.Name();
         node->Parent = parentNode;
         node->Type = NodeType::Blend;
-        (double&)childEntity["Blend"]["Weight"] = glm::clamp((double)childEntity["Blend"]["Weight"], 0.0, 1.0);
-        node->Weight = (double)childEntity["Blend"]["Weight"];
-        node->SubTreeRoot = (bool)childEntity["Blend"]["SubTreeRoot"];
+        childEntity["Blend"]["Weight"] = glm::clamp((const double&)childEntity["Blend"]["Weight"], 0.0, 1.0);
+        node->Weight = (const double&)childEntity["Blend"]["Weight"];
+        node->SubTreeRoot = (const bool&)childEntity["Blend"]["SubTreeRoot"];
         //if (node->Weight < 1.f && node->Weight > 0.f) {
             node->Child[0] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose1"], childEntity);
             node->Child[1] = FillTreeByName(node, (std::string)childEntity["Blend"]["Pose2"], childEntity);
@@ -213,7 +213,7 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 
             if (entity.Valid()) {
                 if (entity.HasComponent("Blend")) {
-                    (double&)entity["Blend"]["Weight"] = blendInfo.Weight;
+                    entity["Blend"]["Weight"] = blendInfo.Weight;
                 }
             }
         }
@@ -229,7 +229,7 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 
             if (entity.Valid()) {
                 if (entity.HasComponent("Animation")) {
-                    (bool&)entity["Animation"]["Play"] = true;
+                    entity["Animation"]["Play"] = true;
                 }
             }
         }
@@ -263,7 +263,7 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
             }
 
             double weight = ((goalWeight - startWeight) * blendInfo.progress) + startWeight;
-            (double&)currentNode->Entity["Blend"]["Weight"] = weight;
+            currentNode->Entity["Blend"]["Weight"] = weight;
             currentNode->Weight = weight;
 
             lastNode = currentNode;
@@ -326,7 +326,7 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
                 }
 
                 double weight = ((goalWeight - startWeight) * blendInfo.progress) + startWeight;
-                (double&)currentNode->Entity["Blend"]["Weight"] = weight;
+                currentNode->Entity["Blend"]["Weight"] = weight;
                 currentNode->Weight = weight;
 
                 lastNode = currentNode;

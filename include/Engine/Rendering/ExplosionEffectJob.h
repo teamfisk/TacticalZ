@@ -18,15 +18,15 @@ struct ExplosionEffectJob : ModelJob
     ExplosionEffectJob(ComponentWrapper explosionEffectComponent, ::Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matGroup, ComponentWrapper modelComponent, ::World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded)
         : ModelJob(model, camera, matrix, matGroup, modelComponent, world, fillColor, fillPercentage, isShielded)
     {
-        ExplosionOrigin = (glm::vec3)explosionEffectComponent["ExplosionOrigin"];
-        TimeSinceDeath = (double)explosionEffectComponent["TimeSinceDeath"];
-        ExplosionDuration = (double)explosionEffectComponent["ExplosionDuration"];
-        EndColor = (glm::vec4)explosionEffectComponent["EndColor"];
-        Randomness = (bool)explosionEffectComponent["Randomness"];
-        RandomnessScalar = (double)explosionEffectComponent["RandomnessScalar"];
-        Velocity = (glm::vec2)explosionEffectComponent["Velocity"];
-        ColorByDistance = (bool)explosionEffectComponent["ColorByDistance"];
-        ExponentialAccelaration = (bool)explosionEffectComponent["ExponentialAccelaration"];
+        ExplosionOrigin = (Field<glm::vec3>)explosionEffectComponent["ExplosionOrigin"];
+        TimeSinceDeath = (Field<double>)explosionEffectComponent["TimeSinceDeath"];
+        ExplosionDuration = (Field<double>)explosionEffectComponent["ExplosionDuration"];
+        EndColor = (Field<glm::vec4>)explosionEffectComponent["EndColor"];
+        Randomness = (Field<bool>)explosionEffectComponent["Randomness"];
+        RandomnessScalar = (Field<double>)explosionEffectComponent["RandomnessScalar"];
+        Velocity = (Field<glm::vec2>)explosionEffectComponent["Velocity"];
+        ColorByDistance = (Field<bool>)explosionEffectComponent["ColorByDistance"];
+        ExponentialAccelaration = (Field<bool>)explosionEffectComponent["ExponentialAccelaration"];
     };
 
     glm::vec3 ExplosionOrigin;

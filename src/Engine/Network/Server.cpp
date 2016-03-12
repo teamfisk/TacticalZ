@@ -222,7 +222,7 @@ void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
                     for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
                         ComponentInfo::Field_t fieldInfo = componentWrapper.Info.Fields.at(componentField);
                         if (fieldInfo.Type == "string") {
-                            std::string& value = componentWrapper[componentField];
+                            const std::string& value = componentWrapper[componentField];
                             packet.WriteString(value);
                         } else {
                             packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
@@ -266,7 +266,7 @@ void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
                 for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
                     ComponentInfo::Field_t fieldInfo = componentWrapper.Info.Fields.at(componentField);
                     if (fieldInfo.Type == "string") {
-                        std::string& value = componentWrapper[componentField];
+                        const std::string& value = componentWrapper[componentField];
                         packet.WriteString(value);
                     } else {
                         packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
