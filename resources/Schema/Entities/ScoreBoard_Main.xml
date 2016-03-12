@@ -20,10 +20,10 @@
     </Entity>
     <Entity name="ScoreBoard_Spectators">
       <Components>
+        <c:Team/>
         <c:ScoreScreen>
           <Offset X="0" Y="-2" Z="0"/>
         </c:ScoreScreen>
-        <c:Team/>
         <c:Transform>
           <Position X="0" Y="-15.7886772" Z="1.5"/>
         </c:Transform>
@@ -44,7 +44,7 @@
     <Entity name="Spawner_1">
       <Components>
         <c:Spawner>
-          <EntityFile></EntityFile>
+          <EntityFile>Schema/Entities/ScoreBoard_Red.xml</EntityFile>
         </c:Spawner>
         <c:Transform>
           <Position X="16.5" Y="0" Z="0"/>
@@ -55,11 +55,20 @@
     <Entity name="Spawner_2">
       <Components>
         <c:Spawner>
-          <EntityFile></EntityFile>
+          <EntityFile>Schema/Entities/ScoreBoard_Blue.xml</EntityFile>
         </c:Spawner>
         <c:Transform>
           <Position X="-16.5" Y="0" Z="0"/>
         </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="EndScreenCameraSpawner">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/EndScreen.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform/>
       </Components>
       <Children/>
     </Entity>

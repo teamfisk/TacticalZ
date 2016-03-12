@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="EndScreen_Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform>
+      <Position X="0" Y="3.10000014" Z="42.9360008"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Camera">
+      <Components>
+        <c:Camera/>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Sprite_Origin">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0.65200001" Z="-1.72800004"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="SpriteBlue">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <Color A="0.392156869" B="0.196078435" G="0" R="0"/>
+                  <Visible>false</Visible>
+                </c:Sprite>
+                <c:Transform>
+                  <Scale X="1.30000007" Y="0.300000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="TextBlue">
+              <Components>
+                <c:Text>
+                  <Content>Blue team win!</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Visible>false</Visible>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="-0.0670000017" Z="0.0299999993"/>
+                  <Scale X="0.150000006" Y="0.150000006" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="TextRed">
+              <Components>
+                <c:Text>
+                  <Content>Red team win!</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="-0.0670000017" Z="0.0299999993"/>
+                  <Scale X="0.150000006" Y="0.150000006" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="SpriteRed">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <Color A="0.392156869" B="0" G="0" R="0.196078435"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Scale X="1.30000007" Y="0.300000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>
