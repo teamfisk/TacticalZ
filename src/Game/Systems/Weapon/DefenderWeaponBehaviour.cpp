@@ -31,7 +31,7 @@ void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo&
             magAmmo += 1;
             reloadTimer = reloadTime;
             Events::PlaySoundOnEntity e;
-            e.EmitterID = wi.Player.ID;
+            e.Emitter = wi.Player;
             e.FilePath = "Audio/weapon/Zoom.wav";
             m_EventBroker->Publish(e);
         } else {
@@ -232,6 +232,13 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     }
     if (weaponModelEntity.Valid()) {
         EntityWrapper spawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
+        Events::PlaySoundOnEntity e;
+        e.Emitter = weaponModelEntity;
+        e.FilePath = "Audio/weapon/Shotgun/ShotgunFire.wav";
+        e.Gain = 1.f;
+        if (IsClient) {
+            m_EventBroker->Publish(e);
+        }
         for (auto& angles : pelletAngles) {
             glm::vec3 direction = TransformSystem::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
             float distance = traceRayDistance(TransformSystem::AbsolutePosition(spawner), direction);
@@ -250,7 +257,7 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
 
     // Sound
     Events::PlaySoundOnEntity e;
-    e.EmitterID = wi.Player.ID;
+    e.Emitter = wi.Player;
     e.FilePath = "Audio/weapon/Blast.wav";
     m_EventBroker->Publish(e);
 }
