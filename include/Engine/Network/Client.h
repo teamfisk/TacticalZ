@@ -77,10 +77,10 @@ private:
     // Network logic
     PlayerDefinition m_PlayerDefinitions[8];
     SnapshotDefinitions m_NextSnapshot;
-    double m_DurationOfPingTime;
-    std::clock_t m_StartPingTime;
-    std::clock_t m_TimeSinceSentInputs;
-    unsigned int m_SendInputIntervalMs;
+    double m_DurationOfPingTime = 0;
+    double m_StartPingTime = 0;
+    double m_TimeSinceSentInputs = 0;
+    double m_SendInputInterval = 0.033;
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
@@ -141,8 +141,8 @@ private:
     UDPClient m_ServerlistRequest;
     std::vector<ServerInfo> m_Serverlist;
     bool m_SearchingForServers = false;
-    std::clock_t m_StartSearchTime;
-    double m_SearchingTime = 200; // Config I guess
+    double m_TimeSearched = 0;
+    double m_SearchingTime = 0.2; // Config I guess
 };
 
 #endif

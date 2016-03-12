@@ -52,14 +52,14 @@ private:
     char readBuffer[BUFFERSIZE] = { 0 };
     size_t bytesRead = 0;
     // time for previouse message
-    std::clock_t previousePingMessage = std::clock();
-    std::clock_t previousSnapshotMessage = std::clock();
-    std::clock_t timOutTimer = std::clock();
+    double previousePingMessage = 0;
+    double previousSnapshotMessage = 0;
+    double timOutTimer = 0;
 
-    // How often we send messages (milliseconds)
-    float pingIntervalMs;
-    float snapshotInterval;
-    int checkTimeOutInterval = 100;
+    // How often we send messages (seconds)
+    double pingInterval = 1;
+    double snapshotInterval = 0.05;
+    double checkTimeOutInterval = 0.1;
     int m_NextPlayerID = 0;
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers

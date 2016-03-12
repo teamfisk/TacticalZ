@@ -5,8 +5,8 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     , m_ServerlistRequest(13)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
-    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
-    pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
+    snapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05);
+    pingInterval = config->Get<float>("Networking.PingIntervalMs", 1000) / 1000.0;
     m_ServerName = config->Get<std::string>("Networking.Name", "Unnamed");
 
     // Subscribe to events
@@ -87,22 +87,24 @@ void Server::Update(double dt)
     }
     m_PlayersToDisconnect.clear();
 
-    std::clock_t currentTime = std::clock();
     // Send snapshot
-    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+    previousSnapshotMessage += dt;
+    if (snapshotInterval < previousSnapshotMessage) {
         sendSnapshot();
-        previousSnapshotMessage = currentTime;
+        previousSnapshotMessage = 0;
     }
     // Send pings each 
-    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+    previousePingMessage += dt;
+    if (pingInterval < previousePingMessage) {
         sendPing();
-        previousePingMessage = currentTime;
+        previousePingMessage = 0;
     }
 
     // Time out logic
-    if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
+    timOutTimer += dt;
+    if (checkTimeOutInterval < timOutTimer) {
         checkForTimeOuts();
-        timOutTimer = currentTime;
+        timOutTimer = 0;
     }
     m_EventBroker->Process<Server>();
     if (isReadingData) {
