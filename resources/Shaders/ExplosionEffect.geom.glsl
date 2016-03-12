@@ -2,6 +2,7 @@
 
 #define MAX_SPLITS 4
 
+uniform mat4 PVM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -23,6 +24,7 @@ uniform float ColorDistanceScalar;
 
 in VertexData{
 	vec3 Position;
+	vec4 ViewSpacePosition;
 	vec3 Normal;
 	vec3 Tangent;
 	vec3 BiTangent;
@@ -34,6 +36,7 @@ in VertexData{
 
 out VertexData{
 	vec3 Position;
+	vec4 ViewSpacePosition;
 	vec3 Normal;
 	vec3 Tangent;
 	vec3 BiTangent;
@@ -101,6 +104,7 @@ void PassThingsThrough(int index)
 	// pass through vertex data
 	Output.Normal = Input[index].Normal;
 	Output.Position = Input[index].Position;
+	Output.ViewSpacePosition = Input[index].ViewSpacePosition;
 	Output.TextureCoordinate = Input[index].TextureCoordinate;
 	Output.Tangent = Input[index].Tangent;
 	Output.BiTangent = Input[index].BiTangent;
@@ -175,7 +179,7 @@ void main()
 			}
 		
 		// convert to window space 
-		gl_Position = P * V * M * vec4(ExplodedPosition, 1.0);
+		gl_Position = PVM * vec4(ExplodedPosition, 1.0);
 		EmitVertex();
 	}
 }

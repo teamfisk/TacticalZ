@@ -1324,11 +1324,6 @@ void DrawFinalPass::DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob
 			if (lastShader != m_FillDepthStencilBufferSkinnedProgram->GetHandle()) {
 				m_FillDepthStencilBufferSkinnedProgram->Bind();
 				lastShader = m_FillDepthStencilBufferSkinnedProgram->GetHandle();
-				glUniform1i(glGetUniformLocation(shaderSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
-				glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-				glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-				glUniform2f(glGetUniformLocation(shaderSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-				glUniform4fv(glGetUniformLocation(shaderSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
 				GLERROR("Bind Uniforms 1");
 			}
 
@@ -1347,11 +1342,6 @@ void DrawFinalPass::DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob
 			if (lastShader != m_FillDepthStencilBufferProgram->GetHandle()) {
 				m_FillDepthStencilBufferProgram->Bind();
 				lastShader = m_FillDepthStencilBufferProgram->GetHandle();
-				glUniform1i(glGetUniformLocation(shaderHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
-				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-				glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-				glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
 				GLERROR("Bind Uniforms 2");
 			}
 
