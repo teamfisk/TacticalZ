@@ -53,7 +53,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
     ResourceManager::RegisterType<TextureSprite>("TextureSprite");
-    ResourceManager::RegisterType<PNG>("Png");
+    ResourceManager::RegisterType<PNG>("PNG");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
     ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
