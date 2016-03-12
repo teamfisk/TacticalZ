@@ -44,9 +44,7 @@ bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
     if (e.Command == "Jump" && e.Value > 0) {
         if (e.PlayerID == -1) {
             playerJumps(LocalPlayer);
-        } else {
-            playerJumps(e.Player);
-        }
+        } 
         return true;
     }
     return false;
