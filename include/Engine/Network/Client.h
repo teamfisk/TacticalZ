@@ -43,7 +43,7 @@ public:
     ~Client();
 
     void Connect(std::string address, int port);
-    void Update() override;
+    void Update(double dt) override;
 private:
     UDPClient m_Unreliable;
     TCPClient m_Reliable;

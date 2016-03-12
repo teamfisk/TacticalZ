@@ -31,7 +31,7 @@ Server::~Server()
 
 }
 
-void Server::Update()
+void Server::Update(double dt)
 {
     m_Reliable.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
 
@@ -106,7 +106,23 @@ void Server::Update()
     }
     m_EventBroker->Process<Server>();
     if (isReadingData) {
-        Network::Update();
+        Network::Update(dt);
+    }
+
+    if (m_GameIsOver) {
+        auto pool = m_World->GetComponents("CapturePointGameMode");
+        if (pool != nullptr && pool->size() > 0) {
+            // Take the first CapturePointGameMode component found.
+            ComponentWrapper& modeComponent = *pool->begin();
+            // Decrease timer.
+            double& timer = (double&)modeComponent["ResetCountdown"];
+            timer -= dt;
+            if (timer < 0) {
+                resetMap();
+            }
+        } else {
+            resetMap();
+        }
     }
 }
 
@@ -165,7 +181,7 @@ void Server::reliableBroadcast(Packet& packet)
 
 void Server::unreliableBroadcast(Packet& packet)
 {
-   m_Unreliable.SendToConnectedPlayers(packet, m_ConnectedPlayers);
+    m_Unreliable.SendToConnectedPlayers(packet, m_ConnectedPlayers);
 }
 
 // Send snapshot fields
@@ -550,18 +566,8 @@ bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
 
 bool Server::OnWin(const Events::Win & e)
 {
-    // Postpone this code and trigger after some time in a update
-    Events::Reset reset;
-    m_EventBroker->Publish(reset);
-    Packet removeMap(MessageType::RemoveWorld);
-    reliableBroadcast(removeMap);
-    removeWorld();
-    // Hardcoded for now.
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Rocky2.xml");
-    entityFile->MergeInto(m_World);
-    Packet newWorld(MessageType::Snapshot);
-    createWorldSnapshot(newWorld);
-    reliableBroadcast(newWorld);
+    // Postpone the gameover reset
+    m_GameIsOver = true;
     return true;
 }
 
@@ -686,4 +692,20 @@ PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
         }
     }
     return -1;
+}
+
+void Server::resetMap()
+{
+    m_GameIsOver = false;
+    Events::Reset reset;
+    m_EventBroker->Publish(reset);
+    Packet removeMap(MessageType::RemoveWorld);
+    reliableBroadcast(removeMap);
+    removeWorld();
+    // Hardcoded for now.
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Rocky2.xml");
+    entityFile->MergeInto(m_World);
+    Packet newWorld(MessageType::Snapshot);
+    createWorldSnapshot(newWorld);
+    reliableBroadcast(newWorld);
 }

@@ -34,7 +34,7 @@ public:
     Server(World* world, EventBroker* eventBroker, int port);
     ~Server();
 
-    void Update() override;
+    void Update(double dt) override;
 
 private:
     // Network channels
@@ -44,6 +44,7 @@ private:
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
     int m_Port = 27666;
+    bool m_GameIsOver = false;
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
     std::vector<PlayerID> m_PlayersToDisconnect;
@@ -87,6 +88,7 @@ private:
     void kick(PlayerID player);
     PlayerID getPlayerIDFromEndpoint();
     PlayerID getPlayerIDFromEntityID(EntityID entityID);
+    void resetMap();
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();

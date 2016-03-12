@@ -48,7 +48,7 @@ void Client::Connect(std::string address, int port)
     }
 }
 
-void Client::Update()
+void Client::Update(double dt)
 {
     m_EventBroker->Process<Client>();
     while (m_Unreliable.IsSocketAvailable()) {

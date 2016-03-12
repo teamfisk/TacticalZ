@@ -22,7 +22,7 @@ public:
     Network(World* world, EventBroker* eventBroker);
     virtual ~Network() { };
 
-    virtual void Update() = 0;
+    virtual void Update(double dt) = 0;
 
 protected:
     World* m_World;
