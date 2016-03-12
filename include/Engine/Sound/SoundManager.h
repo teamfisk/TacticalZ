@@ -30,6 +30,7 @@
 #include "../Engine/Core/EPause.h"
 #include "../Engine/Core/EComponentAttached.h"
 #include "../Core/EPlayerSpawned.h"
+#include "../Engine/Network/EPlayerDisconnected.h"
 
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
@@ -139,6 +140,8 @@ private:
     bool OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e);
     EventRelay<SoundManager, Events::ChangeBGM> m_EChangeBGM;
     bool OnChangeBGM(const Events::ChangeBGM &e);
+    EventRelay<SoundManager, Events::PlayerDisconnected> m_EplayerDisconnected;
+    bool OnPlayerDisconnected(const Events::PlayerDisconnected& e);
 
 
 };

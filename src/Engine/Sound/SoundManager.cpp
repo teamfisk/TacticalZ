@@ -30,6 +30,7 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundManager::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayQueueOnEntity, &SoundManager::OnPlayQueueOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EChangeBGM, &SoundManager::OnChangeBGM);
+    EVENT_SUBSCRIBE_MEMBER(m_EplayerDisconnected, &SoundManager::OnPlayerDisconnected);
 
     Events::ChangeBGM e;
     e.FilePath = "Audio/bgm/MenuMusic.wav";
@@ -394,12 +395,30 @@ bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
 bool SoundManager::OnChangeBGM(const Events::ChangeBGM &e)
 {
     if (m_CurrentBGM != nullptr) {
-        stopSound(m_CurrentBGM);
+        if (getSourceState(m_CurrentBGM->ALsource) == AL_PLAYING) {
+            stopSound(m_CurrentBGM);
+        }
     }
     m_CurrentBGM = createSource(e.FilePath);
     m_CurrentBGM->Type = SoundType::BGM;
     alSourcei(m_CurrentBGM->ALsource, AL_LOOPING, 1);
     playSound(m_CurrentBGM);
+    return true;
+}
+
+
+bool SoundManager::OnPlayerDisconnected(const Events::PlayerDisconnected& e)
+{
+    // A player returned to the main menu. Easiest solution when we don't have states in the game. Not "PC".
+    if (m_CurrentBGMCombo != nullptr) {
+        if (getSourceState(m_CurrentBGMCombo->ALsource) == AL_PLAYING) {
+            stopSound(m_CurrentBGMCombo);
+        }
+    }
+    stopSound(m_CurrentBGMCombo);
+    Events::ChangeBGM changeBGM;
+    changeBGM.FilePath = "Audio/BGM/MenuMusic.wav";
+    m_EventBroker->Publish(changeBGM);
     return true;
 }
 
