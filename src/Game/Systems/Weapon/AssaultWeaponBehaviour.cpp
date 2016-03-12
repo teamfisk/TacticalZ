@@ -158,7 +158,7 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 
     // Sound
     Events::PlaySoundOnEntity e;
-    e.EmitterID = wi.Player.ID;
+    e.Emitter = wi.Player;
     e.FilePath = "Audio/weapon/Assault/AssaultWeaponReload.wav";
     m_EventBroker->Publish(e);
 }
@@ -234,7 +234,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         if (hitMarkerSpawner.Valid()) {
             SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
             Events::PlaySoundOnEntity e;
-            e.EmitterID = wi.Player.ID;
+            e.Emitter = wi.Player;
             e.FilePath = "Audio/weapon/hitclick.wav";
             m_EventBroker->Publish(e);
         }
@@ -253,7 +253,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
 
     // Sound
     Events::PlaySoundOnEntity e;
-    e.EmitterID = wi.Player.ID;
+    e.Emitter = wi.Player;
     e.FilePath = "Audio/weapon/Assault/AssaultWeaponFire.wav";
     m_EventBroker->Publish(e);
 }

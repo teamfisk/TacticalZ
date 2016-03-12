@@ -3,6 +3,7 @@
 
 #include "IRenderer.h"
 #include "ShaderProgram.h"
+#include "PNG.h"
 
 class CubeMapPass
 {
@@ -21,7 +22,7 @@ private:
     IRenderer* m_Renderer;
     std::string m_PreviusCubeMapTexture;
 
-    std::vector<Texture*> m_CubeMapTextures;
+    std::vector<std::string> m_CubeMapTextures;
 };
 
 #endif 
