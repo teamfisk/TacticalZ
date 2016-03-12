@@ -32,6 +32,8 @@
 #include "../Game/Events/EDashAbility.h"
 #include "Network/EDisplayServerlist.h"
 #include "Network/EConnectRequest.h"
+#include "Network/EPlayerDisconnected.h"
+
 class Client : public Network
 {
 public:
@@ -100,6 +102,7 @@ private:
     void parseDoubleJump(Packet& packet);
     void parseDashEffect(Packet& packet);
     void parseAmmoPickup(Packet& packet);
+    void parseRemoveWorld(Packet& packet);
     void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
@@ -109,7 +112,6 @@ private:
     void sendLocalPlayerTransform();
     void becomePlayer();
     void displayServerlist();
-    void removeWorld();
     void createMainMenu();
     // Mapping Logic
     // Returns if local EntityID exist in map

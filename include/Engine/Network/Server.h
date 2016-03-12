@@ -11,6 +11,7 @@
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
+#include "Core/EntityFile.h"
 #include "Core/EventBroker.h"
 #include "../Network/Network.h"
 #include "Input/EInputCommand.h"
@@ -24,6 +25,7 @@
 #include "Core/EPlayerDeath.h"
 #include "Network/EPlayerConnected.h"
 #include "Network/EKillDeath.h"
+#include "Core/EWin.h"
 
 class Server : public Network
 {
@@ -110,6 +112,8 @@ private:
     bool OnAmmoPickup(const Events::AmmoPickup& e);
     EventRelay<Server, Events::PlayerDeath> m_EPlayerDeath;
     bool OnPlayerDeath(const Events::PlayerDeath& e);
+    EventRelay<Server, Events::Win> m_EWin;
+    bool OnWin(const Events::Win& e);
 };
 
 #endif

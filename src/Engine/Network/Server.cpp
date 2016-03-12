@@ -17,6 +17,7 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Server::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EAmmoPickup, &Server::OnAmmoPickup);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &Server::OnPlayerDeath);
+    EVENT_SUBSCRIBE_MEMBER(m_EWin, &Server::OnWin);
     // BindWW
     if (port == 0) {
         port = config->Get<float>("Networking.Port", 27666);
@@ -540,6 +541,18 @@ bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
     eKD.Killer = getPlayerIDFromEntityID(e.Killer.ID);
     m_EventBroker->Publish(eKD);
     return false;
+}
+
+bool Server::OnWin(const Events::Win & e)
+{
+    Packet removeMap(MessageType::RemoveWorld);
+    reliableBroadcast(removeMap);
+    removeWorld();
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Rocky2.xml");
+    entityFile->MergeInto(m_World);
+    Packet newWorld(MessageType::Snapshot);
+    reliableBroadcast(newWorld);
+    return true;
 }
 
 void Server::parseClientPing()

@@ -40,6 +40,7 @@ protected:
     void saveToFile();
     void updateNetworkData();
     void popNetworkSegmentOfHeader(Packet& packet);
+    void removeWorld();
 };
 
 #endif

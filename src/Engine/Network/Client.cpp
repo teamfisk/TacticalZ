@@ -1,5 +1,5 @@
 #include "Network/Client.h"
-#include "Network/EPlayerDisconnected.h"
+
 using namespace boost::asio::ip;
 
 Client::Client(World* world, EventBroker* eventBroker)
@@ -158,6 +158,9 @@ void Client::parseMessageType(Packet& packet)
         break;
     case MessageType::AmmoPickup:
         parseAmmoPickup(packet);
+        break;
+    case MessageType::RemoveWorld:
+        parseRemoveWorld(packet);
         break;
     default:
         break;
@@ -334,6 +337,12 @@ void Client::parseAmmoPickup(Packet & packet)
     e.AmmoGain = packet.ReadPrimitive<int>();
     e.Player = m_LocalPlayer;
     m_EventBroker->Publish(e);
+}
+
+void Client::parseRemoveWorld(Packet & packet)
+{
+    removeWorld();
+
 }
 
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)
@@ -705,19 +714,6 @@ void Client::displayServerlist()
         LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
 }
-
-void Client::removeWorld()
-{
-    std::vector<EntityID> childrenToBeDeleted;
-    auto rootEntites = m_World->GetDirectChildren(EntityID_Invalid);
-    for (auto it = rootEntites.first; it != rootEntites.second; it++) {
-        childrenToBeDeleted.push_back(it->second);
-    }
-    for (int i = 0; i < childrenToBeDeleted.size(); ++i) {
-        m_World->DeleteEntity(childrenToBeDeleted[i]);
-    }
-}
-
 
 void Client::createMainMenu()
 {
