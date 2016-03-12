@@ -145,9 +145,11 @@ bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
     if (!IsClient) {
         return false;
     }
-    //Events::PlaySoundOnEntity ev;
-    //ev.Emitter = EntityWrapper(m_World, e.entityID);
-    //ev.FilePath = "Audio/Jump/Jump2.wav";
-    //m_EventBroker->Publish(ev);
+    if (e.entityID == LocalPlayer.ID) {
+        Events::PlaySoundOnEntity ev;
+        ev.Emitter = EntityWrapper(m_World, e.entityID);
+        ev.FilePath = "Audio/Jump/Jump2.wav";
+        m_EventBroker->Publish(ev);
+    }
     return false;
 }

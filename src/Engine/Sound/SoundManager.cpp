@@ -275,7 +275,7 @@ bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
     auto listenerComponents = m_World->GetComponents("Listener");
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
         if ((*it).EntityID != m_LocalPlayer.ID) {
-            continue;;
+            continue;
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
