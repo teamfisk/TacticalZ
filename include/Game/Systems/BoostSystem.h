@@ -6,6 +6,7 @@
 #include "Core/EntityFile.h"
 #include "Core/EPlayerDamage.h"
 #include "Common.h"
+#include "SpawnerSystem.h"
 
 class BoostSystem : public System
 {
@@ -17,5 +18,7 @@ private:
     bool OnPlayerDamage(Events::PlayerDamage& e);
 
     std::string DetermineClass(EntityWrapper player);
+
+    void giveAmmo(EntityWrapper giver, EntityWrapper receiver);
 };
 #endif

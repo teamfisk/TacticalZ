@@ -305,6 +305,8 @@ private:
         wi.ThirdPersonEntity = thirdPersonWeapon;
         wi.ThirdPersonPlayerModel = thirdPersonWeapon.FirstParentWithComponent("Model");
         
+        player["Player"]["CurrentWeapon"] = cWeapon.Info.Name;
+
         OnEquip(cWeapon, wi);
     }
 

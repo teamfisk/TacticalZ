@@ -14,7 +14,6 @@ void SidearmWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWra
 
 void SidearmWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
-
     CheckAmmo(cWeapon, wi);
 
     // Start reloading automatically if at 0 mag ammo
@@ -64,7 +63,7 @@ void SidearmWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
     EntityWrapper rootNode = wi.FirstPersonEntity;
     if (rootNode.Valid()) {
-        EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
+        EntityWrapper blend = rootNode.FirstChildByName("MovementBlendSidearm");
         if (blend.Valid()) {
             (double&)blend["Blend"]["Weight"] = animationWeight;
         }
@@ -282,7 +281,7 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
     // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
         damage = 0;
-        giveAmmo(cWeapon, wi, victim);
+        //giveAmmo(cWeapon, wi, victim);
     }
 
     // Deal damage! 
@@ -294,6 +293,7 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
 
     return damage > 0;
 }
+/*
 
 void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver)
 {
@@ -338,7 +338,7 @@ void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, 
             }
         }
     }
-}
+}*/
 
 void SidearmWeaponBehaviour::CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi)
 {

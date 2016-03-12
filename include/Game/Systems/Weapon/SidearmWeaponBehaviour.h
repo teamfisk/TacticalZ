@@ -37,7 +37,7 @@ private:
     bool playerInFirstPerson(EntityWrapper player);
 
     bool dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi);
-    void giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver);
+   // void giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver);
 
 
     void CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi);
