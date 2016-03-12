@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Options" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Background_Origin">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Background">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <BlurBackground>true</BlurBackground>
+              <Color A="0.196078435" B="0" G="0" R="0"/>
+            </c:Sprite>
+            <c:Transform>
+              <Scale X="0.300000012" Y="0.5" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Title_Origin">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="UnderLine">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <Visible>false</Visible>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0.00500000035" Y="0.198000014" Z="0.0199999996"/>
+                  <Scale X="0.270000011" Y="0.00100000005" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Options</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.131999999" Y="0.202000007" Z="0.0199999996"/>
+                  <Scale X="0.0320000015" Y="0.0310000014" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Buttons_anchor">
+      <Components>
+        <c:Transform>
+          <Position X="0" Y="0.168000013" Z="0.0199999996"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Resolution">
+          <Components>
+            <c:Transform>
+              <Scale X="0.100000001" Y="0.100000001" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Sprite">
+              <Components>
+                <c:Button/>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <Color A="0.392156869" B="1" G="1" R="1"/>
+                </c:Sprite>
+                <c:InputCmdButton>
+                  <Command>Resolution</Command>
+                  <PressValue>1</PressValue>
+                </c:InputCmdButton>
+                <c:Transform>
+                  <Scale X="2.5999999" Y="0.300000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="TextAndCorner_Origin">
+              <Components>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="Text">
+                  <Components>
+                    <c:Text>
+                      <Content>Resolution</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Color A="1" B="0" G="0" R="0"/>
+                      <Alignment>
+                        <Right/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="-0.180000007" Y="-0.116000004" Z="0.00500000035"/>
+                      <Scale X="0.219000012" Y="0.150000006" Z="1"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="ResolutionSpawner">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/Resolution_Options.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

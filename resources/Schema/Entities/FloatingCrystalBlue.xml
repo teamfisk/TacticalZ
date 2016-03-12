@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform>
+      <Position X="0" Y="14.8518229" Z="0"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Anchor1">
+      <Components>
+        <c:RaptorCopter>
+          <Speed>0.30000001192092896</Speed>
+          <Axis X="0" Y="1" Z="0"/>
+        </c:RaptorCopter>
+        <c:FloatingEffect>
+          <Period>30</Period>
+          <Time>1125.9779108477385</Time>
+          <Axis X="0" Y="1" Z="0"/>
+          <Amplitude>3.5</Amplitude>
+        </c:FloatingEffect>
+        <c:Transform>
+          <Position X="-0" Y="-0.711852849" Z="-0"/>
+          <Orientation X="0" Y="455.182343" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/CrystalsLayer1.mesh</Resource>
+              <Color A="1" B="2" G="0.784313738" R="0"/>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Anchor2">
+      <Components>
+        <c:RaptorCopter>
+          <Speed>0.5</Speed>
+          <Axis X="0" Y="1" Z="0"/>
+        </c:RaptorCopter>
+        <c:FloatingEffect>
+          <Period>20</Period>
+          <Time>1231.9108979534806</Time>
+          <Axis X="0" Y="1" Z="0"/>
+          <Amplitude>3</Amplitude>
+        </c:FloatingEffect>
+        <c:Transform>
+          <Position X="-0" Y="-1.69476664" Z="-0"/>
+          <Orientation X="0" Y="752.229553" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/CrystalsLayer2.mesh</Resource>
+              <Color A="1" B="2" G="0.784313738" R="0"/>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Anchor0">
+      <Components>
+        <c:RaptorCopter>
+          <Speed>0.10000000149011612</Speed>
+          <Axis X="0" Y="-1" Z="0"/>
+        </c:RaptorCopter>
+        <c:FloatingEffect>
+          <Period>10</Period>
+          <Time>1278.4275441408811</Time>
+          <Axis X="0" Y="1" Z="0"/>
+          <Amplitude>0.5</Amplitude>
+        </c:FloatingEffect>
+        <c:Transform>
+          <Position X="-0" Y="-0.417467505" Z="-0"/>
+          <Orientation X="0" Y="-147.27742" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/CenterCrystal.mesh</Resource>
+              <Color A="1" B="2" G="0.784313738" R="0"/>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="LightOrigin1">
+          <Components>
+            <c:RaptorCopter>
+              <Speed>1</Speed>
+              <Axis X="0.400000006" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Orientation X="330.00589" Y="825.014587" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.588235319" R="0"/>
+                  <Radius>4.5</Radius>
+                  <Falloff>0.5</Falloff>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="1.1234858" Y="0.720658064" Z="3.40589333"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.588235319" R="0"/>
+                  <Radius>4.5</Radius>
+                  <Falloff>0.5</Falloff>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0.4723185" Y="0" Z="-4.12240839"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.588235319" R="0"/>
+                  <Radius>4.5</Radius>
+                  <Falloff>0.5</Falloff>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="-2.91954184" Y="1.54033804" Z="-0.0577439293"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.588235319" R="0"/>
+                  <Radius>4.5</Radius>
+                  <Falloff>0.5</Falloff>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="1.48998797" Y="-3.06706786" Z="-1.78805089"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

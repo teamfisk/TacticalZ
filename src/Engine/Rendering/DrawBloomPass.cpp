@@ -151,18 +151,7 @@ void DrawBloomPass::OnWindowResize()
 	if (m_Quality == 0) {
 		return;
 	}
-    CommonFunctions::GenerateMipMapTexture(
-        &m_GaussianTexture_vert, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
-        , GL_RGB, GL_FLOAT, m_BloomLod);
-    CommonFunctions::GenerateMipMapTexture(
-        &m_GaussianTexture_horiz, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
-        , GL_RGB, GL_FLOAT, m_BloomLod);
-    for (int i = 0; i < m_BloomLod; i++) {
-        m_GaussianFrameBuffer_vert[i].Generate();
-        m_GaussianFrameBuffer_horiz[i].Generate();
-
-    }
-
+	InitializeBuffers();
 }
 
 void DrawBloomPass::GaussianLodPass(GLuint mipMap, GLuint texture)

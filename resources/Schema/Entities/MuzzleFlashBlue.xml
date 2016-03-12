@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="MuzzleFlashBlue" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>0.039999999105930328</Lifetime>
+    </c:Lifetime>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="PlaneRight">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/PlaneRight.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Cone1Outside">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/Cone1Outside.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Cone1Inside">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/Cone1Inside.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Cone2Outside">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/Cone2Outside.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Cone2Inside">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/Cone2Inside.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlaneUp">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/PlaneUp.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlaneDown">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/PlaneDown.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="PlaneLeft">
+      <Components>
+        <c:Model>
+          <Resource>Models/Effects/MuzzleFlash/Blue/PlaneLeft.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

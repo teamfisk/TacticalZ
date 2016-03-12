@@ -234,9 +234,14 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
 
 void CapturePointSystem::ChangeCapturePointModelsVisibility(EntityWrapper &capturePointModels, bool isOwner) {
     (bool&)capturePointModels["Model"]["Visible"] = isOwner;
-    for (auto& capModel : capturePointModels.ChildrenWithComponent("Model"))
+    for (auto& capModel : capturePointModels.ChildrenWithComponent("Transform"))
     {
-        (bool&)capModel["Model"]["Visible"] = isOwner;
+        if (capModel.HasComponent("Model")) {
+            (bool&)capModel["Model"]["Visible"] = isOwner;
+        }
+        if (capModel.HasComponent("PointLight")) {
+            (bool&)capModel["PointLight"]["Visible"] = isOwner;
+        }
     }
 }
 

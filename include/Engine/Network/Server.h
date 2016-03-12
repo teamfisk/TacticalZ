@@ -36,7 +36,7 @@ public:
 private:
     // Network channels
     TCPServer m_Reliable;
-    //UDPServer m_Unreliable;
+    UDPServer m_Unreliable;
     UDPServer m_ServerlistRequest;
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
