@@ -281,7 +281,7 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
     // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
         damage = 0;
-        giveAmmo(cWeapon, wi, victim);
+        //giveAmmo(cWeapon, wi, victim);
     }
 
     // Deal damage! 
@@ -293,6 +293,7 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
 
     return damage > 0;
 }
+/*
 
 void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver)
 {
@@ -337,7 +338,7 @@ void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, 
             }
         }
     }
-}
+}*/
 
 void SidearmWeaponBehaviour::CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
