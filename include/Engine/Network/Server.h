@@ -74,6 +74,7 @@ private:
     void reliableBroadcast(Packet& packet);
     void unreliableBroadcast(Packet& packet);
     void sendSnapshot();
+    void createWorldSnapshot(Packet& packet);
     void addPlayersToPacket(Packet& packet, EntityID entityID);
     void addChildrenToPacket(Packet& packet, EntityID entityID);
     void addInputCommandsToPacket(Packet& packet);

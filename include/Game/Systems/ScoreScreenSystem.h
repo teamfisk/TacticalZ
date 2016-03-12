@@ -8,6 +8,7 @@
 #include "Core/EPlayerSpawned.h"
 #include "Network/EPlayerConnected.h"
 #include "Network/EPlayerDisconnected.h"
+#include "Game/Events/EReset.h"
 #include "GLM.h"
 
 class ScoreScreenSystem : public PureSystem
@@ -25,6 +26,8 @@ public:
     bool OnPlayerConnected(const Events::PlayerConnected& e);
     EventRelay<ScoreScreenSystem, Events::PlayerDisconnected> m_EPlayerDisconnected;
     bool OnPlayerDisconnected(const Events::PlayerDisconnected& e);
+    EventRelay<ScoreScreenSystem, Events::Reset> m_EReset;
+    bool OnReset(const Events::Reset& e);
 
 private:
     struct PlayerData {

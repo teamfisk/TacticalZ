@@ -9,6 +9,7 @@ SpectatorCameraSystem::SpectatorCameraSystem(SystemParams params)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &SpectatorCameraSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EDisconnect, &SpectatorCameraSystem::OnDisconnect);
+    EVENT_SUBSCRIBE_MEMBER(m_EReset, &SpectatorCameraSystem::OnReset);
 }
 
 void SpectatorCameraSystem::Update(double dt)

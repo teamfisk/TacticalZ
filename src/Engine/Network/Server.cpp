@@ -174,8 +174,14 @@ void Server::sendSnapshot()
     Packet packet(MessageType::Snapshot);
     addInputCommandsToPacket(packet);
     addPlayersToPacket(packet, EntityID_Invalid);
-    //addChildrenToPacket(packet, EntityID_Invalid);
     unreliableBroadcast(packet);
+}
+
+// Send snapshot fields
+void Server::createWorldSnapshot(Packet& packet)
+{
+    addInputCommandsToPacket(packet);
+    addChildrenToPacket(packet, EntityID_Invalid);
 }
 
 void Server::addInputCommandsToPacket(Packet& packet)
@@ -380,8 +386,7 @@ void Server::parseTCPConnect(Packet & packet)
     m_Reliable.Send(connnectPacket, m_ConnectedPlayers.at(playerID));
 
     Packet firstSnapshot(MessageType::Snapshot);
-    addInputCommandsToPacket(firstSnapshot);
-    addChildrenToPacket(firstSnapshot, EntityID_Invalid);
+    createWorldSnapshot(firstSnapshot);
     m_Reliable.Send(firstSnapshot);
 
     // Send notification that a player has connected
@@ -545,6 +550,7 @@ bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
 
 bool Server::OnWin(const Events::Win & e)
 {
+    // Postpone this code and trigger after some time in a update
     Events::Reset reset;
     m_EventBroker->Publish(reset);
     Packet removeMap(MessageType::RemoveWorld);
@@ -554,6 +560,7 @@ bool Server::OnWin(const Events::Win & e)
     auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Rocky2.xml");
     entityFile->MergeInto(m_World);
     Packet newWorld(MessageType::Snapshot);
+    createWorldSnapshot(newWorld);
     reliableBroadcast(newWorld);
     return true;
 }
