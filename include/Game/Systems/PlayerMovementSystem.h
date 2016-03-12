@@ -46,4 +46,6 @@ private:
 
     void updateMovementControllers(double dt);
     void updateVelocity(EntityWrapper player, double dt);
+
+    void setAim(EntityWrapper root, std::string weaponNodeName, double time);
 };

@@ -297,6 +297,8 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
 
 void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver)
 {
+    bool gaveAmmo = false;
+
     if (receiver.HasComponent("AssaultWeapon")) {
         int magazineSize = receiver["AssaultWeapon"]["MagazineSize"];
         int& magazineAmmo = receiver["AssaultWeapon"]["MagazineAmmo"];
@@ -306,8 +308,10 @@ void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, 
 
         if(magazineAmmo < magazineSize) {
             magazineAmmo += 1;
+            gaveAmmo = true;
         } else if (ammo < maxAmmo) {
             ammo += 1;
+            gaveAmmo = true;
         }
     } else if (receiver.HasComponent("DefenderWeapon")) {
         int magazineSize = receiver["DefenderWeapon"]["MagazineSize"];
@@ -318,8 +322,20 @@ void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, 
 
         if (magazineAmmo < magazineSize) {
             magazineAmmo += 1;
+            gaveAmmo = true;
         } else if (ammo < maxAmmo) {
             ammo += 1;
+            gaveAmmo = true;
+        }
+    }
+
+
+    if(gaveAmmo) {
+        EntityWrapper effectSpawner = wi.FirstPersonEntity.FirstChildByName("AmmoShareEffectSpawner");
+        if(effectSpawner.Valid()) {
+            if (effectSpawner.HasComponent("Spawner")) {
+                SpawnerSystem::Spawn(effectSpawner, effectSpawner);
+            }
         }
     }
 }
@@ -371,26 +387,38 @@ void SidearmWeaponBehaviour::CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi)
     // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
         int magazineAmmo = 0;
+        int ammo = 0;
         if (victim.HasComponent("AssaultWeapon")) {
             magazineAmmo = (int)victim["AssaultWeapon"]["MagazineAmmo"];
+            ammo = (int)victim["AssaultWeapon"]["Ammo"];
 
         } else if (victim.HasComponent("DefenderWeapon")) {
             magazineAmmo = (int)victim["DefenderWeapon"]["MagazineAmmo"];
+            ammo = (int)victim["DefenderWeapon"]["Ammo"];
         }
 
-        
+
         EntityWrapper friendlyAmmoHudSpawner = wi.FirstPersonPlayerModel.FirstChildByName("FriendlyAmmoAttachment");
-        if(friendlyAmmoHudSpawner.Valid()) {
+        if (friendlyAmmoHudSpawner.Valid()) {
 
             auto children = m_World->GetDirectChildren(friendlyAmmoHudSpawner.ID);
 
             if (children.first == children.second) {
-                EntityWrapper friendlyAmmoHud = SpawnerSystem::Spawn(friendlyAmmoHudSpawner, friendlyAmmoHudSpawner);
-                if (friendlyAmmoHud.Valid()) {
-                    EntityWrapper textEntity = friendlyAmmoHud.FirstChildByName("MagazineAmmo");
-                    if (textEntity.Valid()) {
-                        if (textEntity.HasComponent("Text")) {
-                            (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+                if (friendlyAmmoHudSpawner.HasComponent("Spawner")) {
+                    EntityWrapper friendlyAmmoHud = SpawnerSystem::Spawn(friendlyAmmoHudSpawner, friendlyAmmoHudSpawner);
+                    if (friendlyAmmoHud.Valid()) {
+                        EntityWrapper textEntity = friendlyAmmoHud.FirstChildByName("MagazineAmmo");
+                        if (textEntity.Valid()) {
+                            if (textEntity.HasComponent("Text")) {
+                                (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+                            }
+                        }
+
+                        EntityWrapper ammoTextEntity = friendlyAmmoHud.FirstChildByName("Ammo");
+                        if (ammoTextEntity.Valid()) {
+                            if (ammoTextEntity.HasComponent("Text")) {
+                                (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+                            }
                         }
                     }
                 }
@@ -401,8 +429,14 @@ void SidearmWeaponBehaviour::CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi)
                         (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
                     }
                 }
+
+                EntityWrapper ammoTextEntity = friendlyAmmoHudSpawner.FirstChildByName("Ammo");
+                if (ammoTextEntity.Valid()) {
+                    if (ammoTextEntity.HasComponent("Text")) {
+                        (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+                    }
+                }
             }
-            
         }
     }
 }

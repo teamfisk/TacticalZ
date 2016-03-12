@@ -16,7 +16,7 @@
         </c:Sprite>
         <c:Transform>
           <Position X="0" Y="0" Z="-0.00300000003"/>
-          <Scale X="0.119999997" Y="0.119999997" Z="0.119999997"/>
+          <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -33,11 +33,25 @@
             <c:Text>
               <Content>88</Content>
               <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Color A="1" B="3.92156863" G="0" R="0.392156869"/>
+              <Color A="1" B="1.25490201" G="0" R="1.25490201"/>
             </c:Text>
             <c:Transform>
-              <Position X="0" Y="-0.0141239492" Z="0"/>
-              <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+              <Position X="1.53152232e-05" Y="0.0123614743" Z="-8.43336147e-06"/>
+              <Scale X="0.0299999993" Y="0.0299999993" Z="0.0299999993"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Ammo">
+          <Components>
+            <c:Text>
+              <Content>88</Content>
+              <Resource>Fonts/DroidSans.ttf,64</Resource>
+              <Color A="1" B="1.25490201" G="0" R="1.25490201"/>
+            </c:Text>
+            <c:Transform>
+              <Position X="-5.92374272e-06" Y="-0.00478126714" Z="3.26191866e-06"/>
+              <Scale X="0.0199999996" Y="0.0199999996" Z="0.0199999996"/>
             </c:Transform>
           </Components>
           <Children/>

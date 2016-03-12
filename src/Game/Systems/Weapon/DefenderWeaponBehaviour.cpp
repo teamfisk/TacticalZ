@@ -353,6 +353,9 @@ void DefenderWeaponBehaviour::spawnTracers(ComponentWrapper cWeapon, WeaponInfo&
         glm::vec3 origin = Transform::AbsolutePosition(wi.Player.FirstChildByName("Camera"));
         glm::vec3 direction = pelletRotation * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
+
+       // Collision::EntityFirstHitByRay(Ray(origin, direction), m_CollisionOctree, distance, pos);
+
         EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
         if (ray.Valid()) {
             ComponentWrapper cTransform = ray["Transform"];
@@ -397,7 +400,7 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
     float yRefFOV = glm::radians(59.f);
     float yRef = glm::tan(yRefFOV) * nearClip;
     float yRatio = yRef / (glm::tan(yFOV) * nearClip);
-    float yMax = yRatio * (glm::tan(spreadAngle) * farClip);
+    float yMax = yRatio * (glm::tan(spreadAngle) * (farClip - nearClip)) * glm::pi<float>(); // ????? Good enough????
 
     LOG_DEBUG("Ratio: %f", yRatio);
     LOG_DEBUG("fatClip: %f", farClip);

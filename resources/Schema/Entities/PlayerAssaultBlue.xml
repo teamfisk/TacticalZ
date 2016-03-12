@@ -15,7 +15,9 @@
     <c:Collidable/>
     <c:DashAbility/>
     <c:DoubleJump/>
-    <c:SidearmWeapon/>
+    <c:SidearmWeapon>
+      <BaseDamage>10</BaseDamage>
+    </c:SidearmWeapon>
     <c:Health/>
     <c:NetworkComponent/>
     <c:Physics>
@@ -902,10 +904,10 @@
                         <c:Transform/>
                       </Components>
                       <Children>
-                        <Entity name="DashLeft">
+                        <Entity name="DashRight">
                           <Components>
                             <c:Animation>
-                              <AnimationName>DashLeftF</AnimationName>
+                              <AnimationName>DashRightF</AnimationName>
                               <Time>1</Time>
                               <Speed>1.7999999523162842</Speed>
                               <Loop>false</Loop>
@@ -914,10 +916,10 @@
                           </Components>
                           <Children/>
                         </Entity>
-                        <Entity name="DashRight">
+                        <Entity name="DashLeft">
                           <Components>
                             <c:Animation>
-                              <AnimationName>DashRightF</AnimationName>
+                              <AnimationName>DashLeftF</AnimationName>
                               <Time>1</Time>
                               <Speed>1.7999999523162842</Speed>
                               <Loop>false</Loop>
