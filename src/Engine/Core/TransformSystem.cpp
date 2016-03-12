@@ -147,7 +147,7 @@ glm::mat4 TransformSystem::ModelMatrix(EntityWrapper entity)
     auto cacheIt = MatrixCache.find(entity);
     ComponentWrapper cTransform = entity["Transform"];
     bool isDirty = cTransform["Position"].Dirty(DirtySetType::Transform) || cTransform["Orientation"].Dirty(DirtySetType::Transform) || cTransform["Scale"].Dirty(DirtySetType::Transform);
-    if (cacheIt != MatrixCache.end() && !isDirty) {
+    if (cacheIt != MatrixCache.end() && !isDirty && false) {
         return cacheIt->second;
     } else {
         glm::mat4 matrix = glm::translate(AbsolutePosition(entity)) * glm::toMat4(AbsoluteOrientation(entity)) * glm::scale(AbsoluteScale(entity));

@@ -233,8 +233,8 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     if (weaponModelEntity.Valid()) {
         EntityWrapper spawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
         for (auto& angles : pelletAngles) {
-            glm::vec3 direction = Transform::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
-            float distance = traceRayDistance(Transform::AbsolutePosition(spawner), direction);
+            glm::vec3 direction = TransformSystem::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
+            float distance = traceRayDistance(TransformSystem::AbsolutePosition(spawner), direction);
             EntityWrapper ray = SpawnerSystem::Spawn(spawner);
             ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance / 100.f);
             Field<glm::vec3> orientation = ray["Transform"]["Orientation"];
@@ -274,7 +274,7 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
     
     glm::vec3 maxRange = direction * 2.f;
     EntityWrapper camera = wi.Player.FirstChildByName("Camera");
-    glm::vec3 cameraPosition = Transform::AbsolutePosition(camera);
+    glm::vec3 cameraPosition = TransformSystem::AbsolutePosition(camera);
     if (!camera.Valid()) {
         return;
     }

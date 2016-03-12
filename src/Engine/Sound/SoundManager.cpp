@@ -113,7 +113,7 @@ void SoundManager::updateEmitters(double dt)
         if (!m_World->ValidEntity(m_World->GetParent(it->first))) {
             return;
         }
-        glm::vec3 nextPos = Transform::AbsolutePosition(m_World, it->first);
+        glm::vec3 nextPos = TransformSystem::AbsolutePosition(m_World, it->first);
         // Calculate velocity
         glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt;
         setSourcePos(it->second->ALsource, nextPos);
@@ -147,11 +147,11 @@ void SoundManager::updateListener(double dt)
         if (listener.IsChildOf(m_LocalPlayer) || listener == m_LocalPlayer) {
             glm::vec3 previousPos;
             alGetListener3f(AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
-            glm::vec3 nextPos = Transform::AbsolutePosition(listener); // Get next (current) pos
+            glm::vec3 nextPos = TransformSystem::AbsolutePosition(listener); // Get next (current) pos
             glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt; // Calculate velocity
             setListenerPos(nextPos);
             setListenerVel(velocity);
-            setListenerOri(glm::eulerAngles(Transform::AbsoluteOrientation(listener)));
+            setListenerOri(glm::eulerAngles(TransformSystem::AbsoluteOrientation(listener)));
             break;
         }
     }

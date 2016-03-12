@@ -49,7 +49,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                             continue;
                         }
                         float u, v;
-                        hit = Collision::RayVsModel(ray, model->Vertices(), model->m_Indices, Transform::ModelMatrix(boxB.Entity), dist, u, v);
+                        hit = Collision::RayVsModel(ray, model->Vertices(), model->m_Indices, TransformSystem::ModelMatrix(boxB.Entity), dist, u, v);
                     } else {
                         hit = Collision::RayVsAABB(ray, boxB, dist);
                     }
@@ -93,7 +93,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                     continue;
                 }
 
-                glm::mat4 modelMatrix = Transform::ModelMatrix(boxB.Entity);
+                glm::mat4 modelMatrix = TransformSystem::ModelMatrix(boxB.Entity);
 
                 glm::vec3 inOutVelocity = (glm::vec3)cPhysics["Velocity"];
                 bool isOnGround = (bool)cPhysics["IsOnGround"];

@@ -127,6 +127,7 @@ Game::Game(int argc, char* argv[])
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TransformSystem>(updateOrderLevel);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
@@ -249,12 +250,12 @@ void Game::Tick()
     m_EventBroker->Swap();
     m_EventBroker->Clear();
 
-    //LOG_DEBUG("Recalculated positions: %i", Transform::RecalculatedPositions);
-    //LOG_DEBUG("Recalculated orientations: %i", Transform::RecalculatedOrientations);
-    //LOG_DEBUG("Recalculated scales: %i", Transform::RecalculatedScales);
-    Transform::RecalculatedPositions = 0;
-    Transform::RecalculatedOrientations = 0;
-    Transform::RecalculatedScales = 0;
+    //LOG_DEBUG("Recalculated positions: %i", TransformSystem::RecalculatedPositions);
+    //LOG_DEBUG("Recalculated orientations: %i", TransformSystem::RecalculatedOrientations);
+    //LOG_DEBUG("Recalculated scales: %i", TransformSystem::RecalculatedScales);
+    TransformSystem::RecalculatedPositions = 0;
+    TransformSystem::RecalculatedOrientations = 0;
+    TransformSystem::RecalculatedScales = 0;
 }
 
 int Game::parseArgs(int argc, char* argv[])

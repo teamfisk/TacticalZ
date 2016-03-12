@@ -218,8 +218,8 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     // Tracer
     EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
     if (tracerSpawner.Valid()) {
-        glm::vec3 origin = Transform::AbsolutePosition(tracerSpawner);
-        glm::vec3 direction = glm::quat(Transform::AbsoluteOrientationEuler(tracerSpawner)) * glm::vec3(0, 0, -1);
+        glm::vec3 origin = TransformSystem::AbsolutePosition(tracerSpawner);
+        glm::vec3 direction = glm::quat(TransformSystem::AbsoluteOrientationEuler(tracerSpawner)) * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
         EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
         if (ray.Valid()) {

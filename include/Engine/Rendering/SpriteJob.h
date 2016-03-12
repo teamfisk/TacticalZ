@@ -13,7 +13,7 @@
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
 #include "../Core/World.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "Skeleton.h"
 
 struct SpriteJob : RenderJob
@@ -37,7 +37,7 @@ struct SpriteJob : RenderJob
         BlurBackground = (bool)cSprite["BlurBackground"];
 
         Entity = cSprite.EntityID;
-        Position = Transform::AbsolutePosition(world, cSprite.EntityID);
+        Position = TransformSystem::AbsolutePosition(world, cSprite.EntityID);
         Depth = 0;
         if (depthSorted) {
             glm::vec3 viewpos = glm::vec3(camera->ViewMatrix() * glm::vec4(Position, 1));
@@ -50,7 +50,7 @@ struct SpriteJob : RenderJob
         FillColor = fillColor;
         FillPercentage = fillPercentage;
 
-        glm::vec3 scale = Transform::AbsoluteScale(world, cSprite.EntityID);
+        glm::vec3 scale = TransformSystem::AbsoluteScale(world, cSprite.EntityID);
 
         if((bool)cSprite["KeepRatio"] == true) {
             if(scale.y >= scale.x) {
