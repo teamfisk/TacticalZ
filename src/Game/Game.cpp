@@ -40,6 +40,7 @@
 #include "Game/Systems/MainMenuSystem.h"
 #include "Game/Systems/ServerListSystem.h"
 #include "Game/Systems/StartSystem.h"
+#include "Game/Systems/EndScreenSystem.h"
 #include "Rendering/TextureSprite.h"
 
 
@@ -157,6 +158,7 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<SpectatorCameraSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ServerListSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<StartSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<EndScreenSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");

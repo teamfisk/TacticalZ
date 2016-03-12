@@ -11,6 +11,7 @@
     <Entity name="Camera">
       <Components>
         <c:Camera/>
+        <c:EndScreen/>
         <c:Transform/>
       </Components>
       <Children>
@@ -21,6 +22,22 @@
             </c:Transform>
           </Components>
           <Children>
+            <Entity name="SpriteRed">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                  <BlurBackground>true</BlurBackground>
+                  <Color A="0.588235319" B="0" G="0" R="0.588235319"/>
+                  <Visible>false</Visible>
+                </c:Sprite>
+                <c:Transform>
+                  <Scale X="1.30000007" Y="0.300000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
             <Entity name="SpriteBlue">
               <Components>
                 <c:Sprite>
@@ -28,8 +45,7 @@
                   <GlowMap></GlowMap>
                   <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
                   <BlurBackground>true</BlurBackground>
-                  <Color A="0.392156869" B="0.196078435" G="0" R="0"/>
-                  <Visible>false</Visible>
+                  <Color A="0.588235319" B="0.588235319" G="0" R="0"/>
                 </c:Sprite>
                 <c:Transform>
                   <Scale X="1.30000007" Y="0.300000012" Z="1"/>
@@ -60,21 +76,6 @@
                 <c:Transform>
                   <Position X="0" Y="-0.0670000017" Z="0.0299999993"/>
                   <Scale X="0.150000006" Y="0.150000006" Z="1"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="SpriteRed">
-              <Components>
-                <c:Sprite>
-                  <Model>Models/Core/UnitQuad.mesh</Model>
-                  <GlowMap></GlowMap>
-                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-                  <BlurBackground>true</BlurBackground>
-                  <Color A="0.392156869" B="0" G="0" R="0.196078435"/>
-                </c:Sprite>
-                <c:Transform>
-                  <Scale X="1.30000007" Y="0.300000012" Z="1"/>
                 </c:Transform>
               </Components>
               <Children/>

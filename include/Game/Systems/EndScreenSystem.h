@@ -14,8 +14,8 @@ public:
     virtual void Update(double dt) override;
 
 private:
-    EventRelay<EndScreenSystem, Events::Win&> m_EWin;
-    bool OnWin(const Events::Win&);
+    EventRelay<EndScreenSystem, Events::Win> m_EWin;
+    bool OnWin(const Events::Win& e);
 };
 
 #endif
