@@ -71,6 +71,7 @@ private:
     bool m_ResizeWindow = false;
 	int m_SSAO_Quality = 0;
 	int m_GLOW_Quality = 2;
+	unsigned int m_MSAA_Level = 0;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;

@@ -1,5 +1,5 @@
 #include "Rendering/DrawFinalPass.h"
-DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass)
+DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass, ConfigFile* config)
 	: m_Renderer(renderer)
 	, m_LightCullingPass(lightCullingPass)
 	, m_CubeMapPass(cubeMapPass)
@@ -10,6 +10,8 @@ DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCulling
     m_ShieldPixelRate = 8;
 	m_FinalPassFrameBuffer = new FrameBuffer();
 	m_ShieldDepthFrameBuffer = new FrameBuffer();
+
+	setMSAA(config->Get<int>("MSAA.Level", 0));
 
     InitializeTextures();
     InitializeShaderPrograms();
@@ -48,21 +50,35 @@ void DrawFinalPass::InitializeFrameBuffers()
 		}
 		m_AntiAliasedFrameBuffer->Generate();
 
+		if (m_SceneTexture != 0) {
+			glDeleteRenderbuffers(1, &m_SceneTexture);
+		}
 		glGenRenderbuffers(1, &m_SceneTexture);
+		GLERROR("FBO 1");
 		glBindRenderbuffer(GL_RENDERBUFFER, m_SceneTexture);
+		GLERROR("FBO 11");
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+		GLERROR("FBO 111");
 
+		if (m_BloomTexture != 0) {
+			glDeleteRenderbuffers(1, &m_BloomTexture);
+		}
 		glGenRenderbuffers(1, &m_BloomTexture);
+		GLERROR("FBO 2");
 		glBindRenderbuffer(GL_RENDERBUFFER, m_BloomTexture);
+		GLERROR("FBO 22");
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+		GLERROR("FBO 222");
 
+		if (m_DepthBuffer != 0) {
+			glDeleteRenderbuffers(1, &m_DepthBuffer);
+		}
 		glGenRenderbuffers(1, &m_DepthBuffer);
+		GLERROR("FBO 3");
 		glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
+		GLERROR("FBO 33");
 		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-
-		glGenRenderbuffers(1, &m_ShieldBuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, m_ShieldBuffer);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_DEPTH_COMPONENT32F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+		GLERROR("FBO 333");
 
 		//CommonFunctions::GenerateMultiSampleTexture(&m_SceneTexture, m_MSAA, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F);
 		//CommonFunctions::GenerateMultiSampleTexture(&m_BloomTexture, m_MSAA, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F);
@@ -81,10 +97,10 @@ void DrawFinalPass::InitializeFrameBuffers()
 
 		CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
 			glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
-
-		CommonFunctions::GenerateTexture(&m_ShieldBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-			glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 	}
+
+	CommonFunctions::GenerateTexture(&m_ShieldBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
+		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 
 	if (m_FinalPassFrameBuffer->GetHandle() == 0) {
 		if (m_MSAA) {
@@ -103,11 +119,7 @@ void DrawFinalPass::InitializeFrameBuffers()
     GLERROR("FBO generation");
 
 	if (m_ShieldDepthFrameBuffer->GetHandle() == 0) {
-		if (m_MSAA) {
-			m_ShieldDepthFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
-		} else {
-			m_ShieldDepthFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
-		}
+		m_ShieldDepthFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
 	}
 	m_ShieldDepthFrameBuffer->Generate();
 }
@@ -355,16 +367,18 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
         m_FullBlurredTexture = blurHUDPass->Draw(sceneTexture, scene);
     }
 
-    DrawFinalPassState* stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
+	DrawFinalPassState* stateSprite;
     if(scene.ShouldBlur) {
         //Combine nonblur and blur texture
-        stateSprite->Disable(GL_DEPTH_TEST);
-        stateSprite->Disable(GL_STENCIL_TEST);
 		GLuint sceneTexture = SceneTexture();
-		delete stateSprite;
 		stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
+		stateSprite->Disable(GL_DEPTH_TEST);
+		stateSprite->Disable(GL_STENCIL_TEST);
         m_CombinedTexture = blurHUDPass->CombineTextures(sceneTexture, m_FullBlurredTexture);
-    }
+
+	} else {
+		stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
+	}
 	//Draw Transparen objects
 	//state->BlendFunc(GL_ONE, GL_ONE);
 	//state->StencilFunc(GL_EQUAL, 1, 0xFF);
@@ -410,14 +424,41 @@ void DrawFinalPass::OnWindowResize()
 		m_ShieldDepthFrameBuffer = new FrameBuffer();
 	}
 
-	if (!m_MSAA) {
+	if (m_MSAA) {
 		if (m_AntiAliasedFrameBuffer != nullptr) {
 			delete m_AntiAliasedFrameBuffer;
+			m_AntiAliasedFrameBuffer = nullptr;
 		}
 	}
 
     InitializeFrameBuffers();
     GLERROR("Error changing texture resolutions");
+}
+
+void DrawFinalPass::setMSAA(unsigned int numberOfSamples) {
+	if (m_MSAA == numberOfSamples) {
+		return;
+	}
+
+	if (!(bool)numberOfSamples) {
+		if (m_AntiAliasedFrameBuffer != nullptr) {
+			delete m_AntiAliasedFrameBuffer;
+			m_AntiAliasedFrameBuffer = nullptr;
+		}
+		delete m_FinalPassFrameBuffer;
+		m_FinalPassFrameBuffer = new FrameBuffer();
+	}
+
+	if ((bool)numberOfSamples && !(bool)m_MSAA) {
+		delete m_FinalPassFrameBuffer;
+		m_FinalPassFrameBuffer = new FrameBuffer();
+	}
+
+	m_MSAA = numberOfSamples;
+
+	InitializeFrameBuffers();
+
+
 }
 
 void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
@@ -1366,7 +1407,14 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
                     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
                     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 }
-
+				if (spriteJob->ClampToBorder) {
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+				}
+				else {
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				}
             } else {
                 glBindTexture(GL_TEXTURE_2D, m_ErrorTexture->m_Texture);
             }

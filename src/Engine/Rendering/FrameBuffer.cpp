@@ -16,6 +16,7 @@ Texture2D::~Texture2D()
     if (m_ResourceHandle != 0) {
         glDeleteTextures(1, m_ResourceHandle);
     }
+	*m_ResourceHandle = 0;
 }
 
 Texture2DMultiSample::~Texture2DMultiSample()
@@ -23,6 +24,7 @@ Texture2DMultiSample::~Texture2DMultiSample()
 	if (m_ResourceHandle != 0) {
 		glDeleteTextures(1, m_ResourceHandle);
 	}
+	*m_ResourceHandle = 0;
 }
 
 RenderBuffer::~RenderBuffer()
@@ -30,6 +32,7 @@ RenderBuffer::~RenderBuffer()
     if (m_ResourceHandle != 0) {
         glDeleteRenderbuffers(1, m_ResourceHandle);
     }
+	*m_ResourceHandle = 0;
 }
 
 Texture2DArray::~Texture2DArray()
@@ -37,6 +40,7 @@ Texture2DArray::~Texture2DArray()
 	if (m_ResourceHandle != 0) {
 		glDeleteTextures(1, m_ResourceHandle);
 	}
+	*m_ResourceHandle = 0;
 }
 
 

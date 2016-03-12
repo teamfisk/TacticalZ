@@ -17,7 +17,7 @@
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass);
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass, ConfigFile* config);
 	~DrawFinalPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
@@ -25,6 +25,7 @@ public:
     void Draw(RenderScene& scene, BlurHUD* blurHUDPass);
     void ClearBuffer();
     void OnWindowResize();
+	void setMSAA(unsigned int numberOfSamples);
 
     //Return the texture that is used in later stages to apply the bloom effect
 	GLuint BloomTexture() {
@@ -129,7 +130,7 @@ private:
 
     //maqke this component based i guess?
     GLuint m_ShieldPixelRate = 16;
-	unsigned int m_MSAA = 4;
+	unsigned int m_MSAA = 0;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
