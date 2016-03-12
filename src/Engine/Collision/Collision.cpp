@@ -638,7 +638,7 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
         return boost::none;
     }
 
-    glm::mat4 modelMat = Transform::AbsoluteTransformation(entity);
+    glm::mat4 modelMat = Transform::ModelMatrix(entity);
     glm::vec3 mini(INFINITY);
     glm::vec3 maxi(-INFINITY);
     glm::vec3 maxCorner = modelSpaceBox.MaxCorner();

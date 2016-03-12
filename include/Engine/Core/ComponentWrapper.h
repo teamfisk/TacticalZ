@@ -56,7 +56,6 @@ struct ComponentWrapper
 
     void SetAllDirty(const std::string& fieldName, bool dirty = true)
     { 
-        LOG_DEBUG("DIRTY: %s %s", Info.Name.c_str(), fieldName.c_str());
         for (auto& kv : *DirtyBitField) {
             SetDirty(kv.first, fieldName);
         }

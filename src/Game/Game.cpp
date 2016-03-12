@@ -240,6 +240,13 @@ void Game::Tick()
     m_RenderFrame->Clear();
     m_EventBroker->Swap();
     m_EventBroker->Clear();
+
+    //LOG_DEBUG("Recalculated positions: %i", Transform::RecalculatedPositions);
+    //LOG_DEBUG("Recalculated orientations: %i", Transform::RecalculatedOrientations);
+    //LOG_DEBUG("Recalculated scales: %i", Transform::RecalculatedScales);
+    Transform::RecalculatedPositions = 0;
+    Transform::RecalculatedOrientations = 0;
+    Transform::RecalculatedScales = 0;
 }
 
 int Game::parseArgs(int argc, char* argv[])
