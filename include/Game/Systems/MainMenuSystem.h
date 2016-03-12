@@ -24,6 +24,7 @@ public:
 private:
     IRenderer* m_Renderer;
     void OpenSubMenu(const Events::InputCommand& e);
+    void OpenDropDown(const Events::InputCommand& e);
 
     EventRelay<MainMenuSystem, Events::ButtonClicked> m_EClicked;
     bool OnButtonClick(const Events::ButtonClicked& e);
@@ -36,6 +37,7 @@ private:
 
     std::string m_CurrentCommand = "";
     EntityWrapper m_OpenSubMenu = EntityWrapper::Invalid;
+    EntityWrapper m_DropDown = EntityWrapper::Invalid;
 
 };
 
