@@ -44,7 +44,7 @@ bool EndScreenSystem::OnWin(const Events::Win& e)
             if (blueText.HasComponent("Text"))
                 (bool&)blueText["Text"]["Visible"] = false;
 
-        }else if (e.TeamThatWon == 1) {
+        }else if (e.TeamThatWon == 3) {
             //Blue team won
             if (redSprite.HasComponent("Sprite"))
                 (bool&)redSprite["Sprite"]["Visible"] = false;
