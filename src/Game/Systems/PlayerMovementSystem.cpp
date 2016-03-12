@@ -274,10 +274,9 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
 
             // TODO: Animations
         }
-
+        playerStep(dt, player);
         controller->Reset();
     }
-    playerStep(dt);
 }
 
 
@@ -313,12 +312,12 @@ void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
     position += velocity * (float)dt;
 }
 
-void PlayerMovementSystem::playerStep(double dt)
+void PlayerMovementSystem::playerStep(double dt, EntityWrapper player)
 {
-    if (!m_LocalPlayer.Valid()) {
+    // Position of the local player, used see how far a player has moved.
+    if(!IsClient) {
         return;
     }
-    // Position of the local player, used see how far a player has moved.
     glm::vec3 pos = (glm::vec3)m_World->GetComponent(m_LocalPlayer.ID, "Transform")["Position"];
     // Used to see if a player is airborne.
     bool grounded = (bool)m_World->GetComponent(m_LocalPlayer.ID, "Physics")["IsOnGround"];
@@ -329,8 +328,8 @@ void PlayerMovementSystem::playerStep(double dt)
         // Player moved a step's distance
         // Create footstep sound
         Events::PlaySoundOnEntity e;
-        e.EmitterID = m_LocalPlayer.ID;
-        e.FilePath = m_LeftFoot ? "Audio/footstep/footstep2.wav" : "Audio/footstep/footstep3.wav";
+        e.Emitter = m_LocalPlayer;
+        e.FilePath = m_LeftFoot ? "Audio/Footstep/Footstep2.wav" : "Audio/Footstep/Footstep3.wav";
         m_LeftFoot = !m_LeftFoot;
         m_EventBroker->Publish(e);
         m_DistanceMoved = 0.f;
