@@ -29,9 +29,9 @@ void main()
 	vec4 color_result = Color * diffuseTexel;
 
 	float pos = ((P * vec4(Input.Position, 1)).y + 1.0)/2.0;
-	float fillResult = floor(pos*FillPercentage);
+	float fillResult = clamp(floor(pos/FillPercentage), 0, 1);
 
-	color_result = FillColor*diffuseTexel.a*fillResult + color_result*(1-fillResult);
+	color_result = FillColor*diffuseTexel.a*(1 - fillResult) + color_result*fillResult;
 
 	sceneColor = vec4(color_result.xyz, clamp(color_result.a, 0, 1));
 
