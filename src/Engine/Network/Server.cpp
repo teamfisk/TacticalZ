@@ -592,7 +592,7 @@ void Server::parseOnInputCommand(Packet& packet)
             e.Player = EntityWrapper(m_World, m_ConnectedPlayers.at(player).EntityID);
             e.Value = packet.ReadPrimitive<float>();
             m_EventBroker->Publish(e);
-            if (e.Command == "PrimaryFire" || e.Command == "Reload" || e.Command == "Jump") {
+            if (e.Command == "PrimaryFire" || e.Command == "Reload") {
                 m_InputCommandsToBroadcast.push_back(e);
             }
             //LOG_INFO("Server::parseOnInputCommand: Command is %s. Value is %f. PlayerID is %i.", e.Command.c_str(), e.Value, e.PlayerID);

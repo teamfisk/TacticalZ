@@ -86,16 +86,20 @@ bool SoundSystem::OnCaptured(const Events::Captured & e)
     return false;
 }
 
-// Testing purposes atm...
 bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 {
     if (!IsClient) { // Only play for clients
         return false;
     }
-    if (!e.Victim.Valid()) {
+    if (!e.Victim.Valid() || !e.Inflictor.Valid()) {
         return false;
     }
-
+    auto victimTeam = m_World->GetComponent(e.Victim.ID, "Team");
+    auto inflictorTeam = m_World->GetComponent(e.Inflictor.ID, "Team");
+    if ((int)victimTeam["Team"] == (int)inflictorTeam["Team"]) {
+        // Victim and inflictor are the same team, should not play "hurt" sound.
+        return false;
+    }
     std::vector<std::string> paths;
     paths.push_back("Audio/Hurt/Hurt" + std::to_string(m_RandIntDistribution(m_RandomGenerator)) + ".wav");
 
@@ -141,9 +145,9 @@ bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
     if (!IsClient) {
         return false;
     }
-    Events::PlaySoundOnEntity ev;
-    ev.Emitter = EntityWrapper(m_World, e.entityID);
-    ev.FilePath = "Audio/Jump/Jump2.wav";
-    m_EventBroker->Publish(ev);
+    //Events::PlaySoundOnEntity ev;
+    //ev.Emitter = EntityWrapper(m_World, e.entityID);
+    //ev.FilePath = "Audio/Jump/Jump2.wav";
+    //m_EventBroker->Publish(ev);
     return false;
 }

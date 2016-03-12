@@ -223,7 +223,9 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     PerformanceTimer::StartTimerAndStopPrevious("SoundManager");
-    m_SoundManager->Update(dt);
+    if (m_IsClient) {
+        m_SoundManager->Update(dt);
+    }
 
     // Update network
     PerformanceTimer::StartTimerAndStopPrevious("Network");
