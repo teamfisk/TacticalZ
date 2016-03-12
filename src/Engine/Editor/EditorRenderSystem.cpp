@@ -7,7 +7,7 @@ EditorRenderSystem::EditorRenderSystem(SystemParams params, IRenderer* renderer,
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &EditorRenderSystem::OnSetCamera);
     auto resolution = Rectangle::Rectangle(1280, 720);
-    m_EditorCamera = new Camera((float)resolution.Width / resolution.Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_EditorCamera = new Camera((float)resolution.Width / resolution.Height, glm::radians(45.f), 0.001f, 500.f);
 }
 
 void EditorRenderSystem::Update(double dt)
@@ -54,7 +54,7 @@ void EditorRenderSystem::Update(double dt)
             EntityWrapper entity(m_World, cModel.EntityID);
             glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
-                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f, false);
+                std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f, false, false);
                 if (cModel["Transparent"]) {
                     scene.Jobs.TransparentObjects.push_back(modelJob);
                 } else {
@@ -86,7 +86,7 @@ bool EditorRenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
-    m_EditorCamera->SetFOV(static_cast<float>((double)cCamera["FOV"]));
+    m_EditorCamera->SetFOV(glm::radians(static_cast<float>((double)cCamera["FOV"])));
     m_EditorCamera->SetNearClip(static_cast<float>((double)cCamera["NearClip"]));
     m_EditorCamera->SetFarClip(static_cast<float>((double)cCamera["FarClip"]));
     m_EditorCamera->SetPosition(cTransform["Position"]);

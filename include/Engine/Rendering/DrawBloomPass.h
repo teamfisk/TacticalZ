@@ -13,7 +13,7 @@ class DrawBloomPass
 {
 public:
     DrawBloomPass(IRenderer* renderer, ConfigFile* config);
-    ~DrawBloomPass() { }
+	~DrawBloomPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
@@ -33,12 +33,14 @@ public:
 		if (m_Quality == 0) { 
 			return m_BlackTexture->m_Texture;
 		} else { 
-			return m_GaussianTexture_vert;
+			return m_FinalGaussianTexture;
 		} 
 	}
 
 
 private:
+    void GaussianLodPass(GLuint mipMap, GLuint texture);
+    void CombineGaussianBlur();
     Texture* m_BlackTexture;
     Model* m_ScreenQuad;
 
@@ -47,15 +49,19 @@ private:
     //const LightCullingPass* m_LightCullingPass 
     int m_Iterations;
 	int m_Quality = 0;
+    int m_BloomLod = 5;
 
     GLuint m_GaussianTexture_horiz = 0;
     GLuint m_GaussianTexture_vert = 0;
+    GLuint m_FinalGaussianTexture = 0;
 
-    FrameBuffer m_GaussianFrameBuffer_horiz;
-    FrameBuffer m_GaussianFrameBuffer_vert;
+    FrameBuffer* m_GaussianFrameBuffer_horiz = nullptr;
+    FrameBuffer* m_GaussianFrameBuffer_vert = nullptr;
+    FrameBuffer m_GaussianCombineBuffer;
 
     ShaderProgram* m_GaussianProgram_horiz;
     ShaderProgram* m_GaussianProgram_vert;
+    ShaderProgram* m_GaussianCombineProgram;
 
 };
 

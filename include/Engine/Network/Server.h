@@ -36,7 +36,7 @@ public:
 private:
     // Network channels
     TCPServer m_Reliable;
-    //UDPServer m_Unreliable;
+    UDPServer m_Unreliable;
     UDPServer m_ServerlistRequest;
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
@@ -60,6 +60,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers
     std::clock_t m_StartPingTime;
+    std::string m_ServerName = "";
 
     // Packet loss logic
     PacketID m_PacketID = 0;

@@ -9,10 +9,11 @@ RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, Rende
     , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
+    EVENT_SUBSCRIBE_MEMBER(m_EResolutionChanged, &RenderSystem::OnResolutionChanged);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &RenderSystem::OnPlayerSpawned);
 
-    m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_Camera = new Camera((float)m_Renderer->GetViewportSize().Width / m_Renderer->GetViewportSize().Height, glm::radians(45.f), 0.01f, 5000.f);
 }
 
 RenderSystem::~RenderSystem()
@@ -20,11 +21,18 @@ RenderSystem::~RenderSystem()
     delete m_Camera;
 }
 
+bool RenderSystem::OnResolutionChanged(Events::ResolutionChanged& e)
+{
+    // Update camera aspect ration on resolution change
+    m_Camera->SetAspectRatio((float)e.NewResolution.Width / e.NewResolution.Height);
+    return true;
+}
+
 bool RenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
-    m_Camera->SetFOV((double)cCamera["FOV"]);
+    m_Camera->SetFOV(glm::radians((double)cCamera["FOV"]));
     m_Camera->SetNearClip((double)cCamera["NearClip"]);
     m_Camera->SetFarClip((double)cCamera["FarClip"]);
     m_Camera->SetPosition(cTransform["Position"]);
@@ -170,6 +178,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 
 bool RenderSystem::isEntityVisible(EntityWrapper& entity)
 {
+    return true;
     // Only render children of a camera if that camera is currently active
     if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
         return false;
@@ -258,7 +267,8 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     m_World, 
                     fillColor, 
                     fillPercentage,
-					isShielded
+					isShielded,
+					false
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
                     explosionEffectJob->CalculateHash();
@@ -296,7 +306,8 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     m_World, 
                     fillColor, 
                     fillPercentage,
-					isShielded
+					isShielded,
+					(bool)cModel["Shadow"]
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
                     modelJob->CalculateHash();
@@ -435,6 +446,7 @@ void RenderSystem::Update(double dt)
     }
 
     RenderScene scene;
+    scene.ShouldBlur = true;
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
 
@@ -448,7 +460,7 @@ void RenderSystem::Update(double dt)
     fillModels(scene.Jobs);
     fillPointLights(scene.Jobs.PointLight, m_World);
     //TODO: Make sure all objects needed are also sorted.
-	scene.Jobs.OpaqueObjects.sort();
+	scene.Jobs.OpaqueObjects.sort([](auto& a, auto& b) {return *a < *b; });
     fillSprites(scene.Jobs.SpriteJob, m_World);
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);

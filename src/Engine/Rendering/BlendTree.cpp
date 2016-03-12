@@ -2,10 +2,7 @@
 
 BlendTree::BlendTree(EntityWrapper ModelEntity, Skeleton* skeleton)
 {
-
     m_Skeleton = skeleton;
-
-
 
     if (ModelEntity.HasComponent("Animation")) {
         const Skeleton::Animation* animation = skeleton->GetAnimation(ModelEntity["Animation"]["AnimationName"]);
@@ -217,7 +214,6 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
                 }
             }
         }
-
         return blendInfo;
     }
 
@@ -270,7 +266,7 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
             currentNode = currentNode->Parent;
 
             if (blendInfo.SingleBlend) {
-                break;
+                return blendInfo;;
             }
         }
     } else if(goalNodes.size() >= 2) {
@@ -331,9 +327,11 @@ BlendTree::AutoBlendInfo BlendTree::AutoBlendStep(AutoBlendInfo blendInfo)
 
                 lastNode = currentNode;
                 currentNode = currentNode->Parent;
+                if (blendInfo.SingleBlend) {
+                    return blendInfo;
+                }
             }
         }
-
     }
 
     return blendInfo;
@@ -425,6 +423,55 @@ EntityWrapper BlendTree::GetSubTreeRoot(std::string nodeName)
     }
 
     return subTreeRoots.front()->Entity;
+}
+
+
+std::vector<EntityWrapper> BlendTree::GetSingleLevelRoots(std::string name)
+{
+    std::vector<Node*> nodes = FindNodesByName(name);
+    std::vector<EntityWrapper> entities;
+
+    for (auto it = nodes.begin(); it != nodes.end(); it++) {
+        Node* currentNode = (*it)->Parent;
+        
+        if(currentNode->Entity.Valid()) {
+            entities.push_back(currentNode->Entity);
+        }
+    }
+
+    return entities;
+}
+
+
+std::vector<EntityWrapper> BlendTree::GetEntitesByName(std::string name)
+{
+    std::vector<Node*> nodes = FindNodesByName(name);
+    std::vector<EntityWrapper> entities;
+
+    for (auto it = nodes.begin(); it != nodes.end(); it++) {
+        Node* currentNode = (*it);
+
+        if (currentNode->Entity.Valid()) {
+            entities.push_back(currentNode->Entity);
+        }
+    }
+
+    return entities;
+}
+
+
+void BlendTree::SetWeightByName(std::string name, double weight)
+{
+    std::vector<Node*> nodes = FindNodesByName(name);
+
+    for (auto node : nodes) {
+        EntityWrapper entity = node->Entity;
+
+        if(entity.HasComponent("Blend")) {
+            entity["Blend"]["Weight"] = weight;
+            node->Weight = weight;
+        }
+    }
 }
 
 void BlendTree::Blend(std::map<int, Skeleton::PoseData>& pose)

@@ -35,8 +35,12 @@
 #include "Game/Systems/BoostSystem.h"
 #include "Game/Systems/BoostIconsHUDSystem.h"
 #include "Game/Systems/ScoreScreenSystem.h"
+#include "Game/Systems/SpectatorCameraSystem.h"
 #include "GUI/ButtonSystem.h"
-#include "GUI/MainMenuSystem.h"
+#include "Game/Systems/MainMenuSystem.h"
+#include "Game/Systems/ServerListSystem.h"
+#include "Game/Systems/StartSystem.h"
+#include "Rendering/TextureSprite.h"
 
 
 Game::Game(int argc, char* argv[])
@@ -48,6 +52,7 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
+    ResourceManager::RegisterType<TextureSprite>("TextureSprite");
     ResourceManager::RegisterType<PNG>("Png");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
@@ -149,6 +154,9 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<BoostIconsHUDSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ScoreScreenSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<SpectatorCameraSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ServerListSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<StartSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -211,7 +219,7 @@ void Game::Tick()
     PerformanceTimer::StartTimerAndStopPrevious("InputProxy");
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
-    m_InputProxy->Process();
+    m_InputProxy->Process(ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse);
     m_EventBroker->Swap();
 
     PerformanceTimer::StartTimerAndStopPrevious("SoundManager");

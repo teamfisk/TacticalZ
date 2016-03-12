@@ -36,10 +36,6 @@ ScreenCoords::PixelData ScreenCoords::ToPixelData(float x, float y, FrameBuffer*
     unsigned char pdata[3];
     glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &pdata);
 	GLERROR("glReadPixels(pdata) Error");
-    PickDataBuffer->Unbind();
-
-    glBindFramebuffer(GL_FRAMEBUFFER, DepthBuffer); 
-	GLERROR("glBindFramebuffer(DepthBuffer) Error");
     float depthData;
     glReadPixels(x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depthData);
 	GLERROR("glReadPixels(depthData) Error");

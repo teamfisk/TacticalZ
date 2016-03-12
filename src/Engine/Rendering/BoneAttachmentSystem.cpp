@@ -50,13 +50,15 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         glm::vec4 perspective;
         glm::decompose(boneTransform, scale, rotation, translation, skew, perspective);
 
-        glm::vec3 angles = glm::vec3(-glm::pitch(rotation), -glm::yaw(rotation), -glm::roll(rotation));
+        rotation = glm::quat((glm::vec3)entity["BoneAttachment"]["OrientationOffset"]) * rotation;
+        rotation = glm::inverse(rotation);
+        glm::vec3 angles = glm::eulerAngles(rotation);
         
         if ((bool)entity["BoneAttachment"]["InheritPosition"]) {
             entity["Transform"]["Position"] = translation + (glm::vec3)entity["BoneAttachment"]["PositionOffset"];
         }
         if ((bool)entity["BoneAttachment"]["InheritOrientation"]) {
-            entity["Transform"]["Orientation"] = angles  + (glm::vec3)entity["BoneAttachment"]["OrientationOffset"];
+            entity["Transform"]["Orientation"] = angles;
         }
         if ((bool)entity["BoneAttachment"]["InheritScale"]) {
             entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];

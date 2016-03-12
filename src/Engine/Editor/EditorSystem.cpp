@@ -4,7 +4,7 @@
 #include "Editor/EditorWidgetSystem.h"
 #include "Core/EntityFile.h"
 
-EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
+EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame)
     : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
@@ -14,7 +14,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
     m_EditorWorldSystemPipeline->AddSystem<EditorWidgetSystem>(0, m_Renderer);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
-    
+
     m_EditorCamera = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/Empty.xml");
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
@@ -47,6 +47,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
         Enable();
     } else {
         Disable();
+        m_EventBroker->Publish(Events::UnlockMouse());
     }
 }
 
@@ -71,14 +72,16 @@ void EditorSystem::Update(double dt)
         m_EditorStats->Draw(actualDelta);
 
         if (m_CurrentSelection.Valid() && m_Widget.Valid()) {
-            m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection);
+            if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
+                return;
+            }
+            (Field<glm::vec3>)m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection);
             if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
                 m_Widget["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(m_CurrentSelection);
             } else {
                 m_Widget["Transform"]["Orientation"] = glm::vec3(0, 0, 0);
             }
         }
-
         m_EditorWorldSystemPipeline->Update(actualDelta);
 
         ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
@@ -202,16 +205,26 @@ bool EditorSystem::OnMousePress(const Events::MousePress& e)
 bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
 {
     if (m_CurrentSelection.Valid()) {
+        if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
+            return false;
+        }
         if (m_WidgetSpace == EditorGUI::WidgetSpace::Global) {
             glm::quat parentOrientation;
+            glm::vec3 parentScale(1.f);
             EntityWrapper parent = m_CurrentSelection.Parent();
             if (parent.Valid()) {
                 parentOrientation = glm::inverse(Transform::AbsoluteOrientation(parent));
+                parentScale = Transform::AbsoluteScale(parent);
             }
-            (Field<glm::vec3>)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation;
+            (Field<glm::vec3>)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation / parentScale;
         } else if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
+            glm::vec3 parentScale(1.f);
+            EntityWrapper parent = m_CurrentSelection.Parent();
+            if (parent.Valid()) {
+                parentScale = Transform::AbsoluteScale(parent);
+            }
             glm::quat selectionOri = glm::quat((glm::vec3)m_CurrentSelection["Transform"]["Orientation"]);
-            glm::vec3 localTranslation = selectionOri * e.Translation;
+            glm::vec3 localTranslation = selectionOri * e.Translation / parentScale;
             (Field<glm::vec3>)m_CurrentSelection["Transform"]["Position"] += localTranslation;
         }
         m_EditorGUI->SetDirty(m_CurrentSelection);
@@ -300,4 +313,16 @@ void EditorSystem::setWidgetMode(EditorGUI::WidgetMode mode)
     }
 
     m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
+}
+
+bool EditorSystem::isAnyParentMissingTransform(EntityID entityID)
+{
+    EntityWrapper entity(m_World, entityID);
+    while (entity.Parent().Valid()) {
+        if (!entity.HasComponent("Transform")) {
+            return true;
+        }
+        entity = entity.Parent();
+    }
+    return false;
 }

@@ -108,10 +108,10 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         //change what model is displaying (change all in case 2 capturepoints has been captured on the same frame)
         for (int i = 0; i < m_NumberOfCapturePoints; i++) {
             auto owner = (int)m_CapturePointNumberToEntityMap[i]["Team"]["Team"];
-            if (m_CapturePointNumberToEntityMap[i].FirstChildByName("Red").ID != EntityID_Invalid) {
-                m_CapturePointNumberToEntityMap[i].FirstChildByName("Red")["Model"]["Visible"] = owner == redTeam ? true : false;
-                m_CapturePointNumberToEntityMap[i].FirstChildByName("Blue")["Model"]["Visible"] = owner == blueTeam ? true : false;
-                m_CapturePointNumberToEntityMap[i].FirstChildByName("Spectator")["Model"]["Visible"] = owner == spectatorTeam ? true : false;
+            if (m_CapturePointNumberToEntityMap[i].FirstChildByName("Red").Valid()) {
+                ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Red"), owner == redTeam);
+                ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Blue"), owner == blueTeam);
+                ChangeCapturePointModelsVisibility(m_CapturePointNumberToEntityMap[i].FirstChildByName("Spectator"), owner == spectatorTeam);
             }
         }
         //save the next cap points and publish the captured event
@@ -230,6 +230,19 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         m_WinnerWasFound = true;
     }
 
+}
+
+void CapturePointSystem::ChangeCapturePointModelsVisibility(EntityWrapper &capturePointModels, bool isOwner) {
+    (Field<bool>)capturePointModels["Model"]["Visible"] = isOwner;
+    for (auto& capModel : capturePointModels.ChildrenWithComponent("Transform"))
+    {
+        if (capModel.HasComponent("Model")) {
+            (Field<bool>)capModel["Model"]["Visible"] = isOwner;
+        }
+        if (capModel.HasComponent("PointLight")) {
+            (Field<bool>)capModel["PointLight"]["Visible"] = isOwner;
+        }
+    }
 }
 
 bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e)

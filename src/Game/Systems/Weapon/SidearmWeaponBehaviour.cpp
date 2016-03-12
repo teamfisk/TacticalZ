@@ -52,7 +52,7 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     cWeapon["FireCooldown"] = 60.0 / (double)cWeapon["RPM"];
 
     // Get weapon model based on current person
-    EntityWrapper weaponModelEntity = getRelevantWeaponModelEntity(wi);
+    EntityWrapper weaponModelEntity = getRelevantWeaponEntity(wi);
     if (!weaponModelEntity.Valid()) {
         return;
     }

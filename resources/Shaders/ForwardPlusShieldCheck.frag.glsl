@@ -1,7 +1,9 @@
 #version 430
 
 #define MIN_AMBIENT_LIGHT 0.3
+#define MAX_SPLITS 4
 
+uniform mat4 VM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -11,7 +13,7 @@ uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
-uniform float GlowIntensity = 10;
+uniform float GlowIntensity;
 uniform vec3 CameraPosition;
 uniform int SSAOQuality;
 
@@ -69,6 +71,7 @@ in VertexData{
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;
@@ -138,7 +141,7 @@ void main()
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate * SpecularUVRepeat);
-	vec4 position = V * M * vec4(Input.Position, 1.0); 
+	vec4 position = VM * vec4(Input.Position, 1.0); 
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));

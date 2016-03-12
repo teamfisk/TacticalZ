@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Options" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Background_Origin">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Background">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <BlurBackground>true</BlurBackground>
+              <Color A="0.196078435" B="0" G="0" R="0"/>
+            </c:Sprite>
+            <c:Transform>
+              <Scale X="0.300000012" Y="0.5" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Title_Origin">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="UnderLine">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0.00500000035" Y="0.198000014" Z="0.0199999996"/>
+                  <Scale X="0.270000011" Y="0.00100000005" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>Options</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.131999999" Y="0.202000007" Z="0.0199999996"/>
+                  <Scale X="0.0320000015" Y="0.0310000014" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Buttons_anchor">
+      <Components>
+        <c:Transform>
+          <Position X="0" Y="0.168000013" Z="0.0199999996"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Res1080">
+          <Components>
+            <c:Button/>
+            <c:ConfigBtnResolution>
+              <Width>1920</Width>
+              <Height>1080</Height>
+            </c:ConfigBtnResolution>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <BlurBackground>true</BlurBackground>
+              <Color A="0.392156869" B="1" G="1" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="-0.088000007" Y="0" Z="0"/>
+              <Scale X="0.0820000023" Y="0.0299999993" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>1920x1080</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="0" G="0" R="0"/>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.361000031" Y="-0.562000036" Z="0.0199999996"/>
+                  <Scale X="0.180000007" Y="0.469000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Res768">
+          <Components>
+            <c:Button/>
+            <c:ConfigBtnResolution>
+              <Width>1366</Width>
+              <Height>768</Height>
+            </c:ConfigBtnResolution>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <BlurBackground>true</BlurBackground>
+              <Color A="0.392156869" B="1" G="1" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Scale X="0.0820000023" Y="0.0299999993" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>1366x768</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="0" G="0" R="0"/>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.380000025" Y="-0.561999977" Z="0.0199999996"/>
+                  <Scale X="0.180000007" Y="0.469000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Res720">
+          <Components>
+            <c:Button/>
+            <c:ConfigBtnResolution>
+              <Width>1280</Width>
+              <Height>720</Height>
+            </c:ConfigBtnResolution>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <BlurBackground>true</BlurBackground>
+              <Color A="0.392156869" B="1" G="1" R="1"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0.088000007" Y="0" Z="0"/>
+              <Scale X="0.0820000023" Y="0.0299999993" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Text">
+              <Components>
+                <c:Text>
+                  <Content>1280x720</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="0" G="0" R="0"/>
+                  <Alignment>
+                    <Left/>
+                  </Alignment>
+                </c:Text>
+                <c:Transform>
+                  <Position X="-0.387000024" Y="-0.561999977" Z="0.0199999996"/>
+                  <Scale X="0.180000007" Y="0.469000012" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

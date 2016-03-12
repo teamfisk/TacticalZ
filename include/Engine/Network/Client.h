@@ -17,6 +17,7 @@
 #include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
 #include "Core/World.h"
+#include "Core/EntityFile.h"
 #include "Core/EventBroker.h"
 #include "Core/ConfigFile.h"
 #include "Core/EPlayerDeath.h"
@@ -29,19 +30,8 @@
 #include "Core/EAmmoPickup.h"
 #include "Network/ESearchForServers.h"
 #include "../Game/Events/EDashAbility.h"
-
-struct ServerInfo
-{
-    ServerInfo(std::string a, int b, std::string c, int d)
-    {
-        Address = a; Port = b; Name = c; PlayersConnected = d;
-    }
-    std::string Address = "";
-    int Port = 0;
-    std::string Name = "";
-    int PlayersConnected = 0;
-};
-
+#include "Network/EDisplayServerlist.h"
+#include "Network/EConnectRequest.h"
 class Client : public Network
 {
 public:
@@ -52,7 +42,7 @@ public:
     void Connect(std::string address, int port);
     void Update() override;
 private:
-    //UDPClient m_Unreliable;
+    UDPClient m_Unreliable;
     TCPClient m_Reliable;
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();
@@ -91,7 +81,7 @@ private:
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    size_t  receive(char* data);
+    size_t receive(char* data);
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
@@ -119,6 +109,8 @@ private:
     void sendLocalPlayerTransform();
     void becomePlayer();
     void displayServerlist();
+    void removeWorld();
+    void createMainMenu();
     // Mapping Logic
     // Returns if local EntityID exist in map
     bool clientServerMapsHasEntity(EntityID clientEntityID);
@@ -139,13 +131,15 @@ private:
     bool OnDoubleJump(Events::DoubleJump & e);
     EventRelay<Client, Events::DashAbility> m_EDashAbility;
     bool OnDashAbility(const Events::DashAbility& e);
+    EventRelay<Client, Events::ConnectRequest> m_EConnectRequest;
+    bool OnConnectRequest(const Events::ConnectRequest& e);
 
     bool OnSearchForServers(const Events::SearchForServers& e);
     UDPClient m_ServerlistRequest;
     std::vector<ServerInfo> m_Serverlist;
     bool m_SearchingForServers = false;
     std::clock_t m_StartSearchTime;
-    double m_SearchingTime = 2000; // Config I guess
+    double m_SearchingTime = 200; // Config I guess
 };
 
 #endif
