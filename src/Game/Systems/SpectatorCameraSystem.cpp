@@ -27,6 +27,14 @@ void SpectatorCameraSystem::Update(double dt)
     }
 }
 
+void SpectatorCameraSystem::reset()
+{
+    m_CamSetToTeamPick = false;
+    // They will also be set to menu, so unlock mouse just in case they were in game with locked mouse.
+    Events::UnlockMouse unlock;
+    m_EventBroker->Publish(unlock);
+}
+
 bool SpectatorCameraSystem::OnInputCommand(const Events::InputCommand& e)
 {
     // Only the client should do this, and only if player is not spawned.
@@ -95,10 +103,13 @@ bool SpectatorCameraSystem::OnDisconnect(const Events::PlayerDisconnected& e)
     // If local player gets disconnected, they should be set to 
     // the spectator camera next time a map loads that has one.
     if (e.Entity == LocalPlayer.ID) {
-        m_CamSetToTeamPick = false;
-        // They will also be set to menu, so unlock mouse just in case they were in game with locked mouse.
-        Events::UnlockMouse unlock;
-        m_EventBroker->Publish(unlock);
+        reset();
     }
+    return true;
+}
+
+bool SpectatorCameraSystem::OnReset(const Events::Reset & e)
+{
+    reset();
     return true;
 }

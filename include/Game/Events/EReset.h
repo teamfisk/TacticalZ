@@ -1,5 +1,5 @@
-#ifndef Restart_h__
-#define Restart_h__
+#ifndef Reset_h__
+#define Reset_h__
 
 #include "Core/EventBroker.h"
 #include "Core/EntityWrapper.h"
@@ -7,7 +7,7 @@
 namespace Events
 {
 
-struct Restart : Event
+struct Reset : Event
 {
 };
 

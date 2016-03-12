@@ -33,6 +33,7 @@
 #include "Network/EDisplayServerlist.h"
 #include "Network/EConnectRequest.h"
 #include "Network/EPlayerDisconnected.h"
+#include "Game/Events/EReset.h"
 
 class Client : public Network
 {

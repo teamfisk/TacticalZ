@@ -342,7 +342,8 @@ void Client::parseAmmoPickup(Packet & packet)
 void Client::parseRemoveWorld(Packet & packet)
 {
     removeWorld();
-
+    Events::Reset e;
+    m_EventBroker->Publish(e);
 }
 
 void Client::updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID)

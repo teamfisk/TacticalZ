@@ -26,6 +26,7 @@
 #include "Network/EPlayerConnected.h"
 #include "Network/EKillDeath.h"
 #include "Core/EWin.h"
+#include "Game/Events/EReset.h"
 
 class Server : public Network
 {

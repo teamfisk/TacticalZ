@@ -545,9 +545,12 @@ bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
 
 bool Server::OnWin(const Events::Win & e)
 {
+    Events::Reset reset;
+    m_EventBroker->Publish(reset);
     Packet removeMap(MessageType::RemoveWorld);
     reliableBroadcast(removeMap);
     removeWorld();
+    // Hardcoded for now.
     auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Rocky2.xml");
     entityFile->MergeInto(m_World);
     Packet newWorld(MessageType::Snapshot);

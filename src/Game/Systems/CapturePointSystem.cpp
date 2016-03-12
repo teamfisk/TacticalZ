@@ -11,7 +11,25 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
         EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
     }
+    EVENT_SUBSCRIBE_MEMBER(m_EReset, &CapturePointSystem::OnReset);
+    Init();
+}
 
+void CapturePointSystem::Init()
+{
+    m_WinnerWasFound = false;
+    //need to track these variables for the captureSystem to work as per design!
+    m_RedTeamNextPossibleCapturePoint = m_NotACapturePoint;
+    m_BlueTeamNextPossibleCapturePoint = m_NotACapturePoint;
+    m_RedTeamHomeCapturePoint = m_NotACapturePoint;
+    m_BlueTeamHomeCapturePoint = m_NotACapturePoint;
+    m_NumberOfCapturePoints = 0;
+    m_ResetTimers = false;
+    m_RecentlyCapturedNeedNextCapturePointNow = false;
+    m_CapturePointNumberToEntityMap.clear();
+    //vectors which will keep track of enter/leave changes
+    m_ETriggerTouchVector.clear();
+    m_ETriggerLeaveVector.clear();
 }
 
 //here all capturepoints will update their component
@@ -22,6 +40,9 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
         return;
     }
     if (m_WinnerWasFound) {
+        return;
+    }
+    if (!capturePointEntity.Valid()) {
         return;
     }
     const int capturePointNumber = cCapturePoint["CapturePointNumber"];
@@ -60,7 +81,7 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
     }
 
     //if we havent received all capturepoints yet, just return
-    if (m_NumberOfCapturePoints == 0 || m_NumberOfCapturePoints != m_CapturePointNumberToEntityMap.size()) {
+    if (m_NumberOfCapturePoints == 0 || m_NumberOfCapturePoints > m_CapturePointNumberToEntityMap.size()) {
         m_CapturePointNumberToEntityMap.insert(std::make_pair(capturePointNumber, capturePointEntity));
         return;
     }
@@ -232,10 +253,10 @@ void CapturePointSystem::UpdateComponent(EntityWrapper& capturePointEntity, Comp
 
 }
 
-void CapturePointSystem::ChangeCapturePointModelsVisibility(EntityWrapper &capturePointModels, bool isOwner) {
+void CapturePointSystem::ChangeCapturePointModelsVisibility(EntityWrapper &capturePointModels, bool isOwner)
+{
     (bool&)capturePointModels["Model"]["Visible"] = isOwner;
-    for (auto& capModel : capturePointModels.ChildrenWithComponent("Transform"))
-    {
+    for (auto& capModel : capturePointModels.ChildrenWithComponent("Transform")) {
         if (capModel.HasComponent("Model")) {
             (bool&)capModel["Model"]["Visible"] = isOwner;
         }
@@ -267,5 +288,11 @@ bool CapturePointSystem::OnCaptured(const Events::Captured& e)
 {
     //reset the timers in the next update since a capture has changed the "nextCapturePoint" for 1-2 teams
     m_ResetTimers = true;
+    return true;
+}
+
+bool CapturePointSystem::OnReset(const Events::Reset& e)
+{ 
+    Init();
     return true;
 }
