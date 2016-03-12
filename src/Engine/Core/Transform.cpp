@@ -45,7 +45,7 @@ glm::vec3 Transform::AbsolutePosition(EntityWrapper entity)
     } else {
         EntityWrapper parent = entity.Parent();
         // Calculate position
-        glm::vec3 position = AbsolutePosition(parent) + Transform::AbsoluteScale(parent) * (Transform::AbsoluteOrientation(parent) * (const glm::vec3&)cTransformPosition);
+        glm::vec3 position = AbsolutePosition(parent) + Transform::AbsoluteOrientation(parent) * (Transform::AbsoluteScale(parent) * (const glm::vec3&)cTransformPosition);
         // Cache it
         PositionCache[entity] = position;
         RecalculatedPositions++;
