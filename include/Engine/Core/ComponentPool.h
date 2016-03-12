@@ -43,9 +43,10 @@ public:
 	typedef ComponentWrapper* pointer;
 	typedef ComponentWrapper& reference;
 
-    ComponentPool(const ::ComponentInfo& ci) 
+    ComponentPool(const ::ComponentInfo& ci, World* world) 
         : m_ComponentInfo(ci)
         , m_Pool(ci.Meta->Allocation, ci.GetHeaderSize() + ci.Stride)
+        , m_World(world)
     { }
     ~ComponentPool();
 	ComponentPool(const ComponentPool& other);
@@ -82,6 +83,7 @@ private:
     MemoryPool<char> m_Pool;
     std::unordered_map<EntityID, char*> m_EntityToComponent;
     DirtySet m_DirtySet;
+    World* m_World;
 };
 
 #endif

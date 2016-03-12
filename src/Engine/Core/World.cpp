@@ -48,7 +48,7 @@ bool World::ValidEntity(EntityID entity) const
 void World::RegisterComponent(const ComponentInfo& ci)
 {
     if (m_ComponentPools.find(ci.Name) == m_ComponentPools.end()) {
-        m_ComponentPools[ci.Name] = new ComponentPool(ci);
+        m_ComponentPools[ci.Name] = new ComponentPool(ci, this);
     }
 }
 

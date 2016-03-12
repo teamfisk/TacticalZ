@@ -51,10 +51,6 @@ glm::vec3 Transform::AbsolutePosition(EntityWrapper entity)
         RecalculatedPositions++;
         // Unset dirty flag
         cTransformPosition.SetDirty(DirtySetType::Transform, false);
-        // Flag children as dirty
-        for (auto& child : entity.ChildrenWithComponent("Transform")) {
-            child["Transform"]["Position"].SetDirty(DirtySetType::Transform, true);
-        }
         return position;
     }
 }
@@ -97,10 +93,6 @@ glm::quat Transform::AbsoluteOrientation(EntityWrapper entity)
         RecalculatedOrientations++;
         // Unset dirty flag
         cTransformOrientation.SetDirty(DirtySetType::Transform, false);
-        // Flag children as dirty
-        for (auto& child : entity.ChildrenWithComponent("Transform")) {
-            child["Transform"]["Orientation"].SetDirty(DirtySetType::Transform, true);
-        }
         return orientation;
     }
 }
@@ -130,10 +122,6 @@ glm::vec3 Transform::AbsoluteScale(EntityWrapper entity)
         RecalculatedPositions++;
         // Unset dirty flag
         cTransformScale.SetDirty(DirtySetType::Transform, false);
-        // Flag children as dirty
-        for (auto& child : entity.ChildrenWithComponent("Transform")) {
-            child["Transform"]["Scale"].SetDirty(DirtySetType::Transform, true);
-        }
         return scale;
     }
 }

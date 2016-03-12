@@ -11,7 +11,7 @@ ComponentWrapper ComponentPoolForwardIterator::operator*() const
 {
     char* data = &(*m_MemoryPoolIterator);
     EntityID entity = *reinterpret_cast<EntityID*>(data);
-    ComponentWrapper wrapper(m_ComponentInfo, data, &m_ComponentPool->m_DirtySet[entity]);
+    ComponentWrapper wrapper(m_ComponentInfo, data, &m_ComponentPool->m_DirtySet[entity], m_ComponentPool->m_World);
     return wrapper;
 }
 
@@ -79,7 +79,7 @@ ComponentWrapper ComponentPool::Allocate(EntityID entity)
     memcpy(data, &entity, sizeof(EntityID));
 
     m_EntityToComponent[entity] = data;
-    ComponentWrapper component(m_ComponentInfo, data, &m_DirtySet[entity]);
+    ComponentWrapper component(m_ComponentInfo, data, &m_DirtySet[entity], m_World);
 
     // Copy defaults
     memcpy(component.Data, m_ComponentInfo.Defaults.get(), m_ComponentInfo.Stride);
@@ -92,7 +92,7 @@ ComponentWrapper ComponentPool::GetByEntity(EntityID ent)
 {
     auto data = m_EntityToComponent.at(ent);
     auto bitField = &m_DirtySet[ent];
-    return ComponentWrapper(m_ComponentInfo, data, bitField);
+    return ComponentWrapper(m_ComponentInfo, data, bitField, m_World);
 }
 
 bool ComponentPool::KnowsEntity(EntityID ent)

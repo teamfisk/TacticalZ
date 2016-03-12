@@ -10,56 +10,25 @@
 #include "DirtySet.h"
 #include "Util/Any.h"
 
+class World;
 
 struct ComponentWrapper
 {
-    ComponentWrapper(const ComponentInfo& componentInfo, char* data, ::DirtyBitField* dirtyBitField)
-        : Info(componentInfo)
-        , EntityID(*reinterpret_cast<::EntityID*>(data))
-        , Data(data + componentInfo.GetHeaderSize())
-        , DirtyBitField(dirtyBitField)
-    { }
+    ComponentWrapper(const ComponentInfo& componentInfo, char* data, ::DirtyBitField* dirtyBitField, World* world);
 
+    World* m_World;
     const ComponentInfo& Info;
     const ::EntityID EntityID;
     char* Data;
     ::DirtyBitField* DirtyBitField = nullptr;
 
-    ComponentInfo::EnumType Enum(const char* fieldName, const char* enumKey)
-    {
-        return Info.Meta->FieldEnumDefinitions.at(fieldName).at(enumKey);
-    }
+    ComponentInfo::EnumType Enum(const char* fieldName, const char* enumKey);
 
-    bool Dirty(DirtySetType type, const std::string& fieldName)
-    {
-        if (DirtyBitField == nullptr) {
-            return true;
-        } else {
-            auto& field = Info.Fields.at(fieldName);
-            return DirtyBitField->operator[](type).count(field.Index) == 1;
-        }
-    }
+    bool Dirty(DirtySetType type, const std::string& fieldName);
 
-    void SetDirty(DirtySetType type, const std::string& fieldName, bool dirty = true)
-    {
-        if (DirtyBitField == nullptr) {
-            return;
-        }
+    void SetDirty(DirtySetType type, const std::string& fieldName, bool dirty = true);
 
-        auto& field = Info.Fields.at(fieldName);
-        if (dirty) {
-            DirtyBitField->operator[](type).insert(field.Index);
-        } else {
-            DirtyBitField->operator[](type).erase(field.Index);
-        }
-    }
-
-    void SetAllDirty(const std::string& fieldName, bool dirty = true)
-    { 
-        for (auto& kv : *DirtyBitField) {
-            SetDirty(kv.first, fieldName);
-        }
-    }
+    void SetAllDirty(const std::string& fieldName, bool dirty = true);
 
     template <typename T>
     T& Field(const std::string& name)
@@ -271,7 +240,7 @@ struct Field<glm::vec4> : FieldBase<glm::vec4>
 struct SharedComponentWrapper : ComponentWrapper
 {
     SharedComponentWrapper(const ComponentInfo& componentInfo, boost::shared_array<char> data)
-        : ComponentWrapper(componentInfo, data.get(), nullptr)
+        : ComponentWrapper(componentInfo, data.get(), nullptr, nullptr)
         , m_DataReference(data)
     { }
 

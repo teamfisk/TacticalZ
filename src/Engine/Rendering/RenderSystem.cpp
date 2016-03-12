@@ -178,7 +178,6 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 
 bool RenderSystem::isEntityVisible(EntityWrapper& entity)
 {
-    return true;
     // Only render children of a camera if that camera is currently active
     if (isChildOfACamera(entity) && !isChildOfCurrentCamera(entity)) {
         return false;
