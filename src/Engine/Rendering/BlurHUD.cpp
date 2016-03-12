@@ -119,6 +119,21 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 {
     GLERROR("DrawBloomPass::Draw: Pre");
 
+    bool shouldRun = false;
+    for (auto& job : scene.Jobs.SpriteJob) {
+        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
+        if (!spriteJob) {
+            continue;
+        }
+        if (!spriteJob->BlurBackground) {
+            continue;
+        }
+        shouldRun = true;
+        break;
+    }
+    if(!shouldRun) {
+        return m_BlackTexture->m_Texture;
+    }
     FillStencil(scene);
 
     RenderState state;
@@ -225,6 +240,7 @@ void BlurHUD::FillStencil(RenderScene& scene)
 
     GLuint shaderHandle = m_FillDepthStencilProgram->GetHandle();
     glm::mat4 VP = scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix();
+
 
     for (auto& job : scene.Jobs.SpriteJob) {
         auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);

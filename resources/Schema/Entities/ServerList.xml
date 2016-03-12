@@ -30,21 +30,6 @@
         </Entity>
       </Children>
     </Entity>
-    <Entity name="Background">
-      <Components>
-        <c:Sprite>
-          <Model>Models/Core/UnitQuad.mesh</Model>
-          <GlowMap></GlowMap>
-          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-          <BlurBackground>true</BlurBackground>
-          <Color A="0.196078435" B="0" G="0" R="0"/>
-        </c:Sprite>
-        <c:Transform>
-          <Scale X="0.300000012" Y="0.5" Z="1"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
     <Entity name="RefreshButton">
       <Components>
         <c:Button/>
@@ -87,20 +72,6 @@
         <c:Transform/>
       </Components>
       <Children>
-        <Entity name="UnderLine">
-          <Components>
-            <c:Sprite>
-              <Model>Models/Core/UnitQuad.mesh</Model>
-              <GlowMap></GlowMap>
-              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-            </c:Sprite>
-            <c:Transform>
-              <Position X="0.00500000035" Y="0.198000014" Z="0.0199999996"/>
-              <Scale X="0.270000011" Y="0.00100000005" Z="1"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
         <Entity name="Text">
           <Components>
             <c:Text>
@@ -116,6 +87,112 @@
             </c:Transform>
           </Components>
           <Children/>
+        </Entity>
+        <Entity name="UnderLine">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <Visible>false</Visible>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0.00500000035" Y="0.198000014" Z="0.0199999996"/>
+              <Scale X="0.270000011" Y="0.00100000005" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Background_Origin">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Background">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+              <BlurBackground>true</BlurBackground>
+              <Color A="0.196078435" B="0" G="0" R="0"/>
+            </c:Sprite>
+            <c:Transform>
+              <Scale X="0.300000012" Y="0.5" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Corners">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0" Z="0.0100000007"/>
+              <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="TopLeft">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                  <Linear>false</Linear>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="-29.0360012" Y="49.0510025" Z="0"/>
+                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="BottomLeft">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                  <Linear>false</Linear>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="-29.0050011" Y="-48.927002" Z="0"/>
+                  <Orientation X="0" Y="0" Z="3.14499998"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="BottomRight">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                  <Linear>false</Linear>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="29.0750008" Y="-48.9350014" Z="0"/>
+                  <Orientation X="0" Y="0" Z="4.71218538"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="TopRight">
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                  <Linear>false</Linear>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="29.0750008" Y="49.0650024" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>
