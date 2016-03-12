@@ -297,7 +297,7 @@ bool SoundManager::OnPlayAnnouncerVoice(const Events::PlayAnonuncerVoice& e)
     auto listenerComponents = m_World->GetComponents("Listener");
     for (auto it = listenerComponents->begin(); it != listenerComponents->end(); it++) {
         if ((*it).EntityID != m_LocalPlayer.ID) {
-            break;
+            continue;
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
@@ -394,7 +394,7 @@ bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
 bool SoundManager::OnChangeBGM(const Events::ChangeBGM &e)
 {
     if (m_CurrentBGM != nullptr) {
-        stopSound(m_CurrentBGM); 
+        stopSound(m_CurrentBGM);
     }
     m_CurrentBGM = createSource(e.FilePath);
     m_CurrentBGM->Type = SoundType::BGM;
@@ -419,10 +419,18 @@ void SoundManager::setSoundProperties(Source* source, ComponentWrapper* soundCom
 {
     float gain;
     switch (source->Type) {
-    case SoundType::SFX: gain = m_SFXVolumeChannel; break;
-    case SoundType::BGM: gain = m_BGMVolumeChannel; break;
-    case SoundType::Announcer: gain = m_AnnouncerVolumeChannel; break;
-    default: gain = 1.f; break;
+    case SoundType::SFX: 
+        gain = m_SFXVolumeChannel; 
+        break;
+    case SoundType::BGM: 
+        gain = m_BGMVolumeChannel;
+        break;
+    case SoundType::Announcer: 
+        gain = m_AnnouncerVolumeChannel; 
+        break;
+    default:
+        gain = 1.f;
+        break;
     }
     alSourcef(source->ALsource, AL_GAIN, (float)(double)(*soundComponent)["Gain"] * gain);
     alSourcef(source->ALsource, AL_PITCH, (float)(double)(*soundComponent)["Pitch"]);
