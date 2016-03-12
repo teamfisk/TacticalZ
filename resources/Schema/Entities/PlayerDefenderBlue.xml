@@ -857,48 +857,12 @@
                 <Entity name="WeaponBlend">
                   <Components>
                     <c:BlendAdditive>
-                      <Adder>MovementBlend2</Adder>
+                      <Adder>IdleDefender</Adder>
                       <Receiver>FinalBlend</Receiver>
                     </c:BlendAdditive>
                     <c:Transform/>
                   </Components>
                   <Children>
-                    <Entity name="MovementBlend2">
-                      <Components>
-                        <c:Blend>
-                          <Pose1>Idle</Pose1>
-                          <Pose2>Run</Pose2>
-                          <Weight>0</Weight>
-                        </c:Blend>
-                        <c:Transform/>
-                      </Components>
-                      <Children>
-                        <Entity name="Run">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleAssaultRifleU</AnimationName>
-                              <Time>0.74083502154680936</Time>
-                              <Play>true</Play>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="Idle">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleAssaultRifleU</AnimationName>
-                              <Time>0.74083502154680936</Time>
-                              <Play>true</Play>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
                     <Entity name="FinalBlend">
                       <Components>
                         <c:Blend>
@@ -980,6 +944,18 @@
                         </Entity>
                       </Children>
                     </Entity>
+                    <Entity name="IdleDefender">
+                      <Components>
+                        <c:Animation>
+                          <AnimationName>IdleAssaultRifleU</AnimationName>
+                          <Time>0.74083502154680936</Time>
+                          <Play>true</Play>
+                          <Additive>true</Additive>
+                        </c:Animation>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
                   </Children>
                 </Entity>
                 <Entity name="Aim">
@@ -1007,7 +983,7 @@
                 <Entity name="WeaponBlend">
                   <Components>
                     <c:BlendAdditive>
-                      <Adder>MovementBlend2</Adder>
+                      <Adder>IdleSidearm</Adder>
                       <Receiver>ActionBlend</Receiver>
                     </c:BlendAdditive>
                     <c:Transform/>
@@ -1044,36 +1020,15 @@
                         </Entity>
                       </Children>
                     </Entity>
-                    <Entity name="MovementBlend2">
+                    <Entity name="IdleSidearm">
                       <Components>
-                        <c:Blend>
-                          <Pose1>Idle</Pose1>
-                          <Pose2>Run</Pose2>
-                        </c:Blend>
+                        <c:Animation>
+                          <AnimationName>IdleSecWepU</AnimationName>
+                          <Additive>true</Additive>
+                        </c:Animation>
                         <c:Transform/>
                       </Components>
-                      <Children>
-                        <Entity name="Idle">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleSecWepU</AnimationName>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="Run">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleSecWepU</AnimationName>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
+                      <Children/>
                     </Entity>
                   </Children>
                 </Entity>

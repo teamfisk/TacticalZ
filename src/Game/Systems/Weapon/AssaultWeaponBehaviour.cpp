@@ -74,7 +74,7 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
     EntityWrapper rootNode = wi.FirstPersonEntity;
     if (rootNode.Valid()) {
-        EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
+        EntityWrapper blend = rootNode.FirstChildByName("MovementBlendAssault");
         if (blend.Valid()) {
             (double&)blend["Blend"]["Weight"] = animationWeight;
         }

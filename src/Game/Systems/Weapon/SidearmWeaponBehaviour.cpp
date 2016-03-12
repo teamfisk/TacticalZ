@@ -14,7 +14,6 @@ void SidearmWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWra
 
 void SidearmWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
-
     CheckAmmo(cWeapon, wi);
 
     // Start reloading automatically if at 0 mag ammo
@@ -64,7 +63,7 @@ void SidearmWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
     EntityWrapper rootNode = wi.FirstPersonEntity;
     if (rootNode.Valid()) {
-        EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
+        EntityWrapper blend = rootNode.FirstChildByName("MovementBlendSidearm");
         if (blend.Valid()) {
             (double&)blend["Blend"]["Weight"] = animationWeight;
         }

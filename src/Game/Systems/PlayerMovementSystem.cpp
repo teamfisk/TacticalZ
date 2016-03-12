@@ -24,6 +24,8 @@ void PlayerMovementSystem::Update(double dt)
         if (LocalPlayer.Valid()){
             updateVelocity(LocalPlayer, dt);
         }
+
+        
         m_SprintEffectTimer += dt;
         if (m_SprintEffectTimer < 0.016f) {
             return;

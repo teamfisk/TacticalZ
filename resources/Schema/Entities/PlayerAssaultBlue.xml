@@ -583,8 +583,8 @@
               <EntityFile>Schema/Entities/WeaponAssaultBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.128669754" Y="1.08486295" Z="-0.361068189"/>
-              <Orientation X="-0.0353791788" Y="-0.0854677409" Z="0.133094966"/>
+              <Position X="0.128669813" Y="1.08486295" Z="-0.361068189"/>
+              <Orientation X="-0.0353792347" Y="-0.0854677409" Z="0.133094937"/>
             </c:Transform>
             <c:WeaponAttachment>
               <Weapon>AssaultWeapon</Weapon>
@@ -604,8 +604,8 @@
               <EntityFile>Schema/Entities/SidearmWeaponBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.128669754" Y="1.08486295" Z="-0.361068189"/>
-              <Orientation X="-0.0353791788" Y="-0.0854677409" Z="0.133094966"/>
+              <Position X="0.128669813" Y="1.08486295" Z="-0.361068189"/>
+              <Orientation X="-0.0353792347" Y="-0.0854677409" Z="0.133094937"/>
             </c:Transform>
             <c:WeaponAttachment>
               <Weapon>SidearmWeapon</Weapon>
@@ -959,7 +959,7 @@
                 <Entity name="WeaponBlend">
                   <Components>
                     <c:BlendAdditive>
-                      <Adder>MovementBlend</Adder>
+                      <Adder>IdleAssault</Adder>
                       <Receiver>ActionBlend</Receiver>
                     </c:BlendAdditive>
                     <c:Transform/>
@@ -998,41 +998,17 @@
                         </Entity>
                       </Children>
                     </Entity>
-                    <Entity name="MovementBlend2">
+                    <Entity name="IdleAssault">
                       <Components>
-                        <c:Blend>
-                          <Pose1>Idle</Pose1>
-                          <Pose2>Run</Pose2>
-                          <Weight>0</Weight>
-                        </c:Blend>
+                        <c:Animation>
+                          <AnimationName>IdleAssaultRifleU</AnimationName>
+                          <Time>1.9871198993639698</Time>
+                          <Play>true</Play>
+                          <Additive>true</Additive>
+                        </c:Animation>
                         <c:Transform/>
                       </Components>
-                      <Children>
-                        <Entity name="Run">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleAssaultRifleU</AnimationName>
-                              <Time>1.9871198993639698</Time>
-                              <Play>true</Play>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="Idle">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleAssaultRifleU</AnimationName>
-                              <Time>1.9871198993639698</Time>
-                              <Play>true</Play>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
+                      <Children/>
                     </Entity>
                   </Children>
                 </Entity>
@@ -1063,44 +1039,12 @@
                 <Entity name="WeaponBlend">
                   <Components>
                     <c:BlendAdditive>
-                      <Adder>MovementBlend2</Adder>
+                      <Adder>IdleSidearm</Adder>
                       <Receiver>ActionBlend</Receiver>
                     </c:BlendAdditive>
                     <c:Transform/>
                   </Components>
                   <Children>
-                    <Entity name="MovementBlend2">
-                      <Components>
-                        <c:Blend>
-                          <Pose1>Idle</Pose1>
-                          <Pose2>Run</Pose2>
-                          <Weight>0</Weight>
-                        </c:Blend>
-                        <c:Transform/>
-                      </Components>
-                      <Children>
-                        <Entity name="Idle">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleSecWepU</AnimationName>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="Run">
-                          <Components>
-                            <c:Animation>
-                              <AnimationName>IdleSecWepU</AnimationName>
-                              <Additive>true</Additive>
-                            </c:Animation>
-                            <c:Transform/>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
                     <Entity name="ActionBlend">
                       <Components>
                         <c:Blend>
@@ -1132,6 +1076,16 @@
                           <Children/>
                         </Entity>
                       </Children>
+                    </Entity>
+                    <Entity name="IdleSidearm">
+                      <Components>
+                        <c:Animation>
+                          <AnimationName>IdleSecWepU</AnimationName>
+                          <Additive>true</Additive>
+                        </c:Animation>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
                     </Entity>
                   </Children>
                 </Entity>

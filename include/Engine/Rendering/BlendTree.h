@@ -49,9 +49,7 @@ public:
                     next = next->Child[0];
                 }
             }
-
             return next;
-
         }
     };
 
@@ -82,6 +80,7 @@ public:
     BlendTree::Node* FirstCommonParent(Node* node1, Node* node2);
 
     EntityWrapper GetSubTreeRoot(std::string nodeName);
+    std::vector<EntityWrapper> GetSubTreeRoots(std::string nodeName);
 
     std::vector<EntityWrapper> GetSingleLevelRoots(std::string name);
     std::vector<EntityWrapper> GetEntitesByName(std::string name);

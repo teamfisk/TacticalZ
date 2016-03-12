@@ -163,6 +163,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                             aeb.Duration = 0.1;
                             aeb.NodeName = "Run";
                             aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
                             aeb.Start = true;
                             m_EventBroker->Publish(aeb);
                         }
@@ -172,6 +173,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                             aeb.Duration = 0.1;
                             aeb.NodeName = "Run";
                             aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
                             aeb.Start = true;
                             aeb.Reverse = true;
                             m_EventBroker->Publish(aeb);
@@ -211,10 +213,10 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
         }
     }
 
-    //Animation
-    if (glm::length2(m_Movement) < 0.25f) {
-        //Blend to Idle
-        if (m_PlayerEntity.Valid()) {
+    if (m_PlayerEntity.Valid()) {
+        glm::vec2 movementXZ = glm::vec2(m_Movement.x, m_Movement.z);
+        if (glm::length(movementXZ) < 0.1f) {
+            //Blend to Idle
             EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 Events::AutoAnimationBlend aeb;
@@ -233,10 +235,8 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                 aeb.Start = true;
                 m_EventBroker->Publish(aeb);
             }
-        }
-    } else {
-        //Blend to movement
-        if (m_PlayerEntity.Valid()) {
+        } else {
+            //Blend to movement
             EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 Events::AutoAnimationBlend aeb;
@@ -248,8 +248,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
         }
     }
 
-
-    if (glm::length2(m_Movement) > 0) {
+    if (glm::length(m_Movement) > 0) {
         m_Movement = glm::normalize(m_Movement);
 
         //Animation
