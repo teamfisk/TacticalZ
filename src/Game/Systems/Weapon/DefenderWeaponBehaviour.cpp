@@ -152,6 +152,13 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
         EntityWrapper attachment = wi.Player.FirstChildByName("ShieldAttachment");
         if (attachment.Valid()) {
             if (e.Value > 0) {
+
+                if(wi.Player.Valid()) {
+                    if(wi.Player.HasComponent("ShieldAbility")) {
+                        (bool&)wi.Player["ShieldAbility"]["Active"] = true;
+                    }
+                }
+
                 if (IsServer) {
                     SpawnerSystem::Spawn(attachment, attachment);
                 }
@@ -213,6 +220,12 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                 }
             } else {
                 attachment.DeleteChildren();
+
+                if (wi.Player.Valid()) {
+                    if (wi.Player.HasComponent("ShieldAbility")) {
+                        (bool&)wi.Player["ShieldAbility"]["Active"] = false;
+                    }
+                }
 
                 if (IsClient) {
                     EntityWrapper root = wi.FirstPersonEntity;
