@@ -69,6 +69,21 @@ void SidearmWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         }
     }
 
+    // Restore view angle
+    if (IsClient) {
+        Field<float> currentTravel = cWeapon["CurrentTravel"];
+        Field<float> returnSpeed = cWeapon["ViewReturnSpeed"];
+        if (currentTravel > 0) {
+            float change = returnSpeed * dt;
+            currentTravel = glm::max(0.f, currentTravel - change);
+            EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+            if (camera.Valid()) {
+                Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
+                cameraOrientation.x(cameraOrientation.x() - change);
+            }
+        }
+    }
+
     if ((bool)cWeapon["Automatic"] && canFire(cWeapon)) {
         fireBullet(cWeapon, wi);
     }
@@ -181,6 +196,25 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         return;
     } else {
         magAmmo -= 1;
+    }
+
+    // View punch
+    if (IsClient) {
+        EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+        if (camera.Valid()) {
+            Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
+            float viewPunch = cWeapon["ViewPunch"];
+            float maxTravelAngle = cWeapon["MaxTravelAngle"];
+            Field<float> currentTravel = cWeapon["CurrentTravel"];
+            if (currentTravel < maxTravelAngle) {
+                float change = viewPunch;
+                if (currentTravel + change > maxTravelAngle) {
+                    change = maxTravelAngle - currentTravel;
+                }
+                cameraOrientation.x(cameraOrientation.x() + change);
+                currentTravel += change;
+            }
+        }
     }
 
     // Get weapon model based on current person

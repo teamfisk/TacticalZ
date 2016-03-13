@@ -324,23 +324,23 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     spawnTracers(cWeapon, wi, pattern);
 
     // View punch
-    //if (IsClient) {
-    //    EntityWrapper camera = wi.Player.FirstChildByName("Camera");
-    //    if (camera.Valid()) {
-    //        glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
-    //        float viewPunch = cWeapon["ViewPunch"];
-    //        float maxTravelAngle = cWeapon["MaxTravelAngle"];
-    //        float& currentTravel = cWeapon["CurrentTravel"];
-    //        if (currentTravel < maxTravelAngle) {
-    //            float change = viewPunch;
-    //            if (currentTravel + change > maxTravelAngle) {
-    //                change = maxTravelAngle - currentTravel;
-    //            }
-    //            cameraOrientation.x += change;
-    //            currentTravel += change;
-    //        }
-    //    }
-    //}
+    if (IsClient) {
+        EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+        if (camera.Valid()) {
+            Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
+            float viewPunch = cWeapon["ViewPunch"];
+            float maxTravelAngle = (const float&)cWeapon["MaxTravelAngle"];
+            Field<float> currentTravel = cWeapon["CurrentTravel"];
+            if (currentTravel < maxTravelAngle) {
+                float change = viewPunch;
+                if (currentTravel + change > maxTravelAngle) {
+                    change = maxTravelAngle - currentTravel;
+                }
+                cameraOrientation.x(cameraOrientation.x() + change);
+                currentTravel += change;
+            }
+        }
+    }
 
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "Fire");
