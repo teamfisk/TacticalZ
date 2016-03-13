@@ -104,12 +104,17 @@ struct ModelJob : RenderJob
         FillPercentage = fillPercentage;
 		IsShielded = isShielded;
 
+        
+        if (world->HasComponent(Entity, "Unpickable")) {
+            NotPickable = true;
+        }
+
         if (model->IsSkinned()) {
             Skeleton = Model->m_RawModel->m_Skeleton;
 
             if (Skeleton != nullptr) {
-                
                 EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
+                
 
                 if(Skeleton->BlendTrees.find(entityWrapper) != Skeleton->BlendTrees.end()) {
                     BlendTree = Skeleton->BlendTrees.at(entityWrapper);
@@ -147,6 +152,7 @@ struct ModelJob : RenderJob
     float FillPercentage = 0.0;
 	bool IsShielded;
 	bool Shadow;
+    bool NotPickable = false;
 
     void CalculateHash() override
     {
