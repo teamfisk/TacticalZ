@@ -8,9 +8,7 @@ BoostSystem::BoostSystem(SystemParams params)
 
 bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
 {
-    if (!IsServer) {
-        return false;
-    }
+    
 
     if (e.Victim == e.Inflictor) {
         return false;
@@ -35,6 +33,9 @@ bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
     if (className == "SidearmWeapon") { // give ammo
         giveAmmo(e.Inflictor, e.Victim);
     } else { //give boost
+        if (!IsServer) {
+            return false;
+        }
         //get the XML file, example: "Schema/Entities/BoostclassName.xml"
         std::string classXML = "Schema/Entities/" + className + ".xml";
 

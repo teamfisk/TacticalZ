@@ -386,13 +386,11 @@ void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi
     PickData pickData = m_Renderer->Pick(centerScreen);
     EntityWrapper victim(m_World, pickData.Entity);
     if (!victim.Valid()) {
-        RemoveBoostCheckHUD(wi);
         return;
     }
 
     // Don't let us somehow shoot ourselves in the foot
     if (victim == LocalPlayer) {
-        RemoveBoostCheckHUD(wi);
         return;
     }
 
@@ -401,7 +399,6 @@ void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi
         victim = victim.FirstParentWithComponent("Player");
     }
     if (!victim.Valid()) {
-        RemoveBoostCheckHUD(wi);
         return;
     }
 
@@ -463,6 +460,12 @@ void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi
             } else {
                 EntityWrapper friendlyBoostHud = friendlyBoostHudSpawner.FirstChildByName("FriendlyBoostHUD");
                 if (friendlyBoostHud.Valid()) {
+                    if(friendlyBoostHud.HasComponent("Lifetime")) {
+                        (Field<double>)friendlyBoostHud["Lifetime"]["Lifetime"] = 0.5;
+                    }
+
+
+
                     EntityWrapper assaultBoostEntity = friendlyBoostHud.FirstChildByName("AssaultBoost");
                     if (assaultBoostEntity.Valid()) {
                         EntityWrapper active = assaultBoostEntity.FirstChildByName("Active");
@@ -504,10 +507,3 @@ void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi
     }
 }
 
-void AssaultWeaponBehaviour::RemoveBoostCheckHUD(WeaponInfo& wi)
-{
-    EntityWrapper friendlyBoostHudSpawner = wi.FirstPersonPlayerModel.FirstChildByName("FriendlyBoostAttachment");
-    if (friendlyBoostHudSpawner.Valid()) {
-        friendlyBoostHudSpawner.DeleteChildren();
-    }
-}
