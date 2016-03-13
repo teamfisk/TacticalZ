@@ -25,9 +25,7 @@ struct ComponentWrapper
     ComponentInfo::EnumType Enum(const char* fieldName, const char* enumKey);
 
     bool Dirty(DirtySetType type, const std::string& fieldName);
-
     void SetDirty(DirtySetType type, const std::string& fieldName, bool dirty = true);
-
     void SetAllDirty(const std::string& fieldName, bool dirty = true);
 
     template <typename T>
@@ -117,7 +115,8 @@ struct ComponentWrapper
             typename T,
             typename = typename std::enable_if<!std::is_base_of<::FIELDLOL, T>::value>::type
         >
-        operator T&() = delete;
+        //operator T&() = delete;
+        operator T&() { static_assert(constexpr(false), "https://github.com/teamfisk/TacticalZ/pull/212"); }
 
         // Value assignment
         template <typename T>
