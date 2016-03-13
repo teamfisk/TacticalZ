@@ -177,8 +177,10 @@ void Renderer::Draw(RenderFrame& frame)
 
 	ImGui::SliderInt("SSAO Quality", &m_SSAO_Quality, 0, 3);
 	ImGui::SliderInt("Glow Quality", &m_GLOW_Quality, 0, 3);
+	ImGui::SliderInt("MSAA Level", (int*)&m_MSAA_Level, 0, 16);
 	m_SSAOPass->ChangeQuality(m_SSAO_Quality);
 	m_DrawBloomPass->ChangeQuality(m_GLOW_Quality);
+	m_DrawFinalPass->setMSAA(m_MSAA_Level);
     GLERROR("SSAO Settings");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -237,7 +239,8 @@ void Renderer::Draw(RenderFrame& frame)
 
     if (m_DebugTextureToDraw == 0) {
         PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
+		GLuint test = m_DrawFinalPass->SceneTexture();
+        m_DrawColorCorrectionPass->Draw(test, m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
         PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
 
@@ -316,7 +319,7 @@ void Renderer::InitializeRenderPasses()
 	m_SSAOPass = new SSAOPass(this, m_Config);
 	m_ShadowPass = new ShadowPass(this);
     m_BlurHUDPass = new BlurHUD(this);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass, m_Config);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);

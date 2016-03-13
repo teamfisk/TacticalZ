@@ -1,6 +1,9 @@
 #include "Core/PerformanceTimer.h"
+
+#ifdef DEBUG
 #include <ctime>
 #include <fstream>
+
 
 cpu_timer PerformanceTimer::m_Timer;
 std::map<std::string, cpu_timer> PerformanceTimer::timers;
@@ -74,3 +77,15 @@ void PerformanceTimer::CreateExcelData()
     }
     someFileStream.close();
 }
+
+#else
+
+void PerformanceTimer::StartTimer(std::string nameOfTimer) {};
+void PerformanceTimer::StartTimerAndStopPrevious(std::string nameOfTimer) {};
+void PerformanceTimer::StopTimer(std::string nameOfTimer) {};
+void PerformanceTimer::SetFrameNumber(int frameNumber) {};
+
+void PerformanceTimer::ResetAllTimers() {};
+void PerformanceTimer::CreateExcelData() {};
+
+#endif //DEBUG

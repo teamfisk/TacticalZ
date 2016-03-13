@@ -2,8 +2,6 @@
 
 #define MIN_AMBIENT_LIGHT 0.3
 #define MAX_SPLITS 4
-
-uniform mat4 VM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -82,6 +80,7 @@ layout (std430, binding = 4) buffer LightIndexBuffer
 
 in VertexData{
 	vec3 Position;
+	vec4 ViewSpacePosition;
 	vec3 Normal;
 	vec3 Tangent;
 	vec3 BiTangent;
@@ -362,13 +361,12 @@ void main()
 	 									 GlowUVRepeat1, GlowUVRepeat2, GlowUVRepeat3);
 	vec4 specularTexel = CalcBlendedTexel(splatTexel, SpecularMapTexture1, SpecularMapTexture2, SpecularMapTexture3,
 										 SpecularUVRepeat1, SpecularUVRepeat2, SpecularUVRepeat3);
-	vec4 position = VM * vec4(Input.Position, 1.0); 
 	//vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate, SplatMapTexture);
 	vec4 normal = V * CalcBlendedNormal(splatTexel, NormalMapTexture1, NormalMapTexture2, NormalMapTexture3,
 		   								NormalUVRepeat1, NormalUVRepeat2, NormalUVRepeat3);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
-	vec4 viewVec = normalize(-position); 
+	vec4 viewVec = normalize(-Input.ViewSpacePosition); 
 
 	vec2 tilePos;
 	tilePos.x = int(gl_FragCoord.x/TILE_SIZE);
@@ -391,7 +389,7 @@ void main()
 		LightResult light_result;
 		//These if statements should be removed.
 		if(light.Type == 1) { // point
-			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
+			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, Input.ViewSpacePosition, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
 			int DepthMapIndex = getShadowIndex(FarDistance);
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
