@@ -18,6 +18,7 @@ public:
     // will try to pick a spawn location so that the spawned entity doesn't 
     // collide with anything that has that component and is collidable.
     static EntityWrapper Spawn(EntityWrapper spawner, EntityWrapper parent = EntityWrapper::Invalid, const std::string& dontCollideComponent = "");
+    static EntityWrapper SpawnEntityFile(const std::string& entityFilePath, EntityWrapper spawner, EntityWrapper parent = EntityWrapper::Invalid, const std::string& dontCollideComponent = "");
 
 private:
     EventRelay<SpawnerSystem, Events::SpawnerSpawn> m_OnSpawnerSpawn;
