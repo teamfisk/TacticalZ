@@ -8,6 +8,7 @@
     <c:Fade>
       <FadeTime>0.080000000000000002</FadeTime>
     </c:Fade>
+    <c:NetworkComponent/>
     <c:Transform/>
   </Components>
 

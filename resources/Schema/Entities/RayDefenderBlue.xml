@@ -5,6 +5,7 @@
     <c:Lifetime>
       <Lifetime>0.079999998211860657</Lifetime>
     </c:Lifetime>
+    <c:NetworkComponent/>
     <c:Transform/>
   </Components>
 
