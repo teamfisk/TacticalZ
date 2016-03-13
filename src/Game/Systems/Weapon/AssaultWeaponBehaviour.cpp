@@ -36,8 +36,11 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         int& magSize = cWeapon["MagazineSize"];
         int& ammo = cWeapon["Ammo"];
 
-        ammo = glm::max(0, ammo - (magSize - magAmmo));
-        magAmmo = glm::min(magSize, ammo);
+        int usedAmmo = glm::max(0, magSize - magAmmo);
+        magAmmo = glm::clamp(ammo + magAmmo, 0, magSize);
+        ammo = glm::max(0, ammo - usedAmmo);
+        
+        
         isReloading = false;
         if (wi.FirstPersonEntity.Valid()) {
             wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = true;
@@ -337,4 +340,100 @@ bool AssaultWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
     m_EventBroker->Publish(ePlayerDamage);
 
     return damage > 0;
+}
+
+void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    // Only check ammo client side
+    if (!IsClient) {
+        return;
+    }
+
+    // Only handle ammo check for the local player
+    if (wi.Player != LocalPlayer) {
+        return;
+    }
+
+    // Make sure the player isn't checking from the grave
+    if (!wi.Player.Valid()) {
+        return;
+    }
+
+    // 3D-pick middle of screen
+    Rectangle viewport = m_Renderer->GetViewportSize();
+    glm::vec2 centerScreen(viewport.Width / 2, viewport.Height / 2);
+    // TODO: Some horizontal spread
+    PickData pickData = m_Renderer->Pick(centerScreen);
+    EntityWrapper victim(m_World, pickData.Entity);
+    if (!victim.Valid()) {
+        RemoveBoostCheckHUD(wi);
+        return;
+    }
+
+    // Don't let us somehow shoot ourselves in the foot
+    if (victim == LocalPlayer) {
+        RemoveBoostCheckHUD(wi);
+        return;
+    }
+
+    // Only care about players being hit
+    if (!victim.HasComponent("Player")) {
+        victim = victim.FirstParentWithComponent("Player");
+    }
+    if (!victim.Valid()) {
+        RemoveBoostCheckHUD(wi);
+        return;
+    }
+
+
+    // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
+    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
+        
+        EntityWrapper friendlyBoostHudSpawner = wi.FirstPersonPlayerModel.FirstChildByName("FriendlyBoostAttachment");
+        if (friendlyBoostHudSpawner.Valid()) {
+
+            auto children = m_World->GetDirectChildren(friendlyBoostHudSpawner.ID);
+
+            if (children.first == children.second) {
+                if (friendlyBoostHudSpawner.HasComponent("Spawner")) {
+                    EntityWrapper friendlyAmmoHud = SpawnerSystem::Spawn(friendlyBoostHudSpawner, friendlyBoostHudSpawner);
+                    if (friendlyAmmoHud.Valid()) {
+                        EntityWrapper textEntity = friendlyAmmoHud.FirstChildByName("MagazineAmmo");
+                        if (textEntity.Valid()) {
+                            if (textEntity.HasComponent("Text")) {
+                               // (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+                            }
+                        }
+
+                        EntityWrapper ammoTextEntity = friendlyAmmoHud.FirstChildByName("Ammo");
+                        if (ammoTextEntity.Valid()) {
+                            if (ammoTextEntity.HasComponent("Text")) {
+                     //           (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+                            }
+                        }
+                    }
+                }
+            } else {
+                EntityWrapper textEntity = friendlyBoostHudSpawner.FirstChildByName("MagazineAmmo");
+                if (textEntity.Valid()) {
+                    if (textEntity.HasComponent("Text")) {
+                    //    (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+                    }
+                }
+
+                EntityWrapper ammoTextEntity = friendlyBoostHudSpawner.FirstChildByName("Ammo");
+                if (ammoTextEntity.Valid()) {
+                    if (ammoTextEntity.HasComponent("Text")) {
+                //        (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void AssaultWeaponBehaviour::RemoveBoostCheckHUD(WeaponInfo& wi)
+{
+
 }

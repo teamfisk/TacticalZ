@@ -213,6 +213,26 @@
             </Entity>
           </Children>
         </Entity>
+        <Entity name="FriendlyBoostAttachment">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/FriendlyAmmoHUD.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="-0.000110394583" Y="-0.0891034827" Z="6.07890324e-05"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="BoostShareEffectSpawner">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/AmmoShareEffectView.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
       </Children>
     </Entity>
   </Children>
