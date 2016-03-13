@@ -33,7 +33,7 @@ private:
     // Used to track afterimages for sprint effect.
     float m_SprintEffectTimer;
     // The logic for making the sound play when player is moving
-    void playerStep(double dt);
+    void playerStep(double dt, EntityWrapper player);
     // Spawn a hexagon at origin of an Entity
     void spawnHexagon(EntityWrapper target);
 

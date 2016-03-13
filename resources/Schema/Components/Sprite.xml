@@ -9,6 +9,6 @@
 	<KeepRatioX>false</KeepRatioX>
 	<KeepRatioY>false</KeepRatioY>
 	<KeepRatio>false</KeepRatio>
-	<Linear>false</Linear>
+	<Linear>true</Linear>
 	<BlurBackground>false</BlurBackground>
 </Sprite>

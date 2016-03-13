@@ -12,6 +12,9 @@
 				<xs:element name="MaxRespawnTime" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Players will be spawned when RespawnTime reaches this.</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="ResetCountdown" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>The map will be reset when time reaches 0.</xs:documentation></xs:annotation>
+				</xs:element>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

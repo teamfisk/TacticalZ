@@ -10,6 +10,8 @@ DrawFinalPassState::DrawFinalPassState(GLuint frameBuffer)
     Enable(GL_DEPTH_TEST);
 	DepthMask(GL_TRUE);
     Enable(GL_CULL_FACE);
+	Enable(GL_ALPHA_TEST);
+	AlphaFunc(GL_GEQUAL, 0.05f);
    // Enable(GL_STENCIL_TEST);
    // StencilFunc(GL_NOTEQUAL, 1, 0xFF);
    // StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);

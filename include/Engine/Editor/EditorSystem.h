@@ -47,6 +47,7 @@ private:
     // Utility functions
     EntityWrapper importEntity(EntityWrapper parent, boost::filesystem::path filePath);
     void setWidgetMode(EditorGUI::WidgetMode mode);
+    bool isAnyParentMissingTransform(EntityID entityID);
 
     // GUI callbacks
     void OnEntitySelected(EntityWrapper entity);

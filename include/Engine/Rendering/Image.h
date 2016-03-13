@@ -3,6 +3,8 @@
 
 struct Image
 {
+    virtual ~Image() = default;
+
 	enum class ImageFormat
 	{
 		Unknown,

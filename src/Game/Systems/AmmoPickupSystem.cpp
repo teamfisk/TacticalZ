@@ -72,11 +72,11 @@ void AmmoPickupSystem::SetPlayerAmmo(EntityWrapper &player, int ammoGain) {
 
     PlayerClass playerClass = DetermineClass(player);
     if (playerClass == PlayerClass::Defender) {
-        (int&)player["DefenderWeapon"]["Ammo"] = std::min((int)player["DefenderWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
+        (Field<int>)player["DefenderWeapon"]["Ammo"] = std::min((int)player["DefenderWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
     } else if (playerClass == PlayerClass::Sniper) {
-        (int&)player["SniperWeapon"]["Ammo"] = std::min((int)player["SniperWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
+        (Field<int>)player["SniperWeapon"]["Ammo"] = std::min((int)player["SniperWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
     } else if (playerClass == PlayerClass::Assault) {
-        (int&)player["AssaultWeapon"]["Ammo"] = std::min((int)player["AssaultWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
+        (Field<int>)player["AssaultWeapon"]["Ammo"] = std::min((int)player["AssaultWeapon"]["Ammo"] + ammoGain, maxWeaponAmmo);
     } else {
         //unknown class - ignore
     }

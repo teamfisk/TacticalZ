@@ -81,7 +81,7 @@ public:
             for (auto& pair : group.PureSystems) {
                 const std::string& componentName = pair.first;
                 auto& systems = pair.second;
-                const ComponentPool* pool = m_World->GetComponents(componentName);
+                ComponentPool* pool = m_World->GetComponents(componentName);
                 if (pool == nullptr) {
                     continue;
                 }

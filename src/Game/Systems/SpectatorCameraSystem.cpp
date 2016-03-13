@@ -8,6 +8,8 @@ SpectatorCameraSystem::SpectatorCameraSystem(SystemParams params)
     , m_PickedTeam(-1)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &SpectatorCameraSystem::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EDisconnect, &SpectatorCameraSystem::OnDisconnect);
+    EVENT_SUBSCRIBE_MEMBER(m_EReset, &SpectatorCameraSystem::OnReset);
 }
 
 void SpectatorCameraSystem::Update(double dt)
@@ -24,6 +26,14 @@ void SpectatorCameraSystem::Update(double dt)
             m_EventBroker->Publish(unlock);
         }
     }
+}
+
+void SpectatorCameraSystem::reset()
+{
+    m_CamSetToTeamPick = false;
+    // They will also be set to menu, so unlock mouse just in case they were in game with locked mouse.
+    Events::UnlockMouse unlock;
+    m_EventBroker->Publish(unlock);
 }
 
 bool SpectatorCameraSystem::OnInputCommand(const Events::InputCommand& e)
@@ -86,5 +96,21 @@ bool SpectatorCameraSystem::OnInputCommand(const Events::InputCommand& e)
         m_EventBroker->Publish(unlock);
     }
 
+    return true;
+}
+
+bool SpectatorCameraSystem::OnDisconnect(const Events::PlayerDisconnected& e)
+{
+    // If local player gets disconnected, they should be set to 
+    // the spectator camera next time a map loads that has one.
+    if (e.Entity == LocalPlayer.ID) {
+        reset();
+    }
+    return true;
+}
+
+bool SpectatorCameraSystem::OnReset(const Events::Reset & e)
+{
+    reset();
     return true;
 }

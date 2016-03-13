@@ -73,6 +73,8 @@
 							<xs:element ref="c:ServerList" minOccurs="0"/>
 							<xs:element ref="c:EndScreen" minOccurs="0"/>
 							<xs:element ref="c:Fade" minOccurs="0"/>
+							<xs:element ref="c:ConfigBtnResolution" minOccurs="0"/>
+							<xs:element ref="c:ConfigBtnFloat" minOccurs="0"/>
 						</xs:all>
 					</xs:complexType>
 				</xs:element>

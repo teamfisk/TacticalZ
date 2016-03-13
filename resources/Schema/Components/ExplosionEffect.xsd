@@ -44,14 +44,20 @@
 				<xs:element name="ColorByDistance" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Change the color by its moved distance instead of by its time</xs:documentation></xs:annotation>
 				</xs:element>
-				<!--<xs:element name="ReverseAnimation" type="t:bool" minOccurs="0">
-					<xs:annotation><xs:documentation>Implosions are cooler</xs:documentation></xs:annotation>
-				</xs:element>-->
 				<!--<xs:element name="Wireframe" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Enable/disable wireframe</xs:documentation></xs:annotation>
 				</xs:element>-->
 				<xs:element name="ExponentialAccelaration" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Linear/Exponential accelaration</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Pulsate" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Pulsate the effect</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Reverse" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Reverse the effect</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="ColorDistanceScalar" type="t:double" minOccurs="0">
+					<xs:annotation><xs:documentation>Scale the distance of the color change</xs:documentation></xs:annotation>
 				</xs:element>
 			</xs:all>
 		</xs:complexType>

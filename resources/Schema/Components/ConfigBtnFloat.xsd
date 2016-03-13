@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="ConfigBtnFloat">
+		<xs:annotation><xs:documentation>Used with a Button component, this button will change a variable in the config file.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="Header" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>The header of the section in config.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Field" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>The name of the field to be changed in the config.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="PressValue" type="t:float" minOccurs="0">
+					<xs:annotation><xs:documentation>The value to give the field.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

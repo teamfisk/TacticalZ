@@ -32,6 +32,9 @@
 #include "../Game/Events/EDashAbility.h"
 #include "Network/EDisplayServerlist.h"
 #include "Network/EConnectRequest.h"
+#include "Network/EPlayerDisconnected.h"
+#include "Game/Events/EReset.h"
+
 class Client : public Network
 {
 public:
@@ -40,9 +43,9 @@ public:
     ~Client();
 
     void Connect(std::string address, int port);
-    void Update() override;
+    void Update(double dt) override;
 private:
-    //UDPClient m_Unreliable;
+    UDPClient m_Unreliable;
     TCPClient m_Reliable;
     std::vector<Events::PlayerSpawned> m_PlayerSpawnEvents;
     void parseSpawnEvents();
@@ -74,14 +77,14 @@ private:
     // Network logic
     PlayerDefinition m_PlayerDefinitions[8];
     SnapshotDefinitions m_NextSnapshot;
-    double m_DurationOfPingTime;
-    std::clock_t m_StartPingTime;
-    std::clock_t m_TimeSinceSentInputs;
-    unsigned int m_SendInputIntervalMs;
+    double m_DurationOfPingTime = 0;
+    double m_StartPingTime = 0;
+    double m_TimeSinceSentInputs = 0;
+    double m_SendInputInterval = 0.033;
     std::vector<Events::InputCommand> m_InputCommandBuffer;
 
     // Private member functions
-    size_t  receive(char* data);
+    size_t receive(char* data);
     void disconnect();
     void parseMessageType(Packet& packet);
     void updateFields(Packet& packet, const ComponentInfo& componentInfo, const EntityID& entityID);
@@ -100,6 +103,7 @@ private:
     void parseDoubleJump(Packet& packet);
     void parseDashEffect(Packet& packet);
     void parseAmmoPickup(Packet& packet);
+    void parseRemoveWorld(Packet& packet);
     void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();
@@ -109,7 +113,6 @@ private:
     void sendLocalPlayerTransform();
     void becomePlayer();
     void displayServerlist();
-    void removeWorld();
     void createMainMenu();
     // Mapping Logic
     // Returns if local EntityID exist in map
@@ -138,8 +141,8 @@ private:
     UDPClient m_ServerlistRequest;
     std::vector<ServerInfo> m_Serverlist;
     bool m_SearchingForServers = false;
-    std::clock_t m_StartSearchTime;
-    double m_SearchingTime = 2000; // Config I guess
+    double m_TimeSearched = 0;
+    double m_SearchingTime = 0.2; // Config I guess
 };
 
 #endif
