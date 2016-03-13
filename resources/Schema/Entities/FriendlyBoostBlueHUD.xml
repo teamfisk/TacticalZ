@@ -6,7 +6,7 @@
       <Lifetime>0.5</Lifetime>
     </c:Lifetime>
     <c:Transform>
-      <Scale X="1.5" Y="1.5" Z="1"/>
+      <Scale X="1.20000005" Y="1.20000005" Z="1"/>
     </c:Transform>
   </Components>
 
@@ -78,6 +78,19 @@
             </c:Transform>
           </Components>
           <Children>
+            <Entity name="Inactive">
+              <Components>
+                <c:Text>
+                  <Content>\2</Content>
+                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                  <Color A="1" B="0.784313738" G="0.784313738" R="0.784313738"/>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-8.43336147e-06"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
             <Entity name="Active">
               <Components>
                 <c:Text>
@@ -88,19 +101,6 @@
                 </c:Text>
                 <c:Transform>
                   <Position X="0" Y="0" Z="0.00999999978"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="Inactive">
-              <Components>
-                <c:Text>
-                  <Content>\2</Content>
-                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
-                  <Color A="1" B="0.784313738" G="0.784313738" R="0.784313738"/>
-                </c:Text>
-                <c:Transform>
-                  <Position X="0" Y="0" Z="-8.43336147e-06"/>
                 </c:Transform>
               </Components>
               <Children/>

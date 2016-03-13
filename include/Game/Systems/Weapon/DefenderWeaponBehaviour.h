@@ -41,6 +41,7 @@ private:
 
     // Utility
     Camera cameraFromEntity(EntityWrapper camera);
+    void CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi);
 };
 
 #endif

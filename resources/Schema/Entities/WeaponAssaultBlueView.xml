@@ -224,15 +224,6 @@
           </Components>
           <Children/>
         </Entity>
-        <Entity name="BoostShareEffectSpawner">
-          <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/AmmoShareEffectView.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
-          </Components>
-          <Children/>
-        </Entity>
       </Children>
     </Entity>
   </Children>
