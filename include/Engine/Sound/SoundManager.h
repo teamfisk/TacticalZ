@@ -31,6 +31,7 @@
 #include "../Engine/Core/EComponentAttached.h"
 #include "../Core/EPlayerSpawned.h"
 #include "../Engine/Network/EPlayerDisconnected.h"
+#include "../Game/Events/EReset.h"
 
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
@@ -142,6 +143,8 @@ private:
     bool OnChangeBGM(const Events::ChangeBGM &e);
     EventRelay<SoundManager, Events::PlayerDisconnected> m_EplayerDisconnected;
     bool OnPlayerDisconnected(const Events::PlayerDisconnected& e);
+    EventRelay<SoundManager, Events::Reset> m_EReset;
+    bool OnReset(const Events::Reset& e);
 
 
 };

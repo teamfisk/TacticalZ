@@ -31,6 +31,7 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayQueueOnEntity, &SoundManager::OnPlayQueueOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EChangeBGM, &SoundManager::OnChangeBGM);
     EVENT_SUBSCRIBE_MEMBER(m_EplayerDisconnected, &SoundManager::OnPlayerDisconnected);
+    EVENT_SUBSCRIBE_MEMBER(m_EReset, &SoundManager::OnReset);
 
     Events::ChangeBGM e;
     e.FilePath = "Audio/bgm/MenuMusic.wav";
@@ -419,6 +420,23 @@ bool SoundManager::OnPlayerDisconnected(const Events::PlayerDisconnected& e)
     Events::ChangeBGM changeBGM;
     changeBGM.FilePath = "Audio/BGM/MenuMusic.wav";
     m_EventBroker->Publish(changeBGM);
+    return true;
+}
+
+
+bool SoundManager::OnReset(const Events::Reset& e)
+{
+    // The game was reset, stop playing the background music (drums)
+    if (m_CurrentBGMCombo != nullptr) {
+        if (getSourceState(m_CurrentBGMCombo->ALsource) == AL_PLAYING) {
+            stopSound(m_CurrentBGMCombo);
+        }
+    }
+    if (m_CurrentBGM != nullptr) {
+        if (getSourceState(m_CurrentBGM->ALsource) == AL_PLAYING) {
+            stopSound(m_CurrentBGM);
+        }
+    }
     return true;
 }
 
