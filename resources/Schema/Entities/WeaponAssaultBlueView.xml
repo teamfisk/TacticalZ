@@ -131,7 +131,7 @@
                   <EntityFile>Schema/Entities/RayAssaultBlue.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform>
-                  <Position X="0.00123506912" Y="-0.00209517847" Z="-0.0250000004"/>
+                  <Position X="0.00179657922" Y="-0.00304772682" Z="-0.334699303"/>
                 </c:Transform>
               </Components>
               <Children/>
