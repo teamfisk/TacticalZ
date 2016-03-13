@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+	
+	<xs:element name="Unpickable">
+		<xs:annotation>
+			<xs:documentation>Makes the entity unpickable</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>
