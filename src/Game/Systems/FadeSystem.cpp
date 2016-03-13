@@ -20,7 +20,7 @@ void FadeSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cFade,
     }
 
     double fadeTime = cFade["FadeTime"];
-    Field<bool> currentTime = cFade["Time"];
+    Field<double> currentTime = cFade["Time"];
     currentTime += dTime;
 
     if(currentTime > fadeTime) {
