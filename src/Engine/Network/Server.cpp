@@ -94,17 +94,17 @@ void Server::Update(double dt)
         previousSnapshotMessage = 0;
     }
     // Send pings each 
-    previousePingMessage += dt;
-    if (pingInterval < previousePingMessage) {
+    previousPingMessage += dt;
+    if (pingInterval < previousPingMessage) {
         sendPing();
-        previousePingMessage = 0;
+        previousPingMessage = 0;
     }
 
     // Time out logic
-    timOutTimer += dt;
-    if (checkTimeOutInterval < timOutTimer) {
+    timeOutTimer += dt;
+    if (checkTimeOutInterval < timeOutTimer) {
         checkForTimeOuts();
-        timOutTimer = 0;
+        timeOutTimer = 0;
     }
     m_EventBroker->Process<Server>();
     if (isReadingData) {
@@ -117,7 +117,7 @@ void Server::Update(double dt)
             // Take the first CapturePointGameMode component found.
             ComponentWrapper& modeComponent = *pool->begin();
             // Decrease timer.
-            double& timer = (double&)modeComponent["ResetCountdown"];
+            Field<double> timer = modeComponent["ResetCountdown"];
             timer -= dt;
             if (timer < 0) {
                 resetMap();

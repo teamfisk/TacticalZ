@@ -10,6 +10,7 @@ ScoreScreenSystem::ScoreScreenSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerConnected, &ScoreScreenSystem::OnPlayerConnected);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDisconnected, &ScoreScreenSystem::OnPlayerDisconnected);
     EVENT_SUBSCRIBE_MEMBER(m_EReset, &ScoreScreenSystem::OnReset);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &ScoreScreenSystem::OnInputCommand);
 }
 
 void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& scoreScreen, double dt)
@@ -166,5 +167,16 @@ bool ScoreScreenSystem::OnReset(const Events::Reset & e)
         it.second.Team = 1;
         it.second.Player = EntityWrapper::Invalid;
     }
+    return true;
+}
+
+bool ScoreScreenSystem::OnInputCommand(const Events::InputCommand & e)
+{
+    if (e.Command != "PickTeam" || e.PlayerID == -1 || e.Value == 0) {
+        return false;
+    }
+
+    m_PlayerIdentities.at(e.PlayerID).Team = e.Value;
+
     return true;
 }

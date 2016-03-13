@@ -10,9 +10,9 @@ CapturePointSystem::CapturePointSystem(SystemParams params)
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &CapturePointSystem::OnTriggerTouch);
         EVENT_SUBSCRIBE_MEMBER(m_ETriggerLeave, &CapturePointSystem::OnTriggerLeave);
         EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &CapturePointSystem::OnCaptured);
+        EVENT_SUBSCRIBE_MEMBER(m_EReset, &CapturePointSystem::OnReset);
+        Init();
     }
-    EVENT_SUBSCRIBE_MEMBER(m_EReset, &CapturePointSystem::OnReset);
-    Init();
 }
 
 void CapturePointSystem::Init()

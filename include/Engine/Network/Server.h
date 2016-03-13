@@ -52,9 +52,9 @@ private:
     char readBuffer[BUFFERSIZE] = { 0 };
     size_t bytesRead = 0;
     // time for previouse message
-    double previousePingMessage = 0;
+    double previousPingMessage = 0;
     double previousSnapshotMessage = 0;
-    double timOutTimer = 0;
+    double timeOutTimer = 0;
 
     // How often we send messages (seconds)
     double pingInterval = 1;
