@@ -76,9 +76,9 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 void SpawnerSystem::transformEntityToSpawnPoint(EntityWrapper spawnedEntity, EntityWrapper spawnPoint)
 {
     // Set its position and orientation to that of the SpawnPoint
-    spawnedEntity["Transform"]["Position"] = Transform::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
+    spawnedEntity["Transform"]["Position"] = TransformSystem::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
     // TODO: Quaternions, bitch
-    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint));
+    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(TransformSystem::AbsoluteOrientation(spawnPoint));
 }
 
 bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, EntityWrapper spawnPoint, const std::string& dontCollideComponent)
@@ -86,7 +86,7 @@ bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, Entity
     transformEntityToSpawnPoint(spawnedEntity, spawnPoint);
     //Check if the spawned entity collides with anything, and if so, continue to the next spawnpoint.
     EntityAABB spawnedBox = *Collision::EntityAbsoluteAABB(spawnedEntity);
-    const ComponentPool* otherSpawnedEntities = spawnPoint.World->GetComponents(dontCollideComponent);
+    auto otherSpawnedEntities = spawnPoint.World->GetComponents(dontCollideComponent);
     for (const auto& obj : *otherSpawnedEntities) {
         if (spawnedEntity.ID == obj.EntityID) {
             continue;
@@ -113,7 +113,7 @@ bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, Entity
                     spawnedBox,
                     model->Vertices(),
                     model->m_Indices,
-                    Transform::ModelMatrix(otherEntity))) {
+                    TransformSystem::ModelMatrix(otherEntity))) {
                 return true;
             }
         }

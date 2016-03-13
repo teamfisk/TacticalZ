@@ -12,8 +12,8 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override
     {
         ComponentWrapper& transform = m_World->GetComponent(component.EntityID, "Transform");
-        (double&)component["Time"] += dt;
-        (glm::vec3&)transform["Position"] = (float)(double)component["Amplitude"] * glm::sin((glm::two_pi<float>() / (float)(double)component["Period"]) *  (float)(double)component["Time"]) * (glm::vec3)component["Axis"];
+        (Field<double>)component["Time"] += dt;
+        (Field<glm::vec3>)transform["Position"] = (float)(double)component["Amplitude"] * glm::sin((glm::two_pi<float>() / (float)(double)component["Period"]) *  (float)(double)component["Time"]) * (glm::vec3)component["Axis"];
 
     }
 };

@@ -49,7 +49,8 @@ void CapturePointHUDSystem::Update(double dt)
                 double currentCaptureTime = (double)entityCP["CapturePoint"]["CaptureTimer"];
                 double progress = glm::abs(currentCaptureTime)/15.0;
                 int currentCapturingTeam = currentCaptureTime > 0 ? redTeam : currentCaptureTime < 0 ? blueTeam : spectatorTeam;
-                ((glm::vec3&)entityHUD["Transform"]["Orientation"]).z = currentCapturingTeam == redTeam ? glm::half_pi<float>()+glm::pi<float>() : glm::half_pi<float>();
+                Field<glm::vec3> orientation = entityHUD["Transform"]["Orientation"];
+                orientation.z(currentCapturingTeam == redTeam ? glm::half_pi<float>()+glm::pi<float>() : glm::half_pi<float>());
                 glm::vec4 fillColor = currentCapturingTeam == redTeam ? glm::vec4(1, 0.f, 0, 0.7f) : glm::vec4(0, 0.2f, 1, 0.7f);
                 entityHUD["Fill"]["Color"] = fillColor;
                 entityHUD["Fill"]["Percentage"] = progress;

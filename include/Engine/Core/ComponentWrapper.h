@@ -4,46 +4,32 @@
 #include <boost/shared_array.hpp>
 #include <boost/any.hpp>
 #include "../Common.h"
+#include "../GLM.h"
 #include "Entity.h"
 #include "ComponentInfo.h"
+#include "DirtySet.h"
 #include "Util/Any.h"
 
-template <typename T, typename Enable = void>
-struct ComponentField { };
-
-template <typename T>
-struct ComponentField<T, typename std::enable_if<std::is_trivially_copyable<T>::value>::type>
-{
-    static T& Get(const ComponentInfo::Field_t& info, char* data) { return *reinterpret_cast<T*>(data); }
-    static void Set(const ComponentInfo::Field_t& info, char* data, const T& value) { Get(data) = value; }
-};
-
-template <>
-struct ComponentField<std::string, void>
-{
-    static std::string& Get(const ComponentInfo::Field_t& info, char* data) { return **reinterpret_cast<std::string**>(data); }
-    static void Set(const ComponentInfo::Field_t& info, char* data, const std::string& value) { Get(info, data) = value; }
-};
+class World;
 
 struct ComponentWrapper
 {
-    ComponentWrapper(const ComponentInfo& componentInfo, char* data)
-        : Info(componentInfo)
-        , EntityID(*reinterpret_cast<::EntityID*>(data))
-        , Data(data + sizeof(::EntityID))
-    { }
+    ComponentWrapper(const ComponentInfo& componentInfo, char* data, ::DirtyBitField* dirtyBitField, World* world);
 
+    World* m_World;
     const ComponentInfo& Info;
     const ::EntityID EntityID;
     char* Data;
+    ::DirtyBitField* DirtyBitField = nullptr;
 
-    ComponentInfo::EnumType Enum(const char* fieldName, const char* enumKey)
-    {
-        return Info.Meta->FieldEnumDefinitions.at(fieldName).at(enumKey);
-    }
+    ComponentInfo::EnumType Enum(const char* fieldName, const char* enumKey);
+
+    bool Dirty(DirtySetType type, const std::string& fieldName);
+    void SetDirty(DirtySetType type, const std::string& fieldName, bool dirty = true);
+    void SetAllDirty(const std::string& fieldName, bool dirty = true);
 
     template <typename T>
-    T& Field(std::string name)
+    T& Field(const std::string& name)
     {
         const ComponentInfo::Field_t& field = Info.Fields.at(name);
         if (sizeof(T) > field.Stride) {
@@ -55,13 +41,15 @@ struct ComponentWrapper
     }
 
     template <typename T>
-    void SetField(std::string name, const T value) { Field<T>(name) = value; }
-    //template <typename T>
-    //void SetField(std::string name, T& value) { Field<T>(name) = value; }
+    void SetField(const std::string& name, const T& value) 
+    { 
+        Field<T>(name) = value; 
+        SetAllDirty(name);
+    }
 
     // Specialization for string literals
     template <std::size_t N>
-    void SetField(std::string name, const char(&value)[N]) { Field<std::string>(name) = std::string(value); }
+    void SetField(const std::string& name, const char(&value)[N]) { SetField(name, std::string(value)); }
 
     void Copy(ComponentWrapper& destination)
     {
@@ -95,40 +83,163 @@ struct ComponentWrapper
     struct SubscriptProxy
     {
         friend struct ComponentWrapper;
-    private:
-        SubscriptProxy(ComponentWrapper* component, std::string propertyName)
+  
+    public:
+        SubscriptProxy(ComponentWrapper* component, std::string fieldName)
             : m_Component(component)
-            , m_PropertyName(propertyName)
+            , m_FieldName(fieldName)
         { }
 
         ComponentWrapper* m_Component;
-        std::string m_PropertyName;
+        std::string m_FieldName;
 
     public:
         // Return the integer value of an enum type key for this field
-        ComponentInfo::EnumType Enum(const char* enumKey) { return m_Component->Enum(m_PropertyName.c_str(), enumKey); }
+        ComponentInfo::EnumType Enum(const char* enumKey) { return m_Component->Enum(m_FieldName.c_str(), enumKey); }
+        bool Dirty(DirtySetType type) { return m_Component->Dirty(type, m_FieldName); }
+        void SetDirty(DirtySetType type, bool dirty = true) { m_Component->SetDirty(type, m_FieldName, dirty); }
+        void SetAllDirty(bool dirty = true) { m_Component->SetAllDirty(m_FieldName, dirty); }
 
-        template <typename T>
-        operator T&() { return m_Component->Field<T>(m_PropertyName); }
+        operator const double&() { return m_Component->Field<double>(m_FieldName); }
+        operator const float&() { return m_Component->Field<float>(m_FieldName); }
+        operator const int&() { return m_Component->Field<int>(m_FieldName); }
+        operator const glm::vec3&() { return m_Component->Field<glm::vec3>(m_FieldName); }
+        operator const glm::vec4&() { return m_Component->Field<glm::vec4>(m_FieldName); }
+        operator const glm::quat&() { return m_Component->Field<glm::quat>(m_FieldName); }
+        operator const bool&() { return m_Component->Field<bool>(m_FieldName); }
+        operator const std::string&() { return m_Component->Field<std::string>(m_FieldName); }
 
+        // Don't allow non-const references
+        // If this wasn't deleted, the above overloads would still get called for some reason...
+        template <
+            typename T,
+            typename = typename std::enable_if<!std::is_base_of<::FIELDLOL, T>::value>::type
+        >
+        //operator T&() = delete;
+        operator T&() { static_assert(constexpr(false), "https://github.com/teamfisk/TacticalZ/pull/212"); }
+
+        // Value assignment
         template <typename T>
-        void operator=(const T val) { m_Component->SetField<T>(m_PropertyName, val); }
-        // TODO: Pass by reference and rvalue (universal reference?)
-        //template <typename T>
-        //void operator=(T& val) { m_Component->SetField<T>(m_PropertyName, val); }
+        void operator=(const T& val) { m_Component->SetField<T>(m_FieldName, val); }
 
         // Specialization for string literals
         template <std::size_t N>
-        void operator=(const char(&val)[N]) { m_Component->SetField<N>(m_PropertyName, val); }
+        void operator=(const char(&val)[N]) { m_Component->SetField<N>(m_FieldName, val); }
     };
-    SubscriptProxy operator[](std::string propertyName) { return SubscriptProxy(this, propertyName); }
+    SubscriptProxy operator[](const std::string& propertyName) { return SubscriptProxy(this, propertyName); }
 };
+
+struct FIELDLOL { }; // lol
+
+template <typename T>
+struct FieldBase : FIELDLOL
+{
+    FieldBase(ComponentWrapper::SubscriptProxy& Proxy)
+        : Proxy(Proxy)
+        , Data(Proxy.m_Component->Field<T>(Proxy.m_FieldName))
+    { }
+
+    void SetAllDirty() { Proxy.SetAllDirty(); }
+
+    FieldBase& operator=(const FieldBase& rhs) { Data = rhs.Data; SetAllDirty(); return *this; }
+    FieldBase& operator=(const T& rhs) { Data = rhs; SetAllDirty(); return *this; }
+
+    template <typename T2> FieldBase& operator+=(const T2& rhs) { Data += rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator-=(const T2& rhs) { Data -= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator*=(const T2& rhs) { Data *= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator/=(const T2& rhs) { Data /= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator%=(const T2& rhs) { Data %= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator&=(const T2& rhs) { Data &= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator|=(const T2& rhs) { Data |= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator^=(const T2& rhs) { Data ^= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator<<=(const T2& rhs) { Data <<= rhs; SetAllDirty(); return *this; }
+    template <typename T2> FieldBase& operator>>=(const T2& rhs) { Data >>= rhs; SetAllDirty(); return *this; }
+
+    T operator+() const { return +Data; }
+    T operator-() const { return -Data; }
+    T operator~() const { return ~Data; }
+
+    FieldBase& operator++() { Data++; SetAllDirty(); return *this; }
+    T operator++(int) { T tmp = Data; operator++(); return tmp; }
+    FieldBase& operator--() { Data--; SetAllDirty(); return *this; }
+    T operator--(int) { T tmp = Data; operator--(); return tmp; }
+
+    operator const T&() const { return Data; }
+    const T& operator*() const { return operator const T&(); }
+
+protected:
+    ComponentWrapper::SubscriptProxy Proxy;
+    T& Data;
+};
+
+template <typename T>
+struct Field : FieldBase<T>
+{
+    using FieldBase<T>::FieldBase;
+    using FieldBase<T>::operator=;
+};
+
+template <>
+struct Field<glm::vec3> : FieldBase<glm::vec3>
+{
+    using FieldBase<glm::vec3>::FieldBase;
+    using FieldBase<glm::vec3>::operator=;
+
+    glm::vec3::value_type x() const { return Data.x; }
+    void x(glm::vec3::value_type val) { Data.x = val; SetAllDirty(); }
+    glm::vec3::value_type y() const { return Data.y; }
+    void y(glm::vec3::value_type val) { Data.y = val; SetAllDirty(); }
+    glm::vec3::value_type z() const { return Data.z; }
+    void z(glm::vec3::value_type val) { Data.z = val; SetAllDirty(); }
+
+    template <typename T> friend glm::vec3 operator+(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) + glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator-(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) - glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator*(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) * glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator/(const Field<glm::vec3>& lhs, const T& rhs) { return static_cast<glm::vec3>(lhs) / glm::vec3(rhs); }
+    template <typename T> friend glm::vec3 operator+(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) + static_cast<glm::vec3>(rhs); }
+    template <typename T> friend glm::vec3 operator-(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) - static_cast<glm::vec3>(rhs); }
+    template <typename T> friend glm::vec3 operator*(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) * static_cast<glm::vec3>(rhs); }
+    template <typename T> friend glm::vec3 operator/(const T& lhs, const Field<glm::vec3>& rhs) { return glm::vec3(lhs) / static_cast<glm::vec3>(rhs); }
+
+    friend glm::vec3& operator+=(glm::vec3& lhs, const Field<glm::vec3>& rhs) { lhs += *rhs; return lhs; }
+};
+
+template <>
+struct Field<glm::vec4> : FieldBase<glm::vec4>
+{
+    //Field(glm::vec4& Data)
+    //    : FieldBase(Data)
+    //{ }
+    using FieldBase<glm::vec4>::FieldBase;
+    using FieldBase<glm::vec4>::operator=;
+
+    glm::vec4::value_type x() const { return Data.x; }
+    void x(glm::vec4::value_type val) { Data.x = val; SetAllDirty(); }
+    glm::vec4::value_type y() const { return Data.y; }
+    void y(glm::vec4::value_type val) { Data.y = val; SetAllDirty(); }
+    glm::vec4::value_type z() const { return Data.z; }
+    void z(glm::vec4::value_type val) { Data.z = val; SetAllDirty(); }
+    glm::vec4::value_type w() const { return Data.w; }
+    void w(glm::vec4::value_type val) { Data.w = val; SetAllDirty(); }
+
+    template <typename T> friend glm::vec4 operator+(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) + glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator-(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) - glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator*(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) * glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator/(const Field<glm::vec4>& lhs, const T& rhs) { return static_cast<glm::vec4>(lhs) / glm::vec4(rhs); }
+    template <typename T> friend glm::vec4 operator+(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) + static_cast<glm::vec4>(rhs); }
+    template <typename T> friend glm::vec4 operator-(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) - static_cast<glm::vec4>(rhs); }
+    template <typename T> friend glm::vec4 operator*(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) * static_cast<glm::vec4>(rhs); }
+    template <typename T> friend glm::vec4 operator/(const T& lhs, const Field<glm::vec4>& rhs) { return glm::vec4(lhs) / static_cast<glm::vec4>(rhs); }
+
+    friend glm::vec4& operator+=(glm::vec4& lhs, const Field<glm::vec4>& rhs) { lhs += *rhs; return lhs; }
+};
+
 
 // A component wrapper that "owns" its data through a shared pointer
 struct SharedComponentWrapper : ComponentWrapper
 {
     SharedComponentWrapper(const ComponentInfo& componentInfo, boost::shared_array<char> data)
-        : ComponentWrapper(componentInfo, data.get())
+        : ComponentWrapper(componentInfo, data.get(), nullptr, nullptr)
         , m_DataReference(data)
     { }
 

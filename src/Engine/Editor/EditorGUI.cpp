@@ -381,6 +381,10 @@ bool EditorGUI::drawComponentField(ComponentWrapper& c, const ComponentInfo::Fie
         ImGui::TextDisabled(field.Type.c_str());
     }
 
+    if (dirty) {
+        c[field.Name].SetAllDirty();
+    }
+
     ImGui::PopID();
 
     return dirty;

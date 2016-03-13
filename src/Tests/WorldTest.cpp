@@ -30,14 +30,14 @@ BOOST_AUTO_TEST_CASE(WorldTestSingleAllocation, * boost::unit_test::tolerance(0.
     BOOST_TEST(vec3.z == 3.f);
 
     // Change values
-    ((int&)c["TestInteger"]) += 1;
+    ((Field<int>)c["TestInteger"]) += 1;
     BOOST_TEST((int)c["TestInteger"] == 1338);
-    ((double&)c["TestDouble"]) += 1.11;
+    ((Field<double>)c["TestDouble"]) += 1.11;
     std::cout << (double)c["TestDouble"] << std::endl;
     BOOST_TEST((double)c["TestDouble"] == 14.48);
     c["TestString"] = "Siesta";
     BOOST_TEST((std::string)c["TestString"] == "Siesta");
-    ((glm::vec3&)c["TestVec3"]).y += 1.f;
+    ((Field<glm::vec3>)c["TestVec3"]).y += 1.f;
     BOOST_TEST(((glm::vec3)c["TestVec3"]).y == 3.f);
 }
 
@@ -100,16 +100,16 @@ BOOST_AUTO_TEST_CASE(WorldCopy, *utf::tolerance(0.00001))
 
     // Check that built-in types are copied but don't reside in the same memory
     BOOST_CHECK((int)w1_c1["TestInteger"] == (int)w2_c1["TestInteger"]);
-    BOOST_CHECK(&(int&)w1_c1["TestInteger"] != &(int&)w2_c1["TestInteger"]);
+    BOOST_CHECK(&(Field<int>)w1_c1["TestInteger"] != &(Field<int>)w2_c1["TestInteger"]);
     BOOST_CHECK((double)w1_c1["TestDouble"] == (double)w2_c1["TestDouble"]);
-    BOOST_CHECK(&(int&)w1_c1["TestDouble"] != &(int&)w2_c1["TestDouble"]);
+    BOOST_CHECK(&(Field<int>)w1_c1["TestDouble"] != &(Field<int>)w2_c1["TestDouble"]);
     BOOST_CHECK((int)w1_c2["TestInteger"] == (int)w2_c2["TestInteger"]);
-    BOOST_CHECK(&(int&)w1_c2["TestInteger"] != &(int&)w2_c2["TestInteger"]);
+    BOOST_CHECK(&(Field<int>)w1_c2["TestInteger"] != &(Field<int>)w2_c2["TestInteger"]);
     BOOST_CHECK((double)w1_c2["TestDouble"] == (double)w2_c2["TestDouble"]);
-    BOOST_CHECK(&(int&)w1_c2["TestDouble"] != &(int&)w2_c2["TestDouble"]);
+    BOOST_CHECK(&(Field<int>)w1_c2["TestDouble"] != &(Field<int>)w2_c2["TestDouble"]);
     // Check that specially handled strings are fine
     BOOST_CHECK((std::string)w1_c1["TestString"] == (std::string)w2_c1["TestString"]);
-    BOOST_CHECK(&(std::string&)w1_c1["TestString"] != &(std::string&)w2_c1["TestString"]);
+    BOOST_CHECK(&(Field<std::string>)w1_c1["TestString"] != &(Field<std::string>)w2_c1["TestString"]);
     BOOST_CHECK((std::string)w1_c2["TestString"] == (std::string)w2_c2["TestString"]);
-    BOOST_CHECK(&(std::string&)w1_c2["TestString"] != &(std::string&)w2_c2["TestString"]);
+    BOOST_CHECK(&(Field<std::string>)w1_c2["TestString"] != &(Field<std::string>)w2_c2["TestString"]);
 }

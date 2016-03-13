@@ -25,10 +25,10 @@ void PlayerSpawnSystem::Update(double dt)
         // Take the first CapturePointGameMode component found.
         ComponentWrapper& modeComponent = *pool->begin();
         // Increase timer.
-        double& timer = (double&)modeComponent["RespawnTime"];
+        Field<double> timer = modeComponent["RespawnTime"];
         timer += dt;
         if (m_DbgConfigForceRespawn) {
-            (double&)modeComponent["MaxRespawnTime"] = m_ForcedRespawnTime;
+            (Field<double>)modeComponent["MaxRespawnTime"] = m_ForcedRespawnTime;
         }
         double maxRespawnTime = (double)modeComponent["MaxRespawnTime"];
         EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
