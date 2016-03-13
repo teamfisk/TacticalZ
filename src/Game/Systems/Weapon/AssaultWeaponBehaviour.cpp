@@ -198,6 +198,46 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         magAmmo -= 1;
     }
 
+    // Get weapon model based on current person
+    EntityWrapper weaponModelEntity = getRelevantWeaponEntity(wi);
+    if (!weaponModelEntity.Valid()) {
+        return;
+    }
+
+    // Tracer
+    EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzleRay");
+    if (tracerSpawner.Valid()) {
+        glm::vec3 origin = Transform::AbsolutePosition(tracerSpawner);
+        glm::vec3 direction = glm::quat(Transform::AbsoluteOrientationEuler(tracerSpawner)) * glm::vec3(0, 0, -1);
+        float distance = traceRayDistance(origin, direction);
+        EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner, tracerSpawner);
+        if (ray.Valid()) {
+            ((glm::vec3&)ray["Transform"]["Scale"]).z = distance;
+        }
+    }
+    //MuzzleFlash
+    EntityWrapper muzzleFlashSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzleFlash");
+    if (muzzleFlashSpawner.Valid()) {
+        std::uniform_real_distribution<float> randomSpreadAngle(0.f, 3.1415f*2);
+        EntityWrapper flash = SpawnerSystem::Spawn(muzzleFlashSpawner, muzzleFlashSpawner);
+        if (flash.Valid()) {
+            ((glm::vec3&)flash["Transform"]["Orientation"]).z = randomSpreadAngle(m_RandomEngine);
+        }
+    }
+
+    // Deal damage
+    if (dealDamage(cWeapon, wi)) {
+        // Show hit marker
+        EntityWrapper hitMarkerSpawner = wi.Player.FirstChildByName("HitMarkerSpawner");
+        if (hitMarkerSpawner.Valid()) {
+            SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
+            Events::PlaySoundOnEntity e;
+            e.EmitterID = wi.Player.ID;
+            e.FilePath = "Audio/weapon/hitclick.wav";
+            m_EventBroker->Publish(e);
+        }
+    }
+
     // View punch
     if (IsClient) {
         EntityWrapper camera = wi.Player.FirstChildByName("Camera");
@@ -214,37 +254,6 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
                 cameraOrientation.x += change;
                 currentTravel += change;
             }
-        }
-    }
-
-    // Get weapon model based on current person
-    EntityWrapper weaponModelEntity = getRelevantWeaponEntity(wi);
-    if (!weaponModelEntity.Valid()) {
-        return;
-    }
-
-    // Tracer
-    EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
-    if (tracerSpawner.Valid()) {
-        glm::vec3 origin = Transform::AbsolutePosition(tracerSpawner);
-        glm::vec3 direction = glm::quat(Transform::AbsoluteOrientationEuler(tracerSpawner)) * glm::vec3(0, 0, -1);
-        float distance = traceRayDistance(origin, direction);
-        EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
-        if (ray.Valid()) {
-            ((glm::vec3&)ray["Transform"]["Scale"]).z = distance;
-        }
-    }
-
-    // Deal damage
-    if (dealDamage(cWeapon, wi)) {
-        // Show hit marker
-        EntityWrapper hitMarkerSpawner = wi.Player.FirstChildByName("HitMarkerSpawner");
-        if (hitMarkerSpawner.Valid()) {
-            SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
-            Events::PlaySoundOnEntity e;
-            e.EmitterID = wi.Player.ID;
-            e.FilePath = "Audio/weapon/hitclick.wav";
-            m_EventBroker->Publish(e);
         }
     }
     

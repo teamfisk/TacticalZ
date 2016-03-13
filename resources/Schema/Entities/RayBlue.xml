@@ -3,25 +3,26 @@
 
   <Components>
     <c:Lifetime>
-      <Lifetime>10</Lifetime>
+      <Lifetime>0.079999998211860657</Lifetime>
     </c:Lifetime>
-    <c:Transform>
-      <Scale X="0" Y="1" Z="1"/>
-    </c:Transform>
+    <c:Transform/>
   </Components>
 
   <Children>
     <Entity>
       <Components>
         <c:Sprite>
-          <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+          <Model>Models/Core/UnitQuad.mesh</Model>
           <GlowMap></GlowMap>
-          <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+          <DiffuseTexture>Textures/Effects/NewRay5.png</DiffuseTexture>
+          <Color A="1" B="2.35294127" G="1.17647064" R="0"/>
+          <KeepRatio>true</KeepRatio>
+          <Linear>true</Linear>
         </c:Sprite>
         <c:Transform>
           <Position X="0" Y="0" Z="-0.5"/>
           <Orientation X="0" Y="-1.57099998" Z="0"/>
-          <Scale X="1" Y="0.0260000005" Z="0"/>
+          <Scale X="1" Y="0.0700000003" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -29,14 +30,17 @@
     <Entity>
       <Components>
         <c:Sprite>
-          <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+          <Model>Models/Core/UnitQuad.mesh</Model>
           <GlowMap></GlowMap>
-          <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+          <DiffuseTexture>Textures/Effects/NewRay5.png</DiffuseTexture>
+          <Color A="1" B="2.35294127" G="1.17647064" R="0"/>
+          <KeepRatio>true</KeepRatio>
+          <Linear>true</Linear>
         </c:Sprite>
         <c:Transform>
           <Position X="0" Y="0" Z="-0.5"/>
           <Orientation X="0" Y="4.71218538" Z="3.14199996"/>
-          <Scale X="1" Y="0.0260000005" Z="0"/>
+          <Scale X="1" Y="0.0700000003" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>

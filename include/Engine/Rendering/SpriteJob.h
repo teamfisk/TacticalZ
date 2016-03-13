@@ -54,7 +54,7 @@ struct SpriteJob : RenderJob
 
         if((bool)cSprite["KeepRatio"] == true) {
             if(scale.y >= scale.x) {
-                ScaleY = (scale.x)/(scale.y);
+                ScaleY = (scale.y)/(scale.x);
                 ScaleX = 1.f;
             } else {
                 ScaleY = 1.f;
@@ -90,8 +90,8 @@ struct SpriteJob : RenderJob
     bool Pickable;
 	bool IsIndicator = false;
     bool BlurBackground = false;
-    float ScaleX = 1;
-    float ScaleY = 1;
+    float ScaleX = 1.f;
+    float ScaleY = 1.f;
     bool Linear = false;
 
     glm::vec4 FillColor = glm::vec4(0);
