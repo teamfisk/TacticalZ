@@ -16,6 +16,7 @@
 #include "Network/UDPClient.h"
 #include "Network/TCPClient.h"
 #include "Network/SnapshotDefinitions.h"
+#include "Network/EKillDeath.h"
 #include "Core/World.h"
 #include "Core/EntityFile.h"
 #include "Core/EventBroker.h"
@@ -104,6 +105,7 @@ private:
     void parseDashEffect(Packet& packet);
     void parseAmmoPickup(Packet& packet);
     void parseRemoveWorld(Packet& packet);
+    void parseKDEvent(Packet& packet);
     void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();

@@ -111,8 +111,83 @@
                           <Model>Models/Core/UnitQuad.mesh</Model>
                           <GlowMap></GlowMap>
                           <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <Color A="0.300000012" B="1" G="1" R="1"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0" Y="0.919596612" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ProgressionHexagon">
+                          <Components>
+                            <c:Fill>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                            </c:Fill>
+                            <c:CapturePointHUD>
+                              <CapturePointNumber>2</CapturePointNumber>
+                            </c:CapturePointHUD>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00999999978"/>
+                              <Orientation X="0" Y="0" Z="1.57079637"/>
+                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="BackgroundHexagon">
+                      <Components>
+                        <c:Sprite>
+                          <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                          <Color A="0.300000012" B="1" G="1" R="1"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ProgressionHexagon">
+                          <Components>
+                            <c:Fill>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                            </c:Fill>
+                            <c:CapturePointHUD>
+                              <CapturePointNumber>3</CapturePointNumber>
+                            </c:CapturePointHUD>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0" Z="0.00999999978"/>
+                              <Orientation X="0" Y="0" Z="1.57079637"/>
+                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="BackgroundHexagon">
+                      <Components>
+                        <c:Sprite>
+                          <DepthSort>false</DepthSort>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
-                          <Linear>true</Linear>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="1.62788737" Y="0.919596612" Z="0"/>
@@ -133,7 +208,6 @@
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <Linear>true</Linear>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -153,87 +227,6 @@
                           <GlowMap></GlowMap>
                           <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.300000012" B="1" G="1" R="1"/>
-                          <Linear>true</Linear>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Position X="0" Y="0.919596612" Z="0"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="ProgressionHexagon">
-                          <Components>
-                            <c:Fill>
-                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
-                            </c:Fill>
-                            <c:CapturePointHUD>
-                              <CapturePointNumber>2</CapturePointNumber>
-                            </c:CapturePointHUD>
-                            <c:Sprite>
-                              <DepthSort>false</DepthSort>
-                              <Model>Models/Core/UnitQuad.mesh</Model>
-                              <GlowMap></GlowMap>
-                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <Linear>true</Linear>
-                            </c:Sprite>
-                            <c:Transform>
-                              <Position X="0" Y="0" Z="0.00999999978"/>
-                              <Orientation X="0" Y="0" Z="1.57079637"/>
-                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                    <Entity name="BackgroundHexagon">
-                      <Components>
-                        <c:Sprite>
-                          <DepthSort>false</DepthSort>
-                          <Model>Models/Core/UnitQuad.mesh</Model>
-                          <GlowMap></GlowMap>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <Color A="0.300000012" B="1" G="1" R="1"/>
-                          <Linear>true</Linear>
-                        </c:Sprite>
-                        <c:Transform>
-                          <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="ProgressionHexagon">
-                          <Components>
-                            <c:Fill>
-                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
-                            </c:Fill>
-                            <c:CapturePointHUD>
-                              <CapturePointNumber>3</CapturePointNumber>
-                            </c:CapturePointHUD>
-                            <c:Sprite>
-                              <DepthSort>false</DepthSort>
-                              <Model>Models/Core/UnitQuad.mesh</Model>
-                              <GlowMap></GlowMap>
-                              <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <Linear>true</Linear>
-                            </c:Sprite>
-                            <c:Transform>
-                              <Position X="0" Y="0" Z="0.00999999978"/>
-                              <Orientation X="0" Y="0" Z="1.57079637"/>
-                              <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                    <Entity name="BackgroundHexagon">
-                      <Components>
-                        <c:Sprite>
-                          <DepthSort>false</DepthSort>
-                          <Model>Models/Core/UnitQuad.mesh</Model>
-                          <GlowMap></GlowMap>
-                          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
-                          <Color A="0.300000012" B="1" G="1" R="1"/>
-                          <Linear>true</Linear>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="-0.820431828" Y="0.441878349" Z="-0.100000001"/>
@@ -253,7 +246,6 @@
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <Linear>true</Linear>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -273,7 +265,6 @@
                           <GlowMap></GlowMap>
                           <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                           <Color A="0.699999988" B="0" G="0" R="1"/>
-                          <Linear>true</Linear>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="-1.58304751" Y="0.919596612" Z="0"/>
@@ -292,7 +283,6 @@
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
-                              <Linear>true</Linear>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0" Y="0" Z="0.00999999978"/>
@@ -319,7 +309,7 @@
                       <Components>
                         <c:Text>
                           <Content></Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
                           <Alignment>
                             <Right/>
                           </Alignment>
@@ -332,7 +322,7 @@
                       <Components>
                         <c:Text>
                           <Content></Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
                           <Alignment>
                             <Right/>
                           </Alignment>
@@ -347,7 +337,7 @@
                       <Components>
                         <c:Text>
                           <Content></Content>
-                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
                           <Alignment>
                             <Right/>
                           </Alignment>
@@ -393,12 +383,12 @@
                           <Percentage>1</Percentage>
                           <Color A="1" B="1" G="0" R="0"/>
                         </c:Fill>
+                        <c:HealthHUD/>
                         <c:Text>
                           <Content>100/100</Content>
                           <Resource>Fonts/DroidSans.ttf,64</Resource>
-                          <Color A="0.505882382" B="0" G="1.17647064" R="0"/>
+                          <Color A="0.505882382" B="1.56862748" G="1.17647064" R="0"/>
                         </c:Text>
-                        <c:HealthHUD/>
                         <c:Transform>
                           <Position X="0.0200000014" Y="-0.101000004" Z="0.00300000003"/>
                           <Orientation X="0" Y="0" Z="1.57070696"/>
@@ -419,7 +409,6 @@
                           <GlowMap></GlowMap>
                           <DiffuseTexture>Textures/HealthHUD3.png</DiffuseTexture>
                           <Color A="0.588235319" B="0" G="0" R="0"/>
-                          <Linear>true</Linear>
                         </c:Sprite>
                         <c:Transform>
                           <Scale X="0.106000006" Y="0.333000004" Z="0.150000006"/>
@@ -438,18 +427,17 @@
                         <Entity name="Assault">
                           <Components>
                             <c:Fill>
-                              <Color A="1" B="0.533333361" G="1.56862748" R="0.329411775"/>
+                              <Color A="1" B="1.96078432" G="0.784313738" R="0"/>
                             </c:Fill>
                             <c:Sprite>
                               <DepthSort>false</DepthSort>
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Icons/Boosts/Assault-01.png</DiffuseTexture>
-                              <Color A="0.392156869" B="0.0392156877" G="0.184313729" R="0"/>
-                              <Linear>true</Linear>
+                              <Color A="0.392156869" B="0.352941185" G="0.196078435" R="0"/>
                             </c:Sprite>
                             <c:Transform>
-                              <Position X="0.0250000004" Y="0.0870000049" Z="0"/>
+                              <Position X="0.0250000004" Y="0.0650000051" Z="0"/>
                               <Orientation X="0" Y="0" Z="3.14199996"/>
                               <Scale X="0.0399999991" Y="0.0399999991" Z="0.5"/>
                             </c:Transform>
@@ -459,18 +447,17 @@
                         <Entity name="Defender">
                           <Components>
                             <c:Fill>
-                              <Color A="1" B="1.96078432" G="0.58431375" R="0.105882354"/>
+                              <Color A="1" B="1.96078432" G="0.784313738" R="0"/>
                             </c:Fill>
                             <c:Sprite>
                               <DepthSort>false</DepthSort>
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Icons/Boosts/Defender-01.png</DiffuseTexture>
-                              <Color A="0.392156869" B="0.34117648" G="0.192156866" R="0"/>
-                              <Linear>true</Linear>
+                              <Color A="0.392156869" B="0.352941185" G="0.196078435" R="0"/>
                             </c:Sprite>
                             <c:Transform>
-                              <Position X="0.0240000002" Y="0.131999999" Z="0"/>
+                              <Position X="0.0240000002" Y="0.104000002" Z="0"/>
                               <Orientation X="0" Y="0" Z="3.14199996"/>
                               <Scale X="0.0399999991" Y="0.0400000028" Z="0.165000007"/>
                             </c:Transform>
@@ -480,19 +467,17 @@
                         <Entity name="Sniper">
                           <Components>
                             <c:Fill>
-                              <Color A="1" B="0.345098048" G="0" R="1.96078432"/>
+                              <Color A="1" B="1.96078432" G="0.784313738" R="0"/>
                             </c:Fill>
                             <c:Sprite>
                               <DepthSort>false</DepthSort>
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Icons/Boosts/Sniper-01.png</DiffuseTexture>
-                              <Color A="0.392156869" B="0.121568628" G="0" R="0.443137258"/>
-                              <Visible>false</Visible>
-                              <Linear>true</Linear>
+                              <Color A="0.392156869" B="0.352941185" G="0.196078435" R="0"/>
                             </c:Sprite>
                             <c:Transform>
-                              <Position X="0.0250000004" Y="0.145000011" Z="0"/>
+                              <Position X="0.0240000002" Y="0.145000011" Z="0"/>
                               <Orientation X="0" Y="0" Z="3.14199996"/>
                               <Scale X="0.0400000028" Y="0.0400000028" Z="0.165000007"/>
                             </c:Transform>
@@ -513,7 +498,6 @@
                           <GlowMap></GlowMap>
                           <DiffuseTexture>Textures/Icons/Abilities/Long/Superman-01.png</DiffuseTexture>
                           <Color A="1" B="0.20784314" G="1.17647064" R="0.192156866"/>
-                          <Linear>true</Linear>
                         </c:Sprite>
                         <c:Transform>
                           <Position X="0.0250000004" Y="0.0100000007" Z="0"/>
@@ -923,10 +907,10 @@
                         <c:Transform/>
                       </Components>
                       <Children>
-                        <Entity name="DashLeft">
+                        <Entity name="DashRight">
                           <Components>
                             <c:Animation>
-                              <AnimationName>DashLeftF</AnimationName>
+                              <AnimationName>DashRightF</AnimationName>
                               <Time>1</Time>
                               <Speed>1.7999999523162842</Speed>
                               <Loop>false</Loop>
@@ -935,10 +919,10 @@
                           </Components>
                           <Children/>
                         </Entity>
-                        <Entity name="DashRight">
+                        <Entity name="DashLeft">
                           <Components>
                             <c:Animation>
-                              <AnimationName>DashRightF</AnimationName>
+                              <AnimationName>DashLeftF</AnimationName>
                               <Time>1</Time>
                               <Speed>1.7999999523162842</Speed>
                               <Loop>false</Loop>
