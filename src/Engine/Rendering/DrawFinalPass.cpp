@@ -65,15 +65,6 @@ void DrawFinalPass::InitializeShaderPrograms()
     m_ForwardPlusProgram->Link();
     GLERROR("Creating forward+ program");
 
-	m_ForwardPlusNoShadowsProgram = ResourceManager::Load<ShaderProgram>("#ForwardPlusNoShadowProgram");
-	m_ForwardPlusNoShadowsProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
-	m_ForwardPlusNoShadowsProgram->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/ForwardPlusNoShadows.frag.glsl")));
-	m_ForwardPlusNoShadowsProgram->Compile();
-	m_ForwardPlusNoShadowsProgram->BindFragDataLocation(0, "sceneColor");
-	m_ForwardPlusNoShadowsProgram->BindFragDataLocation(1, "bloomColor");
-	m_ForwardPlusNoShadowsProgram->Link();
-	GLERROR("Creating forward+ program without shadows");
-
     m_ExplosionEffectProgram = ResourceManager::Load<ShaderProgram>("#ExplosionEffectProgram");
     m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ForwardPlus.vert.glsl")));
     m_ExplosionEffectProgram->AddShader(std::shared_ptr<Shader>(new GeometryShader("Shaders/ExplosionEffect.geom.glsl")));
@@ -363,12 +354,7 @@ void DrawFinalPass::OnWindowResize()
 
 void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
 {
-	GLuint forwardHandle;
-	if (m_ShadowPass->EnableShadows()) {
-		forwardHandle = m_ForwardPlusProgram->GetHandle();
-	} else {
-		forwardHandle = m_ForwardPlusNoShadowsProgram->GetHandle();
-	}
+    GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
 	GLuint explosionHandle = m_ExplosionEffectProgram->GetHandle();
 	GLuint explosionSplatMapHandle = m_ExplosionEffectSplatMapProgram->GetHandle();
 	GLuint forwardSplatMapHandle = m_ForwardPlusSplatMapProgram->GetHandle();
@@ -550,13 +536,9 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                         glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
                     }
 					else {
-						if (lastShader != forwardHandle) {
-							if (forwardHandle == m_ForwardPlusProgram->GetHandle()) {
-								m_ForwardPlusProgram->Bind();
-							} else {
-								m_ForwardPlusNoShadowsProgram->Bind();
-							}
-							lastShader = forwardHandle;
+						if (lastShader != m_ForwardPlusProgram->GetHandle()) {
+							m_ForwardPlusProgram->Bind();
+							lastShader = m_ForwardPlusProgram->GetHandle();
 							GLERROR("Bind ForwardPlusProgram program");
 							glUniform1i(glGetUniformLocation(forwardHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
 							glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
@@ -641,12 +623,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 
 void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
 {
-	GLuint forwardHandle;
-	if (m_ShadowPass->EnableShadows()) {
-		forwardHandle = m_ForwardPlusProgram->GetHandle();
-	} else {
-		forwardHandle = m_ForwardPlusNoShadowsProgram->GetHandle();
-	}
+	GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
 	GLuint explosionHandle = m_ExplosionEffectProgram->GetHandle();
 	GLuint explosionSplatMapHandle = m_ExplosionEffectSplatMapProgram->GetHandle();
 	GLuint forwardSplatMapHandle = m_ForwardPlusSplatMapProgram->GetHandle();
@@ -1047,14 +1024,9 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 
 							}
 							else {
-								if (lastShader != forwardHandle) {
-									if (forwardHandle == m_ForwardPlusProgram->GetHandle()) {
-										m_ForwardPlusProgram->Bind();
-									}
-									else {
-										m_ForwardPlusNoShadowsProgram->Bind();
-									}
-									lastShader = forwardHandle;
+								if (lastShader != m_ForwardPlusProgram->GetHandle()) {
+									m_ForwardPlusProgram->Bind();
+									lastShader = m_ForwardPlusProgram->GetHandle();
 									GLERROR("Bind ForwardPlusProgram program");
 									glUniform1i(glGetUniformLocation(forwardHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
 									glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
@@ -1140,12 +1112,7 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 
 void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
 {
-	GLuint forwardHandle;
-	if (m_ShadowPass->EnableShadows()) {
-		forwardHandle = m_ForwardPlusProgram->GetHandle();
-	} else {
-		forwardHandle = m_ForwardPlusNoShadowsProgram->GetHandle();
-	}
+    GLuint forwardHandle = m_ForwardPlusProgram->GetHandle();
     GLERROR("forwardHandle");
     GLuint explosionHandle = m_ExplosionEffectProgram->GetHandle();
     GLERROR("explosionHandle");
@@ -1204,11 +1171,7 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
             auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
             if (modelJob) {
                 //bind forward program
-				if (m_ShadowPass->EnableShadows()) {
-					m_ForwardPlusProgram->Bind();
-				} else {
-					m_ForwardPlusNoShadowsProgram->Bind();
-				}
+                m_ForwardPlusProgram->Bind();
                 glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 
                 //bind uniforms
