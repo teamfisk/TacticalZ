@@ -20,7 +20,7 @@ ShadowPass::ShadowPass(IRenderer * renderer)
 
 ShadowPass::~ShadowPass()
 {
-	glDeleteTextures(1, &m_DepthMap);
+	CommonFunctions::DeleteTexture(&m_DepthMap);
 }
 
 void ShadowPass::DebugGUI()
@@ -218,7 +218,7 @@ void ShadowPass::CheckStatus(bool shadowStatus)
 	m_EnableShadows = shadowStatus;
 
 	if (m_EnableShadows == false) {
-		glDeleteTextures(1, &m_DepthMap);
+		CommonFunctions::DeleteTexture(&m_DepthMap);
 		return;
 	}
 
