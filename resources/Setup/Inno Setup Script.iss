@@ -34,6 +34,7 @@ OutputDir=.
 DisableWelcomePage=false
 ;WizardSmallImageFile=
 WizardImageFile=Setup Banner.bmp
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -69,42 +70,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Filename: "{app}\Config.ini"; Section: "Networking"; Key: "Name"; String: "{%USERNAME}"; Flags: createkeyifdoesntexist
 
 [Run]
-Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "Installing Microsoft Visual C++ Redistributable...."; Check: IsWin64 and not VCinstalled
+Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/norestart /passive"; StatusMsg: "Installing Microsoft Visual C++ 2015 x64 Redistributable....";
 
 [ThirdParty]
 UseRelativePaths=True
-
-[Code]
-function VCinstalled: Boolean;
- // By Michael Weiner <mailto:spam@cogit.net>
- // Function for Inno Setup Compiler
- // 13 November 2015
- // Returns True if Microsoft Visual C++ Redistributable is installed, otherwise False.
- // The programmer may set the year of redistributable to find; see below.
- var
-  names: TArrayOfString;
-  i: Integer;
-  dName, key, year: String;
- begin
-  // Year of redistributable to find; leave null to find installation for any year.
-  year := '';
-  Result := False;
-  key := 'Software\Microsoft\Windows\CurrentVersion\Uninstall';
-  // Get an array of all of the uninstall subkey names.
-  if RegGetSubkeyNames(HKEY_LOCAL_MACHINE, key, names) then
-   // Uninstall subkey names were found.
-   begin
-    i := 0
-    while ((i < GetArrayLength(names)) and (Result = False)) do
-     // The loop will end as soon as one instance of a Visual C++ redistributable is found.
-     begin
-      // For each uninstall subkey, look for a DisplayName value.
-      // If not found, then the subkey name will be used instead.
-      if not RegQueryStringValue(HKEY_LOCAL_MACHINE, key + '\' + names[i], 'DisplayName', dName) then
-       dName := names[i];
-      // See if the value contains both of the strings below.
-      Result := (Pos(Trim('Visual C++ ' + year),dName) * Pos('Redistributable',dName) <> 0)
-      i := i + 1;
-     end;
-   end;
- end;
