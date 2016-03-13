@@ -155,7 +155,7 @@
           <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Transform>
-          <Position X="0.0540262833" Y="-0.0954347998" Z="-0.225546911"/>
+          <Position X="0.0540262833" Y="-0.0954347998" Z="-0.225546926"/>
           <Orientation X="0.00124507793" Y="0.077417776" Z="0.00737103401"/>
           <Scale X="0.300000012" Y="0.300000042" Z="0.299999952"/>
         </c:Transform>
@@ -248,7 +248,7 @@
               <Shadow>false</Shadow>
             </c:Model>
             <c:Transform>
-              <Position X="0.120748043" Y="-0.228436321" Z="-0.151475549"/>
+              <Position X="0.120748043" Y="-0.228436321" Z="-0.151475564"/>
               <Orientation X="0.0102800643" Y="-0.00312487315" Z="0.0428144038"/>
             </c:Transform>
           </Components>
@@ -267,7 +267,7 @@
         <Entity name="Muzzle">
           <Components>
             <c:Transform>
-              <Position X="0.137428522" Y="-0.145251781" Z="-0.590083241"/>
+              <Position X="0.119734153" Y="-0.145251781" Z="-0.564532101"/>
             </c:Transform>
           </Components>
           <Children>
@@ -277,7 +277,7 @@
                   <EntityFile>Schema/Entities/RayDefenderBlue.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform>
-                  <Position X="0.0180841181" Y="0.0252480619" Z="-0.663679719"/>
+                  <Position X="0" Y="0" Z="-0.109966502"/>
                 </c:Transform>
               </Components>
               <Children/>
@@ -288,7 +288,7 @@
                   <EntityFile>Schema/Entities/MuzzleFlashBlue.xml</EntityFile>
                 </c:Spawner>
                 <c:Transform>
-                  <Position X="0.0201820824" Y="0.0212024488" Z="-0.0305794869"/>
+                  <Position X="0.0201820824" Y="0" Z="0"/>
                   <Scale X="1.5" Y="1.5" Z="1"/>
                 </c:Transform>
               </Components>
