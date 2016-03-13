@@ -168,8 +168,10 @@ void Renderer::Draw(RenderFrame& frame)
 
 	ImGui::SliderInt("SSAO Quality", &m_SSAO_Quality, 0, 3);
 	ImGui::SliderInt("Glow Quality", &m_GLOW_Quality, 0, 3);
+	ImGui::Checkbox("EnableShadows", &m_Shadow_Enabled);
 	m_SSAOPass->ChangeQuality(m_SSAO_Quality);
 	m_DrawBloomPass->ChangeQuality(m_GLOW_Quality);
+	m_ShadowPass->CheckStatus(m_Shadow_Enabled);
     GLERROR("SSAO Settings");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);

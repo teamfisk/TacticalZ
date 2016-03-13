@@ -38,6 +38,8 @@ public:
 	void ClearBuffer();
 	void Draw(RenderScene& scene);
 
+	void CheckStatus(bool status);
+
 	void DebugGUI();
 
 	GLuint DepthMap() const { return m_DepthMap; }
@@ -45,6 +47,7 @@ public:
 	std::array<glm::mat4, MAX_SPLITS> LightV() const { return m_LightView; }
 	std::array<float, MAX_SPLITS> FarDistance() const { std::array<float, MAX_SPLITS> f; for (int i = 0; i < MAX_SPLITS; i++) f[i] = m_shadowFrusta[i].FarClip; return f; }
 	int CurrentNrOfSplits() const { return m_CurrentNrOfSplits; }
+	bool EnableShadows() const { return m_EnableShadows; }
 
 	void SetSplitWeight(float split_weight) { m_SplitWeight = split_weight; };
 private:
@@ -63,8 +66,8 @@ private:
 
 	GLuint m_DepthMap;
 	FrameBuffer m_DepthBuffer;
-    ShaderProgram* m_ShadowProgram;
-    ShaderProgram* m_ShadowProgramSkinned;
+	ShaderProgram* m_ShadowProgram;
+	ShaderProgram* m_ShadowProgramSkinned;
 
 	std::array<glm::mat4, MAX_SPLITS> m_LightProjection;
 	std::array<glm::mat4, MAX_SPLITS> m_LightView;
@@ -75,7 +78,7 @@ private:
 
 	bool m_TransparentObjects = false;
 	bool m_TexturedShadows = false;
-	bool m_EnableShadows = true;
+	bool m_EnableShadows = false;
 
 	int m_CurrentNrOfSplits = 4;
 	float m_SplitWeight = 0.962f;
