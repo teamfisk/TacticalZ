@@ -83,26 +83,26 @@ void PlayerMovementSystem::Update(double dt)
                 if (!playerModel.HasComponent("Model")) {
                     continue;
                 }
-                auto playerEntityModel = playerModel["Model"];
                 EntityWrapper dashEffect = playerModel.Clone();
-                playerEntityModel.Copy(dashEffect["Model"]);
                 for (auto& cAnim : dashEffect.ChildrenWithComponent("Animation")) {
                     cAnim["Animation"]["Play"] = false;
                 }
+                const double fadeTime = 0.5f;
                 for (auto& cModel : dashEffect.ChildrenWithComponent("Model")) {
                     EntityWrapper e(m_World, cModel.ID);
                     e.AttachComponent("Lifetime");
                     e.AttachComponent("Fade");
                     e["Fade"]["Loop"] = false;
-                    e["Fade"]["FadeTime"] = 0.5;
-                    e["Fade"]["Time"] = (double)dashEffect["Fade"]["FadeTime"];
+                    e["Fade"]["FadeTime"] = fadeTime;
+                    e["Fade"]["Time"] = fadeTime;
+                    e["Lifetime"]["Lifetime"] = fadeTime;
                 }
                 dashEffect.AttachComponent("Lifetime");
                 dashEffect.AttachComponent("Fade");
                 dashEffect["Fade"]["Loop"] = false;
-                dashEffect["Fade"]["FadeTime"] = 0.5;
-                dashEffect["Fade"]["Time"] = (double)dashEffect["Fade"]["FadeTime"];
-                dashEffect["Lifetime"]["Lifetime"] = (double)dashEffect["Fade"]["FadeTime"];
+                dashEffect["Fade"]["FadeTime"] = fadeTime;
+                dashEffect["Fade"]["Time"] = fadeTime;
+                dashEffect["Lifetime"]["Lifetime"] = fadeTime;
                 dashEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
                 dashEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
             }
