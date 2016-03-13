@@ -417,6 +417,8 @@ bool SoundManager::OnSetCamera(const Events::SetCamera& e)
         alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
         setGain(m_CurrentBGMCombo, 0);
         playSound(m_CurrentBGMCombo);
+    } else if (e.CameraEntity.Name() == "WINCAMERAISH") {
+        // Play win sound! 
     }
 }
 
