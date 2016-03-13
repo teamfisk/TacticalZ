@@ -23,7 +23,7 @@ void HealthHUDSystem::Update(double dt)
 
             if (entity.HasComponent("Text")) {
                 double health = (const double&)entityIDParent["Health"]["Health"];
-                double maxHealth = (const double&)entityIDParent["Health"]["Health"];
+                double maxHealth = (const double&)entityIDParent["Health"]["MaxHealth"];
                 std::string s = "";
                 s = s + std::to_string((int)health);
                 s = s + "/";
