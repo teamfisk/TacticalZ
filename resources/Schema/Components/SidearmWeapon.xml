@@ -7,7 +7,7 @@
 	<RPM>500</RPM>
 	<Automatic>false</Automatic>
 	<ViewPunch>0.01</ViewPunch>
-	<ReloadTime>0.5</ReloadTime>
+	<ReloadTime>1.0</ReloadTime>
 	<EquipTime>0.5</EquipTime>
 	<TriggerHeld>false</TriggerHeld>
 	<FireCooldown>0</FireCooldown>

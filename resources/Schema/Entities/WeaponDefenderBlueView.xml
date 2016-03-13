@@ -146,42 +146,6 @@
         </Entity>
       </Children>
     </Entity>
-    <Entity name="ViewModel">
-      <Components>
-        <c:BoneAttachment>
-          <BoneName>R_Arm_Weapon_Joint</BoneName>
-        </c:BoneAttachment>
-        <c:Model>
-          <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
-        </c:Model>
-        <c:Transform>
-          <Position X="0.120748043" Y="-0.228436321" Z="-0.151475549"/>
-          <Orientation X="0.0102800643" Y="-0.00312487315" Z="0.0428144038"/>
-        </c:Transform>
-      </Components>
-      <Children>
-        <Entity name="WeaponMuzzle">
-          <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/DefenderRayBlue.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform>
-              <Position X="0.0145629933" Y="0.0680000037" Z="-0.306000024"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="ReloadSpawner">
-          <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/ReloadEffectView.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform/>
-          </Components>
-          <Children/>
-        </Entity>
-      </Children>
-    </Entity>
     <Entity name="AmmoHUD">
       <Components>
         <c:BoneAttachment>
@@ -248,6 +212,70 @@
                 </c:TextFieldReader>
                 <c:Transform>
                   <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="WeaponOrigin">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="ViewModel">
+          <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
+            <c:Model>
+              <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.120748043" Y="-0.228436321" Z="-0.151475549"/>
+              <Orientation X="0.0102800643" Y="-0.00312487315" Z="0.0428144038"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="ReloadSpawner">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/ReloadEffectView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Muzzle">
+          <Components>
+            <c:Transform>
+              <Position X="0.137428522" Y="-0.145251781" Z="-0.590083241"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="WeaponMuzzleRay">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/RayDefenderBlue.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.0180841181" Y="0.0252480619" Z="-0.663679719"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="WeaponMuzzleFlash">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/MuzzleFlashBlue.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.0201820824" Y="0.0212024488" Z="-0.0305794869"/>
+                  <Scale X="1.5" Y="1.5" Z="1"/>
                 </c:Transform>
               </Components>
               <Children/>
