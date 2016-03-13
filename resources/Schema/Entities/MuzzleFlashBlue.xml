@@ -3,7 +3,7 @@
 
   <Components>
     <c:Lifetime>
-      <Lifetime>0.039999999105930328</Lifetime>
+      <Lifetime>0.08</Lifetime>
     </c:Lifetime>
     <c:Transform/>
   </Components>
@@ -16,6 +16,10 @@
       <Children>
         <Entity name="Cone1Outside">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/Cone1Outside.mesh</Resource>
@@ -28,6 +32,10 @@
         </Entity>
         <Entity name="Cone1Inside">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/Cone1Inside.mesh</Resource>
@@ -49,6 +57,10 @@
       <Children>
         <Entity name="Cone2Inside">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/Cone2Inside.mesh</Resource>
@@ -61,6 +73,10 @@
         </Entity>
         <Entity name="Cone2Outside">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/Cone2Outside.mesh</Resource>
@@ -82,6 +98,10 @@
       <Children>
         <Entity name="PlaneLeft">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/PlaneLeft.mesh</Resource>
@@ -94,6 +114,10 @@
         </Entity>
         <Entity name="PlaneRight">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/PlaneRight.mesh</Resource>
@@ -106,6 +130,10 @@
         </Entity>
         <Entity name="PlaneUp">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/PlaneUp.mesh</Resource>
@@ -118,6 +146,10 @@
         </Entity>
         <Entity name="PlaneDown">
           <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
             <c:Model>
               <GlowIntensity>2</GlowIntensity>
               <Resource>Models/Effects/MuzzleFlash/Blue/PlaneDown.mesh</Resource>
