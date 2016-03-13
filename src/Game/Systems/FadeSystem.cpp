@@ -24,14 +24,14 @@ void FadeSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cFade,
     currentTime += dTime;
 
     if(currentTime > fadeTime) {
-        currentTime = 0.0;
+        currentTime = 0.0 + fadeTime * (bool)cFade["Loop"];
         if ((bool)cFade["Reverse"]) {
             (Field<bool>)cFade["Out"] = !(bool)cFade["Out"];
             currentTime = fadeTime;
         }
     }
     if(currentTime < 0.0) {
-        currentTime = fadeTime;
+        currentTime = fadeTime * (bool)cFade["Loop"];
         if ((bool)cFade["Reverse"]) {
             (Field<bool>)cFade["Out"] = !(bool)cFade["Out"];
             currentTime = 0.0;
