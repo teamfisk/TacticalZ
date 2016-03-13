@@ -155,7 +155,7 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
 
                 if(wi.Player.Valid()) {
                     if(wi.Player.HasComponent("ShieldAbility")) {
-                        (Field<double>)wi.Player["ShieldAbility"]["Active"] = true;
+                        (Field<bool>)wi.Player["ShieldAbility"]["Active"] = true;
                     }
                 }
 
@@ -285,7 +285,7 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     cWeapon["FireCooldown"] = 60.0 / (double)cWeapon["RPM"];
 
     // Stop reloading
-    Field<double> isReloading = cWeapon["IsReloading"];
+    Field<bool> isReloading = cWeapon["IsReloading"];
     isReloading = false;
 
     // Ammo
