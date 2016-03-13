@@ -1336,7 +1336,7 @@ void DrawFinalPass::DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob
             } else {
                 frameBones = modelJob->Skeleton->GetTPose();
             }
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+            glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
         } else {
 			if (lastShader != m_FillDepthStencilBufferProgram->GetHandle()) {

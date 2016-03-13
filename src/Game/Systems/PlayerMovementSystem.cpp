@@ -24,6 +24,8 @@ void PlayerMovementSystem::Update(double dt)
         if (LocalPlayer.Valid()){
             updateVelocity(LocalPlayer, dt);
         }
+
+        
         m_SprintEffectTimer += dt;
         if (m_SprintEffectTimer < 0.016f) {
             return;
@@ -82,17 +84,15 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             // Limit camera pitch so we don't break our necks
             cameraOrientation.x(glm::clamp(cameraOrientation.x(), -glm::half_pi<float>(), glm::half_pi<float>()));
 
+            float pitch = cameraOrientation.x();
+            double time = ((pitch + glm::half_pi<float>()) / glm::pi<float>());
+
             // Set third person model aim pitch
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
-                EntityWrapper aimPrimaryEntity = playerModel.FirstChildByName("Aim");
-                if(aimPrimaryEntity.Valid()){
-                    if(aimPrimaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x();
-                        double time = ((pitch + glm::half_pi<float>()) / glm::pi<float>());
-                        (Field<double>)aimPrimaryEntity["Animation"]["Time"] = time;
-                    }
-                }
+                setAim(playerModel, "SidearmWeapon", time);
+                setAim(playerModel, "AssaultWeapon", time);
+                setAim(playerModel, "DefenderWeapon", time);
             }
         }
 
@@ -314,6 +314,25 @@ void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
     position += velocity * (float)dt;
 }
 
+
+void PlayerMovementSystem::setAim(EntityWrapper root, std::string weaponNodeName, double time)
+{
+    if (root.Valid()) {
+        EntityWrapper blendTreeUpper = root.FirstChildByName("BlendTreeUpper");
+        if (blendTreeUpper.Valid()) {
+            EntityWrapper weapon = blendTreeUpper.FirstChildByName(weaponNodeName);
+            if(weapon.Valid()) {
+                EntityWrapper aim = weapon.FirstChildByName("Aim");
+                if (aim.Valid()) {
+                    if (aim.HasComponent("Animation")) {
+                        (Field<double>)aim["Animation"]["Time"] = time;
+                    }
+                }
+            }
+        }
+    }
+}
+
 void PlayerMovementSystem::playerStep(double dt, EntityWrapper player)
 {
     // Position of the local player, used see how far a player has moved.
@@ -373,17 +392,22 @@ void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
 
 bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
 {
-    EntityWrapper player(m_World, e.Player);
-    if (!player.Valid()){// || !IsClient || player.ID == LocalPlayer.ID) {
+    EntityWrapper eventPlayer(m_World, e.Player);
+    if (!eventPlayer.Valid()){// || IsServer || eventPlayer.ID == LocalPlayer.ID) {
         return false;
     }
 
 //    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
   //  EntityWrapper dashEffect = entityFile->MergeInto(m_World);
-    EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+    EntityWrapper playerModel = eventPlayer.FirstChildByName("PlayerModel");
 
     for (auto& kv : m_PlayerInputControllers) {
         EntityWrapper player = kv.first;
+        if(player != eventPlayer) {
+            continue;
+        }
+
+
         auto& controller = kv.second;
 
         if (!player.Valid()) {

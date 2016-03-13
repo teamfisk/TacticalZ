@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="EndScreen">
+		<xs:annotation>
+			<xs:documentation>Put this on the camera that will show the final screen.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

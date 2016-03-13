@@ -58,7 +58,7 @@ bool HealthSystem::OnPlayerHealthPickup(Events::PlayerHealthPickup& e)
     ComponentWrapper cHealth = e.Player["Health"];
     Field<double> health = cHealth["Health"];
     health += e.HealthAmount;
-    health = std::min((double)health, (double)cHealth["MaxHealth"]);
+    health = std::min(*health, (const double&)cHealth["MaxHealth"]);
 
     return true;
 }

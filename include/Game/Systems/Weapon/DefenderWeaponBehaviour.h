@@ -6,6 +6,7 @@
 #include "Core/EPlayerDamage.h"
 #include "Sound/EPlaySoundOnEntity.h"
 #include "Sound/EPlaySoundOnEntity.h"
+#include <glm/gtx/vector_angle.hpp>
 
 class DefenderWeaponBehaviour : public WeaponBehaviour<DefenderWeaponBehaviour>
 {
@@ -23,18 +24,24 @@ public:
     void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
     bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
+    void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+
 
 private:
     std::random_device m_RandomDevice;
     std::mt19937 m_RandomEngine;
 
+
+
     // Weapon functions
     void fireShell(ComponentWrapper cWeapon, WeaponInfo& wi);
-    void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage);
+    void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, const std::vector<glm::vec2>& pattern);
+    void spawnTracers(ComponentWrapper cWeapon, WeaponInfo& wi, std::vector<glm::vec2> pattern);
     bool canFire(ComponentWrapper cWeapon, WeaponInfo& wi);
 
     // Utility
     Camera cameraFromEntity(EntityWrapper camera);
+    void CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi);
 };
 
 #endif

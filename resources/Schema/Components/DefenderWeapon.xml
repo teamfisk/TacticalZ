@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <DefenderWeapon xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DefenderWeapon.xsd">
 	<Slot><Primary/></Slot>
-	<MagazineAmmo>8</MagazineAmmo>
+	<MagazineAmmo>9999</MagazineAmmo>
 	<MagazineSize>8</MagazineSize>
 	<Ammo>64</Ammo>
 	<MaxAmmo>64</MaxAmmo>
 	<BaseDamage>90</BaseDamage>
-	<SpreadAngle>0.174533</SpreadAngle> <!-- 0.174533 = 10 degrees -->
+	<SpreadAngle>10</SpreadAngle>
 	<MaxTravelAngle>0.174533</MaxTravelAngle> <!-- 0.174533 = 10 degrees -->
-	<NumPellets>10</NumPellets>
+	<NumPellets>9</NumPellets>
 	<RPM>120</RPM>
 	<ViewPunch>0.03</ViewPunch>
 	<ViewReturnSpeed>0.2</ViewReturnSpeed>

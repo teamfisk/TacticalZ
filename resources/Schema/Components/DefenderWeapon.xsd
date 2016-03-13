@@ -36,7 +36,7 @@
 					<xs:annotation><xs:documentation>Damage dealt if all shotgun pellets hit</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="SpreadAngle" type="t:float" minOccurs="0">
-					<xs:annotation><xs:documentation>Spread angle in radians</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>The spread angle radius.</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="MaxTravelAngle" type="t:float" minOccurs="0">
 					<xs:annotation><xs:documentation>Maximum vertical aim travel angle in radians</xs:documentation></xs:annotation>

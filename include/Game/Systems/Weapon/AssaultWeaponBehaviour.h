@@ -31,12 +31,14 @@ private:
 
     // Weapon functions
     void fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi);
-    //void dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage);
     bool canFire(ComponentWrapper cWeapon, WeaponInfo& wi);
     bool dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi);
 
     // Utility
     //Camera cameraFromEntity(EntityWrapper camera);
+
+    void CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi);
+
 };
 
 #endif

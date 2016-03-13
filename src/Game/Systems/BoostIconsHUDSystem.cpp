@@ -5,36 +5,38 @@ void BoostIconsHUDSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
     EntityWrapper assaultEntity = entity.FirstChildByName("Assault");
     EntityWrapper defenderEntity = entity.FirstChildByName("Defender");
     EntityWrapper sniperEntity = entity.FirstChildByName("Sniper");
+    EntityWrapper player = entity.FirstParentWithComponent("Player");
+
 
     if(assaultEntity.Valid()) {
         if (assaultEntity.HasComponent("Fill")) {
-            EntityWrapper parentWithAssaultBoost = assaultEntity.FirstParentWithComponent("BoostAssault");
-            if (parentWithAssaultBoost.Valid()) {
-                assaultEntity["Fill"]["Percentage"] = 1.0;
+            EntityWrapper assaultBoost = player.FirstChildByName("BoostAssault");
+            if (assaultBoost.Valid()) {
+                (Field<double>)assaultEntity["Fill"]["Percentage"] = 1.0;
             } else {
-                assaultEntity["Fill"]["Percentage"] = 0.0;
+                (Field<double>)assaultEntity["Fill"]["Percentage"] = 0.0;
             }
         }
     }
 
     if (defenderEntity.Valid()) {
         if (defenderEntity.HasComponent("Fill")) {
-            EntityWrapper parentWithAssaultBoost = defenderEntity.FirstParentWithComponent("BoostDefender");
-            if (parentWithAssaultBoost.Valid()) {
-                defenderEntity["Fill"]["Percentage"] = 1.0;
+            EntityWrapper defenderBoost = player.FirstChildByName("BoostDefender");
+            if (defenderBoost.Valid()) {
+                (Field<double>)defenderEntity["Fill"]["Percentage"] = 1.0;
             } else {
-                defenderEntity["Fill"]["Percentage"] = 0.0;
+                (Field<double>)defenderEntity["Fill"]["Percentage"] = 0.0;
             }
         }
     }
 
     if (sniperEntity.Valid()) {
         if (sniperEntity.HasComponent("Fill")) {
-            EntityWrapper parentWithAssaultBoost = sniperEntity.FirstParentWithComponent("BoostSniper");
-            if (parentWithAssaultBoost.Valid()) {
-                sniperEntity["Fill"]["Percentage"] = 1.0;
+            EntityWrapper sniperBoost = player.FirstChildByName("BoostSniper");
+            if (sniperBoost.Valid()) {
+                (Field<double>)sniperEntity["Fill"]["Percentage"] = 1.0;
             } else {
-                sniperEntity["Fill"]["Percentage"] = 0.0;
+                (Field<double>)sniperEntity["Fill"]["Percentage"] = 0.0;
             }
         }
     }
