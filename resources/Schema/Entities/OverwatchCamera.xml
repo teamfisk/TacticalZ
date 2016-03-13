@@ -8,7 +8,7 @@
     </c:RaptorCopter>
     <c:Transform>
       <Position X="0" Y="-4" Z="0"/>
-      <Orientation X="0" Y="58.3794823" Z="0"/>
+      <Orientation X="0" Y="71.5427246" Z="0"/>
     </c:Transform>
   </Components>
 
@@ -275,7 +275,6 @@
                       <GlowMap></GlowMap>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0" G="0.294117659" R="0.980392158"/>
-                      <Linear>true</Linear>
                     </c:Sprite>
                     <c:InputCmdButton>
                       <Command>PickTeam</Command>
@@ -311,7 +310,6 @@
                       <GlowMap></GlowMap>
                       <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
                       <Color A="1" B="0.980392158" G="0.294117659" R="0"/>
-                      <Linear>true</Linear>
                     </c:Sprite>
                     <c:InputCmdButton>
                       <Command>PickTeam</Command>
@@ -709,6 +707,60 @@
                         <c:Transform>
                           <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
                           <Scale X="0.25" Y="0.25" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="KillFeed">
+                  <Components>
+                    <c:KillFeed/>
+                    <c:Transform>
+                      <Position X="0.431000024" Y="0.253000021" Z="0"/>
+                      <Scale X="0.0149999997" Y="0.0149999997" Z="0.0149999997"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="KillFeed1">
+                      <Components>
+                        <c:Text>
+                          <Content></Content>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                          <Alignment>
+                            <Right/>
+                          </Alignment>
+                        </c:Text>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="KillFeed2">
+                      <Components>
+                        <c:Text>
+                          <Content></Content>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                          <Alignment>
+                            <Right/>
+                          </Alignment>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="-1" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="KillFeed3">
+                      <Components>
+                        <c:Text>
+                          <Content></Content>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                          <Alignment>
+                            <Right/>
+                          </Alignment>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="-2" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children/>

@@ -7,6 +7,10 @@ void KillFeedSystem::Update(double dt)
         return;
     }
 
+    for (auto it = m_DeathQueue.begin(); it != m_DeathQueue.end(); it++) {
+        (*it).TimeToLive -= dt;
+    }
+
     for (auto& killFeedComponent : *killFeeds) {
         EntityWrapper entity = EntityWrapper(m_World, killFeedComponent.EntityID);
 
@@ -16,10 +20,7 @@ void KillFeedSystem::Update(double dt)
                 (Field<std::string>)child["Text"]["Content"] = "";
             }
         }
-        
-
-
-
+      
         int feedIndex = 1;
         for (auto it = m_DeathQueue.begin(); it != m_DeathQueue.end(); ) {
             bool remove = false;
@@ -27,14 +28,19 @@ void KillFeedSystem::Update(double dt)
             EntityWrapper child = entity.FirstChildByName("KillFeed" + std::to_string(feedIndex));
 
             if (child.HasComponent("Text")) {
-                (Field<std::string>)child["Text"]["Content"] = (*it).Content;
-                (Field<glm::vec4>)child["Text"]["Color"] = (*it).Color;
 
-                (*it).TimeToLive -= dt;
+                std::string str = "";
+                //Add killer to the start of string.
+                str = (*it).KillerColor + "\\" + std::to_string((*it).KillerClass) + "\\CFFFFFF" +  " " + (*it).KillerName + "  ";
+                //Add Weapon to middle of string.
+                str += "\\" + std::to_string((*it).KillerClass+3) + "  ";
+                //Add victim to the end of string
+                str += (*it).VictimColor + "\\" + std::to_string((*it).VictimClass) + "\\CFFFFFF" + " " + (*it).VictimName;
+
+                (Field<std::string>)child["Text"]["Content"] = str;
 
                 if ((*it).TimeToLive <= 0.f) {
                     (Field<std::string>)child["Text"]["Content"] = "";
-                    (Field<glm::vec4>)child["Text"]["Color"] = (*it).Color;
                     remove = true;
                 }
             }
@@ -52,29 +58,30 @@ void KillFeedSystem::Update(double dt)
     }
 }
 
-bool KillFeedSystem::OnPlayerDeath(Events::PlayerDeath& e)
+bool KillFeedSystem::OnPlayerKillDeath(Events::KillDeath& e)
 {
-    KillFeedInfo kfInfo;
+    KillFeedInfo info;
 
-    if (e.Player.HasComponent("Team")) {
-        int red = e.Player["Team"].Enum("Team", "Red");
-        int blue = e.Player["Team"].Enum("Team", "Blue");
-
-        if ((int)e.Player["Team"]["Team"] == red) {
-            kfInfo.Content = "Blue Player killed Red Player";
-            kfInfo.Color = glm::vec4(0.f, 0.2f, 1.f, 0.8f);
-            m_DeathQueue.push_back(kfInfo);
-        } else if ((int)e.Player["Team"]["Team"] == blue) {
-            kfInfo.Content = "Red Player killed blue Player";
-            kfInfo.Color = glm::vec4(1.f, 0.f, 0.f, 0.8f);
-            m_DeathQueue.push_back(kfInfo);
-        }
+    info.KillerName = e.KillerName;
+    info.KillerID = e.Killer;
+    info.KillerClass = e.KillerClass;
+    info.KillerTeam = e.KillerTeam;
+    if(info.KillerTeam == 2){
+        info.KillerColor = m_BlueColor;
+    } else if (info.KillerTeam == 3) {
+        info.KillerColor = m_RedColor;
     }
 
-
-    if(m_DeathQueue.size() > 3) {
-        m_DeathQueue.pop_front();
+    info.VictimName = e.CasualtyName;
+    info.VictimID = e.Casualty;
+    info.VictimClass = e.CasualtyClass;
+    info.VictimTeam = e.CasualtyTeam;
+    if (info.VictimTeam == 2) {
+        info.VictimColor = m_BlueColor;
+    } else if (info.VictimTeam == 3) {
+        info.VictimColor = m_RedColor;
     }
 
-    return true;
+    m_DeathQueue.push_back(info);
+    return 1;
 }
