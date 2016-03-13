@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Fade xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Fade.xsd">
+	<FadeTime>1</FadeTime>
+	<Time>0</Time>
+	<Out>true</Out>
+</Fade>

@@ -1,14 +1,15 @@
-#ifndef FadeOutSystem_h__
-#define FadeOutSystem_h__
+#ifndef FadeSystem_h__
+#define FadeSystem_h__
 
 #include "Core/System.h"
+#include "GLM.h"
 
-class FadeOutSystem : public PureSystem
+class FadeSystem : public PureSystem
 {
 public:
-    FadeOutSystem(SystemParams params)
+    FadeSystem(SystemParams params)
         : System(params)
-        , PureSystem("FadeOut")
+        , PureSystem("Fade")
     {
 
     }
