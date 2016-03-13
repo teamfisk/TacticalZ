@@ -41,6 +41,7 @@
 #include "Game/Systems/ServerListSystem.h"
 #include "Game/Systems/StartSystem.h"
 #include "Game/Systems/EndScreenSystem.h"
+#include "Game/Systems/FadeOutSystem.h"
 #include "Rendering/TextureSprite.h"
 
 
