@@ -10,8 +10,8 @@
 	<MaxTravelAngle>0.174533</MaxTravelAngle> <!-- 0.174533 = 10 degrees -->
 	<NumPellets>9</NumPellets>
 	<RPM>120</RPM>
-	<ViewPunch>0.03</ViewPunch>
-	<ViewReturnSpeed>0.2</ViewReturnSpeed>
+	<ViewPunch>0.15</ViewPunch>
+	<ViewReturnSpeed>0.3</ViewReturnSpeed>
 	<ReloadTime>0.5</ReloadTime>
 	<TriggerHeld>false</TriggerHeld>
 	<FireCooldown>0</FireCooldown>

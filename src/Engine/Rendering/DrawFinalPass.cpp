@@ -414,7 +414,6 @@ void DrawFinalPass::ClearBuffer()
     GLERROR("END");
 }
 
-
 void DrawFinalPass::OnWindowResize()
 {
 	if (m_FinalPassFrameBuffer->MultiSampling() != (bool)m_MSAA) {
