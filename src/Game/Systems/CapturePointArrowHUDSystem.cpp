@@ -68,12 +68,12 @@ void CapturePointArrowHUDSystem::Update(double dt)
 
                     if(currentOwner != redTeamEnum) {
                         //This capturePoint is not owned by the red team and is therefor an eligible target for red team
-                        glm::vec3 targetPos = Transform::AbsolutePosition(capturePointEntity);
+                        glm::vec3 targetPos = TransformSystem::AbsolutePosition(capturePointEntity);
                         redTargets.insert(std::pair<int, glm::vec3>(capturePointID, targetPos));
                     }
                     if(currentOwner != blueTeamEnum) {
                         //This capturePoint is not owned by the blue team and is therefor an eligible target for blue team
-                        glm::vec3 targetPos = Transform::AbsolutePosition(capturePointEntity);
+                        glm::vec3 targetPos = TransformSystem::AbsolutePosition(capturePointEntity);
                         blueTargets.insert(std::pair<int, glm::vec3>(capturePointID, targetPos));
                     }
 
@@ -155,16 +155,16 @@ void CapturePointArrowHUDSystem::Update(double dt)
             pos = m_BlueTeamCurrentTarget;
         }
 
-        glm::vec3& arrowOri = arrowEntity["Transform"]["Orientation"];
-        glm::vec3 lookVector = glm::normalize(Transform::AbsolutePosition(arrowEntity) - pos); //Maybe should be player instead
+        Field<glm::vec3> arrowOri = arrowEntity["Transform"]["Orientation"];
+        glm::vec3 lookVector = glm::normalize(TransformSystem::AbsolutePosition(arrowEntity) - pos); //Maybe should be player instead
         float pitch = std::asin(-lookVector.y);
         float yaw = std::atan2(lookVector.x, lookVector.z);
-        arrowOri.x = pitch;
-        arrowOri.y = yaw;
-        arrowOri.z = 0.f;
+        arrowOri.x(pitch);
+        arrowOri.y(yaw);
+        arrowOri.z(0.f);
         EntityWrapper parent = arrowEntity.Parent();
         if (parent.Valid()) {
-            arrowOri -= Transform::AbsoluteOrientationEuler(parent);
+            arrowOri -= TransformSystem::AbsoluteOrientationEuler(parent);
         }
     }
 }
@@ -175,8 +175,8 @@ bool CapturePointArrowHUDSystem::OnCapturePointCaptured(Events::Captured& e)
         return 0;
     }
 
-    m_RedTeamCurrentTarget = Transform::AbsolutePosition(e.RedTeamNextCapturePoint);
-    m_BlueTeamCurrentTarget = Transform::AbsolutePosition(e.BlueTeamNextCapturePoint);
+    m_RedTeamCurrentTarget = TransformSystem::AbsolutePosition(e.RedTeamNextCapturePoint);
+    m_BlueTeamCurrentTarget = TransformSystem::AbsolutePosition(e.BlueTeamNextCapturePoint);
 
     m_InitialtargetsSet = true;
     return 0;

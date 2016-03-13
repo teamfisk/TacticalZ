@@ -67,7 +67,7 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
 bool PlayerDeathSystem::OnEntityDeleted(Events::EntityDeleted& e)
 {
     // We only care about when the local players death effect is removed.
-    if (m_LocalPlayerDeathEffect.ID != e.DeletedEntity) {
+    if (m_LocalPlayerDeathEffect != e.DeletedEntity) {
         return false;
     }
 

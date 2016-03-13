@@ -14,8 +14,6 @@ protected:
 	TextureSprite(std::string path);
 
 public:
-	~TextureSprite();
-
 	void Bind(GLenum textureUnit = GL_TEXTURE0);
 
 	GLuint m_Texture = 0;

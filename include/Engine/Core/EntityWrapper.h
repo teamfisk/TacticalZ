@@ -45,8 +45,9 @@ struct EntityWrapper
 
 private:
     EntityWrapper firstChildByNameRecursive(const std::string& name, EntityID parent);
-    EntityWrapper cloneRecursive(EntityWrapper entity, EntityWrapper parent);
     void childrenWithComponentRecursive(const std::string& componentType, EntityWrapper& entity, std::vector<EntityWrapper>& childrenWithComponent);
+    static void fillRelationships(std::unordered_multimap<EntityWrapper, EntityWrapper>& relationMap, EntityWrapper entity);
+    static void recreateRelationships(const std::unordered_multimap<EntityWrapper, EntityWrapper>& relationMap, EntityWrapper templateEntity, EntityWrapper parent = EntityWrapper::Invalid);
 };
 
 namespace std

@@ -87,7 +87,7 @@ float DamageIndicatorSystem::CalculateAngle(EntityWrapper player, glm::vec3 enem
     auto enemyPlayerVector = glm::normalize(playerPosition - enemyPosition);
 
     //get the rotationvector relative to the z-axis
-    auto rotationVectorVec3 = glm::vec3(glm::toMat4(Transform::AbsoluteOrientation(player))*glm::vec4(0, 0, 1, 0));
+    auto rotationVectorVec3 = glm::vec3(glm::toMat4(TransformSystem::AbsoluteOrientation(player))*glm::vec4(0, 0, 1, 0));
     //rotate the direction-vector 90 degrees to get the players side-vector
     auto playerSideVector = glm::vec3(glm::rotateY(rotationVectorVec3, 1.57f));
 

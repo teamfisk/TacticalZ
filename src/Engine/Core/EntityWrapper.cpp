@@ -94,8 +94,30 @@ EntityWrapper EntityWrapper::Clone(EntityWrapper parent /*= Invalid*/)
         return EntityWrapper::Invalid;
     }
 
-    EntityWrapper clone = cloneRecursive(*this, EntityWrapper::Invalid);
-    this->World->SetParent(clone.ID, parent.ID);
+    // Create a relationship map of children of this entity
+    std::unordered_multimap<EntityWrapper, EntityWrapper> relationships;
+    fillRelationships(relationships, *this);
+
+    ::World* targetWorld = this->World;
+    if (parent.Valid()) {
+        targetWorld = parent.World;
+    }
+
+    // Create root entity
+    EntityWrapper clone(targetWorld, targetWorld->CreateEntity(parent.ID));
+    // Copy name
+    clone.World->SetName(clone.ID, this->Name());
+    // Clone components
+    for (auto& kv : this->World->GetComponentPools()) {
+        if (kv.second->KnowsEntity(this->ID)) {
+            ComponentWrapper c1 = kv.second->GetByEntity(this->ID);
+            ComponentWrapper c2 = clone.World->AttachComponent(clone.ID, kv.first);
+            c1.Copy(c2);
+        }
+    }
+    // Recreate entity tree
+    recreateRelationships(relationships, *this, clone);
+
     return clone;
 }
 
@@ -207,30 +229,6 @@ EntityWrapper EntityWrapper::firstChildByNameRecursive(const std::string& name, 
     return EntityWrapper::Invalid;
 }
 
-EntityWrapper EntityWrapper::cloneRecursive(EntityWrapper entity, EntityWrapper parent)
-{
-    EntityWrapper clone = EntityWrapper(entity.World, entity.World->CreateEntity(parent.ID));
-    entity.World->SetName(clone.ID, entity.Name());
-
-    // Clone components
-    for (auto& kv : entity.World->GetComponentPools()) {
-        if (kv.second->KnowsEntity(entity.ID)) {
-            ComponentWrapper c1 = kv.second->GetByEntity(entity.ID);
-            ComponentWrapper c2 = entity.World->AttachComponent(clone.ID, kv.first);
-            c1.Copy(c2);
-        }
-    }
-
-    // Clone children
-    auto children = entity.World->GetDirectChildren(entity.ID);
-    for (auto it = children.first; it != children.second; ++it) {
-        EntityWrapper child(entity.World, it->second);
-        cloneRecursive(child, clone);
-    }
-      
-    return clone;
-}
-
 void EntityWrapper::childrenWithComponentRecursive(const std::string& componentType, EntityWrapper& entity, std::vector<EntityWrapper>& childrenWithComponent)
 {
     auto itPair = this->World->GetDirectChildren(entity.ID);
@@ -244,5 +242,37 @@ void EntityWrapper::childrenWithComponentRecursive(const std::string& componentT
             childrenWithComponent.push_back(child);
         }
         childrenWithComponentRecursive(componentType, child, childrenWithComponent);
+    }
+}
+
+void EntityWrapper::fillRelationships(std::unordered_multimap<EntityWrapper, EntityWrapper>& relationMap, EntityWrapper entity)
+{
+    auto children = entity.World->GetDirectChildren(entity.ID);
+    for (auto it = children.first; it != children.second; ++it) {
+        EntityWrapper child(entity.World, it->second);
+        relationMap.insert(std::make_pair(entity, child));
+        fillRelationships(relationMap, child);
+    }
+}
+
+void EntityWrapper::recreateRelationships(const std::unordered_multimap<EntityWrapper, EntityWrapper>& relationMap, EntityWrapper templateEntity, EntityWrapper parent /*= EntityWrapper::Invalid*/)
+{
+    // Recursively create children
+    auto children = relationMap.equal_range(templateEntity);
+    for (auto it = children.first; it != children.second; ++it) {
+        EntityWrapper child = it->second;
+        // Create clone entity
+        EntityWrapper clone(parent.World, parent.World->CreateEntity(parent.ID));
+        // Copy name
+        clone.World->SetName(clone.ID, child.Name());
+        // Clone components
+        for (auto& kv : child.World->GetComponentPools()) {
+            if (kv.second->KnowsEntity(child.ID)) {
+                ComponentWrapper c1 = kv.second->GetByEntity(child.ID);
+                ComponentWrapper c2 = clone.World->AttachComponent(clone.ID, kv.first);
+                c1.Copy(c2);
+            }
+        }
+        recreateRelationships(relationMap, child, clone);
     }
 }

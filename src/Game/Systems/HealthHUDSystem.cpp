@@ -22,19 +22,23 @@ void HealthHUDSystem::Update(double dt)
         if (entityIDParent.HasComponent("Health")) {
 
             if (entity.HasComponent("Text")) {
+                Field<double> health = entityIDParent["Health"]["Health"];
+                Field<double> maxHealth = entityIDParent["Health"]["Health"];
                 std::string s = "";
-                s = s + std::to_string((int)(double)entityIDParent["Health"]["Health"]);
+                s = s + std::to_string((int)health);
                 s = s + "/";
-                s = s + std::to_string((int)(double)entityIDParent["Health"]["MaxHealth"]);
-                float healthPercentage = (double)entityIDParent["Health"]["Health"]/(double)entityIDParent["Health"]["MaxHealth"];
-                //(glm::vec4&)entity["Text"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Text"]["Color"]).a);
+                s = s + std::to_string((int)maxHealth);
+                float healthPercentage = health/maxHealth;
+                //(Field<glm::vec4>)entity["Text"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Text"]["Color"]).a);
                 entity["Text"]["Content"] = s;
             }
 
             if(entity.HasComponent("Fill")) {
-                float healthPercentage = (double)entityIDParent["Health"]["Health"]/(double)entityIDParent["Health"]["MaxHealth"];
-                (glm::vec4&)entity["Fill"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Fill"]["Color"]).a);
-                (double&)entity["Fill"]["Percentage"] = healthPercentage;
+                Field<double> health = entityIDParent["Health"]["Health"];
+                Field<double> maxHealth = entityIDParent["Health"]["Health"];
+                float healthPercentage = health/maxHealth;
+                entity["Fill"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Fill"]["Color"]).a);
+                entity["Fill"]["Percentage"] = (double)healthPercentage;
 
             }
         }
