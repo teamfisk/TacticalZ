@@ -23,6 +23,7 @@ enum class MessageType
     OnDashEffect,
     ServerlistRequest,
     AmmoPickup,
+    RemoveWorld,
     Invalid
 };
 

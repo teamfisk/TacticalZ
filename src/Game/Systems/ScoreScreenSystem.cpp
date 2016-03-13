@@ -9,6 +9,8 @@ ScoreScreenSystem::ScoreScreenSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &ScoreScreenSystem::OnPlayerSpawn);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerConnected, &ScoreScreenSystem::OnPlayerConnected);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDisconnected, &ScoreScreenSystem::OnPlayerDisconnected);
+    EVENT_SUBSCRIBE_MEMBER(m_EReset, &ScoreScreenSystem::OnReset);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &ScoreScreenSystem::OnInputCommand);
 }
 
 void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& scoreScreen, double dt)
@@ -155,4 +157,26 @@ bool ScoreScreenSystem::OnPlayerDisconnected(const Events::PlayerDisconnected& e
     //player has disconnected, remove him from list of ScoreIdentities
     m_DisconnectedIdentities.push_back(e.PlayerID);
     return 0;
+}
+
+bool ScoreScreenSystem::OnReset(const Events::Reset & e)
+{
+    for (auto& it : m_PlayerIdentities) {
+        it.second.Deaths = 0;
+        it.second.Kills = 0;
+        it.second.Team = 1;
+        it.second.Player = EntityWrapper::Invalid;
+    }
+    return true;
+}
+
+bool ScoreScreenSystem::OnInputCommand(const Events::InputCommand & e)
+{
+    if (e.Command != "PickTeam" || e.PlayerID == -1 || e.Value == 0) {
+        return false;
+    }
+
+    m_PlayerIdentities.at(e.PlayerID).Team = e.Value;
+
+    return true;
 }
