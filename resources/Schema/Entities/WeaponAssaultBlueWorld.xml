@@ -2,6 +2,7 @@
 <Entity name="AssaultWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:Shielded/>
     <c:Model>
       <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
     </c:Model>
