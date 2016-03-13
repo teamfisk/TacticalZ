@@ -6,47 +6,30 @@ SoundSystem::SoundSystem(SystemParams params)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Announcer = ResourceManager::Load<ConfigFile>("Config.ini")->Get<std::string>("Sound.Announcer", "female");
-    if (IsClient) {
-        EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
-        EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &SoundSystem::OnInputCommand);
-        EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
-        EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &SoundSystem::OnDashAbility);
-        EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
-        EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
-        EVENT_SUBSCRIBE_MEMBER(m_ETriggerTouch, &SoundSystem::OnTriggerTouch);
-        EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &SoundSystem::OnPlayerDeath);
-    }
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    m_RandomGenerator = std::default_random_engine(seed);
+    m_RandIntDistribution = std::uniform_int_distribution<int>(1, 12);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundSystem::OnPlayerSpawned);
+    EVENT_SUBSCRIBE_MEMBER(m_InputCommand, &SoundSystem::OnInputCommand);
+    EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &SoundSystem::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &SoundSystem::OnPlayerDamage);
+    EVENT_SUBSCRIBE_MEMBER(m_ECaptured, &SoundSystem::OnCaptured);
+    EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &SoundSystem::OnPlayerDeath);
 }
 
 void SoundSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cComponent, double dt)
 { }
 
 void SoundSystem::Update(double dt)
-{
-    if (!IsClient) {
-        return;
-    }
-
-    // Temp for play test.
-    if (m_DrumsIsPlaying) {
-        m_DrumsIsPlaying = !drumTimer(dt);
-    }
-}
+{ }
 
 bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
     if (e.PlayerID == -1) { // Local player
         m_World->AttachComponent(e.Player.ID, "Listener");
-        Events::PlaySoundOnEntity go;
-        go.EmitterID = LocalPlayer.ID;
-        go.FilePath = "Audio/announcer/" + m_Announcer + "/go.wav";
+        Events::PlayAnonuncerVoice go;
+        go.FilePath = "Audio/Announcer/" + m_Announcer + "/Go.wav";
         m_EventBroker->Publish(go);
-        // TEMP: starts bgm
-        {
-            Events::PlayBackgroundMusic ev;
-            ev.FilePath = "Audio/bgm/ambient.wav";
-            m_EventBroker->Publish(ev);
-        }
     }
     return true;
 }
@@ -54,82 +37,67 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
 bool SoundSystem::OnInputCommand(const Events::InputCommand & e)
 {
     if (e.Command == "Jump" && e.Value > 0) {
-        if (e.PlayerID == -1) { // local player
-            playerJumps();
-            return true;
-        }
+        if (e.PlayerID == -1) {
+            playerJumps(LocalPlayer);
+        } 
+        return true;
     }
-
     return false;
 }
 
-void SoundSystem::playerJumps()
+void SoundSystem::playerJumps(EntityWrapper player)
 {
-    if (!LocalPlayer.Valid()) {
+    if (!IsClient) { // Only play for clients
         return;
     }
-
-    bool grounded = (bool)m_World->GetComponent(LocalPlayer.ID, "Physics")["IsOnGround"];
+    if(!player.HasComponent("Physics")) {
+        return;
+    }
+    bool grounded = (bool)player["Physics"]["IsOnGround"];
     if (grounded) {
         Events::PlaySoundOnEntity e;
-        e.EmitterID = LocalPlayer.ID;
-        e.FilePath = "Audio/jump/jump1.wav";
+        e.Emitter = player;
+        e.FilePath = "Audio/Jump/Jump1.wav";
         m_EventBroker->Publish(e);
-    }
-}
-
-bool SoundSystem::drumTimer(double dt)
-{
-    m_DrumTimer += dt;
-    if (m_DrumTimer > 15) {
-        m_DrumTimer = 0.0;
-        return true;
-    } else {
-        return false;
     }
 }
 
 bool SoundSystem::OnCaptured(const Events::Captured & e)
 {
-    if (!LocalPlayer.Valid()) {
+    if (!IsClient) { // Only play for clients
         return false;
     }
     int homeTeam = (int)m_World->GetComponent(e.CapturePointTakenID, "Team")["Team"];
     int team = (int)m_World->GetComponent(LocalPlayer.ID, "Team")["Team"];
-    Events::PlaySoundOnEntity ev;
+    Events::PlayAnonuncerVoice ev;
     if (team == homeTeam) {
-        ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_achieved.wav";
+        ev.FilePath = "Audio/Announcer/" + m_Announcer + "/ObjectiveAchieved.wav";
     } else {
-        ev.FilePath = "Audio/announcer/" + m_Announcer + "/objective_failed.wav"; // have not been tested
+        ev.FilePath = "Audio/Announcer/" + m_Announcer + "/ObjectiveFailed.wav";
     }
-    ev.EmitterID = LocalPlayer.ID;
     m_EventBroker->Publish(ev);
-    // Temp for play test.
-    m_DrumsIsPlaying = false;
     return false;
 }
 
-// Testing purposes atm...
 bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 {
     if (!IsClient) { // Only play for clients
         return false;
     }
-    if (LocalPlayer.ID = e.Victim.ID) { // You're local player was the one who took dmg
+    if (!e.Victim.Valid() || !e.Inflictor.Valid()) {
         return false;
     }
-    std::uniform_int_distribution<int> dist(1, 12);
-    int rand = dist(generator);
+    auto victimTeam = m_World->GetComponent(e.Victim.ID, "Team");
+    auto inflictorTeam = m_World->GetComponent(e.Inflictor.ID, "Team");
+    if ((int)victimTeam["Team"] == (int)inflictorTeam["Team"]) {
+        // Victim and inflictor are the same team, should not play "hurt" sound.
+        return false;
+    }
     std::vector<std::string> paths;
-    paths.push_back("Audio/hurt/hurt" + std::to_string(rand) + ".wav");
+    paths.push_back("Audio/Hurt/Hurt" + std::to_string(m_RandIntDistribution(m_RandomGenerator)) + ".wav");
 
-    //     // Breathe
-    //     int ammountOfbreaths = (static_cast<int>(e.Damage) / 10) + 2; // TEMP: Idk something stupid like this shit
-    //     for (int i = 0; i < ammountOfbreaths; i++) {
-    //         paths.push_back("Audio/exhausted/breath.wav");
-    //     }
     Events::PlayQueueOnEntity ev;
-    ev.Emitter = LocalPlayer;
+    ev.Emitter = e.Victim;
     ev.FilePaths = paths;
     m_EventBroker->Publish(ev);
     return false;
@@ -137,7 +105,7 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
 
 bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 {
-    if (e.Player.ID != LocalPlayer.ID) {
+    if (!e.Player.Valid()) {
         return false;
     }
     if (!IsClient) {
@@ -146,8 +114,9 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
     // The local player is dead. The local player might be invalid?
     // Play the sound from the listener.
     // TODO: We might want to hear other players die.
-    Events::PlayBackgroundMusic ev;
-    ev.FilePath = "Audio/die/die2.wav";
+    Events::PlaySoundOnEntity ev;
+    ev.Emitter = e.Player;
+    ev.FilePath = "Audio/Die/Die2.wav";
     m_EventBroker->Publish(ev);
     return false;
 }
@@ -155,43 +124,25 @@ bool SoundSystem::OnPlayerDeath(const Events::PlayerDeath & e)
 bool SoundSystem::OnPlayerHealthPickup(const Events::PlayerHealthPickup & e)
 {
     Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
-    ev.FilePath = "Audio/pickup/pickup2.wav";
+    ev.Emitter = LocalPlayer;
+    ev.FilePath = "Audio/Pickup/Pickup2.wav";
     m_EventBroker->Publish(ev);
-    return false;
-}
-
-bool SoundSystem::OnTriggerTouch(const Events::TriggerTouch & e)
-{
-    // Temp for play test.
-    if (m_DrumsIsPlaying) {
-        return false;
-    }
-    if (m_World->HasComponent(e.Trigger.ID, "CapturePoint")) {
-        Events::PlaySoundOnEntity ev; // should be BGM
-        ev.EmitterID = LocalPlayer.ID;
-        ev.FilePath = "Audio/bgm/drumstest.wav";
-        m_EventBroker->Publish(ev);
-        // Temp for play test.
-        m_DrumsIsPlaying = true;
-    }
     return false;
 }
 
 bool SoundSystem::OnDoubleJump(const Events::DoubleJump & e)
 {
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
-    ev.FilePath = "Audio/jump/jump2.wav";
-    m_EventBroker->Publish(ev);
-    return false;
-}
-
-bool SoundSystem::OnDashAbility(const Events::DashAbility &e)
-{
-    Events::PlaySoundOnEntity ev;
-    ev.EmitterID = LocalPlayer.ID;
-    ev.FilePath = "Audio/jump/dash1.wav";
-    m_EventBroker->Publish(ev);
+    if (!m_World->ValidEntity(e.entityID)) {
+        return false;
+    }
+    if (!IsClient) {
+        return false;
+    }
+    if (e.entityID == LocalPlayer.ID) {
+        Events::PlaySoundOnEntity ev;
+        ev.Emitter = EntityWrapper(m_World, e.entityID);
+        ev.FilePath = "Audio/Jump/Jump2.wav";
+        m_EventBroker->Publish(ev);
+    }
     return false;
 }

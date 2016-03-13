@@ -3,6 +3,7 @@
 
 #include "Common.h"
 #include "Core/System.h"
+#include "Engine/GLM.h"
 
 class ExplosionEffectSystem : public PureSystem
 {

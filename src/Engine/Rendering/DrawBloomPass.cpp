@@ -76,12 +76,12 @@ void DrawBloomPass::InitializeShaderPrograms()
 void DrawBloomPass::InitializeBuffers()
 {
     CommonFunctions::GenerateMipMapTexture(
-        &m_GaussianTexture_horiz, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
-        , GL_RGB, GL_FLOAT, m_BloomLod);
+        &m_GaussianTexture_horiz, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height),
+		GL_RGB16F, GL_RGB, GL_FLOAT, m_BloomLod, GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
     CommonFunctions::GenerateMipMapTexture(
-        &m_GaussianTexture_vert, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
-        , GL_RGB, GL_FLOAT, m_BloomLod);
-    CommonFunctions::GenerateTexture(&m_FinalGaussianTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+        &m_GaussianTexture_vert, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height),
+		GL_RGB16F, GL_RGB, GL_FLOAT, m_BloomLod, GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
+    CommonFunctions::GenerateTexture(&m_FinalGaussianTexture, GL_CLAMP_TO_BORDER, GL_NEAREST, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
 
     if (m_GaussianCombineBuffer.GetHandle() == 0) {
         m_GaussianCombineBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_FinalGaussianTexture, GL_COLOR_ATTACHMENT0)));
@@ -151,18 +151,7 @@ void DrawBloomPass::OnWindowResize()
 	if (m_Quality == 0) {
 		return;
 	}
-    CommonFunctions::GenerateMipMapTexture(
-        &m_GaussianTexture_vert, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
-        , GL_RGB, GL_FLOAT, m_BloomLod);
-    CommonFunctions::GenerateMipMapTexture(
-        &m_GaussianTexture_horiz, GL_CLAMP_TO_BORDER, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height)
-        , GL_RGB, GL_FLOAT, m_BloomLod);
-    for (int i = 0; i < m_BloomLod; i++) {
-        m_GaussianFrameBuffer_vert[i].Generate();
-        m_GaussianFrameBuffer_horiz[i].Generate();
-
-    }
-
+	InitializeBuffers();
 }
 
 void DrawBloomPass::GaussianLodPass(GLuint mipMap, GLuint texture)

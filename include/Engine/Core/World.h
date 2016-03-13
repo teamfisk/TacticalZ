@@ -35,7 +35,7 @@ public:
     // Delete a component off an entity
     void DeleteComponent(EntityID entity, const std::string& componentType);
     // Get all components of the specified type
-    const ComponentPool* GetComponents(const std::string& componentType);
+    ComponentPool* GetComponents(const std::string& componentType);
     // Get entity parent
     EntityID GetParent(EntityID entity);
     // Change the parent of an entity

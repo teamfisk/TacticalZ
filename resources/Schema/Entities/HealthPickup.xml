@@ -2,21 +2,26 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:NetworkComponent/>
     <c:HealthPickup/>
-    <c:Model>
-      <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
-    </c:Model>
+    <c:Trigger/>
     <c:RaptorCopter>
       <Speed>8</Speed>
       <Axis X="0" Y="0.100000001" Z="0"/>
     </c:RaptorCopter>
+    <c:Model>
+      <Resource>Models/Props/PickUps/HealthPickUp.mesh</Resource>
+    </c:Model>
+    <c:NetworkComponent/>
+    <c:PointLight>
+      <Color A="1" B="0" G="1" R="1"/>
+      <Radius>1.5</Radius>
+      <Intensity>3</Intensity>
+    </c:PointLight>
     <c:Transform>
-      <Position X="0" Y="2.36784196" Z="0"/>
+      <Position X="0" Y="2.36800003" Z="0"/>
+      <Orientation X="0" Y="19005.3867" Z="0"/>
       <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
-      <Orientation X="0" Y="18767.0273" Z="0"/>
     </c:Transform>
-    <c:Trigger/>
   </Components>
 
   <Children/>

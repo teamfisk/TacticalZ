@@ -12,7 +12,8 @@ namespace Events
 // Sound behavior is thereby specified in the SoundEmitter component.
 struct PlaySoundOnEntity : public Event
 {
-    EntityID EmitterID = 0;
+    EntityWrapper Emitter = EntityWrapper::Invalid;
+    float Gain = 1.f;
     std::string FilePath = "";
 };
 

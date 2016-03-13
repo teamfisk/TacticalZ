@@ -71,7 +71,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 			float minScale = (float)(double)indicator["MinScale"];
 			bool hasTeam = indicator["VisibleForSingleTeamOnly"];
 			isIndicator = true;
-			glm::vec3 pos = Transform::AbsolutePosition(entity);
+			glm::vec3 pos = TransformSystem::AbsolutePosition(entity);
 
 
 			EntityWrapper entityTeam;
@@ -138,7 +138,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 			modelMatrix[3][2] = pos.z;
 			modelMatrix[3][3] = 1.0f;
 
-			glm::mat4 tranformationMatrix = modelMatrix * glm::scale(Transform::AbsoluteScale(entity));
+			glm::mat4 tranformationMatrix = modelMatrix * glm::scale(TransformSystem::AbsoluteScale(entity));
 			glm::vec4 tmp = tranformationMatrix * glm::vec4(glm::vec3(0.5, 0.5, 0), 1.0f);
 			glm::vec2 projectedTopRight = m_Camera->WorldToScreen(glm::vec3(tmp), m_Renderer->GetViewportSize());
 			tmp = tranformationMatrix * glm::vec4(glm::vec3(-0.5, -0.5, 0), 1.0f);
@@ -151,7 +151,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 			modelMatrix = tranformationMatrix;
 		}
 		else {
-			modelMatrix = Transform::ModelMatrix(entity.ID, world);
+			modelMatrix = TransformSystem::ModelMatrix(entity.ID, world);
 		}
 
 
@@ -184,7 +184,7 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
     }
 
     // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    bool outOfBodyExperience = false; // ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
     if (
         (entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) 
         && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) 
@@ -250,7 +250,7 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
 
 		bool isShielded = m_World->HasComponent(cModel.EntityID, "Shielded") || m_World->HasComponent(cModel.EntityID, "Player");
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
+        glm::mat4 modelMatrix = TransformSystem::ModelMatrix(cModel.EntityID, m_World);
         //Loop through all materialgroups of a model
         for (auto matGroup : model->MaterialGroups()) {
             //If the model has an explosioneffect component, we will add an explosioneffectjob
@@ -362,6 +362,11 @@ void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, 
                 continue;
             }
 
+            EntityWrapper entity(world, pointlightC.EntityID);
+            if (!isEntityVisible(entity)) {
+                continue;
+            }
+
             std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
             jobs.push_back(pointLightJob);
         }
@@ -422,7 +427,7 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
             }
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(textComponent.EntityID, world);
+        glm::mat4 modelMatrix = TransformSystem::ModelMatrix(textComponent.EntityID, world);
         std::shared_ptr<TextJob> textJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
         jobs.push_back(textJob);
 
@@ -440,8 +445,8 @@ void RenderSystem::Update(double dt)
 
     // Update the current camera used for rendering
     if (m_CurrentCamera.Valid()) {
-        m_Camera->SetPosition(Transform::AbsolutePosition(m_CurrentCamera));
-        m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
+        m_Camera->SetPosition(TransformSystem::AbsolutePosition(m_CurrentCamera));
+        m_Camera->SetOrientation(TransformSystem::AbsoluteOrientation(m_CurrentCamera));
     }
 
     RenderScene scene;

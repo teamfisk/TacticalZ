@@ -13,7 +13,7 @@ void KillFeedSystem::Update(double dt)
         for (int i = 1; i <= 3; i++) {
             EntityWrapper child = entity.FirstChildByName("KillFeed" + std::to_string(i));
             if (child.HasComponent("Text")) {
-                (std::string&)child["Text"]["Content"] = "";
+                (Field<std::string>)child["Text"]["Content"] = "";
             }
         }
         
@@ -27,14 +27,14 @@ void KillFeedSystem::Update(double dt)
             EntityWrapper child = entity.FirstChildByName("KillFeed" + std::to_string(feedIndex));
 
             if (child.HasComponent("Text")) {
-                (std::string&)child["Text"]["Content"] = (*it).Content;
-                (glm::vec4&)child["Text"]["Color"] = (*it).Color;
+                (Field<std::string>)child["Text"]["Content"] = (*it).Content;
+                (Field<glm::vec4>)child["Text"]["Color"] = (*it).Color;
 
                 (*it).TimeToLive -= dt;
 
                 if ((*it).TimeToLive <= 0.f) {
-                    (std::string&)child["Text"]["Content"] = "";
-                    (glm::vec4&)child["Text"]["Color"] = (*it).Color;
+                    (Field<std::string>)child["Text"]["Content"] = "";
+                    (Field<glm::vec4>)child["Text"]["Color"] = (*it).Color;
                     remove = true;
                 }
             }

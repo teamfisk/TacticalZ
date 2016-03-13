@@ -151,9 +151,9 @@ bool RayVsModel(const Ray& ray,
     const glm::mat4& modelMatrix)
 {
     for (int i = 0; i < modelIndices.size();) {
-        glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v0 = TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v1 = TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v2 = TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         if (RayVsTriangle(ray, v0, v1, v2)) {
             return true;
         }
@@ -204,9 +204,9 @@ bool RayVsModel(const Ray& ray,
     outDistance = INFINITY;
     bool hit = false;
     for (int i = 0; i < modelIndices.size();) {
-        glm::vec3 v0 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        glm::vec3 v1 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
-        glm::vec3 v2 = Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v0 = TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v1 = TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
+        glm::vec3 v2 = TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix);
         float dist = outDistance;
         float u;
         float v;
@@ -360,7 +360,14 @@ constexpr bool FaceIsGround(float faceNormalY)
 //An array containing 3 int pairs { 0, 2 }, { 0, 1 }, { 1, 2 }
 constexpr std::array<std::pair<int, int>, 3> dimensionPairs({ std::pair<int, int>(0, 2), std::pair<int, int>(0, 1), std::pair<int, int>(1, 2) });
 
-bool AABBvsTriangle(const AABB& box,
+enum class BoxTriRes
+{
+    Front,
+    Behind,
+    Intersect
+};
+
+BoxTriRes AABBvsTriangle(const AABB& box,
     const std::array<glm::vec3, 3>& triPos,
     const glm::vec3& originalBoxVelocity,
     float verticalStepHeight,
@@ -374,7 +381,7 @@ bool AABBvsTriangle(const AABB& box,
     //Less checks, and we should be able to walk out from models if we are trapped inside.
     glm::vec3 triNormal = glm::cross(triPos[1] - triPos[0], triPos[2] - triPos[0]);
     if (!vectorHasLength(triNormal) || (glm::dot(triNormal, originalBoxVelocity) > 0)) {
-        return false;
+        return BoxTriRes::Behind;
     }
     triNormal = glm::normalize(triNormal);
 
@@ -409,6 +416,9 @@ bool AABBvsTriangle(const AABB& box,
     const glm::vec3& min = box.MinCorner();
     const glm::vec3& max = box.MaxCorner();
 
+    // If there is no intersection, whether the box center is in front of or behind the triangle.
+    BoxTriRes noIntersection = glm::dot(triNormal, origin - triPos[0]) > 0 ? BoxTriRes::Front : BoxTriRes::Behind;
+
     //For each projection in xy-, xz-, and yx-planes.
     for (std::pair<int, int> dim : dimensionPairs) {
         //2D Triangle.
@@ -426,7 +436,7 @@ bool AABBvsTriangle(const AABB& box,
         bool pushedFromTriangleLine;
         //if projections don't overlap, return false.
         if (!rectangleVsTriangle(boxMin, boxMax, t2D, resolutionVector, resolutionDist, pushedFromTriangleLine)) {
-            return false;
+            return noIntersection;
         } else if (resolveCollision) {
             //Overwrite the smallest resolution if this is smaller.
             if (resolutionDist < resolveShortest.DistanceSq) {
@@ -462,14 +472,15 @@ bool AABBvsTriangle(const AABB& box,
     float t = glm::dot(triNormal, triPos[0] - origin) / glm::dot(triNormal, diagonal);
     //If intersection point between plane and diagonal is within the box.
     if (glm::abs(t) > 1) {
-        return false;
+        return noIntersection;
     }
 
     if (!resolveCollision) {
-        return true;
+        return BoxTriRes::Intersect;
     }
 
     glm::vec3 cornerResolution = (1+t) * diagonal;
+    cornerResolution = glm::dot(cornerResolution, triNormal) * triNormal;
     //Overwrite the smallest resolution if cornerResolution is smaller.
     float lenSq = glm::length2(cornerResolution);
     if (lenSq < resolveShortest.DistanceSq) {
@@ -498,7 +509,7 @@ bool AABBvsTriangle(const AABB& box,
     case ResolveDimZ:
         //If we get here, the resolution is along one coordinate axis.
         //set velocity to 0 in y if it is along y-axis.
-        return true;
+        return BoxTriRes::Intersect;
     case Line:
         projNorm = glm::normalize(outResolution);
         break;
@@ -533,10 +544,10 @@ bool AABBvsTriangle(const AABB& box,
             boxVelocity = boxVelocity - glm::dot(boxVelocity, projNorm) * projNorm;
         }
     }
-    return true;
+    return BoxTriRes::Intersect;
 }
 
-bool AABBvsTriangles(const AABB& box,
+Output AABBvsTriangles(const AABB& box,
     const RawModel::Vertex* modelVertices,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix,
@@ -546,34 +557,41 @@ bool AABBvsTriangles(const AABB& box,
     glm::vec3& outResolutionVector,
     bool resolveCollision)
 {
-    bool hit = false;
-
+    bool intersect = false;
+    Output out = Output::OutContained;
     bool everHitTheGround = false;
     AABB newBox = box;
     outResolutionVector = glm::vec3(0.f);
     glm::vec3 originalBoxVelocity(boxVelocity);
     for (int i = 0; i < modelIndices.size(); ) {
         std::array<glm::vec3, 3> triVertices = {
-            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
-            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
-            Transform::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
+            TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+            TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix),
+            TransformSystem::TransformPoint(modelVertices[modelIndices[i++]].Position, modelMatrix)
         };
         glm::vec3 outVec;
         bool collideWithGround = isOnGround;
-        if (AABBvsTriangle(newBox, triVertices, originalBoxVelocity, verticalStepHeight, collideWithGround, boxVelocity, outVec, resolveCollision)) {
-            hit = true;
+        switch (AABBvsTriangle(newBox, triVertices, originalBoxVelocity, verticalStepHeight, collideWithGround, boxVelocity, outVec, resolveCollision)) {
+        case Collision::BoxTriRes::Front:
+            out = Output::OutSeparated;
+            break;
+        case Collision::BoxTriRes::Intersect:
+            intersect = true;
             outResolutionVector += outVec;
             newBox = AABB::FromOriginSize(newBox.Origin() + outVec, newBox.Size());
             if (collideWithGround) {
                 everHitTheGround = isOnGround = true;
             }
+            break;
+        default:
+            break;
         }
     }
 
     if (!everHitTheGround) {
         isOnGround = false;
     }
-    return hit;
+    return intersect ? Output::OutIntersecting : out;
 }
 
 bool AABBvsTriangles(const AABB& box,
@@ -593,10 +611,28 @@ bool AABBvsTriangles(const AABB& box,
         verticalStepHeight,
         isOnGround,
         outResolutionVector,
-        true);
+        true) == Output::OutIntersecting;
 }
 
 bool AABBvsTriangles(const AABB& box,
+    const RawModel::Vertex* modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix)
+{
+    glm::vec3 vel, outres;
+    bool g;
+    return AABBvsTriangles(box,
+        modelVertices,
+        modelIndices,
+        modelMatrix,
+        vel,
+        0.f,
+        g,
+        outres,
+        false) == Output::OutIntersecting;
+}
+
+Output AABBvsTrianglesWContainment(const AABB& box,
     const RawModel::Vertex* modelVertices,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix)
@@ -619,9 +655,9 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
     AABB modelSpaceBox;
     if (entity.HasComponent("AABB") && !takeModelBox) {
         ComponentWrapper& cAABB = entity["AABB"];
-        modelSpaceBox = EntityAABB::FromOriginSize((glm::vec3)cAABB["Origin"], (glm::vec3)cAABB["Size"]);
+        modelSpaceBox = EntityAABB::FromOriginSize((const glm::vec3&)cAABB["Origin"], (const glm::vec3&)cAABB["Size"]);
     } else if (entity.HasComponent("Model")) {
-        std::string res = entity["Model"]["Resource"];
+        const std::string& res = entity["Model"]["Resource"];
         if (res.empty()) {
             return boost::none;
         }
@@ -638,7 +674,7 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
         return boost::none;
     }
 
-    glm::mat4 modelMat = Transform::AbsoluteTransformation(entity);
+    glm::mat4 modelMat = TransformSystem::ModelMatrix(entity);
     glm::vec3 mini(INFINITY);
     glm::vec3 maxi(-INFINITY);
     glm::vec3 maxCorner = modelSpaceBox.MaxCorner();
@@ -649,7 +685,7 @@ boost::optional<EntityAABB> EntityAbsoluteAABB(EntityWrapper& entity, bool takeM
         corner.x = bits.test(0) ? maxCorner.x : minCorner.x;
         corner.y = bits.test(1) ? maxCorner.y : minCorner.y;
         corner.z = bits.test(2) ? maxCorner.z : minCorner.z;
-        corner = Transform::TransformPoint(corner, modelMat);
+        corner = TransformSystem::TransformPoint(corner, modelMat);
         mini = glm::min(mini, corner);
         maxi = glm::max(maxi, corner);
     }
@@ -667,7 +703,7 @@ boost::optional<EntityAABB> AbsoluteAABBExplosionEffect(EntityWrapper& entity)
     if (!modelBox) {
         return boost::none;
     }
-    bool isRandom = (bool)entity["ExplosionEffect"]["Randomness"];
+    Field<bool> isRandom = entity["ExplosionEffect"]["Randomness"];
     float random = isRandom ? (float)(double)entity["ExplosionEffect"]["RandomnessScalar"] : 0;
     glm::vec3 origin = (glm::vec3)entity["ExplosionEffect"]["ExplosionOrigin"];
     glm::vec3 randomVel = (glm::vec3)entity["ExplosionEffect"]["Velocity"];
@@ -705,7 +741,7 @@ boost::optional<EntityAABB> EntityFirstHitByRay(const Ray& ray, std::vector<Enti
             continue;
         }
         float u, v;
-        if (RayVsModel(ray, model->Vertices(), model->m_RawModel->m_Indices, Transform::ModelMatrix(entityBox.Entity), outDistance, u, v)) {
+        if (RayVsModel(ray, model->Vertices(), model->m_RawModel->m_Indices, TransformSystem::ModelMatrix(entityBox.Entity), outDistance, u, v)) {
             outIntersectPos = ray.Origin() + outDistance * ray.Direction();
             return entityBox;
         }

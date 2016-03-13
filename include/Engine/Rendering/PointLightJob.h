@@ -7,7 +7,7 @@
 #include "../GLM.h"
 #include "../Core/ComponentWrapper.h"
 #include "RenderJob.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "../Core/World.h"
 
 struct PointLightJob : RenderJob
@@ -16,7 +16,7 @@ struct PointLightJob : RenderJob
         : RenderJob()
     {
         Position = glm::vec4((glm::vec3)transformComponent["Position"], 1.0f);
-        Position = glm::vec4(Transform::AbsolutePosition(m_World, transformComponent.EntityID), 1.f);
+        Position = glm::vec4(TransformSystem::AbsolutePosition(m_World, transformComponent.EntityID), 1.f);
         Color = (glm::vec4)pointLightComponent["Color"];
         Radius = (double)pointLightComponent["Radius"];
         Intensity = (double)pointLightComponent["Intensity"];

@@ -67,10 +67,19 @@ void Renderer::InitializeWindow()
 	// Create a window
 	GLFWmonitor* monitor = nullptr;
 	if (m_Fullscreen) {
-		monitor = glfwGetPrimaryMonitor();
+        //monitor = glfwGetPrimaryMonitor();
+        //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+        //glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        //glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        //glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        //glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+        glfwWindowHint(GLFW_DECORATED, false);
+        glfwWindowHint(GLFW_AUTO_ICONIFY, false);
 	}
-	//glfwWindowHint(GLFW_SAMPLES, 8);
-	m_Window = glfwCreateWindow(m_Resolution.Width, m_Resolution.Height, "daydream", monitor, nullptr);
+
+    //glfwWindowHint(GLFW_SAMPLES, 8);
+	m_Window = glfwCreateWindow(m_Resolution.Width, m_Resolution.Height + 1, "daydream", monitor, nullptr);
 	if (!m_Window) {
 		LOG_ERROR("GLFW: Failed to create window");
 		exit(EXIT_FAILURE);
@@ -140,6 +149,7 @@ void Renderer::updateFramebufferSize()
     m_LightCullingPass->OnWindowResize();
     m_DrawBloomPass->OnWindowResize();
     m_SSAOPass->OnWindowResize();
+	m_BlurHUDPass->OnWindowResize();
     
     e.NewResolution = m_ViewportSize;
     m_EventBroker->Publish(e);
@@ -167,8 +177,10 @@ void Renderer::Draw(RenderFrame& frame)
 
 	ImGui::SliderInt("SSAO Quality", &m_SSAO_Quality, 0, 3);
 	ImGui::SliderInt("Glow Quality", &m_GLOW_Quality, 0, 3);
+	ImGui::SliderInt("MSAA Level", (int*)&m_MSAA_Level, 0, 16);
 	m_SSAOPass->ChangeQuality(m_SSAO_Quality);
 	m_DrawBloomPass->ChangeQuality(m_GLOW_Quality);
+	m_DrawFinalPass->setMSAA(m_MSAA_Level);
     GLERROR("SSAO Settings");
     //clear buffer 0
     glClearColor(0.f, 0.f, 0.f, 0.f);
@@ -227,7 +239,8 @@ void Renderer::Draw(RenderFrame& frame)
 
     if (m_DebugTextureToDraw == 0) {
         PerformanceTimer::StartTimer("Renderer-Color Correction Pass");
-        m_DrawColorCorrectionPass->Draw(m_DrawFinalPass->SceneTexture(), m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
+		GLuint test = m_DrawFinalPass->SceneTexture();
+        m_DrawColorCorrectionPass->Draw(test, m_DrawBloomPass->GaussianTexture(), frame.Gamma, frame.Exposure);
         PerformanceTimer::StopTimer("Renderer-Color Correction Pass");
     }
 
@@ -306,7 +319,7 @@ void Renderer::InitializeRenderPasses()
 	m_SSAOPass = new SSAOPass(this, m_Config);
 	m_ShadowPass = new ShadowPass(this);
     m_BlurHUDPass = new BlurHUD(this);
-    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass);
+    m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass, m_Config);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);
     m_DrawBloomPass = new DrawBloomPass(this, m_Config);
     m_DrawColorCorrectionPass = new DrawColorCorrectionPass(this);

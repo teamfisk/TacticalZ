@@ -22,7 +22,7 @@
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "imgui/imgui.h"
 #include "TextPass.h"
 #include "Util/CommonFunctions.h"
@@ -71,6 +71,7 @@ private:
     bool m_ResizeWindow = false;
 	int m_SSAO_Quality = 0;
 	int m_GLOW_Quality = 2;
+	unsigned int m_MSAA_Level = 0;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;

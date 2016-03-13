@@ -17,7 +17,6 @@
             <c:Text>
               <Content>123.123.123.123</Content>
               <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Color A="1" B="0" G="0" R="0"/>
               <Alignment>
                 <Left/>
               </Alignment>
@@ -28,7 +27,7 @@
               <Field>IP</Field>
             </c:TextFieldReader>
             <c:Transform>
-              <Position X="-0.200000003" Y="-0.100000001" Z="0"/>
+              <Position X="-0.200000003" Y="-0.100000001" Z="0.00700000022"/>
               <Scale X="0.649999976" Y="0.649999976" Z="1"/>
             </c:Transform>
           </Components>
@@ -39,7 +38,6 @@
             <c:Text>
               <Content>65999</Content>
               <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Color A="1" B="0" G="0" R="0"/>
               <Alignment>
                 <Left/>
               </Alignment>
@@ -50,7 +48,7 @@
               <Field>Port</Field>
             </c:TextFieldReader>
             <c:Transform>
-              <Position X="4.70000029" Y="-0.100000001" Z="0"/>
+              <Position X="4.70000029" Y="-0.100000001" Z="0.00700000022"/>
               <Scale X="0.649999976" Y="0.649999976" Z="1"/>
             </c:Transform>
           </Components>
@@ -61,7 +59,6 @@
             <c:Text>
               <Content>UnkownServer</Content>
               <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Color A="1" B="0" G="0" R="0"/>
               <Alignment>
                 <Left/>
               </Alignment>
@@ -72,7 +69,7 @@
               <Field>ServerName</Field>
             </c:TextFieldReader>
             <c:Transform>
-              <Position X="-8.60000038" Y="-0.100000001" Z="0"/>
+              <Position X="-8.60000038" Y="-0.100000001" Z="0.00700000022"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -82,7 +79,6 @@
             <c:Text>
               <Content>0</Content>
               <Resource>Fonts/DroidSans.ttf,64</Resource>
-              <Color A="1" B="0" G="0" R="0"/>
               <Alignment>
                 <Left/>
               </Alignment>
@@ -93,7 +89,7 @@
               <Field>PlayersConnected</Field>
             </c:TextFieldReader>
             <c:Transform>
-              <Position X="7.80000019" Y="0" Z="0"/>
+              <Position X="7.80000019" Y="0" Z="0.00700000022"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -102,15 +98,85 @@
           <Components>
             <c:Button/>
             <c:Sprite>
+              <DepthSort>false</DepthSort>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
               <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
               <BlurBackground>true</BlurBackground>
-              <GlowMap></GlowMap>
-              <DepthSort>false</DepthSort>
-              <Color A="0.588235319" B="1" G="1" R="1"/>
+              <Color A="0.392156869" B="0.392156869" G="0.392156869" R="0.392156869"/>
             </c:Sprite>
             <c:Transform>
-              <Position X="0.100000001" Y="0.496000022" Z="0"/>
+              <Position X="0.100000001" Y="0.496000022" Z="0.00700000022"/>
               <Scale X="18.1000004" Y="2" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Corners">
+      <Components>
+        <c:Transform>
+          <Position X="0" Y="0" Z="0.00700000022"/>
+          <Scale X="0.200000003" Y="0.200000003" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="TopLeft">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+              <Linear>false</Linear>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="-43.9590034" Y="6.70000029" Z="0"/>
+              <Orientation X="0" Y="0" Z="1.57079637"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="BottomLeft">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+              <Linear>false</Linear>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="-43.9589996" Y="-1.75600004" Z="0"/>
+              <Orientation X="0" Y="0" Z="3.14499998"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="BottomRight">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+              <Linear>false</Linear>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="44.8320007" Y="-1.75600004" Z="0"/>
+              <Orientation X="0" Y="0" Z="4.71218538"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="TopRight">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+              <Linear>false</Linear>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="44.8320007" Y="6.69999981" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
