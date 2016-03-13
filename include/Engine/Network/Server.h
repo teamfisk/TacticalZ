@@ -11,6 +11,7 @@
 #include "Network/MessageType.h"
 #include "Network/PlayerDefinition.h"
 #include "Core/World.h"
+#include "Core/EntityFile.h"
 #include "Core/EventBroker.h"
 #include "../Network/Network.h"
 #include "Input/EInputCommand.h"
@@ -24,6 +25,8 @@
 #include "Core/EPlayerDeath.h"
 #include "Network/EPlayerConnected.h"
 #include "Network/EKillDeath.h"
+#include "Core/EWin.h"
+#include "Game/Events/EReset.h"
 
 class Server : public Network
 {
@@ -31,7 +34,7 @@ public:
     Server(World* world, EventBroker* eventBroker, int port);
     ~Server();
 
-    void Update() override;
+    void Update(double dt) override;
 
 private:
     // Network channels
@@ -41,6 +44,7 @@ private:
     // dont forget to set these in the childrens receive logic
     boost::asio::ip::address m_Address;
     int m_Port = 27666;
+    bool m_GameIsOver = false;
     // Sending messages to client logic
     std::map<PlayerID, PlayerDefinition> m_ConnectedPlayers;
     std::vector<PlayerID> m_PlayersToDisconnect;
@@ -48,14 +52,14 @@ private:
     char readBuffer[BUFFERSIZE] = { 0 };
     size_t bytesRead = 0;
     // time for previouse message
-    std::clock_t previousePingMessage = std::clock();
-    std::clock_t previousSnapshotMessage = std::clock();
-    std::clock_t timOutTimer = std::clock();
+    double previousPingMessage = 0;
+    double previousSnapshotMessage = 0;
+    double timeOutTimer = 0;
 
-    // How often we send messages (milliseconds)
-    float pingIntervalMs;
-    float snapshotInterval;
-    int checkTimeOutInterval = 100;
+    // How often we send messages (seconds)
+    double pingInterval = 1;
+    double snapshotInterval = 0.05;
+    double checkTimeOutInterval = 0.1;
     int m_NextPlayerID = 0;
     std::vector<Events::InputCommand> m_InputCommandsToBroadcast;
     //Timers
@@ -71,6 +75,7 @@ private:
     void reliableBroadcast(Packet& packet);
     void unreliableBroadcast(Packet& packet);
     void sendSnapshot();
+    void createWorldSnapshot(Packet& packet);
     void addPlayersToPacket(Packet& packet, EntityID entityID);
     void addChildrenToPacket(Packet& packet, EntityID entityID);
     void addInputCommandsToPacket(Packet& packet);
@@ -83,6 +88,7 @@ private:
     void kick(PlayerID player);
     PlayerID getPlayerIDFromEndpoint();
     PlayerID getPlayerIDFromEntityID(EntityID entityID);
+    void resetMap();
     void parsePlayerTransform(Packet& packet);
     void parseOnInputCommand(Packet& packet);
     void parseClientPing();
@@ -110,6 +116,8 @@ private:
     bool OnAmmoPickup(const Events::AmmoPickup& e);
     EventRelay<Server, Events::PlayerDeath> m_EPlayerDeath;
     bool OnPlayerDeath(const Events::PlayerDeath& e);
+    EventRelay<Server, Events::Win> m_EWin;
+    bool OnWin(const Events::Win& e);
 };
 
 #endif
