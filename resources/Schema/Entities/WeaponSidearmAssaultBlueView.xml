@@ -97,7 +97,7 @@
         <Entity name="WeaponMuzzle">
           <Components>
             <c:Spawner>
-              <EntityFile>Schema/Entities/Ray2Red.xml</EntityFile>
+              <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
               <Position X="0" Y="0.105000004" Z="-0.256000012"/>

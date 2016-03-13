@@ -373,27 +373,28 @@ void DefenderWeaponBehaviour::spawnTracers(ComponentWrapper cWeapon, WeaponInfo&
 
         float distance;
         glm::vec3 hitPosition;
-        Collision::EntityFirstHitByRay(Ray(cameraPosition, direction), m_CollisionOctree, distance, hitPosition);
+        if (Collision::EntityFirstHitByRay(Ray(cameraPosition, direction), m_CollisionOctree, distance, hitPosition) != boost::none) { // don't spawn ray if you "miss the world"
 
-        EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
-        if (ray.Valid()) {
-            ComponentWrapper cTransform = ray["Transform"];
-            glm::vec3& rayOrigin = cTransform["Position"];
-            glm::vec3& rayOrientation = cTransform["Orientation"];
-            glm::vec3& rayScale = cTransform["Scale"];
+            EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
+            if (ray.Valid()) {
+                ComponentWrapper cTransform = ray["Transform"];
+                glm::vec3& rayOrigin = cTransform["Position"];
+                glm::vec3& rayOrientation = cTransform["Orientation"];
+                glm::vec3& rayScale = cTransform["Scale"];
 
-            glm::vec3 muzzlePosition = Transform::AbsolutePosition(muzzle);
-            glm::quat muzzleOrientation = Transform::AbsoluteOrientation(muzzle);
-            
-            rayOrigin = muzzlePosition;
+                glm::vec3 muzzlePosition = Transform::AbsolutePosition(muzzle);
+                glm::quat muzzleOrientation = Transform::AbsoluteOrientation(muzzle);
 
-            glm::vec3 muzzleToHit = hitPosition - muzzlePosition;
-            glm::vec3 lookVector = glm::normalize(-muzzleToHit);
-            float pitch = std::asin(-lookVector.y);
-            float yaw = std::atan2(lookVector.x, lookVector.z);
-            glm::quat orientation = glm::quat(glm::vec3(pitch, yaw, 0));
-            rayOrientation = glm::eulerAngles(orientation);
-            rayScale.z = glm::length(muzzleToHit);
+                rayOrigin = muzzlePosition;
+
+                glm::vec3 muzzleToHit = hitPosition - muzzlePosition;
+                glm::vec3 lookVector = glm::normalize(-muzzleToHit);
+                float pitch = std::asin(-lookVector.y);
+                float yaw = std::atan2(lookVector.x, lookVector.z);
+                glm::quat orientation = glm::quat(glm::vec3(pitch, yaw, 0));
+                rayOrientation = glm::eulerAngles(orientation);
+                rayScale.z = glm::length(muzzleToHit);
+            }
         }
     }
 }
@@ -448,8 +449,8 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
         }
 
         // Temp hit decal
-        EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
-        hit["Transform"]["Position"] = pick.Position;
+       // EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
+       // hit["Transform"]["Position"] = pick.Position;
 
         // Don't let us shoot ourselves in the foot somehow
         if (victim == LocalPlayer) {
@@ -471,7 +472,7 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
         }
 
         damageSum[victim] += pelletDamage;
-        ((glm::vec3&)hit["Model"]["Color"]).b = 1.f;
+      //  ((glm::vec3&)hit["Model"]["Color"]).b = 1.f;
     }
 
     // Deal damage!

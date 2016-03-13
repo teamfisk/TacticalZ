@@ -321,6 +321,8 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
         }
     }
 
+    spawnTracer(cWeapon, wi);
+
     // Deal damage! 
     Events::PlayerDamage ePlayerDamage;
     ePlayerDamage.Inflictor = wi.Player;
@@ -330,6 +332,49 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
 
     return damage > 0;
 }
+
+void SidearmWeaponBehaviour::spawnTracer(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    EntityWrapper muzzle = getRelevantWeaponEntity(wi).FirstChildByName("WeaponMuzzle");
+    if (!muzzle.Valid()) {
+        return;
+    }
+
+    EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+    if (!camera.Valid()) {
+        return;
+    }
+
+    glm::vec3 cameraPosition = Transform::AbsolutePosition(camera);
+    glm::vec3 direction = glm::vec3(0, 0, -1);
+
+    float distance;
+    glm::vec3 hitPosition;
+    Collision::EntityFirstHitByRay(Ray(cameraPosition, direction), m_CollisionOctree, distance, hitPosition);
+
+    EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
+    if (ray.Valid()) {
+        ComponentWrapper cTransform = ray["Transform"];
+        glm::vec3& rayOrigin = cTransform["Position"];
+        glm::vec3& rayOrientation = cTransform["Orientation"];
+        glm::vec3& rayScale = cTransform["Scale"];
+
+        glm::vec3 muzzlePosition = Transform::AbsolutePosition(muzzle);
+        glm::quat muzzleOrientation = Transform::AbsoluteOrientation(muzzle);
+
+        rayOrigin = muzzlePosition;
+
+        glm::vec3 muzzleToHit = hitPosition - muzzlePosition;
+        glm::vec3 lookVector = glm::normalize(-muzzleToHit);
+        float pitch = std::asin(-lookVector.y);
+        float yaw = std::atan2(lookVector.x, lookVector.z);
+        glm::quat orientation = glm::quat(glm::vec3(pitch, yaw, 0));
+        rayOrientation = glm::eulerAngles(orientation);
+        rayScale.z = glm::length(muzzleToHit);
+    }
+
+}
+
 /*
 
 void SidearmWeaponBehaviour::giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver)

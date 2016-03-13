@@ -13,9 +13,13 @@
     </c:Team>
     <c:Collidable/>
     <c:DefenderWeapon>
+      <BaseDamage>120</BaseDamage>
       <MagazineAmmo>8</MagazineAmmo>
+      <SpreadAngle>5</SpreadAngle>
     </c:DefenderWeapon>
-    <c:SidearmWeapon/>
+    <c:SidearmWeapon>
+      <BaseDamage>10</BaseDamage>
+    </c:SidearmWeapon>
     <c:Health>
       <Health>150</Health>
       <MaxHealth>150</MaxHealth>

@@ -163,7 +163,7 @@
         <Entity name="WeaponMuzzle">
           <Components>
             <c:Spawner>
-              <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
+              <EntityFile>Schema/Entities/DefenderRayBlue.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
               <Position X="0.0145629933" Y="0.0680000037" Z="-0.306000024"/>

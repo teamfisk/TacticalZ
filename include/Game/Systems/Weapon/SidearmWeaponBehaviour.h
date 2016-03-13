@@ -39,6 +39,7 @@ private:
     bool dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi);
    // void giveAmmo(ComponentWrapper cWeapon, WeaponInfo& wi, EntityWrapper receiver);
 
+    void spawnTracer(ComponentWrapper cWeapon, WeaponInfo& wi);
 
     void CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi);
     void RemoveFrindlyAmmoHUD(WeaponInfo& wi);
