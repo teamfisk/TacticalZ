@@ -36,8 +36,11 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         int& magSize = cWeapon["MagazineSize"];
         int& ammo = cWeapon["Ammo"];
 
-        ammo = glm::max(0, ammo - (magSize - magAmmo));
-        magAmmo = glm::min(magSize, ammo);
+        int usedAmmo = glm::max(0, magSize - magAmmo);
+        magAmmo = glm::clamp(ammo + magAmmo, 0, magSize);
+        ammo = glm::max(0, ammo - usedAmmo);
+        
+        
         isReloading = false;
         if (wi.FirstPersonEntity.Valid()) {
             wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = true;
