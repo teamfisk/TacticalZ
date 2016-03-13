@@ -35,7 +35,7 @@ void HealthHUDSystem::Update(double dt)
 
             if(entity.HasComponent("Fill")) {
                 double health = (const double&)entityIDParent["Health"]["Health"];
-                double maxHealth = (const double&)entityIDParent["Health"]["Health"];
+                double maxHealth = (const double&)entityIDParent["Health"]["MaxHealth"];
                 float healthPercentage = health/maxHealth;
                 entity["Fill"]["Color"] = glm::vec4(1.0 - healthPercentage, 0.f, healthPercentage, glm::vec4(entity["Fill"]["Color"]).a);
                 entity["Fill"]["Percentage"] = (double)healthPercentage;
