@@ -30,6 +30,7 @@
 #include "../Engine/Core/EPause.h"
 #include "../Engine/Core/EComponentAttached.h"
 #include "../Core/EPlayerSpawned.h"
+#include "../Rendering/ESetCamera.h"
 
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
@@ -91,7 +92,6 @@ private:
     void matchBGMLoop();
     Source* m_CurrentBGM = nullptr;
     Source* m_CurrentBGMCombo = nullptr;
-    bool m_DrumLoopHasBeenStarted = false;
 
     // Logic
     World* m_World = nullptr;
@@ -139,6 +139,8 @@ private:
     bool OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e);
     EventRelay<SoundManager, Events::ChangeBGM> m_EChangeBGM;
     bool OnChangeBGM(const Events::ChangeBGM &e);
+    EventRelay<SoundManager, Events::SetCamera> m_ESetCamera;
+    bool OnSetCamera(const Events::SetCamera& e);
 
 
 };
