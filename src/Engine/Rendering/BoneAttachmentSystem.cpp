@@ -55,13 +55,13 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         glm::vec3 angles = glm::eulerAngles(rotation);
         
         if ((bool)entity["BoneAttachment"]["InheritPosition"]) {
-            (glm::vec3&)entity["Transform"]["Position"] = translation + (glm::vec3)entity["BoneAttachment"]["PositionOffset"];
+            entity["Transform"]["Position"] = translation + (glm::vec3)entity["BoneAttachment"]["PositionOffset"];
         }
         if ((bool)entity["BoneAttachment"]["InheritOrientation"]) {
-            (glm::vec3&)entity["Transform"]["Orientation"] = angles;
+            entity["Transform"]["Orientation"] = angles;
         }
         if ((bool)entity["BoneAttachment"]["InheritScale"]) {
-            (glm::vec3&)entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];
+            entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];
         }
     }
 

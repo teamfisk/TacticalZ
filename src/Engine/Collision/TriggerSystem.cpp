@@ -15,7 +15,7 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
     if (triggerEntity.HasComponent("Model")) {
         try {
             triggerModel = ResourceManager::Load<RawModel, true>(triggerEntity["Model"]["Resource"]);
-            triggerModelMat = Transform::ModelMatrix(triggerEntity);
+            triggerModelMat = TransformSystem::ModelMatrix(triggerEntity);
         } catch (const std::exception&) {
         }
     }

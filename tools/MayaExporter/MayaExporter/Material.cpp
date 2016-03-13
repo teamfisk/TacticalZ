@@ -108,7 +108,7 @@ bool Material::findColorTexture(MaterialNode& material_node, MFnDependencyNode& 
 			return true;
 
 		} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
-			MGlobal::displayInfo(MString() + "find splat map");
+			MGlobal::displayInfo(MString() + "found color splat map");
 			return findSplatTextures(material_node, material_node.ColorMaps, MFnDependencyNode(AllConnections[i].node()));
 		}
 	}
@@ -162,9 +162,9 @@ bool Material::findNormalTexture(MaterialNode& material_node, MFnDependencyNode&
 
 					material_node.NormalMaps.push_back(newTexture);
 					return true;
-				} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
-					MGlobal::displayInfo(MString() + "find splat map");
-					return findSplatTextures(material_node, material_node.NormalMaps, MFnDependencyNode(AllConnections[i].node()));
+				} else if (AllBumpConnections[j].node().hasFn(MFn::kLayeredTexture)) {
+					MGlobal::displayInfo(MString() + "found normal splat map");
+					return findSplatTextures(material_node, material_node.NormalMaps, MFnDependencyNode(AllBumpConnections[j].node()));
 				}
 			}
 		}
@@ -218,7 +218,7 @@ bool Material::findSpecularTexture(MaterialNode& material_node, MFnDependencyNod
 				material_node.type = MaterialNode::MaterialType::SingleTextures;
 			return true;
 		} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
-			MGlobal::displayInfo(MString() + "find splat map");
+			MGlobal::displayInfo(MString() + "found specular splat map");
 			return findSplatTextures(material_node, material_node.SpecularMaps, MFnDependencyNode(AllConnections[i].node()));
 		}
 	}
@@ -270,7 +270,7 @@ bool Material::findIncandescenceTexture(MaterialNode& material_node, MFnDependen
 			return true;
 
 		} else if (AllConnections[i].node().hasFn(MFn::kLayeredTexture)) {
-			MGlobal::displayInfo(MString() + "find splat map");
+			MGlobal::displayInfo(MString() + "found incandescens splat map");
 			return findSplatTextures(material_node, material_node.IncandescenceMaps, MFnDependencyNode(AllConnections[i].node()));
 		}
 	}
