@@ -24,7 +24,7 @@ void CommonFunctions::GenerateMultiSampleTexture(GLuint* texture, int numSamples
 }
 
 
-void CommonFunctions::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type, GLint numMipMaps)
+void CommonFunctions::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type, GLint numMipMaps, GLint MAGFilter, GLint MINFilter)
 {
     glDeleteTextures(1, texture);
 	glGenTextures(1, texture);
@@ -35,8 +35,8 @@ void CommonFunctions::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, gl
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, MAGFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MINFilter);
 	GLERROR("MipMap Texture initialization failed");
 }
 
