@@ -392,17 +392,22 @@ void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
 
 bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
 {
-    EntityWrapper player(m_World, e.Player);
-    if (!player.Valid() || !IsClient || player.ID == LocalPlayer.ID) {
+    EntityWrapper eventPlayer(m_World, e.Player);
+    if (!eventPlayer.Valid() || IsServer || eventPlayer.ID == LocalPlayer.ID) {
         return false;
     }
 
 //    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
   //  EntityWrapper dashEffect = entityFile->MergeInto(m_World);
-    EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+    EntityWrapper playerModel = eventPlayer.FirstChildByName("PlayerModel");
 
     for (auto& kv : m_PlayerInputControllers) {
         EntityWrapper player = kv.first;
+        if(player != eventPlayer) {
+            continue;
+        }
+
+
         auto& controller = kv.second;
 
         if (!player.Valid()) {
