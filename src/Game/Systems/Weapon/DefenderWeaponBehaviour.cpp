@@ -359,26 +359,41 @@ void DefenderWeaponBehaviour::spawnTracers(ComponentWrapper cWeapon, WeaponInfo&
         return;
     }
 
+    EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+    if (!camera.Valid()) {
+        return;
+    }
+
     float spreadAngle = glm::radians((float)cWeapon["SpreadAngle"]);
 
     for (auto& pellet : pattern) {
-        glm::quat pelletRotation = glm::quat(Transform::AbsoluteOrientationEuler(wi.Player.FirstChildByName("Camera"))) * glm::quat(glm::vec3(pellet.y, pellet.x, 0) * spreadAngle);
-        glm::vec3 origin = Transform::AbsolutePosition(wi.Player.FirstChildByName("Camera"));
+        glm::quat pelletRotation = glm::quat(Transform::AbsoluteOrientationEuler(camera)) * glm::quat(glm::vec3(pellet.y, pellet.x, 0) * spreadAngle);
+        glm::vec3 cameraPosition = Transform::AbsolutePosition(camera);
         glm::vec3 direction = pelletRotation * glm::vec3(0, 0, -1);
-        float distance = traceRayDistance(origin, direction);
 
-       // Collision::EntityFirstHitByRay(Ray(origin, direction), m_CollisionOctree, distance, pos);
+        float distance;
+        glm::vec3 hitPosition;
+        Collision::EntityFirstHitByRay(Ray(cameraPosition, direction), m_CollisionOctree, distance, hitPosition);
 
         EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
         if (ray.Valid()) {
             ComponentWrapper cTransform = ray["Transform"];
-            glm::vec3& position = cTransform["Position"];
-            glm::vec3& orientation = cTransform["Orientation"];
-            glm::vec3& scale = cTransform["Scale"];
+            glm::vec3& rayOrigin = cTransform["Position"];
+            glm::vec3& rayOrientation = cTransform["Orientation"];
+            glm::vec3& rayScale = cTransform["Scale"];
 
-            position = Transform::AbsolutePosition(wi.Player.FirstChildByName("Camera"));
-            orientation = glm::eulerAngles(pelletRotation);
-            scale.z = distance;
+            glm::vec3 muzzlePosition = Transform::AbsolutePosition(muzzle);
+            glm::quat muzzleOrientation = Transform::AbsoluteOrientation(muzzle);
+            
+            rayOrigin = muzzlePosition;
+
+            glm::vec3 muzzleToHit = hitPosition - muzzlePosition;
+            glm::vec3 lookVector = glm::normalize(-muzzleToHit);
+            float pitch = std::asin(-lookVector.y);
+            float yaw = std::atan2(lookVector.x, lookVector.z);
+            glm::quat orientation = glm::quat(glm::vec3(pitch, yaw, 0));
+            rayOrientation = glm::eulerAngles(orientation);
+            rayScale.z = glm::length(muzzleToHit);
         }
     }
 }

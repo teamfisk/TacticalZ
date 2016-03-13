@@ -5,6 +5,7 @@
 #include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
 #include "Sound/EPlaySoundOnEntity.h"
+#include <glm/gtx/vector_angle.hpp>
 
 class DefenderWeaponBehaviour : public WeaponBehaviour<DefenderWeaponBehaviour>
 {
