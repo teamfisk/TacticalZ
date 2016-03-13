@@ -212,6 +212,33 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                         m_EventBroker->Publish(aeb);
                     }
                 }
+
+
+                EntityWrapper firstPersonModel = m_PlayerEntity.FirstChildByName("Hands");
+                if (firstPersonModel.Valid()) {
+                    if (val > 0) {  // Walk/Run
+                        if (!m_Crouching) {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.1;
+                            aeb.NodeName = "Run";
+                            aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                    } else if (val < 0) {   // Walk/run Backwards
+                        if (!m_Crouching) {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.1;
+                            aeb.NodeName = "Run";
+                            aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
+                            aeb.Start = true;
+                            aeb.Reverse = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                    }
+                }
             }
         }
     }
