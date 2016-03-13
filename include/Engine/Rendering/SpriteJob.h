@@ -21,7 +21,7 @@ struct SpriteJob : RenderJob
     SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage, bool depthSorted, bool isIndicator)
         : RenderJob()
     {
-        Model = ResourceManager::Load<::Model>((std::string)cSprite["Model"]);
+        Model = ResourceManager::Load<::Model>(cSprite["Model"]);
         ::RawModel::MaterialProperties matProp = Model->MaterialGroups().front();
         TextureID = 0;
 

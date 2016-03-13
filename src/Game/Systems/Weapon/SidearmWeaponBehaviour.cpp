@@ -2,7 +2,7 @@
 
 void SidearmWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt)
 {
-    double& cooldown = cWeapon["FireCooldown"];
+    Field<double> cooldown = cWeapon["FireCooldown"];
     if (cooldown > 0) {
         cooldown -= dt;
         if (cooldown < 0) {
@@ -17,29 +17,29 @@ void SidearmWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     CheckAmmo(cWeapon, wi);
 
     // Start reloading automatically if at 0 mag ammo
-    int& magAmmo = cWeapon["MagazineAmmo"];
+    Field<int> magAmmo = cWeapon["MagazineAmmo"];
     if (m_ConfigAutoReload && magAmmo <= 0) {
         OnReload(cWeapon, wi);
     }
 
     // Only start reloading once we're done firing
-    bool& reloadQueued = cWeapon["ReloadQueued"];
-    double& fireCooldown = cWeapon["FireCooldown"];
-    bool& isReloading = cWeapon["IsReloading"];
+    Field<bool> reloadQueued = cWeapon["ReloadQueued"];
+    Field<double> fireCooldown = cWeapon["FireCooldown"];
+    Field<bool> isReloading = cWeapon["IsReloading"];
     if (reloadQueued && fireCooldown <= 0) {
         reloadQueued = fireCooldown;
         isReloading = true;
     }
 
     // Decrement reload timer
-    double& reloadTimer = cWeapon["ReloadTimer"];
+    Field<double> reloadTimer = cWeapon["ReloadTimer"];
     if (isReloading) {
         reloadTimer = glm::max(0.0, reloadTimer - dt);
     }
 
     // Handle reloading
     if (isReloading && reloadTimer <= 0.0) {
-        int& magSize = cWeapon["MagazineSize"];
+        Field<int> magSize = cWeapon["MagazineSize"];
 
         magAmmo = magSize;
         isReloading = false;
@@ -65,7 +65,7 @@ void SidearmWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     if (rootNode.Valid()) {
         EntityWrapper blend = rootNode.FirstChildByName("MovementBlendSidearm");
         if (blend.Valid()) {
-            (double&)blend["Blend"]["Weight"] = animationWeight;
+            (Field<double>)blend["Blend"]["Weight"] = animationWeight;
         }
     }
 
@@ -90,20 +90,20 @@ void SidearmWeaponBehaviour::OnCeasePrimaryFire(ComponentWrapper cWeapon, Weapon
 
 void SidearmWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    bool& reloadQueued = cWeapon["ReloadQueued"];
-    bool& isReloading = cWeapon["IsReloading"];
+    Field<bool> reloadQueued = cWeapon["ReloadQueued"];
+    Field<bool> isReloading = cWeapon["IsReloading"];
     if (reloadQueued || isReloading) {
         return;
     }
 
-    int& magAmmo = cWeapon["MagazineAmmo"];
-    int& magSize = cWeapon["MagazineSize"];
+    Field<int> magAmmo = cWeapon["MagazineAmmo"];
+    Field<int> magSize = cWeapon["MagazineSize"];
     if (magAmmo >= magSize) {
         return;
     }
 
     double reloadTime = cWeapon["ReloadTime"];
-    double& reloadTimer = cWeapon["ReloadTimer"];
+    Field<double> reloadTimer = cWeapon["ReloadTimer"];
 
     // Start reload
     reloadQueued = true;
@@ -143,7 +143,7 @@ void SidearmWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 
     // Sound
     Events::PlaySoundOnEntity e;
-    e.EmitterID = wi.Player.ID;
+    e.Emitter = wi.Player;
     e.FilePath = "Audio/weapon/Assault/AssaultWeaponReload.wav";
     m_EventBroker->Publish(e);
 }
@@ -176,7 +176,7 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     cWeapon["FireCooldown"] = 60.0 / (double)cWeapon["RPM"];
 
     // Ammo
-    int& magAmmo = cWeapon["MagazineAmmo"];
+    Field<int> magAmmo = cWeapon["MagazineAmmo"];
     if (magAmmo <= 0) {
         return;
     } else {
@@ -192,12 +192,12 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     // Tracer
     EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
     if (tracerSpawner.Valid()) {
-        glm::vec3 origin = Transform::AbsolutePosition(tracerSpawner);
-        glm::vec3 direction = Transform::AbsoluteOrientation(tracerSpawner) * glm::vec3(0, 0, -1);
+        glm::vec3 origin = TransformSystem::AbsolutePosition(tracerSpawner);
+        glm::vec3 direction = TransformSystem::AbsoluteOrientation(tracerSpawner) * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
         EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
         if (ray.Valid()) {
-            ((glm::vec3&)ray["Transform"]["Scale"]).z = distance;
+            ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance);
         }
     }
 
@@ -208,7 +208,7 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         if (hitMarkerSpawner.Valid()) {
             SpawnerSystem::Spawn(hitMarkerSpawner, hitMarkerSpawner);
             Events::PlaySoundOnEntity e;
-            e.EmitterID = wi.Player.ID;
+            e.Emitter = wi.Player;
             e.FilePath = "Audio/weapon/hitclick.wav";
             m_EventBroker->Publish(e);
         }
@@ -345,7 +345,7 @@ void SidearmWeaponBehaviour::spawnTracer(ComponentWrapper cWeapon, WeaponInfo& w
         return;
     }
 
-    glm::vec3 cameraPosition = Transform::AbsolutePosition(camera);
+    glm::vec3 cameraPosition = TransformSystem::AbsolutePosition(camera);
     glm::vec3 direction = glm::vec3(0, 0, -1);
 
     float distance;
@@ -355,12 +355,12 @@ void SidearmWeaponBehaviour::spawnTracer(ComponentWrapper cWeapon, WeaponInfo& w
     EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
     if (ray.Valid()) {
         ComponentWrapper cTransform = ray["Transform"];
-        glm::vec3& rayOrigin = cTransform["Position"];
-        glm::vec3& rayOrientation = cTransform["Orientation"];
-        glm::vec3& rayScale = cTransform["Scale"];
+        Field<glm::vec3> rayOrigin = cTransform["Position"];
+        Field<glm::vec3> rayOrientation = cTransform["Orientation"];
+        Field<glm::vec3> rayScale = cTransform["Scale"];
 
-        glm::vec3 muzzlePosition = Transform::AbsolutePosition(muzzle);
-        glm::quat muzzleOrientation = Transform::AbsoluteOrientation(muzzle);
+        glm::vec3 muzzlePosition = TransformSystem::AbsolutePosition(muzzle);
+        glm::quat muzzleOrientation = TransformSystem::AbsoluteOrientation(muzzle);
 
         rayOrigin = muzzlePosition;
 
@@ -370,7 +370,7 @@ void SidearmWeaponBehaviour::spawnTracer(ComponentWrapper cWeapon, WeaponInfo& w
         float yaw = std::atan2(lookVector.x, lookVector.z);
         glm::quat orientation = glm::quat(glm::vec3(pitch, yaw, 0));
         rayOrientation = glm::eulerAngles(orientation);
-        rayScale.z = glm::length(muzzleToHit);
+        rayScale.z(glm::length(muzzleToHit));
     }
 
 }
@@ -492,14 +492,14 @@ void SidearmWeaponBehaviour::CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi)
                         EntityWrapper textEntity = friendlyAmmoHud.FirstChildByName("MagazineAmmo");
                         if (textEntity.Valid()) {
                             if (textEntity.HasComponent("Text")) {
-                                (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+                                (Field<std::string>)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
                             }
                         }
 
                         EntityWrapper ammoTextEntity = friendlyAmmoHud.FirstChildByName("Ammo");
                         if (ammoTextEntity.Valid()) {
                             if (ammoTextEntity.HasComponent("Text")) {
-                                (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+                                (Field<std::string>)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
                             }
                         }
                     }
@@ -508,14 +508,14 @@ void SidearmWeaponBehaviour::CheckAmmo(ComponentWrapper cWeapon, WeaponInfo& wi)
                 EntityWrapper textEntity = friendlyAmmoHudSpawner.FirstChildByName("MagazineAmmo");
                 if (textEntity.Valid()) {
                     if (textEntity.HasComponent("Text")) {
-                        (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+                        (Field<std::string>)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
                     }
                 }
 
                 EntityWrapper ammoTextEntity = friendlyAmmoHudSpawner.FirstChildByName("Ammo");
                 if (ammoTextEntity.Valid()) {
                     if (ammoTextEntity.HasComponent("Text")) {
-                        (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+                        (Field<std::string>)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
                     }
                 }
             }

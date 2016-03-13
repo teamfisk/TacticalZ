@@ -81,10 +81,10 @@ void BoostSystem::giveAmmo(EntityWrapper giver, EntityWrapper receiver)
 {
     if (receiver.HasComponent("AssaultWeapon")) {
         int magazineSize = receiver["AssaultWeapon"]["MagazineSize"];
-        int& magazineAmmo = receiver["AssaultWeapon"]["MagazineAmmo"];
+        Field<int> magazineAmmo = receiver["AssaultWeapon"]["MagazineAmmo"];
         int prevMagazineAmmo = receiver["AssaultWeapon"]["MagazineAmmo"];
         int maxAmmo = receiver["AssaultWeapon"]["MaxAmmo"];
-        int& ammo = receiver["AssaultWeapon"]["Ammo"];
+        Field<int> ammo = receiver["AssaultWeapon"]["Ammo"];
 
         int givenAmmo = 3;
 
@@ -97,10 +97,10 @@ void BoostSystem::giveAmmo(EntityWrapper giver, EntityWrapper receiver)
         }
     } else if (receiver.HasComponent("DefenderWeapon")) {
         int magazineSize = receiver["DefenderWeapon"]["MagazineSize"];
-        int& magazineAmmo = receiver["DefenderWeapon"]["MagazineAmmo"];
+        Field<int> magazineAmmo = receiver["DefenderWeapon"]["MagazineAmmo"];
         int prevMagazineAmmo = receiver["DefenderWeapon"]["MagazineAmmo"];
         int maxAmmo = receiver["DefenderWeapon"]["MaxAmmo"];
-        int& ammo = receiver["DefenderWeapon"]["Ammo"];
+        Field<int> ammo = receiver["DefenderWeapon"]["Ammo"];
 
         int givenAmmo = 1;
 

@@ -84,7 +84,7 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             // Limit camera pitch so we don't break our necks
             cameraOrientation.x(glm::clamp(cameraOrientation.x(), -glm::half_pi<float>(), glm::half_pi<float>()));
 
-            float pitch = cameraOrientation.x;
+            float pitch = cameraOrientation.x();
             double time = ((pitch + glm::half_pi<float>()) / glm::pi<float>());
 
             // Set third person model aim pitch
@@ -325,7 +325,7 @@ void PlayerMovementSystem::setAim(EntityWrapper root, std::string weaponNodeName
                 EntityWrapper aim = weapon.FirstChildByName("Aim");
                 if (aim.Valid()) {
                     if (aim.HasComponent("Animation")) {
-                        (double&)aim["Animation"]["Time"] = time;
+                        (Field<double>)aim["Animation"]["Time"] = time;
                     }
                 }
             }

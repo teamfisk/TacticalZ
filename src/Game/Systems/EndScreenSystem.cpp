@@ -35,37 +35,37 @@ bool EndScreenSystem::OnWin(const Events::Win& e)
         if (e.TeamThatWon == 2) {
             //Red team won
             if(redSprite.HasComponent("Sprite"))
-                (bool&)redSprite["Sprite"]["Visible"] = true;
+                (Field<bool>)redSprite["Sprite"]["Visible"] = true;
             if (redText.HasComponent("Text"))
-                (bool&)redText["Text"]["Visible"] = true;
+                (Field<bool>)redText["Text"]["Visible"] = true;
 
             if (blueSprite.HasComponent("Sprite"))
-                (bool&)blueSprite["Sprite"]["Visible"] = false;
+                (Field<bool>)blueSprite["Sprite"]["Visible"] = false;
             if (blueText.HasComponent("Text"))
-                (bool&)blueText["Text"]["Visible"] = false;
+                (Field<bool>)blueText["Text"]["Visible"] = false;
 
         }else if (e.TeamThatWon == 3) {
             //Blue team won
             if (redSprite.HasComponent("Sprite"))
-                (bool&)redSprite["Sprite"]["Visible"] = false;
+                (Field<bool>)redSprite["Sprite"]["Visible"] = false;
             if (redText.HasComponent("Text"))
-                (bool&)redText["Text"]["Visible"] = false;
+                (Field<bool>)redText["Text"]["Visible"] = false;
 
             if (blueSprite.HasComponent("Sprite"))
-                (bool&)blueSprite["Sprite"]["Visible"] = true;
+                (Field<bool>)blueSprite["Sprite"]["Visible"] = true;
             if (blueText.HasComponent("Text"))
-                (bool&)blueText["Text"]["Visible"] = true;
+                (Field<bool>)blueText["Text"]["Visible"] = true;
         } else {
             //No team won?
             if (redSprite.HasComponent("Sprite"))
-                (bool&)redSprite["Sprite"]["Visible"] = false;
+                (Field<bool>)redSprite["Sprite"]["Visible"] = false;
             if (blueSprite.HasComponent("Sprite"))
-                (bool&)blueSprite["Sprite"]["Visible"] = false;
+                (Field<bool>)blueSprite["Sprite"]["Visible"] = false;
 
             if (redText.HasComponent("Text"))
-                (bool&)redText["Text"]["Visible"] = false;
+                (Field<bool>)redText["Text"]["Visible"] = false;
             if (blueText.HasComponent("Text"))
-                (bool&)blueText["Text"]["Visible"] = false;
+                (Field<bool>)blueText["Text"]["Visible"] = false;
         }
     }
 

@@ -36,9 +36,9 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         Field<int> magSize = cWeapon["MagazineSize"];
         Field<int> ammo = cWeapon["Ammo"];
 
-        int usedAmmo = glm::max(0, magSize - magAmmo);
-        magAmmo = glm::clamp(ammo + magAmmo, 0, magSize);
-        ammo = glm::max(0, ammo - usedAmmo);
+        int usedAmmo = glm::max(0, *magSize - *magAmmo);
+        magAmmo = glm::clamp(*ammo + *magAmmo, 0, *magSize);
+        ammo = glm::max(0, *ammo - usedAmmo);
         
         
         isReloading = false;
@@ -243,7 +243,7 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         std::uniform_real_distribution<float> randomSpreadAngle(0.f, 3.1415f*2);
         EntityWrapper flash = SpawnerSystem::Spawn(muzzleFlashSpawner, muzzleFlashSpawner);
         if (flash.Valid()) {
-            ((glm::vec3&)flash["Transform"]["Orientation"]).z = randomSpreadAngle(m_RandomEngine);
+            ((Field<glm::vec3>)flash["Transform"]["Orientation"]).z(randomSpreadAngle(m_RandomEngine));
         }
     }
 
@@ -264,16 +264,16 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     if (IsClient) {
         EntityWrapper camera = wi.Player.FirstChildByName("Camera");
         if (camera.Valid()) {
-            glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
+            Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
             float viewPunch = cWeapon["ViewPunch"];
             float maxTravelAngle = cWeapon["MaxTravelAngle"];
-            float& currentTravel = cWeapon["CurrentTravel"];
+            Field<float> currentTravel = cWeapon["CurrentTravel"];
             if (currentTravel < maxTravelAngle) {
                 float change = viewPunch;
                 if (currentTravel + change > maxTravelAngle) {
                     change = maxTravelAngle - currentTravel;
                 }
-                cameraOrientation.x += change;
+                cameraOrientation.x(cameraOrientation.x() + change);
                 currentTravel += change;
             }
         }
