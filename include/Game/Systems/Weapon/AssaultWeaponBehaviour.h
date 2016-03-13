@@ -36,6 +36,10 @@ private:
 
     // Utility
     //Camera cameraFromEntity(EntityWrapper camera);
+
+    void CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi);
+    void RemoveBoostCheckHUD(WeaponInfo& wi);
+
 };
 
 #endif
