@@ -90,11 +90,12 @@ void PlayerMovementSystem::Update(double dt)
                     cAnim["Animation"]["Play"] = false;
                 }
                 for (auto& cModel : dashEffect.ChildrenWithComponent("Model")) {
-                    Entity.AttachComponent("Lifetime");
-                    dashEffect.AttachComponent("Fade");
-                    dashEffect["Fade"]["Loop"] = false;
-                    dashEffect["Fade"]["FadeTime"] = 0.5;
-                    dashEffect["Fade"]["Time"] = (double)dashEffect["Fade"]["FadeTime"];
+                    EntityWrapper e(m_World, cModel.ID);
+                    e.AttachComponent("Lifetime");
+                    e.AttachComponent("Fade");
+                    e["Fade"]["Loop"] = false;
+                    e["Fade"]["FadeTime"] = 0.5;
+                    e["Fade"]["Time"] = (double)dashEffect["Fade"]["FadeTime"];
                 }
                 dashEffect.AttachComponent("Lifetime");
                 dashEffect.AttachComponent("Fade");
