@@ -79,45 +79,37 @@ std::string BoostSystem::DetermineClass(EntityWrapper inflictorPlayer)
 
 void BoostSystem::giveAmmo(EntityWrapper giver, EntityWrapper receiver)
 {
-    bool gaveAmmo = false;
-
     if (receiver.HasComponent("AssaultWeapon")) {
         int magazineSize = receiver["AssaultWeapon"]["MagazineSize"];
         int& magazineAmmo = receiver["AssaultWeapon"]["MagazineAmmo"];
-
+        int prevMagazineAmmo = receiver["AssaultWeapon"]["MagazineAmmo"];
         int maxAmmo = receiver["AssaultWeapon"]["MaxAmmo"];
         int& ammo = receiver["AssaultWeapon"]["Ammo"];
 
-        if (magazineAmmo < magazineSize) {
-            magazineAmmo += 1;
-            gaveAmmo = true;
-        } else if (ammo < maxAmmo) {
-            ammo += 1;
-            gaveAmmo = true;
+        int givenAmmo = 3;
+
+        magazineAmmo = glm::clamp(magazineAmmo + givenAmmo, 0, magazineSize);
+        if (magazineAmmo > prevMagazineAmmo) {
+            givenAmmo = prevMagazineAmmo + givenAmmo - magazineSize;
+        }
+        if (givenAmmo > 0) {
+            ammo = glm::clamp(ammo + givenAmmo, 0, maxAmmo);
         }
     } else if (receiver.HasComponent("DefenderWeapon")) {
         int magazineSize = receiver["DefenderWeapon"]["MagazineSize"];
         int& magazineAmmo = receiver["DefenderWeapon"]["MagazineAmmo"];
-
+        int prevMagazineAmmo = receiver["DefenderWeapon"]["MagazineAmmo"];
         int maxAmmo = receiver["DefenderWeapon"]["MaxAmmo"];
         int& ammo = receiver["DefenderWeapon"]["Ammo"];
 
-        if (magazineAmmo < magazineSize) {
-            magazineAmmo += 1;
-            gaveAmmo = true;
-        } else if (ammo < maxAmmo) {
-            ammo += 1;
-            gaveAmmo = true;
+        int givenAmmo = 1;
+
+        magazineAmmo = glm::clamp(magazineAmmo + givenAmmo, 0, magazineSize);
+        if (magazineAmmo > prevMagazineAmmo) {
+            givenAmmo = prevMagazineAmmo + givenAmmo - magazineSize;
         }
-    }
-
-
-    if (gaveAmmo) {
-        EntityWrapper effectSpawner = giver.FirstChildByName("AmmoShareEffectSpawner");
-        if (effectSpawner.Valid()) {
-            if (effectSpawner.HasComponent("Spawner")) {
-                SpawnerSystem::Spawn(effectSpawner, effectSpawner);
-            }
+        if (givenAmmo > 0) {
+            ammo = glm::clamp(ammo + givenAmmo, 0, maxAmmo);
         }
     }
 }

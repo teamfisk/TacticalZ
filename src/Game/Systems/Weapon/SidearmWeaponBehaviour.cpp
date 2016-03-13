@@ -281,7 +281,44 @@ bool SidearmWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
     // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
         damage = 0;
-        //giveAmmo(cWeapon, wi, victim);
+
+        bool gaveAmmo = false;
+
+        if (victim.HasComponent("AssaultWeapon")) {
+            int magazineSize = victim["AssaultWeapon"]["MagazineSize"];
+            int magazineAmmo = victim["AssaultWeapon"]["MagazineAmmo"];
+
+            int maxAmmo = victim["AssaultWeapon"]["MaxAmmo"];
+            int ammo = victim["AssaultWeapon"]["Ammo"];
+
+            if (magazineAmmo < magazineSize) {
+                gaveAmmo = true;
+            } else if (ammo < maxAmmo) {
+                gaveAmmo = true;
+            }
+        } else if (victim.HasComponent("DefenderWeapon")) {
+            int magazineSize = victim["DefenderWeapon"]["MagazineSize"];
+            int magazineAmmo = victim["DefenderWeapon"]["MagazineAmmo"];
+
+            int maxAmmo = victim["DefenderWeapon"]["MaxAmmo"];
+            int ammo = victim["DefenderWeapon"]["Ammo"];
+
+            if (magazineAmmo < magazineSize) {
+                gaveAmmo = true;
+            } else if (ammo < maxAmmo) {
+                gaveAmmo = true;
+            }
+        }
+
+
+        if (gaveAmmo) {
+            EntityWrapper effectSpawner = wi.FirstPersonEntity.FirstChildByName("AmmoShareEffectSpawner");
+            if (effectSpawner.Valid()) {
+                if (effectSpawner.HasComponent("Spawner")) {
+                    SpawnerSystem::Spawn(effectSpawner, effectSpawner);
+                }
+            }
+        }
     }
 
     // Deal damage! 
