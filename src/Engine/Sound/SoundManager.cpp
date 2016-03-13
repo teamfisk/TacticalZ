@@ -417,8 +417,17 @@ bool SoundManager::OnSetCamera(const Events::SetCamera& e)
         alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
         setGain(m_CurrentBGMCombo, 0);
         playSound(m_CurrentBGMCombo);
-    } else if (e.CameraEntity.Name() == "WINCAMERAISH") {
-        // Play win sound! 
+    } else if (m_World->HasComponent(e.CameraEntity.ID, "EndScreen")) {
+        float timeOffset = getTimeOffsetSeconds(m_CurrentBGM);
+        stopSound(m_CurrentBGM);
+        m_CurrentBGM = createSource("Audio/BGM/Layer3.wav");
+        m_CurrentBGM->Type = SoundType::BGM;
+        alSourcei(m_CurrentBGM->ALsource, AL_LOOPING, 1);
+        playSound(m_CurrentBGM);
+        setTimeOffsetSeconds(m_CurrentBGM, timeOffset);
+        //Events::ChangeBGM changeBGM;
+        //changeBGM.FilePath = "Audio/BGM/Layer3.wav";
+        //m_EventBroker->Publish(changeBGM);
     }
 }
 
@@ -477,6 +486,11 @@ float SoundManager::getTimeOffsetSeconds(Source* source)
     float time;
     alGetSourcef(source->ALsource, AL_SEC_OFFSET, &time);
     return time;
+}
+
+void SoundManager::setTimeOffsetSeconds(Source * source, float timeOffset)
+{ 
+    alSourcef(source->ALsource, AL_SEC_OFFSET, timeOffset);
 }
 
 void SoundManager::initOpenAL()
