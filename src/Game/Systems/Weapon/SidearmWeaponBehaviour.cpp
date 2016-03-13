@@ -2,7 +2,7 @@
 
 void SidearmWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt)
 {
-    double& cooldown = cWeapon["FireCooldown"];
+    Field<double> cooldown = cWeapon["FireCooldown"];
     if (cooldown > 0) {
         cooldown -= dt;
         if (cooldown < 0) {
@@ -60,18 +60,18 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     // Tracer
     EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
     if (tracerSpawner.Valid()) {
-        glm::vec3 origin = Transform::AbsolutePosition(tracerSpawner);
-        glm::vec3 direction = Transform::AbsoluteOrientation(tracerSpawner) * glm::vec3(0, 0, -1);
+        glm::vec3 origin = TransformSystem::AbsolutePosition(tracerSpawner);
+        glm::vec3 direction = TransformSystem::AbsoluteOrientation(tracerSpawner) * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
         EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
-        ((glm::vec3&)ray["Transform"]["Scale"]).z = (distance / 100.f);
+        ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance / 100.f);
     }
 }
 
 bool SidearmWeaponBehaviour::canFire(ComponentWrapper cWeapon)
 {
     bool triggerHeld = cWeapon["TriggerHeld"];
-    double& cooldown = cWeapon["FireCooldown"];
+    Field<double> cooldown = cWeapon["FireCooldown"];
     // TODO: Ammo checks
     return triggerHeld && cooldown <= 0.0;
 }

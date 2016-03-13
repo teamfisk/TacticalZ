@@ -49,7 +49,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                             continue;
                         }
                         float u, v;
-                        hit = Collision::RayVsModel(ray, model->Vertices(), model->m_Indices, Transform::ModelMatrix(boxB.Entity), dist, u, v);
+                        hit = Collision::RayVsModel(ray, model->Vertices(), model->m_Indices, TransformSystem::ModelMatrix(boxB.Entity), dist, u, v);
                     } else {
                         hit = Collision::RayVsAABB(ray, boxB, dist);
                     }
@@ -58,12 +58,12 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                         //TODO: Perhaps this should be done slightly more properly.
                         glm::vec3 newOriginPos = ray.Origin() + (dist - 0.707107f*diameter) * ray.Direction();
                         glm::vec3 resolve = newOriginPos - boxA.Origin();
-                        (glm::vec3&)cTransform["Position"] += resolve;
+                        (Field<glm::vec3>)cTransform["Position"] += resolve;
                         boxA = *Collision::EntityAbsoluteAABB(entity);
                         if (resolve.y > 0) {
                             everHitTheGround = true;
-                            (bool)cPhysics["IsOnGround"] = true;
-                            ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
+                            cPhysics["IsOnGround"] = true;
+                            ((Field<glm::vec3>)cPhysics["Velocity"]).y(0.f);
                         }
                         break;
                     }
@@ -82,7 +82,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
 
             if (boxB.Entity.HasComponent("Model") && Collision::AABBVsAABB(boxA, boxB)) {
                 // Here we know boxB is a entity with Collideable, AABB, and Model.
-                if (!((bool)boxB.Entity["Model"]["Visible"])) {
+                if (!((const bool&)boxB.Entity["Model"]["Visible"])) {
                     // Don't collide against invisible models.
                     continue;
                 }
@@ -93,14 +93,14 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                     continue;
                 }
 
-                glm::mat4 modelMatrix = Transform::ModelMatrix(boxB.Entity);
+                glm::mat4 modelMatrix = TransformSystem::ModelMatrix(boxB.Entity);
 
                 glm::vec3 inOutVelocity = (glm::vec3)cPhysics["Velocity"];
                 bool isOnGround = (bool)cPhysics["IsOnGround"];
                 float verticalStepHeight = (float)(double)cPhysics["VerticalStepHeight"];
                 if (Collision::AABBvsTriangles(boxA, model->Vertices(), model->m_Indices, modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
                     //Move the position to previous position if it is not moving in the xz-plane, else resolve with the resolution vector.
-                    (glm::vec3&)cTransform["Position"] += resolutionVector;
+                    (Field<glm::vec3>)cTransform["Position"] += resolutionVector;
                     boxA = *Collision::EntityAbsoluteAABB(entity);
                     cPhysics["Velocity"] = inOutVelocity;
                     if (isOnGround) {
@@ -110,12 +110,12 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                 }
             } else if (Collision::AABBVsAABB(boxA, boxB, resolutionVector)) {
                 //Enter here if boxB has no Model.
-                (glm::vec3&)cTransform["Position"] += resolutionVector;
+                (Field<glm::vec3>)cTransform["Position"] += resolutionVector;
                 boxA = *Collision::EntityAbsoluteAABB(entity);
                 if (resolutionVector.y > 0) {
                     everHitTheGround = true;
                     (bool)cPhysics["IsOnGround"] = true;
-                    ((glm::vec3&)cPhysics["Velocity"]).y = 0.f;
+                    ((Field<glm::vec3>)cPhysics["Velocity"]).y(0.f);
                 }
             }
         }

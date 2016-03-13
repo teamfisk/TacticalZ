@@ -10,9 +10,9 @@ void BoostIconsHUDSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
         if (assaultEntity.HasComponent("Fill")) {
             EntityWrapper parentWithAssaultBoost = assaultEntity.FirstParentWithComponent("BoostAssault");
             if (parentWithAssaultBoost.Valid()) {
-                (double&)assaultEntity["Fill"]["Percentage"] = 1.0;
+                assaultEntity["Fill"]["Percentage"] = 1.0;
             } else {
-                (double&)assaultEntity["Fill"]["Percentage"] = 0.0;
+                assaultEntity["Fill"]["Percentage"] = 0.0;
             }
         }
     }
@@ -21,9 +21,9 @@ void BoostIconsHUDSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
         if (defenderEntity.HasComponent("Fill")) {
             EntityWrapper parentWithAssaultBoost = defenderEntity.FirstParentWithComponent("BoostDefender");
             if (parentWithAssaultBoost.Valid()) {
-                (double&)defenderEntity["Fill"]["Percentage"] = 1.0;
+                defenderEntity["Fill"]["Percentage"] = 1.0;
             } else {
-                (double&)defenderEntity["Fill"]["Percentage"] = 0.0;
+                defenderEntity["Fill"]["Percentage"] = 0.0;
             }
         }
     }
@@ -32,9 +32,9 @@ void BoostIconsHUDSystem::UpdateComponent(EntityWrapper& entity, ComponentWrappe
         if (sniperEntity.HasComponent("Fill")) {
             EntityWrapper parentWithAssaultBoost = sniperEntity.FirstParentWithComponent("BoostSniper");
             if (parentWithAssaultBoost.Valid()) {
-                (double&)sniperEntity["Fill"]["Percentage"] = 1.0;
+                sniperEntity["Fill"]["Percentage"] = 1.0;
             } else {
-                (double&)sniperEntity["Fill"]["Percentage"] = 0.0;
+                sniperEntity["Fill"]["Percentage"] = 0.0;
             }
         }
     }

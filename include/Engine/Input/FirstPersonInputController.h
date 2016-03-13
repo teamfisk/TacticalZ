@@ -30,7 +30,7 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override;
     virtual void Reset();
 
-    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID);
+    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, Field<double> assaultDashCoolDownTimer, EntityID playerID);
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
     bool SpecialAbilityKeyDown() const { return m_SpecialAbilityKeyDown; }
@@ -358,7 +358,7 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 }
 
 template <typename EventContext>
-void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID) {
+void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, Field<double> assaultDashCoolDownTimer, EntityID playerID) {
     m_AssaultDashDoubleTapDeltaTime += dt;
     assaultDashCoolDownTimer -= dt;
     //cooldown = assaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)

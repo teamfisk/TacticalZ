@@ -2,7 +2,7 @@
 #define AmmoPickupSystem_h__
 
 #include "Core/System.h"
-#include "Core/Transform.h"
+#include "Core/TransformSystem.h"
 #include "Core/ResourceManager.h"
 #include "Core/EntityFile.h"
 #include "Core/EPickupSpawned.h"

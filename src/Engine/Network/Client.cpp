@@ -627,8 +627,8 @@ void Client::sendLocalPlayerTransform()
     Packet packet(MessageType::PlayerTransform, m_SendPacketID);
 
     ComponentWrapper cTransform = m_LocalPlayer["Transform"];
-    glm::vec3& position = cTransform["Position"];
-    glm::vec3& orientation = cTransform["Orientation"];
+    const glm::vec3& position = cTransform["Position"];
+    const glm::vec3& orientation = cTransform["Orientation"];
     packet.WritePrimitive(position.x);
     packet.WritePrimitive(position.y);
     packet.WritePrimitive(position.z);

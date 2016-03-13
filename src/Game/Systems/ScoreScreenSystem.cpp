@@ -40,13 +40,13 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
             if (it->first == ID) {
                 if (it->second.Team != currentTeam) {
                     m_World->DeleteEntity(child.ID);
-                    (int&)entity["ScoreScreen"]["TotalIdentities"] -= 1;
+                    (Field<int>)entity["ScoreScreen"]["TotalIdentities"] -= 1;
                     break;
                 }
                 for (auto it2 = m_DisconnectedIdentities.begin(); it2 != m_DisconnectedIdentities.end(); ++it2) {
                     if (ID == *it2) {
                         m_World->DeleteEntity(child.ID);
-                        (int&)entity["ScoreScreen"]["TotalIdentities"] -= 1;
+                        (Field<int>)entity["ScoreScreen"]["TotalIdentities"] -= 1;
                         it2 = m_DisconnectedIdentities.erase(it2);
                         it = m_PlayerIdentities.erase(it);
 
@@ -59,17 +59,17 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
                     break;
                 }
                 //Update Deaths for child
-                (int&)child["ScoreIdentity"]["Kills"] = it->second.Kills;
+                (Field<int>)child["ScoreIdentity"]["Kills"] = it->second.Kills;
                 //Update Kills for child
-                (int&)child["ScoreIdentity"]["Deaths"] = it->second.Deaths;
+                (Field<int>)child["ScoreIdentity"]["Deaths"] = it->second.Deaths;
                 //KD is not updated at the moment.
                 if (it->second.Deaths != 0) {
-                    (double&)child["ScoreIdentity"]["KD"] = it->second.Kills/it->second.Deaths;
+                    (Field<double>)child["ScoreIdentity"]["KD"] = it->second.Kills/it->second.Deaths;
                 }
 
                 //Update position for child
                 glm::vec3 offset = (glm::vec3)entity["ScoreScreen"]["Offset"];
-                (glm::vec3&) child["Transform"]["Position"] = offset * position;
+                (Field<glm::vec3>) child["Transform"]["Position"] = offset * position;
                 position += 1.f;
 
                 break;
@@ -90,16 +90,16 @@ void ScoreScreenSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper&
             EntityWrapper scoreIdentity = entityFile->MergeInto(m_World);
             glm::vec3 offset = (glm::vec3)entity["ScoreScreen"]["Offset"];
             int newPosition = (int)entity["ScoreScreen"]["TotalIdentities"];
-            (glm::vec3&) scoreIdentity["Transform"]["Position"] = offset * (float)newPosition;
+            (Field<glm::vec3>) scoreIdentity["Transform"]["Position"] = offset * (float)newPosition;
             auto cScoreIdentity = scoreIdentity["ScoreIdentity"];
             auto data = it->second;
 
-            (std::string&)cScoreIdentity["Name"] = data.Name;
-            (int&)cScoreIdentity["ID"] = data.ID;
+            (Field<std::string>)cScoreIdentity["Name"] = data.Name;
+            (Field<int>)cScoreIdentity["ID"] = data.ID;
 
             m_World->SetParent(scoreIdentity.ID, entity.ID);
 
-            (int&)entity["ScoreScreen"]["TotalIdentities"] += 1;
+            (Field<int>)entity["ScoreScreen"]["TotalIdentities"] += 1;
 
         }
     }

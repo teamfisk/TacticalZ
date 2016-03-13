@@ -12,7 +12,7 @@
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
 #include "../Core/World.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "Skeleton.h"
 #include "ShaderProgram.h"
 #include "BlendTree.h"

@@ -119,7 +119,7 @@ void SoundManager::updateEmitters(double dt)
         if (!m_World->ValidEntity(m_World->GetParent(it->first))) {
             return;
         }
-        glm::vec3 nextPos = Transform::AbsolutePosition(m_World, it->first);
+        glm::vec3 nextPos = TransformSystem::AbsolutePosition(m_World, it->first);
         // Calculate velocity
         glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt;
         setSourcePos(it->second->ALsource, nextPos);
@@ -129,8 +129,8 @@ void SoundManager::updateEmitters(double dt)
         setSoundProperties(it->second, &emitter);
 
         // Path changed
-        if (it->second->SoundResource->Path() != (std::string)emitter["FilePath"]) {
-            it->second->SoundResource = ResourceManager::Load<Sound>((std::string)emitter["FilePath"]);
+        if (it->second->SoundResource->Path() != (const std::string&)emitter["FilePath"]) {
+            it->second->SoundResource = ResourceManager::Load<Sound>((const std::string&)emitter["FilePath"]);
             if (it->second->SoundResource->Buffer() != 0) {
                 playSound(it->second);
             }
@@ -153,11 +153,11 @@ void SoundManager::updateListener(double dt)
         if (listener.IsChildOf(m_LocalPlayer) || listener == m_LocalPlayer) {
             glm::vec3 previousPos;
             alGetListener3f(AL_POSITION, &previousPos.x, &previousPos.y, &previousPos.z); // Get previous pos
-            glm::vec3 nextPos = Transform::AbsolutePosition(listener); // Get next (current) pos
+            glm::vec3 nextPos = TransformSystem::AbsolutePosition(listener); // Get next (current) pos
             glm::vec3 velocity = glm::vec3(nextPos - previousPos) / (float)dt; // Calculate velocity
             setListenerPos(nextPos);
             setListenerVel(velocity);
-            setListenerOri(glm::eulerAngles(Transform::AbsoluteOrientation(listener)));
+            setListenerOri(glm::eulerAngles(TransformSystem::AbsoluteOrientation(listener)));
             break;
         }
     }
@@ -238,14 +238,14 @@ bool SoundManager::OnPlaySoundOnPosition(const Events::PlaySoundOnPosition & e)
     Source* source = createSource(e.FilePath);
     auto emitterID = m_World->CreateEntity();
     auto transform = m_World->AttachComponent(emitterID, "Transform");
-    (glm::vec3&)transform["Position"] = e.Position;
+    transform["Position"] = e.Position;
     auto emitter = m_World->AttachComponent(emitterID, "SoundEmitter");
-    (float&)(double)emitter["Gain"] = e.Gain;
-    (float&)(double)emitter["Pitch"] = e.Pitch;
-    (bool&)emitter["Loop"] = e.Loop;
-    (float&)(double)emitter["MaxDistance"] = e.MaxDistance;
-    (float&)(double)emitter["RollOffFactor"] = e.RollOffFactor;
-    (float&)(double)emitter["ReferenceDistance"] = e.ReferenceDistance;
+    emitter["Gain"] = e.Gain;
+    emitter["Pitch"] = e.Pitch;
+    emitter["Loop"] = e.Loop;
+    emitter["MaxDistance"] = e.MaxDistance;
+    emitter["RollOffFactor"] = e.RollOffFactor;
+    emitter["ReferenceDistance"] = e.ReferenceDistance;
     source->Type = SoundType::SFX;
     m_Sources[emitterID] = source;
     playSound(source);
@@ -279,8 +279,8 @@ bool SoundManager::OnPlayBackgroundMusic(const Events::PlayBackgroundMusic & e)
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
-        (bool&)emitter["Loop"] = true;
-        (std::string&)emitter["FilePath"] = e.FilePath;
+        emitter["Loop"] = true;
+        emitter["FilePath"] = e.FilePath;
         m_World->AttachComponent(emitterChild, "Transform");
         Source* source = createSource(e.FilePath);
         source->Type = SoundType::BGM;
@@ -301,8 +301,8 @@ bool SoundManager::OnPlayAnnouncerVoice(const Events::PlayAnonuncerVoice& e)
         }
         auto emitterChild = m_World->CreateEntity((*it).EntityID);
         auto emitter = m_World->AttachComponent(emitterChild, "SoundEmitter");
-        (bool&)emitter["Loop"] = false;
-        (std::string&)emitter["FilePath"] = e.FilePath;
+        emitter["Loop"] = false;
+        emitter["FilePath"] = e.FilePath;
         m_World->AttachComponent(emitterChild, "Transform");
         Source* source = createSource(e.FilePath);
         source->Type = SoundType::Announcer;
