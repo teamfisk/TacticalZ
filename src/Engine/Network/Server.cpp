@@ -5,8 +5,8 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     , m_ServerlistRequest(13)
 {
     ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
-    snapshotInterval = 1000 * config->Get<float>("Networking.SnapshotInterval", 0.05f);
-    pingIntervalMs = config->Get<float>("Networking.PingIntervalMs", 1000);
+    snapshotInterval = config->Get<float>("Networking.SnapshotInterval", 0.05);
+    pingInterval = config->Get<float>("Networking.PingIntervalMs", 1000) / 1000.0;
     m_ServerName = config->Get<std::string>("Networking.Name", "Unnamed");
 
     // Subscribe to events
@@ -17,6 +17,7 @@ Server::Server(World* world, EventBroker* eventBroker, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Server::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EAmmoPickup, &Server::OnAmmoPickup);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDeath, &Server::OnPlayerDeath);
+    EVENT_SUBSCRIBE_MEMBER(m_EWin, &Server::OnWin);
     // BindWW
     if (port == 0) {
         port = config->Get<float>("Networking.Port", 27666);
@@ -30,7 +31,7 @@ Server::~Server()
 
 }
 
-void Server::Update()
+void Server::Update(double dt)
 {
     m_Reliable.AcceptNewConnections(m_NextPlayerID, m_ConnectedPlayers);
 
@@ -86,26 +87,44 @@ void Server::Update()
     }
     m_PlayersToDisconnect.clear();
 
-    std::clock_t currentTime = std::clock();
     // Send snapshot
-    if (snapshotInterval < (1000 * (currentTime - previousSnapshotMessage) / (double)CLOCKS_PER_SEC)) {
+    previousSnapshotMessage += dt;
+    if (snapshotInterval < previousSnapshotMessage) {
         sendSnapshot();
-        previousSnapshotMessage = currentTime;
+        previousSnapshotMessage = 0;
     }
     // Send pings each 
-    if (pingIntervalMs < (1000 * (currentTime - previousePingMessage) / (double)CLOCKS_PER_SEC)) {
+    previousPingMessage += dt;
+    if (pingInterval < previousPingMessage) {
         sendPing();
-        previousePingMessage = currentTime;
+        previousPingMessage = 0;
     }
 
     // Time out logic
-    if (checkTimeOutInterval < (1000 * (currentTime - timOutTimer) / (double)CLOCKS_PER_SEC)) {
+    timeOutTimer += dt;
+    if (checkTimeOutInterval < timeOutTimer) {
         checkForTimeOuts();
-        timOutTimer = currentTime;
+        timeOutTimer = 0;
     }
     m_EventBroker->Process<Server>();
     if (isReadingData) {
-        Network::Update();
+        Network::Update(dt);
+    }
+
+    if (m_GameIsOver) {
+        auto pool = m_World->GetComponents("CapturePointGameMode");
+        if (pool != nullptr && pool->size() > 0) {
+            // Take the first CapturePointGameMode component found.
+            ComponentWrapper& modeComponent = *pool->begin();
+            // Decrease timer.
+            Field<double> timer = modeComponent["ResetCountdown"];
+            timer -= dt;
+            if (timer < 0) {
+                resetMap();
+            }
+        } else {
+            resetMap();
+        }
     }
 }
 
@@ -164,7 +183,7 @@ void Server::reliableBroadcast(Packet& packet)
 
 void Server::unreliableBroadcast(Packet& packet)
 {
-   m_Unreliable.SendToConnectedPlayers(packet, m_ConnectedPlayers);
+    m_Unreliable.SendToConnectedPlayers(packet, m_ConnectedPlayers);
 }
 
 // Send snapshot fields
@@ -173,8 +192,14 @@ void Server::sendSnapshot()
     Packet packet(MessageType::Snapshot);
     addInputCommandsToPacket(packet);
     addPlayersToPacket(packet, EntityID_Invalid);
-    //addChildrenToPacket(packet, EntityID_Invalid);
     unreliableBroadcast(packet);
+}
+
+// Send snapshot fields
+void Server::createWorldSnapshot(Packet& packet)
+{
+    addInputCommandsToPacket(packet);
+    addChildrenToPacket(packet, EntityID_Invalid);
 }
 
 void Server::addInputCommandsToPacket(Packet& packet)
@@ -379,8 +404,7 @@ void Server::parseTCPConnect(Packet & packet)
     m_Reliable.Send(connnectPacket, m_ConnectedPlayers.at(playerID));
 
     Packet firstSnapshot(MessageType::Snapshot);
-    addInputCommandsToPacket(firstSnapshot);
-    addChildrenToPacket(firstSnapshot, EntityID_Invalid);
+    createWorldSnapshot(firstSnapshot);
     m_Reliable.Send(firstSnapshot);
 
     // Send notification that a player has connected
@@ -542,6 +566,13 @@ bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
     return false;
 }
 
+bool Server::OnWin(const Events::Win & e)
+{
+    // Postpone the gameover reset
+    m_GameIsOver = true;
+    return true;
+}
+
 void Server::parseClientPing()
 {
     LOG_INFO("%i: Parsing ping", m_PacketID);
@@ -663,4 +694,20 @@ PlayerID Server::getPlayerIDFromEntityID(EntityID entityID)
         }
     }
     return -1;
+}
+
+void Server::resetMap()
+{
+    m_GameIsOver = false;
+    Events::Reset reset;
+    m_EventBroker->Publish(reset);
+    Packet removeMap(MessageType::RemoveWorld);
+    reliableBroadcast(removeMap);
+    removeWorld();
+    // Hardcoded for now.
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Rocky2.xml");
+    entityFile->MergeInto(m_World);
+    Packet newWorld(MessageType::Snapshot);
+    createWorldSnapshot(newWorld);
+    reliableBroadcast(newWorld);
 }

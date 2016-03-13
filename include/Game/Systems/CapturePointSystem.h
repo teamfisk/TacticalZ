@@ -9,6 +9,7 @@
 #include "Engine/Collision/ETrigger.h"
 #include "Core/ECaptured.h"
 #include "Core/EWin.h"
+#include "Game/Events/EReset.h"
 
 #include <tuple>
 #include <vector>
@@ -23,6 +24,7 @@ public:
     virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& capturePoint, double dt) override;
 
 private:
+    void Init();
     //methods which will take care of specific events
     EventRelay<CapturePointSystem, Events::TriggerTouch> m_ETriggerTouch;
     bool CapturePointSystem::OnTriggerTouch(const Events::TriggerTouch& e);
@@ -30,6 +32,8 @@ private:
     bool CapturePointSystem::OnTriggerLeave(const Events::TriggerLeave& e);
     EventRelay<CapturePointSystem, Events::Captured> m_ECaptured;
     bool CapturePointSystem::OnCaptured(const Events::Captured& e);
+    EventRelay<CapturePointSystem, Events::Reset> m_EReset;
+    bool CapturePointSystem::OnReset(const Events::Reset& e);
     void ChangeCapturePointModelsVisibility(EntityWrapper &capturePointModels, bool isOwner);
 
     bool m_WinnerWasFound = false;
