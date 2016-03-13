@@ -8,6 +8,7 @@
 #include "Events/ESpawnerSpawn.h"
 #include "Core/TransformSystem.h"
 #include "Core/EntityFile.h"
+#include "Rendering/Model.h"
 
 class SpawnerSystem : public System
 {

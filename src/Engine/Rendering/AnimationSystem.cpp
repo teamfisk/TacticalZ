@@ -37,7 +37,7 @@ void AnimationSystem::CreateBlendTrees()
             continue;;
         }
 
-        Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+        Skeleton* skeleton = model->m_Skeleton;
         if (skeleton == nullptr) {
             continue;
         }
@@ -79,7 +79,7 @@ void AnimationSystem::UpdateAnimations(double dt)
             return;
         }
 
-        Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+        Skeleton* skeleton = model->m_Skeleton;
         if (skeleton == nullptr) {
             return;
         }
@@ -175,7 +175,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
         return false;
     }
 
-    Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+    Skeleton* skeleton = model->m_Skeleton;
     if (skeleton == nullptr) {
         return false;
     }
@@ -294,7 +294,7 @@ bool AnimationSystem::OnEntityDeleted(Events::EntityDeleted& e)
             return false;
         }
 
-        Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+        Skeleton* skeleton = model->m_Skeleton;
         if (skeleton == nullptr) {
             return false;
         }
@@ -325,7 +325,7 @@ bool AnimationSystem::OnSetBlendWeight(Events::SetBlendWeight& e)
         return false;
     }
 
-    Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+    Skeleton* skeleton = model->m_Skeleton;
     if (skeleton == nullptr) {
         return false;
     }

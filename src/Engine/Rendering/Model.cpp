@@ -2,8 +2,10 @@
 
 Model::Model(std::string fileName)
 {
+    //fileName = "Models/Core/ScreenQuad.mesh";
     //Try loading the model asyncronously, if it throws any exceptions then let it propagate back to caller.
-    m_RawModel = ResourceManager::Load<RawModel, true>(fileName);
+    auto m_RawModel = ResourceManager::Load<RawModel, true>(fileName);
+    //throw FailedLoadingException("Test");
 
     for (auto& materialProperty : m_RawModel->m_Materials) {
 		switch (materialProperty.type) {
@@ -99,14 +101,24 @@ Model::Model(std::string fileName)
 
     glm::vec3 mini(INFINITY);
     glm::vec3 maxi(-INFINITY);
-
     for (unsigned int i = 0; i < m_RawModel->NumVertices(); i++) {
         const auto& v = m_RawModel->Vertices()[i];
         mini = glm::min(mini, v.Position);
         maxi = glm::max(maxi, v.Position);
     }
-
     m_Box = AABB(mini, maxi);
+
+    //m_Skeleton = m_RawModel->m_Skeleton;
+    delete m_RawModel->m_Skeleton;
+    m_Materials = m_RawModel->m_Materials;
+    //m_Indices = m_RawModel->m_Indices;
+    m_IsSkinned = m_RawModel->IsSkinned();
+    // Copy vertex positions for collisions later
+    for (auto& v : m_RawModel->m_Vertices) {
+        //m_Vertices.push_back(v.Position);
+    }
+
+    ResourceManager::Release("RawModel", fileName);
 }
 
 Model::~Model()

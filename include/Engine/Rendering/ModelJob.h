@@ -105,7 +105,7 @@ struct ModelJob : RenderJob
 		IsShielded = isShielded;
 
         if (model->IsSkinned()) {
-            Skeleton = Model->m_RawModel->m_Skeleton;
+            Skeleton = Model->m_Skeleton;
 
             if (Skeleton != nullptr) {
                 

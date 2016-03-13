@@ -493,12 +493,13 @@ void RawModelCustom::ReadAnimationKeyFrame(std::size_t& offset, char* fileData, 
 
 RawModelCustom::~RawModelCustom()
 {
-    if (m_Skeleton != nullptr) {
-        delete m_Skeleton;
-    }
-	for (auto material : m_Materials) {
-		delete material.material;
-	}
+    // Ownership of skeleton and materials get transferred to Model
+ //   if (m_Skeleton != nullptr) {
+ //       delete m_Skeleton;
+ //   }
+	//for (auto material : m_Materials) {
+	//	delete material.material;
+	//}
 }
 
 #endif

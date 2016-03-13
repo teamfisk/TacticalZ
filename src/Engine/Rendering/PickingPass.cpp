@@ -110,7 +110,7 @@ void PickingPass::Draw(RenderScene& scene)
                 std::vector<glm::mat4> frameBones;
 				if (modelJob->BlendTree != nullptr) {
                     frameBones = modelJob->BlendTree->GetFinalPose();
-                } else {
+                } else if (modelJob->Skeleton != nullptr) {
                     frameBones = modelJob->Skeleton->GetTPose();
                 }
                 glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
