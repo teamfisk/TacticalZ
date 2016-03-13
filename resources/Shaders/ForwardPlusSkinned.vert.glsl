@@ -3,6 +3,7 @@
 #define MAX_SPLITS 4
 
 uniform mat4 PVM;
+uniform mat4 VM;
 uniform mat4 TIM;
 uniform mat4 M;
 uniform mat4 V;
@@ -21,6 +22,7 @@ layout(location = 6) in vec4 BoneWeights;
 
 out VertexData{
 	vec3 Position;
+	vec4 ViewSpacePosition;
 	vec3 Normal;
 	vec3 Tangent;
 	vec3 BiTangent;
@@ -34,16 +36,15 @@ void main()
 {
 	mat4 boneTransform = mat4(1);
 
-	if(BoneWeights[0] > 0.0f){ 
 	boneTransform = BoneWeights[0] * Bones[int(BoneIndices[0])]
 				  + BoneWeights[1] * Bones[int(BoneIndices[1])]
 				  + BoneWeights[2] * Bones[int(BoneIndices[2])]
 				  + BoneWeights[3] * Bones[int(BoneIndices[3])];
-	}
 
 	gl_Position = PVM*boneTransform * vec4(Position, 1.0);
 	
 	Output.Position = (boneTransform * vec4(Position, 1.0)).xyz;
+	Output.ViewSpacePosition = VM * vec4(Position, 1.0);
 	Output.TextureCoordinate = TextureCoords;
 	Output.Normal = vec3(M * boneTransform * vec4(Normal, 0.0));
 	Output.Tangent = vec3(M * vec4(Tangent, 0.0));
