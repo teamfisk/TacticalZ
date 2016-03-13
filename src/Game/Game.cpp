@@ -232,10 +232,10 @@ void Game::Tick()
     PerformanceTimer::StartTimerAndStopPrevious("Network");
     m_EventBroker->Process<MultiplayerSnapshotFilter>();
     if (m_NetworkClient != nullptr) {
-        m_NetworkClient->Update();
+        m_NetworkClient->Update(dt);
     }
     if (m_NetworkServer != nullptr) {
-        m_NetworkServer->Update();
+        m_NetworkServer->Update(dt);
     }
     //m_SoundManager->Update(dt);
 
