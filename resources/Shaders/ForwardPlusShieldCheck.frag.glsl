@@ -65,6 +65,7 @@ layout (std430, binding = 4) buffer LightIndexBuffer
 
 in VertexData{
 	vec3 Position;
+	vec4 ViewSpacePosition;
 	vec3 Normal;
 	vec3 Tangent;
 	vec3 BiTangent;
@@ -141,11 +142,10 @@ void main()
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate * SpecularUVRepeat);
-	vec4 position = VM * vec4(Input.Position, 1.0); 
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
-	vec4 viewVec = normalize(-position);
+	vec4 viewVec = normalize(-Input.ViewSpacePosition);
 	vec3 I = normalize(vec3(M * vec4(Input.Position, 1.0)) - CameraPosition);
 	vec3 R = reflect(-I, Input.Normal);
 	//R = vec3(P * vec4(R, 1.0));
@@ -170,7 +170,7 @@ void main()
 		LightResult light_result;
 		//These if statements should be removed.
 		if(light.Type == 1) { // point
-			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
+			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, Input.ViewSpacePosition, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 		}

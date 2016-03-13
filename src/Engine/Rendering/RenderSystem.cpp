@@ -362,6 +362,11 @@ void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, 
                 continue;
             }
 
+            EntityWrapper entity(world, pointlightC.EntityID);
+            if (!isEntityVisible(entity)) {
+                continue;
+            }
+
             std::shared_ptr<PointLightJob> pointLightJob = std::shared_ptr<PointLightJob>(new PointLightJob(transformC, pointlightC, m_World));
             jobs.push_back(pointLightJob);
         }

@@ -76,6 +76,11 @@ void PickingPass::Draw(RenderScene& scene)
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
 
         if (modelJob) {
+            if(modelJob->NotPickable) {
+                continue;
+            }
+
+
             int pickColor[2] = { m_ColorCounter[0], m_ColorCounter[1] };
 
             PickingInfo pickInfo;

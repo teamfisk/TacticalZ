@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<PlayerSpawn xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="PlayerSpawn.xsd"/>
+<PlayerSpawn xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="PlayerSpawn.xsd">
+	<AssaultFile>Schema/Entities/PlayerAssaultBlue.xml</AssaultFile>
+	<DefenderFile>Schema/Entities/PlayerDefenderBlue.xml</DefenderFile>
+	<SniperFile></SniperFile>
+</PlayerSpawn>

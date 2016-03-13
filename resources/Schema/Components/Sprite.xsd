@@ -39,6 +39,9 @@
 				<xs:element name="Linear" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>If it should use Linear or Nearest sampling method.</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="ClampToBorder" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If it should clamp to border or repeat the texture.</xs:documentation></xs:annotation>
+				</xs:element>
 				<xs:element name="BlurBackground" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Wether the background should be blurred begind this sprite.</xs:documentation></xs:annotation>
 				</xs:element>

@@ -10,5 +10,6 @@
 	<KeepRatioY>false</KeepRatioY>
 	<KeepRatio>false</KeepRatio>
 	<Linear>true</Linear>
+	<ClampToBorder>false</ClampToBorder>
 	<BlurBackground>false</BlurBackground>
 </Sprite>

@@ -30,10 +30,7 @@ SoundManager::SoundManager(World* world, EventBroker* eventBroker)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &SoundManager::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayQueueOnEntity, &SoundManager::OnPlayQueueOnEntity);
     EVENT_SUBSCRIBE_MEMBER(m_EChangeBGM, &SoundManager::OnChangeBGM);
-
-    Events::ChangeBGM e;
-    e.FilePath = "Audio/bgm/MenuMusic.wav";
-    m_EventBroker->Publish(e);
+    EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &SoundManager::OnSetCamera);
 }
 
 SoundManager::~SoundManager()
@@ -67,8 +64,7 @@ void SoundManager::Update(double dt)
     deleteInactiveEmitters();
     updateEmitters(dt);
     updateListener(dt);
-    if (m_DrumLoopHasBeenStarted)
-        matchBGMLoop();
+    matchBGMLoop();
 }
 
 void SoundManager::deleteInactiveEmitters()
@@ -363,15 +359,6 @@ bool SoundManager::OnPlayerSpawned(const Events::PlayerSpawned &e)
 {
     if (e.PlayerID == -1) { // Local player
         m_LocalPlayer = e.Player;
-        if (m_DrumLoopHasBeenStarted) {
-            return true;
-        }
-        m_CurrentBGMCombo = createSource("Audio/BGM/Layer2.wav");
-        m_CurrentBGMCombo->Type = SoundType::BGM;
-        alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
-        setGain(m_CurrentBGMCombo, 0);
-        playSound(m_CurrentBGMCombo);
-        m_DrumLoopHasBeenStarted = true;
         return true;
     }
     return false;
@@ -394,13 +381,43 @@ bool SoundManager::OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e)
 bool SoundManager::OnChangeBGM(const Events::ChangeBGM &e)
 {
     if (m_CurrentBGM != nullptr) {
-        stopSound(m_CurrentBGM);
+        if (getSourceState(m_CurrentBGM->ALsource) == AL_PLAYING) {
+            stopSound(m_CurrentBGM);
+        }
     }
     m_CurrentBGM = createSource(e.FilePath);
     m_CurrentBGM->Type = SoundType::BGM;
     alSourcei(m_CurrentBGM->ALsource, AL_LOOPING, 1);
     playSound(m_CurrentBGM);
     return true;
+}
+
+bool SoundManager::OnSetCamera(const Events::SetCamera& e)
+{
+    if (e.CameraEntity.Name() == "Overview_Camera_Start_Menu") {
+        if (m_CurrentBGMCombo != nullptr) {
+            if (getSourceState(m_CurrentBGMCombo->ALsource) == AL_PLAYING) {
+                stopSound(m_CurrentBGMCombo);
+            }
+        }
+        Events::ChangeBGM changeBGM;
+        changeBGM.FilePath = "Audio/BGM/MenuMusic.wav";
+        m_EventBroker->Publish(changeBGM);
+    } else if (e.CameraEntity.Name() == "PickTeamCamera") {
+        Events::ChangeBGM changeBGM;
+        changeBGM.FilePath = "Audio/BGM/Layer1.wav";
+        m_EventBroker->Publish(changeBGM);
+        if (m_CurrentBGMCombo != nullptr) {
+            if (getSourceState(m_CurrentBGMCombo->ALsource) == AL_PLAYING) {
+                stopSound(m_CurrentBGMCombo);
+            }
+        }
+        m_CurrentBGMCombo = createSource("Audio/BGM/Layer2.wav");
+        m_CurrentBGMCombo->Type = SoundType::BGM;
+        alSourcei(m_CurrentBGMCombo->ALsource, AL_LOOPING, 1);
+        setGain(m_CurrentBGMCombo, 0);
+        playSound(m_CurrentBGMCombo);
+    }
 }
 
 ALenum SoundManager::getSourceState(ALuint source)
@@ -419,14 +436,14 @@ void SoundManager::setSoundProperties(Source* source, ComponentWrapper* soundCom
 {
     float gain;
     switch (source->Type) {
-    case SoundType::SFX: 
-        gain = m_SFXVolumeChannel; 
+    case SoundType::SFX:
+        gain = m_SFXVolumeChannel;
         break;
-    case SoundType::BGM: 
+    case SoundType::BGM:
         gain = m_BGMVolumeChannel;
         break;
-    case SoundType::Announcer: 
-        gain = m_AnnouncerVolumeChannel; 
+    case SoundType::Announcer:
+        gain = m_AnnouncerVolumeChannel;
         break;
     default:
         gain = 1.f;
