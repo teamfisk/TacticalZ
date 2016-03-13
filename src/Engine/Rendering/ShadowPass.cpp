@@ -6,7 +6,7 @@ ShadowPass::ShadowPass(IRenderer * renderer, int shadow_res_x, int shadow_res_y)
 	m_ResolutionSizeWidth = shadow_res_x;
 	m_ResolutionSizeHeight = shadow_res_y;
 
-	InitializeFrameBuffers();
+	CheckStatus(true);
 	InitializeShaderPrograms();
 }
 
@@ -14,18 +14,17 @@ ShadowPass::ShadowPass(IRenderer * renderer)
 {
 	m_Renderer = renderer;
 
-	InitializeFrameBuffers();
+	CheckStatus(true);
 	InitializeShaderPrograms();
 }
 
 ShadowPass::~ShadowPass()
 {
-
+	CommonFunctions::DeleteTexture(&m_DepthMap);
 }
 
 void ShadowPass::DebugGUI()
 {
-	ImGui::Checkbox("EnableShadows", &m_EnableShadows);
 	ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
 	ImGui::DragFloat("ShadowClippingWeight", &m_SplitWeight, 0.001f, 0.f, 1.f);
 	ImGui::Checkbox("ShadowTransparentObjects", &m_TransparentObjects);
@@ -126,6 +125,7 @@ float ShadowPass::FindRadius(ShadowFrustum& frustum)
 void ShadowPass::InitializeFrameBuffers()
 {
 	// Depth texture
+	glDeleteTextures(1, &m_DepthMap);
 	glGenTextures(1, &m_DepthMap);
 
 	glBindTexture(GL_TEXTURE_2D_ARRAY, m_DepthMap);
@@ -156,12 +156,12 @@ void ShadowPass::InitializeShaderPrograms()
 	m_ShadowProgram->BindFragDataLocation(0, "ShadowMap");
 	m_ShadowProgram->Link();
 
-    m_ShadowProgramSkinned = ResourceManager::Load<ShaderProgram>("#ShadowProgramSkinned");
-    m_ShadowProgramSkinned->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ShadowSkinned.vert.glsl")));
-    m_ShadowProgramSkinned->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Shadow.frag.glsl")));
-    m_ShadowProgramSkinned->Compile();
-    m_ShadowProgramSkinned->BindFragDataLocation(0, "ShadowMap");
-    m_ShadowProgramSkinned->Link();
+	m_ShadowProgramSkinned = ResourceManager::Load<ShaderProgram>("#ShadowProgramSkinned");
+	m_ShadowProgramSkinned->AddShader(std::shared_ptr<Shader>(new VertexShader("Shaders/ShadowSkinned.vert.glsl")));
+	m_ShadowProgramSkinned->AddShader(std::shared_ptr<Shader>(new FragmentShader("Shaders/Shadow.frag.glsl")));
+	m_ShadowProgramSkinned->Compile();
+	m_ShadowProgramSkinned->BindFragDataLocation(0, "ShadowMap");
+	m_ShadowProgramSkinned->Link();
 }
 
 void ShadowPass::ClearBuffer()
@@ -209,53 +209,109 @@ void ShadowPass::RadiusToLightspace(ShadowFrustum& frustum)
 	frustum.LRBT = { left, right, bottom, top };
 }
 
+void ShadowPass::CheckStatus(bool shadowStatus)
+{
+	if (m_EnableShadows == shadowStatus) {
+		return;
+	}
+
+	m_EnableShadows = shadowStatus;
+
+	if (m_EnableShadows == false) {
+		CommonFunctions::DeleteTexture(&m_DepthMap);
+		return;
+	}
+
+	InitializeFrameBuffers();
+}
+
 void ShadowPass::Draw(RenderScene & scene)
 {
-	if (m_EnableShadows) {
-		InitializeCameras(scene);
-		UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
+	if (!m_EnableShadows) {
+		return;
+	}
 
-		ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
+	InitializeCameras(scene);
+	UpdateSplitDist(m_shadowFrusta, scene.Camera->NearClip(), scene.Camera->FarClip());
 
-		
-		glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight);
+	ShadowPassState* state = new ShadowPassState(m_DepthBuffer.GetHandle());
 
-		for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-			UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward());
+	glViewport(0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight);
 
-			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
+	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
+		UpdateFrustumPoints(m_shadowFrusta[i], scene.Camera->Position(), scene.Camera->Forward());
 
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
 
-            GLuint shaderHandle;
+		GLuint shaderHandle;
 
-			for (auto &job : scene.Jobs.DirectionalLight) {
+		for (auto &job : scene.Jobs.DirectionalLight) {
 
-				auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
+			auto directionalLightJob = std::dynamic_pointer_cast<DirectionalLightJob>(job);
 
-				if (directionalLightJob) {
-					m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
+			if (directionalLightJob) {
+				m_LightView[i] = glm::lookAt(glm::vec3(-directionalLightJob->Direction) + m_shadowFrusta[i].MiddlePoint, m_shadowFrusta[i].MiddlePoint, glm::vec3(0.f, 1.f, 0.f));
 
-					PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
-					//FindRadius(m_shadowFrusta[i]);
-					//RadiusToLightspace(m_shadowFrusta[i]);
-					m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[LEFT], m_shadowFrusta[i].LRBT[RIGHT], m_shadowFrusta[i].LRBT[BOTTOM], m_shadowFrusta[i].LRBT[TOP], m_NearFarPlane[NEAR], m_NearFarPlane[FAR]);
-
-
-                    m_ShadowProgram->Bind();
-                    shaderHandle = m_ShadowProgram->GetHandle();
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
-					glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
-
-                    m_ShadowProgramSkinned->Bind();
-                    shaderHandle = m_ShadowProgramSkinned->GetHandle();
-                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
-                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
+				PointsToLightspace(m_shadowFrusta[i], m_LightView[i]);
+				//FindRadius(m_shadowFrusta[i]);
+				//RadiusToLightspace(m_shadowFrusta[i]);
+				m_LightProjection[i] = glm::ortho(m_shadowFrusta[i].LRBT[LEFT], m_shadowFrusta[i].LRBT[RIGHT], m_shadowFrusta[i].LRBT[BOTTOM], m_shadowFrusta[i].LRBT[TOP], m_NearFarPlane[NEAR], m_NearFarPlane[FAR]);
 
 
+				m_ShadowProgram->Bind();
+				shaderHandle = m_ShadowProgram->GetHandle();
+				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
+				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
 
-					GLERROR("ShadowLight ERROR");
+				m_ShadowProgramSkinned->Bind();
+				shaderHandle = m_ShadowProgramSkinned->GetHandle();
+				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(m_LightProjection[i]));
+				glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(m_LightView[i]));
 
-					for (auto &objectJob : scene.Jobs.OpaqueObjects) {
+
+
+				GLERROR("ShadowLight ERROR");
+
+				for (auto &objectJob : scene.Jobs.OpaqueObjects) {
+					if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob)) {
+						auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
+
+						if (!modelJob->Shadow) {
+							continue;
+						}
+
+						if (modelJob->Model->IsSkinned()) {
+							m_ShadowProgramSkinned->Bind();
+							shaderHandle = m_ShadowProgramSkinned->GetHandle();
+
+							std::vector<glm::mat4> frameBones;
+							if (modelJob->BlendTree != nullptr) {
+								frameBones = modelJob->BlendTree->GetFinalPose();
+							}
+							else {
+								frameBones = modelJob->Skeleton->GetTPose();
+							}
+							glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+						}
+						else {
+							m_ShadowProgram->Bind();
+							shaderHandle = m_ShadowProgram->GetHandle();
+						}
+
+						glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+						glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), 1.f);
+
+						glBindVertexArray(modelJob->Model->VAO);
+						glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+						glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
+
+						GLERROR("Shadow Draw ERROR");
+					}
+				}
+				if (m_TransparentObjects) {
+					state->CullFace(GL_BACK);
+					for (auto &objectJob : scene.Jobs.TransparentObjects) {
 						if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob)) {
 							auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
 
@@ -263,25 +319,53 @@ void ShadowPass::Draw(RenderScene & scene)
 								continue;
 							}
 
-                            if(modelJob->Model->IsSkinned()) {
-                                m_ShadowProgramSkinned->Bind();
-                                shaderHandle = m_ShadowProgramSkinned->GetHandle();
+							if (modelJob->Model->IsSkinned()) {
+								m_ShadowProgramSkinned->Bind();
+								shaderHandle = m_ShadowProgramSkinned->GetHandle();
 
-                                std::vector<glm::mat4> frameBones;
-                                if (modelJob->BlendTree != nullptr) {
-                                    frameBones = modelJob->BlendTree->GetFinalPose();
-                                } else {
-                                    frameBones = modelJob->Skeleton->GetTPose();
-                                }
-                                glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+								std::vector<glm::mat4> frameBones;
+								if (modelJob->BlendTree != nullptr) {
+									frameBones = modelJob->BlendTree->GetFinalPose();
+								}
+								else {
+									frameBones = modelJob->Skeleton->GetTPose();
+								}
+								glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
-                            } else {
-                                m_ShadowProgram->Bind();
-                                shaderHandle = m_ShadowProgram->GetHandle();
-                            }
+							}
+							else {
+								m_ShadowProgram->Bind();
+								shaderHandle = m_ShadowProgram->GetHandle();
+							}
 
 							glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-							glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), 1.f);
+							glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
+
+							if (m_TexturedShadows) {
+								switch (modelJob->Type) {
+								case RawModel::MaterialType::SingleTextures:
+								case RawModel::MaterialType::Basic:
+								{
+									glActiveTexture(GL_TEXTURE24);
+									if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
+										glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
+										glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
+									}
+									else {
+										glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+										glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+									}
+									break;
+								}
+								case RawModel::MaterialType::SplatMapping:
+								{
+									glActiveTexture(GL_TEXTURE24);
+									glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
+									glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+									break;
+								}
+								}
+							}
 
 							glBindVertexArray(modelJob->Model->VAO);
 							glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
@@ -290,76 +374,13 @@ void ShadowPass::Draw(RenderScene & scene)
 							GLERROR("Shadow Draw ERROR");
 						}
 					}
-					if (m_TransparentObjects) {
-						state->CullFace(GL_BACK);
-						for (auto &objectJob : scene.Jobs.TransparentObjects) {
-							if (!std::dynamic_pointer_cast<ExplosionEffectJob>(objectJob)) {
-								auto modelJob = std::dynamic_pointer_cast<ModelJob>(objectJob);
-
-								if (!modelJob->Shadow) {
-									continue;
-								}
-
-                                if (modelJob->Model->IsSkinned()) {
-                                    m_ShadowProgramSkinned->Bind();
-                                    shaderHandle = m_ShadowProgramSkinned->GetHandle();
-
-                                    std::vector<glm::mat4> frameBones;
-                                    if (modelJob->BlendTree != nullptr) {
-                                        frameBones = modelJob->BlendTree->GetFinalPose();
-                                    } else {
-                                        frameBones = modelJob->Skeleton->GetTPose();
-                                    }
-                                    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
-                                } else {
-                                    m_ShadowProgram->Bind();
-                                    shaderHandle = m_ShadowProgram->GetHandle();
-                                }
-
-								glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
-								glUniform1f(glGetUniformLocation(shaderHandle, "Alpha"), modelJob->Color.a);
-
-								if (m_TexturedShadows) {
-									switch (modelJob->Type) {
-									case RawModel::MaterialType::SingleTextures:
-									case RawModel::MaterialType::Basic:
-									{
-										glActiveTexture(GL_TEXTURE24);
-										if (modelJob->DiffuseTexture.size() > 0 && modelJob->DiffuseTexture[0]->Texture != nullptr) {
-											glBindTexture(GL_TEXTURE_2D, modelJob->DiffuseTexture[0]->Texture->m_Texture);
-											glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(modelJob->DiffuseTexture[0]->UVRepeat));
-										}
-										else {
-											glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-											glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
-										}
-										break;
-									}
-									case RawModel::MaterialType::SplatMapping:
-									{
-										glActiveTexture(GL_TEXTURE24);
-										glBindTexture(GL_TEXTURE_2D, m_WhiteTexture->m_Texture);
-										glUniform2fv(glGetUniformLocation(shaderHandle, "DiffuseUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
-										break;
-									}
-									}
-								}
-
-								glBindVertexArray(modelJob->Model->VAO);
-								glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
-								glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex * sizeof(unsigned int)));
-
-								GLERROR("Shadow Draw ERROR");
-							}
-						}
-						state->CullFace(GL_FRONT);
-					}
+					state->CullFace(GL_FRONT);
 				}
 			}
 		}
-		glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-		m_DepthBuffer.Unbind();
-		delete state;
 	}
+
+	glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+	m_DepthBuffer.Unbind();
+	delete state;
 }
