@@ -20,7 +20,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
 OutputBaseFilename=Axyz Setup
-SetupIconFile=Axyz.ico
+SetupIconFile=..\Axyz.ico
 Compression=lzma2
 SolidCompression=yes
 ; "ArchitecturesAllowed=x64" specifies that Setup cannot run on
@@ -33,7 +33,7 @@ ArchitecturesInstallIn64BitMode=x64
 OutputDir=.
 DisableWelcomePage=false
 ;WizardSmallImageFile=
-
+WizardImageFile=Setup Banner.bmp
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -41,25 +41,25 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\bin\Audio\*"; DestDir: "{app}\Audio\"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\bin\Fonts\*"; DestDir: "{app}\Fonts\"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\bin\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\bin\Models\*"; DestDir: "{app}\Models\"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\bin\Schema\*"; DestDir: "{app}\Schema\"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\bin\Shaders\*"; DestDir: "{app}\Shaders\"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\bin\Textures\*"; DestDir: "{app}\Textures\"; Flags: ignoreversion createallsubdirs recursesubdirs
-Source: "..\bin\assimp.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\DefaultConfig.ini"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\DefaultInput.ini"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\glew32.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\glfw3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\imgui.ini"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\Input.ini"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\libpng16.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\TacticalZ.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\xerces-c_3_1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\zlib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\deps\redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
+Source: "..\..\bin\Audio\*"; DestDir: "{app}\Audio\"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\..\bin\Fonts\*"; DestDir: "{app}\Fonts\"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\..\bin\Licenses\*"; DestDir: "{app}\Licenses\"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\..\bin\Models\*"; DestDir: "{app}\Models\"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\..\bin\Schema\*"; DestDir: "{app}\Schema\"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\..\bin\Shaders\*"; DestDir: "{app}\Shaders\"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\..\bin\Textures\*"; DestDir: "{app}\Textures\"; Flags: ignoreversion createallsubdirs recursesubdirs
+Source: "..\..\bin\assimp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\DefaultConfig.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\DefaultInput.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\glew32.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\glfw3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\imgui.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Input.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\libpng16.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\TacticalZ.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\xerces-c_3_1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\zlib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\deps\redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Icons]
 Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -108,20 +108,3 @@ function VCinstalled: Boolean;
      end;
    end;
  end;
-
- procedure InitializeWizard();
-begin
-  // Welcome page
-  // Hide the labels
-  WizardForm.WelcomeLabel1.Visible := False;
-  WizardForm.WelcomeLabel2.Visible := False;
-  // Stretch image over whole page
-  WizardForm.WizardBitmapImage.Width := WizardForm.WizardBitmapImage.Parent.Width;
-
-  // Finished page
-  // Hide the labels
-  WizardForm.FinishedLabel.Visible := False;
-  WizardForm.FinishedHeadingLabel.Visible := False;
-  // Stretch image over whole page
-  WizardForm.WizardBitmapImage2.Width := WizardForm.WizardBitmapImage2.Parent.Width;
-end;
