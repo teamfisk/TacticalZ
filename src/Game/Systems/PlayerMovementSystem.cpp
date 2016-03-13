@@ -64,7 +64,7 @@ void PlayerMovementSystem::Update(double dt)
         //    }
         //}
         m_DashEffectTimer += dt;
-        if (m_DashEffectTimer < 0.046f) {
+        if (m_DashEffectTimer < 0.075f) {
             return;
         }
         m_DashEffectTimer = 0.f;
@@ -88,6 +88,13 @@ void PlayerMovementSystem::Update(double dt)
                 playerEntityModel.Copy(dashEffect["Model"]);
                 for (auto& cAnim : dashEffect.ChildrenWithComponent("Animation")) {
                     cAnim["Animation"]["Play"] = false;
+                }
+                for (auto& cModel : dashEffect.ChildrenWithComponent("Model")) {
+                    Entity.AttachComponent("Lifetime");
+                    dashEffect.AttachComponent("Fade");
+                    dashEffect["Fade"]["Loop"] = false;
+                    dashEffect["Fade"]["FadeTime"] = 0.5;
+                    dashEffect["Fade"]["Time"] = (double)dashEffect["Fade"]["FadeTime"];
                 }
                 dashEffect.AttachComponent("Lifetime");
                 dashEffect.AttachComponent("Fade");
