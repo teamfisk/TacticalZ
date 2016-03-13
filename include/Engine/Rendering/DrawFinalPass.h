@@ -76,7 +76,6 @@ private:
 	const ShadowPass* m_ShadowPass;
 
     ShaderProgram* m_ForwardPlusProgram;
-	ShaderProgram* m_ForwardPlusNoShadowsProgram;
     ShaderProgram* m_ExplosionEffectProgram;
 	ShaderProgram* m_ExplosionEffectSplatMapProgram;
     ShaderProgram* m_SpriteProgram;
