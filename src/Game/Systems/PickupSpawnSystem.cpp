@@ -45,7 +45,7 @@ void PickupSpawnSystem::Update(double dt)
                 m_PickupAtMaximum.erase(it);
                 break;
             }
-            if ((double)it->player["Health"]["Health"] < (double)it->player["Health"]["MaxHealth"]) {
+            if ((const double&)it->player["Health"]["Health"] < (const double&)it->player["Health"]["MaxHealth"]) {
                 DoPickup(it->player, it->trigger);
                 m_PickupAtMaximum.erase(it);
                 break;
@@ -59,7 +59,7 @@ bool PickupSpawnSystem::OnTriggerTouch(Events::TriggerTouch& e)
         return false;
     }
     //if at maxhealth, save the trigger-touch to a vector since standing inside it will not re-trigger the trigger
-    if ((double)e.Entity["Health"]["Health"] >= (double)e.Entity["Health"]["MaxHealth"]) {
+    if ((const double&)e.Entity["Health"]["Health"] >= (const double&)e.Entity["Health"]["MaxHealth"]) {
         m_PickupAtMaximum.push_back({ e.Entity, e.Trigger });
         return false;
     }
@@ -87,7 +87,7 @@ void PickupSpawnSystem::DoPickup(EntityWrapper &player, EntityWrapper &trigger)
     if (!trigger.Valid()) {
         return;
     }
-    double healthGiven = 0.01*(double)trigger["HealthPickup"]["HealthGain"] * (double)player["Health"]["MaxHealth"];
+    double healthGiven = 0.01*(const double&)trigger["HealthPickup"]["HealthGain"] * (const double&)player["Health"]["MaxHealth"];
 
     //only the server will increase the players hp and set it in the next delta
     Events::PlayerHealthPickup ePlayerHealthPickup;
