@@ -2,18 +2,58 @@
 <Entity name="ScoreBoard_Main_Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Transform/>
+    <c:NetworkComponent/>
+    <c:Transform>
+      <Orientation X="0" Y="4.71199989" Z="0"/>
+    </c:Transform>
   </Components>
 
   <Children>
+    <Entity name="Spawner_2">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/ScoreBoard_Red.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="-16.5" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Background_Main">
+      <Components>
+        <c:Model>
+          <GlowIntensity>0.80000019073486328</GlowIntensity>
+          <Resource>Models/Props/ScoreBoard/Scoreboard.mesh</Resource>
+          <Shadow>false</Shadow>
+        </c:Model>
+        <c:Transform>
+          <Orientation X="0" Y="3.13400006" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
     <Entity name="Background_Spectator">
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <GlowIntensity>0.70000028610229492</GlowIntensity>
+          <Resource>Models/Props/ScoreBoard/Spectatorboard.mesh</Resource>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
           <Position X="0" Y="-19" Z="0"/>
-          <Scale X="30" Y="12" Z="1"/>
+          <Orientation X="0" Y="3.13300014" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Spawner_1">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/ScoreBoard_Blue.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="16.5" Y="0" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -27,48 +67,6 @@
         <c:Transform>
           <Position X="0" Y="-15.7886772" Z="1.5"/>
         </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity name="Background_Main">
-      <Components>
-        <c:Model>
-          <Resource>Models/Core/UnitCube.mesh</Resource>
-        </c:Model>
-        <c:Transform>
-          <Scale X="69" Y="25" Z="1"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity name="Spawner_1">
-      <Components>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/ScoreBoard_Red.xml</EntityFile>
-        </c:Spawner>
-        <c:Transform>
-          <Position X="16.5" Y="0" Z="0"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity name="Spawner_2">
-      <Components>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/ScoreBoard_Blue.xml</EntityFile>
-        </c:Spawner>
-        <c:Transform>
-          <Position X="-16.5" Y="0" Z="0"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
-    <Entity name="EndScreenCameraSpawner">
-      <Components>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/EndScreen.xml</EntityFile>
-        </c:Spawner>
-        <c:Transform/>
       </Components>
       <Children/>
     </Entity>
