@@ -108,7 +108,15 @@ void Client::Update(double dt)
 
         hasServerTimedOut();
     }
-    //Network::Update();
+
+    if (ImGui::BeginPopupModal("Disconnected", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("You have been disconnected from server.\n\n");
+        ImGui::SetCursorPosX(ImGui::GetContentRegionAvailWidth() - 120);
+        if (ImGui::Button("OK", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
 }
 
 void Client::parseMessageType(Packet& packet)
@@ -196,7 +204,7 @@ void Client::parseTCPConnect(Packet& packet)
     packet.WritePrimitive(m_PlayerID);
     m_Unreliable.Send(packet);
 
-     //  LOG_INFO("Sent UDP Connect Server");
+    //  LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -676,6 +684,7 @@ void Client::hasServerTimedOut()
     if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
+        ImGui::OpenPopup("Disconnected");
         disconnect();
     }
 }
