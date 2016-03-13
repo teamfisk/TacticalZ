@@ -8,6 +8,7 @@
     </c:BlendAdditive>
     <c:Model>
       <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
+      <Shadow>false</Shadow>
     </c:Model>
     <c:Transform/>
   </Components>
@@ -244,6 +245,7 @@
             </c:BoneAttachment>
             <c:Model>
               <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
+              <Shadow>false</Shadow>
             </c:Model>
             <c:Transform>
               <Position X="0.120748043" Y="-0.228436321" Z="-0.151475549"/>
