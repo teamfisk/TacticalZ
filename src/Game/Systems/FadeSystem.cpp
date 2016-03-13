@@ -11,7 +11,7 @@ void FadeSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cFade,
         return;
     }
 
-    if (!(bool)cFade["Out"]) {
+    if ((bool)cFade["Out"]) {
         dTime *= -1;
     }
 

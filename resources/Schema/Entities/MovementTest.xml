@@ -2,6 +2,10 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:CapturePointGameMode>
+      <RespawnTime>2.3827375146874772</RespawnTime>
+      <MaxRespawnTime>4</MaxRespawnTime>
+    </c:CapturePointGameMode>
     <c:Transform>
       <Position X="0" Y="-0.872543275" Z="-2.49763942"/>
     </c:Transform>
@@ -252,6 +256,735 @@
                 </c:Transform>
               </Components>
               <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="PickTeam">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="OverwatchCamera">
+          <Components>
+            <c:RaptorCopter>
+              <Speed>0.049999997019767761</Speed>
+              <Axis X="0" Y="1" Z="0"/>
+            </c:RaptorCopter>
+            <c:Transform>
+              <Position X="0" Y="-4" Z="0"/>
+              <Orientation X="0" Y="60.4130783" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="CameraAnchor">
+              <Components>
+                <c:Transform>
+                  <Position X="66" Y="59.2180023" Z="0"/>
+                  <Orientation X="5.89000034" Y="1.57079637" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="PickClassCamera">
+                  <Components>
+                    <c:Camera/>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity name="PickClassHUD">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0" Y="-0" Z="-0.5"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="SniperClassPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Icons/Classes/Sniper-01.png</DiffuseTexture>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>3</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0.150000006" Y="-0.0500000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="SniperText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Sniper</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                  <Color A="1" B="0" G="1" R="0.784313738"/>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="0.800000012" Z="0"/>
+                                  <Scale X="0.310000002" Y="0.310000002" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="AssaultClassPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Icons/Classes/Assault-01.png</DiffuseTexture>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="-0.150000006" Y="-0.0500000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="AssaultText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Assault</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                  <Color A="1" B="0" G="1" R="0.784313738"/>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="0.800000012" Z="0"/>
+                                  <Scale X="0.310000002" Y="0.310000002" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="DefenderClassPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Icons/Classes/Defender-01.png</DiffuseTexture>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>2</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0" Y="-0.0500000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="DefenderText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Defender</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                  <Color A="1" B="0" G="1" R="0.784313738"/>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="0.800000012" Z="0"/>
+                                  <Scale X="0.310000002" Y="0.310000002" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ClassPickText">
+                          <Components>
+                            <c:Text>
+                              <Content>Pick Class</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="0" G="1" R="0.784313738"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="0.0799999982" Z="0"/>
+                              <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ToTeamPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="1" B="0" G="1" R="0.509803951"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>SwapToTeamPick</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0.349999994" Y="-0.180000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ChangeText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Change</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TeamText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Team</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="PickTeamCamera">
+                  <Components>
+                    <c:Camera/>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity name="PickTeamHUD">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0" Y="0" Z="-0.5"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="TeamPickText">
+                          <Components>
+                            <c:Text>
+                              <Content>Pick Team</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="0" G="1" R="0.784313738"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="0.0799999982" Z="0"/>
+                              <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="SpectatorPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="1" B="0" G="1" R="0.509803951"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickTeam</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0" Y="-0.0500000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="SpectatorText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Spectator</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="-0.0450000018" Z="0.00200000009"/>
+                                  <Scale X="0.200000003" Y="0.200000003" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TeamRedPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="1" B="0" G="0.294117659" R="0.980392158"/>
+                              <Linear>true</Linear>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickTeam</Command>
+                              <PressValue>2</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0.150000006" Y="-0.0500000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="RedText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Red</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="-0.0850000009" Z="0.00249999994"/>
+                                  <Scale X="0.310000002" Y="0.310000002" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TeamBluePick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="1" B="0.980392158" G="0.294117659" R="0"/>
+                              <Linear>true</Linear>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickTeam</Command>
+                              <PressValue>3</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="-0.150000006" Y="-0.0500000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="BlueText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Blue</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="-0.0850000009" Z="0.00200000009"/>
+                                  <Scale X="0.310000002" Y="0.310000002" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ToClassPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="1" B="0" G="1" R="0.509803951"/>
+                              <Visible>false</Visible>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>SwapToClassPick</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0.349999994" Y="-0.0800000057" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ChangeText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Change</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                  <Visible>false</Visible>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="ClassText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Class</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                  <Visible>false</Visible>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+                <Entity name="SpectatorCamera">
+                  <Components>
+                    <c:Camera/>
+                    <c:Transform/>
+                  </Components>
+                  <Children>
+                    <Entity name="SpectatorHUD">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0" Y="0" Z="-0.5"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="RespawnTimer">
+                          <Components>
+                            <c:Text>
+                              <Content>2</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Color A="1" B="0" G="1" R="0.784313738"/>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="0.178199276" Z="0"/>
+                              <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="CapturePointHUD">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="0.190541431" Z="0"/>
+                              <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="BackgroundHexagon">
+                              <Components>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                                  <Color A="0.300000012" B="1" G="1" R="1"/>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="ProgressionHexagon">
+                                  <Components>
+                                    <c:Fill>
+                                      <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                    </c:Fill>
+                                    <c:CapturePointHUD>
+                                      <CapturePointNumber>3</CapturePointNumber>
+                                    </c:CapturePointHUD>
+                                    <c:Sprite>
+                                      <DepthSort>false</DepthSort>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0" Y="0" Z="0.00999999978"/>
+                                      <Orientation X="0" Y="0" Z="1.57079637"/>
+                                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="BackgroundHexagon">
+                              <Components>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="1.62788737" Y="0.919596612" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="ProgressionHexagon">
+                                  <Components>
+                                    <c:Fill>
+                                      <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                    </c:Fill>
+                                    <c:CapturePointHUD>
+                                      <CapturePointNumber>4</CapturePointNumber>
+                                    </c:CapturePointHUD>
+                                    <c:Sprite>
+                                      <DepthSort>false</DepthSort>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0" Y="0" Z="0.00999999978"/>
+                                      <Orientation X="0" Y="0" Z="1.57079637"/>
+                                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="BackgroundHexagon">
+                              <Components>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                                  <Color A="0.300000012" B="1" G="1" R="1"/>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0" Y="0.919596612" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="ProgressionHexagon">
+                                  <Components>
+                                    <c:Fill>
+                                      <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                    </c:Fill>
+                                    <c:CapturePointHUD>
+                                      <CapturePointNumber>2</CapturePointNumber>
+                                    </c:CapturePointHUD>
+                                    <c:Sprite>
+                                      <DepthSort>false</DepthSort>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0" Y="0" Z="0.00999999978"/>
+                                      <Orientation X="0" Y="0" Z="1.57079637"/>
+                                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="BackgroundHexagon">
+                              <Components>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                                  <Color A="0.300000012" B="1" G="1" R="1"/>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.820431828" Y="0.441878349" Z="-0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="ProgressionHexagon">
+                                  <Components>
+                                    <c:Fill>
+                                      <Percentage>0.10332605343919568</Percentage>
+                                      <Color A="0.699999988" B="0" G="0" R="1"/>
+                                    </c:Fill>
+                                    <c:CapturePointHUD>
+                                      <CapturePointNumber>1</CapturePointNumber>
+                                    </c:CapturePointHUD>
+                                    <c:Sprite>
+                                      <DepthSort>false</DepthSort>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0" Y="0" Z="0.00999999978"/>
+                                      <Orientation X="0" Y="0" Z="4.71238899"/>
+                                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="BackgroundHexagon">
+                              <Components>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                                  <Color A="0.699999988" B="0" G="0" R="1"/>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-1.58304751" Y="0.919596612" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="ProgressionHexagon">
+                                  <Components>
+                                    <c:Fill>
+                                      <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                    </c:Fill>
+                                    <c:CapturePointHUD/>
+                                    <c:Sprite>
+                                      <DepthSort>false</DepthSort>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0" Y="0" Z="0.00999999978"/>
+                                      <Orientation X="0" Y="0" Z="1.57079637"/>
+                                      <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ToTeamPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="1" B="0" G="1" R="0.509803951"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>SwapToTeamPick</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0.349999994" Y="-0.180000007" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ChangeText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Change</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TeamText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Team</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ToClassPick">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="1" B="0" G="1" R="0.509803951"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>SwapToClassPick</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Position X="0.349999994" Y="-0.0800000057" Z="0"/>
+                              <Scale X="0.0799999982" Y="0.0799999982" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ChangeText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Change</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="ClassText">
+                              <Components>
+                                <c:Text>
+                                  <Content>Class</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0" Y="-0.224999994" Z="0.00200000009"/>
+                                  <Scale X="0.25" Y="0.25" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
             </Entity>
           </Children>
         </Entity>

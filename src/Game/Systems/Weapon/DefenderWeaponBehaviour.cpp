@@ -354,7 +354,16 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
 
 void DefenderWeaponBehaviour::spawnTracers(ComponentWrapper cWeapon, WeaponInfo& wi, std::vector<glm::vec2> pattern)
 {
-    EntityWrapper muzzle = getRelevantWeaponEntity(wi).FirstChildByName("WeaponMuzzle");
+    EntityWrapper flashSpawner = getRelevantWeaponEntity(wi).FirstChildByName("WeaponMuzzleFlash");
+    if (flashSpawner.Valid()) {
+        std::uniform_real_distribution<float> randomSpreadAngle(0.f, 3.1415f*2);
+        EntityWrapper flash = SpawnerSystem::Spawn(flashSpawner, flashSpawner);
+        if (flash.Valid()) {
+            ((Field<glm::vec3>)flash["Transform"]["Orientation"]).z(randomSpreadAngle(m_RandomEngine));
+        }
+    }
+
+    EntityWrapper muzzle = getRelevantWeaponEntity(wi).FirstChildByName("WeaponMuzzleRay");
     if (!muzzle.Valid()) {
         return;
     }

@@ -189,17 +189,28 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         return;
     }
 
-    // Tracer
-    EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
+    //Tracer
+    EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzleRay");
     if (tracerSpawner.Valid()) {
         glm::vec3 origin = TransformSystem::AbsolutePosition(tracerSpawner);
         glm::vec3 direction = TransformSystem::AbsoluteOrientation(tracerSpawner) * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
-        EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
+        EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner, tracerSpawner);
         if (ray.Valid()) {
             ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance);
         }
     }
+
+    //Flash
+    EntityWrapper flashSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzleFlash");
+    if (flashSpawner.Valid()) {
+        std::uniform_real_distribution<float> randomSpreadAngle(0.f, 3.1415f*2);
+        EntityWrapper flash = SpawnerSystem::Spawn(flashSpawner, flashSpawner);
+        if(flash.Valid()){
+            ((Field<glm::vec3>)flash["Transform"]["Orientation"]).z(randomSpreadAngle(m_RandomEngine));
+        }
+    }
+
 
     // Deal damage
     if (dealDamage(cWeapon, wi)) {
