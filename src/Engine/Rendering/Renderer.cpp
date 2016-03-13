@@ -67,10 +67,19 @@ void Renderer::InitializeWindow()
 	// Create a window
 	GLFWmonitor* monitor = nullptr;
 	if (m_Fullscreen) {
-		monitor = glfwGetPrimaryMonitor();
+        //monitor = glfwGetPrimaryMonitor();
+        //const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+        //glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        //glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        //glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        //glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+        glfwWindowHint(GLFW_DECORATED, false);
+        glfwWindowHint(GLFW_AUTO_ICONIFY, false);
 	}
-	//glfwWindowHint(GLFW_SAMPLES, 8);
-	m_Window = glfwCreateWindow(m_Resolution.Width, m_Resolution.Height, "daydream", monitor, nullptr);
+
+    //glfwWindowHint(GLFW_SAMPLES, 8);
+	m_Window = glfwCreateWindow(m_Resolution.Width, m_Resolution.Height + 1, "daydream", monitor, nullptr);
 	if (!m_Window) {
 		LOG_ERROR("GLFW: Failed to create window");
 		exit(EXIT_FAILURE);
