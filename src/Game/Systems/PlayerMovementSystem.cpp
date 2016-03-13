@@ -393,7 +393,7 @@ void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
 bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
 {
     EntityWrapper eventPlayer(m_World, e.Player);
-    if (!eventPlayer.Valid() || IsServer || eventPlayer.ID == LocalPlayer.ID) {
+    if (!eventPlayer.Valid()){// || IsServer || eventPlayer.ID == LocalPlayer.ID) {
         return false;
     }
 
