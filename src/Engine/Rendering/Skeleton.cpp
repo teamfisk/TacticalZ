@@ -33,33 +33,33 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
     PoseData poseData;
     
     if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
-        std::vector<Animation::Keyframe> boneKeyFrames = animation->JointAnimations.at(bone->ID);
+        const std::vector<Animation::Keyframe>& boneKeyFrames = animation->JointAnimations.at(bone->ID);
 
-        Animation::Keyframe currentFrame;
-        Animation::Keyframe nextFrame;
+        const Animation::Keyframe* currentFrame;
+        const Animation::Keyframe* nextFrame;
 
         if (boneKeyFrames.size() > 1) { // 2+ keyframes for the current bone
             for (int index = boneKeyFrames.size()-1; index >= 0; index--) { // find the bone keyframes that surrounds the current frame
                 if (time >= boneKeyFrames.at(index).Time) {
-                    currentFrame = boneKeyFrames.at(index);
-                    nextFrame = boneKeyFrames.at((index + 1) % boneKeyFrames.size());
+                    currentFrame = &boneKeyFrames.at(index);
+                    nextFrame = &boneKeyFrames.at((index + 1) % boneKeyFrames.size());
                     break;
                 }
             }
 
             float progress;
 
-            if (nextFrame.Index == 0) {
+            if (nextFrame->Index == 0) {
                 nextFrame = currentFrame;
-                progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
+                progress = (time - currentFrame->Time) / (animation->Duration - currentFrame->Time);
             } else {
-                progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
+                progress = (time - currentFrame->Time) / (nextFrame->Time - currentFrame->Time);
 
             }
 
             progress = glm::clamp(progress, 0.0f, 1.0f);
-            Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
-            Animation::Keyframe::BoneProperty nextBoneProperty = nextFrame.BoneProperties;
+            const Animation::Keyframe::BoneProperty& currentBoneProperty = currentFrame->BoneProperties;
+			const Animation::Keyframe::BoneProperty& nextBoneProperty = nextFrame->BoneProperties;
 
             glm::vec3 position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
             glm::quat rotation = glm::normalize(glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress));
@@ -77,10 +77,10 @@ void Skeleton::AccumulateBoneTransforms(bool noRootMotion, const Animation* anim
             boneMatrices[bone->ID] = poseData;
 
         } else { // 1 keyframes for the current bone
-            currentFrame = boneKeyFrames.at(0);
-            poseData.Translation = currentFrame.BoneProperties.Position;
-            poseData.Orientation = currentFrame.BoneProperties.Rotation;
-            poseData.Scale = currentFrame.BoneProperties.Scale;
+            currentFrame = &boneKeyFrames.at(0);
+            poseData.Translation = currentFrame->BoneProperties.Position;
+            poseData.Orientation = currentFrame->BoneProperties.Rotation;
+            poseData.Scale = currentFrame->BoneProperties.Scale;
             boneMatrices[bone->ID] = poseData;
         }
     }
@@ -117,33 +117,33 @@ Skeleton::PoseData Skeleton::GetAdditiveBonePose(const Bone* bone, const Animati
     glm::vec3 scale = glm::vec3(1);
 
     if (animation->JointAnimations.find(bone->ID) != animation->JointAnimations.end()) {
-        std::vector<Animation::Keyframe> boneKeyFrames = animation->JointAnimations.at(bone->ID);
+        const std::vector<Animation::Keyframe>& boneKeyFrames = animation->JointAnimations.at(bone->ID);
 
-        Animation::Keyframe currentFrame;
-        Animation::Keyframe nextFrame;
+        const Animation::Keyframe* currentFrame;
+        const Animation::Keyframe* nextFrame;
 
         if (boneKeyFrames.size() > 1) { // 2+ keyframes for the current bone
             for (int index = boneKeyFrames.size()-1; index >= 0; index--) { // find the bone keyframes that surrounds the current frame
                 if (time >= boneKeyFrames.at(index).Time) {
-                    currentFrame = boneKeyFrames.at(index);
-                    nextFrame = boneKeyFrames.at((index + 1) % boneKeyFrames.size());
+                    currentFrame = &boneKeyFrames.at(index);
+                    nextFrame = &boneKeyFrames.at((index + 1) % boneKeyFrames.size());
                     break;
                 }
             }
 
             float progress;
 
-            if (nextFrame.Index == 0) {
+            if (nextFrame->Index == 0) {
                 nextFrame = currentFrame;
-                progress = (time - currentFrame.Time) / (animation->Duration - currentFrame.Time);
+                progress = (time - currentFrame->Time) / (animation->Duration - currentFrame->Time);
             } else {
-                progress = (time - currentFrame.Time) / (nextFrame.Time - currentFrame.Time);
+                progress = (time - currentFrame->Time) / (nextFrame->Time - currentFrame->Time);
             }
 
             progress = glm::clamp(progress, 0.0f, 1.0f);
             
-            Animation::Keyframe::BoneProperty currentBoneProperty = currentFrame.BoneProperties;
-            Animation::Keyframe::BoneProperty nextBoneProperty = nextFrame.BoneProperties;
+            const Animation::Keyframe::BoneProperty& currentBoneProperty = currentFrame->BoneProperties;
+            const Animation::Keyframe::BoneProperty& nextBoneProperty = nextFrame->BoneProperties;
 
             position = currentBoneProperty.Position * (1.f - progress) + nextBoneProperty.Position * progress;
             rotation = glm::slerp(currentBoneProperty.Rotation, nextBoneProperty.Rotation, progress);
@@ -151,10 +151,10 @@ Skeleton::PoseData Skeleton::GetAdditiveBonePose(const Bone* bone, const Animati
 
 
         } else { // 1 keyframes for the current bone
-            currentFrame = boneKeyFrames.at(0);
-            position = currentFrame.BoneProperties.Position;
-            rotation = currentFrame.BoneProperties.Rotation;
-            scale = currentFrame.BoneProperties.Scale;
+            currentFrame = &boneKeyFrames.at(0);
+            position = currentFrame->BoneProperties.Position;
+            rotation = currentFrame->BoneProperties.Rotation;
+            scale = currentFrame->BoneProperties.Scale;
         }
     }
 
@@ -270,10 +270,10 @@ void Skeleton::AccumulateFinalPose(std::map<int, glm::mat4>& boneMatrices, std::
         boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
     } else {
         if (bone->Parent) {
-            boneMatrix = parentMatrix * (glm::inverse(bone->OffsetMatrix) * bone->Parent->OffsetMatrix);
+            boneMatrix = parentMatrix * bone->BindTransformMatrix * bone->Parent->OffsetMatrix;
             boneMatrices[bone->ID] = boneMatrix * bone->OffsetMatrix;
         } else {
-            boneMatrix = glm::inverse(bone->OffsetMatrix);
+            boneMatrix = bone->BindTransformMatrix;
             boneMatrices[bone->ID] = parentMatrix;
         }
     }
