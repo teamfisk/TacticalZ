@@ -52,7 +52,11 @@ bool SpectatorCameraSystem::OnInputCommand(const Events::InputCommand& e)
     // TODO: 1 Signifies spectator, should probably have real enum here later.
     // Spectators should never end up at the class select, instead put them at the SpectatorCamera.
     if (swapToClass && m_PickedTeam != 1) {
-        camName = "PickClassCamera";
+        if (m_PickedTeam == 2) {
+            camName = "PickClassCameraRed";
+        } else if (m_PickedTeam == 3) {
+            camName = "PickClassCameraBlue";
+        }
     } else if (e.Command == "SwapToTeamPick") {
         camName = "PickTeamCamera";
     } else {
