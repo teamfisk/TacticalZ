@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="RedCapturepointBorde" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform>
+      <Position X="0" Y="0.271661639" Z="0"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Bottom">
+      <Components>
+        <c:FloatingEffect>
+          <Period>6</Period>
+          <Time>3</Time>
+          <Axis X="0" Y="1" Z="0"/>
+          <Amplitude>0.10000000149011612</Amplitude>
+        </c:FloatingEffect>
+        <c:Transform>
+          <Position X="-0" Y="-8.74227801e-09" Z="-0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/DoubleSidedCylinder.mesh</Resource>
+              <Color A="0.392156869" B="0" G="0.235294119" R="21.9607849"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.5" Z="0"/>
+              <Scale X="8.19999981" Y="0.0199999996" Z="8.19999981"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="LowerMid">
+      <Components>
+        <c:FloatingEffect>
+          <Period>6</Period>
+          <Time>2</Time>
+          <Axis X="0" Y="1" Z="0"/>
+          <Amplitude>0.10000000149011612</Amplitude>
+        </c:FloatingEffect>
+        <c:Transform>
+          <Position X="0" Y="0.0866025388" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/DoubleSidedCylinder.mesh</Resource>
+              <Color A="0.313725501" B="0" G="0.235294119" R="21.9607849"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="0.899999976" Z="0"/>
+              <Scale X="8.19999981" Y="0.0199999996" Z="8.19999981"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="UpperMid">
+      <Components>
+        <c:FloatingEffect>
+          <Period>6</Period>
+          <Time>1</Time>
+          <Axis X="0" Y="1" Z="0"/>
+          <Amplitude>0.10000000149011612</Amplitude>
+        </c:FloatingEffect>
+        <c:Transform>
+          <Position X="0" Y="0.0866025463" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/DoubleSidedCylinder.mesh</Resource>
+              <Color A="0.196078435" B="0" G="0.235294119" R="21.9607849"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="1.29999995" Z="0"/>
+              <Scale X="8.19999981" Y="0.0199999996" Z="8.19999981"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Top">
+      <Components>
+        <c:FloatingEffect>
+          <Period>6</Period>
+          <Axis X="0" Y="1" Z="0"/>
+          <Amplitude>0.10000000149011612</Amplitude>
+        </c:FloatingEffect>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity>
+          <Components>
+            <c:Model>
+              <Resource>Models/Props/CapturePoint/DoubleSidedCylinder.mesh</Resource>
+              <Color A="0.117647059" B="0" G="0.235294119" R="21.9607849"/>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform>
+              <Position X="0" Y="1.70000005" Z="0"/>
+              <Scale X="8.19999981" Y="0.0199999996" Z="8.19999981"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>
