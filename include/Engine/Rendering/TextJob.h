@@ -17,8 +17,8 @@ struct TextJob : RenderJob
         : RenderJob()
     {
         Matrix = matrix;
-        Color = (glm::vec4)textComponent["Color"];
-        Content = (std::string)textComponent["Content"];
+        Color = (const glm::vec4&)textComponent["Color"];
+        Content = (const std::string&)textComponent["Content"];
         Resource = font;
 
         if ((int)textComponent["Alignment"] == textComponent["Alignment"].Enum("Left")) {

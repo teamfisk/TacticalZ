@@ -13,8 +13,8 @@ void UniformScaleSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper
         return;
     }
 
-    float distance = glm::length((glm::vec3)entity["Transform"]["Position"] - (glm::vec3&)m_Camera["Transform"]["Position"]);
-    entity["Transform"]["Scale"] = (glm::vec3&)cUniformScale["Scale"] * distance;
+    float distance = glm::length((glm::vec3)entity["Transform"]["Position"] - (const glm::vec3&)m_Camera["Transform"]["Position"]);
+    entity["Transform"]["Scale"] = (const glm::vec3&)cUniformScale["Scale"] * distance;
 }
 
 bool UniformScaleSystem::OnSetCamera(const Events::SetCamera& e)

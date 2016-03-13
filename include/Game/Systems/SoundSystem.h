@@ -2,6 +2,7 @@
 #define Systems_SoundSystem_h__
 
 #include <random>
+#include <chrono>
 
 #include "../Engine/Core/System.h"
 #include "../Engine/Core/ResourceManager.h"
@@ -20,9 +21,10 @@
 #include "../Engine/Collision/ETrigger.h"
 #include "../Engine/Sound/EPlaySoundOnEntity.h"
 #include "../Engine/Sound/EPlayBackgroundMusic.h"
+#include "../Engine/Sound/EPlayAnnouncerVoice.h"
 #include "../Game/Events/EDoubleJump.h"
 #include "../Game/Events/EDashAbility.h"
-
+#include "../Engine/Sound/EChangeBGM.h"
 
 class SoundSystem : public PureSystem, ImpureSystem
 {
@@ -33,14 +35,10 @@ public:
 private:
     std::string m_Announcer = "";
     // Logic for playing a sound when a player jumps
-    void playerJumps();
-    
-    // Temporary solution for play test.
-    bool m_DrumsIsPlaying = false;
-    double m_DrumTimer = 0.0;
-    bool drumTimer(double dt);
+    void playerJumps(EntityWrapper player);
 
-    std::default_random_engine generator;
+    std::default_random_engine m_RandomGenerator;
+    std::uniform_int_distribution<int> m_RandIntDistribution;
 
     EventRelay<SoundSystem, Events::PlayerSpawned> m_EPlayerSpawned;
     bool OnPlayerSpawned(const Events::PlayerSpawned &e);
@@ -48,10 +46,6 @@ private:
     bool OnInputCommand(const Events::InputCommand &e);
     EventRelay<SoundSystem, Events::DoubleJump> m_EDoubleJump;
     bool OnDoubleJump(const Events::DoubleJump &e);
-    EventRelay<SoundSystem, Events::DashAbility> m_EDashAbility;
-    bool OnDashAbility(const Events::DashAbility &e);
-    EventRelay<SoundSystem, Events::TriggerTouch> m_ETriggerTouch;
-    bool OnTriggerTouch(const Events::TriggerTouch &e);
     EventRelay<SoundSystem, Events::Captured> m_ECaptured;
     bool OnCaptured(const Events::Captured &e);
     EventRelay<SoundSystem, Events::PlayerDamage> m_EPlayerDamage;

@@ -125,6 +125,7 @@ void EntityXMLFilePreprocessor::parseComponentInfo()
         auto modelGroup = modelGroupParticle->getModelGroupTerm();
 
         // <xs:element... 
+        unsigned char fieldIndex = 0;
         unsigned int fieldOffset = 0;
         auto particles = modelGroup->getParticles();
         for (unsigned int i = 0; i < particles->size(); ++i) {
@@ -182,12 +183,14 @@ void EntityXMLFilePreprocessor::parseComponentInfo()
             auto& field = compInfo.Fields[name];
             field.Name = name;
             field.Type = effectiveType;
+            field.Index = fieldIndex;
             field.Offset = fieldOffset;
             field.Stride = stride;
             compInfo.FieldsInOrder.push_back(name);
             if (field.Type == "string") {
                 compInfo.StringFields.push_back(name);
             }
+            fieldIndex += 1;
             fieldOffset += stride;
         }
 

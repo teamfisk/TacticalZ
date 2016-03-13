@@ -19,7 +19,6 @@ Texture::Texture(std::string path)
     }
    
     // Construct the OpenGL texture
-
     glGenTextures(1, &m_Texture);
     glBindTexture(GL_TEXTURE_2D, m_Texture);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -30,6 +29,8 @@ Texture::Texture(std::string path)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     GLERROR("Texture load");
+
+    ResourceManager::Release("PNG", path);
 }
 
 Texture::~Texture()

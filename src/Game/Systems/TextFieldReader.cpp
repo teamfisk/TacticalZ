@@ -34,7 +34,7 @@ void TextFieldReader::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
     }
     const ComponentInfo::Field_t& field = component.Info.Fields.at(fieldName);
 
-    std::string& text = entity["Text"]["Content"];
+    Field<std::string> text = entity["Text"]["Content"];
 
     if (field.Type == "int") {
         text = boost::lexical_cast<std::string>((const int&)component[fieldName]);

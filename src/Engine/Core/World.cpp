@@ -48,7 +48,7 @@ bool World::ValidEntity(EntityID entity) const
 void World::RegisterComponent(const ComponentInfo& ci)
 {
     if (m_ComponentPools.find(ci.Name) == m_ComponentPools.end()) {
-        m_ComponentPools[ci.Name] = new ComponentPool(ci);
+        m_ComponentPools[ci.Name] = new ComponentPool(ci, this);
     }
 }
 
@@ -95,7 +95,7 @@ void World::DeleteComponent(EntityID entity, const std::string& componentType)
     }
 }
 
-const ComponentPool* World::GetComponents(const std::string& componentType)
+ComponentPool* World::GetComponents(const std::string& componentType)
 {
     auto it = m_ComponentPools.find(componentType);
     return (it != m_ComponentPools.end()) ? it->second : nullptr;
@@ -223,7 +223,7 @@ void World::deleteEntityRecursive(EntityID entity, bool cascaded /*= false*/)
 
     if (m_EventBroker != nullptr) {
         Events::EntityDeleted e;
-        e.DeletedEntity = entity;
+        e.DeletedEntity = EntityWrapper(this, entity);
         e.Cascaded = cascaded;
         m_EventBroker->Publish(e);
     }

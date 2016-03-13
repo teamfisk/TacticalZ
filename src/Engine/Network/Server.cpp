@@ -224,7 +224,7 @@ void Server::addPlayersToPacket(Packet & packet, EntityID entityID)
                     for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
                         ComponentInfo::Field_t fieldInfo = componentWrapper.Info.Fields.at(componentField);
                         if (fieldInfo.Type == "string") {
-                            std::string& value = componentWrapper[componentField];
+                            const std::string& value = componentWrapper[componentField];
                             packet.WriteString(value);
                         } else {
                             packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
@@ -268,7 +268,7 @@ void Server::addChildrenToPacket(Packet & packet, EntityID entityID)
                 for (auto& componentField : componentWrapper.Info.FieldsInOrder) {
                     ComponentInfo::Field_t fieldInfo = componentWrapper.Info.Fields.at(componentField);
                     if (fieldInfo.Type == "string") {
-                        std::string& value = componentWrapper[componentField];
+                        const std::string& value = componentWrapper[componentField];
                         packet.WriteString(value);
                     } else {
                         packet.WriteData(componentWrapper.Data + fieldInfo.Offset, fieldInfo.Stride);
@@ -489,7 +489,7 @@ bool Server::OnEntityDeleted(const Events::EntityDeleted & e)
 {
     if (!e.Cascaded) {
         Packet packet = Packet(MessageType::EntityDeleted);
-        packet.WritePrimitive<EntityID>(e.DeletedEntity);
+        packet.WritePrimitive<EntityID>(e.DeletedEntity.ID);
         reliableBroadcast(packet);
     }
     return false;

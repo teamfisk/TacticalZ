@@ -52,7 +52,7 @@ void EditorRenderSystem::Update(double dt)
             }
 
             EntityWrapper entity(m_World, cModel.EntityID);
-            glm::mat4 modelMatrix = Transform::ModelMatrix(entity.ID, entity.World);
+            glm::mat4 modelMatrix = TransformSystem::ModelMatrix(entity.ID, entity.World);
             for (auto matGroup : model->MaterialGroups()) {
                 std::shared_ptr<ModelJob> modelJob = std::make_shared<ModelJob>(model, scene.Camera, modelMatrix, matGroup, cModel, entity.World, glm::vec4(0), 0.f, false, false);
                 if (cModel["Transparent"]) {

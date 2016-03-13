@@ -2,7 +2,7 @@
 
 void DefenderWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt)
 {
-    double& fireCooldown = cWeapon["FireCooldown"];
+    Field<double> fireCooldown = cWeapon["FireCooldown"];
     fireCooldown = glm::max(0.0, fireCooldown - dt);
 
     WeaponBehaviour::UpdateComponent(entity, cWeapon, dt);
@@ -11,27 +11,27 @@ void DefenderWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWr
 void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
     // Decrement reload timer
-    double& reloadTimer = cWeapon["ReloadTimer"];
+    Field<double> reloadTimer = cWeapon["ReloadTimer"];
     reloadTimer = glm::max(0.0, reloadTimer - dt);
 
     // Start reloading automatically if at 0 mag ammo
-    int& magAmmo = cWeapon["MagazineAmmo"];
+    Field<int> magAmmo = cWeapon["MagazineAmmo"];
     if (m_ConfigAutoReload && magAmmo <= 0) {
         OnReload(cWeapon, wi);
     }
 
     // Handle reloading
-    bool& isReloading = cWeapon["IsReloading"];
+    Field<bool> isReloading = cWeapon["IsReloading"];
     if (isReloading && reloadTimer <= 0.0) {
         double reloadTime = cWeapon["ReloadTime"];
-        int& magSize = cWeapon["MagazineSize"];
-        int& ammo = cWeapon["Ammo"];
+        Field<int> magSize = cWeapon["MagazineSize"];
+        Field<int> ammo = cWeapon["Ammo"];
         if (magAmmo < magSize && ammo > 0) {
             ammo -= 1;
             magAmmo += 1;
             reloadTimer = reloadTime;
             Events::PlaySoundOnEntity e;
-            e.EmitterID = wi.Player.ID;
+            e.Emitter = wi.Player;
             e.FilePath = "Audio/weapon/Zoom.wav";
             m_EventBroker->Publish(e);
         } else {
@@ -42,15 +42,15 @@ void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo&
 
     // Restore view angle
     if (IsClient) {
-        float& currentTravel = cWeapon["CurrentTravel"];
-        float& returnSpeed = cWeapon["ViewReturnSpeed"];
+        Field<float> currentTravel = cWeapon["CurrentTravel"];
+        Field<float> returnSpeed = cWeapon["ViewReturnSpeed"];
         if (currentTravel > 0) {
             float change = returnSpeed * dt;
             currentTravel = glm::max(0.f, currentTravel - change);
             EntityWrapper camera = wi.Player.FirstChildByName("Camera");
             if (camera.Valid()) {
-                glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
-                cameraOrientation.x -= change;
+                Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
+                cameraOrientation.x(cameraOrientation.x() - change);
             }
         }
     }
@@ -76,23 +76,23 @@ void DefenderWeaponBehaviour::OnCeasePrimaryFire(ComponentWrapper cWeapon, Weapo
 
 void DefenderWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
-    bool& isReloading = cWeapon["IsReloading"];
+    Field<bool> isReloading = cWeapon["IsReloading"];
     if (isReloading) {
         return;
     }
 
-    int& magAmmo = cWeapon["MagazineAmmo"];
-    int& magSize = cWeapon["MagazineSize"];
+    Field<int> magAmmo = cWeapon["MagazineAmmo"];
+    Field<int> magSize = cWeapon["MagazineSize"];
     if (magAmmo >= magSize) {
         return;
     }
-    int& ammo = cWeapon["Ammo"];
+    Field<int> ammo = cWeapon["Ammo"];
     if (ammo <= 0) {
         return;
     }
 
     double reloadTime = cWeapon["ReloadTime"];
-    double& reloadTimer = cWeapon["ReloadTimer"];
+    Field<double> reloadTimer = cWeapon["ReloadTimer"];
    
     // Start reload
     isReloading = true;
@@ -179,11 +179,11 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     cWeapon["FireCooldown"] = 60.0 / (double)cWeapon["RPM"];
 
     // Stop reloading
-    bool& isReloading = cWeapon["IsReloading"];
+    Field<bool> isReloading = cWeapon["IsReloading"];
     isReloading = false;
 
     // Ammo
-    int& magAmmo = cWeapon["MagazineAmmo"];
+    Field<int> magAmmo = cWeapon["MagazineAmmo"];
     if (magAmmo <= 0) {
         return;
     } else {
@@ -208,16 +208,16 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     if (IsClient) {
         EntityWrapper camera = wi.Player.FirstChildByName("Camera");
         if (camera.Valid()) {
-            glm::vec3& cameraOrientation = camera["Transform"]["Orientation"];
+            Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
             float viewPunch = cWeapon["ViewPunch"];
             float maxTravelAngle = cWeapon["MaxTravelAngle"];
-            float& currentTravel = cWeapon["CurrentTravel"];
+            Field<float> currentTravel = cWeapon["CurrentTravel"];
             if (currentTravel < maxTravelAngle) {
                 float change = viewPunch;
                 if (currentTravel + change > maxTravelAngle) {
                     change = maxTravelAngle - currentTravel;
                 }
-                cameraOrientation.x += change;
+                cameraOrientation.x(cameraOrientation.x() + change);
                 currentTravel += change;
             }
         }
@@ -232,14 +232,21 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     }
     if (weaponModelEntity.Valid()) {
         EntityWrapper spawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
+        Events::PlaySoundOnEntity e;
+        e.Emitter = weaponModelEntity;
+        e.FilePath = "Audio/weapon/Shotgun/ShotgunFire.wav";
+        e.Gain = 1.f;
+        if (IsClient) {
+            m_EventBroker->Publish(e);
+        }
         for (auto& angles : pelletAngles) {
-            glm::vec3 direction = Transform::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
-            float distance = traceRayDistance(Transform::AbsolutePosition(spawner), direction);
+            glm::vec3 direction = TransformSystem::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
+            float distance = traceRayDistance(TransformSystem::AbsolutePosition(spawner), direction);
             EntityWrapper ray = SpawnerSystem::Spawn(spawner);
-            ((glm::vec3&)ray["Transform"]["Scale"]).z = (distance / 100.f);
-            glm::vec3& orientation = ray["Transform"]["Orientation"];
-            orientation.x += angles.x;
-            orientation.y += angles.y;
+            ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance / 100.f);
+            Field<glm::vec3> orientation = ray["Transform"]["Orientation"];
+            orientation.x(orientation.x() + angles.x);
+            orientation.y(orientation.y() + angles.y);
             glm::vec3 trajectory = direction * distance;
             dealDamage(cWeapon, wi, direction, pelletDamage);
         }
@@ -250,7 +257,7 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
 
     // Sound
     Events::PlaySoundOnEntity e;
-    e.EmitterID = wi.Player.ID;
+    e.Emitter = wi.Player;
     e.FilePath = "Audio/weapon/Blast.wav";
     m_EventBroker->Publish(e);
 }
@@ -274,7 +281,7 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
     
     glm::vec3 maxRange = direction * 2.f;
     EntityWrapper camera = wi.Player.FirstChildByName("Camera");
-    glm::vec3 cameraPosition = Transform::AbsolutePosition(camera);
+    glm::vec3 cameraPosition = TransformSystem::AbsolutePosition(camera);
     if (!camera.Valid()) {
         return;
     }
