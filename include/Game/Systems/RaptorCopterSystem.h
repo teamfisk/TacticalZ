@@ -33,6 +33,6 @@ public:
         ComponentWrapper& cTransform = entity["Transform"];
         //FSubscriptProxy subOri(&cTransform, "Orientation");
         //Field<glm::vec3> orientation = subOri;
-        (glm::vec3&)cTransform["Orientation"] += (float)(const double&)cRaptorCopter["Speed"] * (float)dt * (glm::vec3)cRaptorCopter["Axis"];
+        (Field<glm::vec3>)cTransform["Orientation"] += (float)(const double&)cRaptorCopter["Speed"] * (float)dt * (glm::vec3)cRaptorCopter["Axis"];
     }
 };
