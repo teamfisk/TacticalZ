@@ -462,8 +462,8 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
         }
 
         // Temp hit decal
-        EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
-        (Field<glm::vec3>)hit["Transform"]["Position"] = pick.Position;
+//         EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
+//         (Field<glm::vec3>)hit["Transform"]["Position"] = pick.Position;
 
         // Don't let us shoot ourselves in the foot somehow
         if (victim == LocalPlayer) {
@@ -490,7 +490,7 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
         }
 
         damageSum[victim] += pelletDamage;
-        ((Field<glm::vec4>)hit["Model"]["Color"]).z(1.f);
+       // ((Field<glm::vec4>)hit["Model"]["Color"]).z(1.f);
     }
 
     // Deal damage!
