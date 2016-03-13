@@ -5,9 +5,8 @@
 #include "../Core/World.h"
 #include "../Core/SystemPipeline.h"
 #include "../Core/ResourceManager.h"
-#include "../Core/EntityFilePreprocessor.h"
-#include "../Core/EntityFileParser.h"
-#include "../Core/EntityFileWriter.h"
+#include "../Core/EntityFile.h"
+#include "../Core/EntityXMLFileWriter.h"
 #include "../Core/EMousePress.h"
 #include "../Input/EInputCommand.h"
 #include "EditorGUI.h"
@@ -48,6 +47,7 @@ private:
     // Utility functions
     EntityWrapper importEntity(EntityWrapper parent, boost::filesystem::path filePath);
     void setWidgetMode(EditorGUI::WidgetMode mode);
+    bool isAnyParentMissingTransform(EntityID entityID);
 
     // GUI callbacks
     void OnEntitySelected(EntityWrapper entity);

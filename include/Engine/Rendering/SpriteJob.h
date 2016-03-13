@@ -7,12 +7,13 @@
 #include "../GLM.h"
 #include "../Core/ComponentWrapper.h"
 #include "Texture.h"
+#include "TextureSprite.h"
 #include "Model.h"
 #include "RenderJob.h"
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
 #include "../Core/World.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "Skeleton.h"
 
 struct SpriteJob : RenderJob
@@ -20,20 +21,24 @@ struct SpriteJob : RenderJob
     SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage, bool depthSorted, bool isIndicator)
         : RenderJob()
     {
-        Model = ResourceManager::Load<::Model>("Models/Core/UnitQuad.mesh");
+        Model = ResourceManager::Load<::Model>(cSprite["Model"]);
         ::RawModel::MaterialProperties matProp = Model->MaterialGroups().front();
         TextureID = 0;
 
-        DiffuseTexture = CommonFunctions::LoadTexture(cSprite["DiffuseTexture"], true);
+        DiffuseTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["DiffuseTexture"]);
+        IncandescenceTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["GlowMap"]);
 
-        IncandescenceTexture = CommonFunctions::LoadTexture(cSprite["GlowMap"], true);
+        Linear = (bool)cSprite["Linear"];
+		ClampToBorder = (bool)cSprite["ClampToBorder"];
 
         StartIndex = matProp.material->StartIndex;
         EndIndex = matProp.material->EndIndex;
 		Matrix = matrix;
         Color = cSprite["Color"];
+        BlurBackground = (bool)cSprite["BlurBackground"];
+
         Entity = cSprite.EntityID;
-        Position = Transform::AbsolutePosition(world, cSprite.EntityID);
+        Position = TransformSystem::AbsolutePosition(world, cSprite.EntityID);
         Depth = 0;
         if (depthSorted) {
             glm::vec3 viewpos = glm::vec3(camera->ViewMatrix() * glm::vec4(Position, 1));
@@ -45,6 +50,26 @@ struct SpriteJob : RenderJob
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;
+
+        glm::vec3 scale = TransformSystem::AbsoluteScale(world, cSprite.EntityID);
+
+        if((bool)cSprite["KeepRatio"] == true) {
+            if(scale.y >= scale.x) {
+                ScaleY = (scale.y)/(scale.x);
+                ScaleX = 1.f;
+            } else {
+                ScaleY = 1.f;
+                ScaleX = (scale.x)/(scale.y);
+            }
+        } else {
+            if ((bool)cSprite["KeepRatioX"] == true) {
+                ScaleX = scale.x;
+            }
+            if ((bool)cSprite["KeepRatioY"] == true) {
+                ScaleY = scale.y;
+            }
+        }
+
     };
 
     unsigned int TextureID;
@@ -65,6 +90,11 @@ struct SpriteJob : RenderJob
 
     bool Pickable;
 	bool IsIndicator = false;
+    bool BlurBackground = false;
+    float ScaleX = 1.f;
+    float ScaleY = 1.f;
+    bool Linear = false;
+	bool ClampToBorder = false;
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;

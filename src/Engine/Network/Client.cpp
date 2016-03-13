@@ -1,4 +1,5 @@
 #include "Network/Client.h"
+
 using namespace boost::asio::ip;
 
 Client::Client(World* world, EventBroker* eventBroker)
@@ -11,7 +12,7 @@ Client::Client(World* world, EventBroker* eventBroker)
 
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_PlayerName = config->Get<std::string>("Networking.Name", "Raptorcopter");
-    m_SendInputIntervalMs = config->Get<int>("Networking.SendInputIntervalMs", 33);
+    m_SendInputInterval = config->Get<int>("Networking.SendInputIntervalMs", 33) / 1000.0;
     LOG_INFO("Client initialized");
 
     m_ServerlistRequest.Connect(m_PlayerName, "192.168.1.255", 32554);
@@ -33,7 +34,9 @@ void Client::Connect(std::string address, int port)
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerDamage, &Client::OnPlayerDamage);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &Client::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &Client::OnDoubleJump);
+    EVENT_SUBSCRIBE_MEMBER(m_EDashAbility, &Client::OnDashAbility);
     EVENT_SUBSCRIBE_MEMBER(m_ESearchForServers, &Client::OnSearchForServers);
+    EVENT_SUBSCRIBE_MEMBER(m_EConnectRequest, &Client::OnConnectRequest);
     auto config = ResourceManager::Load<ConfigFile>("Config.ini");
     m_Address = address;
     if (address.empty()) {
@@ -45,19 +48,22 @@ void Client::Connect(std::string address, int port)
     }
 }
 
-void Client::Update()
+void Client::Update(double dt)
 {
     m_EventBroker->Process<Client>();
     while (m_Unreliable.IsSocketAvailable()) {
-        // Packet will get real data in receive
-        Packet packet(MessageType::Invalid);
-        m_Unreliable.Receive(packet);
-        if (packet.GetMessageType() == MessageType::Connect) {
-            parseUDPConnect(packet);
+        m_Unreliable.ReceivePackets();
+    }
+    // Packet will get real data in GetNextPacket()
+    Packet parsedPacket(MessageType::Invalid);
+    while (m_Unreliable.GetNextPacket(parsedPacket)) {
+        if (parsedPacket.GetMessageType() == MessageType::Connect) {
+            parseUDPConnect(parsedPacket);
         } else {
-            parseMessageType(packet);
+            parseMessageType(parsedPacket);
         }
     }
+
     while (m_Reliable.IsSocketAvailable()) {
         // Packet will get real data in receive
         Packet packet(MessageType::Invalid);
@@ -79,30 +85,45 @@ void Client::Update()
     }
 
     if (m_SearchingForServers) {
-        if (m_SearchingTime < (1000* (std::clock() - m_StartSearchTime) / (double)CLOCKS_PER_SEC)) {
+        m_TimeSearched += dt;
+        if (m_SearchingTime < m_TimeSearched) {
+            m_TimeSearched = 0;
             m_SearchingForServers = false;
-            displayServerlist();
+            //displayServerlist();
+            Events::DisplayServerlist e;
+            e.Serverlist = m_Serverlist;
+            m_EventBroker->Publish(e);
         }
     }
 
     if (m_IsConnected) {
         // Don't send 1 input in 1 packet, bunch em up.
-        if (m_SendInputIntervalMs < (1000 * (std::clock() - m_TimeSinceSentInputs) / (double)CLOCKS_PER_SEC)) {
+        m_TimeSinceSentInputs += dt;
+        if (m_SendInputInterval <  m_TimeSinceSentInputs) {
             sendInputCommands();
-            m_TimeSinceSentInputs = std::clock();
+            m_TimeSinceSentInputs = 0;
         }
         // HACK: Send absolute player positions for now to avoid desync until we have reliable messages
         sendLocalPlayerTransform();
 
         hasServerTimedOut();
     }
-    //Network::Update();
+
+    if (ImGui::BeginPopupModal("Disconnected", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("You have been disconnected from server.\n\n");
+        ImGui::SetCursorPosX(ImGui::GetContentRegionAvailWidth() - 120);
+        if (ImGui::Button("OK", ImVec2(120, 0))) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
 }
 
 void Client::parseMessageType(Packet& packet)
 {
-    // Pop packetSize
-    packet.ReadPrimitive<int>();
+    // Pop packetSize, sequenceNumber and packetsInSequence.
+    popNetworkSegmentOfHeader(packet);
+
     int messageType = packet.ReadPrimitive<int>();
     if (messageType == -1)
         return;
@@ -143,8 +164,17 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::OnDoubleJump:
         parseDoubleJump(packet);
         break;
+    case MessageType::OnDashEffect:
+        parseDashEffect(packet);
+        break;
     case MessageType::AmmoPickup:
         parseAmmoPickup(packet);
+        break;
+    case MessageType::RemoveWorld:
+        parseRemoveWorld(packet);
+        break;
+    case MessageType::KD:
+        parseKDEvent(packet);
         break;
     default:
         break;
@@ -154,27 +184,30 @@ void Client::parseMessageType(Packet& packet)
 void Client::parseUDPConnect(Packet& packet)
 {
     // Map ServerEntityID and your PlayerID
+    // TODO: If this is not received send a new connect message.
     LOG_INFO("I be connected PogChamp");
 }
 
 void Client::parseTCPConnect(Packet& packet)
 {
     LOG_INFO("Received TCP connect from server");
-    // Pop size of message int
-    packet.ReadPrimitive<int>();
+    // Pop packetSize, group, groupIndex and groupSize.
+    popNetworkSegmentOfHeader(packet);
+
     int messageType = packet.ReadPrimitive<int>();
     // Read packet ID 
     m_PreviousPacketID = m_PacketID;    // Set previous packet id
     m_PacketID = packet.ReadPrimitive<int>(); //Read new packet id
     // parse player id and other stuff
     m_PlayerID = packet.ReadPrimitive<int>();
-    m_PlayerID = packet.ReadPrimitive<int>();
     LOG_INFO("A Player connected");
+    // TODO: If this is not received send a new connect message.
     Packet UnreliablePacket(MessageType::Connect, m_SendPacketID);
     // Add player id and other stuff
     packet.WritePrimitive(m_PlayerID);
     m_Unreliable.Send(packet);
-    LOG_INFO("Sent UDP Connect Server");
+
+    //  LOG_INFO("Sent UDP Connect Server");
 }
 
 void Client::parsePlayerConnected(Packet & packet)
@@ -200,10 +233,11 @@ void Client::parsePing()
 
 void Client::parseServerlist(Packet& packet)
 {
-    // Pop size, message type, and ID
+    // Pop packetSize, group, groupIndex and groupSize.
+    popNetworkSegmentOfHeader(packet);
     packet.ReadPrimitive<int>();
     packet.ReadPrimitive<int>();
-    packet.ReadPrimitive<int>();
+
     std::string address = packet.ReadString();
     int port = packet.ReadPrimitive<int>();
     std::string serverName = packet.ReadString();
@@ -216,7 +250,7 @@ void Client::parseServerlist(Packet& packet)
 void Client::parseKick()
 {
     LOG_WARNING("You have been kicked from the server.");
-    m_IsConnected = false;
+    disconnect();
 }
 
 void Client::parseSpawnEvents()
@@ -262,7 +296,7 @@ void Client::parseEntityDeletion(Packet & packet)
     if (m_ServerIDToClientID.find(entityToDelete) != m_ServerIDToClientID.end()) {
         EntityID localEntity = m_ServerIDToClientID.at(entityToDelete);
         if (m_World->ValidEntity(localEntity)) {
-            if (m_World->HasComponent(localEntity,"Player")) {
+            if (m_World->HasComponent(localEntity, "Player")) {
                 Events::PlayerDeath e;
                 e.Player = EntityWrapper(m_World, localEntity);
                 m_EventBroker->Publish(e);
@@ -297,11 +331,48 @@ void Client::parseDoubleJump(Packet & packet)
     }
 }
 
+
+void Client::parseDashEffect(Packet& packet)
+{
+    EntityID serverID = packet.ReadPrimitive<EntityID>();
+    if (!serverClientMapsHasEntity(serverID)) {
+        return;
+    }
+    Events::DashAbility e;
+    e.Player = m_ServerIDToClientID.at(serverID);
+    if (e.Player != m_LocalPlayer.ID) {
+        m_EventBroker->Publish(e);
+    }
+}
+
 void Client::parseAmmoPickup(Packet & packet)
-{ 
+{
     Events::AmmoPickup e;
     e.AmmoGain = packet.ReadPrimitive<int>();
     e.Player = m_LocalPlayer;
+    m_EventBroker->Publish(e);
+}
+
+void Client::parseRemoveWorld(Packet & packet)
+{
+    removeWorld();
+    Events::Reset e;
+    m_EventBroker->Publish(e);
+}
+
+void Client::parseKDEvent(Packet & packet)
+{
+    Events::KillDeath e;
+    e.Casualty = packet.ReadPrimitive<int>();
+    e.CasualtyClass = packet.ReadPrimitive<int>();
+    e.CasualtyName = packet.ReadString();
+    e.CasualtyTeam = packet.ReadPrimitive<int>();
+
+    e.Killer = packet.ReadPrimitive<int>();
+    e.KillerClass = packet.ReadPrimitive<int>();
+    e.KillerName = packet.ReadString();
+    e.KillerTeam = packet.ReadPrimitive<int>();
+
     m_EventBroker->Publish(e);
 }
 
@@ -388,7 +459,7 @@ void Client::parseSnapshot(Packet& packet)
                     if (m_SnapshotFilter != nullptr) {
                         shouldApply = m_SnapshotFilter->FilterComponent(localEntity, newComponent);
                     }
-                    if (shouldApply) {                        
+                    if (shouldApply) {
                         ComponentWrapper currentComponent = m_World->GetComponent(localEntityID, componentType);
                         memcpy(currentComponent.Data, newComponent.Data, componentInfo.Stride);
                     }
@@ -435,22 +506,23 @@ void Client::parseSnapshot(Packet& packet)
 
 void Client::disconnect()
 {
+    removeWorld();
     m_IsConnected = false;
     m_PreviousPacketID = 0;
     m_PacketID = 0;
     Packet packet(MessageType::Disconnect, m_SendPacketID);
     m_Reliable.Send(packet);
+    m_Unreliable.Disconnect();
     m_Reliable.Disconnect();
+    Events::PlayerDisconnected e;
+    e.Entity = m_LocalPlayer.ID;
+    e.PlayerID = -1;
+    m_EventBroker->Publish(e);
+    createMainMenu();
 }
 
 bool Client::OnInputCommand(const Events::InputCommand & e)
 {
-    // TEMP
-    if (e.Command == "SearchForServers" && e.Value > 0) {
-        Events::SearchForServers e;
-        m_EventBroker->Publish(e);
-    }
-
     if (e.PlayerID != -1) {
         return false;
     }
@@ -518,12 +590,41 @@ bool Client::OnPlayerSpawned(const Events::PlayerSpawned& e)
     return true;
 }
 
+
+bool Client::OnDashAbility(const Events::DashAbility& e)
+{
+    if (!clientServerMapsHasEntity(e.Player) || e.Player != m_LocalPlayer.ID) {
+        return false;
+    }
+    Packet packet(MessageType::OnDashEffect);
+    packet.WritePrimitive(m_ClientIDToServerID.at(e.Player));
+    m_Reliable.Send(packet);
+    return true;
+}
+
+
+bool Client::OnConnectRequest(const Events::ConnectRequest& e)
+{
+    removeWorld();
+    if (m_Reliable.Connect(m_PlayerName, e.IP, e.Port)) {
+        m_Unreliable.Connect(m_PlayerName, e.IP, e.Port);
+        // The client sent a successful connect message
+        return true;
+
+    } else {
+        // The client could not send a successful connect message
+        createMainMenu();
+        // Load the main menu again ?
+        return false;
+    }
+    return false;
+}
+
 bool Client::OnSearchForServers(const Events::SearchForServers& e)
 {
     m_SearchingForServers = true;
-    m_StartSearchTime = std::clock();
+    m_TimeSearched = 0;
     m_Serverlist.clear();
-    LOG_INFO("Searching for LAN servers...\n");
     Packet packet(MessageType::ServerlistRequest);
     m_ServerlistRequest.Broadcast(packet, 13); // TODO: Config
     return true;
@@ -566,8 +667,8 @@ void Client::sendLocalPlayerTransform()
     Packet packet(MessageType::PlayerTransform, m_SendPacketID);
 
     ComponentWrapper cTransform = m_LocalPlayer["Transform"];
-    glm::vec3& position = cTransform["Position"];
-    glm::vec3& orientation = cTransform["Orientation"];
+    const glm::vec3& position = cTransform["Position"];
+    const glm::vec3& orientation = cTransform["Orientation"];
     packet.WritePrimitive(position.x);
     packet.WritePrimitive(position.y);
     packet.WritePrimitive(position.z);
@@ -602,6 +703,7 @@ void Client::hasServerTimedOut()
     if (timeSincePing > m_TimeoutMs) {
         // Clear everything and go to menu.
         LOG_INFO("Server has timed out, returning to menu, Beep Boop.");
+        ImGui::OpenPopup("Disconnected");
         disconnect();
     }
 }
@@ -643,6 +745,12 @@ void Client::displayServerlist()
         ServerInfo si = m_Serverlist[i];
         LOG_INFO("%s:%i\t%s\t%i\n", si.Address.c_str(), si.Port, si.Name.c_str(), si.PlayersConnected);
     }
+}
+
+void Client::createMainMenu()
+{
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/StartMenu.xml");
+    entityFile->MergeInto(m_World);
 }
 
 bool Client::clientServerMapsHasEntity(EntityID clientEntityID)

@@ -2,13 +2,20 @@
 
 void ExplosionEffectSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt)
 {
-    if ((double)component["TimeSinceDeath"] > (double)component["ExplosionDuration"]) {
-        (double)component["TimeSinceDeath"] = 0.f;
+    Field<double> delay = component["Delay"];
+    if (delay > 0) {
+        delay = std::max(0.0, delay - dt);
     }
-    (double&)component["TimeSinceDeath"] += dt;
 
-    //if ((bool)Component["Gravity"] == true) {
-    //    (bool)Component["ExponentialAccelaration"] = false;
-    //}
+	if (delay <= 0) {
+		Field<double> timeSinceDeath = component["TimeSinceDeath"];
+		timeSinceDeath += (Field<double>)component["Speed"] * dt;
+		if (timeSinceDeath < 0) {
+			timeSinceDeath = 0.0;
+		}
+		else if (timeSinceDeath >(const double&)component["ExplosionDuration"]) {
+			timeSinceDeath = (const double&)component["ExplosionDuration"];
+		}
+	}
 }
 

@@ -7,5 +7,12 @@
 		<xs:annotation>
 			<xs:documentation>Combined with a Spawner and a Team component, defines a spawn point for a player team.</xs:documentation>
 		</xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="AssaultFile" type="t:string" minOccurs="0"/>
+				<xs:element name="DefenderFile" type="t:string" minOccurs="0"/>
+				<xs:element name="SniperFile" type="t:string" minOccurs="0"/>
+			</xs:all>
+		</xs:complexType>
 	</xs:element>
 </xs:schema>

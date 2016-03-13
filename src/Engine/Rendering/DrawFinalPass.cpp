@@ -1,48 +1,127 @@
 #include "Rendering/DrawFinalPass.h"
-DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass)
+DrawFinalPass::DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass, ConfigFile* config)
 	: m_Renderer(renderer)
 	, m_LightCullingPass(lightCullingPass)
 	, m_CubeMapPass(cubeMapPass)
 	, m_SSAOPass(ssaoPass)
+	, m_ShadowPass(shadowPass)
 {
     //TODO: Make sure that uniforms are not sent into shader if not needed.
     m_ShieldPixelRate = 8;
+	m_FinalPassFrameBuffer = new FrameBuffer();
+	m_ShieldDepthFrameBuffer = new FrameBuffer();
+
+	setMSAA(config->Get<int>("MSAA.Level", 0));
+
     InitializeTextures();
     InitializeShaderPrograms();
     InitializeFrameBuffers();
 }
 
+DrawFinalPass::~DrawFinalPass(){
+	CommonFunctions::DeleteTexture(&m_BloomTexture);
+	CommonFunctions::DeleteTexture(&m_SceneTexture);
+	CommonFunctions::DeleteTexture(&m_DepthBuffer);
+	CommonFunctions::DeleteTexture(&m_ShieldBuffer);
+	CommonFunctions::DeleteTexture(&m_CubeMapTexture);
+
+	delete m_FinalPassFrameBuffer;
+	delete m_ShieldDepthFrameBuffer;
+}
+
 void DrawFinalPass::InitializeTextures()
 {
-    m_WhiteTexture = CommonFunctions::LoadTexture("Textures/Core/White.png", false);
-    m_BlackTexture = CommonFunctions::LoadTexture("Textures/Core/Black.png", false);
-    m_NeutralNormalTexture = CommonFunctions::LoadTexture("Textures/Core/NeutralNormalMap.png", false);
-    m_GreyTexture = CommonFunctions::LoadTexture("Textures/Core/Grey.png", false);
-    m_ErrorTexture = CommonFunctions::LoadTexture("Textures/Core/ErrorTexture.png", false);
+    m_WhiteTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/White.png");
+    m_BlackTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Black.png");
+    m_NeutralNormalTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/NeutralNormalMap.png");
+    m_GreyTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/Grey.png");
+    m_ErrorTexture = CommonFunctions::TryLoadResource<Texture, false>("Textures/Core/ErrorTexture.png");
 }
 
 void DrawFinalPass::InitializeFrameBuffers()
 {
-	CommonFunctions::GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    //GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-	CommonFunctions::GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    //GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
-    //GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
+	if (m_MSAA) {
+		CommonFunctions::GenerateTexture(&m_AntiAliasedTexture, GL_CLAMP_TO_BORDER, GL_NEAREST,
+			glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
 
-	CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+		if (m_AntiAliasedFrameBuffer == nullptr) {
+			m_AntiAliasedFrameBuffer = new FrameBuffer();
+			m_AntiAliasedFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_AntiAliasedTexture, GL_COLOR_ATTACHMENT0)));
+		}
+		m_AntiAliasedFrameBuffer->Generate();
 
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
-    //m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
-    m_FinalPassFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
-    m_FinalPassFrameBuffer.Generate();
-    GLERROR("FBO generation");
+		if (m_SceneTexture != 0) {
+			glDeleteRenderbuffers(1, &m_SceneTexture);
+		}
+		glGenRenderbuffers(1, &m_SceneTexture);
+		GLERROR("FBO 1");
+		glBindRenderbuffer(GL_RENDERBUFFER, m_SceneTexture);
+		GLERROR("FBO 11");
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+		GLERROR("FBO 111");
+
+		if (m_BloomTexture != 0) {
+			glDeleteRenderbuffers(1, &m_BloomTexture);
+		}
+		glGenRenderbuffers(1, &m_BloomTexture);
+		GLERROR("FBO 2");
+		glBindRenderbuffer(GL_RENDERBUFFER, m_BloomTexture);
+		GLERROR("FBO 22");
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_RGB16F, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+		GLERROR("FBO 222");
+
+		if (m_DepthBuffer != 0) {
+			glDeleteRenderbuffers(1, &m_DepthBuffer);
+		}
+		glGenRenderbuffers(1, &m_DepthBuffer);
+		GLERROR("FBO 3");
+		glBindRenderbuffer(GL_RENDERBUFFER, m_DepthBuffer);
+		GLERROR("FBO 33");
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_MSAA, GL_DEPTH24_STENCIL8, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+		GLERROR("FBO 333");
+
+		//CommonFunctions::GenerateMultiSampleTexture(&m_SceneTexture, m_MSAA, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F);
+		//CommonFunctions::GenerateMultiSampleTexture(&m_BloomTexture, m_MSAA, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F);
+		
+		//CommonFunctions::GenerateMultiSampleTexture(&m_DepthBuffer, m_MSAA,
+			//glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8);
+
+		//CommonFunctions::GenerateMultiSampleTexture(&m_ShieldBuffer, m_MSAA,
+			//glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32F);
+	} else {
+		CommonFunctions::GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+		//GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+		CommonFunctions::GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_BORDER, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
+		//GenerateMipMapTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, glm::vec2(m_Renderer->GetViewPortSize().Width, m_Renderer->GetViewPortSize().Height), GL_RGB16F, GL_FLOAT, 4);
+		//GenerateTexture(&m_StencilTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_STENCIL, GL_STENCIL_INDEX8, GL_INT);
+
+		CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
+			glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+	}
 
 	CommonFunctions::GenerateTexture(&m_ShieldBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
-	m_ShieldDepthFrameBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
-	m_ShieldDepthFrameBuffer.Generate();
+		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
+
+	if (m_FinalPassFrameBuffer->GetHandle() == 0) {
+		if (m_MSAA) {
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+			//m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new RenderBuffer(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
+		} else {
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthBuffer, GL_DEPTH_STENCIL_ATTACHMENT)));
+			//m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_StencilTexture, GL_STENCIL_ATTACHMENT)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_SceneTexture, GL_COLOR_ATTACHMENT0)));
+			m_FinalPassFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_BloomTexture, GL_COLOR_ATTACHMENT1)));
+		}
+	}
+    m_FinalPassFrameBuffer->Generate();
+    GLERROR("FBO generation");
+
+	if (m_ShieldDepthFrameBuffer->GetHandle() == 0) {
+		m_ShieldDepthFrameBuffer->AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_ShieldBuffer, GL_DEPTH_ATTACHMENT)));
+	}
+	m_ShieldDepthFrameBuffer->Generate();
 }
 
 void DrawFinalPass::InitializeShaderPrograms()
@@ -233,17 +312,17 @@ void DrawFinalPass::InitializeShaderPrograms()
 	
 }
 
-void DrawFinalPass::Draw(RenderScene& scene)
+void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 {
     GLERROR("Pre");
-	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer.GetHandle());
+	DrawFinalPassState* stateDethp = new DrawFinalPassState(m_ShieldDepthFrameBuffer->GetHandle());
 	//Draw shields to stencil
 	DrawToDepthStencilBuffer(scene.Jobs.ShieldObjects, scene);
 	GLERROR("StencilPass");
 	delete stateDethp;
 
 
-	DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer.GetHandle());
+	DrawFinalPassState* state = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
     if (scene.ClearDepth) {
         //glClear(GL_DEPTH_BUFFER_BIT);
 		state->Disable(GL_DEPTH_TEST);
@@ -272,10 +351,33 @@ void DrawFinalPass::Draw(RenderScene& scene)
 	DrawModelRenderQueuesWithShieldCheck(scene.Jobs.TransparentObjects, scene); //might need changing
     GLERROR("Transparent objects");
 
+    //Generate blur texture.
+    delete state;
+    if (scene.ShouldBlur) {
+        //This needs to be drawn only when the full scene is being renderd, and then let be, otherwise sprite and other shit will show on it.
+		GLuint sceneTexture = SceneTexture();
+        m_FullBlurredTexture = blurHUDPass->Draw(sceneTexture, scene);
+    }
+
+	DrawFinalPassState* stateSprite;
+    if(scene.ShouldBlur) {
+        //Combine nonblur and blur texture
+		GLuint sceneTexture = SceneTexture();
+		stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
+		stateSprite->Disable(GL_DEPTH_TEST);
+		stateSprite->Disable(GL_STENCIL_TEST);
+        m_CombinedTexture = blurHUDPass->CombineTextures(sceneTexture, m_FullBlurredTexture);
+
+	} else {
+		stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
+	}
+    stateSprite->Enable(GL_DEPTH_TEST);
+    //stateSprite->AlphaFunc(GL_GEQUAL, 0.05f);
+    //stateSprite->Enable(GL_ALPHA_TEST);
 	DrawSprites(scene.Jobs.SpriteJob, scene);
 	GLERROR("SpriteJobs");
 
-	delete state;
+	delete stateSprite;
     GLERROR("END");
     
 }
@@ -284,31 +386,64 @@ void DrawFinalPass::Draw(RenderScene& scene)
 void DrawFinalPass::ClearBuffer()
 {
     GLERROR("PRE");
-	m_ShieldDepthFrameBuffer.Bind();
+	m_ShieldDepthFrameBuffer->Bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	m_ShieldDepthFrameBuffer.Unbind();
-    m_FinalPassFrameBuffer.Bind();
+	m_ShieldDepthFrameBuffer->Unbind();
+    m_FinalPassFrameBuffer->Bind();
     GLERROR("Bind HighRes");
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     GLERROR("ViewPort,Scissor LowRes");
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    m_FinalPassFrameBuffer.Unbind();
+    m_FinalPassFrameBuffer->Unbind();
     GLERROR("END");
 }
 
-
 void DrawFinalPass::OnWindowResize()
 {
-    //InitializeFrameBuffers();
-	CommonFunctions::GenerateTexture(&m_DepthBuffer, GL_CLAMP_TO_BORDER, GL_NEAREST,
-		glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
-    CommonFunctions::GenerateTexture(&m_SceneTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-	CommonFunctions::GenerateTexture(&m_BloomTexture, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_FinalPassFrameBuffer.Generate();
+	if (m_FinalPassFrameBuffer->MultiSampling() != (bool)m_MSAA) {
+		delete m_FinalPassFrameBuffer;
+		delete m_ShieldDepthFrameBuffer;
+		m_FinalPassFrameBuffer = new FrameBuffer();
+		m_ShieldDepthFrameBuffer = new FrameBuffer();
+	}
 
+	if (m_MSAA) {
+		if (m_AntiAliasedFrameBuffer != nullptr) {
+			delete m_AntiAliasedFrameBuffer;
+			m_AntiAliasedFrameBuffer = nullptr;
+		}
+	}
+
+    InitializeFrameBuffers();
     GLERROR("Error changing texture resolutions");
+}
+
+void DrawFinalPass::setMSAA(unsigned int numberOfSamples) {
+	if (m_MSAA == numberOfSamples) {
+		return;
+	}
+
+	if (!(bool)numberOfSamples) {
+		if (m_AntiAliasedFrameBuffer != nullptr) {
+			delete m_AntiAliasedFrameBuffer;
+			m_AntiAliasedFrameBuffer = nullptr;
+		}
+		delete m_FinalPassFrameBuffer;
+		m_FinalPassFrameBuffer = new FrameBuffer();
+	}
+
+	if ((bool)numberOfSamples && !(bool)m_MSAA) {
+		delete m_FinalPassFrameBuffer;
+		m_FinalPassFrameBuffer = new FrameBuffer();
+	}
+
+	m_MSAA = numberOfSamples;
+
+	InitializeFrameBuffers();
+
+
 }
 
 void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
@@ -321,6 +456,8 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 	GLuint explosionSkinnedHandle = m_ExplosionEffectSkinnedProgram->GetHandle();
 	GLuint explosionSplatMapSkinnedHandle = m_ExplosionEffectSplatMapSkinnedProgram->GetHandle();
 	GLuint forwardSplatMapSkinnedHandle = m_ForwardPlusSplatMapSkinnedProgram->GetHandle();
+	GLuint lastShader = 0;
+	unsigned int lastModel = 0;
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightCullingPass->LightSSBO());
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
@@ -329,6 +466,13 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_SSAOPass->SSAOTexture());
 
+	glActiveTexture(GL_TEXTURE30);
+	if (m_ShadowPass->DepthMap() != NULL) {
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_ShadowPass->DepthMap());
+	} else {
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_WhiteTexture->m_Texture);
+	}
+
     for (auto &job : jobs) {
         auto explosionEffectJob = std::dynamic_pointer_cast<ExplosionEffectJob>(job);
         if (explosionEffectJob) {
@@ -336,30 +480,48 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             case RawModel::MaterialType::Basic:
 			case RawModel::MaterialType::SingleTextures:
 				{
-					if (explosionEffectJob->Model->IsSkinned()) {
-
-						m_ExplosionEffectSkinnedProgram->Bind();
-						GLERROR("Bind ExplosionEffectSkinned program");
-						//bind uniforms
-						BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
-						glActiveTexture(GL_TEXTURE5);
-						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
-						glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
-						std::vector<glm::mat4> frameBones;
-						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+                    if (explosionEffectJob->Model->IsSkinned()) {
+						if (lastShader != m_ExplosionEffectSkinnedProgram->GetHandle()) {
+							m_ExplosionEffectSkinnedProgram->Bind();
+							lastShader = m_ExplosionEffectSkinnedProgram->GetHandle();
+							GLERROR("Bind ExplosionEffectSkinned program");
+							glUniform1i(glGetUniformLocation(explosionSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(explosionSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(explosionSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind ExplosionEffectSkinned Uniforms");
 						}
-						else {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-						}
-						glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-					}
+                        //bind uniforms
+                        BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
+                        //bind textures
+                        BindExplosionTextures(explosionSkinnedHandle, explosionEffectJob);
+                        glActiveTexture(GL_TEXTURE5);
+                        glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
+                        glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
+
+                        std::vector<glm::mat4> frameBones;
+                        if (explosionEffectJob->BlendTree != nullptr) {
+                            frameBones = explosionEffectJob->BlendTree->GetFinalPose();
+                        } else {
+                            frameBones = explosionEffectJob->Skeleton->GetTPose();
+                        }
+                        glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+
+                    }
 					else {
-						m_ExplosionEffectProgram->Bind();
-						GLERROR("Bind ExplosionEffect program");
+						if (lastShader != m_ExplosionEffectProgram->GetHandle()) {
+							m_ExplosionEffectProgram->Bind();
+							lastShader = m_ExplosionEffectProgram->GetHandle();
+							GLERROR("Bind ExplosionEffect program");
+							glUniform1i(glGetUniformLocation(explosionHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(explosionHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(explosionHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind ExplosionEffect Uniforms");
+						}
 						//bind uniforms
 						BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
 						//bind textures
@@ -372,27 +534,44 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 			}
 			case RawModel::MaterialType::SplatMapping:
 				{
-					if (explosionEffectJob->Model->IsSkinned()) {
-						m_ExplosionEffectSplatMapSkinnedProgram->Bind();
-						GLERROR("Bind ExplosionEffectSplatMapSkinned program");
-						//bind uniforms
-						BindExplosionUniforms(explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
-						//bind textures
-						BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
-						GLERROR("asdasd");
-						std::vector<glm::mat4> frameBones;
-						if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+                    if (explosionEffectJob->Model->IsSkinned()) {
+						if (lastShader != m_ExplosionEffectSplatMapSkinnedProgram->GetHandle()) {
+							m_ExplosionEffectSplatMapSkinnedProgram->Bind();
+							lastShader = m_ExplosionEffectSplatMapSkinnedProgram->GetHandle();
+							GLERROR("Bind ExplosionEffectSplatMapSkinned program");
+							glUniform1i(glGetUniformLocation(explosionSplatMapSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(explosionSplatMapSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind ExplosionEffectSplatMapSkinned Uniforms");
 						}
-						else {
-							frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-						}
-						glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-					}
+                        //bind uniforms
+                        BindExplosionUniforms(explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
+                        //bind textures
+                        BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
+                        GLERROR("asdasd");
+                        std::vector<glm::mat4> frameBones;
+                        if (explosionEffectJob->BlendTree != nullptr) {
+                            frameBones = explosionEffectJob->BlendTree->GetFinalPose();
+                        } else {
+                            frameBones = explosionEffectJob->Skeleton->GetTPose();
+                        }
+                        glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+                    }
 					else {
-						m_ExplosionEffectSplatMapProgram->Bind();
-						GLERROR("Bind ExplosionEffectSplatMap program");
-						//bind uniforms
+						if (lastShader != m_ExplosionEffectSplatMapProgram->GetHandle()) {
+							m_ExplosionEffectSplatMapProgram->Bind();
+							lastShader = m_ExplosionEffectSplatMapProgram->GetHandle();
+							GLERROR("Bind ExplosionEffectSplatMap program");
+							glUniform1i(glGetUniformLocation(explosionSplatMapHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(explosionSplatMapHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(explosionSplatMapHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind ExplosionEffectSplatMap Uniforms");
+						}
 						//bind uniforms
 						BindExplosionUniforms(explosionSplatMapHandle, explosionEffectJob, scene);
 						//bind textures
@@ -405,8 +584,11 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
             glDisable(GL_CULL_FACE);
 
             //draw
-            glBindVertexArray(explosionEffectJob->Model->VAO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
+			if (lastModel != explosionEffectJob->ModelID) {
+				glBindVertexArray(explosionEffectJob->Model->VAO);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
+				lastModel = explosionEffectJob->ModelID;
+			}
             glDrawElements(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(explosionEffectJob->StartIndex*sizeof(unsigned int)));
             glEnable(GL_CULL_FACE);
             GLERROR("explosion effect end");
@@ -420,8 +602,17 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 				case RawModel::MaterialType::SingleTextures:
 				{
 					if (modelJob->Model->IsSkinned()) {
-						m_ForwardPlusSkinnedProgram->Bind();
-						GLERROR("Bind ForwardPlusSkinnedProgram");
+						if (lastShader != m_ForwardPlusSkinnedProgram->GetHandle()) {
+							m_ForwardPlusSkinnedProgram->Bind();
+							lastShader = m_ForwardPlusSkinnedProgram->GetHandle();
+							GLERROR("Bind ForwardPlusSkinnedProgram program");
+							glUniform1i(glGetUniformLocation(forwardSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(forwardSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(forwardSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind ForwardPlusSkinnedProgram Uniforms");
+						}
 						//bind uniforms
 						BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
 						//bind textures
@@ -429,20 +620,27 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 						glActiveTexture(GL_TEXTURE5);
 						glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
 						glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
-
-						std::vector<glm::mat4> frameBones;
-						if (modelJob->AnimationOffset.animation != nullptr) {
-							frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-						}
-						else {
-							frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-						}
-						glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
-					}
+                            
+                        std::vector<glm::mat4> frameBones;
+                        if (modelJob->BlendTree != nullptr) {
+                            frameBones = modelJob->BlendTree->GetFinalPose();
+                        } else {
+                            frameBones = modelJob->Skeleton->GetTPose();
+                        }
+                        glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                    }
 					else {
-						m_ForwardPlusProgram->Bind();
-						GLERROR("Bind ForwardPlusProgram");
+						if (lastShader != m_ForwardPlusProgram->GetHandle()) {
+							m_ForwardPlusProgram->Bind();
+							lastShader = m_ForwardPlusProgram->GetHandle();
+							GLERROR("Bind ForwardPlusProgram program");
+							glUniform1i(glGetUniformLocation(forwardHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(forwardHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind ForwardPlusProgram Uniforms");
+						}
 						//bind uniforms
 						BindModelUniforms(forwardHandle, modelJob, scene);
 						//bind textures
@@ -456,26 +654,43 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 				case RawModel::MaterialType::SplatMapping:
 				{
 					if (modelJob->Model->IsSkinned()) {
-						m_ForwardPlusSplatMapSkinnedProgram->Bind();
-						GLERROR("Bind SplatMap program");
+						if (lastShader != m_ForwardPlusSplatMapSkinnedProgram->GetHandle()) {
+							m_ForwardPlusSplatMapSkinnedProgram->Bind();
+							lastShader = m_ForwardPlusSplatMapSkinnedProgram->GetHandle();
+							GLERROR("Bind SkinnedSplatMapProgram program");
+							glUniform1i(glGetUniformLocation(forwardSplatMapSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(forwardSplatMapSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind SkinnedSplatMapProgram Uniforms");
+						}
 						//bind uniforms
 						BindModelUniforms(forwardSplatMapSkinnedHandle, modelJob, scene);
 						//bind textures
 						BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
 						GLERROR("asdasd");
-						std::vector<glm::mat4> frameBones;
-						if (modelJob->AnimationOffset.animation != nullptr) {
-							frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-						}
-						else {
-							frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-						}
-						glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                        std::vector<glm::mat4> frameBones;
+                        if (modelJob->BlendTree != nullptr) {
+                            frameBones = modelJob->BlendTree->GetFinalPose();
+                        } else {
+                            frameBones = modelJob->Skeleton->GetTPose();
+                        }
+                        glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
 					}
 					else {
-						m_ForwardPlusSplatMapProgram->Bind();
-						GLERROR("Bind SplatMap program");
+						if (lastShader != m_ForwardPlusSplatMapProgram->GetHandle()) {
+							m_ForwardPlusSplatMapProgram->Bind();
+							lastShader = m_ForwardPlusSplatMapProgram->GetHandle();
+							GLERROR("Bind SplatMap program");
+							glUniform1i(glGetUniformLocation(forwardSplatMapHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+							glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+							glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+							glUniform2f(glGetUniformLocation(forwardSplatMapHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+							glUniform4fv(glGetUniformLocation(forwardSplatMapHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+							GLERROR("Bind SplatMap Uniforms");
+						}
 						//bind uniforms
 						BindModelUniforms(forwardSplatMapHandle, modelJob, scene);
 						//bind textures
@@ -486,8 +701,11 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
 				}
                 }
                 //draw
-                glBindVertexArray(modelJob->Model->VAO);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+				if (lastModel != modelJob->ModelID) {
+					glBindVertexArray(modelJob->Model->VAO);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+					lastModel = modelJob->ModelID;
+				}
                 glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex*sizeof(unsigned int)));
                 if (GLERROR("models end")) {
                     continue;
@@ -516,6 +734,8 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 	GLuint explosionSkinnedShieldCheckHandle = m_ExplosionEffectSkinnedShieldCheckProgram->GetHandle();
 	GLuint explosionSplatMapSkinnedShieldCheckHandle = m_ExplosionEffectSplatMapSkinnedShieldCheckProgram->GetHandle();
 	GLuint forwardSplatMapSkinnedShieldCheckHandle = m_ForwardPlusSplatMapSkinnedShieldCheckProgram->GetHandle();
+	GLuint lastShader = 0;
+	unsigned int lastModel = 0;
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_LightCullingPass->LightSSBO());
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_LightCullingPass->LightGridSSBO());
@@ -536,9 +756,17 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 				case RawModel::MaterialType::SingleTextures:
 					{
 						if (explosionEffectJob->Model->IsSkinned()) {
-
-							m_ExplosionEffectSkinnedShieldCheckProgram->Bind();
-							GLERROR("Bind ExplosionEffectSkinned program");
+							if (lastShader != m_ExplosionEffectSkinnedShieldCheckProgram->GetHandle()) {
+								m_ExplosionEffectSkinnedShieldCheckProgram->Bind();
+								lastShader = m_ExplosionEffectSkinnedShieldCheckProgram->GetHandle();
+								GLERROR("Bind ExplosionEffectSkinned program");
+								glUniform1i(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffectSkinned Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionSkinnedShieldCheckHandle, explosionEffectJob, scene);
 							//bind textures
@@ -547,18 +775,27 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
 							glUniform3fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
-							std::vector<glm::mat4> frameBones;
-							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-							}
-							else {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-							}
-							glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                            std::vector<glm::mat4> frameBones;
+                            if (explosionEffectJob->BlendTree != nullptr) {
+                                frameBones = explosionEffectJob->BlendTree->GetFinalPose();
+                            } else {
+                                frameBones = explosionEffectJob->Skeleton->GetTPose();
+                            }
+                            glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 						}
 						else {
-							m_ExplosionEffectShieldCheckProgram->Bind();
-							GLERROR("Bind ExplosionEffect program");
+							if (lastShader != m_ExplosionEffectShieldCheckProgram->GetHandle()) {
+								m_ExplosionEffectShieldCheckProgram->Bind();
+								lastShader = m_ExplosionEffectShieldCheckProgram->GetHandle();
+								GLERROR("Bind ExplosionEffect program");
+								glUniform1i(glGetUniformLocation(explosionShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffect Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionShieldCheckHandle, explosionEffectJob, scene);
 							//bind textures
@@ -573,27 +810,44 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 				case RawModel::MaterialType::SplatMapping:
 					{
 						if (explosionEffectJob->Model->IsSkinned()) {
-							m_ExplosionEffectSplatMapSkinnedShieldCheckProgram->Bind();
-							GLERROR("Bind ExplosionEffectSplatMapSkinned program");
+							if (lastShader != m_ExplosionEffectSplatMapSkinnedShieldCheckProgram->GetHandle()) {
+								m_ExplosionEffectSplatMapSkinnedShieldCheckProgram->Bind();
+								lastShader = m_ExplosionEffectSplatMapSkinnedShieldCheckProgram->GetHandle();
+								GLERROR("Bind ExplosionEffectSplatMapSkinned program");
+								glUniform1i(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffectSplatMapSkinned Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionSplatMapSkinnedShieldCheckHandle, explosionEffectJob, scene);
 							//bind textures
 							BindExplosionTextures(explosionSplatMapSkinnedShieldCheckHandle, explosionEffectJob);
 							GLERROR("asdasd");
-							std::vector<glm::mat4> frameBones;
-							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-							}
-							else {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-							}
-							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
+                            std::vector<glm::mat4> frameBones;
+                            if (explosionEffectJob->BlendTree != nullptr) {
+                                frameBones = explosionEffectJob->BlendTree->GetFinalPose();
+                            } else {
+                                frameBones = explosionEffectJob->Skeleton->GetTPose();
+                            }
+                            glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
 						}
 						else {
-							m_ExplosionEffectSplatMapShieldCheckProgram->Bind();
-							GLERROR("Bind ExplosionEffectSplatMap program");
-							//bind uniforms
+							if (lastShader != m_ExplosionEffectSplatMapShieldCheckProgram->GetHandle()) {
+								m_ExplosionEffectSplatMapShieldCheckProgram->Bind();
+								lastShader = m_ExplosionEffectSplatMapShieldCheckProgram->GetHandle();
+								GLERROR("Bind ExplosionEffectSplatMap program");
+								glUniform1i(glGetUniformLocation(explosionSplatMapShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionSplatMapShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionSplatMapShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffectSplatMap Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionSplatMapShieldCheckHandle, explosionEffectJob, scene);
 							//bind textures
@@ -609,9 +863,17 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 				case RawModel::MaterialType::SingleTextures:
 					{
 						if (explosionEffectJob->Model->IsSkinned()) {
-
-							m_ExplosionEffectSkinnedProgram->Bind();
-							GLERROR("Bind ExplosionEffectSkinned program");
+							if (lastShader != m_ExplosionEffectSkinnedProgram->GetHandle()) {
+								m_ExplosionEffectSkinnedProgram->Bind();
+								lastShader = m_ExplosionEffectSkinnedProgram->GetHandle();
+								GLERROR("Bind ExplosionEffectSkinned program");
+								glUniform1i(glGetUniformLocation(explosionSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffectSkinned Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionSkinnedHandle, explosionEffectJob, scene);
 							//bind textures
@@ -620,18 +882,26 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 							glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
 							glUniform3fv(glGetUniformLocation(explosionSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
-							std::vector<glm::mat4> frameBones;
-							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-							}
-							else {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-							}
-							glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-						}
+                            std::vector<glm::mat4> frameBones;
+                            if (explosionEffectJob->BlendTree != nullptr) {
+                                frameBones = explosionEffectJob->BlendTree->GetFinalPose();
+                            } else {
+                                frameBones = explosionEffectJob->Skeleton->GetTPose();
+                            }
+                            glUniformMatrix4fv(glGetUniformLocation(explosionSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                        }
 						else {
-							m_ExplosionEffectProgram->Bind();
-							GLERROR("Bind ExplosionEffect program");
+							if (lastShader != m_ExplosionEffectProgram->GetHandle()) {
+								m_ExplosionEffectProgram->Bind();
+								lastShader = m_ExplosionEffectProgram->GetHandle();
+								GLERROR("Bind ExplosionEffect program");
+								glUniform1i(glGetUniformLocation(explosionHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffect Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionHandle, explosionEffectJob, scene);
 							//bind textures
@@ -645,26 +915,43 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 				case RawModel::MaterialType::SplatMapping:
 					{
 						if (explosionEffectJob->Model->IsSkinned()) {
-							m_ExplosionEffectSplatMapSkinnedProgram->Bind();
-							GLERROR("Bind ExplosionEffectSplatMapSkinned program");
+							if (lastShader != m_ExplosionEffectSplatMapSkinnedProgram->GetHandle()) {
+								m_ExplosionEffectSplatMapSkinnedProgram->Bind();
+								lastShader = m_ExplosionEffectSplatMapSkinnedProgram->GetHandle();
+								GLERROR("Bind ExplosionEffectSkinnedSplatMap program");
+								glUniform1i(glGetUniformLocation(explosionSplatMapSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionSplatMapSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffectSkinnedSplatMap Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionSplatMapSkinnedHandle, explosionEffectJob, scene);
 							//bind textures
 							BindExplosionTextures(explosionSplatMapSkinnedHandle, explosionEffectJob);
 							GLERROR("asdasd");
-							std::vector<glm::mat4> frameBones;
-							if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
-							}
-							else {
-								frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
-							}
-							glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                            std::vector<glm::mat4> frameBones;
+                            if (explosionEffectJob->BlendTree != nullptr) {
+                                frameBones = explosionEffectJob->BlendTree->GetFinalPose();
+                            } else {
+                                frameBones = explosionEffectJob->Skeleton->GetTPose();
+                            }
+                            glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+
 						}
 						else {
-							m_ExplosionEffectSplatMapProgram->Bind();
-							GLERROR("Bind ExplosionEffectSplatMap program");
-							//bind uniforms
+							if (lastShader != m_ExplosionEffectSplatMapProgram->GetHandle()) {
+								m_ExplosionEffectSplatMapProgram->Bind();
+								lastShader = m_ExplosionEffectSplatMapProgram->GetHandle();
+								GLERROR("Bind ExplosionEffectSplatMap program");
+								glUniform1i(glGetUniformLocation(explosionSplatMapHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+								glUniformMatrix4fv(glGetUniformLocation(explosionSplatMapHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+								glUniform2f(glGetUniformLocation(explosionSplatMapHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+								glUniform4fv(glGetUniformLocation(explosionSplatMapHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+								GLERROR("Bind ExplosionEffectSplatMap Uniforms");
+							}
 							//bind uniforms
 							BindExplosionUniforms(explosionSplatMapHandle, explosionEffectJob, scene);
 							//bind textures
@@ -678,8 +965,11 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 			glDisable(GL_CULL_FACE);
 
 			//draw
-			glBindVertexArray(explosionEffectJob->Model->VAO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
+			if (lastModel != explosionEffectJob->ModelID) {
+				glBindVertexArray(explosionEffectJob->Model->VAO);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, explosionEffectJob->Model->ElementBuffer);
+				lastModel = explosionEffectJob->ModelID;
+			}
 			glDrawElements(GL_TRIANGLES, explosionEffectJob->EndIndex - explosionEffectJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(explosionEffectJob->StartIndex*sizeof(unsigned int)));
 			glEnable(GL_CULL_FACE);
 			GLERROR("explosion effect end");
@@ -694,8 +984,17 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 					case RawModel::MaterialType::SingleTextures:
 						{
 							if (modelJob->Model->IsSkinned()) {
-								m_ForwardPlusSkinnedShieldCheckProgram->Bind();
-								GLERROR("Bind ForwardPlusSkinnedProgram");
+								if (lastShader != m_ForwardPlusSkinnedShieldCheckProgram->GetHandle()) {
+									m_ForwardPlusSkinnedShieldCheckProgram->Bind();
+									lastShader = m_ForwardPlusSkinnedShieldCheckProgram->GetHandle();
+									GLERROR("Bind ForwardPlusSkinnedProgram program");
+									glUniform1i(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind ForwardPlusSkinnedProgram Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardSkinnedShieldCheckHandle, modelJob, scene);
 								//bind textures
@@ -704,19 +1003,27 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 								glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
 								glUniform3fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
-								std::vector<glm::mat4> frameBones;
-								if (modelJob->AnimationOffset.animation != nullptr) {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-								}
-								else {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-								}
-								glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                                std::vector<glm::mat4> frameBones;
+                                if (modelJob->BlendTree != nullptr) {
+                                    frameBones = modelJob->BlendTree->GetFinalPose();
+                                } else {
+                                    frameBones = modelJob->Skeleton->GetTPose();
+                                }
+                                glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
 							}
 							else {
-								m_ForwardPlusShieldCheckProgram->Bind();
-								GLERROR("Bind ForwardPlusProgram");
+								if (lastShader != m_ForwardPlusShieldCheckProgram->GetHandle()) {
+									m_ForwardPlusShieldCheckProgram->Bind();
+									lastShader = m_ForwardPlusShieldCheckProgram->GetHandle();
+									GLERROR("Bind ForwardPlusProgram program");
+									glUniform1i(glGetUniformLocation(forwardShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind ForwardPlusProgram Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardShieldCheckHandle, modelJob, scene);
 								//bind textures
@@ -730,26 +1037,43 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 					case RawModel::MaterialType::SplatMapping:
 						{
 							if (modelJob->Model->IsSkinned()) {
-								m_ForwardPlusSplatMapSkinnedShieldCheckProgram->Bind();
-								GLERROR("Bind SplatMap program");
+								if (lastShader != m_ForwardPlusSplatMapSkinnedShieldCheckProgram->GetHandle()) {
+									m_ForwardPlusSplatMapSkinnedShieldCheckProgram->Bind();
+									lastShader = m_ForwardPlusSplatMapSkinnedShieldCheckProgram->GetHandle();
+									GLERROR("Bind ForwardPlusProgramSplatMapSkinned program");
+									glUniform1i(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind ForwardPlusProgramSplatMapSkinned Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardSplatMapSkinnedShieldCheckHandle, modelJob, scene);
 								//bind textures
 								BindModelTextures(forwardSplatMapSkinnedShieldCheckHandle, modelJob);
 								GLERROR("asdasd");
-								std::vector<glm::mat4> frameBones;
-								if (modelJob->AnimationOffset.animation != nullptr) {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-								}
-								else {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-								}
-								glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
+                                std::vector<glm::mat4> frameBones;
+                                if (modelJob->BlendTree != nullptr) {
+                                    frameBones = modelJob->BlendTree->GetFinalPose();
+                                } else {
+                                    frameBones = modelJob->Skeleton->GetTPose();
+                                }
+                                glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedShieldCheckHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 							}
 							else {
-								m_ForwardPlusSplatMapShieldCheckProgram->Bind();
-								GLERROR("Bind SplatMap program");
+								if (lastShader != m_ForwardPlusSplatMapShieldCheckProgram->GetHandle()) {
+									m_ForwardPlusSplatMapShieldCheckProgram->Bind();
+									lastShader = m_ForwardPlusSplatMapShieldCheckProgram->GetHandle();
+									GLERROR("Bind SplatMap program");
+									glUniform1i(glGetUniformLocation(forwardSplatShieldCheckHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatShieldCheckHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatShieldCheckHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardSplatShieldCheckHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardSplatShieldCheckHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind SplatMap Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardSplatShieldCheckHandle, modelJob, scene);
 								//bind textures
@@ -765,8 +1089,17 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 					case RawModel::MaterialType::SingleTextures:
 						{
 							if (modelJob->Model->IsSkinned()) {
-								m_ForwardPlusSkinnedProgram->Bind();
-								GLERROR("Bind ForwardPlusSkinnedProgram");
+								if (lastShader != m_ForwardPlusSkinnedProgram->GetHandle()) {
+									m_ForwardPlusSkinnedProgram->Bind();
+									lastShader = m_ForwardPlusSkinnedProgram->GetHandle();
+									GLERROR("Bind ForwardPlusSkinnedProgram program");
+									glUniform1i(glGetUniformLocation(forwardSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind ForwardPlusSkinnedProgram Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardSkinnedHandle, modelJob, scene);
 								//bind textures
@@ -775,19 +1108,27 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 								glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapPass->m_CubeMapTexture);
 								glUniform3fv(glGetUniformLocation(forwardSkinnedHandle, "CameraPosition"), 1, glm::value_ptr(scene.Camera->Position()));
 
-								std::vector<glm::mat4> frameBones;
-								if (modelJob->AnimationOffset.animation != nullptr) {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-								}
-								else {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-								}
-								glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+                                std::vector<glm::mat4> frameBones;
+                                if (modelJob->BlendTree != nullptr) {
+                                    frameBones = modelJob->BlendTree->GetFinalPose();
+                                } else {
+                                    frameBones = modelJob->Skeleton->GetTPose();
+                                }
+                                glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
 							}
 							else {
-								m_ForwardPlusProgram->Bind();
-								GLERROR("Bind ForwardPlusProgram");
+								if (lastShader != m_ForwardPlusProgram->GetHandle()) {
+									m_ForwardPlusProgram->Bind();
+									lastShader = m_ForwardPlusProgram->GetHandle();
+									GLERROR("Bind ForwardPlusProgram program");
+									glUniform1i(glGetUniformLocation(forwardHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind ForwardPlusProgram Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardHandle, modelJob, scene);
 								//bind textures
@@ -801,26 +1142,43 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 					case RawModel::MaterialType::SplatMapping:
 						{
 							if (modelJob->Model->IsSkinned()) {
-								m_ForwardPlusSplatMapSkinnedProgram->Bind();
-								GLERROR("Bind SplatMap program");
+								if (lastShader != m_ForwardPlusSplatMapSkinnedProgram->GetHandle()) {
+									m_ForwardPlusSplatMapSkinnedProgram->Bind();
+									lastShader = m_ForwardPlusSplatMapSkinnedProgram->GetHandle();
+									GLERROR("Bind SplatMap program");
+									glUniform1i(glGetUniformLocation(forwardSplatMapSkinnedHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardSplatMapSkinnedHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind SplatMap Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardSplatMapSkinnedHandle, modelJob, scene);
 								//bind textures
 								BindModelTextures(forwardSplatMapSkinnedHandle, modelJob);
 								GLERROR("asdasd");
-								std::vector<glm::mat4> frameBones;
-								if (modelJob->AnimationOffset.animation != nullptr) {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
-								}
-								else {
-									frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
-								}
-								glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
-
+								
+                                std::vector<glm::mat4> frameBones;
+                                if (modelJob->BlendTree != nullptr) {
+                                    frameBones = modelJob->BlendTree->GetFinalPose();
+                                } else {
+                                    frameBones = modelJob->Skeleton->GetTPose();
+                                }
+                                glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 							}
 							else {
-								m_ForwardPlusSplatMapProgram->Bind();
-								GLERROR("Bind SplatMap program");
+								if (lastShader != m_ForwardPlusSplatMapProgram->GetHandle()) {
+									m_ForwardPlusSplatMapProgram->Bind();
+									lastShader = m_ForwardPlusSplatMapProgram->GetHandle();
+									GLERROR("Bind SplatMap program");
+									glUniform1i(glGetUniformLocation(forwardSplatMapHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
+									glUniformMatrix4fv(glGetUniformLocation(forwardSplatMapHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+									glUniform2f(glGetUniformLocation(forwardSplatMapHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
+									glUniform4fv(glGetUniformLocation(forwardSplatMapHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
+									GLERROR("Bind SplatMap Uniforms");
+								}
 								//bind uniforms
 								BindModelUniforms(forwardSplatMapHandle, modelJob, scene);
 								//bind textures
@@ -832,8 +1190,11 @@ void DrawFinalPass::DrawModelRenderQueuesWithShieldCheck(std::list<std::shared_p
 					}
 				}
 				//draw
-				glBindVertexArray(modelJob->Model->VAO);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+				if (lastModel != modelJob->ModelID) {
+					glBindVertexArray(modelJob->Model->VAO);
+					glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelJob->Model->ElementBuffer);
+					lastModel = modelJob->ModelID;
+				}
 				glDrawElements(GL_TRIANGLES, modelJob->EndIndex - modelJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(modelJob->StartIndex*sizeof(unsigned int)));
 				if (GLERROR("models end")) {
 					continue;
@@ -875,10 +1236,10 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
             }
 
             std::vector<glm::mat4> frameBones;
-            if (explosionEffectJob->AnimationOffset.animation != nullptr) {
-                frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations, explosionEffectJob->AnimationOffset);
+            if (explosionEffectJob->BlendTree != nullptr) {
+                frameBones = explosionEffectJob->BlendTree->GetFinalPose();
             } else {
-                frameBones = explosionEffectJob->Skeleton->GetFrameBones(explosionEffectJob->Animations);
+                frameBones = explosionEffectJob->Skeleton->GetTPose();
             }
             glUniformMatrix4fv(glGetUniformLocation(explosionHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
@@ -914,11 +1275,12 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
                 BindModelTextures(forwardHandle ,modelJob);
 
                 std::vector<glm::mat4> frameBones;
-                if (modelJob->AnimationOffset.animation != nullptr) {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+                if (modelJob->BlendTree != nullptr) {
+                    frameBones = modelJob->BlendTree->GetFinalPose();
                 } else {
-                    frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                    frameBones = modelJob->Skeleton->GetTPose();
                 }
+
                 glUniformMatrix4fv(glGetUniformLocation(forwardHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
 
@@ -937,32 +1299,39 @@ void DrawFinalPass::DrawShieldedModelRenderQueue(std::list<std::shared_ptr<Rende
 
 void DrawFinalPass::DrawToDepthStencilBuffer(std::list<std::shared_ptr<RenderJob>>& jobs, RenderScene& scene)
 {
-    
-   
+	GLuint shaderSkinnedHandle = m_FillDepthStencilBufferSkinnedProgram->GetHandle();
+    GLuint shaderHandle = m_FillDepthStencilBufferProgram->GetHandle();
+	GLuint lastShader = 0;
     for (auto &job : jobs) {
         auto modelJob = std::dynamic_pointer_cast<ModelJob>(job);
       
         if(modelJob->Model->IsSkinned()) {
-            m_FillDepthStencilBufferSkinnedProgram->Bind();
-            GLuint shaderHandle = m_FillDepthStencilBufferSkinnedProgram->GetHandle();
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+			if (lastShader != m_FillDepthStencilBufferSkinnedProgram->GetHandle()) {
+				m_FillDepthStencilBufferSkinnedProgram->Bind();
+				lastShader = m_FillDepthStencilBufferSkinnedProgram->GetHandle();
+				GLERROR("Bind Uniforms 1");
+			}
+
+			glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
+			GLERROR("Bind PVM uniform");
 
             std::vector<glm::mat4> frameBones;
-            if (modelJob->AnimationOffset.animation != nullptr) {
-                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations, modelJob->AnimationOffset);
+            if (modelJob->BlendTree != nullptr) {
+                frameBones = modelJob->BlendTree->GetFinalPose();
             } else {
-                frameBones = modelJob->Skeleton->GetFrameBones(modelJob->Animations);
+                frameBones = modelJob->Skeleton->GetTPose();
             }
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
+            glUniformMatrix4fv(glGetUniformLocation(shaderSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));
 
         } else {
-            m_FillDepthStencilBufferProgram->Bind();
-            GLuint shaderHandle = m_FillDepthStencilBufferProgram->GetHandle();
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(modelJob->Matrix));
+			if (lastShader != m_FillDepthStencilBufferProgram->GetHandle()) {
+				m_FillDepthStencilBufferProgram->Bind();
+				lastShader = m_FillDepthStencilBufferProgram->GetHandle();
+				GLERROR("Bind Uniforms 2");
+			}
+
+			glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * modelJob->Matrix));
+			GLERROR("Bind PVM uniform");
         }
 
 
@@ -984,25 +1353,43 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
 
     GLuint shaderHandle = m_SpriteProgram->GetHandle();
 
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
+	glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPos"), 1, glm::value_ptr(scene.Camera->Position()));
+    RenderState* jobState = new RenderState();
+
+
     for(auto& job : jobs) {
         auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
-        RenderState jobState;
 
         if (spriteJob) {
             if(spriteJob->Depth == 0) {
-                jobState.Disable(GL_DEPTH_TEST);
+                jobState->Disable(GL_DEPTH_TEST);
             }
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-            glUniform3fv(glGetUniformLocation(shaderHandle, "CameraPos"), 1, glm::value_ptr(scene.Camera->Position()));
+            glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * spriteJob->Matrix));
             glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(spriteJob->Color));
             glUniform4fv(glGetUniformLocation(shaderHandle, "FillColor"), 1, glm::value_ptr(spriteJob->FillColor));
             glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), spriteJob->FillPercentage);
+            glUniform1f(glGetUniformLocation(shaderHandle, "ScaleX"), spriteJob->ScaleX);
+            glUniform1f(glGetUniformLocation(shaderHandle, "ScaleY"), spriteJob->ScaleY);
 
             glActiveTexture(GL_TEXTURE1);
             if (spriteJob->DiffuseTexture != nullptr) {
                 glBindTexture(GL_TEXTURE_2D, spriteJob->DiffuseTexture->m_Texture);
+                if (spriteJob->Linear) {
+                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                } else {
+                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+                    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                }
+				if (spriteJob->ClampToBorder) {
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+				}
+				else {
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+				}
             } else {
                 glBindTexture(GL_TEXTURE_2D, m_ErrorTexture->m_Texture);
             }
@@ -1020,26 +1407,29 @@ void DrawFinalPass::DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, Rend
             glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
         }
     }
+    delete jobState;
    // m_SpriteProgram->Unbind();
 }
 
 void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<ExplosionEffectJob>& job, RenderScene& scene)
 {
-	glUniform1i(glGetUniformLocation(shaderHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
-	GLERROR("Bind 1 uniform");
     glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(job->Matrix));
 	GLERROR("Bind 2 uniform");
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-	GLERROR("Bind 3 uniform");
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-	GLERROR("Bind 4 uniform");
-
-    glUniform2f(glGetUniformLocation(shaderHandle, "ScreenDimensions"), m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-	GLERROR("Bind 5 uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind PVM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "VM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind VM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "TIM"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(job->Matrix))));
+	GLERROR("Bind TIM uniform");
 
     glUniform3fv(glGetUniformLocation(shaderHandle, "ExplosionOrigin"), 1, glm::value_ptr(job->ExplosionOrigin));
 	GLERROR("Bind 6 uniform");
-    glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), job->TimeSinceDeath);
+	if (job->Reverse == false) {
+		glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), job->TimeSinceDeath);
+	}
+	else {
+		glUniform1f(glGetUniformLocation(shaderHandle, "TimeSinceDeath"), (job->ExplosionDuration - job->TimeSinceDeath));
+	}
 	GLERROR("Bind 7 uniform");
     glUniform1f(glGetUniformLocation(shaderHandle, "ExplosionDuration"), job->ExplosionDuration);
 	GLERROR("Bind 8 uniform");
@@ -1057,6 +1447,10 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 	GLERROR("Bind 14 uniform");
     glUniform1i(glGetUniformLocation(shaderHandle, "ExponentialAccelaration"), job->ExponentialAccelaration);
 	GLERROR("Bind 15 uniform");
+	glUniform1i(glGetUniformLocation(shaderHandle, "Reverse"), job->Reverse);
+	GLERROR("Bind 15-2 uniform");
+	glUniform1f(glGetUniformLocation(shaderHandle, "ColorDistanceScalar"), job->ColorDistanceScalar);
+	GLERROR("Bind 15-3 uniform");
 
     glUniform4fv(glGetUniformLocation(shaderHandle, "Color"), 1, glm::value_ptr(job->Color));
 	GLERROR("Bind 16 uniform");
@@ -1066,29 +1460,25 @@ void DrawFinalPass::BindExplosionUniforms(GLuint shaderHandle, std::shared_ptr<E
 	GLERROR("Bind 18 uniform");
     glUniform1f(glGetUniformLocation(shaderHandle, "FillPercentage"), job->FillPercentage);
 	GLERROR("Bind 19 uniform");
-    glUniform4fv(glGetUniformLocation(shaderHandle, "AmbientColor"), 1, glm::value_ptr(scene.AmbientColor));
-    GLERROR("Bind 20 uniform");
     glUniform1f(glGetUniformLocation(shaderHandle, "GlowIntensity"), job->GlowIntensity);
+
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
+	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
     GLERROR("END");
 }
 
 void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<ModelJob>& job, RenderScene& scene)
 {
-	glUniform1i(glGetUniformLocation(shaderHandle, "SSAOQuality"), m_SSAOPass->TextureQuality());
-	GLERROR("Bind 1 uniform");
 	GLint Location_M = glGetUniformLocation(shaderHandle, "M");
 	glUniformMatrix4fv(Location_M, 1, GL_FALSE, glm::value_ptr(job->Matrix));
 	GLERROR("Bind 2 uniform");
-	GLint Location_V = glGetUniformLocation(shaderHandle, "V");
-	glUniformMatrix4fv(Location_V, 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-	GLERROR("Bind 3 uniform");
-	GLint Location_P = glGetUniformLocation(shaderHandle, "P");
-	glUniformMatrix4fv(Location_P, 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
-	GLERROR("Bind 4 uniform");
-
-	GLint Location_ScreenDimensions = glGetUniformLocation(shaderHandle, "ScreenDimensions");
-	glUniform2f(Location_ScreenDimensions, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
-	GLERROR("Bind 5 uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind PVM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "VM"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix() * job->Matrix));
+	GLERROR("Bind VM uniform");
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "TIM"), 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(job->Matrix))));
+	GLERROR("Bind TIM uniform");
 
 	GLint Location_FillPercentage = glGetUniformLocation(shaderHandle, "FillPercentage");
 	glUniform1f(Location_FillPercentage, job->FillPercentage);
@@ -1101,14 +1491,12 @@ void DrawFinalPass::BindModelUniforms(GLuint shaderHandle, std::shared_ptr<Model
 	GLERROR("Bind 8 uniform");
 	GLint Location_Color = glGetUniformLocation(shaderHandle, "Color");
 	glUniform4fv(Location_Color, 1, glm::value_ptr(job->Color));
-	GLERROR("Bind 9 uniform");
-	GLint Location_AmbientColor = glGetUniformLocation(shaderHandle, "AmbientColor");
-	glUniform4fv(Location_AmbientColor, 1, glm::value_ptr(scene.AmbientColor));
-
-    GLERROR("Bind 10 uniform");
     GLint Location_GlowIntensity = glGetUniformLocation(shaderHandle, "GlowIntensity");
+	glUniform1f(Location_GlowIntensity, job->GlowIntensity);
 
-    glUniform1f(Location_GlowIntensity, job->GlowIntensity);
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightP"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightP().data()));
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "LightV"), MAX_SPLITS, GL_FALSE, glm::value_ptr(*m_ShadowPass->LightV().data()));
+	glUniform1fv(glGetUniformLocation(shaderHandle, "FarDistance"), MAX_SPLITS, m_ShadowPass->FarDistance().data());
 
 	GLERROR("END");
 }

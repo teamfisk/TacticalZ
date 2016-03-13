@@ -12,37 +12,27 @@
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
 #include "../Core/World.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "Skeleton.h"
 #include "ShaderProgram.h"
+#include "BlendTree.h"
 
 struct ModelJob : RenderJob
 {
-    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded)
+    ModelJob(Model* model, Camera* camera, glm::mat4 matrix, ::RawModel::MaterialProperties matProp, ComponentWrapper modelComponent, World* world, glm::vec4 fillColor, float fillPercentage, bool isShielded, bool shadow)
         : RenderJob()
     {
         Model = model;
 		ModelID = model->ResourceID;
 		Type = matProp.type;
 		::RawModel::MaterialBasic* matGroup = matProp.material;
+		ShaderID = matProp.ShaderID;
 		switch(matProp.type){
 		case ::RawModel::MaterialType::Basic:
-			if (Model->IsSkinned()) {
-				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
-			}
-			else {
-				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
-			}
 			TextureID = 0;
 			break;
 		case ::RawModel::MaterialType::SingleTextures:
 			{
-				if (Model->IsSkinned()) {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
-				}
-				else {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
-				}
 				::RawModel::MaterialSingleTextures* singleTextures = static_cast<::RawModel::MaterialSingleTextures*>(matProp.material);
 				TextureID = (singleTextures->ColorMap.Texture) ? singleTextures->ColorMap.Texture->ResourceID : 0;
 				if (modelComponent["DiffuseTexture"]) {
@@ -64,12 +54,6 @@ struct ModelJob : RenderJob
 			break;
 		case ::RawModel::MaterialType::SplatMapping:
 			{
-				if (Model->IsSkinned()) {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapSkinnedProgram")->ResourceID;
-				}
-				else {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram")->ResourceID;
-				}
 				::RawModel::MaterialSplatMapping* SplatTextures = static_cast<::RawModel::MaterialSplatMapping*>(matProp.material);
 
 				SplatMap = &SplatTextures->SplatMap;
@@ -110,45 +94,33 @@ struct ModelJob : RenderJob
         Color = modelComponent["Color"];
         GlowIntensity = ((double)modelComponent["GlowIntensity"]);
         Entity = modelComponent.EntityID;
-        glm::vec3 abspos = Transform::AbsolutePosition(world, modelComponent.EntityID);
+        glm::vec3 abspos = glm::vec3(matrix[3][0], matrix[3][1], matrix[3][2]);
         glm::vec3 worldpos = glm::vec3(camera->ViewMatrix() * glm::vec4(abspos, 1));
         Depth = worldpos.z;
         World = world;
+		Shadow = shadow;
 
         FillColor = fillColor;
         FillPercentage = fillPercentage;
 		IsShielded = isShielded;
 
+        
+        if (world->HasComponent(Entity, "Unpickable")) {
+            NotPickable = true;
+        }
+
         if (model->IsSkinned()) {
             Skeleton = Model->m_RawModel->m_Skeleton;
 
             if (Skeleton != nullptr) {
-                if (world->HasComponent(Entity, "Animation")) {
-                    auto animationComponent = world->GetComponent(Entity, "Animation");
+                EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
+                
 
-                    for (int i = 1; i <= 3; i++) {
-                        ::Skeleton::AnimationData animationData;
-                        animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationComponent["AnimationName" + std::to_string(i)]);
-                        if (animationData.animation == nullptr) {
-                            continue;
-                        }
-                        animationData.time = (double)animationComponent["Time" + std::to_string(i)];
-                        animationData.weight = (double)animationComponent["Weight" + std::to_string(i)];
-
-                        Animations.push_back(animationData);
-                    }
-                }
-
-                if (world->HasComponent(Entity, "AnimationOffset")) {
-                    auto animationOffsetComponent = world->GetComponent(Entity, "AnimationOffset");
-                    AnimationOffset.animation = model->m_RawModel->m_Skeleton->GetAnimation(animationOffsetComponent["AnimationName"]);
-                    AnimationOffset.time = (double)animationOffsetComponent["Time"];
-                } else {
-                    AnimationOffset.animation = nullptr;
+                if(Skeleton->BlendTrees.find(entityWrapper) != Skeleton->BlendTrees.end()) {
+                    BlendTree = Skeleton->BlendTrees.at(entityWrapper);
                 }
             }
         }
-            
     };
 
     unsigned int TextureID;
@@ -167,10 +139,7 @@ struct ModelJob : RenderJob
     glm::vec4 Color;
     const ::Model* Model = nullptr;
     ::Skeleton* Skeleton = nullptr;
-    std::vector<::Skeleton::AnimationData> Animations;
-    ::Skeleton::AnimationOffset AnimationOffset;
-    
-
+    std::shared_ptr<::BlendTree> BlendTree = nullptr;
     float GlowIntensity = 8.0;
     glm::vec4 DiffuseColor;
     glm::vec4 SpecularColor;
@@ -182,9 +151,14 @@ struct ModelJob : RenderJob
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;
 	bool IsShielded;
+	bool Shadow;
+    bool NotPickable = false;
+
     void CalculateHash() override
     {
-        Hash = ShaderID << 20 + ModelID << 10 + TextureID;
+		Hash = TextureID;
+		Hash += ModelID << 10;
+		Hash += ShaderID << 20;
     }
 };
 

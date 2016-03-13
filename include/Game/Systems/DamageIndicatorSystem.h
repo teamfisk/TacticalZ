@@ -2,9 +2,9 @@
 #define DamageIndicatorSystem_h__
 
 #include "Core/System.h"
-#include "Core/Transform.h"
+#include "Core/TransformSystem.h"
 #include "Core/ResourceManager.h"
-#include "Core/EntityFileParser.h"
+#include "Core/EntityFile.h"
 #include "Core/EPlayerDamage.h"
 #include "Common.h"
 #include <tuple>
@@ -15,6 +15,7 @@
 
 #include "Rendering/Util/CommonFunctions.h"
 //#define INDICATOR_TEST
+#include "Core/ConfigFile.h"
 
 class DamageIndicatorSystem : public ImpureSystem
 {
@@ -39,6 +40,8 @@ private:
     };
     std::vector<DamageIndicatorStruct> updateDamageIndicatorVector;
     float CalculateAngle(EntityWrapper player, glm::vec3 enemyPos);
+
+    bool m_NetworkEnabled;
 
     //for tests
 #ifdef INDICATOR_TEST

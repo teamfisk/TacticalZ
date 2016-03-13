@@ -6,9 +6,8 @@
 #include "GLM.h"
 #include "Core/System.h"
 #include "Events/ESpawnerSpawn.h"
-#include "Core/Transform.h"
-#include "Core/ResourceManager.h"
-#include "Core/EntityFileParser.h"
+#include "Core/TransformSystem.h"
+#include "Core/EntityFile.h"
 
 class SpawnerSystem : public System
 {
@@ -19,6 +18,7 @@ public:
     // will try to pick a spawn location so that the spawned entity doesn't 
     // collide with anything that has that component and is collidable.
     static EntityWrapper Spawn(EntityWrapper spawner, EntityWrapper parent = EntityWrapper::Invalid, const std::string& dontCollideComponent = "");
+    static EntityWrapper SpawnEntityFile(const std::string& entityFilePath, EntityWrapper spawner, EntityWrapper parent = EntityWrapper::Invalid, const std::string& dontCollideComponent = "");
 
 private:
     EventRelay<SpawnerSystem, Events::SpawnerSpawn> m_OnSpawnerSpawn;

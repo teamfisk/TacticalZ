@@ -10,8 +10,9 @@ namespace Events
 struct PlayerDeath : Event
 {
     //KilledBy,KilledByWhat is optional for now. It might be used later in the playerlog-system
-    EntityWrapper Player;
-    std::string KilledByWhat;
+    EntityWrapper Player = EntityWrapper::Invalid;
+    EntityWrapper Killer = EntityWrapper::Invalid;
+    std::string KilledByWhat = "";
 };
 
 }

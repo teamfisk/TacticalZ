@@ -8,12 +8,13 @@ DamageIndicatorSystem::DamageIndicatorSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &DamageIndicatorSystem::OnSetCamera);
 
     //load texture to cache
-    auto texture = CommonFunctions::LoadTexture("Textures/DamageIndicator.png", false);
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
+    auto texture = CommonFunctions::TryLoadResource<Texture, false>("Textures/DamageIndicator.png");
+    auto entityFile = ResourceManager::Load<EntityXMLFile>("Schema/Entities/DamageIndicator.xml");
+    m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
 }
 
 void DamageIndicatorSystem::Update(double dt) {
-    if (!IsServer && LocalPlayer.Valid()) {
+    if ((!IsServer || !m_NetworkEnabled) && LocalPlayer.Valid()) {
         for (auto& iter = updateDamageIndicatorVector.begin(); iter != updateDamageIndicatorVector.end(); iter++) {
             if (!iter->spriteEntity.Valid()) {
                 updateDamageIndicatorVector.erase(iter);
@@ -40,25 +41,28 @@ bool DamageIndicatorSystem::OnPlayerDamage(Events::PlayerDamage& e)
         return false;
     }
 
+    //friendly fire - return
+    if (e.Damage < 0.1f) {
+        return false;
+    }
+
     glm::vec3 inflictorPos = e.Inflictor["Transform"]["Position"];
     //if testing
 #ifdef INDICATOR_TEST
-        inflictorPos = DamageIndicatorTest(e.Victim);
+    inflictorPos = DamageIndicatorTest(e.Victim);
 #endif
 
     float angleBetweenVectors = CalculateAngle(e.Victim, inflictorPos);
 
     //load & set the "2d" sprite
     auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DamageIndicator.xml");
-    EntityFileParser parser(entityFile);
-    EntityID spriteID = parser.MergeEntities(m_World);
-    m_World->SetParent(spriteID, m_CurrentCamera);
-    auto spriteWrapper = EntityWrapper(m_World, spriteID);
+    EntityWrapper sprite = entityFile->MergeInto(m_World);
+    m_World->SetParent(sprite.ID, m_CurrentCamera);
     //simply set the rotation z-wise to the angleBetweenVectors
-    spriteWrapper["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);
+    sprite["Transform"]["Orientation"] = glm::vec3(0, 0, angleBetweenVectors);
 
-    if (!IsServer) {
-        updateDamageIndicatorVector.emplace_back(spriteWrapper, inflictorPos);
+    if (!IsServer || !m_NetworkEnabled) {
+        updateDamageIndicatorVector.emplace_back(sprite, inflictorPos);
     }
 
     return true;
@@ -83,7 +87,7 @@ float DamageIndicatorSystem::CalculateAngle(EntityWrapper player, glm::vec3 enem
     auto enemyPlayerVector = glm::normalize(playerPosition - enemyPosition);
 
     //get the rotationvector relative to the z-axis
-    auto rotationVectorVec3 = glm::vec3(glm::toMat4(Transform::AbsoluteOrientation(player))*glm::vec4(0, 0, 1, 0));
+    auto rotationVectorVec3 = glm::vec3(glm::toMat4(TransformSystem::AbsoluteOrientation(player))*glm::vec4(0, 0, 1, 0));
     //rotate the direction-vector 90 degrees to get the players side-vector
     auto playerSideVector = glm::vec3(glm::rotateY(rotationVectorVec3, 1.57f));
 
@@ -124,11 +128,11 @@ glm::vec3 DamageIndicatorSystem::DamageIndicatorTest(EntityWrapper player) {
     }
     m_TestVar++;
 
-     auto inflictorPos = glm::vec3(currentPos.x + testVar*6.0f, currentPos.y, currentPos.z + testVar2*6.0f);
+    auto inflictorPos = glm::vec3(currentPos.x + testVar*6.0f, currentPos.y, currentPos.z + testVar2*6.0f);
 
     //load the explosioneffect XML
-    auto deathEffect = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
-    EntityFileParser parser(deathEffect);
+    auto deathEffect = ResourceManager::Load<EntityXMLFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
+    EntityXMLFileParser parser(deathEffect);
     EntityID deathEffectID = parser.MergeEntities(m_World);
     EntityWrapper deathEffectEW = EntityWrapper(m_World, deathEffectID);
 

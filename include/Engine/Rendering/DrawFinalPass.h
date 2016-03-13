@@ -11,25 +11,91 @@
 #include "Util/UnorderedMapVec2.h"
 #include "Util/CommonFunctions.h"
 #include "Texture.h"
+#include "ShadowPass.h"
+#include "BlurHUD.h"
 
 class DrawFinalPass
 {
 public:
-    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass);
-    ~DrawFinalPass() { }
+    DrawFinalPass(IRenderer* renderer, LightCullingPass* lightCullingPass, CubeMapPass* cubeMapPass, SSAOPass* ssaoPass, ShadowPass* shadowPass, ConfigFile* config);
+	~DrawFinalPass();
     void InitializeTextures();
     void InitializeFrameBuffers();
     void InitializeShaderPrograms();
-    void Draw(RenderScene& scene);
+    void Draw(RenderScene& scene, BlurHUD* blurHUDPass);
     void ClearBuffer();
     void OnWindowResize();
+	void setMSAA(unsigned int numberOfSamples);
 
     //Return the texture that is used in later stages to apply the bloom effect
-    GLuint BloomTexture() const { return m_BloomTexture; }
+	GLuint BloomTexture() {
+		if (m_MSAA){
+			m_AntiAliasedFrameBuffer->Bind();
+			glClearColor(0.f, 0.f, 0.f, 0.f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			m_AntiAliasedFrameBuffer->Unbind();
+			m_FinalPassFrameBuffer->Read();
+			glReadBuffer(GL_COLOR_ATTACHMENT1);
+			m_AntiAliasedFrameBuffer->Draw();
+			glBlitFramebuffer(
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			return m_AntiAliasedTexture;
+		}
+		return m_BloomTexture; }
     //Return the texture with diffuse and lighting of the scene.
-    GLuint SceneTexture() const { return m_SceneTexture; }
+	GLuint DrawFinalPass::SceneTexture() {
+		if (m_MSAA) {
+			m_AntiAliasedFrameBuffer->Bind();
+			glClearColor(0.f, 0.f, 0.f, 0.f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			m_AntiAliasedFrameBuffer->Unbind();
+			m_FinalPassFrameBuffer->Read();
+			glReadBuffer(GL_COLOR_ATTACHMENT0);
+			m_AntiAliasedFrameBuffer->Draw();
+			glBlitFramebuffer(
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			return m_AntiAliasedTexture;
+		}
+		return m_SceneTexture;
+	}
+    //Return the SceneTexture with the blurred HUD bits.
+    GLuint CombinedSceneTexture() {
+		if (m_MSAA) {
+			m_AntiAliasedFrameBuffer->Bind();
+			glClearColor(0.f, 0.f, 0.f, 0.f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			m_AntiAliasedFrameBuffer->Unbind();
+			m_FinalPassFrameBuffer->Read();
+			m_AntiAliasedFrameBuffer->Draw();
+			glBlitFramebuffer(
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			return m_AntiAliasedTexture;
+		}
+		return m_CombinedTexture; }
+    //Return the blurred scene texture.
+    GLuint FullBlurredTexture() { 
+		if (m_MSAA) {
+			m_AntiAliasedFrameBuffer->Bind();
+			glClearColor(0.f, 0.f, 0.f, 0.f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			m_AntiAliasedFrameBuffer->Unbind();
+			m_FinalPassFrameBuffer->Read();
+			m_AntiAliasedFrameBuffer->Draw();
+			glBlitFramebuffer(
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height,
+				GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			return m_AntiAliasedTexture;
+		}
+		return m_FullBlurredTexture; }
     //Return the framebuffer used in the scene rendering stage.
-    FrameBuffer* FinalPassFrameBuffer() { return &m_FinalPassFrameBuffer; }
+    FrameBuffer* FinalPassFrameBuffer() { return m_FinalPassFrameBuffer; }
 
 private:
     void DrawSprites(std::list<std::shared_ptr<RenderJob>>&jobs, RenderScene& scene);
@@ -50,21 +116,27 @@ private:
     Texture* m_GreyTexture;
     Texture* m_ErrorTexture;
 
-    FrameBuffer m_FinalPassFrameBuffer;
-	FrameBuffer m_ShieldDepthFrameBuffer;
-    GLuint m_BloomTexture;
-    GLuint m_SceneTexture;
-    GLuint m_DepthBuffer;
-	GLuint m_ShieldBuffer;
-    GLuint m_CubeMapTexture;
+    FrameBuffer* m_FinalPassFrameBuffer = nullptr;
+	FrameBuffer* m_ShieldDepthFrameBuffer = nullptr;
+	FrameBuffer* m_AntiAliasedFrameBuffer = nullptr;
+    GLuint m_BloomTexture = 0;
+    GLuint m_SceneTexture = 0;
+    GLuint m_DepthBuffer = 0;
+	GLuint m_ShieldBuffer = 0;
+    GLuint m_CubeMapTexture = 0;
+    GLuint m_FullBlurredTexture = 0;
+    GLuint m_CombinedTexture = 0; //This can be removed for less memory usage, just set m_sceneTexture to the return from m_BlurHUDPass.CombineTextures
+	GLuint m_AntiAliasedTexture = 0; //Is only used when MSAA is active;
 
     //maqke this component based i guess?
     GLuint m_ShieldPixelRate = 16;
+	unsigned int m_MSAA = 0;
 
     const IRenderer* m_Renderer;
     const LightCullingPass* m_LightCullingPass;
     const CubeMapPass* m_CubeMapPass;
 	const SSAOPass* m_SSAOPass;
+	const ShadowPass* m_ShadowPass;
 
     ShaderProgram* m_ForwardPlusProgram;
     ShaderProgram* m_ExplosionEffectProgram;

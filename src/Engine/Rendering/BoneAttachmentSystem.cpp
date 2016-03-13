@@ -8,10 +8,13 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
-    auto parent = entity.FirstParentWithComponent("Animation");
-    if (!parent.HasComponent("Model")) {
+    auto parent = entity.FirstParentWithComponent("Model");
+
+    if(!parent.Valid()) {
         return;
     }
+
+
     Model* model;
     try {
         model = ResourceManager::Load<::Model, true>(parent["Model"]["Resource"]);
@@ -35,66 +38,31 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
-    std::vector<::Skeleton::AnimationData> Animations;
-    ::Skeleton::AnimationOffset AnimationOffset;
-    glm::mat4 boneTransform;
+    if (skeleton->BlendTrees.find(parent) != skeleton->BlendTrees.end()) {
 
-    if (parent.HasComponent("Animation")) {
-        for (int i = 1; i <= 3; i++) {
-            ::Skeleton::AnimationData animationData;
-            animationData.animation = model->m_RawModel->m_Skeleton->GetAnimation(parent["Animation"]["AnimationName" + std::to_string(i)]);
-            if (animationData.animation == nullptr) {
-                continue;
-            }
-            animationData.time = (double)parent["Animation"]["Time" + std::to_string(i)];
-            animationData.weight = (double)parent["Animation"]["Weight" + std::to_string(i)];
 
-            Animations.push_back(animationData);
-        }
-    }
+        glm::mat4 boneTransform = skeleton->BlendTrees.at(parent)->GetBoneTransform(id);
 
-    if (parent.HasComponent("AnimationOffset")) {
-        AnimationOffset.animation = model->m_RawModel->m_Skeleton->GetAnimation(parent["AnimationOffset"]["AnimationName"]);
-        AnimationOffset.time = (double)parent["AnimationOffset"]["Time"];
+        glm::vec3 scale;
+        glm::quat rotation;
+        glm::vec3 translation;
+        glm::vec3 skew;
+        glm::vec4 perspective;
+        glm::decompose(boneTransform, scale, rotation, translation, skew, perspective);
 
-        if(AnimationOffset.animation != nullptr) {
-            boneTransform = skeleton->GetBoneTransform(false, skeleton->Bones.at(id), Animations, AnimationOffset, glm::mat4(1));
-        } else {
-            boneTransform = skeleton->GetBoneTransform(false, skeleton->Bones.at(id), Animations, glm::mat4(1));
-        }
+        rotation = glm::quat((glm::vec3)entity["BoneAttachment"]["OrientationOffset"]) * rotation;
+        rotation = glm::inverse(rotation);
+        glm::vec3 angles = glm::eulerAngles(rotation);
         
-    } else {
-        boneTransform = skeleton->GetBoneTransform(false, skeleton->Bones.at(id), Animations, glm::mat4(1));
+        if ((bool)entity["BoneAttachment"]["InheritPosition"]) {
+            entity["Transform"]["Position"] = translation + (glm::vec3)entity["BoneAttachment"]["PositionOffset"];
+        }
+        if ((bool)entity["BoneAttachment"]["InheritOrientation"]) {
+            entity["Transform"]["Orientation"] = angles;
+        }
+        if ((bool)entity["BoneAttachment"]["InheritScale"]) {
+            entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];
+        }
     }
-    
-    
 
-    glm::vec3 scale;
-    glm::quat rotation;
-    glm::vec3 translation;
-    glm::vec3 skew;
-    glm::vec4 perspective;
-    glm::decompose(boneTransform, scale, rotation, translation, skew, perspective);
-
-    glm::vec3 angles = glm::vec3(-glm::pitch(rotation), -glm::yaw(rotation), -glm::roll(rotation));
-/*
-
-    angles.y = asin(-boneTransform[0][2]);
-    if (cos(angles.y) != 0) {
-        angles.x = atan2(boneTransform[1][2], boneTransform[2][2]);
-        angles.z = atan2(boneTransform[0][1], boneTransform[0][0]);
-    } else {
-        angles.x = atan2(-boneTransform[2][0], boneTransform[1][1]);
-        angles.z = 0;
-    }*/
-
-    if ((bool)entity["BoneAttachment"]["InheritPosition"]) {
-        (glm::vec3&)entity["Transform"]["Position"] = translation + (glm::vec3)entity["BoneAttachment"]["PositionOffset"];
-    }
-    if ((bool)entity["BoneAttachment"]["InheritOrientation"]) {
-        (glm::vec3&)entity["Transform"]["Orientation"] = angles  + (glm::vec3)entity["BoneAttachment"]["OrientationOffset"];
-    }
-    if ((bool)entity["BoneAttachment"]["InheritScale"]) {
-        (glm::vec3&)entity["Transform"]["Scale"] = scale  * (glm::vec3)entity["BoneAttachment"]["ScaleOffset"];
-    }
 }

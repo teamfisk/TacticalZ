@@ -9,23 +9,34 @@ SpawnerSystem::SpawnerSystem(SystemParams params)
 
 EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /*= EntityWrapper::Invalid*/, const std::string& dontCollideComponent)
 {
+    // Load the entity file and parse it
+    const std::string& entityFilePath = spawner["Spawner"]["EntityFile"];
+    if (!entityFilePath.empty()) {
+        return SpawnEntityFile(entityFilePath, spawner, parent, dontCollideComponent);
+    } else {
+        return EntityWrapper::Invalid;
+    }
+}
+
+EntityWrapper SpawnerSystem::SpawnEntityFile(const std::string& entityFilePath, EntityWrapper spawner, EntityWrapper parent /*= EntityWrapper::Invalid*/, const std::string& dontCollideComponent /*= ""*/)
+{
     // Spawn the entity in the parent's world if it exists, otherwise in the spawner's world
     World* world = parent.World;
     if (world == nullptr) {
         world = spawner.World;
     } 
 
-    // Load the entity file and parse it
-    const std::string& entityFilePath = spawner["Spawner"]["EntityFile"];
-    auto entityFile = ResourceManager::Load<EntityFile>(entityFilePath);
-    if (entityFile == nullptr) {
+    EntityWrapper spawnedEntity;
+    try {
+        auto entityFile = ResourceManager::Load<EntityFile>(entityFilePath);
+        spawnedEntity = entityFile->MergeInto(world);
+        world->SetParent(spawnedEntity.ID, parent.ID);
+    } catch (const Resource::FailedLoadingException& e) {
         return EntityWrapper::Invalid;
     }
-    EntityFileParser parser(entityFile);
-    EntityWrapper spawnedEntity(world, parser.MergeEntities(world, parent.ID));
 
-    //If the spawned entity is collideable, then we must not spawn it where it collides with something that
-    //has a dontCollideComponent attached.
+    // If the spawned entity is collidable, then we must not spawn it where it collides with something that
+    // has a dontCollideComponent attached.
     bool spawnOnCollidable = dontCollideComponent.empty() || !spawnedEntity.HasComponent("Collidable");
     if (!spawnOnCollidable) {
         boost::optional<EntityAABB> optBox = Collision::EntityAbsoluteAABB(spawnedEntity);
@@ -37,7 +48,7 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 
     // Find any SpawnPoints existing as children of spawner
     auto children = spawner.World->GetDirectChildren(spawner.ID);
-    std::vector<EntityWrapper> spawnPoints;
+    std::list<EntityWrapper> spawnPoints;
     for (auto kv = children.first; kv != children.second; ++kv) {
         const EntityID& child = kv->second;
         if (spawner.World->HasComponent(child, "SpawnPoint")) {
@@ -74,9 +85,9 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 void SpawnerSystem::transformEntityToSpawnPoint(EntityWrapper spawnedEntity, EntityWrapper spawnPoint)
 {
     // Set its position and orientation to that of the SpawnPoint
-    spawnedEntity["Transform"]["Position"] = Transform::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
+    spawnedEntity["Transform"]["Position"] = TransformSystem::AbsolutePosition(spawnPoint.World, spawnPoint.ID);
     // TODO: Quaternions, bitch
-    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(Transform::AbsoluteOrientation(spawnPoint));
+    spawnedEntity["Transform"]["Orientation"] = glm::eulerAngles(TransformSystem::AbsoluteOrientation(spawnPoint));
 }
 
 bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, EntityWrapper spawnPoint, const std::string& dontCollideComponent)
@@ -84,7 +95,7 @@ bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, Entity
     transformEntityToSpawnPoint(spawnedEntity, spawnPoint);
     //Check if the spawned entity collides with anything, and if so, continue to the next spawnpoint.
     EntityAABB spawnedBox = *Collision::EntityAbsoluteAABB(spawnedEntity);
-    const ComponentPool* otherSpawnedEntities = spawnPoint.World->GetComponents(dontCollideComponent);
+    auto otherSpawnedEntities = spawnPoint.World->GetComponents(dontCollideComponent);
     for (const auto& obj : *otherSpawnedEntities) {
         if (spawnedEntity.ID == obj.EntityID) {
             continue;
@@ -111,7 +122,7 @@ bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, Entity
                     spawnedBox,
                     model->CollisionVertices(),
                     model->CollisionIndices(),
-                    Transform::ModelMatrix(otherEntity))) {
+                    TransformSystem::ModelMatrix(otherEntity))) {
                 return true;
             }
         }

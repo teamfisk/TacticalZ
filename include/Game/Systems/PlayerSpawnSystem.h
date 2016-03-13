@@ -15,10 +15,19 @@ public:
     virtual void Update(double dt) override;
 
 private:
+    // This enum must correspond to the command values for PickTeam buttons.
+    enum class PlayerClass
+    {
+        None = 0,
+        Assault = 1,
+        Defender = 2,
+        Sniper = 2
+    };
     struct SpawnRequest
     {
         int PlayerID;
         ComponentInfo::EnumType Team;
+        PlayerClass Class;
     };
 
     bool m_NetworkEnabled = false;

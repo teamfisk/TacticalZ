@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>1.2000000476837158</Lifetime>
+    </c:Lifetime>
+    <c:ExplosionEffect>
+      <Velocity X="2.08100009" Y="3.37400007" Z="0"/>
+      <ExplosionOrigin X="0" Y="0" Z="2.91200018"/>
+      <TimeSinceDeath>1.2000000476837158</TimeSinceDeath>
+      <Speed>-1</Speed>
+      <ExplosionDuration>1.2000000476837158</ExplosionDuration>
+      <EndColor A="0.262745112" B="19.6078434" G="3.92156863" R="0"/>
+      <Randomness>true</Randomness>
+      <ColorByDistance>true</ColorByDistance>
+    </c:ExplosionEffect>
+    <c:Model>
+      <GlowIntensity>16.040000915527344</GlowIntensity>
+      <Resource>Models/Effects/JumpEffectHexagon.mesh</Resource>
+      <Color A="0" B="1.96078432" G="0" R="3.92156863"/>
+      <Transparent>true</Transparent>
+    </c:Model>
+    <c:NetworkComponent/>
+    <c:Transform>
+      <Position X="0" Y="-0.0900000036" Z="-0.00600000005"/>
+      <Orientation X="1.57000005" Y="0" Z="0"/>
+      <Scale X="0.0299999993" Y="0.0299999993" Z="0.0299999993"/>
+    </c:Transform>
+  </Components>
+
+  <Children/>
+
+</Entity>

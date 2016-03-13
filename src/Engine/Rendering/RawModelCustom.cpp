@@ -149,14 +149,29 @@ void RawModelCustom::ReadMaterialSingle(std::size_t& offset, char* fileData, con
 	case MaterialType::Basic:
 		newMaterialProperty.material = new MaterialBasic();
 		ReadMaterialBasic(newMaterialProperty.material, offset, fileData, fileByteSize);
+		if(hasSkin){
+			newMaterialProperty.ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
+		} else {
+			newMaterialProperty.ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
+		}
 		break;
 	case MaterialType::SplatMapping:
 		newMaterialProperty.material = new MaterialSplatMapping();
 		ReadMaterialSplatMapping(static_cast<MaterialSplatMapping*>(newMaterialProperty.material), offset, fileData, fileByteSize);
+		if (hasSkin){
+			newMaterialProperty.ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapSkinnedProgram")->ResourceID;
+		} else {
+			newMaterialProperty.ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram")->ResourceID;
+		}
 		break;
 	case MaterialType::SingleTextures:
 		newMaterialProperty.material = new MaterialSingleTextures();
 		ReadMaterialSingleTexture(static_cast<MaterialSingleTextures*>(newMaterialProperty.material), offset, fileData, fileByteSize);
+		if (hasSkin){
+			newMaterialProperty.ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
+		} else {
+			newMaterialProperty.ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
+		}
 		break;
 	default:
 		throw Resource::FailedLoadingException("Material contains an unknown MaterialType");

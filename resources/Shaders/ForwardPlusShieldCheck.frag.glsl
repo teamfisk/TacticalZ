@@ -1,7 +1,9 @@
 #version 430
 
 #define MIN_AMBIENT_LIGHT 0.3
+#define MAX_SPLITS 4
 
+uniform mat4 VM;
 uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
@@ -11,7 +13,7 @@ uniform vec2 ScreenDimensions;
 uniform vec4 FillColor;
 uniform vec4 AmbientColor;
 uniform float FillPercentage;
-uniform float GlowIntensity = 10;
+uniform float GlowIntensity;
 uniform vec3 CameraPosition;
 uniform int SSAOQuality;
 
@@ -63,12 +65,14 @@ layout (std430, binding = 4) buffer LightIndexBuffer
 
 in VertexData{
 	vec3 Position;
+	vec4 ViewSpacePosition;
 	vec3 Normal;
 	vec3 Tangent;
 	vec3 BiTangent;
 	vec2 TextureCoordinate;
 	vec4 ExplosionColor;
 	float ExplosionPercentageElapsed;
+	vec4 PositionLightSpace[MAX_SPLITS];
 }Input;
 
 out vec4 sceneColor;
@@ -138,11 +142,10 @@ void main()
 	vec4 diffuseTexel = texture2D(DiffuseTexture, Input.TextureCoordinate * DiffuseUVRepeat);
 	vec4 glowTexel = texture2D(GlowMapTexture, Input.TextureCoordinate * GlowUVRepeat);
 	vec4 specularTexel = texture2D(SpecularMapTexture, Input.TextureCoordinate * SpecularUVRepeat);
-	vec4 position = V * M * vec4(Input.Position, 1.0); 
 	vec4 normal = V * CalcNormalMappedValue(Input.Normal, Input.Tangent, Input.BiTangent, Input.TextureCoordinate * NormalUVRepeat, NormalMapTexture);
 	normal = normalize(normal);
 	//vec4 normal = normalize(V  * vec4(Input.Normal, 0.0));
-	vec4 viewVec = normalize(-position);
+	vec4 viewVec = normalize(-Input.ViewSpacePosition);
 	vec3 I = normalize(vec3(M * vec4(Input.Position, 1.0)) - CameraPosition);
 	vec3 R = reflect(-I, Input.Normal);
 	//R = vec3(P * vec4(R, 1.0));
@@ -167,7 +170,7 @@ void main()
 		LightResult light_result;
 		//These if statements should be removed.
 		if(light.Type == 1) { // point
-			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, position, normal, light.Falloff);
+			light_result = CalcPointLightSource(V * light.Position, light.Radius, light.Color, light.Intensity, viewVec, Input.ViewSpacePosition, normal, light.Falloff);
 		} else if (light.Type == 2) { //Directional
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 		}
@@ -178,7 +181,7 @@ void main()
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	float specularResult = (specularTexel.r + specularTexel.g + specularTexel.b)/3.0;
-	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a;
+	vec4 reflectionTotal = reflectionColor * (1-specularTexel.a) * color_result.a * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
 	color_result = color_result * clamp(1/specularTexel.a, 0, 1) + reflectionTotal;
 	//vec4 color_result = (DiffuseColor + Input.ExplosionColor) * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel)) * diffuseTexel * Color;
 	

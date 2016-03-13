@@ -9,7 +9,7 @@ Network::Network(World* world, EventBroker* eventBroker)
     m_TimeoutMs = config->Get<int>("Networking.TimeoutMs", 20000);
 }
 
-void Network::Update()
+void Network::Update(double dt)
 { 
     updateNetworkData();
 }
@@ -81,5 +81,26 @@ void Network::updateNetworkData()
         m_SaveDataTimer = std::clock();
         m_NetworkData.DataSentThisInterval = 0;
         m_NetworkData.DataReceivedThisInterval = 0;
+    }
+}
+
+void Network::popNetworkSegmentOfHeader(Packet & packet)
+{
+    // Pop packetSize, group, groupIndex and groupSize.
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+    packet.ReadPrimitive<int>();
+}
+
+void Network::removeWorld()
+{
+    std::vector<EntityID> childrenToBeDeleted;
+    auto rootEntites = m_World->GetDirectChildren(EntityID_Invalid);
+    for (auto it = rootEntites.first; it != rootEntites.second; it++) {
+        childrenToBeDeleted.push_back(it->second);
+    }
+    for (int i = 0; i < childrenToBeDeleted.size(); ++i) {
+        m_World->DeleteEntity(childrenToBeDeleted[i]);
     }
 }
