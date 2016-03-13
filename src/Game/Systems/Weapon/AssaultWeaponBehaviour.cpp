@@ -10,6 +10,7 @@ void AssaultWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWra
 
 void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
+    CheckBoost(cWeapon, wi);
     // Start reloading automatically if at 0 mag ammo
     Field<int> magAmmo = cWeapon["MagazineAmmo"];
     if (m_ConfigAutoReload && magAmmo <= 0) {
@@ -385,13 +386,11 @@ void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi
     PickData pickData = m_Renderer->Pick(centerScreen);
     EntityWrapper victim(m_World, pickData.Entity);
     if (!victim.Valid()) {
-        RemoveBoostCheckHUD(wi);
         return;
     }
 
     // Don't let us somehow shoot ourselves in the foot
     if (victim == LocalPlayer) {
-        RemoveBoostCheckHUD(wi);
         return;
     }
 
@@ -400,59 +399,111 @@ void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi
         victim = victim.FirstParentWithComponent("Player");
     }
     if (!victim.Valid()) {
-        RemoveBoostCheckHUD(wi);
         return;
     }
 
 
     // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
     if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
-        
+
         EntityWrapper friendlyBoostHudSpawner = wi.FirstPersonPlayerModel.FirstChildByName("FriendlyBoostAttachment");
         if (friendlyBoostHudSpawner.Valid()) {
+
+            EntityWrapper assaultBoost = victim.FirstChildByName("BoostAssault");
+            EntityWrapper defenderBoost = victim.FirstChildByName("BoostDefender");
+            EntityWrapper sniperBoost = victim.FirstChildByName("BoostSniper");
 
             auto children = m_World->GetDirectChildren(friendlyBoostHudSpawner.ID);
 
             if (children.first == children.second) {
                 if (friendlyBoostHudSpawner.HasComponent("Spawner")) {
-                    EntityWrapper friendlyAmmoHud = SpawnerSystem::Spawn(friendlyBoostHudSpawner, friendlyBoostHudSpawner);
-                    if (friendlyAmmoHud.Valid()) {
-                        EntityWrapper textEntity = friendlyAmmoHud.FirstChildByName("MagazineAmmo");
-                        if (textEntity.Valid()) {
-                            if (textEntity.HasComponent("Text")) {
-                               // (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+
+                    EntityWrapper friendlyBoostHud = SpawnerSystem::Spawn(friendlyBoostHudSpawner, friendlyBoostHudSpawner);
+                    if (friendlyBoostHud.Valid()) {
+                        EntityWrapper assaultBoostEntity = friendlyBoostHud.FirstChildByName("AssaultBoost");
+                        if (assaultBoostEntity.Valid()) {
+                            EntityWrapper active = assaultBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (assaultBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
                             }
                         }
 
-                        EntityWrapper ammoTextEntity = friendlyAmmoHud.FirstChildByName("Ammo");
-                        if (ammoTextEntity.Valid()) {
-                            if (ammoTextEntity.HasComponent("Text")) {
-                     //           (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+                        EntityWrapper defenderBoostEntity = friendlyBoostHud.FirstChildByName("DefenderBoost");
+                        if (defenderBoostEntity.Valid()) {
+                            EntityWrapper active = defenderBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (defenderBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
+                            }
+                        }
+
+                        EntityWrapper sniperBoostEntity = friendlyBoostHud.FirstChildByName("SniperBoost");
+                        if (sniperBoostEntity.Valid()) {
+                            EntityWrapper active = sniperBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (sniperBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
                             }
                         }
                     }
                 }
             } else {
-                EntityWrapper textEntity = friendlyBoostHudSpawner.FirstChildByName("MagazineAmmo");
-                if (textEntity.Valid()) {
-                    if (textEntity.HasComponent("Text")) {
-                    //    (std::string&)textEntity["Text"]["Content"] = std::to_string(magazineAmmo);
+                EntityWrapper friendlyBoostHud = friendlyBoostHudSpawner.FirstChildByName("FriendlyBoostHUD");
+                if (friendlyBoostHud.Valid()) {
+                    if(friendlyBoostHud.HasComponent("Lifetime")) {
+                        (Field<double>)friendlyBoostHud["Lifetime"]["Lifetime"] = 0.5;
                     }
-                }
 
-                EntityWrapper ammoTextEntity = friendlyBoostHudSpawner.FirstChildByName("Ammo");
-                if (ammoTextEntity.Valid()) {
-                    if (ammoTextEntity.HasComponent("Text")) {
-                //        (std::string&)ammoTextEntity["Text"]["Content"] = std::to_string(ammo);
+
+
+                    EntityWrapper assaultBoostEntity = friendlyBoostHud.FirstChildByName("AssaultBoost");
+                    if (assaultBoostEntity.Valid()) {
+                        EntityWrapper active = assaultBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (assaultBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+
+                    EntityWrapper defenderBoostEntity = friendlyBoostHud.FirstChildByName("DefenderBoost");
+                    if (defenderBoostEntity.Valid()) {
+                        EntityWrapper active = defenderBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (defenderBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+
+                    EntityWrapper sniperBoostEntity = friendlyBoostHud.FirstChildByName("SniperBoost");
+                    if (sniperBoostEntity.Valid()) {
+                        EntityWrapper active = sniperBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (sniperBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
 }
 
-void AssaultWeaponBehaviour::RemoveBoostCheckHUD(WeaponInfo& wi)
-{
-
-}
