@@ -83,15 +83,24 @@ void PlayerSpawnSystem::Update(double dt)
                     if (it->Team == cSpawnerTeam["Team"].Enum("Spectator")) {
                         ++playersSpectating;
                         break;
+                    } else {
+                        continue;
                     }
-                    continue;
                 }
             }
 
             // TODO: Choose a different spawner depending on class picked?
+            std::string playerEntityFile;
+            if (it->Class == PlayerClass::Assault) {
+                playerEntityFile = (const std::string&)cPlayerSpawn["AssaultFile"];
+            } else if (it->Class == PlayerClass::Defender) {
+                playerEntityFile = (const std::string&)cPlayerSpawn["DefenderFile"];
+            } else if (it->Class == PlayerClass::Sniper) {
+                playerEntityFile = (const std::string&)cPlayerSpawn["SniperFile"];
+            }
 
             // Spawn the player!
-            EntityWrapper player = SpawnerSystem::Spawn(spawner, EntityWrapper::Invalid, "Player");
+            EntityWrapper player = SpawnerSystem::SpawnEntityFile(playerEntityFile, spawner, EntityWrapper::Invalid, "Player");
             // Set the player team affiliation
             player["Team"]["Team"] = it->Team;
 
