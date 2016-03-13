@@ -30,11 +30,6 @@ bool SoundSystem::OnPlayerSpawned(const Events::PlayerSpawned &e)
         Events::PlayAnonuncerVoice go;
         go.FilePath = "Audio/Announcer/" + m_Announcer + "/Go.wav";
         m_EventBroker->Publish(go);
-        {
-            Events::ChangeBGM ev;
-            ev.FilePath = "Audio/BGM/Layer1.wav";
-            m_EventBroker->Publish(ev);
-        }
     }
     return true;
 }

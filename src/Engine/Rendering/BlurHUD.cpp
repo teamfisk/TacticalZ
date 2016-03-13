@@ -68,13 +68,13 @@ void BlurHUD::InitializeBuffers()
 	}
 	m_GaussianFrameBuffer_horiz.Generate();
 
-    CommonFunctions::GenerateTexture(&m_DepthStencil_vert, GL_CLAMP_TO_BORDER, GL_NEAREST,
-        res2, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    //CommonFunctions::GenerateTexture(&m_DepthStencil_vert, GL_CLAMP_TO_BORDER, GL_NEAREST,
+    //    res2, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
     CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_NEAREST,
         res2, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
 	if (m_GaussianFrameBuffer_vert.GetHandle() == 0) {
-        m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthStencil_vert, GL_DEPTH_STENCIL_ATTACHMENT)));
+        m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthStencil_horiz, GL_DEPTH_STENCIL_ATTACHMENT)));
 		m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_vert, GL_COLOR_ATTACHMENT0)));
 	}
 	m_GaussianFrameBuffer_vert.Generate();
@@ -260,22 +260,22 @@ void BlurHUD::FillStencil(RenderScene& scene)
         glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
     }
 
-    state.BindFramebuffer(m_GaussianFrameBuffer_vert.GetHandle());
-    for (auto& job : scene.Jobs.SpriteJob) {
-        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
-        if (!spriteJob) {
-            continue;
-        }
-        if(!spriteJob->BlurBackground) {
-            continue;
-        }
-        glm::mat4 MVP = VP * spriteJob->Matrix;
-        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(MVP));
+    //state.BindFramebuffer(m_GaussianFrameBuffer_vert.GetHandle());
+    //for (auto& job : scene.Jobs.SpriteJob) {
+    //    auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
+    //    if (!spriteJob) {
+    //        continue;
+    //    }
+    //    if(!spriteJob->BlurBackground) {
+    //        continue;
+    //    }
+    //    glm::mat4 MVP = VP * spriteJob->Matrix;
+    //    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(MVP));
 
-        glBindVertexArray(spriteJob->Model->VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
-        glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
-    }
+    //    glBindVertexArray(spriteJob->Model->VAO);
+    //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
+    //    glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
+    //}
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 }
 

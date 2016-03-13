@@ -29,6 +29,7 @@ struct SpriteJob : RenderJob
         IncandescenceTexture = CommonFunctions::TryLoadResource<TextureSprite, true>(cSprite["GlowMap"]);
 
         Linear = (bool)cSprite["Linear"];
+		ClampToBorder = (bool)cSprite["ClampToBorder"];
 
         StartIndex = matProp.material->StartIndex;
         EndIndex = matProp.material->EndIndex;
@@ -93,6 +94,7 @@ struct SpriteJob : RenderJob
     float ScaleX = 1.f;
     float ScaleY = 1.f;
     bool Linear = false;
+	bool ClampToBorder = false;
 
     glm::vec4 FillColor = glm::vec4(0);
     float FillPercentage = 0.0;

@@ -1,5 +1,6 @@
 #version 430
 uniform mat4 PVM;
+uniform mat4 VM;
 #define MAX_SPLITS 4
 uniform mat4 TIM;
 
@@ -17,6 +18,7 @@ layout(location = 4) in vec2 TextureCoords;
 
 out VertexData{
 	vec3 Position;
+	vec4 ViewSpacePosition;
 	vec3 Normal;
 	vec3 Tangent;
 	vec3 BiTangent;
@@ -31,6 +33,7 @@ void main()
 	gl_Position = PVM * vec4(Position, 1.0);
 	//mat4 TIM = transpose(inverse(M));
 	Output.Position = Position;
+	Output.ViewSpacePosition = VM * vec4(Position, 1.0);
 	Output.TextureCoordinate = TextureCoords;
 	Output.Normal = vec3(TIM * vec4(Normal, 0.0));
 	Output.Tangent = vec3(TIM * vec4(Tangent, 0.0));
