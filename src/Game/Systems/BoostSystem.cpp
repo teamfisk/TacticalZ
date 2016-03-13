@@ -8,21 +8,18 @@ BoostSystem::BoostSystem(SystemParams params)
 
 bool BoostSystem::OnPlayerDamage(Events::PlayerDamage& e)
 {
-    if (e.Victim.ID == e.Inflictor.ID) {
+    if (!IsServer) {
         return false;
     }
 
-    if (!e.Victim.Valid() || !LocalPlayer.Valid()) {
+    if (e.Victim == e.Inflictor) {
         return false;
     }
 
-    if (e.Victim != LocalPlayer && !e.Victim.IsChildOf(LocalPlayer)) {
+    if (!e.Victim.Valid() || !e.Inflictor.Valid()) {
         return false;
     }
 
-    if (!e.Inflictor.Valid()) {
-        return false;
-    }
 
     //if its not friendly fire, return
     if ((int)m_World->GetComponent(e.Inflictor.ID, "Team")["Team"] != (int)m_World->GetComponent(e.Victim.ID, "Team")["Team"]) {
@@ -86,7 +83,7 @@ void BoostSystem::giveAmmo(EntityWrapper giver, EntityWrapper receiver)
         int maxAmmo = receiver["AssaultWeapon"]["MaxAmmo"];
         Field<int> ammo = receiver["AssaultWeapon"]["Ammo"];
 
-        int givenAmmo = 3;
+        int givenAmmo = 20;
 
         magazineAmmo = glm::clamp(magazineAmmo + givenAmmo, 0, magazineSize);
         if (magazineAmmo > prevMagazineAmmo) {
@@ -102,7 +99,7 @@ void BoostSystem::giveAmmo(EntityWrapper giver, EntityWrapper receiver)
         int maxAmmo = receiver["DefenderWeapon"]["MaxAmmo"];
         Field<int> ammo = receiver["DefenderWeapon"]["Ammo"];
 
-        int givenAmmo = 1;
+        int givenAmmo = 3;
 
         magazineAmmo = glm::clamp(magazineAmmo + givenAmmo, 0, magazineSize);
         if (magazineAmmo > prevMagazineAmmo) {
