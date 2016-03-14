@@ -8,6 +8,7 @@
     </c:BlendAdditive>
     <c:Model>
       <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
+      <Shadow>false</Shadow>
     </c:Model>
     <c:Transform/>
   </Components>
@@ -86,7 +87,7 @@
           <BoneName>R_Ammo_Joint</BoneName>
         </c:BoneAttachment>
         <c:Transform>
-          <Position X="0.109812573" Y="-0.0832190216" Z="-0.373473197"/>
+          <Position X="0.109812573" Y="-0.0832190216" Z="-0.373473227"/>
           <Orientation X="0.00118373742" Y="0.077411525" Z="0.00458352407"/>
           <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
         </c:Transform>
@@ -183,9 +184,10 @@
             <c:Model>
               <GlowIntensity>1.5</GlowIntensity>
               <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
+              <Shadow>false</Shadow>
             </c:Model>
             <c:Transform>
-              <Position X="0.18578662" Y="-0.216220587" Z="-0.382728696"/>
+              <Position X="0.18578662" Y="-0.216220587" Z="-0.382728726"/>
               <Orientation X="0.010279973" Y="-0.00312555139" Z="0.0428142436"/>
             </c:Transform>
           </Components>
@@ -204,10 +206,19 @@
         <Entity name="Muzzle">
           <Components>
             <c:Transform>
-              <Position X="0.196999997" Y="-0.116999999" Z="-0.668634355"/>
+              <Position X="0.192775041" Y="-0.117133088" Z="-0.647809923"/>
             </c:Transform>
           </Components>
           <Children>
+            <Entity name="WeaponMuzzleRay">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/RaySideArmBlue.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
             <Entity name="WeaponMuzzleFlash">
               <Components>
                 <c:Spawner>
@@ -215,17 +226,6 @@
                 </c:Spawner>
                 <c:Transform>
                   <Scale X="0.5" Y="0.5" Z="0.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="WeaponMuzzleRay">
-              <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/RaySideArmBlue.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform>
-                  <Position X="0" Y="0" Z="-0.155000001"/>
                 </c:Transform>
               </Components>
               <Children/>

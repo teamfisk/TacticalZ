@@ -235,7 +235,8 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         float distance = traceRayDistance(origin, direction);
         EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner, tracerSpawner);
         if (ray.Valid()) {
-            ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance);
+            ((Field<glm::vec3>)ray["Transform"]["Scale"]).x(distance);
+            ((Field<glm::vec3>)ray["Transform"]["Position"]).z(-distance/2.f);
         }
     }
     //MuzzleFlash
