@@ -2,11 +2,21 @@
 
 Texture::Texture(std::string path)
 {
-    PNG* img = ResourceManager::Load<PNG, true>(path); //TODO: Make this threaded. Catch exeptions in all other load places.
+    std::string ext = boost::filesystem::path(path).extension().string();
+    Image* img;
+    if (ext == ".png") {
+        img = ResourceManager::Load<PNG, true>(path);
+		m_Type = TextureType::cPNG;
+    } else if (ext == ".dds") {
+        img = ResourceManager::Load<DDS, true>(path);
+		m_Type = TextureType::cDDS;
+    } else {
+		m_Type = TextureType::cInvalid;
+        throw Resource::FailedLoadingException("Texture extension is not .png nor .dds");
+    }
 
     this->Width = img->Width;
     this->Height = img->Height;
-    this->Data = img->Data;
 
     GLint format;
     switch (img->Format) {
@@ -17,20 +27,59 @@ Texture::Texture(std::string path)
         format = GL_RGBA;
         break;
     }
-   
+
+	//Master hade PNG release here...
+
     // Construct the OpenGL texture
     glGenTextures(1, &m_Texture);
     glBindTexture(GL_TEXTURE_2D, m_Texture);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, img->Width, img->Height, 0, format, GL_UNSIGNED_BYTE, img->Data);
-	glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    GLERROR("Texture load");
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    if (!img->Compressed) {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    }
+    unsigned int w = img->Width;
+    unsigned int h = img->Width;
+    unsigned char* data = img->Data;
+    for (int mipLevel = 0; mipLevel < 1 + img->MipMapLevels; mipLevel++) {
+        if (img->Compressed) {
+            //LOG_DEBUG("mipLevel: %i", mipLevel);
+            //LOG_DEBUG("w: %i", w);
+            //LOG_DEBUG("h: %i", h);
 
-    ResourceManager::Release("PNG", path);
+            std::size_t bpe = 16;
+            std::size_t numBlocksWide = std::max<std::size_t>(1, (w + 3) / 4);
+            std::size_t numBlocksHigh = std::max<std::size_t>(1, (h + 3) / 4);
+            std::size_t rowBytes = numBlocksWide * bpe;
+            std::size_t numRows = numBlocksHigh;
+            std::size_t numBytes = rowBytes * numBlocksHigh;
+            //LOG_DEBUG("numBytes: %i", numBytes);
+            glCompressedTexImage2D(GL_TEXTURE_2D, mipLevel, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, w, h, 0, numBytes, data);
+            data += numBytes;
+        } else {
+            glTexImage2D(GL_TEXTURE_2D, mipLevel, format, img->Width, img->Height, 0, format, GL_UNSIGNED_BYTE, img->Data);
+        }
+
+        w = w >> 1;
+        h = h >> 1;
+    }
+    //LOG_DEBUG("REMAINDER: %i", img->ByteSize - (data - img->Data));
+    // Generate mipmaps if the image file doesn't contain them
+    if (img->MipMapLevels == 0) {
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+
+    if (ext == ".png") {
+        ResourceManager::Release("PNG", path);
+    } else if (ext == ".dds") {
+        ResourceManager::Release("DDS", path);
+    }
+
+    if (GLERROR("Texture load")) {
+        throw Resource::FailedLoadingException("GL texture generation failed");
+    }
 }
 
 Texture::~Texture()

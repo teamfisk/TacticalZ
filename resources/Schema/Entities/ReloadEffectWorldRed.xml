@@ -6,12 +6,14 @@
       <Lifetime>2</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
-      <ColorByDistance>true</ColorByDistance>
-      <Velocity X="1.63300014" Y="0.0320000015" Z="0"/>
-      <ExplosionOrigin X="0" Y="0.0790000036" Z="-0.329000026"/>
-      <ExponentialAccelaration>true</ExponentialAccelaration>
-      <EndColor A="0" B="1" G="1" R="19.6078434"/>
+      <Velocity X="1.78000009" Y="0.0320000015" Z="0"/>
+      <ExplosionOrigin X="0" Y="0.142000005" Z="-0.659000039"/>
+      <EndColor A="0" B="19.6078434" G="0.00392156886" R="1.96078432"/>
+      <RandomnessScalar>1.3399996757507324</RandomnessScalar>
       <Randomness>true</Randomness>
+      <ColorByDistance>true</ColorByDistance>
+      <ExponentialAccelaration>true</ExponentialAccelaration>
+      <ColorDistanceScalar>5.0899982452392578</ColorDistanceScalar>
     </c:ExplosionEffect>
     <c:Model>
       <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>

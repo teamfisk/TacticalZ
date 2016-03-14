@@ -11,7 +11,8 @@
 class VertexLayout : public OutputData
 {
 public:
-	bool useWeights = true;
+	bool isCollision = false;
+	bool useWeights = false;
     float Pos[3]{ 0 };
 	float Normal[3]{ 0 };
 	float Tangent[3]{ 0 };
@@ -23,28 +24,31 @@ public:
     virtual void WriteBinary(std::ostream& out)
     {
         out.write((char*)&Pos, sizeof(float) * 3);
-        out.write((char*)&Normal, sizeof(float) * 3);
-        out.write((char*)&Tangent, sizeof(float) * 3);
-        out.write((char*)&BiNormal, sizeof(float) * 3);
-        out.write((char*)&Uv, sizeof(float) * 2);
-		if (useWeights) {
-			out.write((char*)&BoneIndices, sizeof(float) * 4);
-			out.write((char*)&BoneWeights, sizeof(float) * 4);
+		if (!isCollision) {
+			out.write((char*)&Normal, sizeof(float) * 3);
+			out.write((char*)&Tangent, sizeof(float) * 3);
+			out.write((char*)&BiNormal, sizeof(float) * 3);
+			out.write((char*)&Uv, sizeof(float) * 2);
+			if (useWeights) {
+				out.write((char*)&BoneIndices, sizeof(float) * 4);
+				out.write((char*)&BoneWeights, sizeof(float) * 4);
+			}
 		}
     }
 
     virtual void WriteASCII(std::ostream& out) const
     {
         out <<  Pos[0] << " " << Pos[1]  << " " << Pos[2] << endl;
-        out <<  Normal[0] << " " << Normal[1]  << " " << Normal[2] << endl;
-        out <<  Tangent[0] << " " << Tangent[1]  << " " << Tangent[2] << endl;
-        out <<  BiNormal[0] << " " << BiNormal[1]  << " " << BiNormal[2] << endl;
-        out <<  Uv[0] << " " << Uv[1]  << endl;
-		if (useWeights) {
-			out << BoneIndices[0] << " " << BoneIndices[1] << " " << BoneIndices[2] << " " << BoneIndices[3] << endl;
-			out << BoneWeights[0] << " " << BoneWeights[1] << " " << BoneWeights[2] << " " << BoneWeights[3] << endl;
+		if (!isCollision) {
+			out << Normal[0] << " " << Normal[1] << " " << Normal[2] << endl;
+			out << Tangent[0] << " " << Tangent[1] << " " << Tangent[2] << endl;
+			out << BiNormal[0] << " " << BiNormal[1] << " " << BiNormal[2] << endl;
+			out << Uv[0] << " " << Uv[1] << endl;
+			if (useWeights) {
+				out << BoneIndices[0] << " " << BoneIndices[1] << " " << BoneIndices[2] << " " << BoneIndices[3] << endl;
+				out << BoneWeights[0] << " " << BoneWeights[1] << " " << BoneWeights[2] << " " << BoneWeights[3] << endl;
+			}
 		}
-
     }
     bool operator==(const VertexLayout& right)
     {
@@ -62,6 +66,7 @@ public:
 
 class Mesh : public OutputData {
 public:
+	bool isCollison = false;
 	bool hasSkin = false;
     unsigned int NumVertices;
     unsigned int NumIndices;
@@ -70,7 +75,9 @@ public:
 
     virtual void WriteBinary(std::ostream& out)
     {
-		out.write((char*)&hasSkin, sizeof(bool));
+		if (!isCollison) {
+			out.write((char*)&hasSkin, sizeof(bool));
+		}
         out.write((char*)&NumVertices, sizeof(int));
         out.write((char*)&NumIndices, sizeof(int));
         for (auto aVertex : Vertices) {
@@ -86,11 +93,13 @@ public:
     virtual void WriteASCII(std::ostream& out) const
     {
         out << "New Mesh _ not in binary" << endl;
-		out << "hasSkin: ";
-		if(hasSkin)
-			out << "true" << endl;
-		else
-			out << "false" << endl;
+		if (!isCollison) {
+			out << "hasSkin: ";
+			if (hasSkin)
+				out << "true" << endl;
+			else
+				out << "false" << endl;
+		}
         out << "Number of vertices: " << NumVertices << endl;
         out << "number of indices: " << NumIndices << endl;
         int vertexNumber = 0;
@@ -115,7 +124,7 @@ class MeshClass
 {
 public:
     MeshClass();
-    Mesh GetMeshData(MObjectArray Object);
+    Mesh GetMeshData(MObjectArray Object, bool collision = false);
     ~MeshClass();
 private:
     struct WeightInfo {

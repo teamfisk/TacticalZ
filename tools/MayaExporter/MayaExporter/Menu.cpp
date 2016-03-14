@@ -25,6 +25,7 @@ Menu::Menu(QDialog* dialog)
     m_ExportSelectedButton = new QCheckBox(tr("&Export Selected"));
 	m_ExportAnimationsButton = new QCheckBox(tr("&Export Animations"));
 	m_ExportMaterialButton = new QCheckBox(tr("&Export Material"));;
+	m_IsCollision = new QCheckBox(tr("&Export as collision mesh"));
 
 	m_ExportAnimationsButton->setChecked(true);
     m_ExportMaterialButton->setChecked(true);
@@ -32,6 +33,7 @@ Menu::Menu(QDialog* dialog)
     vbox->addWidget(m_ExportSelectedButton);
 	vbox->addWidget(m_ExportAnimationsButton);
 	vbox->addWidget(m_ExportMaterialButton);
+	vbox->addWidget(m_IsCollision);
 
 	vbox->addStretch(1);
 	optionsBox->setLayout(vbox);
@@ -46,6 +48,7 @@ Menu::Menu(QDialog* dialog)
     connect(m_ExportSelectedButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
 	connect(m_ExportAnimationsButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
 	connect(m_ExportMaterialButton, SIGNAL(clicked(bool)), this, SLOT(NULL));
+	connect(m_IsCollision, SIGNAL(clicked(bool)), this, SLOT(NULL));
 
 	// Creating several layouts, adding widgets & adding them to one layout in the end
 	QHBoxLayout* topLayout = new QHBoxLayout;
@@ -163,40 +166,42 @@ void Menu::RemoveClipClicked(bool)
 
 void Menu::ExportAll(bool)
 {
-    if (m_ExportPath->text().isEmpty()) {
-        MGlobal::displayError(MString() + "Please select a folder.");
-        return;
-    }
+	if (m_ExportPath->text().isEmpty()) {
+		MGlobal::displayError(MString() + "Please select a folder.");
+		return;
+	}
 
-    //Export meshes
-    if (!m_Export.Meshes(m_ExportPath->text().toLocal8Bit().constData(), m_ExportSelectedButton->isChecked())) {
-        MGlobal::displayError(MString() + "Could not export mesh");
-        return;
-    }
+	//Export meshes
+	if (!m_Export.Meshes(m_ExportPath->text().toLocal8Bit().constData(), m_ExportSelectedButton->isChecked(), m_IsCollision->isChecked())) {
+		MGlobal::displayError(MString() + "Could not export mesh");
+		return;
+	}
 
-    if (m_ExportMaterialButton->isChecked()) {
-        if (!m_Export.Materials(m_ExportPath->text().toLocal8Bit().constData())) {
-            MGlobal::displayError(MString() + "Could not export materials");
-            return;
-        }
-    }
+	if (!m_IsCollision->isChecked()){
+		if (m_ExportMaterialButton->isChecked()) {
+			if (!m_Export.Materials(m_ExportPath->text().toLocal8Bit().constData())) {
+				MGlobal::displayError(MString() + "Could not export materials");
+				return;
+			}
+		}
 
-    std::vector<Export::AnimationInfo> animations;
-    for (unsigned int i = 0; i < m_AnimationClipName.size(); i++) {
-        Export::AnimationInfo thisClip;
-        thisClip.Name = std::string(m_AnimationClipName[i]->text().toLocal8Bit().constData());
-        thisClip.Start = m_StartFrameLines[i]->text().toInt();
-        thisClip.End = m_EndFrameLines[i]->text().toInt();
+		std::vector<Export::AnimationInfo> animations;
+		for (unsigned int i = 0; i < m_AnimationClipName.size(); i++) {
+			Export::AnimationInfo thisClip;
+			thisClip.Name = std::string(m_AnimationClipName[i]->text().toLocal8Bit().constData());
+			thisClip.Start = m_StartFrameLines[i]->text().toInt();
+			thisClip.End = m_EndFrameLines[i]->text().toInt();
 
-        animations.push_back(thisClip);
-    }
-    if (m_ExportAnimationsButton->isChecked()) {
-        //Export Animations
-        if (!m_Export.Animations(m_ExportPath->text().toLocal8Bit().constData(), animations)) {
-            MGlobal::displayError(MString() + "Could not export animations");
-            return;
-        }
-    }
+			animations.push_back(thisClip);
+		}
+		if (m_ExportAnimationsButton->isChecked()) {
+			//Export Animations
+			if (!m_Export.Animations(m_ExportPath->text().toLocal8Bit().constData(), animations)) {
+				MGlobal::displayError(MString() + "Could not export animations");
+				return;
+			}
+		}
+	}
 }
 
 void Menu::CancelClicked(bool)

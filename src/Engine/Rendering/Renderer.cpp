@@ -75,7 +75,7 @@ void Renderer::InitializeWindow()
         //glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
         //glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
         glfwWindowHint(GLFW_DECORATED, false);
-        glfwWindowHint(GLFW_AUTO_ICONIFY, false);
+        //glfwWindowHint(GLFW_AUTO_ICONIFY, false);
 	}
 
     //glfwWindowHint(GLFW_SAMPLES, 8);
@@ -167,17 +167,21 @@ void Renderer::Draw(RenderFrame& frame)
 {
     GLERROR("PRE");
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#ifdef DEBUG
     ImGui::Combo("Draw textures", &m_DebugTextureToDraw, "Final\0Scene\0Bloom\0Gaussian\0Picking\0Ambient Occlusion\0Combined Scene Texture\0Full Blurred Texture");
     ImGui::Combo("CubeMap", &m_CubeMapTexture, "Nevada(512)\0Sky(1024)");
+#endif
     if(m_CubeMapTexture == 0) {
         m_CubeMapPass->LoadTextures("Nevada");
     } else if (m_CubeMapTexture == 1) {
         m_CubeMapPass->LoadTextures("Sky");
     }
 
+#ifdef DEBUG
 	ImGui::SliderInt("SSAO Quality", &m_SSAO_Quality, 0, 3);
 	ImGui::SliderInt("Glow Quality", &m_GLOW_Quality, 0, 3);
 	ImGui::SliderInt("MSAA Level", (int*)&m_MSAA_Level, 0, 16);
+#endif
 	m_SSAOPass->ChangeQuality(m_SSAO_Quality);
 	m_DrawBloomPass->ChangeQuality(m_GLOW_Quality);
 	m_DrawFinalPass->setMSAA(m_MSAA_Level);

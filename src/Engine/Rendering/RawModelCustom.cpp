@@ -11,6 +11,7 @@ RawModelCustom::RawModelCustom(std::string fileName)
     ReadMeshFile(fileName);
     ReadMaterialFile(fileName);
     ReadAnimationFile(fileName);
+	ReadCollisionFile(fileName);
 }
 
 void RawModelCustom::ReadMeshFile(std::string filePath)
@@ -71,11 +72,11 @@ void RawModelCustom::ReadVertices(std::size_t& offset, char* fileData, const uns
 		memcpy(&m_SkinedVertices[0], fileData + offset, m_SkinedVertices.size() * sizeof(SkinedVertex));
 		offset += m_SkinedVertices.size() * sizeof(SkinedVertex);
 	} else {
-		if (offset + m_Vertices.size() * sizeof(Vertex) > fileByteSize) {
+		if (offset + m_Vertices.size() * sizeof(RenderVertex) > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading vertices failed");
 		}
-		memcpy(&m_Vertices[0], fileData + offset, m_Vertices.size() * sizeof(Vertex));
-		offset += m_Vertices.size() * sizeof(Vertex);
+		memcpy(&m_Vertices[0], fileData + offset, m_Vertices.size() * sizeof(RenderVertex));
+		offset += m_Vertices.size() * sizeof(RenderVertex);
 	}
 #else
 #endif
@@ -286,7 +287,7 @@ void RawModelCustom::ReadMaterialTextureProperties(RawModelCustom::TextureProper
 		}
 		texture.TexturePath = "Textures/";
 		texture.TexturePath += (fileData + offset);
-		texture.TexturePath += ".png";
+		texture.TexturePath += ".dds";
 		offset += nameLength;
 		if (offset + sizeof(glm::vec2) > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading Material texture UVTiling failed");
@@ -491,14 +492,90 @@ void RawModelCustom::ReadAnimationKeyFrame(std::size_t& offset, char* fileData, 
 
 }
 
+void RawModelCustom::ReadCollisionFile(std::string filePath) {
+	char* fileData;
+	filePath += ".colli";
+	std::ifstream in(filePath.c_str(), std::ios_base::binary | std::ios_base::ate);
+
+	if (!in.is_open()) {
+		return;
+	}
+	unsigned int fileByteSize = static_cast<unsigned int>(in.tellg());
+	in.seekg(0, std::ios_base::beg);
+
+	fileData = new char[fileByteSize];
+	in.read(fileData, fileByteSize);
+	in.close();
+
+	std::size_t offset = 0;
+	if (fileByteSize > 0) {
+		ReadCollisionFileData(offset, fileData, fileByteSize);
+	}
+	hasCollisionMesh = true;
+	delete[] fileData;
+}
+
+const std::vector<glm::vec3>& RawModelCustom::CollisionVertices() {
+	if (hasCollisionMesh) {
+		return m_CollisionVertices;
+	}
+	else if (hasSkin) {
+        // We don't do collisions against skinned meshes now.
+        m_CollisionVertices = std::vector<glm::vec3>();
+		return m_CollisionVertices;
+	}
+	else {
+		return ConstructCollisionList();
+	}
+};
+
+void RawModelCustom::ReadCollisionFileData(std::size_t& offset, char* fileData, const unsigned int& fileByteSize){
+		m_CollisionVertices.resize(static_cast<std::size_t>(*(unsigned int*)(fileData + offset)));
+		offset += sizeof(unsigned int);
+		m_CollisionIndices.resize(static_cast<std::size_t>(*(unsigned int*)(fileData + offset)));
+		offset += sizeof(unsigned int);
+
+		if (offset + m_CollisionVertices.size() * sizeof(glm::vec3) > fileByteSize) {
+			throw Resource::FailedLoadingException("Reading collision vertices failed");
+		}
+		memcpy(&m_CollisionVertices[0], fileData + offset, m_CollisionVertices.size() * sizeof(glm::vec3));
+		offset += m_CollisionVertices.size() * sizeof(glm::vec3);
+
+		if (offset + m_CollisionIndices.size() * sizeof(unsigned int) > fileByteSize) {
+			throw Resource::FailedLoadingException("Reading collision indices failed");
+		}
+		memcpy(&m_CollisionIndices[0], fileData + offset, m_CollisionIndices.size() * sizeof(unsigned int));
+		offset += m_CollisionIndices.size() * sizeof(unsigned int);
+}
+
+const std::vector<glm::vec3>& RawModelCustom::ConstructCollisionList()
+{
+	if (!hasCollisionMesh && m_CollisionVertices.size() == 0) {
+		if (hasSkin) {
+			m_CollisionVertices.reserve(m_SkinedVertices.size());
+			for (const auto& vertex : m_SkinedVertices) {
+				m_CollisionVertices.push_back(vertex.Position);
+			}
+		} else {
+			m_CollisionVertices.reserve(m_Vertices.size());
+			for (const auto& vertex : m_Vertices) {
+				m_CollisionVertices.push_back(vertex.Position);
+			}
+		}
+	}
+
+	return m_CollisionVertices;
+}
+
 RawModelCustom::~RawModelCustom()
 {
-    if (m_Skeleton != nullptr) {
-        delete m_Skeleton;
-    }
-	for (auto material : m_Materials) {
-		delete material.material;
-	}
+    // Ownership of skeleton and materials get transferred to Model
+ //   if (m_Skeleton != nullptr) {
+ //       delete m_Skeleton;
+ //   }
+	//for (auto material : m_Materials) {
+	//	delete material.material;
+	//}
 }
 
 #endif
