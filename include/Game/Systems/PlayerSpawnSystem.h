@@ -19,9 +19,9 @@ private:
     enum class PlayerClass
     {
         None = 0,
-        Assault,
-        Defender,
-        Sniper
+        Assault = 1,
+        Defender = 2,
+        Sniper = 2
     };
     struct SpawnRequest
     {

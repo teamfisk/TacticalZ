@@ -173,6 +173,9 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::RemoveWorld:
         parseRemoveWorld(packet);
         break;
+    case MessageType::KD:
+        parseKDEvent(packet);
+        break;
     default:
         break;
     }
@@ -354,6 +357,22 @@ void Client::parseRemoveWorld(Packet & packet)
 {
     removeWorld();
     Events::Reset e;
+    m_EventBroker->Publish(e);
+}
+
+void Client::parseKDEvent(Packet & packet)
+{
+    Events::KillDeath e;
+    e.Casualty = packet.ReadPrimitive<int>();
+    e.CasualtyClass = packet.ReadPrimitive<int>();
+    e.CasualtyName = packet.ReadString();
+    e.CasualtyTeam = packet.ReadPrimitive<int>();
+
+    e.Killer = packet.ReadPrimitive<int>();
+    e.KillerClass = packet.ReadPrimitive<int>();
+    e.KillerName = packet.ReadString();
+    e.KillerTeam = packet.ReadPrimitive<int>();
+
     m_EventBroker->Publish(e);
 }
 

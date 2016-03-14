@@ -6,11 +6,15 @@
 	<BaseDamage>20</BaseDamage>
 	<RPM>500</RPM>
 	<Automatic>false</Automatic>
-	<ViewPunch>0.01</ViewPunch>
-	<ReloadTime>0.5</ReloadTime>
+	<ViewPunch>0.05</ViewPunch>
+	<MaxTravelAngle>0.174533</MaxTravelAngle> <!-- 0.174533 = 10 degrees -->
+	<ViewReturnSpeed>0.2</ViewReturnSpeed>
+	<ReloadTime>1.0</ReloadTime>
 	<EquipTime>0.5</EquipTime>
 	<TriggerHeld>false</TriggerHeld>
 	<FireCooldown>0</FireCooldown>
+	<ReloadQueued>false</ReloadQueued>
 	<IsReloading>false</IsReloading>
 	<ReloadTimer>0</ReloadTimer>
+	<CurrentTravel>0</CurrentTravel>	
 </SidearmWeapon>

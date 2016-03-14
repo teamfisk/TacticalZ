@@ -36,6 +36,12 @@
 				<xs:element name="ViewPunch" type="t:float" minOccurs="0">
 					<xs:annotation><xs:documentation>View punch in radians for each shell fired</xs:documentation></xs:annotation>
 				</xs:element>
+				<xs:element name="MaxTravelAngle" type="t:float" minOccurs="0">
+					<xs:annotation><xs:documentation>Maximum vertical aim travel angle in radians</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="ViewReturnSpeed" type="t:float" minOccurs="0">
+					<xs:annotation><xs:documentation>The speed in radians per second the view returns to its original position after being punched</xs:documentation></xs:annotation>
+				</xs:element>
 				<xs:element name="ReloadTime" type="t:double" minOccurs="0">
 					<xs:annotation><xs:documentation>Time it takes to load ONE SHELL into the weapon in seconds</xs:documentation></xs:annotation>
 				</xs:element>
@@ -44,8 +50,10 @@
 				</xs:element>
 				<xs:element name="TriggerHeld" type="t:bool" minOccurs="0"/>
 				<xs:element name="FireCooldown" type="t:double" minOccurs="0"/>
+				<xs:element name="ReloadQueued" type="t:bool" minOccurs="0"/>
 				<xs:element name="IsReloading" type="t:bool" minOccurs="0"/>
 				<xs:element name="ReloadTimer" type="t:double" minOccurs="0"/>
+				<xs:element name="CurrentTravel" type="t:float" minOccurs="0"/>
 			</xs:all>
 		</xs:complexType>
 	</xs:element>

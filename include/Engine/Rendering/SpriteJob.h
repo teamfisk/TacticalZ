@@ -21,7 +21,7 @@ struct SpriteJob : RenderJob
     SpriteJob(ComponentWrapper cSprite, Camera* camera, glm::mat4 matrix, World* world, glm::vec4 fillColor, float fillPercentage, bool depthSorted, bool isIndicator)
         : RenderJob()
     {
-        Model = ResourceManager::Load<::Model>((std::string)cSprite["Model"]);
+        Model = ResourceManager::Load<::Model>(cSprite["Model"]);
         ::RawModel::MaterialProperties matProp = Model->MaterialGroups().front();
         TextureID = 0;
 
@@ -55,7 +55,7 @@ struct SpriteJob : RenderJob
 
         if((bool)cSprite["KeepRatio"] == true) {
             if(scale.y >= scale.x) {
-                ScaleY = (scale.x)/(scale.y);
+                ScaleY = (scale.y)/(scale.x);
                 ScaleX = 1.f;
             } else {
                 ScaleY = 1.f;
@@ -91,8 +91,8 @@ struct SpriteJob : RenderJob
     bool Pickable;
 	bool IsIndicator = false;
     bool BlurBackground = false;
-    float ScaleX = 1;
-    float ScaleY = 1;
+    float ScaleX = 1.f;
+    float ScaleY = 1.f;
     bool Linear = false;
 	bool ClampToBorder = false;
 

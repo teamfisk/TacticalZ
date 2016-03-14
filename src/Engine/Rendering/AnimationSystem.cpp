@@ -76,18 +76,18 @@ void AnimationSystem::UpdateAnimations(double dt)
             Field<std::string> res = modelEntity["Model"]["Resource"];
             model = ResourceManager::Load<::Model, true>(res);
         } catch (const std::exception&) {
-            return;
+            continue;
         }
 
         Skeleton* skeleton = model->m_RawModel->m_Skeleton;
         if (skeleton == nullptr) {
-            return;
+            continue;
         }
 
         const Skeleton::Animation* animation = skeleton->GetAnimation(animationC["AnimationName"]);
 
         if (animation == nullptr) {
-            continue;;
+            continue;
         }
 
         double animationSpeed = (const double&)animationC["Speed"];
@@ -128,8 +128,8 @@ void AnimationSystem::UpdateAnimations(double dt)
 void AnimationSystem::UpdateWeights(double dt)
 {
     for (auto it = m_AutoBlendQueues.begin(); it != m_AutoBlendQueues.end(); ) {
-       /* LOG_INFO("%s", it->first.Name().c_str());
-        it->second.PrintQueue();*/
+        //LOG_INFO("%s", it->first.Name().c_str());
+        //it->second.PrintQueue();
         
         if(it->second.HasActiveBlendJob()) {
             AutoBlendQueue::AutoBlendJob& blendJob = it->second.GetActiveBlendJob();
@@ -159,12 +159,13 @@ void AnimationSystem::UpdateWeights(double dt)
 
 bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
 {
-
     if (!e.RootNode.Valid()) {
+        LOG_ERROR("%s, RootNode invalid %s", e.NodeName, e.RootNode.Name().c_str());
         return false;
     }
 
     if (!e.RootNode.HasComponent("Model")) {
+        LOG_ERROR("%s, RootNode has no model %s", e.NodeName, e.RootNode.Name().c_str());
         return false;
     }
 
@@ -172,11 +173,13 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
     try {
         model = ResourceManager::Load<::Model, true>((std::string)e.RootNode["Model"]["Resource"]);
     } catch (const std::exception&) {
+        LOG_ERROR("%s, RootNode model not finished loading %s", e.NodeName, e.RootNode.Name().c_str());
         return false;
     }
 
     Skeleton* skeleton = model->m_RawModel->m_Skeleton;
     if (skeleton == nullptr) {
+        LOG_ERROR("%s, RootNode skeleton invalid %s", e.NodeName, e.RootNode.Name().c_str());
         return false;
     }
 
@@ -184,6 +187,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
     if (skeleton->BlendTrees.find(e.RootNode) != skeleton->BlendTrees.end()) {
         blendTree = skeleton->BlendTrees.at(e.RootNode);
     } else {
+        LOG_ERROR("%s, No blendtree was found invalid %s", e.NodeName, e.RootNode.Name().c_str());
         return false;
     }
 
@@ -194,6 +198,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
         subTreeRoot = blendTree->GetSubTreeRoot(e.NodeName);
 
         if (!subTreeRoot.Valid()) {
+            LOG_ERROR("%s, subTreeRoot invalid", e.NodeName);
             return false;
         }
 
@@ -238,6 +243,7 @@ bool AnimationSystem::OnAutoAnimationBlend(Events::AutoAnimationBlend& e)
             subTreeRoot = entity;
 
             if (!subTreeRoot.Valid()) {
+                LOG_ERROR("%s, subTreeRoot invalid", e.NodeName);
                 return false;
             }
 

@@ -9,14 +9,23 @@ SpawnerSystem::SpawnerSystem(SystemParams params)
 
 EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /*= EntityWrapper::Invalid*/, const std::string& dontCollideComponent)
 {
+    // Load the entity file and parse it
+    const std::string& entityFilePath = spawner["Spawner"]["EntityFile"];
+    if (!entityFilePath.empty()) {
+        return SpawnEntityFile(entityFilePath, spawner, parent, dontCollideComponent);
+    } else {
+        return EntityWrapper::Invalid;
+    }
+}
+
+EntityWrapper SpawnerSystem::SpawnEntityFile(const std::string& entityFilePath, EntityWrapper spawner, EntityWrapper parent /*= EntityWrapper::Invalid*/, const std::string& dontCollideComponent /*= ""*/)
+{
     // Spawn the entity in the parent's world if it exists, otherwise in the spawner's world
     World* world = parent.World;
     if (world == nullptr) {
         world = spawner.World;
     } 
 
-    // Load the entity file and parse it
-    const std::string& entityFilePath = spawner["Spawner"]["EntityFile"];
     EntityWrapper spawnedEntity;
     try {
         auto entityFile = ResourceManager::Load<EntityFile>(entityFilePath);
@@ -39,7 +48,7 @@ EntityWrapper SpawnerSystem::Spawn(EntityWrapper spawner, EntityWrapper parent /
 
     // Find any SpawnPoints existing as children of spawner
     auto children = spawner.World->GetDirectChildren(spawner.ID);
-    std::vector<EntityWrapper> spawnPoints;
+    std::list<EntityWrapper> spawnPoints;
     for (auto kv = children.first; kv != children.second; ++kv) {
         const EntityID& child = kv->second;
         if (spawner.World->HasComponent(child, "SpawnPoint")) {

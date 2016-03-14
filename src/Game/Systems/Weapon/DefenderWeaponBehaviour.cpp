@@ -10,6 +10,7 @@ void DefenderWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWr
 
 void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
+    CheckBoost(cWeapon, wi);
     // Decrement reload timer
     Field<double> reloadTimer = cWeapon["ReloadTimer"];
     reloadTimer = glm::max(0.0, reloadTimer - dt);
@@ -37,6 +38,16 @@ void DefenderWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo&
         } else {
             isReloading = false;
             playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "ReloadEnd");
+
+            if (wi.ThirdPersonPlayerModel.Valid()) {
+                Events::AutoAnimationBlend eFireIdle;
+                eFireIdle.Duration = 0.2;
+                eFireIdle.RootNode = wi.ThirdPersonPlayerModel;
+                eFireIdle.NodeName = "Fire";
+                eFireIdle.Start = false;
+                m_EventBroker->Publish(eFireIdle);
+            }
+
         }
     }
 
@@ -92,7 +103,7 @@ void DefenderWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
     }
 
     double reloadTime = cWeapon["ReloadTime"];
-    Field<double> reloadTimer = cWeapon["ReloadTimer"];
+    Field<double>  reloadTimer = cWeapon["ReloadTimer"];
    
     // Start reload
     isReloading = true;
@@ -114,6 +125,16 @@ void DefenderWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
         eBlendLoop.AnimationEntity = wi.FirstPersonEntity.FirstChildByName("ReloadStart");
         m_EventBroker->Publish(eBlendLoop);
     }
+
+    if(wi.ThirdPersonPlayerModel.Valid()) {
+        Events::AutoAnimationBlend eReload;
+        eReload.Duration = 0.2;
+        eReload.RootNode = wi.ThirdPersonPlayerModel;
+        eReload.NodeName = "Reload";
+        eReload.Restart = true;
+        eReload.Start = true;
+        m_EventBroker->Publish(eReload);
+    }
 }
 
 void DefenderWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -132,8 +153,35 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
         EntityWrapper attachment = wi.Player.FirstChildByName("ShieldAttachment");
         if (attachment.Valid()) {
             if (e.Value > 0) {
+
+                if(wi.Player.Valid()) {
+                    if(wi.Player.HasComponent("ShieldAbility")) {
+                        (Field<bool>)wi.Player["ShieldAbility"]["Active"] = true;
+                    }
+                }
+
                 if (IsServer) {
                     SpawnerSystem::Spawn(attachment, attachment);
+                }
+
+                EntityWrapper backAttachment = attachment.FirstChildByName("Back");
+                if (backAttachment.Valid()) {
+                    Events::AutoAnimationBlend eDeployShieldAttachement;
+                    eDeployShieldAttachement.RootNode = backAttachment;
+                    eDeployShieldAttachement.NodeName = "Deploy";
+                    eDeployShieldAttachement.Restart = true;
+                    eDeployShieldAttachement.Start = true;
+                    m_EventBroker->Publish(eDeployShieldAttachement);
+                }
+                EntityWrapper frontAttachment = attachment.FirstChildByName("Front");
+                if (frontAttachment.Valid()) {
+                    Events::AutoAnimationBlend eDeployShieldAttachement;
+                    eDeployShieldAttachement.RootNode = frontAttachment;
+                    eDeployShieldAttachement.NodeName = "Deploy";
+                    eDeployShieldAttachement.Restart = true;
+                    eDeployShieldAttachement.Start = true;
+                    m_EventBroker->Publish(eDeployShieldAttachement);
+
                 }
 
                 if (IsClient) {
@@ -141,17 +189,44 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                     if (root.Valid()) {
                         EntityWrapper animationNode = root.FirstChildByName("Shield");
                         if (animationNode.Valid()) {
-                            Events::AutoAnimationBlend eFireBlend;
-                            eFireBlend.RootNode = root;
-                            eFireBlend.NodeName = "Shield";
-                            eFireBlend.Restart = true;
-                            eFireBlend.Start = true;
-                            m_EventBroker->Publish(eFireBlend);
+                            Events::AutoAnimationBlend eShieldBlend;
+                            eShieldBlend.RootNode = root;
+                            eShieldBlend.NodeName = "Shield";
+                            eShieldBlend.Restart = true;
+                            eShieldBlend.Start = true;
+                            m_EventBroker->Publish(eShieldBlend);
+                        }
+                    }
+                } else { // server only
+                    EntityWrapper root = wi.ThirdPersonPlayerModel;
+                    if (root.Valid()) {
+                        Events::AutoAnimationBlend eShieldActivateBlend;
+                        eShieldActivateBlend.RootNode = root;
+                        eShieldActivateBlend.NodeName = "ActivateShield";
+                        eShieldActivateBlend.Restart = true;
+                        eShieldActivateBlend.Start = true;
+                        m_EventBroker->Publish(eShieldActivateBlend);
+
+                        EntityWrapper animationNode = root.FirstChildByName("ActivateShield");
+                        if (animationNode.Valid()) {
+                            Events::AutoAnimationBlend eShieldIdleBlend;
+                            eShieldIdleBlend.RootNode = root;
+                            eShieldIdleBlend.NodeName = "ShieldFront";
+                            eShieldIdleBlend.Restart = true;
+                            eShieldIdleBlend.Start = true;
+                            eShieldIdleBlend.AnimationEntity = animationNode;
+                            m_EventBroker->Publish(eShieldIdleBlend);
                         }
                     }
                 }
             } else {
                 attachment.DeleteChildren();
+
+                if (wi.Player.Valid()) {
+                    if (wi.Player.HasComponent("ShieldAbility")) {
+                        (Field<bool>)wi.Player["ShieldAbility"]["Active"] = false;
+                    }
+                }
 
                 if (IsClient) {
                     EntityWrapper root = wi.FirstPersonEntity;
@@ -166,12 +241,44 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                             m_EventBroker->Publish(eFireBlend);
                         }
                     }
+                } else { // server only
+                    EntityWrapper root = wi.ThirdPersonPlayerModel;
+                    if (root.Valid()) {
+                        Events::AutoAnimationBlend eShieldDeactivateBlend;
+                        eShieldDeactivateBlend.RootNode = root;
+                        eShieldDeactivateBlend.NodeName = "ActivateShield";
+                        eShieldDeactivateBlend.Restart = true;
+                        eShieldDeactivateBlend.Start = true;
+                        eShieldDeactivateBlend.Reverse = true;
+                        m_EventBroker->Publish(eShieldDeactivateBlend);
+
+                        EntityWrapper animationNode = root.FirstChildByName("ActivateShield");
+                        if (animationNode.Valid()) {
+                            Events::AutoAnimationBlend eActionBlend;
+                            eActionBlend.RootNode = root;
+                            eActionBlend.NodeName = "ActionBlend";
+                            eActionBlend.AnimationEntity = animationNode;
+                            m_EventBroker->Publish(eActionBlend);
+                        }
+                    }
                 }
             }
         }
     }
 
     return false;
+}
+
+
+void DefenderWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    if (wi.ThirdPersonPlayerModel.Valid()) {
+        Events::AutoAnimationBlend b1;
+        b1.RootNode = wi.ThirdPersonPlayerModel;
+        b1.NodeName = "DefenderWeapon";
+        b1.SingleLevelBlend = true;
+        m_EventBroker->Publish(b1);
+    }
 }
 
 void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -190,19 +297,31 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
         magAmmo -= 1;
     }
 
-    int numPellets = cWeapon["NumPellets"];
-    float spreadAngle = cWeapon["SpreadAngle"];
-    std::uniform_real_distribution<float> randomSpreadAngle(-spreadAngle, spreadAngle);
-
-    // Calculate pellet angles
-    // HACK: Random for now?
-    // TODO: Make distribution even for each quadrant
-    std::vector<glm::vec2> pelletAngles;
-    for (int i = 0; i < numPellets; i++) {
-        pelletAngles.push_back(glm::vec2(randomSpreadAngle(m_RandomEngine), randomSpreadAngle(m_RandomEngine)));
+    // We can't really do any valuable calculations without a valid camera
+    if (!m_CurrentCamera.Valid()) {
+        return;
     }
 
-    double pelletDamage = (double)cWeapon["BaseDamage"] / numPellets;
+    int numPellets = cWeapon["NumPellets"];
+
+    // Create a spread pattern
+    std::vector<glm::vec2> pattern;
+    // The first pellet is always centered
+    pattern.push_back(glm::vec2(0, 0));
+    // Any additional pellets form circles around the middle
+    int numOuterPellets = numPellets - 1;
+    float angleIncrement = glm::two_pi<float>() / numOuterPellets;
+    for (int i = 0; i < numOuterPellets; ++i) {
+        float angle = angleIncrement * i;
+        glm::vec2 pellet = glm::vec2(glm::cos(angle), glm::sin(angle));
+        pattern.push_back(pellet);
+    }
+
+    // Deal damage (clientside)
+    dealDamage(cWeapon, wi, pattern);
+
+    // Spawn tracers
+    spawnTracers(cWeapon, wi, pattern);
 
     // View punch
     if (IsClient) {
@@ -210,7 +329,7 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
         if (camera.Valid()) {
             Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
             float viewPunch = cWeapon["ViewPunch"];
-            float maxTravelAngle = cWeapon["MaxTravelAngle"];
+            float maxTravelAngle = (const float&)cWeapon["MaxTravelAngle"];
             Field<float> currentTravel = cWeapon["CurrentTravel"];
             if (currentTravel < maxTravelAngle) {
                 float change = viewPunch;
@@ -223,37 +342,9 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
         }
     }
 
-    // Tracers
-    EntityWrapper weaponModelEntity;
-    if (wi.Player == LocalPlayer) {
-        weaponModelEntity = wi.FirstPersonEntity;
-    } else {
-        weaponModelEntity = wi.ThirdPersonEntity;
-    }
-    if (weaponModelEntity.Valid()) {
-        EntityWrapper spawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
-        Events::PlaySoundOnEntity e;
-        e.Emitter = weaponModelEntity;
-        e.FilePath = "Audio/weapon/Shotgun/ShotgunFire.wav";
-        e.Gain = 1.f;
-        if (IsClient) {
-            m_EventBroker->Publish(e);
-        }
-        for (auto& angles : pelletAngles) {
-            glm::vec3 direction = TransformSystem::AbsoluteOrientation(spawner) * glm::quat(glm::vec3(angles, 0.f)) * glm::vec3(0, 0, -1);
-            float distance = traceRayDistance(TransformSystem::AbsolutePosition(spawner), direction);
-            EntityWrapper ray = SpawnerSystem::Spawn(spawner);
-            ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance / 100.f);
-            Field<glm::vec3> orientation = ray["Transform"]["Orientation"];
-            orientation.x(orientation.x() + angles.x);
-            orientation.y(orientation.y() + angles.y);
-            glm::vec3 trajectory = direction * distance;
-            dealDamage(cWeapon, wi, direction, pelletDamage);
-        }
-    }
-
     // Play animation
     playAnimationAndReturn(wi.FirstPersonEntity, "FinalBlend", "Fire");
+    playAnimationAndReturn(wi.ThirdPersonPlayerModel, "FinalBlend", "Fire");
 
     // Sound
     Events::PlaySoundOnEntity e;
@@ -262,7 +353,63 @@ void DefenderWeaponBehaviour::fireShell(ComponentWrapper cWeapon, WeaponInfo& wi
     m_EventBroker->Publish(e);
 }
 
-void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, glm::vec3 direction, double damage)
+void DefenderWeaponBehaviour::spawnTracers(ComponentWrapper cWeapon, WeaponInfo& wi, std::vector<glm::vec2> pattern)
+{
+    EntityWrapper flashSpawner = getRelevantWeaponEntity(wi).FirstChildByName("WeaponMuzzleFlash");
+    if (flashSpawner.Valid()) {
+        std::uniform_real_distribution<float> randomSpreadAngle(0.f, 3.1415f*2);
+        EntityWrapper flash = SpawnerSystem::Spawn(flashSpawner, flashSpawner);
+        if (flash.Valid()) {
+            ((Field<glm::vec3>)flash["Transform"]["Orientation"]).z(randomSpreadAngle(m_RandomEngine));
+        }
+    }
+
+    EntityWrapper muzzle = getRelevantWeaponEntity(wi).FirstChildByName("WeaponMuzzleRay");
+    if (!muzzle.Valid()) {
+        return;
+    }
+
+    EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+    if (!camera.Valid()) {
+        return;
+    }
+
+    float spreadAngle = glm::radians((float)cWeapon["SpreadAngle"]);
+
+    for (auto& pellet : pattern) {
+        glm::quat pelletRotation = glm::quat(TransformSystem::AbsoluteOrientationEuler(camera)) * glm::quat(glm::vec3(pellet.y, pellet.x, 0) * spreadAngle);
+        glm::vec3 cameraPosition = TransformSystem::AbsolutePosition(camera);
+        glm::vec3 direction = pelletRotation * glm::vec3(0, 0, -1);
+
+        float distance;
+        glm::vec3 hitPosition;
+        if (Collision::EntityFirstHitByRay(Ray(cameraPosition, direction), m_CollisionOctree, distance, hitPosition) != boost::none) { // don't spawn ray if you "miss the world"
+
+            EntityWrapper ray = SpawnerSystem::Spawn(muzzle);
+            if (ray.Valid()) {
+                ComponentWrapper cTransform = ray["Transform"];
+                Field<glm::vec3> rayOrigin = cTransform["Position"];
+                Field<glm::vec3> rayOrientation = cTransform["Orientation"];
+                Field<glm::vec3> rayScale = cTransform["Scale"];
+
+                glm::vec3 muzzlePosition = TransformSystem::AbsolutePosition(muzzle);
+                glm::quat muzzleOrientation = TransformSystem::AbsoluteOrientation(muzzle);
+
+                rayOrigin = muzzlePosition;
+
+                glm::vec3 muzzleToHit = hitPosition - muzzlePosition;
+                glm::vec3 lookVector = glm::normalize(-muzzleToHit);
+                float pitch = std::asin(-lookVector.y);
+                float yaw = std::atan2(lookVector.x, lookVector.z);
+                glm::quat orientation = glm::quat(glm::vec3(pitch, yaw, 0));
+                rayOrientation = glm::eulerAngles(orientation);
+                rayScale.x(glm::length(muzzleToHit));
+            }
+        }
+    }
+}
+
+void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi, const std::vector<glm::vec2>& pattern)
 {
     // Only deal damage client side
     if (!IsClient) {
@@ -278,47 +425,76 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
     if (!wi.Player.Valid()) {
         return;
     }
-    
-    glm::vec3 maxRange = direction * 2.f;
-    EntityWrapper camera = wi.Player.FirstChildByName("Camera");
-    glm::vec3 cameraPosition = TransformSystem::AbsolutePosition(camera);
-    if (!camera.Valid()) {
-        return;
-    }
-    Rectangle screenResolution = m_Renderer->GetViewportSize();
-    glm::vec2 centerScreen = glm::vec2(screenResolution.Width / 2, screenResolution.Height / 2);
-    glm::vec2 screenCoords = cameraFromEntity(m_CurrentCamera).WorldToScreen(cameraPosition + maxRange, m_Renderer->GetViewportSize());
-    PickData pickData = m_Renderer->Pick(centerScreen + screenCoords);
-    EntityWrapper victim(m_World, pickData.Entity);
-    if (!victim.Valid()) {
-        return;
+
+    // Convert the spread angle to screen coordinates, taking FOV into account
+    Rectangle res = m_Renderer->GetViewportSize();
+    float spreadAngle = glm::radians((float)cWeapon["SpreadAngle"]);
+    float nearClip = (double)m_CurrentCamera["Camera"]["NearClip"];
+    float farClip = (double)m_CurrentCamera["Camera"]["FarClip"];
+    float yFOV = glm::radians((double)m_CurrentCamera["Camera"]["FOV"]);
+    //float yRefFOV = glm::radians(59.f);
+    //float yRef = glm::tan(yRefFOV) * nearClip;
+    //float yRatio = yRef / (glm::tan(yFOV) * nearClip);
+    //float yMax = (yRatio / 2.f) * spreadAngle * (res.Height / 2.f);
+    float yRefFOV = glm::radians(59.f);
+    float yRef = glm::tan(yRefFOV) * nearClip;
+    float yRatio = yRef / (glm::tan(yFOV) * nearClip);
+    float yMax = yRatio * (glm::tan(spreadAngle) * (farClip - nearClip)) * glm::pi<float>(); // ????? Good enough????
+
+    LOG_DEBUG("Ratio: %f", yRatio);
+    LOG_DEBUG("fatClip: %f", farClip);
+    LOG_DEBUG("yMax: %f", yMax);
+    double pelletDamage = (double)cWeapon["BaseDamage"] / pattern.size();
+
+    // Pick!
+    std::unordered_map<EntityWrapper, double> damageSum;
+    glm::vec2 screenCenter(res.Width / 2.f, res.Height / 2.f);
+    for (auto& pellet : pattern) {
+        glm::vec2 pickCoord = screenCenter + (pellet * glm::vec2(yMax, yMax));
+        PickData pick = m_Renderer->Pick(pickCoord);        
+
+        EntityWrapper victim(m_World, pick.Entity);
+        if (!victim.Valid()) {
+            continue;
+        }
+
+        // Temp hit decal
+        EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
+        (Field<glm::vec3>)hit["Transform"]["Position"] = pick.Position;
+
+        // Don't let us shoot ourselves in the foot somehow
+        if (victim == LocalPlayer) {
+            continue;
+        }
+
+        // Only care about players being hit
+        if (!victim.HasComponent("Player")) {
+            victim = victim.FirstParentWithComponent("Player");
+            if (!victim.Valid()) {
+                continue;
+            }
+        }
+
+        // Check for friendly fire
+        if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
+            // TODO: Ammo sharing
+            continue;
+        }
+
+        damageSum[victim] += pelletDamage;
+        ((Field<glm::vec4>)hit["Model"]["Color"]).z(1.f);
     }
 
-    // Don't let us shoot ourselves in the foot somehow
-    if (victim == LocalPlayer) {
-        return;
+    // Deal damage!
+    for (auto& kv : damageSum) {
+        // Deal damage! 
+        Events::PlayerDamage ePlayerDamage;
+        ePlayerDamage.Inflictor = wi.Player;
+        ePlayerDamage.Victim = kv.first;
+        ePlayerDamage.Damage = kv.second;
+        m_EventBroker->Publish(ePlayerDamage);
+        LOG_DEBUG("Dealt %f damage to #%i", kv.second, kv.first.ID);
     }
-
-    // Only care about players being hit
-    if (!victim.HasComponent("Player")) {
-        victim = victim.FirstParentWithComponent("Player");
-    }
-    if (!victim.Valid()) {
-        return;
-    }
-
-    // Check for friendly fire
-    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
-        return;
-    }
-
-    // Deal damage! 
-    Events::PlayerDamage ePlayerDamage;
-    ePlayerDamage.Inflictor = wi.Player;
-    ePlayerDamage.Victim = victim;
-    ePlayerDamage.Damage = damage;
-    m_EventBroker->Publish(ePlayerDamage);
-    LOG_DEBUG("Damage: %f", damage);
 }
 
 bool DefenderWeaponBehaviour::canFire(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -342,4 +518,149 @@ Camera DefenderWeaponBehaviour::cameraFromEntity(EntityWrapper camera)
     cam.SetPosition(cTransform["Position"]);
     cam.SetOrientation(glm::quat((const glm::vec3&)cTransform["Orientation"]));
     return cam;
+}
+
+void DefenderWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    // Only check ammo client side
+    if (!IsClient) {
+        return;
+    }
+
+    // Only handle ammo check for the local player
+    if (wi.Player != LocalPlayer) {
+        return;
+    }
+
+    // Make sure the player isn't checking from the grave
+    if (!wi.Player.Valid()) {
+        return;
+    }
+
+    // 3D-pick middle of screen
+    Rectangle viewport = m_Renderer->GetViewportSize();
+    glm::vec2 centerScreen(viewport.Width / 2, viewport.Height / 2);
+    // TODO: Some horizontal spread
+    PickData pickData = m_Renderer->Pick(centerScreen);
+    EntityWrapper victim(m_World, pickData.Entity);
+    if (!victim.Valid()) {
+        return;
+    }
+
+    // Don't let us somehow shoot ourselves in the foot
+    if (victim == LocalPlayer) {
+        return;
+    }
+
+    // Only care about players being hit
+    if (!victim.HasComponent("Player")) {
+        victim = victim.FirstParentWithComponent("Player");
+    }
+    if (!victim.Valid()) {
+        return;
+    }
+
+
+    // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
+    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
+
+        EntityWrapper friendlyBoostHudSpawner = wi.FirstPersonPlayerModel.FirstChildByName("FriendlyBoostAttachment");
+        if (friendlyBoostHudSpawner.Valid()) {
+
+            EntityWrapper assaultBoost = victim.FirstChildByName("BoostAssault");
+            EntityWrapper defenderBoost = victim.FirstChildByName("BoostDefender");
+            EntityWrapper sniperBoost = victim.FirstChildByName("BoostSniper");
+
+            auto children = m_World->GetDirectChildren(friendlyBoostHudSpawner.ID);
+
+            if (children.first == children.second) {
+                if (friendlyBoostHudSpawner.HasComponent("Spawner")) {
+
+                    EntityWrapper friendlyBoostHud = SpawnerSystem::Spawn(friendlyBoostHudSpawner, friendlyBoostHudSpawner);
+                    if (friendlyBoostHud.Valid()) {
+                        EntityWrapper assaultBoostEntity = friendlyBoostHud.FirstChildByName("AssaultBoost");
+                        if (assaultBoostEntity.Valid()) {
+                            EntityWrapper active = assaultBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (assaultBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
+                            }
+                        }
+
+                        EntityWrapper defenderBoostEntity = friendlyBoostHud.FirstChildByName("DefenderBoost");
+                        if (defenderBoostEntity.Valid()) {
+                            EntityWrapper active = defenderBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (defenderBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
+                            }
+                        }
+
+                        EntityWrapper sniperBoostEntity = friendlyBoostHud.FirstChildByName("SniperBoost");
+                        if (sniperBoostEntity.Valid()) {
+                            EntityWrapper active = sniperBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (sniperBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                EntityWrapper friendlyBoostHud = friendlyBoostHudSpawner.FirstChildByName("FriendlyBoostHUD");
+                if (friendlyBoostHud.Valid()) {
+                    if (friendlyBoostHud.HasComponent("Lifetime")) {
+                        (Field<double>)friendlyBoostHud["Lifetime"]["Lifetime"] = 0.5;
+                    }
+
+
+
+                    EntityWrapper assaultBoostEntity = friendlyBoostHud.FirstChildByName("AssaultBoost");
+                    if (assaultBoostEntity.Valid()) {
+                        EntityWrapper active = assaultBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (assaultBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+
+                    EntityWrapper defenderBoostEntity = friendlyBoostHud.FirstChildByName("DefenderBoost");
+                    if (defenderBoostEntity.Valid()) {
+                        EntityWrapper active = defenderBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (defenderBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+
+                    EntityWrapper sniperBoostEntity = friendlyBoostHud.FirstChildByName("SniperBoost");
+                    if (sniperBoostEntity.Valid()) {
+                        EntityWrapper active = sniperBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (sniperBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

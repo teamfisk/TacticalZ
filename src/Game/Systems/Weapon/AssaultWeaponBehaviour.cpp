@@ -10,6 +10,7 @@ void AssaultWeaponBehaviour::UpdateComponent(EntityWrapper& entity, ComponentWra
 
 void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt)
 {
+    CheckBoost(cWeapon, wi);
     // Start reloading automatically if at 0 mag ammo
     Field<int> magAmmo = cWeapon["MagazineAmmo"];
     if (m_ConfigAutoReload && magAmmo <= 0) {
@@ -36,8 +37,11 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
         Field<int> magSize = cWeapon["MagazineSize"];
         Field<int> ammo = cWeapon["Ammo"];
 
-        ammo = glm::max(0, ammo - (magSize - magAmmo));
-        magAmmo = glm::min(*magSize, *ammo);
+        int usedAmmo = glm::max(0, *magSize - *magAmmo);
+        magAmmo = glm::clamp(*ammo + *magAmmo, 0, *magSize);
+        ammo = glm::max(0, *ammo - usedAmmo);
+        
+        
         isReloading = false;
         if (wi.FirstPersonEntity.Valid()) {
             wi.FirstPersonEntity.FirstChildByName("ViewModel")["Model"]["Visible"] = true;
@@ -74,7 +78,7 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     float animationWeight = glm::min(speed, movementSpeed) / movementSpeed;
     EntityWrapper rootNode = wi.FirstPersonEntity;
     if (rootNode.Valid()) {
-        EntityWrapper blend = rootNode.FirstChildByName("MovementBlend");
+        EntityWrapper blend = rootNode.FirstChildByName("MovementBlendAssault");
         if (blend.Valid()) {
             (Field<double>)blend["Blend"]["Weight"] = animationWeight;
         }
@@ -166,6 +170,14 @@ void AssaultWeaponBehaviour::OnReload(ComponentWrapper cWeapon, WeaponInfo& wi)
 void AssaultWeaponBehaviour::OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi)
 {
     cWeapon["FireCooldown"] = (double)cWeapon["EquipTime"];
+
+    if (wi.ThirdPersonPlayerModel.Valid()) {
+        Events::AutoAnimationBlend b1;
+        b1.RootNode = wi.ThirdPersonPlayerModel;
+        b1.NodeName = "AssaultWeapon";
+        b1.SingleLevelBlend = true;
+        m_EventBroker->Publish(b1);
+    }
 }
 
 void AssaultWeaponBehaviour::OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi)
@@ -216,14 +228,23 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
     }
 
     // Tracer
-    EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzle");
+    EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzleRay");
     if (tracerSpawner.Valid()) {
         glm::vec3 origin = TransformSystem::AbsolutePosition(tracerSpawner);
         glm::vec3 direction = glm::quat(TransformSystem::AbsoluteOrientationEuler(tracerSpawner)) * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
-        EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner);
+        EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner, tracerSpawner);
         if (ray.Valid()) {
             ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance);
+        }
+    }
+    //MuzzleFlash
+    EntityWrapper muzzleFlashSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzleFlash");
+    if (muzzleFlashSpawner.Valid()) {
+        std::uniform_real_distribution<float> randomSpreadAngle(0.f, 3.1415f*2);
+        EntityWrapper flash = SpawnerSystem::Spawn(muzzleFlashSpawner, muzzleFlashSpawner);
+        if (flash.Valid()) {
+            ((Field<glm::vec3>)flash["Transform"]["Orientation"]).z(randomSpreadAngle(m_RandomEngine));
         }
     }
 
@@ -237,6 +258,25 @@ void AssaultWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
             e.Emitter = wi.Player;
             e.FilePath = "Audio/weapon/hitclick.wav";
             m_EventBroker->Publish(e);
+        }
+    }
+
+    // View punch
+    if (IsClient) {
+        EntityWrapper camera = wi.Player.FirstChildByName("Camera");
+        if (camera.Valid()) {
+            Field<glm::vec3> cameraOrientation = camera["Transform"]["Orientation"];
+            float viewPunch = cWeapon["ViewPunch"];
+            float maxTravelAngle = cWeapon["MaxTravelAngle"];
+            Field<float> currentTravel = cWeapon["CurrentTravel"];
+            if (currentTravel < maxTravelAngle) {
+                float change = viewPunch;
+                if (currentTravel + change > maxTravelAngle) {
+                    change = maxTravelAngle - currentTravel;
+                }
+                cameraOrientation.x(cameraOrientation.x() + change);
+                currentTravel += change;
+            }
         }
     }
     
@@ -321,3 +361,149 @@ bool AssaultWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi
 
     return damage > 0;
 }
+
+void AssaultWeaponBehaviour::CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi)
+{
+    // Only check ammo client side
+    if (!IsClient) {
+        return;
+    }
+
+    // Only handle ammo check for the local player
+    if (wi.Player != LocalPlayer) {
+        return;
+    }
+
+    // Make sure the player isn't checking from the grave
+    if (!wi.Player.Valid()) {
+        return;
+    }
+
+    // 3D-pick middle of screen
+    Rectangle viewport = m_Renderer->GetViewportSize();
+    glm::vec2 centerScreen(viewport.Width / 2, viewport.Height / 2);
+    // TODO: Some horizontal spread
+    PickData pickData = m_Renderer->Pick(centerScreen);
+    EntityWrapper victim(m_World, pickData.Entity);
+    if (!victim.Valid()) {
+        return;
+    }
+
+    // Don't let us somehow shoot ourselves in the foot
+    if (victim == LocalPlayer) {
+        return;
+    }
+
+    // Only care about players being hit
+    if (!victim.HasComponent("Player")) {
+        victim = victim.FirstParentWithComponent("Player");
+    }
+    if (!victim.Valid()) {
+        return;
+    }
+
+
+    // If friendly fire, reduce damage to 0 (needed to make Boosts, Ammosharing work)
+    if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
+
+        EntityWrapper friendlyBoostHudSpawner = wi.FirstPersonPlayerModel.FirstChildByName("FriendlyBoostAttachment");
+        if (friendlyBoostHudSpawner.Valid()) {
+
+            EntityWrapper assaultBoost = victim.FirstChildByName("BoostAssault");
+            EntityWrapper defenderBoost = victim.FirstChildByName("BoostDefender");
+            EntityWrapper sniperBoost = victim.FirstChildByName("BoostSniper");
+
+            auto children = m_World->GetDirectChildren(friendlyBoostHudSpawner.ID);
+
+            if (children.first == children.second) {
+                if (friendlyBoostHudSpawner.HasComponent("Spawner")) {
+
+                    EntityWrapper friendlyBoostHud = SpawnerSystem::Spawn(friendlyBoostHudSpawner, friendlyBoostHudSpawner);
+                    if (friendlyBoostHud.Valid()) {
+                        EntityWrapper assaultBoostEntity = friendlyBoostHud.FirstChildByName("AssaultBoost");
+                        if (assaultBoostEntity.Valid()) {
+                            EntityWrapper active = assaultBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (assaultBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
+                            }
+                        }
+
+                        EntityWrapper defenderBoostEntity = friendlyBoostHud.FirstChildByName("DefenderBoost");
+                        if (defenderBoostEntity.Valid()) {
+                            EntityWrapper active = defenderBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (defenderBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
+                            }
+                        }
+
+                        EntityWrapper sniperBoostEntity = friendlyBoostHud.FirstChildByName("SniperBoost");
+                        if (sniperBoostEntity.Valid()) {
+                            EntityWrapper active = sniperBoostEntity.FirstChildByName("Active");
+                            if (active.HasComponent("Text")) {
+                                if (sniperBoost.Valid()) {
+                                    (Field<bool>)active["Text"]["Visible"] = true;
+                                } else {
+                                    (Field<bool>)active["Text"]["Visible"] = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                EntityWrapper friendlyBoostHud = friendlyBoostHudSpawner.FirstChildByName("FriendlyBoostHUD");
+                if (friendlyBoostHud.Valid()) {
+                    if(friendlyBoostHud.HasComponent("Lifetime")) {
+                        (Field<double>)friendlyBoostHud["Lifetime"]["Lifetime"] = 0.5;
+                    }
+
+
+
+                    EntityWrapper assaultBoostEntity = friendlyBoostHud.FirstChildByName("AssaultBoost");
+                    if (assaultBoostEntity.Valid()) {
+                        EntityWrapper active = assaultBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (assaultBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+
+                    EntityWrapper defenderBoostEntity = friendlyBoostHud.FirstChildByName("DefenderBoost");
+                    if (defenderBoostEntity.Valid()) {
+                        EntityWrapper active = defenderBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (defenderBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+
+                    EntityWrapper sniperBoostEntity = friendlyBoostHud.FirstChildByName("SniperBoost");
+                    if (sniperBoostEntity.Valid()) {
+                        EntityWrapper active = sniperBoostEntity.FirstChildByName("Active");
+                        if (active.HasComponent("Text")) {
+                            if (sniperBoost.Valid()) {
+                                (Field<bool>)active["Text"]["Visible"] = true;
+                            } else {
+                                (Field<bool>)active["Text"]["Visible"] = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

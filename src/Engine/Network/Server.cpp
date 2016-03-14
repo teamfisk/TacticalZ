@@ -560,9 +560,48 @@ bool Server::OnAmmoPickup(const Events::AmmoPickup & e)
 bool Server::OnPlayerDeath(const Events::PlayerDeath& e)
 {
     Events::KillDeath eKD;
+    auto entity = e;
     eKD.Casualty = getPlayerIDFromEntityID(e.Player.ID);
     eKD.Killer = getPlayerIDFromEntityID(e.Killer.ID);
+
+    eKD.CasualtyName = m_ConnectedPlayers.at(getPlayerIDFromEntityID(e.Player.ID)).Name;
+    eKD.KillerName = m_ConnectedPlayers.at(getPlayerIDFromEntityID(e.Killer.ID)).Name;
+
+    if(entity.Player.HasComponent("Team")) {
+        eKD.CasualtyTeam = (const int&)entity.Player["Team"]["Team"];
+    }
+    if (entity.Killer.HasComponent("Team")) {
+        eKD.KillerTeam = (const int&)entity.Killer["Team"]["Team"];
+    }
+
+    if(entity.Player.HasComponent("DashAbility")) {
+        eKD.CasualtyClass = 1;
+    } else if (entity.Player.HasComponent("ShieldAbility")) {
+        eKD.CasualtyClass = 2;
+    } else if (entity.Player.HasComponent("SprintAbility")) {
+        eKD.CasualtyClass = 3;
+    }
+    if (entity.Killer.HasComponent("DashAbility")) {
+        eKD.KillerClass = 1;
+    } else if (entity.Killer.HasComponent("ShieldAbility")) {
+        eKD.KillerClass = 2;
+    } else if (entity.Killer.HasComponent("SprintAbility")) {
+        eKD.KillerClass = 3;
+    }
+
     m_EventBroker->Publish(eKD);
+
+    Packet kdPacket(MessageType::KD);
+    kdPacket.WritePrimitive(eKD.Casualty);
+    kdPacket.WritePrimitive(eKD.CasualtyClass);
+    kdPacket.WriteString(eKD.CasualtyName);
+    kdPacket.WritePrimitive(eKD.CasualtyTeam);
+
+    kdPacket.WritePrimitive(eKD.Killer);
+    kdPacket.WritePrimitive(eKD.KillerClass);
+    kdPacket.WriteString(eKD.KillerName);
+    kdPacket.WritePrimitive(eKD.KillerTeam);
+    reliableBroadcast(kdPacket);
     return false;
 }
 

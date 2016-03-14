@@ -27,7 +27,7 @@ void EntityWrapper::AttachComponent(const char* componentName)
 
 EntityWrapper EntityWrapper::Parent()
 {
-    if (this->World == nullptr || this->ID == EntityID_Invalid) {
+    if (!Valid()) {
         return EntityWrapper::Invalid;
     } else {
         return EntityWrapper(this->World, this->World->GetParent(this->ID));
@@ -36,6 +36,10 @@ EntityWrapper EntityWrapper::Parent()
 
 EntityWrapper EntityWrapper::FirstParentByName(const std::string& parentEntityName)
 {
+    if (!Valid()) {
+        return EntityWrapper::Invalid;
+    }
+
     EntityWrapper entity = *this;
     while (entity.Parent().Valid()) {
         entity = entity.Parent();
@@ -48,6 +52,10 @@ EntityWrapper EntityWrapper::FirstParentByName(const std::string& parentEntityNa
 
 EntityWrapper EntityWrapper::FirstChildByName(const std::string& name)
 {
+    if (!Valid()) {
+        return EntityWrapper::Invalid;
+    }
+
     return firstChildByNameRecursive(name, this->ID);
 }
 
@@ -78,6 +86,10 @@ EntityWrapper EntityWrapper::FirstLevelChildByName(const std::string& name)
 
 EntityWrapper EntityWrapper::FirstParentWithComponent(const std::string& componentType)
 {
+    if (!Valid()) {
+        return EntityWrapper::Invalid;
+    }
+
     EntityWrapper entity = *this;
     while (entity.Parent().Valid()) {
         entity = entity.Parent();

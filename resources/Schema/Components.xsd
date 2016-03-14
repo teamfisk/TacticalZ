@@ -71,4 +71,6 @@
 	<xs:include schemaLocation="Components/Unpickable.xsd"/>
 	<xs:include schemaLocation="Components/ConfigBtnResolution.xsd"/>
 	<xs:include schemaLocation="Components/ConfigBtnFloat.xsd"/>
+	<xs:include schemaLocation="Components/EndScreen.xsd"/>
+	<xs:include schemaLocation="Components/Fade.xsd"/>
 </xs:schema>

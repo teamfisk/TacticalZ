@@ -3,6 +3,7 @@
 PlayerMovementSystem::PlayerMovementSystem(SystemParams params)
     : System(params)
     , m_SprintEffectTimer(0.f)
+    , m_DashEffectTimer(0.f)
 {
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &PlayerMovementSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_EDoubleJump, &PlayerMovementSystem::OnDoubleJump);
@@ -24,21 +25,57 @@ void PlayerMovementSystem::Update(double dt)
         if (LocalPlayer.Valid()){
             updateVelocity(LocalPlayer, dt);
         }
-        m_SprintEffectTimer += dt;
-        if (m_SprintEffectTimer < 0.016f) {
+        //m_SprintEffectTimer += dt;
+        //if (m_SprintEffectTimer < 0.016f) {
+        //    return;
+        //}
+        //m_SprintEffectTimer = 0.f;
+        //auto pool = m_World->GetComponents("SprintAbility");
+        //if (pool == nullptr) {
+        //    return;
+        //}
+        //for (auto cSprint : *pool) {
+        //    if (cSprint.EntityID != LocalPlayer.ID && (bool)cSprint["Active"]) {
+        //        // Spawn one afterimage for each player that sprints.
+        //        EntityWrapper player(m_World, cSprint.EntityID);
+        //        auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/SprintEffect.xml");
+        //        EntityWrapper sprintEffect = entityFile->MergeInto(m_World);
+        //        auto playerModel = player.FirstChildByName("PlayerModel");
+        //        if (!playerModel.Valid()) {
+        //            continue;
+        //        }
+        //        if (!playerModel.HasComponent("Model")) {
+        //            continue;
+        //        }
+        //        if (!playerModel.HasComponent("Animation")) {
+        //            continue;
+        //        }
+        //        auto playerEntityModel = playerModel["Model"];
+        //        auto playerEntityAnimation = playerModel["Animation"];
+        //        playerEntityModel.Copy(sprintEffect["Model"]);
+        //        playerEntityAnimation.Copy(sprintEffect["Animation"]);
+        //        sprintEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
+        //        ((Field<glm::vec4>)sprintEffect["ExplosionEffect"]["EndColor"]).w(0.f);
+        //        sprintEffect["Animation"]["Speed1"] = 0.0;
+        //        sprintEffect["Animation"]["Speed2"] = 0.0;
+        //        sprintEffect["Animation"]["Speed3"] = 0.0;
+        //        sprintEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+        //        sprintEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+        //    }
+        //}
+        m_DashEffectTimer += dt;
+        if (m_DashEffectTimer < 0.075f) {
             return;
         }
-        m_SprintEffectTimer = 0.f;
-        auto pool = m_World->GetComponents("SprintAbility");
+        m_DashEffectTimer = 0.f;
+        auto pool = m_World->GetComponents("DashAbility");
         if (pool == nullptr) {
             return;
         }
-        for (auto cSprint : *pool) {
-            if (cSprint.EntityID != LocalPlayer.ID && (bool)cSprint["Active"]) {
-                // Spawn one afterimage for each player that sprints.
-                EntityWrapper player(m_World, cSprint.EntityID);
-                auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/SprintEffect.xml");
-                EntityWrapper sprintEffect = entityFile->MergeInto(m_World);
+        for (auto cDash : *pool) {
+            if (cDash.EntityID != LocalPlayer.ID && (double)cDash["CoolDownMaxTimer"] - (double)cDash["CoolDownTimer"] < 0.5) {
+                // Spawn one afterimage for each player that Dashes.
+                EntityWrapper player(m_World, cDash.EntityID);
                 auto playerModel = player.FirstChildByName("PlayerModel");
                 if (!playerModel.Valid()) {
                     continue;
@@ -46,20 +83,28 @@ void PlayerMovementSystem::Update(double dt)
                 if (!playerModel.HasComponent("Model")) {
                     continue;
                 }
-                if (!playerModel.HasComponent("Animation")) {
-                    continue;
+                EntityWrapper dashEffect = playerModel.Clone();
+                for (auto& cAnim : dashEffect.ChildrenWithComponent("Animation")) {
+                    cAnim["Animation"]["Play"] = false;
                 }
-                auto playerEntityModel = playerModel["Model"];
-                auto playerEntityAnimation = playerModel["Animation"];
-                playerEntityModel.Copy(sprintEffect["Model"]);
-                playerEntityAnimation.Copy(sprintEffect["Animation"]);
-                sprintEffect["ExplosionEffect"]["EndColor"] = (glm::vec4)playerEntityModel["Color"];
-                ((Field<glm::vec4>)sprintEffect["ExplosionEffect"]["EndColor"]).w(0.f);
-                sprintEffect["Animation"]["Speed1"] = 0.0;
-                sprintEffect["Animation"]["Speed2"] = 0.0;
-                sprintEffect["Animation"]["Speed3"] = 0.0;
-                sprintEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
-                sprintEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+                const double fadeTime = 0.5f;
+                for (auto& cModel : dashEffect.ChildrenWithComponent("Model")) {
+                    EntityWrapper e(m_World, cModel.ID);
+                    e.AttachComponent("Lifetime");
+                    e.AttachComponent("Fade");
+                    e["Fade"]["Loop"] = false;
+                    e["Fade"]["FadeTime"] = fadeTime;
+                    e["Fade"]["Time"] = fadeTime;
+                    e["Lifetime"]["Lifetime"] = fadeTime;
+                }
+                dashEffect.AttachComponent("Lifetime");
+                dashEffect.AttachComponent("Fade");
+                dashEffect["Fade"]["Loop"] = false;
+                dashEffect["Fade"]["FadeTime"] = fadeTime;
+                dashEffect["Fade"]["Time"] = fadeTime;
+                dashEffect["Lifetime"]["Lifetime"] = fadeTime;
+                dashEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+                dashEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
             }
         }
     }
@@ -82,17 +127,15 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
             // Limit camera pitch so we don't break our necks
             cameraOrientation.x(glm::clamp(cameraOrientation.x(), -glm::half_pi<float>(), glm::half_pi<float>()));
 
+            float pitch = cameraOrientation.x();
+            double time = ((pitch + glm::half_pi<float>()) / glm::pi<float>());
+
             // Set third person model aim pitch
             EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
-                EntityWrapper aimPrimaryEntity = playerModel.FirstChildByName("Aim");
-                if(aimPrimaryEntity.Valid()){
-                    if(aimPrimaryEntity.HasComponent("Animation")) {
-                        float pitch = cameraOrientation.x();
-                        double time = ((pitch + glm::half_pi<float>()) / glm::pi<float>());
-                        (Field<double>)aimPrimaryEntity["Animation"]["Time"] = time;
-                    }
-                }
+                setAim(playerModel, "SidearmWeapon", time);
+                setAim(playerModel, "AssaultWeapon", time);
+                setAim(playerModel, "DefenderWeapon", time);
             }
         }
 
@@ -314,6 +357,25 @@ void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
     position += velocity * (float)dt;
 }
 
+
+void PlayerMovementSystem::setAim(EntityWrapper root, std::string weaponNodeName, double time)
+{
+    if (root.Valid()) {
+        EntityWrapper blendTreeUpper = root.FirstChildByName("BlendTreeUpper");
+        if (blendTreeUpper.Valid()) {
+            EntityWrapper weapon = blendTreeUpper.FirstChildByName(weaponNodeName);
+            if(weapon.Valid()) {
+                EntityWrapper aim = weapon.FirstChildByName("Aim");
+                if (aim.Valid()) {
+                    if (aim.HasComponent("Animation")) {
+                        (Field<double>)aim["Animation"]["Time"] = time;
+                    }
+                }
+            }
+        }
+    }
+}
+
 void PlayerMovementSystem::playerStep(double dt, EntityWrapper player)
 {
     // Position of the local player, used see how far a player has moved.
@@ -373,17 +435,22 @@ void PlayerMovementSystem::spawnHexagon(EntityWrapper target)
 
 bool PlayerMovementSystem::OnDashAbility(Events::DashAbility & e)
 {
-    EntityWrapper player(m_World, e.Player);
-    if (!player.Valid()){// || !IsClient || player.ID == LocalPlayer.ID) {
+    EntityWrapper eventPlayer(m_World, e.Player);
+    if (!eventPlayer.Valid()){// || IsServer || eventPlayer.ID == LocalPlayer.ID) {
         return false;
     }
 
 //    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/DashEffect.xml");
   //  EntityWrapper dashEffect = entityFile->MergeInto(m_World);
-    EntityWrapper playerModel = player.FirstChildByName("PlayerModel");
+    EntityWrapper playerModel = eventPlayer.FirstChildByName("PlayerModel");
 
     for (auto& kv : m_PlayerInputControllers) {
         EntityWrapper player = kv.first;
+        if(player != eventPlayer) {
+            continue;
+        }
+
+
         auto& controller = kv.second;
 
         if (!player.Valid()) {

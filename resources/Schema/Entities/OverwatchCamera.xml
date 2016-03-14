@@ -8,7 +8,7 @@
     </c:RaptorCopter>
     <c:Transform>
       <Position X="0" Y="-30.6910019" Z="0"/>
-      <Orientation X="0" Y="39.0355186" Z="0"/>
+      <Orientation X="0" Y="43.1977272" Z="0"/>
     </c:Transform>
   </Components>
 
@@ -69,21 +69,6 @@
                         <c:Transform/>
                       </Components>
                       <Children>
-                        <Entity name="TopRight">
-                          <Components>
-                            <c:Sprite>
-                              <Model>Models/Core/UnitQuad.mesh</Model>
-                              <GlowMap></GlowMap>
-                              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                              <Linear>false</Linear>
-                            </c:Sprite>
-                            <c:Transform>
-                              <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
-                              <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
                         <Entity name="BottomRight">
                           <Components>
                             <c:Sprite>
@@ -95,6 +80,21 @@
                             <c:Transform>
                               <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
                               <Orientation X="0" Y="0" Z="4.71199989"/>
+                              <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="TopRight">
+                          <Components>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                              <Linear>false</Linear>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
                               <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                             </c:Transform>
                           </Components>
@@ -157,7 +157,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>AssaultPoseF</AnimationName>
-                              <Time>0.17617116993415038</Time>
+                              <Time>1.725669683907423</Time>
                               <Play>true</Play>
                             </c:Animation>
                             <c:Transform/>
@@ -173,7 +173,7 @@
                               <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                             </c:Model>
                             <c:Transform>
-                              <Position X="0.160869107" Y="1.21697962" Z="-0.151224568"/>
+                              <Position X="0.160869107" Y="1.21322453" Z="-0.151224568"/>
                               <Orientation X="1.90465617" Y="-0.166544378" Z="0.0701896623"/>
                             </c:Transform>
                           </Components>
@@ -556,7 +556,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>DefenderPoseF</AnimationName>
-                              <Time>1.8430093487788781</Time>
+                              <Time>0.89250786275215077</Time>
                               <Play>true</Play>
                             </c:Animation>
                             <c:Transform/>
@@ -572,8 +572,8 @@
                               <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
                             </c:Model>
                             <c:Transform>
-                              <Position X="0.19599846" Y="0.706871212" Z="0.0306189749"/>
-                              <Orientation X="-1.39242756" Y="-0.0973875076" Z="0.332219273"/>
+                              <Position X="0.195243329" Y="0.708130419" Z="0.0326478258"/>
+                              <Orientation X="-1.39242756" Y="-0.0973875225" Z="0.332219273"/>
                             </c:Transform>
                           </Components>
                           <Children/>
@@ -829,6 +829,22 @@
                         <c:Transform/>
                       </Components>
                       <Children>
+                        <Entity name="BottomRight">
+                          <Components>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                              <Linear>false</Linear>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                              <Orientation X="0" Y="0" Z="4.71199989"/>
+                              <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
                         <Entity name="TopRight">
                           <Components>
                             <c:Sprite>
@@ -855,22 +871,6 @@
                             <c:Transform>
                               <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
                               <Orientation X="0" Y="0" Z="3.14900017"/>
-                              <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="BottomRight">
-                          <Components>
-                            <c:Sprite>
-                              <Model>Models/Core/UnitQuad.mesh</Model>
-                              <GlowMap></GlowMap>
-                              <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                              <Linear>false</Linear>
-                            </c:Sprite>
-                            <c:Transform>
-                              <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
-                              <Orientation X="0" Y="0" Z="4.71199989"/>
                               <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                             </c:Transform>
                           </Components>
@@ -917,7 +917,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>SniperPoseF</AnimationName>
-                              <Time>2.0761022922026768</Time>
+                              <Time>1.1256008061759495</Time>
                               <Play>true</Play>
                             </c:Animation>
                             <c:Transform/>
@@ -933,8 +933,8 @@
                               <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
                             </c:Model>
                             <c:Transform>
-                              <Position X="-0.0454485416" Y="1.06776285" Z="-0.125484616"/>
-                              <Orientation X="-1.5053376" Y="1.34000039" Z="-1.34724426"/>
+                              <Position X="-0.0454485789" Y="1.06511343" Z="-0.125484645"/>
+                              <Orientation X="-1.50533736" Y="1.34000039" Z="-1.34724438"/>
                             </c:Transform>
                           </Components>
                           <Children/>
@@ -1534,7 +1534,7 @@
                 <Entity name="RespawnTimer">
                   <Components>
                     <c:Text>
-                      <Content>7</Content>
+                      <Content>2</Content>
                       <Resource>Fonts/DroidSans.ttf,64</Resource>
                       <Color A="1" B="0" G="1" R="0.784313738"/>
                     </c:Text>
@@ -1922,6 +1922,60 @@
                     </Entity>
                   </Children>
                 </Entity>
+                <Entity name="KillFeed">
+                  <Components>
+                    <c:KillFeed/>
+                    <c:Transform>
+                      <Position X="0.494000018" Y="0.252000004" Z="0"/>
+                      <Scale X="0.0149999997" Y="0.0149999997" Z="0.0149999997"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="KillFeed1">
+                      <Components>
+                        <c:Text>
+                          <Content></Content>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                          <Alignment>
+                            <Right/>
+                          </Alignment>
+                        </c:Text>
+                        <c:Transform/>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="KillFeed2">
+                      <Components>
+                        <c:Text>
+                          <Content></Content>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                          <Alignment>
+                            <Right/>
+                          </Alignment>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="-1" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="KillFeed3">
+                      <Components>
+                        <c:Text>
+                          <Content></Content>
+                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                          <Alignment>
+                            <Right/>
+                          </Alignment>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="-2" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
               </Children>
             </Entity>
           </Children>
@@ -2062,7 +2116,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>AssaultPoseF</AnimationName>
-                              <Time>1.3982834359588878</Time>
+                              <Time>0.44778194993216047</Time>
                               <Play>true</Play>
                             </c:Animation>
                             <c:Transform/>
@@ -2078,7 +2132,7 @@
                               <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                             </c:Model>
                             <c:Transform>
-                              <Position X="0.160869107" Y="1.21257722" Z="-0.151224568"/>
+                              <Position X="0.160869107" Y="1.21565855" Z="-0.151224568"/>
                               <Orientation X="1.90465617" Y="-0.166544378" Z="0.0701896623"/>
                             </c:Transform>
                           </Components>
@@ -2461,7 +2515,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>DefenderPoseF</AnimationName>
-                              <Time>1.4984920571354792</Time>
+                              <Time>0.54799057110875182</Time>
                               <Play>true</Play>
                             </c:Animation>
                             <c:Transform/>
@@ -2477,8 +2531,8 @@
                               <Resource>Models/Weapons/Red/DefenderWeaponRed.mesh</Resource>
                             </c:Model>
                             <c:Transform>
-                              <Position X="0.196077555" Y="0.705334127" Z="0.027174633"/>
-                              <Orientation X="-1.39242756" Y="-0.097387597" Z="0.332219392"/>
+                              <Position X="0.194819659" Y="0.710372686" Z="0.0368246883"/>
+                              <Orientation X="-1.39242768" Y="-0.0973874852" Z="0.332219452"/>
                             </c:Transform>
                           </Components>
                           <Children/>
@@ -2822,7 +2876,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>SniperPoseF</AnimationName>
-                              <Time>1.4153160569904912</Time>
+                              <Time>0.46481457096376388</Time>
                               <Play>true</Play>
                             </c:Animation>
                             <c:Transform/>
@@ -2838,8 +2892,8 @@
                               <Resource>Models/Weapons/Red/SecondaryWeaponRed.mesh</Resource>
                             </c:Model>
                             <c:Transform>
-                              <Position X="-0.0454486087" Y="1.06414807" Z="-0.125484616"/>
-                              <Orientation X="-1.50533855" Y="1.34000087" Z="-1.34724522"/>
+                              <Position X="-0.0454485677" Y="1.06916106" Z="-0.125484571"/>
+                              <Orientation X="-1.50533819" Y="1.34000111" Z="-1.3472451"/>
                             </c:Transform>
                           </Components>
                           <Children/>
