@@ -10,8 +10,7 @@ PlayerDeathSystem::PlayerDeathSystem(SystemParams params)
 }
 
 void PlayerDeathSystem::Update(double dt)
-{
-}
+{ }
 
 bool PlayerDeathSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
@@ -33,31 +32,35 @@ void PlayerDeathSystem::createDeathEffect(EntityWrapper player)
     auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/PlayerDeathExplosionWithCamera.xml");
     EntityWrapper deathEffectEW = entityFile->MergeInto(m_World);
 
-    //components that we need from player
     auto playerModel = player.FirstChildByName("PlayerModel");
-    if (!playerModel.HasComponent("Model") || !playerModel.HasComponent("Animation")) {
+    if (!playerModel.Valid()) {
         if (player == LocalPlayer) {
             setSpectatorCamera();
         }
         return;
     }
-    auto playerEntityModel = playerModel["Model"];
-    auto playerEntityAnimation = playerModel["Animation"];
-
-    //copy the data from player to explosioneffectmodel
-    playerEntityModel.Copy(deathEffectEW["Model"]);
-    playerEntityAnimation.Copy(deathEffectEW["Animation"]);
-
-    //copy the models position,orientation
-    deathEffectEW["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
-    deathEffectEW["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
-    //effect,camera is relative to playersPosition
-    //deathEffectEW["ExplosionEffect"]["ExplosionOrigin"] = glm::vec3(0, 0, 0);
-
+    if (!playerModel.HasComponent("Model")) {
+        return;
+    }
+    EntityWrapper deathEffect = playerModel.Clone();
+    for (auto& cAnim : deathEffect.ChildrenWithComponent("Animation")) {
+        cAnim["Animation"]["Play"] = false;
+    }
+    deathEffect.AttachComponent("ExplosionEffect");
+    deathEffectEW["ExplosionEffect"].Copy(deathEffect["ExplosionEffect"]);
+    deathEffect.AttachComponent("Lifetime");
+    deathEffectEW["Lifetime"].Copy(deathEffect["Lifetime"]);
+    deathEffect["Transform"]["Position"] = (glm::vec3)player["Transform"]["Position"];
+    deathEffect["Transform"]["Orientation"] = (glm::vec3)player["Transform"]["Orientation"];
+    for (auto& cModel : deathEffect.ChildrenWithComponent("Model")) {
+        EntityWrapper e(m_World, cModel.ID);
+        e.AttachComponent("ExplosionEffect");
+        deathEffectEW["ExplosionEffect"].Copy(e["ExplosionEffect"]);
+    }
+    EntityWrapper cam = deathEffectEW.FirstChildByName("Camera").Clone(deathEffect);
     //camera (with lifetime) behind the player
     if (player == LocalPlayer) {
-        m_LocalPlayerDeathEffect = deathEffectEW;
-        auto cam = deathEffectEW.FirstChildByName("Camera");
+        m_LocalPlayerDeathEffect = deathEffect;
         Events::SetCamera eSetCamera;
         eSetCamera.CameraEntity = cam;
         m_EventBroker->Publish(eSetCamera);
