@@ -223,15 +223,16 @@ void SidearmWeaponBehaviour::fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi
         return;
     }
 
-    //Tracer
+    // Tracer
     EntityWrapper tracerSpawner = weaponModelEntity.FirstChildByName("WeaponMuzzleRay");
     if (tracerSpawner.Valid()) {
         glm::vec3 origin = TransformSystem::AbsolutePosition(tracerSpawner);
-        glm::vec3 direction = TransformSystem::AbsoluteOrientation(tracerSpawner) * glm::vec3(0, 0, -1);
+        glm::vec3 direction = glm::quat(TransformSystem::AbsoluteOrientationEuler(tracerSpawner)) * glm::vec3(0, 0, -1);
         float distance = traceRayDistance(origin, direction);
         EntityWrapper ray = SpawnerSystem::Spawn(tracerSpawner, tracerSpawner);
         if (ray.Valid()) {
-            ((Field<glm::vec3>)ray["Transform"]["Scale"]).z(distance);
+            ((Field<glm::vec3>)ray["Transform"]["Scale"]).x(distance);
+            ((Field<glm::vec3>)ray["Transform"]["Position"]).z(-distance/2.f);
         }
     }
 

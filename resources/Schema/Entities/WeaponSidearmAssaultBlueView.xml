@@ -8,6 +8,7 @@
     </c:BlendAdditive>
     <c:Model>
       <Resource>Models/Characters/Assault/FirstPersonAssaultBlue.mesh</Resource>
+      <Shadow>false</Shadow>
     </c:Model>
     <c:Transform/>
   </Components>
@@ -183,6 +184,7 @@
             <c:Model>
               <GlowIntensity>1.2999999523162842</GlowIntensity>
               <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
+              <Shadow>false</Shadow>
             </c:Model>
             <c:Transform>
               <Position X="0.185786247" Y="-0.21622014" Z="-0.412707269"/>
@@ -204,7 +206,7 @@
         <Entity name="Muzzle">
           <Components>
             <c:Transform>
-              <Position X="0.197295129" Y="-0.116625182" Z="-0.709192753"/>
+              <Position X="0.189540595" Y="-0.114737265" Z="-0.681462705"/>
             </c:Transform>
           </Components>
           <Children>
@@ -213,9 +215,7 @@
                 <c:Spawner>
                   <EntityFile>Schema/Entities/RaySideArmBlue.xml</EntityFile>
                 </c:Spawner>
-                <c:Transform>
-                  <Position X="0" Y="0" Z="-0.155046776"/>
-                </c:Transform>
+                <c:Transform/>
               </Components>
               <Children/>
             </Entity>
