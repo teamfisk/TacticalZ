@@ -21,7 +21,7 @@ void PlayerMovementSystem::Update(double dt)
 {
     updateMovementControllers(dt);
     // Only do physics calculations on client and only for themselves.
-    if (IsClient) {
+    if (IsClient || true) {
         if (LocalPlayer.Valid()){
             updateVelocity(LocalPlayer, dt);
         }
@@ -73,7 +73,7 @@ void PlayerMovementSystem::Update(double dt)
             return;
         }
         for (auto cDash : *pool) {
-            if (cDash.EntityID != LocalPlayer.ID && (double)cDash["CoolDownMaxTimer"] - (double)cDash["CoolDownTimer"] < 0.5) {
+            if ((double)cDash["CoolDownMaxTimer"] - (double)cDash["CoolDownTimer"] < 0.5) {
                 // Spawn one afterimage for each player that Dashes.
                 EntityWrapper player(m_World, cDash.EntityID);
                 auto playerModel = player.FirstChildByName("PlayerModel");

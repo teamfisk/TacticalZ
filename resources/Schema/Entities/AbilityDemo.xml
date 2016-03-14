@@ -7,6 +7,10 @@
       <Gamma>1</Gamma>
       <Exposure>0.82000017166137695</Exposure>
     </c:SceneLight>
+    <c:CapturePointGameMode>
+      <RespawnTime>0.32289272439493288</RespawnTime>
+      <MaxRespawnTime>0.5</MaxRespawnTime>
+    </c:CapturePointGameMode>
     <c:Transform/>
   </Components>
 
@@ -73,7 +77,9 @@
     </Entity>
     <Entity name="Cam">
       <Components>
-        <c:Camera/>
+        <c:Camera>
+          <FOV>47</FOV>
+        </c:Camera>
         <c:Model>
           <Resource>Models/Core/UnitSphere.mesh</Resource>
           <Shadow>false</Shadow>
@@ -92,6 +98,11 @@
     </Entity>
     <Entity name="Spawn">
       <Components>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
         <c:PlayerSpawn>
           <AssaultFile>Schema/Entities/PlayerAssaultBlue.xml</AssaultFile>
           <DefenderFile>Schema/Entities/PlayerDefenderBlue.xml</DefenderFile>
@@ -99,12 +110,25 @@
         </c:PlayerSpawn>
         <c:Model>
           <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
+          <Visible>false</Visible>
         </c:Model>
         <c:Spawner>
           <EntityFile></EntityFile>
         </c:Spawner>
         <c:Transform>
           <Position X="0.100000001" Y="2.8398931" Z="-29.0827847"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Model>
+          <Resource>Models/Highgrounds/Hg21.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="-1.75605178" Z="-20.9220009"/>
+          <Scale X="0.407000005" Y="0.407000005" Z="0.407000005"/>
         </c:Transform>
       </Components>
       <Children/>
