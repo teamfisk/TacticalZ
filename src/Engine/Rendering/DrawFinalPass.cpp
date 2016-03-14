@@ -624,7 +624,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                         std::vector<glm::mat4> frameBones;
                         if (modelJob->BlendTree != nullptr) {
                             frameBones = modelJob->BlendTree->GetFinalPose();
-                        } else {
+                        } else if (modelJob->Skeleton != nullptr) {
                             frameBones = modelJob->Skeleton->GetTPose();
                         }
                         glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));

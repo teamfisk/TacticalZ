@@ -16,21 +16,24 @@ private:
 
 public:
 	~Model();
-    const std::vector<RawModel::MaterialProperties>& MaterialGroups() const { return m_RawModel->m_Materials; }
-    const glm::mat4& Matrix() const { return m_RawModel->m_Matrix; }
+    const std::vector<RawModel::MaterialProperties>& MaterialGroups() const { return m_Materials; }
+    //const RawModel::Vertex* Vertices() const { return m_RawModel->Vertices(); }
+	unsigned int NumberOfVertices() const { return m_Vertices.size(); }
+	//size_t NumberOfVertices() const { return m_RawModel->NumVertices(); }
+	//const std::vector<unsigned int>& Indices() const { return m_RawModel->Indices(); }
 
-    const RawModel::RenderVertex* Vertices() const { return m_RawModel->Vertices(); }
-	size_t NumberOfVertices() const { return m_RawModel->NumVertices(); }
-	const std::vector<unsigned int>& Indices() const { return m_RawModel->Indices(); }
-
-	const RawModel::Vertex* CollisionVertices() const { return m_RawModel->CollisionVertices(); }
-	const std::vector<unsigned int>& CollisionIndices() const { return m_RawModel->CollisionIndices(); }
+	//const RawModel::Vertex* CollisionVertices() const { return m_RawModel->CollisionVertices(); }
+	//const std::vector<unsigned int>& CollisionIndices() const { return m_RawModel->CollisionIndices(); }
 
     const AABB& Box() const { return m_Box; }
-	bool IsSkinned() const { return m_RawModel->IsSkinned(); }
+	bool IsSkinned() const { return m_IsSkinned; }
 	GLuint VAO;
 	GLuint ElementBuffer;
-    RawModel* m_RawModel;
+    //RawModel* m_RawModel;
+
+    Skeleton* m_Skeleton = nullptr;
+    std::vector<glm::vec3> m_Vertices;
+    std::vector<unsigned int> m_Indices;
 
 private:
     AABB m_Box;
@@ -40,6 +43,9 @@ private:
 	GLuint TangentNormalsBuffer;
 	GLuint BiTangentNormalsBuffer;
 	GLuint TextureCoordBuffer;
+
+	std::vector<RawModel::MaterialProperties> m_Materials;
+    bool m_IsSkinned;
 };
 
 #endif

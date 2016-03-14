@@ -112,16 +112,16 @@ bool SpawnerSystem::spawnedEntityIsColliding(EntityWrapper spawnedEntity, Entity
             if (!spawnedBox.Entity.HasComponent("Model")) {
                 return true;
             }
-            RawModel* model = nullptr;
+            Model* model = nullptr;
             try {
-                model = ResourceManager::Load<RawModel, true>(otherEntity["Model"]["Resource"]);
+                model = ResourceManager::Load<Model, true>(otherEntity["Model"]["Resource"]);
             } catch (const std::exception&) {
             }
 
             if (model != nullptr && Collision::AABBvsTriangles(
                     spawnedBox,
-                    model->CollisionVertices(),
-                    model->CollisionIndices(),
+                    model->m_Vertices,
+                    model->m_Indices,
                     TransformSystem::ModelMatrix(otherEntity))) {
                 return true;
             }

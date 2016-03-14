@@ -572,12 +572,13 @@ const RawModelCustom::Vertex* RawModelCustom::ConstructCollisionList()
 
 RawModelCustom::~RawModelCustom()
 {
-    if (m_Skeleton != nullptr) {
-        delete m_Skeleton;
-    }
-	for (auto material : m_Materials) {
-		delete material.material;
-	}
+    // Ownership of skeleton and materials get transferred to Model
+ //   if (m_Skeleton != nullptr) {
+ //       delete m_Skeleton;
+ //   }
+	//for (auto material : m_Materials) {
+	//	delete material.material;
+	//}
 }
 
 #endif

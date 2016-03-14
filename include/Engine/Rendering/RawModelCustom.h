@@ -13,6 +13,7 @@
 
 #include <boost/filesystem/path.hpp>
 
+#include <boost/endian/buffers.hpp>
 #include "../Common.h"
 #include "../GLM.h"
 #include "../Core/ResourceManager.h"
@@ -20,14 +21,10 @@
 #include "Skeleton.h"
 #include "ShaderProgram.h"
 
-#include "boost\endian\buffers.hpp"
-
-
-
 class RawModelCustom : public Resource
 {
     friend class ResourceManager;
-
+    friend class Model;
 protected:
     RawModelCustom(std::string fileName);
 

@@ -10,11 +10,11 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
         return;
     }
 
-    RawModel* triggerModel = nullptr;
+    Model* triggerModel = nullptr;
     glm::mat4 triggerModelMat;
     if (triggerEntity.HasComponent("Model")) {
         try {
-            triggerModel = ResourceManager::Load<RawModel, true>(triggerEntity["Model"]["Resource"]);
+            triggerModel = ResourceManager::Load<Model, true>(triggerEntity["Model"]["Resource"]);
             triggerModelMat = TransformSystem::ModelMatrix(triggerEntity);
         } catch (const std::exception&) {
         }
@@ -38,8 +38,8 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
                 ? Collision::Output::OutContained 
                 : Collision::AABBvsTrianglesWContainment(
                 colliderBox,
-                triggerModel->CollisionVertices(),
-                triggerModel->CollisionIndices(),
+                triggerModel->m_Vertices,
+                triggerModel->m_Indices,
                 triggerModelMat);
 
             if (colliderFitsInTrigger && Collision::AABBVsAABB(completelyInsideBox, colliderBox) && out == Collision::Output::OutContained) {

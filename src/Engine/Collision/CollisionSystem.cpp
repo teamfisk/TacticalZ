@@ -41,15 +41,15 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                             // Don't collide against invisible models.
                             continue;
                         }
-                        RawModel* model;
+                        Model* model;
                         std::string res = (std::string)boxB.Entity["Model"]["Resource"];
                         try {
-                            model = ResourceManager::Load<RawModel, true>(res);
+                            model = ResourceManager::Load<Model, true>(res);
                         } catch (const std::exception&) {
                             continue;
                         }
                         float u, v;
-                        hit = Collision::RayVsModel(ray, model->CollisionVertices(), model->CollisionIndices(), TransformSystem::ModelMatrix(boxB.Entity), dist, u, v);
+                        hit = Collision::RayVsModel(ray, model->m_Vertices, model->m_Indices, TransformSystem::ModelMatrix(boxB.Entity), dist, u, v);
                     } else {
                         hit = Collision::RayVsAABB(ray, boxB, dist);
                     }
@@ -86,9 +86,9 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                     // Don't collide against invisible models.
                     continue;
                 }
-                RawModel* model;
+                Model* model;
                 try {
-                    model = ResourceManager::Load<RawModel, true>(boxB.Entity["Model"]["Resource"]);
+                    model = ResourceManager::Load<Model, true>(boxB.Entity["Model"]["Resource"]);
                 } catch (const std::exception&) {
                     continue;
                 }
@@ -98,7 +98,7 @@ void CollisionSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapper& c
                 glm::vec3 inOutVelocity = (glm::vec3)cPhysics["Velocity"];
                 bool isOnGround = (bool)cPhysics["IsOnGround"];
                 float verticalStepHeight = (float)(double)cPhysics["VerticalStepHeight"];
-                if (Collision::AABBvsTriangles(boxA, model->CollisionVertices(), model->CollisionIndices(), modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
+                if (Collision::AABBvsTriangles(boxA, model->m_Vertices, model->m_Indices, modelMatrix, inOutVelocity, verticalStepHeight, isOnGround, resolutionVector)) {
                     //Move the position to previous position if it is not moving in the xz-plane, else resolve with the resolution vector.
                     (Field<glm::vec3>)cTransform["Position"] += resolutionVector;
                     boxA = *Collision::EntityAbsoluteAABB(entity);
