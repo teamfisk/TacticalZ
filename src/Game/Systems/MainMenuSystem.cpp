@@ -135,6 +135,8 @@ bool MainMenuSystem::OnInputCommand(const Events::InputCommand& e)
         OpenSubMenu(e);
     } else if (e.Command == "Resolution" && e.Value == 1) {
         OpenDropDown(e);
+    } else if (e.Command == "Quit" && e.Value == 1) {
+        exit(EXIT_FAILURE);
     }
     return true;
 }

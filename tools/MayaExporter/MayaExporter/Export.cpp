@@ -5,7 +5,7 @@ Export::Export()
 
 }
 
-bool Export::Meshes(std::string pathName, bool selectedOnly)
+bool Export::Meshes(std::string pathName, bool selectedOnly, bool isCollision)
 { 
     MStatus status;
     if (pathName.empty()) {
@@ -92,8 +92,14 @@ bool Export::Meshes(std::string pathName, bool selectedOnly)
             Objects.append(node);
         }
     }
-    GetMeshData(Objects);
-    WriteMeshData(pathName);
+    GetMeshData(Objects, isCollision);
+
+	if (!isCollision) {
+		WriteMeshData(pathName);
+	} else {
+		WriteCollisionData(pathName);
+	}
+
     MGlobal::displayInfo(MString() + "Enabling IKSolvers");
     status = MGlobal::executeCommand("doEnableNodeItems true all;");
     if (status != MS::kSuccess) {
@@ -144,9 +150,9 @@ bool Export::Animations(std::string pathName, std::vector<AnimationInfo> animInf
     return true;
 }
 
-bool Export::GetMeshData(MObjectArray object)
+bool Export::GetMeshData(MObjectArray object, bool collision)
 { 
-    meshes = m_MeshHandler.GetMeshData(object);
+    meshes = m_MeshHandler.GetMeshData(object, collision);
     return true;
 }
 
@@ -183,6 +189,17 @@ void Export::WriteMeshData(std::string pathName)
     m_MeshFile.writeToFiles((OutputData*)&meshes);
 
     m_MeshFile.CloseFiles();
+}
+
+void Export::WriteCollisionData(std::string pathName) {
+	m_ColliFile.ASCIIFilePath(pathName + "_colli.txt");
+	m_ColliFile.binaryFilePath(pathName + ".colli");
+
+	m_ColliFile.OpenFiles();
+
+	m_ColliFile.writeToFiles((OutputData*)&meshes);
+
+	m_ColliFile.CloseFiles();
 }
 
 void Export::WriteAnimData(std::string pathName)
