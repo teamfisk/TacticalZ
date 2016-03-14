@@ -202,12 +202,18 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
 
             if (addSpeed > 0) {
                 static float accel = 15.f;
+#ifdef DEBUG
                 ImGui::InputFloat("accel", &accel);
+#endif
                 static float airAccel = 0.5f;
+#ifdef DEBUG
                 ImGui::InputFloat("airAccel", &airAccel);
+#endif
                 float actualAccel = isOnGround ? accel : airAccel;
                 static float surfaceFriction = 5.f;
+#ifdef DEBUG
                 ImGui::InputFloat("surfaceFriction", &surfaceFriction);
+#endif
                 float accelerationSpeed = actualAccel * (float)dt * wishSpeed * surfaceFriction;
                 //if doubleTapped do Assault Dash - but only boost maximum 50.0f
                 float doubleTapDashBoost = controller->AssaultDashDoubleTapped() ? 40.0f : 1.0f;
@@ -220,7 +226,9 @@ void PlayerMovementSystem::updateMovementControllers(double dt)
                     accelerationSpeed *= (double)player["SprintAbility"]["StrengthOfEffect"];
                 }
                 velocity += accelerationSpeed * (glm::vec3)wishDirection;
+#ifdef DEBUG
                 ImGui::Text("velocity: (%f, %f, %f) |%f|", velocity.x(), velocity.y(), velocity.z(), glm::length((glm::vec3)velocity));
+#endif
             }
 
             if (isOnGround) {
@@ -336,10 +344,14 @@ void PlayerMovementSystem::updateVelocity(EntityWrapper player, double dt)
     // Ground friction
     float speed = glm::length((glm::vec3)velocity);
     static float groundFriction = 7.f;
+#ifdef DEBUG
     ImGui::InputFloat("groundFriction", &groundFriction);
+#endif
     static float airFriction = 2.f;
 
+#ifdef DEBUG
     ImGui::InputFloat("airFriction", &airFriction);
+#endif
     float friction = isOnGround ? groundFriction : airFriction;
     if (speed > 0) {
         float drop = speed * friction * (float)dt;
