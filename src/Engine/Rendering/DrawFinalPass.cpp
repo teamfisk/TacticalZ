@@ -1537,10 +1537,12 @@ void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<E
 		if (job->NormalTexture.size() > 0 && job->NormalTexture[0]->Texture != nullptr) {
 			glBindTexture(GL_TEXTURE_2D, job->NormalTexture[0]->Texture->m_Texture);
 			glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(job->NormalTexture[0]->UVRepeat));
+			glUniform1i(glGetUniformLocation(shaderHandle, "NormalTextureType"), job->NormalTexture[0]->Texture->m_Type);
 		}
 		else {
 			glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
 			glUniform2fv(glGetUniformLocation(shaderHandle, "NormalUVRepeat"), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+			glUniform1i(glGetUniformLocation(shaderHandle, "NormalTextureType"), m_NeutralNormalTexture->m_Type);
 		}
 
 		glActiveTexture(GL_TEXTURE3);
@@ -1593,10 +1595,12 @@ void DrawFinalPass::BindExplosionTextures(GLuint shaderHandle, std::shared_ptr<E
 			if (job->NormalTexture.size() > i && job->NormalTexture[i]->Texture != nullptr) {
 				glBindTexture(GL_TEXTURE_2D, job->NormalTexture[i]->Texture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(job->NormalTexture[i]->UVRepeat));
+				glUniform1i(glGetUniformLocation(shaderHandle, "NormalTextureType"), job->NormalTexture[0]->Texture->m_Type);
 			}
 			else {
 				glBindTexture(GL_TEXTURE_2D, m_NeutralNormalTexture->m_Texture);
 				glUniform2fv(glGetUniformLocation(shaderHandle, std::string(UniformName + ((char)(i + '1'))).c_str()), 1, glm::value_ptr(glm::vec2(1.0f, 1.0f)));
+				glUniform1i(glGetUniformLocation(shaderHandle, "NormalTextureType"), m_NeutralNormalTexture->m_Type);
 			}
 			texturePosition++;
 		}

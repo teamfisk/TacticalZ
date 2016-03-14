@@ -21,7 +21,7 @@ public:
 
 	GLuint m_Texture = 0;
 
-	enum TextureType : GLint { Invalid = 0, DDS = 1, PNG = 2};
+	enum TextureType : GLint { cInvalid = 0, cDDS = 1, cPNG = 2};
 	TextureType m_Type;
 };
 

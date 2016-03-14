@@ -166,7 +166,7 @@ vec4 CalcBlendedTexel(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
 }
 
 vec4 CalcBlendedNormal(vec4 blendValue, sampler2D R, sampler2D G, sampler2D B,
-					   vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues
+					   vec2 R_TileValues,  vec2 G_TileValues,  vec2 B_TileValues,
 					   int R_TextureType, int G_TextureType, int B_TextureType) {
 	mat3 TBN = mat3(Input.Tangent, Input.BiTangent, Input.Normal);
 	vec3 R_Channel = NormalMapValue(Input.TextureCoordinate * R_TileValues, R, R_TextureType);
