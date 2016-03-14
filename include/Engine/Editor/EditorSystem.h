@@ -43,6 +43,7 @@ private:
     EditorGUI::WidgetSpace m_WidgetSpace = EditorGUI::WidgetSpace::Global;
     EntityWrapper m_Widget = EntityWrapper::Invalid;
     EntityWrapper m_CurrentSelection = EntityWrapper::Invalid;
+    glm::vec3 m_CamVelocity;
 
     // Utility functions
     EntityWrapper importEntity(EntityWrapper parent, boost::filesystem::path filePath);
