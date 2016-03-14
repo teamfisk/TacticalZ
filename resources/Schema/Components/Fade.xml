@@ -3,5 +3,6 @@
 	<FadeTime>1</FadeTime>
 	<Time>0</Time>
 	<Out>true</Out>
+	<Loop>true</Loop>
 	<Reverse>false</Reverse>
 </Fade>
