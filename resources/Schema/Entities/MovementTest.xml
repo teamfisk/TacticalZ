@@ -3,7 +3,7 @@
 
   <Components>
     <c:CapturePointGameMode>
-      <RespawnTime>0.35657206405745967</RespawnTime>
+      <RespawnTime>0.10012471663946698</RespawnTime>
       <MaxRespawnTime>0.5</MaxRespawnTime>
     </c:CapturePointGameMode>
     <c:Transform>
@@ -19,7 +19,11 @@
             <Red/>
           </Team>
         </c:Team>
-        <c:PlayerSpawn/>
+        <c:PlayerSpawn>
+          <AssaultFile>Schema/Entities/PlayerAssaultBlue.xml</AssaultFile>
+          <DefenderFile>Schema/Entities/PlayerDefenderBlue.xml</DefenderFile>
+          <SniperFile></SniperFile>
+        </c:PlayerSpawn>
         <c:Spawner>
           <EntityFile>Schema/Entities/PlayerDefenderBlue.xml</EntityFile>
         </c:Spawner>
@@ -90,7 +94,11 @@
             <Blue/>
           </Team>
         </c:Team>
-        <c:PlayerSpawn/>
+        <c:PlayerSpawn>
+          <AssaultFile>Schema/Entities/PlayerAssaultBlue.xml</AssaultFile>
+          <DefenderFile>Schema/Entities/PlayerDefenderBlue.xml</DefenderFile>
+          <SniperFile></SniperFile>
+        </c:PlayerSpawn>
         <c:Spawner>
           <EntityFile>Schema/Entities/PlayerAssaultBlue.xml</EntityFile>
         </c:Spawner>
@@ -107,7 +115,7 @@
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>
-              <Position X="0.800000012" Y="0" Z="0"/>
+              <Position X="-0.600000024" Y="0" Z="0.549540162"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -120,7 +128,7 @@
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.600000024" Y="0" Z="0.549540162"/>
+              <Position X="0.800000012" Y="0" Z="0"/>
             </c:Transform>
           </Components>
           <Children/>
@@ -269,7 +277,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="0" Y="-30.6910019" Z="0"/>
-          <Orientation X="0" Y="39.1253624" Z="0"/>
+          <Orientation X="0" Y="43.4443054" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -417,7 +425,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>AssaultPoseF</AnimationName>
-                                  <Time>2.2728534617500387</Time>
+                                  <Time>0.65905298965262915</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -433,7 +441,7 @@
                                   <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
                                 </c:Model>
                                 <c:Transform>
-                                  <Position X="0.160869107" Y="1.21713078" Z="-0.151224568"/>
+                                  <Position X="0.160869107" Y="1.21468747" Z="-0.151224568"/>
                                   <Orientation X="1.90465617" Y="-0.166544378" Z="0.0701896623"/>
                                 </c:Transform>
                               </Components>
@@ -816,7 +824,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>DefenderPoseF</AnimationName>
-                                  <Time>1.4396916405947664</Time>
+                                  <Time>2.3258911684973569</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -832,8 +840,8 @@
                                   <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
                                 </c:Model>
                                 <c:Transform>
-                                  <Position X="0.196064115" Y="0.705373585" Z="0.0272535309"/>
-                                  <Orientation X="-1.3924278" Y="-0.0973875821" Z="0.332219422"/>
+                                  <Position X="0.195810497" Y="0.711551607" Z="0.0388058722"/>
+                                  <Orientation X="-1.3924278" Y="-0.0973876044" Z="0.332219511"/>
                                 </c:Transform>
                               </Components>
                               <Children/>
@@ -1089,22 +1097,6 @@
                             <c:Transform/>
                           </Components>
                           <Children>
-                            <Entity name="BottomRight">
-                              <Components>
-                                <c:Sprite>
-                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                  <GlowMap></GlowMap>
-                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                  <Linear>false</Linear>
-                                </c:Sprite>
-                                <c:Transform>
-                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
-                                  <Orientation X="0" Y="0" Z="4.71199989"/>
-                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
                             <Entity name="TopRight">
                               <Components>
                                 <c:Sprite>
@@ -1131,6 +1123,22 @@
                                 <c:Transform>
                                   <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
                                   <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
                               </Components>
@@ -1177,7 +1185,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>SniperPoseF</AnimationName>
-                                  <Time>1.6727845840185651</Time>
+                                  <Time>0.058984111921155602</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -1193,8 +1201,8 @@
                                   <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
                                 </c:Model>
                                 <c:Transform>
-                                  <Position X="-0.0454485044" Y="1.06437671" Z="-0.125484675"/>
-                                  <Orientation X="-1.50533736" Y="1.34000039" Z="-1.34724414"/>
+                                  <Position X="-0.0454485416" Y="1.07162762" Z="-0.12548463"/>
+                                  <Orientation X="-1.50533807" Y="1.34000039" Z="-1.34724486"/>
                                 </c:Transform>
                               </Components>
                               <Children/>
@@ -1428,14 +1436,14 @@
                 <Entity name="PickTeamHUD">
                   <Components>
                     <c:Transform>
-                      <Position X="0" Y="0" Z="-0.63500005"/>
+                      <Position X="0" Y="0.0200000014" Z="-0.63500005"/>
                     </c:Transform>
                   </Components>
                   <Children>
                     <Entity name="TeamBluePick">
                       <Components>
                         <c:Transform>
-                          <Position X="-0.114000008" Y="0.0190000013" Z="0"/>
+                          <Position X="-0.131000012" Y="0.0190000013" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -1447,14 +1455,14 @@
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
                               <BlurBackground>true</BlurBackground>
-                              <Color A="0.392156869" B="0.349019617" G="0" R="0"/>
+                              <Color A="0.392156869" B="0.768627465" G="0" R="0"/>
                             </c:Sprite>
                             <c:InputCmdButton>
                               <Command>PickTeam</Command>
                               <PressValue>3</PressValue>
                             </c:InputCmdButton>
                             <c:Transform>
-                              <Scale X="0.207000017" Y="0.249000013" Z="1"/>
+                              <Scale X="0.24000001" Y="0.307000011" Z="1"/>
                             </c:Transform>
                           </Components>
                           <Children/>
@@ -1471,9 +1479,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="0.100000001" Y="-0.121000007" Z="0.00499999989"/>
+                                  <Position X="0.118000008" Y="-0.150000006" Z="0.00499999989"/>
                                   <Orientation X="0" Y="0" Z="4.71199989"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
@@ -1487,9 +1496,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="0.100000001" Y="0.120000005" Z="0.00499999989"/>
+                                  <Position X="0.118000008" Y="0.150000006" Z="0.00499999989"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
                               </Components>
@@ -1502,9 +1512,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="-0.100000001" Y="-0.121000007" Z="0.00499999989"/>
+                                  <Position X="-0.117000006" Y="-0.150000006" Z="0.00499999989"/>
                                   <Orientation X="0" Y="0" Z="3.14900017"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
@@ -1518,9 +1529,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="-0.100000001" Y="0.121000007" Z="0.00499999989"/>
+                                  <Position X="-0.117000006" Y="0.150000006" Z="0.00499999989"/>
                                   <Orientation X="0" Y="0" Z="1.5710001"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
@@ -1534,6 +1546,7 @@
                             <c:Text>
                               <Content>Blue</Content>
                               <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Visible>false</Visible>
                               <Alignment>
                                 <Left/>
                               </Alignment>
@@ -1545,127 +1558,27 @@
                           </Components>
                           <Children/>
                         </Entity>
-                      </Children>
-                    </Entity>
-                    <Entity name="TeamRedPick">
-                      <Components>
-                        <c:Transform>
-                          <Position X="0.114" Y="0.0189999994" Z="0"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="Button_1">
+                        <Entity>
                           <Components>
-                            <c:Button/>
                             <c:Sprite>
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
-                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
-                              <BlurBackground>true</BlurBackground>
-                              <Color A="0.392156869" B="0" G="0" R="0.556862772"/>
+                              <DiffuseTexture>Textures/HUD/BlueTeam.png</DiffuseTexture>
+                              <ClampToBorder>true</ClampToBorder>
                             </c:Sprite>
-                            <c:InputCmdButton>
-                              <Command>PickTeam</Command>
-                              <PressValue>2</PressValue>
-                            </c:InputCmdButton>
                             <c:Transform>
-                              <Scale X="0.207000017" Y="0.249000013" Z="1"/>
+                              <Position X="0" Y="-0.00900000054" Z="0.00600000005"/>
+                              <Scale X="0.340000004" Y="0.340000004" Z="1"/>
                             </c:Transform>
                           </Components>
                           <Children/>
-                        </Entity>
-                        <Entity name="Text">
-                          <Components>
-                            <c:Text>
-                              <Content>Red</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="-0.0890000015" Y="-0.105000004" Z="0.00499999989"/>
-                              <Scale X="0.0500000007" Y="0.0500000007" Z="1"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="ButtonCorner_Origin">
-                          <Components>
-                            <c:Transform/>
-                          </Components>
-                          <Children>
-                            <Entity name="BottomRight">
-                              <Components>
-                                <c:Sprite>
-                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                  <GlowMap></GlowMap>
-                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                  <Linear>false</Linear>
-                                </c:Sprite>
-                                <c:Transform>
-                                  <Position X="0.100000001" Y="-0.121000007" Z="0.00499999989"/>
-                                  <Orientation X="0" Y="0" Z="4.71199989"/>
-                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                            <Entity name="TopRight">
-                              <Components>
-                                <c:Sprite>
-                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                  <GlowMap></GlowMap>
-                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                  <Linear>false</Linear>
-                                </c:Sprite>
-                                <c:Transform>
-                                  <Position X="0.100000001" Y="0.120000005" Z="0.00499999989"/>
-                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                            <Entity name="BottomLeft">
-                              <Components>
-                                <c:Sprite>
-                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                  <GlowMap></GlowMap>
-                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                  <Linear>false</Linear>
-                                </c:Sprite>
-                                <c:Transform>
-                                  <Position X="-0.100000001" Y="-0.121000007" Z="0.00499999989"/>
-                                  <Orientation X="0" Y="0" Z="3.14900017"/>
-                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                            <Entity name="TopLeft">
-                              <Components>
-                                <c:Sprite>
-                                  <Model>Models/Core/UnitQuad.mesh</Model>
-                                  <GlowMap></GlowMap>
-                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
-                                  <Linear>false</Linear>
-                                </c:Sprite>
-                                <c:Transform>
-                                  <Position X="-0.100000001" Y="0.121000007" Z="0.00499999989"/>
-                                  <Orientation X="0" Y="0" Z="1.5710001"/>
-                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
-                                </c:Transform>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
                         </Entity>
                       </Children>
                     </Entity>
                     <Entity name="TeamSpectatorPick">
                       <Components>
                         <c:Transform>
-                          <Position X="0" Y="-0.153000012" Z="0"/>
+                          <Position X="0" Y="-0.184000015" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -1680,11 +1593,11 @@
                               <Color A="0.392156869" B="0" G="0" R="0"/>
                             </c:Sprite>
                             <c:InputCmdButton>
-                              <Command>PickTeam</Command>
+                              <Command>PickTeam_</Command>
                               <PressValue>1</PressValue>
                             </c:InputCmdButton>
                             <c:Transform>
-                              <Scale X="0.435000032" Y="0.0520000011" Z="1"/>
+                              <Scale X="0.502000034" Y="0.0530000031" Z="1"/>
                             </c:Transform>
                           </Components>
                           <Children/>
@@ -1693,7 +1606,7 @@
                           <Components>
                             <c:Text>
                               <Content>Spectator</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
                             </c:Text>
                             <c:Transform>
                               <Position X="0" Y="-0.00800000038" Z="0.00499999989"/>
@@ -1714,9 +1627,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="0.214000016" Y="-0.0230000019" Z="0.00499999989"/>
+                                  <Position X="0.248000011" Y="-0.0230000019" Z="0.00499999989"/>
                                   <Orientation X="0" Y="0" Z="4.71199989"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
@@ -1730,9 +1644,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="0.214000002" Y="0.0240000002" Z="0.00499999989"/>
+                                  <Position X="0.247000009" Y="0.0240000002" Z="0.00499999989"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
                               </Components>
@@ -1745,9 +1660,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="-0.214000002" Y="-0.023" Z="0.00499999989"/>
+                                  <Position X="-0.247000009" Y="-0.023" Z="0.00499999989"/>
                                   <Orientation X="0" Y="0" Z="3.14900017"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
@@ -1761,9 +1677,10 @@
                                   <GlowMap></GlowMap>
                                   <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
                                   <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
                                 </c:Sprite>
                                 <c:Transform>
-                                  <Position X="-0.214000002" Y="0.0240000002" Z="0.00499999989"/>
+                                  <Position X="-0.247000009" Y="0.0240000002" Z="0.00499999989"/>
                                   <Orientation X="0" Y="0" Z="1.5710001"/>
                                   <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
                                 </c:Transform>
@@ -1771,6 +1688,141 @@
                               <Children/>
                             </Entity>
                           </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="TeamRedPick">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0.130999997" Y="0.0190000013" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <BlurBackground>true</BlurBackground>
+                              <Color A="0.392156869" B="0" G="0" R="0.90196079"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickTeam</Command>
+                              <PressValue>2</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.24000001" Y="0.307000011" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.118000008" Y="-0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.118000008" Y="0.150000006" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.117000006" Y="-0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.117000006" Y="0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Blue</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Visible>false</Visible>
+                              <Alignment>
+                                <Left/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00900000054" Y="-0.105000004" Z="0.00499999989"/>
+                              <Scale X="0.0500000007" Y="0.0500000007" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity>
+                          <Components>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/HUD/RedTeam.png</DiffuseTexture>
+                              <ClampToBorder>true</ClampToBorder>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="-0.00900000054" Z="0.00600000005"/>
+                              <Scale X="0.340000004" Y="0.340000004" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
                         </Entity>
                       </Children>
                     </Entity>
@@ -2182,6 +2234,60 @@
                         </Entity>
                       </Children>
                     </Entity>
+                    <Entity name="KillFeed">
+                      <Components>
+                        <c:KillFeed/>
+                        <c:Transform>
+                          <Position X="0.494000018" Y="0.252000004" Z="0"/>
+                          <Scale X="0.0149999997" Y="0.0149999997" Z="0.0149999997"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="KillFeed1">
+                          <Components>
+                            <c:Text>
+                              <Content></Content>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                              <Alignment>
+                                <Right/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="KillFeed2">
+                          <Components>
+                            <c:Text>
+                              <Content></Content>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                              <Alignment>
+                                <Right/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-1" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="KillFeed3">
+                          <Components>
+                            <c:Text>
+                              <Content></Content>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                              <Alignment>
+                                <Right/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-2" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
                   </Children>
                 </Entity>
               </Children>
@@ -2322,7 +2428,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>AssaultPoseF</AnimationName>
-                                  <Time>0.9949657277747761</Time>
+                                  <Time>1.8811652556773666</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -2338,7 +2444,7 @@
                                   <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
                                 </c:Model>
                                 <c:Transform>
-                                  <Position X="0.160869107" Y="1.21340287" Z="-0.151224568"/>
+                                  <Position X="0.160869107" Y="1.21425688" Z="-0.151224568"/>
                                   <Orientation X="1.90465617" Y="-0.166544378" Z="0.0701896623"/>
                                 </c:Transform>
                               </Components>
@@ -2721,7 +2827,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>DefenderPoseF</AnimationName>
-                                  <Time>1.0951743489513674</Time>
+                                  <Time>1.9813738768539579</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -2737,8 +2843,8 @@
                                   <Resource>Models/Weapons/Red/DefenderWeaponRed.mesh</Resource>
                                 </c:Model>
                                 <c:Transform>
-                                  <Position X="0.195622981" Y="0.70677036" Z="0.0300085638"/>
-                                  <Orientation X="-1.39242733" Y="-0.0973875821" Z="0.332219303"/>
+                                  <Position X="0.195940435" Y="0.708098531" Z="0.0331460983"/>
+                                  <Orientation X="-1.39242768" Y="-0.0973874852" Z="0.332219243"/>
                                 </c:Transform>
                               </Components>
                               <Children/>
@@ -3082,7 +3188,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>SniperPoseF</AnimationName>
-                                  <Time>1.0119983488063795</Time>
+                                  <Time>1.89819787670897</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -3098,8 +3204,8 @@
                                   <Resource>Models/Weapons/Red/SecondaryWeaponRed.mesh</Resource>
                                 </c:Model>
                                 <c:Transform>
-                                  <Position X="-0.045448523" Y="1.06568146" Z="-0.125484601"/>
-                                  <Orientation X="-1.50533819" Y="1.34000111" Z="-1.3472451"/>
+                                  <Position X="-0.0454485491" Y="1.06597364" Z="-0.125484616"/>
+                                  <Orientation X="-1.50533819" Y="1.34000039" Z="-1.34724486"/>
                                 </c:Transform>
                               </Components>
                               <Children/>
