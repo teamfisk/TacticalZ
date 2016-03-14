@@ -14,7 +14,19 @@ void AssaultWeaponBehaviour::UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& 
     // Start reloading automatically if at 0 mag ammo
     Field<int> magAmmo = cWeapon["MagazineAmmo"];
     if (m_ConfigAutoReload && magAmmo <= 0) {
-        OnReload(cWeapon, wi);
+        //OnReload(cWeapon, wi);
+        // Send an input command instead of reloading immediately so the server
+        // has a chance to catch up.
+        if (IsClient) {
+            Events::InputCommand e;
+            e.Player = wi.Player;
+            e.PlayerID = -1;
+            e.Command = "Reload";
+            e.Value = 1;
+            m_EventBroker->Publish(e);
+            e.Value = 0;
+            m_EventBroker->Publish(e);
+        }
     }
 
     // Only start reloading once we're done firing
