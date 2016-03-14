@@ -22,18 +22,19 @@ public:
         int End;
     };
 
-    bool Meshes(std::string pathName, bool selectedOnly = false);
+    bool Meshes(std::string pathName, bool selectedOnly = false, bool isCollision = false);
     bool Materials(std::string pathName);
     bool Animations(std::string pathName, std::vector<AnimationInfo> animInfo);
 
 private:
-    bool GetMeshData(MObjectArray object);
+    bool GetMeshData(MObjectArray object, bool collision);
     bool GetMaterialData();
     bool GetAnimationData(AnimationInfo info);
 
     void WriteMeshData(std::string pathName);
     void WriteAnimData(std::string pathName);
     void WriteMaterialData(std::string pathName);
+	void WriteCollisionData(std::string pathName);
 
     Material m_MaterialHandler;
     Skeleton m_SkeletonHandler;
@@ -44,6 +45,7 @@ private:
     WriteToFile m_MeshFile;
     WriteToFile m_AnimFile;
     WriteToFile m_MtrlFile;
+	WriteToFile m_ColliFile;
 
     //Mesh Data
     Mesh meshes;

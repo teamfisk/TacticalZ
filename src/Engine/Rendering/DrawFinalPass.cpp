@@ -332,14 +332,6 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
     glClearStencil(0x00);
     glClear(GL_STENCIL_BUFFER_BIT);
 
-    //Fill depth buffer
-	state->Enable(GL_STENCIL_TEST);
-	state->StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	state->StencilFunc(GL_ALWAYS, 1, 0xFF);
-	state->StencilMask(0xFF);
-	state->DepthMask(GL_FALSE);
-	//DrawToDepthStencilBuffer(scene.Jobs.ShieldObjects, scene);
-	state->DepthMask(GL_TRUE);
 
     //Draw Opaque shielded objects
 	state->Disable(GL_STENCIL_TEST);
@@ -354,10 +346,10 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 	GLERROR("OpaqueObjects");
 
 	//state->Disable(GL_STENCIL_TEST);
-    //Draw Transparen Shielded objects
+    //Draw Transparen objects
 	state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	DrawModelRenderQueuesWithShieldCheck(scene.Jobs.TransparentObjects, scene); //might need changing
-    GLERROR("Shielded Transparent objects");
+    GLERROR("Transparent objects");
 
     //Generate blur texture.
     delete state;
@@ -379,12 +371,6 @@ void DrawFinalPass::Draw(RenderScene& scene, BlurHUD* blurHUDPass)
 	} else {
 		stateSprite = new DrawFinalPassState(m_FinalPassFrameBuffer->GetHandle());
 	}
-	//Draw Transparen objects
-	//state->BlendFunc(GL_ONE, GL_ONE);
-	//state->StencilFunc(GL_EQUAL, 1, 0xFF);
-	//DrawModelRenderQueues(scene.Jobs.TransparentObjects, scene);
-	GLERROR("TransparentObjects");
-	//state->BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     stateSprite->Enable(GL_DEPTH_TEST);
     //stateSprite->AlphaFunc(GL_GEQUAL, 0.05f);
     //stateSprite->Enable(GL_ALPHA_TEST);
@@ -638,7 +624,7 @@ void DrawFinalPass::DrawModelRenderQueues(std::list<std::shared_ptr<RenderJob>>&
                         std::vector<glm::mat4> frameBones;
                         if (modelJob->BlendTree != nullptr) {
                             frameBones = modelJob->BlendTree->GetFinalPose();
-                        } else {
+                        } else if (modelJob->Skeleton != nullptr) {
                             frameBones = modelJob->Skeleton->GetTPose();
                         }
                         glUniformMatrix4fv(glGetUniformLocation(forwardSkinnedHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));

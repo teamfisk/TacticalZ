@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ReloadEffect" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="In">
+      <Components>
+        <c:ExplosionEffect>
+          <ExplosionOrigin X="0" Y="0.112999998" Z="-0.430000007"/>
+          <TimeSinceDeath>0.5</TimeSinceDeath>
+          <Delay>0.5</Delay>
+          <Speed>-1</Speed>
+          <ExplosionDuration>0.5</ExplosionDuration>
+          <EndColor A="0" B="3.92156863" G="0.545098066" R="1"/>
+          <Randomness>true</Randomness>
+        </c:ExplosionEffect>
+        <c:Model>
+          <GlowIntensity>1.5</GlowIntensity>
+          <Resource>Models/Weapons/Red/SecondaryWeaponRed.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Out">
+      <Components>
+        <c:Lifetime>
+          <Lifetime>0.5</Lifetime>
+        </c:Lifetime>
+        <c:ExplosionEffect>
+          <ExplosionOrigin X="0" Y="0.113000005" Z="-0.430000007"/>
+          <ExplosionDuration>0.5</ExplosionDuration>
+          <EndColor A="0" B="3.92156863" G="0.545098066" R="1"/>
+          <Randomness>true</Randomness>
+        </c:ExplosionEffect>
+        <c:Model>
+          <GlowIntensity>1.5</GlowIntensity>
+          <Resource>Models/Weapons/Red/SecondaryWeaponRed.mesh</Resource>
+          <Shadow>false</Shadow>
+          <Transparent>true</Transparent>
+        </c:Model>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -110,7 +110,7 @@ struct ModelJob : RenderJob
         }
 
         if (model->IsSkinned()) {
-            Skeleton = Model->m_RawModel->m_Skeleton;
+            Skeleton = Model->m_Skeleton;
 
             if (Skeleton != nullptr) {
                 EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
