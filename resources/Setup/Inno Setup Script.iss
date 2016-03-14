@@ -4,7 +4,7 @@
 #define MyAppName "Axyz"
 #define MyAppVersion "1.0"
 #define MyAppURL "https://github.com/teamfisk/TacticalZ"
-#define MyAppExeName "TacticalZ.exe"
+#define MyAppExeName "Axyz.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -57,7 +57,7 @@ Source: "..\..\bin\glfw3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\imgui.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Input.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\libpng16.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\TacticalZ.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Axyz.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\xerces-c_3_1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\zlib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\deps\redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
