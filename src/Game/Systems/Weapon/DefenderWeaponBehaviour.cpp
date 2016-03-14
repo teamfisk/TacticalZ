@@ -160,9 +160,8 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                     }
                 }
 
-                if (IsServer) {
-                    SpawnerSystem::Spawn(attachment, attachment);
-                }
+                SpawnerSystem::Spawn(attachment, attachment);
+                
 
                 EntityWrapper backAttachment = attachment.FirstChildByName("Back");
                 if (backAttachment.Valid()) {
