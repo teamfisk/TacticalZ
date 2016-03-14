@@ -19,6 +19,7 @@ public:
     virtual const glm::vec3 Rotation() const { return m_Rotation; }
     virtual bool Jumping() const { return m_Jumping; }
     virtual bool Crouching() const { return m_Crouching; }
+    virtual bool CrouchingLastFrame() const { return m_CrouchingLastFrame; }
     virtual bool DoubleJumping() const { return m_DoubleJumping; }
     virtual void SetDoubleJumping(bool isDoubleJumping) {
         m_DoubleJumping = isDoubleJumping;
@@ -29,7 +30,7 @@ public:
     virtual bool OnCommand(const Events::InputCommand& e) override;
     virtual void Reset();
 
-    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID);
+    void AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, Field<double> assaultDashCoolDownTimer, EntityID playerID);
     virtual bool AssaultDashDoubleTapped() const { return m_AssaultDashDoubleTapped; }
     virtual bool PlayerIsDashing() const { return m_PlayerIsDashing; }
     bool SpecialAbilityKeyDown() const { return m_SpecialAbilityKeyDown; }
@@ -44,6 +45,7 @@ protected:
     bool m_Jumping = false;
     bool m_DoubleJumping = false;
     bool m_Crouching = false;
+    bool m_CrouchingLastFrame = false;
     //assault dash membervariables - needed to calculate the doubletap- and dashlogic
     double m_AssaultDashDoubleTapDeltaTime = 0.0;
     //i will let m_AssaultDashDoubleTapSensitivityTimer stay hardcoded, its not really a gamevariable (more an inputvariable), 
@@ -82,6 +84,7 @@ void FirstPersonInputController<EventContext>::Reset()
 {
     m_Rotation = glm::vec3(0.f, 0.f, 0.f);
     m_Jumping = false;
+    m_CrouchingLastFrame = m_Crouching;
 }
 
 template <typename EventContext>
@@ -163,6 +166,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                             aeb.Duration = 0.1;
                             aeb.NodeName = "Run";
                             aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
                             aeb.Start = true;
                             m_EventBroker->Publish(aeb);
                         }
@@ -172,6 +176,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                             aeb.Duration = 0.1;
                             aeb.NodeName = "Run";
                             aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
                             aeb.Start = true;
                             aeb.Reverse = true;
                             m_EventBroker->Publish(aeb);
@@ -207,14 +212,41 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                         m_EventBroker->Publish(aeb);
                     }
                 }
+
+
+                EntityWrapper firstPersonModel = m_PlayerEntity.FirstChildByName("Hands");
+                if (firstPersonModel.Valid()) {
+                    if (val > 0) {  // Walk/Run
+                        if (!m_Crouching) {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.1;
+                            aeb.NodeName = "Run";
+                            aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
+                            aeb.Start = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                    } else if (val < 0) {   // Walk/run Backwards
+                        if (!m_Crouching) {
+                            Events::AutoAnimationBlend aeb;
+                            aeb.Duration = 0.1;
+                            aeb.NodeName = "Run";
+                            aeb.RootNode = firstPersonModel;
+                            aeb.SingleLevelBlend = true;
+                            aeb.Start = true;
+                            aeb.Reverse = true;
+                            m_EventBroker->Publish(aeb);
+                        }
+                    }
+                }
             }
         }
     }
 
-    //Animation
-    if (glm::length2(m_Movement) < 0.25f) {
-        //Blend to Idle
-        if (m_PlayerEntity.Valid()) {
+    if (m_PlayerEntity.Valid()) {
+        glm::vec2 movementXZ = glm::vec2(m_Movement.x, m_Movement.z);
+        if (glm::length(movementXZ) < 0.1f) {
+            //Blend to Idle
             EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 Events::AutoAnimationBlend aeb;
@@ -233,10 +265,8 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                 aeb.Start = true;
                 m_EventBroker->Publish(aeb);
             }
-        }
-    } else {
-        //Blend to movement
-        if (m_PlayerEntity.Valid()) {
+        } else {
+            //Blend to movement
             EntityWrapper playerModel = m_PlayerEntity.FirstChildByName("PlayerModel");
             if (playerModel.Valid()) {
                 Events::AutoAnimationBlend aeb;
@@ -248,8 +278,7 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
         }
     }
 
-
-    if (glm::length2(m_Movement) > 0) {
+    if (glm::length(m_Movement) > 0) {
         m_Movement = glm::normalize(m_Movement);
 
         //Animation
@@ -355,7 +384,7 @@ bool FirstPersonInputController<EventContext>::OnLockMouse(const Events::LockMou
 }
 
 template <typename EventContext>
-void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, double& assaultDashCoolDownTimer, EntityID playerID) {
+void FirstPersonInputController<EventContext>::AssaultDashCheck(double dt, bool isJumping, double assaultDashCoolDownMaxTimer, Field<double> assaultDashCoolDownTimer, EntityID playerID) {
     m_AssaultDashDoubleTapDeltaTime += dt;
     assaultDashCoolDownTimer -= dt;
     //cooldown = assaultDashCoolDownMaxTimer sec, pretend the dash lasts 0.25 sec (for friction to do its work)

@@ -270,7 +270,8 @@ private:
         EntityWrapper thirdPersonAttachment;
         for (auto& attachment : weaponAttachments) {
             ComponentWrapper cWeaponAttachment = attachment["WeaponAttachment"];
-            if ((std::string&)cWeaponAttachment["Weapon"] == m_ComponentType) {
+            Field<std::string> weaponType = cWeaponAttachment["Weapon"];
+            if (*weaponType == m_ComponentType) {
                 ComponentWrapper::SubscriptProxy person = cWeaponAttachment["Person"];
                 if ((ComponentInfo::EnumType)person == person.Enum("FirstPerson")) {
                     firstPersonAttachment = attachment;
@@ -305,6 +306,8 @@ private:
         wi.ThirdPersonEntity = thirdPersonWeapon;
         wi.ThirdPersonPlayerModel = thirdPersonWeapon.FirstParentWithComponent("Model");
         
+        player["Player"]["CurrentWeapon"] = cWeapon.Info.Name;
+
         OnEquip(cWeapon, wi);
     }
 

@@ -68,13 +68,13 @@ void BlurHUD::InitializeBuffers()
 	}
 	m_GaussianFrameBuffer_horiz.Generate();
 
-    CommonFunctions::GenerateTexture(&m_DepthStencil_vert, GL_CLAMP_TO_BORDER, GL_NEAREST,
-        res2, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
+    //CommonFunctions::GenerateTexture(&m_DepthStencil_vert, GL_CLAMP_TO_BORDER, GL_NEAREST,
+    //    res2, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
     CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_NEAREST,
         res2, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
 	if (m_GaussianFrameBuffer_vert.GetHandle() == 0) {
-        m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthStencil_vert, GL_DEPTH_STENCIL_ATTACHMENT)));
+        m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_DepthStencil_horiz, GL_DEPTH_STENCIL_ATTACHMENT)));
 		m_GaussianFrameBuffer_vert.AddResource(std::shared_ptr<BufferResource>(new Texture2D(&m_GaussianTexture_vert, GL_COLOR_ATTACHMENT0)));
 	}
 	m_GaussianFrameBuffer_vert.Generate();
@@ -97,14 +97,14 @@ void BlurHUD::ClearBuffer()
     glClearStencil(0x00);
     glStencilMask(~0);
     glDisable(GL_SCISSOR_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_GaussianFrameBuffer_horiz.Unbind();
     m_GaussianFrameBuffer_vert.Bind();
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glClearStencil(0x00);
     glStencilMask(~0);
     glDisable(GL_SCISSOR_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_GaussianFrameBuffer_vert.Unbind();
 
     m_CombinedTextureBuffer.Bind();
@@ -119,6 +119,21 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 {
     GLERROR("DrawBloomPass::Draw: Pre");
 
+    bool shouldRun = false;
+    for (auto& job : scene.Jobs.SpriteJob) {
+        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
+        if (!spriteJob) {
+            continue;
+        }
+        if (!spriteJob->BlurBackground) {
+            continue;
+        }
+        shouldRun = true;
+        break;
+    }
+    if(!shouldRun) {
+        return m_BlackTexture->m_Texture;
+    }
     FillStencil(scene);
 
     RenderState state;
@@ -142,9 +157,15 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
     glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
     glScissor(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
     
+    m_GaussianProgram_vert->Bind();
+    glUniform1i(glGetUniformLocation(shaderHandle_vert, "Lod"), 0);
     m_GaussianProgram_horiz->Bind();
+    glUniform1i(glGetUniformLocation(shaderHandle_horiz, "Lod"), 0);
+
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+
     glBindVertexArray(m_ScreenQuad->VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
     glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
@@ -158,8 +179,6 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 		glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
 
-        glBindVertexArray(m_ScreenQuad->VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
         //horizontal pass
@@ -170,8 +189,6 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 		glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_vert);
 
-        glBindVertexArray(m_ScreenQuad->VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
         glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
             , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 		m_GaussianFrameBuffer_horiz.Unbind();
@@ -184,8 +201,7 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 
 	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_GaussianTexture_horiz);
-    glBindVertexArray(m_ScreenQuad->VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ScreenQuad->ElementBuffer);
+
     glDrawElementsBaseVertex(GL_TRIANGLES, m_ScreenQuad->MaterialGroups()[0].material->EndIndex - m_ScreenQuad->MaterialGroups()[0].material->StartIndex +1
         , GL_UNSIGNED_INT, 0, m_ScreenQuad->MaterialGroups()[0].material->StartIndex);
 
@@ -200,10 +216,7 @@ GLuint BlurHUD::Draw(GLuint texture, RenderScene& scene)
 
 void BlurHUD::OnWindowResize()
 {
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_vert, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_GaussianFrameBuffer_vert.Generate();
-    CommonFunctions::GenerateTexture(&m_GaussianTexture_horiz, GL_CLAMP_TO_EDGE, GL_LINEAR, glm::vec2(m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality), GL_RGB16F, GL_RGB, GL_FLOAT);
-    m_GaussianFrameBuffer_horiz.Generate();
+	InitializeBuffers();
 }
 
 void BlurHUD::FillStencil(RenderScene& scene)
@@ -211,20 +224,23 @@ void BlurHUD::FillStencil(RenderScene& scene)
     RenderState state;
 
     state.BindFramebuffer(m_GaussianFrameBuffer_horiz.GetHandle());
-    state.Disable(GL_DEPTH_TEST);
+    state.Enable(GL_DEPTH_TEST);
     state.Enable(GL_CULL_FACE);
     state.Enable(GL_STENCIL_TEST);
     state.StencilFunc(GL_ALWAYS, 1, 0xFF);
     state.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     state.StencilMask(0xFF);
+
+    state.AlphaFunc(GL_GEQUAL, 0.95f);
+    state.Enable(GL_ALPHA_TEST);
+
     glViewport(0, 0, m_Renderer->GetViewportSize().Width/m_BlurQuality, m_Renderer->GetViewportSize().Height/m_BlurQuality);
 
     m_FillDepthStencilProgram->Bind();
 
     GLuint shaderHandle = m_FillDepthStencilProgram->GetHandle();
+    glm::mat4 VP = scene.Camera->ProjectionMatrix() * scene.Camera->ViewMatrix();
 
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "V"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ViewMatrix()));
-    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "P"), 1, GL_FALSE, glm::value_ptr(scene.Camera->ProjectionMatrix()));
 
     for (auto& job : scene.Jobs.SpriteJob) {
         auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
@@ -234,28 +250,32 @@ void BlurHUD::FillStencil(RenderScene& scene)
         if (!spriteJob->BlurBackground) {
             continue;
         }
-        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
+
+        glm::mat4 MVP = VP * spriteJob->Matrix;
+        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(MVP));
+
 
         glBindVertexArray(spriteJob->Model->VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
         glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
     }
 
-    state.BindFramebuffer(m_GaussianFrameBuffer_vert.GetHandle());
-    for (auto& job : scene.Jobs.SpriteJob) {
-        auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
-        if (!spriteJob) {
-            continue;
-        }
-        if(!spriteJob->BlurBackground) {
-            continue;
-        }
-        glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "M"), 1, GL_FALSE, glm::value_ptr(spriteJob->Matrix));
+    //state.BindFramebuffer(m_GaussianFrameBuffer_vert.GetHandle());
+    //for (auto& job : scene.Jobs.SpriteJob) {
+    //    auto spriteJob = std::dynamic_pointer_cast<SpriteJob>(job);
+    //    if (!spriteJob) {
+    //        continue;
+    //    }
+    //    if(!spriteJob->BlurBackground) {
+    //        continue;
+    //    }
+    //    glm::mat4 MVP = VP * spriteJob->Matrix;
+    //    glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "PVM"), 1, GL_FALSE, glm::value_ptr(MVP));
 
-        glBindVertexArray(spriteJob->Model->VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
-        glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
-    }
+    //    glBindVertexArray(spriteJob->Model->VAO);
+    //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, spriteJob->Model->ElementBuffer);
+    //    glDrawElements(GL_TRIANGLES, spriteJob->EndIndex - spriteJob->StartIndex + 1, GL_UNSIGNED_INT, (void*)(spriteJob->StartIndex*sizeof(unsigned int)));
+    //}
     glViewport(0, 0, m_Renderer->GetViewportSize().Width, m_Renderer->GetViewportSize().Height);
 }
 

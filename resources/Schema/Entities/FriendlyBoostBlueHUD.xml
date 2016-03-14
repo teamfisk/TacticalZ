@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="FriendlyBoostHUD" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>0.5</Lifetime>
+    </c:Lifetime>
+    <c:Transform>
+      <Scale X="1.20000005" Y="1.20000005" Z="1"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="BoostHUDBackground">
+      <Components>
+        <c:Sprite>
+          <Model>Models/Core/UnitQuad.mesh</Model>
+          <GlowMap></GlowMap>
+          <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+          <Color A="0.588235319" B="0" G="0" R="0"/>
+        </c:Sprite>
+        <c:Transform>
+          <Position X="0" Y="0" Z="-0.00300000003"/>
+          <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="BoostIcons">
+      <Components>
+        <c:Transform>
+          <Position X="-1.47358617e-06" Y="-0.0191892758" Z="4.05375999e-07"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="AssaultBoost">
+          <Components>
+            <c:Transform>
+              <Position X="0.0120000001" Y="0.00899999961" Z="-8.43336147e-06"/>
+              <Scale X="0.0199999996" Y="0.0199999996" Z="0.0199999996"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Active">
+              <Components>
+                <c:Text>
+                  <Content>\1</Content>
+                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                  <Color A="1" B="1.37254906" G="0.392156869" R="0"/>
+                  <Visible>false</Visible>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.0149999997"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Inactive">
+              <Components>
+                <c:Text>
+                  <Content>\1</Content>
+                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                  <Color A="1" B="0.784313738" G="0.784313738" R="0.784313738"/>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-8.43336147e-06"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="DefenderBoost">
+          <Components>
+            <c:Transform>
+              <Position X="-0.0120000001" Y="0.00900000054" Z="-8.43336147e-06"/>
+              <Scale X="0.0199999996" Y="0.0199999996" Z="0.0199999996"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Inactive">
+              <Components>
+                <c:Text>
+                  <Content>\2</Content>
+                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                  <Color A="1" B="0.784313738" G="0.784313738" R="0.784313738"/>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-8.43336147e-06"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Active">
+              <Components>
+                <c:Text>
+                  <Content>\2</Content>
+                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                  <Color A="1" B="1.37254906" G="0.392156869" R="0"/>
+                  <Visible>false</Visible>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.00999999978"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="SniperBoost">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="0.0310000014" Z="-1.21438188e-05"/>
+              <Scale X="0.0199999996" Y="0.0199999996" Z="0.0199999996"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Active">
+              <Components>
+                <c:Text>
+                  <Content>\3</Content>
+                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                  <Color A="1" B="1.37254906" G="0.392156869" R="0"/>
+                  <Visible>false</Visible>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.00999999978"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Inactive">
+              <Components>
+                <c:Text>
+                  <Content>\3</Content>
+                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                  <Color A="1" B="0.784313738" G="0.784313738" R="0.784313738"/>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-8.43336147e-06"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

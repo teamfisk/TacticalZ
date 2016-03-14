@@ -4,7 +4,7 @@
 #include "Editor/EditorWidgetSystem.h"
 #include "Core/EntityFile.h"
 
-EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame) 
+EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame* renderFrame)
     : System(params)
     , m_Renderer(renderer)
     , m_RenderFrame(renderFrame)
@@ -14,7 +14,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
     m_EditorWorldSystemPipeline->AddSystem<UniformScaleSystem>(0);
     m_EditorWorldSystemPipeline->AddSystem<EditorWidgetSystem>(0, m_Renderer);
     m_EditorWorldSystemPipeline->AddSystem<EditorRenderSystem>(1, m_Renderer, m_RenderFrame);
-    
+
     m_EditorCamera = importEntity(EntityWrapper(m_EditorWorld, EntityID_Invalid), "Schema/Entities/Empty.xml");
     m_ActualCamera = m_EditorCamera;
     m_EditorWorld->AttachComponent(m_EditorCamera.ID, "Transform");
@@ -47,6 +47,7 @@ EditorSystem::EditorSystem(SystemParams params, IRenderer* renderer, RenderFrame
         Enable();
     } else {
         Disable();
+        m_EventBroker->Publish(Events::UnlockMouse());
     }
 }
 
@@ -71,21 +72,23 @@ void EditorSystem::Update(double dt)
         m_EditorStats->Draw(actualDelta);
 
         if (m_CurrentSelection.Valid() && m_Widget.Valid()) {
-            (glm::vec3&)m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection);
+            if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
+                return;
+            }
+            (Field<glm::vec3>)m_Widget["Transform"]["Position"] = TransformSystem::AbsolutePosition(m_CurrentSelection);
             if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
-                (glm::vec3&)m_Widget["Transform"]["Orientation"] = Transform::AbsoluteOrientationEuler(m_CurrentSelection);
+                m_Widget["Transform"]["Orientation"] = TransformSystem::AbsoluteOrientationEuler(m_CurrentSelection);
             } else {
-                (glm::vec3&)m_Widget["Transform"]["Orientation"] = glm::vec3(0, 0, 0);
+                m_Widget["Transform"]["Orientation"] = glm::vec3(0, 0, 0);
             }
         }
-
         m_EditorWorldSystemPipeline->Update(actualDelta);
 
         ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
-        glm::vec3& ori = cameraTransform["Orientation"];
-        ori.x = m_EditorCameraInputController->Rotation().x;
-        ori.y = m_EditorCameraInputController->Rotation().y;
-        glm::vec3& pos = cameraTransform["Position"];
+        Field<glm::vec3> ori = cameraTransform["Orientation"];
+        ori.x(m_EditorCameraInputController->Rotation().x);
+        ori.y(m_EditorCameraInputController->Rotation().y);
+        Field<glm::vec3> pos = cameraTransform["Position"];
         pos += m_EditorCameraInputController->Movement() * glm::inverse(glm::quat(ori)) * (float)actualDelta;
     }
 }
@@ -101,7 +104,7 @@ void EditorSystem::Enable()
     eSetCamera.CameraEntity = m_EditorCamera;
     m_EventBroker->Publish(eSetCamera);
     if (m_ActualCamera.Valid()) {
-        (glm::vec3&)m_EditorCamera["Transform"]["Position"] = Transform::AbsolutePosition(m_ActualCamera);
+        (Field<glm::vec3>)m_EditorCamera["Transform"]["Position"] = TransformSystem::AbsolutePosition(m_ActualCamera);
     }
 
     // Pause the world we're editing
@@ -202,24 +205,27 @@ bool EditorSystem::OnMousePress(const Events::MousePress& e)
 bool EditorSystem::OnWidgetDelta(const Events::WidgetDelta& e)
 {
     if (m_CurrentSelection.Valid()) {
+        if (isAnyParentMissingTransform(m_CurrentSelection.ID)) {
+            return false;
+        }
         if (m_WidgetSpace == EditorGUI::WidgetSpace::Global) {
             glm::quat parentOrientation;
             glm::vec3 parentScale(1.f);
             EntityWrapper parent = m_CurrentSelection.Parent();
             if (parent.Valid()) {
-                parentOrientation = glm::inverse(Transform::AbsoluteOrientation(parent));
-                parentScale = Transform::AbsoluteScale(parent);
+                parentOrientation = glm::inverse(TransformSystem::AbsoluteOrientation(parent));
+                parentScale = TransformSystem::AbsoluteScale(parent);
             }
-            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation / parentScale;
+            (Field<glm::vec3>)m_CurrentSelection["Transform"]["Position"] += parentOrientation * e.Translation / parentScale;
         } else if (m_WidgetSpace == EditorGUI::WidgetSpace::Local) {
             glm::vec3 parentScale(1.f);
             EntityWrapper parent = m_CurrentSelection.Parent();
             if (parent.Valid()) {
-                parentScale = Transform::AbsoluteScale(parent);
+                parentScale = TransformSystem::AbsoluteScale(parent);
             }
             glm::quat selectionOri = glm::quat((glm::vec3)m_CurrentSelection["Transform"]["Orientation"]);
             glm::vec3 localTranslation = selectionOri * e.Translation / parentScale;
-            (glm::vec3&)m_CurrentSelection["Transform"]["Position"] += localTranslation;
+            (Field<glm::vec3>)m_CurrentSelection["Transform"]["Position"] += localTranslation;
         }
         m_EditorGUI->SetDirty(m_CurrentSelection);
     }
@@ -306,5 +312,17 @@ void EditorSystem::setWidgetMode(EditorGUI::WidgetMode mode)
         break;
     }
 
-    m_Widget["Transform"]["Position"] = Transform::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
+    m_Widget["Transform"]["Position"] = TransformSystem::AbsolutePosition(m_CurrentSelection.World, m_CurrentSelection.ID);
+}
+
+bool EditorSystem::isAnyParentMissingTransform(EntityID entityID)
+{
+    EntityWrapper entity(m_World, entityID);
+    while (entity.Parent().Valid()) {
+        if (!entity.HasComponent("Transform")) {
+            return true;
+        }
+        entity = entity.Parent();
+    }
+    return false;
 }

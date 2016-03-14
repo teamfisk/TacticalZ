@@ -2,6 +2,7 @@
 #define ComponentInfo_h__
 
 #include "../Common.h"
+#include "Entity.h"
 #include <boost/shared_array.hpp>
 
 struct ComponentInfo
@@ -21,6 +22,7 @@ struct ComponentInfo
     {
         std::string Name;
         std::string Type;
+        unsigned char Index;
         unsigned int Offset;
         unsigned int Stride;
     };
@@ -32,6 +34,16 @@ struct ComponentInfo
     unsigned int Stride = 0;
     boost::shared_array<char> Defaults = nullptr;
 	std::shared_ptr<Meta_t> Meta = nullptr;
+
+    std::size_t GetHeaderSize() const
+    {
+        std::size_t size = 0;
+
+        // A component block starts with an entity ID
+        size += sizeof(EntityID);
+
+        return size;
+    }
 };
 
 template<>

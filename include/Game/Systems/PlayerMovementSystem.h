@@ -32,8 +32,10 @@ private:
     glm::vec3 m_LastPosition = glm::vec3();
     // Used to track afterimages for sprint effect.
     float m_SprintEffectTimer;
+    // Used to track afterimages for dash effect.
+    float m_DashEffectTimer;
     // The logic for making the sound play when player is moving
-    void playerStep(double dt);
+    void playerStep(double dt, EntityWrapper player);
     // Spawn a hexagon at origin of an Entity
     void spawnHexagon(EntityWrapper target);
 
@@ -46,4 +48,6 @@ private:
 
     void updateMovementControllers(double dt);
     void updateVelocity(EntityWrapper player, double dt);
+
+    void setAim(EntityWrapper root, std::string weaponNodeName, double time);
 };

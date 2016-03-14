@@ -14,7 +14,6 @@ protected:
 	TextureSprite(std::string path);
 
 public:
-	~TextureSprite() {};
 };
 
 #endif

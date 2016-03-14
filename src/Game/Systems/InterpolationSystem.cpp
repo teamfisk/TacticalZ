@@ -17,7 +17,7 @@ void InterpolationSystem::Update(double dt)
             continue;
         }
         auto& iPosition = kv.second;
-        glm::vec3& position = iPosition.Component[iPosition.Field];
+        Field<glm::tvec3<float, glm::highp>> position = iPosition.Component[iPosition.Field];
 
         iPosition.Alpha += dt;
         float alpha = glm::min(iPosition.Alpha / m_SnapshotInterval, 1.0);
@@ -31,7 +31,7 @@ void InterpolationSystem::Update(double dt)
             continue;
         }
         auto& iOrientation = kv.second;
-        glm::vec3& orientation = iOrientation.Component[iOrientation.Field];
+        Field<glm::vec3> orientation = iOrientation.Component[iOrientation.Field];
 
         iOrientation.Alpha += dt / m_SnapshotInterval;
         iOrientation.Alpha = glm::min(iOrientation.Alpha, 1.0);
@@ -45,7 +45,7 @@ void InterpolationSystem::Update(double dt)
             continue;
         }
         auto& iVelocity = kv.second;
-        glm::vec3& position = iVelocity.Component[iVelocity.Field];
+        Field<glm::vec3> position = iVelocity.Component[iVelocity.Field];
 
         iVelocity.Alpha += dt;
         float alpha = glm::min(iVelocity.Alpha / m_SnapshotInterval, 1.0);
@@ -72,8 +72,8 @@ bool InterpolationSystem::OnInterpolate(Events::Interpolate& e)
         Interpolation<glm::quat> iOrientation(
             cTransform,
             "Orientation",
-            glm::quat((glm::vec3&)cTransform["Orientation"]),
-            glm::quat((glm::vec3&)e.Component["Orientation"])
+            glm::quat((Field<glm::vec3>)cTransform["Orientation"]),
+            glm::quat((Field<glm::vec3>)e.Component["Orientation"])
         );
         m_InterpolateOrientation.erase(e.Entity);
         m_InterpolateOrientation.insert(std::make_pair(e.Entity, iOrientation));

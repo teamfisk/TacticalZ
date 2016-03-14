@@ -22,16 +22,18 @@
 #include "../Core/EventBroker.h"
 #include "ImGuiRenderPass.h"
 #include "Camera.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "imgui/imgui.h"
 #include "TextPass.h"
 #include "Util/CommonFunctions.h"
 #include "Core/PerformanceTimer.h"
 #include "ShadowPass.h"
+#include "EResolutionChanged.h"
 
 class Renderer : public IRenderer
 {
     static void glfwFrameBufferCallback(GLFWwindow* window, int width, int height);
+    static void glfwWindowSizeCallback(GLFWwindow* window, int width, int height);
 
 public:
 	Renderer(EventBroker* eventBroker, ConfigFile* config)
@@ -40,12 +42,13 @@ public:
     { }
 	~Renderer();
 
+    virtual void SetResolution(const Rectangle& resolution) override;
+
     virtual void Initialize() override;
     virtual void Update(double dt) override;
     virtual void Draw(RenderFrame& frame) override;
 
     virtual PickData Pick(glm::vec2 screenCoord) override;
-
 
 private:
     //----------------------Variables----------------------//
@@ -68,6 +71,7 @@ private:
     bool m_ResizeWindow = false;
 	int m_SSAO_Quality = 0;
 	int m_GLOW_Quality = 2;
+	unsigned int m_MSAA_Level = 0;
 
     PickingPass* m_PickingPass;
     LightCullingPass* m_LightCullingPass;
@@ -90,11 +94,14 @@ private:
     void InputUpdate(double dt);
     //void PickingPass(RenderQueueCollection& rq);
     //void DrawScreenQuad(GLuint textureToDraw);
+    void setWindowSize(Rectangle size);
+    void updateFramebufferSize();
 
     static bool DepthSort(const std::shared_ptr<RenderJob> &i, const std::shared_ptr<RenderJob> &j) { return (i->Depth < j->Depth); }
     void SortRenderJobsByDepth(RenderScene &scene);
     void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type);
-	//--------------------ShaderPrograms-------------------//
+
+    //--------------------ShaderPrograms-------------------//
     ShaderProgram* m_BasicForwardProgram;
     ShaderProgram* m_ExplosionEffectProgram;
 

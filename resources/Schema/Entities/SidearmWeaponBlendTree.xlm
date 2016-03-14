@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="SidearmWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:BlendAdditive>
+      <Adder>Aim</Adder>
+      <Receiver>WeaponBlend</Receiver>
+    </c:BlendAdditive>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="WeaponBlend">
+      <Components>
+        <c:BlendAdditive>
+          <Adder>MovementBlend2</Adder>
+          <Receiver>ActionBlend</Receiver>
+        </c:BlendAdditive>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="ActionBlend">
+          <Components>
+            <c:Blend>
+              <Pose1>Reload</Pose1>
+              <Pose2>Fire</Pose2>
+            </c:Blend>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Reload">
+              <Components>
+                <c:Animation>
+                  <AnimationName>ReloadSwitchU</AnimationName>
+                  <Loop>false</Loop>
+                </c:Animation>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Fire">
+              <Components>
+                <c:Animation>
+                  <AnimationName>ShootSecWepU</AnimationName>
+                  <Loop>false</Loop>
+                </c:Animation>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="MovementBlend2">
+          <Components>
+            <c:Blend>
+              <Pose1>Idle</Pose1>
+              <Pose2>Run</Pose2>
+            </c:Blend>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Idle">
+              <Components>
+                <c:Animation>
+                  <AnimationName>IdleSecWepU</AnimationName>
+                  <Additive>true</Additive>
+                </c:Animation>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Run">
+              <Components>
+                <c:Animation>
+                  <AnimationName>IdleSecWepU</AnimationName>
+                  <Additive>true</Additive>
+                </c:Animation>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Aim">
+      <Components>
+        <c:Animation>
+          <AnimationName>AimSecWepA</AnimationName>
+          <Time>0.5</Time>
+          <Speed>0.10000000149011612</Speed>
+          <Loop>false</Loop>
+          <Additive>true</Additive>
+        </c:Animation>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

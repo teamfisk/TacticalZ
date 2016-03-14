@@ -14,11 +14,12 @@
 #include "ModelJob.h"
 #include "Renderer.h"
 #include "PointLightJob.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "../Core/EPlayerSpawned.h"
 #include "../Core/Octree.h"
 #include "../Collision/EntityAABB.h"
 #include "../Core/ConfigFile.h"
+#include "EResolutionChanged.h"
 
 class RenderSystem : public ImpureSystem
 {
@@ -36,6 +37,8 @@ private:
     EntityWrapper m_LocalPlayer = EntityWrapper::Invalid;
     Octree<EntityAABB>* m_Octree;
 
+    EventRelay<RenderSystem, Events::ResolutionChanged> m_EResolutionChanged;
+    bool OnResolutionChanged(Events::ResolutionChanged &event);
     EventRelay<RenderSystem, Events::SetCamera> m_ESetCamera;
     bool OnSetCamera(Events::SetCamera &event);
     EventRelay<RenderSystem, Events::InputCommand> m_EInputCommand;

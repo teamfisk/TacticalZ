@@ -63,7 +63,8 @@ private:
 
 	GLuint m_DepthMap;
 	FrameBuffer m_DepthBuffer;
-	ShaderProgram* m_ShadowProgram;
+    ShaderProgram* m_ShadowProgram;
+    ShaderProgram* m_ShadowProgramSkinned;
 
 	std::array<glm::mat4, MAX_SPLITS> m_LightProjection;
 	std::array<glm::mat4, MAX_SPLITS> m_LightView;

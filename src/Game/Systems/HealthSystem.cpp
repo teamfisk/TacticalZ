@@ -21,7 +21,7 @@ bool HealthSystem::OnPlayerDamaged(Events::PlayerDamage& e)
     }
 
     ComponentWrapper cHealth = e.Victim["Health"];
-    double& health = cHealth["Health"];
+    Field<double> health = cHealth["Health"];
     //if player has the boost from a defender, subtract the damage taken by StrengthOfEffect amount
     auto playerBoostDefenderEntity = e.Victim.FirstChildByName("BoostDefender");
     if (playerBoostDefenderEntity.Valid()) {
@@ -56,9 +56,9 @@ bool HealthSystem::OnInputCommand(Events::InputCommand& e)
 bool HealthSystem::OnPlayerHealthPickup(Events::PlayerHealthPickup& e)
 {
     ComponentWrapper cHealth = e.Player["Health"];
-    double& health = cHealth["Health"];
+    Field<double> health = cHealth["Health"];
     health += e.HealthAmount;
-    health = std::min(health, (double)cHealth["MaxHealth"]);
+    health = std::min(*health, (const double&)cHealth["MaxHealth"]);
 
     return true;
 }

@@ -3,7 +3,7 @@
 
 struct Image
 {
-    virtual ~Image() { }
+    virtual ~Image() = default;
 
 	enum class ImageFormat
 	{

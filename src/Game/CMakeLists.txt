@@ -53,10 +53,11 @@ target_link_libraries(Game
     ${LIBRARIES}
 )
 
-add_executable(TacticalZ
+add_executable(Axyz
 	main.cpp
+    ${CMAKE_SOURCE_DIR}/resources/TacticalZ.rc
 )
-target_link_libraries(TacticalZ
+target_link_libraries(Axyz
     Game
     ${LIBRARIES}
 )

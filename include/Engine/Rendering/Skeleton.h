@@ -20,11 +20,14 @@ public:
 			, Parent(parent)
 			, Name(name)
 			, OffsetMatrix(offsetMatrix)
-		{ }
+		{
+			BindTransformMatrix = glm::inverse(offsetMatrix);
+		}
 
 		std::string Name;
 		glm::mat4 OffsetMatrix;
         int ID;
+		glm::mat4 BindTransformMatrix;
 
 		Bone* Parent;
 		std::vector<Bone*> Children;

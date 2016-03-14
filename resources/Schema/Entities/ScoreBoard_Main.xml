@@ -2,41 +2,166 @@
 <Entity name="ScoreBoard_Main_Origin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Transform/>
+    <c:NetworkComponent/>
+    <c:Transform>
+      <Orientation X="0" Y="4.71199989" Z="0"/>
+    </c:Transform>
   </Components>
 
   <Children>
-    <Entity name="Background_Spectator">
+    <Entity name="Spawner_2">
       <Components>
-        <c:Model>
-          <Resource>Models/Core/UnitCube.mesh</Resource>
-        </c:Model>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/ScoreBoard_Red.xml</EntityFile>
+        </c:Spawner>
         <c:Transform>
-          <Position X="0" Y="-19" Z="0"/>
-          <Scale X="30" Y="12" Z="1"/>
+          <Position X="-16.5" Y="0" Z="0"/>
         </c:Transform>
       </Components>
-      <Children/>
-    </Entity>
-    <Entity name="ScoreBoard_Spectators">
-      <Components>
-        <c:ScoreScreen>
-          <Offset X="0" Y="-2" Z="0"/>
-        </c:ScoreScreen>
-        <c:Team/>
-        <c:Transform>
-          <Position X="0" Y="-15.7886772" Z="1.5"/>
-        </c:Transform>
-      </Components>
-      <Children/>
+      <Children>
+        <Entity name="ScoreBoard_Red_Origin">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="RedSide">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitCube.mesh</Resource>
+                  <Color A="1" B="0" G="0.0862745121" R="1"/>
+                  <Visible>false</Visible>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.5"/>
+                  <Scale X="32" Y="23" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="ScoreBoard_Red">
+              <Components>
+                <c:Team>
+                  <Team>
+                    <Red/>
+                  </Team>
+                </c:Team>
+                <c:ScoreScreen>
+                  <Offset X="0" Y="-3" Z="0"/>
+                </c:ScoreScreen>
+                <c:Transform>
+                  <Position X="0" Y="7" Z="1.5"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="IDText">
+                  <Components>
+                    <c:Text>
+                      <Content>ID</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="-13" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="NameText">
+                  <Components>
+                    <c:Text>
+                      <Content>Name</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="-10" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KDText">
+                  <Components>
+                    <c:Text>
+                      <Content>KD</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="1.28838646" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KillsText">
+                  <Components>
+                    <c:Text>
+                      <Content>Kills</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="4.6874299" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="DeathsText">
+                  <Components>
+                    <c:Text>
+                      <Content>Deaths</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="8.9577198" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
     </Entity>
     <Entity name="Background_Main">
       <Components>
         <c:Model>
-          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <GlowIntensity>0.80000019073486328</GlowIntensity>
+          <Resource>Models/Props/ScoreBoard/Scoreboard.mesh</Resource>
+          <Shadow>false</Shadow>
         </c:Model>
         <c:Transform>
-          <Scale X="69" Y="25" Z="1"/>
+          <Orientation X="0" Y="3.13400006" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Background_Spectator">
+      <Components>
+        <c:Model>
+          <GlowIntensity>0.70000028610229492</GlowIntensity>
+          <Resource>Models/Props/ScoreBoard/Spectatorboard.mesh</Resource>
+          <Shadow>false</Shadow>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="-19" Z="0"/>
+          <Orientation X="0" Y="3.13300014" Z="0"/>
         </c:Transform>
       </Components>
       <Children/>
@@ -44,24 +169,236 @@
     <Entity name="Spawner_1">
       <Components>
         <c:Spawner>
-          <EntityFile></EntityFile>
+          <EntityFile>Schema/Entities/ScoreBoard_Blue.xml</EntityFile>
         </c:Spawner>
         <c:Transform>
           <Position X="16.5" Y="0" Z="0"/>
         </c:Transform>
       </Components>
-      <Children/>
+      <Children>
+        <Entity name="ScoreBoard_Blue_Origin">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="BlueSide">
+              <Components>
+                <c:Model>
+                  <Resource>Models/Core/UnitCube.mesh</Resource>
+                  <Color A="1" B="1" G="0.505882382" R="0"/>
+                  <Visible>false</Visible>
+                </c:Model>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="0.5"/>
+                  <Scale X="32" Y="23" Z="1"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="ScoreBoard_Blue">
+              <Components>
+                <c:Team>
+                  <Team>
+                    <Blue/>
+                  </Team>
+                </c:Team>
+                <c:ScoreScreen>
+                  <Offset X="0" Y="-3" Z="0"/>
+                </c:ScoreScreen>
+                <c:Transform>
+                  <Position X="0" Y="7" Z="1.5"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="IDText">
+                  <Components>
+                    <c:Text>
+                      <Content>ID</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="-13" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="NameText">
+                  <Components>
+                    <c:Text>
+                      <Content>Name</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="-10" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KDText">
+                  <Components>
+                    <c:Text>
+                      <Content>KD</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="1.28838646" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="KillsText">
+                  <Components>
+                    <c:Text>
+                      <Content>Kills</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="4.6874299" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="DeathsText">
+                  <Components>
+                    <c:Text>
+                      <Content>Deaths</Content>
+                      <Resource>Fonts/DroidSans.ttf,64</Resource>
+                      <Alignment>
+                        <Left/>
+                      </Alignment>
+                    </c:Text>
+                    <c:Transform>
+                      <Position X="8.9577198" Y="2.5" Z="0"/>
+                      <Scale X="2" Y="2" Z="2"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
     </Entity>
-    <Entity name="Spawner_2">
+    <Entity name="ScoreBoard_Spectators">
       <Components>
-        <c:Spawner>
-          <EntityFile></EntityFile>
-        </c:Spawner>
+        <c:Team/>
+        <c:ScoreScreen>
+          <Offset X="0" Y="-2" Z="0"/>
+        </c:ScoreScreen>
         <c:Transform>
-          <Position X="-16.5" Y="0" Z="0"/>
+          <Position X="0" Y="-15.7886772" Z="1.5"/>
         </c:Transform>
       </Components>
       <Children/>
+    </Entity>
+    <Entity name="EndScreen">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="EndScreen_Origin">
+          <Components>
+            <c:Transform>
+              <Position X="0" Y="3.10000014" Z="42.9360008"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="Camera">
+              <Components>
+                <c:Camera/>
+                <c:EndScreen/>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="Sprite_Origin">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0" Y="0.65200001" Z="-1.72800004"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="SpriteRed">
+                      <Components>
+                        <c:Sprite>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                          <BlurBackground>true</BlurBackground>
+                          <Color A="0.588235319" B="0" G="0" R="0.588235319"/>
+                          <Visible>false</Visible>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Scale X="1.30000007" Y="0.300000012" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="SpriteBlue">
+                      <Components>
+                        <c:Sprite>
+                          <Model>Models/Core/UnitQuad.mesh</Model>
+                          <GlowMap></GlowMap>
+                          <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                          <BlurBackground>true</BlurBackground>
+                          <Color A="0.588235319" B="0.588235319" G="0" R="0"/>
+                        </c:Sprite>
+                        <c:Transform>
+                          <Scale X="1.30000007" Y="0.300000012" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="TextBlue">
+                      <Components>
+                        <c:Text>
+                          <Content>Blue team win!</Content>
+                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Visible>false</Visible>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="-0.0670000017" Z="0.0299999993"/>
+                          <Scale X="0.150000006" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="TextRed">
+                      <Components>
+                        <c:Text>
+                          <Content>Red team win!</Content>
+                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="-0.0670000017" Z="0.0299999993"/>
+                          <Scale X="0.150000006" Y="0.150000006" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
     </Entity>
   </Children>
 

@@ -12,7 +12,7 @@
 #include "../Core/AABB.h"
 #include "Rendering/RawModelCustom.h"
 //#include "Rendering/RawModelAssimp.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "../Core/Entity.h"
 #include "../Core/EntityWrapper.h"
 #include "EntityAABB.h"
@@ -80,6 +80,18 @@ bool AABBvsTriangles(const AABB& box,
 
 //Detects collision, but does not resolve.
 bool AABBvsTriangles(const AABB& box,
+    const RawModel::Vertex* modelVertices,
+    const std::vector<unsigned int>& modelIndices,
+    const glm::mat4& modelMatrix);
+
+enum Output
+{
+    OutContained,
+    OutSeparated,
+    OutIntersecting
+};
+//Detects intersection and containment.
+Output AABBvsTrianglesWContainment(const AABB& box,
     const RawModel::Vertex* modelVertices,
     const std::vector<unsigned int>& modelIndices,
     const glm::mat4& modelMatrix);

@@ -12,7 +12,7 @@
 #include "../Core/ResourceManager.h"
 #include "Camera.h"
 #include "../Core/World.h"
-#include "../Core/Transform.h"
+#include "../Core/TransformSystem.h"
 #include "Skeleton.h"
 #include "ShaderProgram.h"
 #include "BlendTree.h"
@@ -26,24 +26,13 @@ struct ModelJob : RenderJob
 		ModelID = model->ResourceID;
 		Type = matProp.type;
 		::RawModel::MaterialBasic* matGroup = matProp.material;
+		ShaderID = matProp.ShaderID;
 		switch(matProp.type){
 		case ::RawModel::MaterialType::Basic:
-			if (Model->IsSkinned()) {
-				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
-			}
-			else {
-				ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
-			}
 			TextureID = 0;
 			break;
 		case ::RawModel::MaterialType::SingleTextures:
 			{
-				if (Model->IsSkinned()) {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSkinnedProgram")->ResourceID;
-				}
-				else {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusProgram")->ResourceID;
-				}
 				::RawModel::MaterialSingleTextures* singleTextures = static_cast<::RawModel::MaterialSingleTextures*>(matProp.material);
 				TextureID = (singleTextures->ColorMap.Texture) ? singleTextures->ColorMap.Texture->ResourceID : 0;
 				if (modelComponent["DiffuseTexture"]) {
@@ -65,12 +54,6 @@ struct ModelJob : RenderJob
 			break;
 		case ::RawModel::MaterialType::SplatMapping:
 			{
-				if (Model->IsSkinned()) {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapSkinnedProgram")->ResourceID;
-				}
-				else {
-					ShaderID = ResourceManager::Load<ShaderProgram>("#ForwardPlusSplatMapProgram")->ResourceID;
-				}
 				::RawModel::MaterialSplatMapping* SplatTextures = static_cast<::RawModel::MaterialSplatMapping*>(matProp.material);
 
 				SplatMap = &SplatTextures->SplatMap;
@@ -121,12 +104,17 @@ struct ModelJob : RenderJob
         FillPercentage = fillPercentage;
 		IsShielded = isShielded;
 
+        
+        if (world->HasComponent(Entity, "Unpickable")) {
+            NotPickable = true;
+        }
+
         if (model->IsSkinned()) {
             Skeleton = Model->m_RawModel->m_Skeleton;
 
             if (Skeleton != nullptr) {
-                
                 EntityWrapper entityWrapper = EntityWrapper(world, modelComponent.EntityID);
+                
 
                 if(Skeleton->BlendTrees.find(entityWrapper) != Skeleton->BlendTrees.end()) {
                     BlendTree = Skeleton->BlendTrees.at(entityWrapper);
@@ -164,6 +152,7 @@ struct ModelJob : RenderJob
     float FillPercentage = 0.0;
 	bool IsShielded;
 	bool Shadow;
+    bool NotPickable = false;
 
     void CalculateHash() override
     {

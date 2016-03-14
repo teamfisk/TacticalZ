@@ -29,7 +29,6 @@ Texture::Texture(std::string path)
     }
 
     // Construct the OpenGL texture
-
     glGenTextures(1, &m_Texture);
     glBindTexture(GL_TEXTURE_2D, m_Texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

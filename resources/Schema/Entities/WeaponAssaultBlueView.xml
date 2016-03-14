@@ -88,26 +88,15 @@
           <BoneName>R_Arm_Weapon_Joint</BoneName>
         </c:BoneAttachment>
         <c:Model>
+          <GlowIntensity>1.5</GlowIntensity>
           <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
         </c:Model>
         <c:Transform>
-          <Position X="0.120748274" Y="-0.228437141" Z="-0.181454718"/>
-          <Orientation X="0.0102804415" Y="-0.00312523148" Z="0.0428143665"/>
+          <Position X="0.120748267" Y="-0.22843127" Z="-0.181454584"/>
+          <Orientation X="0.0102799674" Y="-0.00312504289" Z="0.0428140014"/>
         </c:Transform>
       </Components>
       <Children>
-        <Entity name="WeaponMuzzle">
-          <Components>
-            <c:Spawner>
-              <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
-            </c:Spawner>
-            <c:Transform>
-              <Position X="0.00800000038" Y="0.0920000076" Z="-0.416000009"/>
-              <Orientation X="6.2760005" Y="0.00500000035" Z="0.00600000005"/>
-            </c:Transform>
-          </Components>
-          <Children/>
-        </Entity>
         <Entity name="ReloadSpawner">
           <Components>
             <c:Spawner>
@@ -116,6 +105,38 @@
             <c:Transform/>
           </Components>
           <Children/>
+        </Entity>
+        <Entity name="Muzzle">
+          <Components>
+            <c:Transform>
+              <Position X="0.00728808995" Y="0.0896582007" Z="-0.643795013"/>
+              <Orientation X="6.27600002" Y="0.00499999989" Z="0.00600000005"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="WeaponMuzzleFlash">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/MuzzleFlashBlue.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.000221854658" Y="-0.000376355601" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="WeaponMuzzleRay">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/RayAssaultBlue.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Position X="0.00123506912" Y="-0.00209517847" Z="-0.681198895"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>
@@ -127,17 +148,18 @@
           <InheritScale>true</InheritScale>
         </c:BoneAttachment>
         <c:Transform>
-          <Position X="0.0540266186" Y="-0.0954354703" Z="-0.255526125"/>
-          <Orientation X="0.000778362213" Y="0.0774229616" Z="0.00124316185"/>
-          <Scale X="0.25000003" Y="0.250000238" Z="0.500000417"/>
+          <Position X="0.0540265888" Y="-0.0954296291" Z="-0.255526036"/>
+          <Orientation X="0.000777846028" Y="0.0774231106" Z="0.00124278688"/>
+          <Scale X="0.25000006" Y="0.250000149" Z="0.500000238"/>
         </c:Transform>
       </Components>
       <Children>
         <Entity name="Background">
           <Components>
             <c:Sprite>
-              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <Model>Models/Core/UnitQuad.mesh</Model>
               <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
               <Color A="0.588235319" B="0" G="0" R="0"/>
             </c:Sprite>
             <c:Transform>
@@ -190,6 +212,17 @@
               <Children/>
             </Entity>
           </Children>
+        </Entity>
+        <Entity name="FriendlyBoostAttachment">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/FriendlyBoostBlueHUD.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="-0.000110394583" Y="-0.0891034827" Z="6.07890324e-05"/>
+            </c:Transform>
+          </Components>
+          <Children/>
         </Entity>
       </Children>
     </Entity>

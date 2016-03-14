@@ -9,20 +9,38 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:all>
+				<xs:element name="Model" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>The model the sprite will use.</xs:documentation></xs:annotation>
+				</xs:element>
 				<xs:element name="DiffuseTexture" type="t:string" minOccurs="0">
-					<xs:annotation><xs:documentation>Diffuse Texture file</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>Diffuse Texture file.</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="GlowMap" type="t:string" minOccurs="0">
-					<xs:annotation><xs:documentation>GlowMap file</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>GlowMap file.</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Color" type="t:Color" minOccurs="0">
-					<xs:annotation><xs:documentation>Color tint</xs:documentation></xs:annotation>
+					<xs:annotation><xs:documentation>Color tint.</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="Visible" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Whether the model is visible or not</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="DepthSort" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Whether the sprite should be sorted with depth or not. Only use false for textures that are on HUD</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="KeepRatioX" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Wether the sprite should repeat in x instead of stretch when scaled.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="KeepRatioY" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Wether the sprite should repeat in y instead of stretch when scaled.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="KeepRatio" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>Keep a 1:1 ratio between X and Y.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Linear" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If it should use Linear or Nearest sampling method.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="ClampToBorder" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If it should clamp to border or repeat the texture.</xs:documentation></xs:annotation>
 				</xs:element>
 				<xs:element name="BlurBackground" type="t:bool" minOccurs="0">
 					<xs:annotation><xs:documentation>Wether the background should be blurred begind this sprite.</xs:documentation></xs:annotation>

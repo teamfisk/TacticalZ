@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="MuzzleFlashFire" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>0.08</Lifetime>
+    </c:Lifetime>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Level1">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Cone1Outside">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/Cone1Outside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Cone1Inside">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/Cone1Inside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Level2">
+      <Components>
+        <c:Transform>
+          <Position X="0.000134464673" Y="8.11116188e-05" Z="-0.0197895896"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Cone2Inside">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/Cone2Inside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Cone2Outside">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/Cone2Outside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Level3">
+      <Components>
+        <c:Transform>
+          <Position X="0.000216802931" Y="0.000130779619" Z="-0.0319075659"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="PlaneLeft">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/PlaneLeft.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlaneRight">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/PlaneRight.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlaneUp">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/PlaneUp.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlaneDown">
+          <Components>
+            <c:Fade>
+              <FadeTime>0.08</FadeTime>
+              <Reverse>true</Reverse>
+            </c:Fade>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Blue/PlaneDown.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Lights">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Light_front">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.mesh</Resource>
+              <Visible>false</Visible>
+              <Shadow>false</Shadow>
+            </c:Model>
+            <c:PointLight>
+              <Color A="1" B="1" G="1" R="0"/>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-0.000288648967" Y="0.000489665952" Z="0.0824639797"/>
+              <Scale X="0.0299999993" Y="0.0299999993" Z="0.0299999993"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Light_Side">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.mesh</Resource>
+              <Color A="1" B="1" G="1" R="0"/>
+              <Visible>false</Visible>
+              <Shadow>false</Shadow>
+            </c:Model>
+            <c:PointLight>
+              <Color A="1" B="1" G="1" R="0"/>
+              <Radius>0.40000000596046448</Radius>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="-0.0870000049" Y="0.0210000016" Z="0.186000004"/>
+              <Scale X="0.0299999993" Y="0.0299999993" Z="0.0299999993"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Light_front2">
+          <Components>
+            <c:Model>
+              <Resource>Models/Core/UnitSphere.mesh</Resource>
+              <Visible>false</Visible>
+              <Shadow>false</Shadow>
+            </c:Model>
+            <c:PointLight>
+              <Color A="1" B="1" G="1" R="0"/>
+            </c:PointLight>
+            <c:Transform>
+              <Position X="0.000448234321" Y="-0.000760387513" Z="-0.323961914"/>
+              <Scale X="0.0299999993" Y="0.0299999993" Z="0.0299999993"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="MuzzleFlashFire" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Lifetime>
+      <Lifetime>0.039999999105930328</Lifetime>
+    </c:Lifetime>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="Level1">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Cone1Outside">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/Cone1Outside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Cone1Inside">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/Cone1Inside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Level2">
+      <Components>
+        <c:Transform>
+          <Position X="0.000134464673" Y="8.11116188e-05" Z="-0.0197895896"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="Cone2Inside">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/Cone2Inside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Cone2Outside">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/Cone2Outside.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Level3">
+      <Components>
+        <c:Transform>
+          <Position X="0.000216802931" Y="0.000130779619" Z="-0.0319075659"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="PlaneLeft">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/PlaneLeft.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlaneRight">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/PlaneRight.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlaneUp">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/PlaneUp.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="PlaneDown">
+          <Components>
+            <c:Model>
+              <GlowIntensity>2</GlowIntensity>
+              <Resource>Models/Effects/MuzzleFlash/Fire/PlaneDown.mesh</Resource>
+              <Shadow>false</Shadow>
+              <Transparent>true</Transparent>
+            </c:Model>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

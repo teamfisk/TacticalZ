@@ -40,6 +40,8 @@
 #include "Game/Systems/MainMenuSystem.h"
 #include "Game/Systems/ServerListSystem.h"
 #include "Game/Systems/StartSystem.h"
+#include "Game/Systems/EndScreenSystem.h"
+#include "Game/Systems/FadeSystem.h"
 #include "Rendering/TextureSprite.h"
 
 
@@ -128,6 +130,7 @@ Game::Game(int argc, char* argv[])
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TransformSystem>(updateOrderLevel);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
@@ -158,6 +161,8 @@ Game::Game(int argc, char* argv[])
     m_SystemPipeline->AddSystem<SpectatorCameraSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ServerListSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<StartSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<EndScreenSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<FadeSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -224,16 +229,18 @@ void Game::Tick()
     m_EventBroker->Swap();
 
     PerformanceTimer::StartTimerAndStopPrevious("SoundManager");
-    m_SoundManager->Update(dt);
+    if (m_IsClient) {
+        m_SoundManager->Update(dt);
+    }
 
     // Update network
     PerformanceTimer::StartTimerAndStopPrevious("Network");
     m_EventBroker->Process<MultiplayerSnapshotFilter>();
     if (m_NetworkClient != nullptr) {
-        m_NetworkClient->Update();
+        m_NetworkClient->Update(dt);
     }
     if (m_NetworkServer != nullptr) {
-        m_NetworkServer->Update();
+        m_NetworkServer->Update(dt);
     }
     //m_SoundManager->Update(dt);
 
@@ -249,6 +256,13 @@ void Game::Tick()
     m_RenderFrame->Clear();
     m_EventBroker->Swap();
     m_EventBroker->Clear();
+
+    //LOG_DEBUG("Recalculated positions: %i", TransformSystem::RecalculatedPositions);
+    //LOG_DEBUG("Recalculated orientations: %i", TransformSystem::RecalculatedOrientations);
+    //LOG_DEBUG("Recalculated scales: %i", TransformSystem::RecalculatedScales);
+    TransformSystem::RecalculatedPositions = 0;
+    TransformSystem::RecalculatedOrientations = 0;
+    TransformSystem::RecalculatedScales = 0;
 }
 
 int Game::parseArgs(int argc, char* argv[])

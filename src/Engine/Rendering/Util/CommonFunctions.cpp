@@ -17,23 +17,26 @@ void CommonFunctions::GenerateMultiSampleTexture(GLuint* texture, int numSamples
 {
 	glDeleteTextures(1, texture);
 	glGenTextures(1, texture);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, *texture);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, numSamples, internalFormat, dimensions.x, dimensions.y, false);
+	glBindTexture(GL_TEXTURE_2D, *texture);
+	GLERROR("Texture initialization failed 1");
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, numSamples, internalFormat, dimensions.x, dimensions.y, GL_FALSE);
 	GLERROR("Texture initialization failed");
 }
 
 
-void CommonFunctions::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint format, GLenum type, GLint numMipMaps)
+void CommonFunctions::GenerateMipMapTexture(GLuint* texture, GLenum wrapping, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type, GLint numMipMaps, GLint MAGFilter, GLint MINFilter)
 {
+    glDeleteTextures(1, texture);
 	glGenTextures(1, texture);
 	glBindTexture(GL_TEXTURE_2D, *texture);
-	glTexStorage2D(GL_TEXTURE_2D, numMipMaps, GL_RGBA8, dimensions.x, dimensions.y);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dimensions.x, dimensions.y, format, type, texture);
+	glTexStorage2D(GL_TEXTURE_2D, numMipMaps, internalFormat, dimensions.x, dimensions.y);
+	//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dimensions.x, dimensions.y, format, type, NULL);
+    GLERROR("MipMap Texture glTexSubImage2D failed");
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapping);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapping);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, MAGFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MINFilter);
 	GLERROR("MipMap Texture initialization failed");
 }
 
