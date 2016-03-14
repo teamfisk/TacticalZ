@@ -570,7 +570,7 @@ Output AABBvsTriangles(const AABB& box,
     bool resolveCollision)
 {
     if (!modelVertices) {
-        return false;
+        return Output::OutSeparated;
     }
     bool intersect = false;
     Output out = Output::OutContained;

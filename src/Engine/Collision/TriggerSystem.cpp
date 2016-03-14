@@ -38,8 +38,8 @@ void TriggerSystem::UpdateComponent(EntityWrapper& triggerEntity, ComponentWrapp
                 ? Collision::Output::OutContained 
                 : Collision::AABBvsTrianglesWContainment(
                 colliderBox,
-                triggerModel->Vertices(),
-                triggerModel->m_Indices,
+                triggerModel->CollisionVertices(),
+                triggerModel->CollisionIndices(),
                 triggerModelMat);
 
             if (colliderFitsInTrigger && Collision::AABBVsAABB(completelyInsideBox, colliderBox) && out == Collision::Output::OutContained) {
