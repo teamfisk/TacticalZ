@@ -1,21 +1,84 @@
 #include "Rendering/ShadowPass.h"
 
-ShadowPass::ShadowPass(IRenderer * renderer, int shadow_res_x, int shadow_res_y)
+ShadowPass::ShadowPass(IRenderer * renderer, int shadow_res_x, int shadow_res_y, bool useShadow)
 {
-	m_Renderer = renderer;
-	m_ResolutionSizeWidth = shadow_res_x;
-	m_ResolutionSizeHeight = shadow_res_y;
+	m_EnableShadows = useShadow;
+	if (useShadow) {
+		m_Renderer = renderer;
+		m_ResolutionSizeWidth = shadow_res_x;
+		m_ResolutionSizeHeight = shadow_res_y;
 
-	InitializeFrameBuffers();
-	InitializeShaderPrograms();
+		InitializeFrameBuffers();
+		InitializeShaderPrograms();
+	} else {
+		glGenTextures(1, &m_DepthMap);
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_DepthMap);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, 1, 1, m_CurrentNrOfSplits);
+
+		//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+		glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, glm::vec4(1.f).data);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+		m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2DArray(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
+		m_DepthBuffer.Generate();
+
+		m_DepthBuffer.Bind();
+
+		for (int i = 0; i < m_CurrentNrOfSplits; i++) {
+			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+		}
+
+		m_DepthBuffer.Unbind();
+	}
 }
 
-ShadowPass::ShadowPass(IRenderer * renderer)
+ShadowPass::ShadowPass(IRenderer * renderer, bool useShadow)
 {
-	m_Renderer = renderer;
+	m_EnableShadows = useShadow;
+	if (useShadow) {
+		m_Renderer = renderer;
 
-	InitializeFrameBuffers();
-	InitializeShaderPrograms();
+		InitializeFrameBuffers();
+		InitializeShaderPrograms();
+	} else {
+		glGenTextures(1, &m_DepthMap);
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_DepthMap);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_DEPTH_COMPONENT16, 1, 1, m_CurrentNrOfSplits);
+
+		//glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, m_ResolutionSizeWidth, m_ResolutionSizeHeight, m_CurrentNrOfSplits, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+		glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, glm::vec4(1.f).data);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+		m_DepthBuffer.AddResource(std::shared_ptr<BufferResource>(new Texture2DArray(&m_DepthMap, GL_DEPTH_ATTACHMENT)));
+		m_DepthBuffer.Generate();
+
+		m_DepthBuffer.Bind();
+
+		for (int i = 0; i < m_CurrentNrOfSplits; i++) {
+			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+		}
+
+		m_DepthBuffer.Unbind();
+
+	}
 }
 
 ShadowPass::~ShadowPass()
@@ -120,7 +183,6 @@ float ShadowPass::FindRadius(ShadowFrustum& frustum)
 			radius = distance;
 		}
 	}
-
 	frustum.Radius = radius;
 	return radius;
 }
@@ -168,15 +230,17 @@ void ShadowPass::InitializeShaderPrograms()
 
 void ShadowPass::ClearBuffer()
 {
-	m_DepthBuffer.Bind();
+	if (m_EnableShadows) {
+		m_DepthBuffer.Bind();
 
-	for (int i = 0; i < m_CurrentNrOfSplits; i++) {
-		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
+		for (int i = 0; i < m_CurrentNrOfSplits; i++) {
+			glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_DepthMap, 0, i);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		}
+
+		m_DepthBuffer.Unbind();
 	}
-
-	m_DepthBuffer.Unbind();
 }
 
 void ShadowPass::PointsToLightspace(ShadowFrustum& frustum, glm::mat4 v)

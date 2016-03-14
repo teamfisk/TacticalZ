@@ -321,7 +321,7 @@ void Renderer::InitializeRenderPasses()
     m_LightCullingPass = new LightCullingPass(this);
     m_CubeMapPass = new CubeMapPass(this);
 	m_SSAOPass = new SSAOPass(this, m_Config);
-	m_ShadowPass = new ShadowPass(this);
+	m_ShadowPass = new ShadowPass(this, m_Config->Get<bool>("Shadows.Enable", false));
     m_BlurHUDPass = new BlurHUD(this);
     m_DrawFinalPass = new DrawFinalPass(this, m_LightCullingPass, m_CubeMapPass, m_SSAOPass, m_ShadowPass, m_Config);
     m_DrawScreenQuadPass = new DrawScreenQuadPass(this);

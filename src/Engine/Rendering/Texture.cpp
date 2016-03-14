@@ -28,8 +28,6 @@ Texture::Texture(std::string path)
         break;
     }
 
-	//Master hade PNG release here...
-
     // Construct the OpenGL texture
     glGenTextures(1, &m_Texture);
     glBindTexture(GL_TEXTURE_2D, m_Texture);

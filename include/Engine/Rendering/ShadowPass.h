@@ -29,8 +29,8 @@ struct ShadowFrustum
 class ShadowPass
 {
 public:
-	ShadowPass(IRenderer* renderer);
-	ShadowPass(IRenderer * renderer, int ShadowResX, int ShadowResY);
+	ShadowPass(IRenderer* renderer, bool useShadow);
+	ShadowPass(IRenderer * renderer, int ShadowResX, int ShadowResY, bool useShadow);
 	~ShadowPass();
 
 	void InitializeFrameBuffers();
