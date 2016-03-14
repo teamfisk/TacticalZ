@@ -13,6 +13,7 @@
 #include "Input/EInputCommand.h"
 #include "Network/ESearchForServers.h"
 #include "Network/EConnectRequest.h"
+#include <stdlib.h>
 
 
 class MainMenuSystem : public ImpureSystem

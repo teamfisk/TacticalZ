@@ -609,6 +609,9 @@ bool Server::OnWin(const Events::Win & e)
 {
     // Postpone the gameover reset
     m_GameIsOver = true;
+    Packet winPacket = Packet(MessageType::Win);
+    winPacket.WritePrimitive(e.TeamThatWon);
+    reliableBroadcast(winPacket);
     return true;
 }
 

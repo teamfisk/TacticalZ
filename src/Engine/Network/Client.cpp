@@ -176,6 +176,9 @@ void Client::parseMessageType(Packet& packet)
     case MessageType::KD:
         parseKDEvent(packet);
         break;
+    case MessageType::Win:
+        parseWin(packet);
+        break;
     default:
         break;
     }
@@ -373,6 +376,13 @@ void Client::parseKDEvent(Packet & packet)
     e.KillerName = packet.ReadString();
     e.KillerTeam = packet.ReadPrimitive<int>();
 
+    m_EventBroker->Publish(e);
+}
+
+void Client::parseWin(Packet& packet)
+{
+    Events::Win e;
+    e.TeamThatWon = packet.ReadPrimitive<int>();
     m_EventBroker->Publish(e);
 }
 

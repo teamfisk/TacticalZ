@@ -66,6 +66,7 @@ private:
     QCheckBox* m_ExportSelectedButton = nullptr;
 	QCheckBox* m_ExportAnimationsButton = nullptr;
 	QCheckBox* m_ExportMaterialButton = nullptr;
+	QCheckBox* m_IsCollision = nullptr;
 
 	QLineEdit* m_ExportPath = nullptr;
 	QFileDialog* m_FileDialog = nullptr;

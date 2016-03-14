@@ -22,7 +22,7 @@ void AutoBlendQueue::Insert(AutoBlendJob autoBlendJob)
                 return;
             }
 
-            Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+            Skeleton* skeleton = model->m_Skeleton;
             if (skeleton == nullptr) {
                 return;
             }
@@ -130,7 +130,7 @@ bool AutoBlendQueue::HasActiveBlendJob()
                 return HasActiveBlendJob();
             }
 
-            Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+            Skeleton* skeleton = model->m_Skeleton;
             if (skeleton == nullptr) {
                 m_BlendQueue.pop_front();
                 return HasActiveBlendJob();
@@ -173,7 +173,7 @@ std::shared_ptr<BlendTree> AutoBlendQueue::GetBlendTree()
         return nullptr;
     }
 
-    Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+    Skeleton* skeleton = model->m_Skeleton;
     if (skeleton == nullptr) {
         return nullptr;
     }

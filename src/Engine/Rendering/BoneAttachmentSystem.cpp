@@ -26,7 +26,7 @@ void BoneAttachmentSystem::UpdateComponent(EntityWrapper& entity, ComponentWrapp
         return;
     }
 
-    Skeleton* skeleton = model->m_RawModel->m_Skeleton;
+    Skeleton* skeleton = model->m_Skeleton;
 
     if(skeleton == nullptr) {
         return;

@@ -25,11 +25,13 @@ ShadowPass::~ShadowPass()
 
 void ShadowPass::DebugGUI()
 {
+#ifdef DEBUG
 	ImGui::Checkbox("EnableShadows", &m_EnableShadows);
 	ImGui::DragFloat2("ShadowMapNearFar", m_NearFarPlane, 1.f, -1000.f, 1000.f);
 	ImGui::DragFloat("ShadowClippingWeight", &m_SplitWeight, 0.001f, 0.f, 1.f);
 	ImGui::Checkbox("ShadowTransparentObjects", &m_TransparentObjects);
 	ImGui::Checkbox("ShadowOnTextureAlphas", &m_TexturedShadows);
+#endif
 }
 
 void ShadowPass::InitializeCameras(RenderScene & scene)
@@ -259,7 +261,7 @@ void ShadowPass::Draw(RenderScene & scene)
                                 std::vector<glm::mat4> frameBones;
                                 if (modelJob->BlendTree != nullptr) {
                                     frameBones = modelJob->BlendTree->GetFinalPose();
-                                } else {
+                                } else if (modelJob->Skeleton != nullptr) {
                                     frameBones = modelJob->Skeleton->GetTPose();
                                 }
                                 glUniformMatrix4fv(glGetUniformLocation(shaderHandle, "Bones"), frameBones.size(), GL_FALSE, glm::value_ptr(frameBones[0]));

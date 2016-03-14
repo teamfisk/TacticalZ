@@ -13,6 +13,7 @@
 
 #include <boost/filesystem/path.hpp>
 
+#include <boost/endian/buffers.hpp>
 #include "../Common.h"
 #include "../GLM.h"
 #include "../Core/ResourceManager.h"
@@ -20,22 +21,17 @@
 #include "Skeleton.h"
 #include "ShaderProgram.h"
 
-#include "boost\endian\buffers.hpp"
-
-
-
 class RawModelCustom : public Resource
 {
     friend class ResourceManager;
-
+    friend class Model;
 protected:
     RawModelCustom(std::string fileName);
 
 public:
     ~RawModelCustom();
-    
-	struct Vertex
-	{
+
+	struct RenderVertex {
 		glm::vec3 Position;
 		glm::vec3 Normal;
 		glm::vec3 Tangent;
@@ -43,7 +39,7 @@ public:
 		glm::vec2 TextureCoords;
 	};
 
-    struct SkinedVertex : public Vertex {
+    struct SkinedVertex : public RenderVertex {
         glm::vec4 BoneIndices;
         glm::vec4 BoneWeights;
     };
@@ -91,7 +87,7 @@ public:
 		unsigned int ShaderID = 0;
 	};
 
-	const Vertex*	Vertices() const {
+	const RenderVertex* Vertices() const {
 		if (hasSkin) { 
 			return m_SkinedVertices.data(); 
 		} else {
@@ -99,16 +95,16 @@ public:
 		}
 	};
 
-	unsigned int	VertexSize() const {
+	unsigned int VertexSize() const {
 		if (hasSkin) {
 			return sizeof(SkinedVertex);
 		}
 		else {
-			return sizeof(Vertex);
+			return sizeof(RenderVertex);
 		}
 	};
 
-	unsigned int	NumVertices() const {
+	size_t NumVertices() const {
 		if (hasSkin) {
 			return m_SkinedVertices.size();
 		} else {
@@ -116,17 +112,39 @@ public:
 		}
 	};
 
+	const std::vector<unsigned int>& Indices() const {
+		return m_Indices;
+	}
+
 	bool IsSkinned() const { return hasSkin; };
+
+	const std::vector<glm::vec3>& CollisionVertices();
+
+	size_t NumCollisionVertices() const {
+		return m_CollisionVertices.size();
+	};
+
+	const std::vector<unsigned int>& CollisionIndices() const {
+		if (hasCollisionMesh) {
+			return m_CollisionIndices;
+		} else {
+			return m_Indices;
+		}
+	};
 
 	std::vector<MaterialProperties> m_Materials;
 
-    std::vector<unsigned int> m_Indices;
+    
     Skeleton* m_Skeleton = nullptr;
     glm::mat4 m_Matrix;
 
 private:
    	bool hasSkin;
-	std::vector<Vertex> m_Vertices;
+	bool hasCollisionMesh = false;
+	std::vector<unsigned int> m_Indices;
+	std::vector<unsigned int> m_CollisionIndices;
+	std::vector<glm::vec3> m_CollisionVertices;
+	std::vector<RenderVertex> m_Vertices;
 	std::vector<SkinedVertex> m_SkinedVertices;
 
     void ReadMeshFile(std::string filePath);
@@ -149,7 +167,12 @@ private:
     void ReadAnimationClips(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int numberOfClips);
     void ReadAnimationClipSingle(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, unsigned int clipIndex);
     void ReadAnimationKeyFrame(std::size_t& offset, char* fileData, const unsigned int& fileByteSize, std::vector<Skeleton::Animation::Keyframe>& animation);
-    
+
+
+	void ReadCollisionFile(std::string filePath);
+	void ReadCollisionFileData(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
+
+	const std::vector<glm::vec3>& ConstructCollisionList();
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
 
