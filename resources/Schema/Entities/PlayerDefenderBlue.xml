@@ -579,6 +579,7 @@
         <c:Shielded/>
         <c:HiddenForLocalPlayer/>
         <c:Model>
+          <GlowIntensity>2.5</GlowIntensity>
           <Resource>Models/Characters/Defender/DefenderBlue.mesh</Resource>
         </c:Model>
         <c:Transform/>
@@ -593,7 +594,7 @@
               <EntityFile>Schema/Entities/WeaponDefenderBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.160437703" Y="1.04422736" Z="-0.295565188"/>
+              <Position X="0.160437733" Y="1.04422712" Z="-0.295565248"/>
               <Orientation X="-0.105441377" Y="-0.0721141845" Z="0.143959135"/>
             </c:Transform>
             <c:WeaponAttachment>
@@ -614,7 +615,7 @@
               <EntityFile>Schema/Entities/SidearmWeaponBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.160437703" Y="1.04422736" Z="-0.295565188"/>
+              <Position X="0.160437733" Y="1.04422712" Z="-0.295565248"/>
               <Orientation X="-0.105441377" Y="-0.0721141845" Z="0.143959135"/>
             </c:Transform>
             <c:WeaponAttachment>
@@ -888,6 +889,40 @@
                         <c:Transform/>
                       </Components>
                       <Children>
+                        <Entity name="ActionBlend">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Fire</Pose1>
+                              <Pose2>Reload</Pose2>
+                              <Weight>0</Weight>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="Reload">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootgunReloadU</AnimationName>
+                                  <Time>0.14583822250136791</Time>
+                                  <Speed>0.5</Speed>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Fire">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootRifleU</AnimationName>
+                                  <Time>1</Time>
+                                  <Loop>false</Loop>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
                         <Entity name="ShieldBlend">
                           <Components>
                             <c:Blend>
@@ -916,40 +951,6 @@
                                   <AnimationName>ShieldFrontU</AnimationName>
                                   <Time>0.41969766243472861</Time>
                                   <Play>true</Play>
-                                </c:Animation>
-                                <c:Transform/>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
-                        <Entity name="ActionBlend">
-                          <Components>
-                            <c:Blend>
-                              <Pose1>Fire</Pose1>
-                              <Pose2>Reload</Pose2>
-                              <Weight>0</Weight>
-                            </c:Blend>
-                            <c:Transform/>
-                          </Components>
-                          <Children>
-                            <Entity name="Reload">
-                              <Components>
-                                <c:Animation>
-                                  <AnimationName>ShootgunReloadU</AnimationName>
-                                  <Time>0.14583822250136791</Time>
-                                  <Speed>0.5</Speed>
-                                </c:Animation>
-                                <c:Transform/>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                            <Entity name="Fire">
-                              <Components>
-                                <c:Animation>
-                                  <AnimationName>ShootRifleU</AnimationName>
-                                  <Time>1</Time>
-                                  <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>
                               </Components>
@@ -1057,6 +1058,287 @@
                       <Additive>true</Additive>
                     </c:Animation>
                     <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Lights">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Head">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>Head</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.0856663585" Y="1.2534951" Z="-0.133027688"/>
+                  <Orientation X="-0.235829338" Y="-0.136557266" Z="-0.187501058"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Left">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Radius>0.5</Radius>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.0938162878" Y="0.0610048659" Z="-0.00614821212"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Right">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Radius>0.5</Radius>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.0939999968" Y="0.0610048659" Z="-0.00614821212"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Back">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.00160108448" Y="0.112655103" Z="0.116904415"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Armor_Left">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>L_Shoulder_Armor_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="-0.0269512236" Y="1.13939428" Z="-0.199132487"/>
+                  <Orientation X="-0.110516846" Y="-1.05545807" Z="-0.203601331"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="light">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="0.701960802" G="0" R="0.188235298"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.259081453" Y="0.0924699008" Z="0.0193806943"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Armor_Right">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Shoulder_Armor_Joint</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.123754352" Y="1.18282735" Z="0.0295087993"/>
+                  <Orientation X="-0.355504364" Y="-1.02102363" Z="0.0802353695"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="light">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="0.701960802" G="0" R="0.188235298"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.259000003" Y="0.0924699008" Z="0.0193806943"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Elbow_Left">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>L_Elbow</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="-0.0833175629" Y="0.974545717" Z="-0.390948415"/>
+                  <Orientation X="-2.35358214" Y="-0.837287009" Z="-2.76216173"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Upper">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="0.701960802" G="0" R="0.188235298"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.0530259758" Y="0.0710293874" Z="-0.0176120717"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Lower">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="0.701960802" G="0" R="0.188235298"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.0404068455" Y="-0.0798887387" Z="-0.000667487504"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Elbow_Right">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Elbow</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.310823619" Y="1.07933402" Z="-0.0732751936"/>
+                  <Orientation X="1.59707475" Y="1.42150164" Z="0.993495047"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Upper">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="0.701960802" G="0" R="0.188235298"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.0529999994" Y="0.0710293874" Z="-0.0176120717"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Lower">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="0.701960802" G="0" R="0.188235298"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.0399999991" Y="-0.0798887387" Z="-0.000667487504"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Chest">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>Spine_3</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.0422187448" Y="1.08502948" Z="-0.0667301118"/>
+                  <Orientation X="-0.52381134" Y="-0.969553411" Z="0.280594945"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Back">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.20000000298023224</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0" Y="0.0223282184" Z="0.16728729"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Leg_Bottom_Left">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>L_Leg_Bottom</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="-0.121533178" Y="0.396223545" Z="-0.258486152"/>
+                  <Orientation X="0.0132522807" Y="0.0868163407" Z="-0.0923329741"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Outside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.09705697" Y="-0.0529966503" Z="0.026842406"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Inside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.0758597851" Y="-0.0458693244" Z="0.0236873701"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Leg_Bottom_Right">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Leg_Bottom</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.186360687" Y="0.321388036" Z="0.0346593708"/>
+                  <Orientation X="-0.723665595" Y="-0.643600702" Z="0.338778794"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Inside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.09705697" Y="-0.0529966503" Z="0.026842406"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Outside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.0758597851" Y="-0.0458693244" Z="0.0236873701"/>
+                    </c:Transform>
                   </Components>
                   <Children/>
                 </Entity>
