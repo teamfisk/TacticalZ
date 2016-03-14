@@ -69,7 +69,7 @@ private:
 	std::array<glm::mat4, MAX_SPLITS> m_LightProjection;
 	std::array<glm::mat4, MAX_SPLITS> m_LightView;
 
-	GLfloat m_NearFarPlane[2] = { -34.f, 27.f };
+	GLfloat m_NearFarPlane[2] = { -128.f, 128.f };
 	GLuint m_ResolutionSizeWidth = 1024 * 2;
 	GLuint m_ResolutionSizeHeight = 1024 * 2;
 
@@ -78,7 +78,7 @@ private:
 	bool m_EnableShadows = true;
 
 	int m_CurrentNrOfSplits = 4;
-	float m_SplitWeight = 0.962f;
+	float m_SplitWeight = 0.7f;
 
 	std::array<ShadowFrustum, MAX_SPLITS> m_shadowFrusta;
 
