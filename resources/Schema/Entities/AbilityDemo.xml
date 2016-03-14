@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:SceneLight>
+      <AmbientColor A="1" B="0.392156869" G="0.392156869" R="0.392156869"/>
+      <Gamma>1</Gamma>
+      <Exposure>0.82000017166137695</Exposure>
+    </c:SceneLight>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <GlowIntensity>1.0199999809265137</GlowIntensity>
+          <Resource>Models/Props/Walls/SciFiWallTop.mesh</Resource>
+          <Color A="1" B="3.92156863" G="1" R="1"/>
+          <Shadow>false</Shadow>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="58.718792" Z="15.6310005"/>
+          <Orientation X="0" Y="0" Z="3.14199996"/>
+          <Scale X="0.279000014" Y="1" Z="0.279000014"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <GlowIntensity>1.5</GlowIntensity>
+          <Resource>Models/Props/Pillars/SciFiPillar2Blue.mesh</Resource>
+          <Shadow>false</Shadow>
+        </c:Model>
+        <c:Transform>
+          <Position X="-14.4384613" Y="-1.2316848" Z="0"/>
+          <Orientation X="0" Y="2.64800024" Z="0"/>
+          <Scale X="2" Y="3.60000014" Z="1.9000001"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Collidable/>
+        <c:Model>
+          <GlowIntensity>1.5</GlowIntensity>
+          <Resource>Models/Props/Pillars/SciFiPillar2Blue.mesh</Resource>
+          <Shadow>false</Shadow>
+        </c:Model>
+        <c:Transform>
+          <Position X="14.3019333" Y="-1.12725353" Z="0"/>
+          <Orientation X="0" Y="3.84800029" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Dir">
+      <Components>
+        <c:DirectionalLight>
+          <Color A="1" B="0.725490212" G="0.75686276" R="0.741176486"/>
+          <Intensity>1.0699999332427979</Intensity>
+        </c:DirectionalLight>
+        <c:Transform>
+          <Orientation X="3.68318534" Y="0" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Cam">
+      <Components>
+        <c:Camera/>
+        <c:Model>
+          <Resource>Models/Core/UnitSphere.mesh</Resource>
+          <Shadow>false</Shadow>
+          <NormalMap>false</NormalMap>
+          <DiffuseTexture>false</DiffuseTexture>
+          <SpecularMap>false</SpecularMap>
+          <GlowMap>false</GlowMap>
+        </c:Model>
+        <c:Transform>
+          <Position X="0.100000001" Y="-0.0670000017" Z="-32.8670006"/>
+          <Orientation X="0" Y="3.1400001" Z="0"/>
+          <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Spawn">
+      <Components>
+        <c:PlayerSpawn>
+          <AssaultFile>Schema/Entities/PlayerAssaultBlue.xml</AssaultFile>
+          <DefenderFile>Schema/Entities/PlayerDefenderBlue.xml</DefenderFile>
+          <SniperFile></SniperFile>
+        </c:PlayerSpawn>
+        <c:Model>
+          <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
+        </c:Model>
+        <c:Spawner>
+          <EntityFile></EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="0.100000001" Y="2.8398931" Z="-29.0827847"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

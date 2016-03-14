@@ -78,7 +78,7 @@ private:
 	bool m_EnableShadows = true;
 
 	int m_CurrentNrOfSplits = 4;
-	float m_SplitWeight = 0.7f;
+	float m_SplitWeight = 0.962f;
 
 	std::array<ShadowFrustum, MAX_SPLITS> m_shadowFrusta;
 
