@@ -324,7 +324,8 @@ void main()
 	float shadowFactor = 0.0;
 
 	for(int i = start; i < start + amount; i++) {
-
+		vec3 shadowColor = vec3(1.0);
+		
 		int l = int(LightIndex[i]);
 		LightSource light = LightSources.List[l];
 
@@ -336,13 +337,11 @@ void main()
 			int DepthMapIndex = getShadowIndex(FarDistance);
 			light_result = CalcDirectionalLightSource(V * light.Direction, light.Color, light.Intensity, viewVec, normal);
 			shadowFactor = CalcShadowValue(Input.PositionLightSpace[DepthMapIndex], Input.Normal, vec3(light.Direction), DepthMap, DepthMapIndex);
+			shadowColor = min(vec3(shadowFactor), vec3(1.0));
 		}
-		totalLighting.Diffuse += vec4(light_result.Diffuse.rgb * ao, light_result.Diffuse.a);
-		totalLighting.Specular += vec4(light_result.Specular.rgb * ao, light_result.Specular.a);
+		totalLighting.Diffuse += vec4(light_result.Diffuse.rgb * ao * shadowColor, light_result.Diffuse.a);
+		totalLighting.Specular += vec4(light_result.Specular.rgb * ao * shadowColor, light_result.Specular.a);
 	}
-	
-	totalLighting.Diffuse *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
-	totalLighting.Specular *= vec4(min(vec3(shadowFactor) + AmbientColor.xyz, vec3(1.0)), 1.0);
 
 	vec4 color_result = mix((Color * diffuseTexel * DiffuseColor), Input.ExplosionColor, Input.ExplosionPercentageElapsed);
 	color_result = color_result * (totalLighting.Diffuse + (totalLighting.Specular * specularTexel));
