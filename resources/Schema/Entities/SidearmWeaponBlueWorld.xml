@@ -2,6 +2,7 @@
 <Entity name="SidearmWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:Shielded/>
     <c:Model>
       <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
     </c:Model>
@@ -9,16 +10,37 @@
   </Components>
 
   <Children>
-    <Entity name="WeaponMuzzle">
+    <Entity name="Muzzle">
       <Components>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/RayBlue.xml</EntityFile>
-        </c:Spawner>
         <c:Transform>
-          <Position X="0.0123999491" Y="0.102453232" Z="-0.273824364"/>
+          <Position X="-0.0169804785" Y="-0.0188358482" Z="-0.222064406"/>
         </c:Transform>
       </Components>
-      <Children/>
+      <Children>
+        <Entity name="WeaponMuzzleRay">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/RaySideArmBlue.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0" Y="0.125075191" Z="-0.206788138"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="WeaponMuzzleFlash">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/MuzzleFlashSideArmBlue.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0.0240342002" Y="0.116005458" Z="-0.0419839472"/>
+              <Scale X="0.5" Y="0.5" Z="0.5"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
   </Children>
 

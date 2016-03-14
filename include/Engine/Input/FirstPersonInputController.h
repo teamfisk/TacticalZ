@@ -213,7 +213,6 @@ bool FirstPersonInputController<EventContext>::OnCommand(const Events::InputComm
                     }
                 }
 
-
                 EntityWrapper firstPersonModel = m_PlayerEntity.FirstChildByName("Hands");
                 if (firstPersonModel.Valid()) {
                     if (val > 0) {  // Walk/Run

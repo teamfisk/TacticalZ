@@ -87,6 +87,9 @@ bool SoundSystem::OnPlayerDamage(const Events::PlayerDamage & e)
     if (!e.Victim.Valid() || !e.Inflictor.Valid()) {
         return false;
     }
+    if (e.Victim.ID != LocalPlayer.ID) {
+        return false;
+    }
     auto victimTeam = m_World->GetComponent(e.Victim.ID, "Team");
     auto inflictorTeam = m_World->GetComponent(e.Inflictor.ID, "Team");
     if ((int)victimTeam["Team"] == (int)inflictorTeam["Team"]) {

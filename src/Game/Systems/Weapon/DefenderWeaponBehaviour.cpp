@@ -395,9 +395,12 @@ void DefenderWeaponBehaviour::spawnTracers(ComponentWrapper cWeapon, WeaponInfo&
                 glm::vec3 muzzlePosition = TransformSystem::AbsolutePosition(muzzle);
                 glm::quat muzzleOrientation = TransformSystem::AbsoluteOrientation(muzzle);
 
-                rayOrigin = muzzlePosition;
 
                 glm::vec3 muzzleToHit = hitPosition - muzzlePosition;
+
+                rayOrigin = muzzlePosition + (muzzleToHit/2.f);
+
+
                 glm::vec3 lookVector = glm::normalize(-muzzleToHit);
                 float pitch = std::asin(-lookVector.y);
                 float yaw = std::atan2(lookVector.x, lookVector.z);
@@ -459,8 +462,8 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
         }
 
         // Temp hit decal
-        EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
-        (Field<glm::vec3>)hit["Transform"]["Position"] = pick.Position;
+//         EntityWrapper hit = ResourceManager::Load<EntityFile>("Schema/Entities/HitTest.xml")->MergeInto(m_World);
+//         (Field<glm::vec3>)hit["Transform"]["Position"] = pick.Position;
 
         // Don't let us shoot ourselves in the foot somehow
         if (victim == LocalPlayer) {
@@ -477,12 +480,17 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
 
         // Check for friendly fire
         if ((ComponentInfo::EnumType)victim["Team"]["Team"] == (ComponentInfo::EnumType)wi.Player["Team"]["Team"]) {
-            // TODO: Ammo sharing
+            // Give boost
+            Events::PlayerDamage ePlayerDamage;
+            ePlayerDamage.Inflictor = wi.Player;
+            ePlayerDamage.Victim = victim;
+            ePlayerDamage.Damage = 0;
+            m_EventBroker->Publish(ePlayerDamage);
             continue;
         }
 
         damageSum[victim] += pelletDamage;
-        ((Field<glm::vec4>)hit["Model"]["Color"]).z(1.f);
+       // ((Field<glm::vec4>)hit["Model"]["Color"]).z(1.f);
     }
 
     // Deal damage!
@@ -493,7 +501,6 @@ void DefenderWeaponBehaviour::dealDamage(ComponentWrapper cWeapon, WeaponInfo& w
         ePlayerDamage.Victim = kv.first;
         ePlayerDamage.Damage = kv.second;
         m_EventBroker->Publish(ePlayerDamage);
-        LOG_DEBUG("Dealt %f damage to #%i", kv.second, kv.first.ID);
     }
 }
 

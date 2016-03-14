@@ -25,6 +25,7 @@ enum class MessageType
     AmmoPickup,
     RemoveWorld,
     KD,
+    Win,
     Invalid
 };
 
