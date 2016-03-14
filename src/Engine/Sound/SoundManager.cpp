@@ -425,9 +425,6 @@ bool SoundManager::OnSetCamera(const Events::SetCamera& e)
         alSourcei(m_CurrentBGM->ALsource, AL_LOOPING, 1);
         playSound(m_CurrentBGM);
         setTimeOffsetSeconds(m_CurrentBGM, timeOffset);
-        //Events::ChangeBGM changeBGM;
-        //changeBGM.FilePath = "Audio/BGM/Layer3.wav";
-        //m_EventBroker->Publish(changeBGM);
     }
 }
 
