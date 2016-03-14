@@ -84,6 +84,7 @@ void EditorSystem::Update(double dt)
             }
         }
         m_EditorWorldSystemPipeline->Update(actualDelta);
+    }
 
         ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
         Field<glm::vec3> ori = cameraTransform["Orientation"];
@@ -132,7 +133,6 @@ void EditorSystem::Update(double dt)
             m_CamVelocity.z = glm::min(m_CamVelocity.z, glm::abs(move.z));
         }
         pos += m_CamVelocity * glm::inverse(glm::quat(ori)) * (float)actualDelta;
-    }
 }
 
 void EditorSystem::Enable()
@@ -159,7 +159,7 @@ void EditorSystem::Enable()
 
 void EditorSystem::Disable()
 {
-    m_EditorCameraInputController->Disable();
+    //m_EditorCameraInputController->Disable();
     m_EventBroker->Publish(Events::LockMouse());
     Events::SetCamera e;
     e.CameraEntity = m_ActualCamera;

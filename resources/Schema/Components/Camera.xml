@@ -2,5 +2,5 @@
 <Camera xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Camera.xsd">
 	<FOV>59</FOV> <!-- 90 horizontal FOV at 1080p -->
 	<NearClip>0.01</NearClip>
-	<FarClip>5000</FarClip>
+	<FarClip>300</FarClip>
 </Camera>

@@ -19,6 +19,7 @@ void Renderer::Initialize()
 {
 	m_SSAO_Quality = m_Config->Get<int>("SSAO.Quality", 0);
 	m_GLOW_Quality = m_Config->Get<int>("GLOW.Quality", 0);
+    m_MSAA_Level = m_Config->Get<unsigned int>("MSAA.Level", 0);
 	InitializeWindow();
     
     InitializeRenderPasses();
