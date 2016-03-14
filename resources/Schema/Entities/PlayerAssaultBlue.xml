@@ -572,6 +572,7 @@
         <c:Shielded/>
         <c:HiddenForLocalPlayer/>
         <c:Model>
+          <GlowIntensity>2.2000000476837158</GlowIntensity>
           <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
         </c:Model>
         <c:Transform/>
@@ -586,8 +587,8 @@
               <EntityFile>Schema/Entities/WeaponAssaultBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.128669813" Y="1.08486295" Z="-0.361068189"/>
-              <Orientation X="-0.0353792347" Y="-0.0854677409" Z="0.133094937"/>
+              <Position X="0.165036291" Y="1.03316653" Z="-0.230842277"/>
+              <Orientation X="-0.0310075935" Y="-0.0666775182" Z="0.132169068"/>
             </c:Transform>
             <c:WeaponAttachment>
               <Weapon>AssaultWeapon</Weapon>
@@ -607,8 +608,8 @@
               <EntityFile>Schema/Entities/SidearmWeaponBlueWorld.xml</EntityFile>
             </c:Spawner>
             <c:Transform>
-              <Position X="0.128669813" Y="1.08486295" Z="-0.361068189"/>
-              <Orientation X="-0.0353792347" Y="-0.0854677409" Z="0.133094937"/>
+              <Position X="0.165036291" Y="1.03316653" Z="-0.230842277"/>
+              <Orientation X="-0.0310075935" Y="-0.0666775182" Z="0.132169068"/>
             </c:Transform>
             <c:WeaponAttachment>
               <Weapon>SidearmWeapon</Weapon>
@@ -675,7 +676,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>CrouchStrafeLeftF</AnimationName>
-                                  <Time>0.14513013667773755</Time>
+                                  <Time>0.47961568648540975</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -686,7 +687,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>CrouchStrafeRightF</AnimationName>
-                                  <Time>0.072451598628520131</Time>
+                                  <Time>0.40693714843619233</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -699,7 +700,7 @@
                           <Components>
                             <c:Animation>
                               <AnimationName>CrouchWalkF</AnimationName>
-                              <Time>0.8508255838059231</Time>
+                              <Time>0.1853111336135953</Time>
                               <Play>true</Play>
                             </c:Animation>
                             <c:Transform/>
@@ -712,7 +713,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>CrouchF</AnimationName>
-                          <Time>1.5240530807526143</Time>
+                          <Time>1.8585386305602865</Time>
                           <Play>true</Play>
                         </c:Animation>
                         <c:Transform/>
@@ -755,7 +756,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>WalkF</AnimationName>
-                                  <Time>0.35598021321569639</Time>
+                                  <Time>0.87165493950985962</Time>
                                   <Play>true</Play>
                                 </c:Animation>
                                 <c:Transform/>
@@ -766,7 +767,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>RunF</AnimationName>
-                                  <Time>0.3084600556940007</Time>
+                                  <Time>0.33980950828232714</Time>
                                   <Speed>2</Speed>
                                   <Play>true</Play>
                                 </c:Animation>
@@ -790,7 +791,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>StrafeLeftF</AnimationName>
-                                  <Time>0.91116869109547771</Time>
+                                  <Time>0.94251814368380415</Time>
                                   <Speed>2</Speed>
                                   <Play>true</Play>
                                 </c:Animation>
@@ -802,7 +803,7 @@
                               <Components>
                                 <c:Animation>
                                   <AnimationName>StrafeRightF</AnimationName>
-                                  <Time>0.98857969993144401</Time>
+                                  <Time>0.019929152519770454</Time>
                                   <Speed>2</Speed>
                                   <Play>true</Play>
                                 </c:Animation>
@@ -818,7 +819,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>IdleF</AnimationName>
-                          <Time>0.85485929533452953</Time>
+                          <Time>0.55386718012173475</Time>
                           <Play>true</Play>
                         </c:Animation>
                         <c:Transform/>
@@ -944,7 +945,7 @@
             <c:Blend>
               <Pose1>AssaultWeapon</Pose1>
               <Pose2>SidearmWeapon</Pose2>
-              <Weight>1</Weight>
+              <Weight>0</Weight>
               <SubTreeRoot>true</SubTreeRoot>
             </c:Blend>
             <c:Transform/>
@@ -1005,7 +1006,7 @@
                       <Components>
                         <c:Animation>
                           <AnimationName>IdleAssaultRifleU</AnimationName>
-                          <Time>1.9871198993639698</Time>
+                          <Time>1.502794625658133</Time>
                           <Play>true</Play>
                           <Additive>true</Additive>
                         </c:Animation>
@@ -1101,6 +1102,232 @@
                       <Additive>true</Additive>
                     </c:Animation>
                     <c:Transform/>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Lights">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="Elbow_Left">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>L_Elbow</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="-0.0546795987" Y="0.970895708" Z="-0.395071507"/>
+                  <Orientation X="-2.67347836" Y="-1.14967656" Z="-2.35179591"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Upper">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.119805202" Y="0.0187246669" Z="-0.0205985513"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Lower">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.0430894755" Y="-0.0822322816" Z="0.0446314402"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Elbow_Right">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Elbow</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.311819345" Y="1.00506735" Z="-0.00708915293"/>
+                  <Orientation X="1.66802835" Y="1.3856616" Z="0.553554595"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Upper">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.119999997" Y="0.0187246669" Z="-0.0205985513"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Lower">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.0430000015" Y="-0.0822322816" Z="0.0446314402"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Head">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>Head</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.0847049356" Y="1.25094736" Z="-0.146904141"/>
+                  <Orientation X="-0.270355761" Y="-0.134028792" Z="-0.181556195"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Left">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.117407471" Y="0.0664995536" Z="-0.00829757564"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Right">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.116999999" Y="0.0664995536" Z="-0.00829757564"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Leg_top_left">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>L_Leg_Top</BoneName>
+                  <PositionOffset X="-0.116000004" Y="0.0500000007" Z="0.0360000022"/>
+                </c:BoneAttachment>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.784313738" R="0"/>
+                  <Intensity>0.10000000149011612</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="-0.187708378" Y="0.720764816" Z="0.0189282075"/>
+                  <Orientation X="0.690089703" Y="-0.0030452935" Z="-0.0742322952"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Leg_top_Right">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Leg_Top</BoneName>
+                  <PositionOffset X="0.0800000057" Y="0.0730000064" Z="0.064000003"/>
+                </c:BoneAttachment>
+                <c:PointLight>
+                  <Color A="1" B="1" G="0.784313738" R="0"/>
+                  <Intensity>0.10000000149011612</Intensity>
+                </c:PointLight>
+                <c:Transform>
+                  <Position X="0.149033397" Y="0.743774891" Z="0.0911710933"/>
+                  <Orientation X="0.00418904377" Y="-0.590482414" Z="0.240698725"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Leg_bottom_Left">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>L_Leg_Bottomdw</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="-0.121549807" Y="0.396206558" Z="-0.258821368"/>
+                  <Orientation X="0.0123701356" Y="0.0872921124" Z="-0.0923962742"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Outside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.0752567574" Y="-0.0357234403" Z="0.0396512263"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Inside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.075000003" Y="-0.0357234403" Z="0.0396512263"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="Leg_bottom_Right">
+              <Components>
+                <c:BoneAttachment>
+                  <BoneName>R_Leg_Bottom</BoneName>
+                </c:BoneAttachment>
+                <c:Transform>
+                  <Position X="0.184887171" Y="0.323244393" Z="0.0367886424"/>
+                  <Orientation X="-0.714135528" Y="-0.644820809" Z="0.337111086"/>
+                </c:Transform>
+              </Components>
+              <Children>
+                <Entity name="Inside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="-0.0752567574" Y="-0.0357234403" Z="0.0396512263"/>
+                    </c:Transform>
+                  </Components>
+                  <Children/>
+                </Entity>
+                <Entity name="Outside">
+                  <Components>
+                    <c:PointLight>
+                      <Color A="1" B="1" G="0.784313738" R="0"/>
+                      <Intensity>0.10000000149011612</Intensity>
+                    </c:PointLight>
+                    <c:Transform>
+                      <Position X="0.075000003" Y="-0.0357234403" Z="0.0396512263"/>
+                    </c:Transform>
                   </Components>
                   <Children/>
                 </Entity>

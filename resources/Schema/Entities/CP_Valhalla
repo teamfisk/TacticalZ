@@ -3,7 +3,7 @@
 
   <Components>
     <c:CapturePointGameMode>
-      <RespawnTime>6.1665781578731185</RespawnTime>
+      <RespawnTime>3.9331944839627795</RespawnTime>
     </c:CapturePointGameMode>
     <c:Transform/>
   </Components>
@@ -1639,11 +1639,11 @@
                               <Components>
                                 <c:FloatingEffect>
                                   <Period>12</Period>
-                                  <Time>62984.076527523939</Time>
+                                  <Time>63214.458258080005</Time>
                                   <Axis X="0" Y="0.100000001" Z="0"/>
                                 </c:FloatingEffect>
                                 <c:Transform>
-                                  <Position X="-0" Y="-0.088599436" Z="-0"/>
+                                  <Position X="-0" Y="-0.0723237917" Z="-0"/>
                                 </c:Transform>
                               </Components>
                               <Children>
@@ -1695,11 +1695,11 @@
                           <Components>
                             <c:FloatingEffect>
                               <Period>12</Period>
-                              <Time>63050.842732846242</Time>
+                              <Time>63281.224463402308</Time>
                               <Axis X="0" Y="0.100000001" Z="0"/>
                             </c:FloatingEffect>
                             <c:Transform>
-                              <Position X="0" Y="0.0996586382" Z="0"/>
+                              <Position X="0" Y="0.0394074991" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -1767,11 +1767,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>12</Period>
-                          <Time>62916.820063753301</Time>
+                          <Time>63147.201794309367</Time>
                           <Axis X="0" Y="0.100000001" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.0418060683" Z="0"/>
+                          <Position X="0" Y="0.0994076431" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3795,11 +3795,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69202.135239041163</Time>
+                          <Time>69432.516969597855</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.0828395635" Z="0"/>
+                          <Position X="0" Y="0.199691162" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3821,7 +3821,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -3850,11 +3850,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69228.607088085424</Time>
+                          <Time>69458.988818642116</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.18809773" Z="0"/>
+                          <Position X="0" Y="0.0049496335" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3876,7 +3876,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -3905,11 +3905,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69215.913711082496</Time>
+                          <Time>69446.295441639188</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0510992371" Z="-0"/>
+                          <Position X="0" Y="0.161624059" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3931,7 +3931,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -3960,11 +3960,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69296.542300440764</Time>
+                          <Time>69526.924030997456</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.198447496" Z="0"/>
+                          <Position X="0" Y="0.048860658" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -3986,7 +3986,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="-0.0281207096"/>
-                              <Orientation X="0" Y="56046.2422" Z="0"/>
+                              <Orientation X="0" Y="56235.0703" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -4015,11 +4015,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69278.15032678</Time>
+                          <Time>69508.532057336692</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.0920931175" Z="0"/>
+                          <Position X="0" Y="0.198855385" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -4041,7 +4041,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -4070,11 +4070,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69241.469964355332</Time>
+                          <Time>69471.851694912024</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.199230954" Z="-0"/>
+                          <Position X="-0" Y="-0.088647157" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -4096,7 +4096,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="-0.0281207096"/>
-                              <Orientation X="0" Y="56046.2422" Z="0"/>
+                              <Orientation X="0" Y="56235.0703" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -4973,11 +4973,11 @@
                               <Components>
                                 <c:FloatingEffect>
                                   <Period>12</Period>
-                                  <Time>63451.797301405764</Time>
+                                  <Time>63682.17903196183</Time>
                                   <Axis X="0" Y="0.100000001" Z="0"/>
                                 </c:FloatingEffect>
                                 <c:Transform>
-                                  <Position X="-0" Y="-0.0809232518" Z="-0"/>
+                                  <Position X="-0" Y="-0.0813626423" Z="-0"/>
                                 </c:Transform>
                               </Components>
                               <Children>
@@ -5054,11 +5054,11 @@
                           <Components>
                             <c:FloatingEffect>
                               <Period>12</Period>
-                              <Time>63480.7685357062</Time>
+                              <Time>63711.150266262266</Time>
                               <Axis X="0" Y="0.100000001" Z="0"/>
                             </c:FloatingEffect>
                             <c:Transform>
-                              <Position X="0" Y="0.0392041802" Z="0"/>
+                              <Position X="0" Y="0.0996766537" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -5110,11 +5110,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>12</Period>
-                          <Time>63177.480037232468</Time>
+                          <Time>63407.861767788534</Time>
                           <Axis X="0" Y="0.100000001" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0968291461" Z="-0"/>
+                          <Position X="-0" Y="-0.00698561966" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -6650,11 +6650,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69374.443358853416</Time>
+                          <Time>69604.825089410107</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.197132275" Z="0"/>
+                          <Position X="0" Y="0.103003517" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -6676,7 +6676,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="41019.9063" Z="0"/>
+                              <Orientation X="0" Y="41208.7344" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -6705,11 +6705,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>71478.149113747073</Time>
+                          <Time>71708.530844303765</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.0914110765" Z="0"/>
+                          <Position X="0" Y="0.198935911" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -6731,7 +6731,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="-0.0281207096"/>
-                              <Orientation X="0" Y="56046.2422" Z="0"/>
+                              <Orientation X="0" Y="56235.0703" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -6760,11 +6760,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>71463.036656204742</Time>
+                          <Time>71693.418386761434</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0258914325" Z="-0"/>
+                          <Position X="-0" Y="-0.194188401" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -6786,7 +6786,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -6815,11 +6815,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69388.467021556848</Time>
+                          <Time>69618.848752113539</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.199202299" Z="0"/>
+                          <Position X="0" Y="0.0889374837" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -6841,7 +6841,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -6870,11 +6870,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>71553.5104577288</Time>
+                          <Time>71783.892188285492</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.19988142" Z="-0"/>
+                          <Position X="-0" Y="-0.0661400184" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -6896,7 +6896,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0.00979492068" Y="2.33157492" Z="0.0350835398"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -6925,11 +6925,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69453.61010219554</Time>
+                          <Time>69683.991832752232</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.188027769" Z="-0"/>
+                          <Position X="-0" Y="-0.00474410551" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -6951,7 +6951,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -6980,11 +6980,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>71511.181803421947</Time>
+                          <Time>71741.563533978639</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.107547142" Z="-0"/>
+                          <Position X="-0" Y="-0.196160257" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -7006,7 +7006,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -7035,11 +7035,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>71443.800316245892</Time>
+                          <Time>71674.182046802583</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.118320182" Z="-0"/>
+                          <Position X="0" Y="0.107297875" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -7061,7 +7061,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="-0.0281207096"/>
-                              <Orientation X="0" Y="56046.2422" Z="0"/>
+                              <Orientation X="0" Y="56235.0703" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -9138,11 +9138,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69329.48324041006</Time>
+                          <Time>69559.864970966752</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.199770823" Z="-0"/>
+                          <Position X="-0" Y="-0.0785709247" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -9164,7 +9164,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36800003" Z="0"/>
-                              <Orientation X="0" Y="56692.5117" Z="0"/>
+                              <Orientation X="0" Y="56881.3398" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -9193,11 +9193,11 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>2</Period>
-                          <Time>69344.788290159966</Time>
+                          <Time>69575.170020716658</Time>
                           <Axis X="0" Y="0.200000003" Z="0"/>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.120848238" Z="0"/>
+                          <Position X="-0" Y="-0.104622938" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -9219,7 +9219,7 @@
                             </c:PointLight>
                             <c:Transform>
                               <Position X="0" Y="2.36784196" Z="-0.0281207096"/>
-                              <Orientation X="0" Y="56046.2422" Z="0"/>
+                              <Orientation X="0" Y="56235.0703" Z="0"/>
                               <Scale X="0.600000024" Y="0.600000024" Z="0.600000024"/>
                             </c:Transform>
                             <c:Trigger/>
@@ -10147,12 +10147,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10176,12 +10176,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10205,12 +10205,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10234,12 +10234,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10276,13 +10276,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39059.627377907571</Time>
+                          <Time>39290.009108463637</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.348915488" Z="-0"/>
-                          <Orientation X="0" Y="19821.3613" Z="0"/>
+                          <Position X="-0" Y="-0.00832962617" Z="-0"/>
+                          <Orientation X="0" Y="19942.1289" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10306,13 +10306,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39106.144024094858</Time>
+                          <Time>39336.525754650924</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.329350382" Z="-0"/>
-                          <Orientation X="0" Y="-3943.271" Z="0"/>
+                          <Position X="-0" Y="-0.409519732" Z="-0"/>
+                          <Orientation X="0" Y="-3966.8728" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10323,7 +10323,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15514.002" Y="38926.8281" Z="0"/>
+                              <Orientation X="15608.4092" Y="39168.3633" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -10400,13 +10400,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38953.694390801975</Time>
+                          <Time>39184.076121358041</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.944518864" Z="0"/>
-                          <Orientation X="0" Y="11721.7129" Z="0"/>
+                          <Position X="0" Y="2.63720083" Z="0"/>
+                          <Orientation X="0" Y="11789.2236" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10447,12 +10447,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10477,12 +10477,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10507,12 +10507,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10537,12 +10537,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10580,13 +10580,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39616.386811172692</Time>
+                          <Time>39846.768541728758</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-2.71912718" Z="-0"/>
-                          <Orientation X="0" Y="20109.0879" Z="0"/>
+                          <Position X="0" Y="2.54733729" Z="0"/>
+                          <Orientation X="0" Y="20229.8555" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10612,13 +10612,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39662.903457360066</Time>
+                          <Time>39893.285187916132</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.483985722" Z="0"/>
-                          <Orientation X="0" Y="-3998.88818" Z="0"/>
+                          <Position X="0" Y="0.440122128" Z="0"/>
+                          <Orientation X="0" Y="-4022.48999" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10643,7 +10643,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15736.2881" Y="39515.6953" Z="0"/>
+                              <Orientation X="15830.6953" Y="39757.2305" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -10715,13 +10715,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>39510.453824066688</Time>
+                          <Time>39740.835554622754</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.331146896" Z="0"/>
-                          <Orientation X="0" Y="11883.9502" Z="0"/>
+                          <Position X="-0" Y="-3.29022455" Z="-0"/>
+                          <Orientation X="0" Y="11951.4609" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10768,13 +10768,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38393.637356756328</Time>
+                          <Time>38624.019087312394</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-3.40122914" Z="-0"/>
-                          <Orientation X="0" Y="11558.0518" Z="0"/>
+                          <Position X="0" Y="0.7127828" Z="0"/>
+                          <Orientation X="0" Y="11625.5625" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10800,13 +10800,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>38499.570343862186</Time>
+                          <Time>38729.952074418252</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.402718574" Z="-0"/>
-                          <Orientation X="0" Y="19526.6094" Z="0"/>
+                          <Position X="0" Y="0.0429702774" Z="0"/>
+                          <Orientation X="0" Y="19647.377" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10832,13 +10832,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>38546.086990049531</Time>
+                          <Time>38776.468720605597</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.315536857" Z="-0"/>
-                          <Orientation X="0" Y="-3887.26025" Z="0"/>
+                          <Position X="-0" Y="-0.398882926" Z="-0"/>
+                          <Orientation X="0" Y="-3910.86206" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10849,7 +10849,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15290.0098" Y="38337.1289" Z="0"/>
+                              <Orientation X="15384.417" Y="38578.6641" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -10938,12 +10938,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10968,12 +10968,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -10998,12 +10998,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11028,12 +11028,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11100,12 +11100,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11130,12 +11130,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11160,12 +11160,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11190,12 +11190,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11233,13 +11233,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38393.637356756328</Time>
+                          <Time>38624.019087312394</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-3.40122914" Z="-0"/>
-                          <Orientation X="0" Y="11558.0518" Z="0"/>
+                          <Position X="0" Y="0.7127828" Z="0"/>
+                          <Orientation X="0" Y="11625.5625" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11265,13 +11265,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>38499.570343862186</Time>
+                          <Time>38729.952074418252</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.402718574" Z="-0"/>
-                          <Orientation X="0" Y="19526.6094" Z="0"/>
+                          <Position X="0" Y="0.0429702774" Z="0"/>
+                          <Orientation X="0" Y="19647.377" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11297,13 +11297,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>38546.086990049531</Time>
+                          <Time>38776.468720605597</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.315536857" Z="-0"/>
-                          <Orientation X="0" Y="-3887.26025" Z="0"/>
+                          <Position X="-0" Y="-0.398882926" Z="-0"/>
+                          <Orientation X="0" Y="-3910.86206" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11314,7 +11314,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15290.0098" Y="38337.1289" Z="0"/>
+                              <Orientation X="15384.417" Y="38578.6641" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -11418,13 +11418,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39106.144024094858</Time>
+                          <Time>39336.525754650924</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.329350382" Z="-0"/>
-                          <Orientation X="0" Y="-3943.271" Z="0"/>
+                          <Position X="-0" Y="-0.409519732" Z="-0"/>
+                          <Orientation X="0" Y="-3966.8728" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11435,7 +11435,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15514.002" Y="38926.8281" Z="0"/>
+                              <Orientation X="15608.4092" Y="39168.3633" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -11511,13 +11511,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39059.627377907571</Time>
+                          <Time>39290.009108463637</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.348915488" Z="-0"/>
-                          <Orientation X="0" Y="19821.3613" Z="0"/>
+                          <Position X="-0" Y="-0.00832962617" Z="-0"/>
+                          <Orientation X="0" Y="19942.1289" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11541,13 +11541,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38953.694390801975</Time>
+                          <Time>39184.076121358041</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.944518864" Z="0"/>
-                          <Orientation X="0" Y="11721.7129" Z="0"/>
+                          <Position X="0" Y="2.63720083" Z="0"/>
+                          <Orientation X="0" Y="11789.2236" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11576,12 +11576,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11605,12 +11605,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11634,12 +11634,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11663,12 +11663,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11717,13 +11717,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39616.386811172692</Time>
+                          <Time>39846.768541728758</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-2.71912718" Z="-0"/>
-                          <Orientation X="0" Y="20109.0879" Z="0"/>
+                          <Position X="0" Y="2.54733729" Z="0"/>
+                          <Orientation X="0" Y="20229.8555" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11749,13 +11749,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39662.903457360066</Time>
+                          <Time>39893.285187916132</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.483985722" Z="0"/>
-                          <Orientation X="0" Y="-3998.88818" Z="0"/>
+                          <Position X="0" Y="0.440122128" Z="0"/>
+                          <Orientation X="0" Y="-4022.48999" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11780,7 +11780,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15736.2881" Y="39515.6953" Z="0"/>
+                              <Orientation X="15830.6953" Y="39757.2305" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -11852,13 +11852,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>39510.453824066688</Time>
+                          <Time>39740.835554622754</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.331146896" Z="0"/>
-                          <Orientation X="0" Y="11883.9502" Z="0"/>
+                          <Position X="-0" Y="-3.29022455" Z="-0"/>
+                          <Orientation X="0" Y="11951.4609" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11889,12 +11889,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11919,12 +11919,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11949,12 +11949,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -11979,12 +11979,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12062,13 +12062,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>38546.086990049531</Time>
+                          <Time>38776.468720605597</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.315536857" Z="-0"/>
-                          <Orientation X="0" Y="-3887.26025" Z="0"/>
+                          <Position X="-0" Y="-0.398882926" Z="-0"/>
+                          <Orientation X="0" Y="-3910.86206" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12091,7 +12091,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15290.0098" Y="38337.1289" Z="0"/>
+                              <Orientation X="15384.417" Y="38578.6641" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -12163,13 +12163,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38393.637356756328</Time>
+                          <Time>38624.019087312394</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-3.40122914" Z="-0"/>
-                          <Orientation X="0" Y="11558.0518" Z="0"/>
+                          <Position X="0" Y="0.7127828" Z="0"/>
+                          <Orientation X="0" Y="11625.5625" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12195,13 +12195,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>38499.570343862186</Time>
+                          <Time>38729.952074418252</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.402718574" Z="-0"/>
-                          <Orientation X="0" Y="19526.6094" Z="0"/>
+                          <Position X="0" Y="0.0429702774" Z="0"/>
+                          <Orientation X="0" Y="19647.377" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12233,12 +12233,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12263,12 +12263,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12293,12 +12293,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12323,12 +12323,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12373,12 +12373,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12402,12 +12402,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12431,12 +12431,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12460,12 +12460,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12502,13 +12502,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39616.386811172692</Time>
+                          <Time>39846.768541728758</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-2.71912718" Z="-0"/>
-                          <Orientation X="0" Y="20109.0879" Z="0"/>
+                          <Position X="0" Y="2.54733729" Z="0"/>
+                          <Orientation X="0" Y="20229.8555" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12533,13 +12533,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39662.903457360066</Time>
+                          <Time>39893.285187916132</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.483985722" Z="0"/>
-                          <Orientation X="0" Y="-3998.88818" Z="0"/>
+                          <Position X="0" Y="0.440122128" Z="0"/>
+                          <Orientation X="0" Y="-4022.48999" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12563,7 +12563,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15736.2881" Y="39515.6953" Z="0"/>
+                              <Orientation X="15830.6953" Y="39757.2305" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -12631,13 +12631,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>39510.453824066688</Time>
+                          <Time>39740.835554622754</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.331146896" Z="0"/>
-                          <Orientation X="0" Y="11883.9502" Z="0"/>
+                          <Position X="-0" Y="-3.29022455" Z="-0"/>
+                          <Orientation X="0" Y="11951.4609" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12683,13 +12683,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39059.627377907571</Time>
+                          <Time>39290.009108463637</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.348915488" Z="-0"/>
-                          <Orientation X="0" Y="19821.3613" Z="0"/>
+                          <Position X="-0" Y="-0.00832962617" Z="-0"/>
+                          <Orientation X="0" Y="19942.1289" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12714,13 +12714,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39106.144024094858</Time>
+                          <Time>39336.525754650924</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.329350382" Z="-0"/>
-                          <Orientation X="0" Y="-3943.271" Z="0"/>
+                          <Position X="-0" Y="-0.409519732" Z="-0"/>
+                          <Orientation X="0" Y="-3966.8728" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12744,7 +12744,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15514.002" Y="38926.8281" Z="0"/>
+                              <Orientation X="15608.4092" Y="39168.3633" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -12812,13 +12812,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38953.694390801975</Time>
+                          <Time>39184.076121358041</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.944518864" Z="0"/>
-                          <Orientation X="0" Y="11721.7129" Z="0"/>
+                          <Position X="0" Y="2.63720083" Z="0"/>
+                          <Orientation X="0" Y="11789.2236" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12848,12 +12848,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12878,12 +12878,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12908,12 +12908,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -12938,12 +12938,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13013,13 +13013,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38953.694390801975</Time>
+                          <Time>39184.076121358041</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.944518864" Z="0"/>
-                          <Orientation X="0" Y="11721.7129" Z="0"/>
+                          <Position X="0" Y="2.63720083" Z="0"/>
+                          <Orientation X="0" Y="11789.2236" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13043,13 +13043,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39059.627377907571</Time>
+                          <Time>39290.009108463637</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.348915488" Z="-0"/>
-                          <Orientation X="0" Y="19821.3613" Z="0"/>
+                          <Position X="-0" Y="-0.00832962617" Z="-0"/>
+                          <Orientation X="0" Y="19942.1289" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13073,13 +13073,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39106.144024094858</Time>
+                          <Time>39336.525754650924</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.329350382" Z="-0"/>
-                          <Orientation X="0" Y="-3943.271" Z="0"/>
+                          <Position X="-0" Y="-0.409519732" Z="-0"/>
+                          <Orientation X="0" Y="-3966.8728" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13090,7 +13090,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15514.002" Y="38926.8281" Z="0"/>
+                              <Orientation X="15608.4092" Y="39168.3633" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -13171,12 +13171,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13200,12 +13200,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13229,12 +13229,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13258,12 +13258,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13308,12 +13308,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13338,12 +13338,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13368,12 +13368,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13398,12 +13398,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13441,13 +13441,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>39510.453824066688</Time>
+                          <Time>39740.835554622754</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.331146896" Z="0"/>
-                          <Orientation X="0" Y="11883.9502" Z="0"/>
+                          <Position X="-0" Y="-3.29022455" Z="-0"/>
+                          <Orientation X="0" Y="11951.4609" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13473,13 +13473,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39616.386811172692</Time>
+                          <Time>39846.768541728758</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-2.71912718" Z="-0"/>
-                          <Orientation X="0" Y="20109.0879" Z="0"/>
+                          <Position X="0" Y="2.54733729" Z="0"/>
+                          <Orientation X="0" Y="20229.8555" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13505,13 +13505,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39662.903457360066</Time>
+                          <Time>39893.285187916132</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.483985722" Z="0"/>
-                          <Orientation X="0" Y="-3998.88818" Z="0"/>
+                          <Position X="0" Y="0.440122128" Z="0"/>
+                          <Orientation X="0" Y="-4022.48999" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13522,7 +13522,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15736.2881" Y="39515.6953" Z="0"/>
+                              <Orientation X="15830.6953" Y="39757.2305" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -13629,13 +13629,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38393.637356756328</Time>
+                          <Time>38624.019087312394</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-3.40122914" Z="-0"/>
-                          <Orientation X="0" Y="11558.0518" Z="0"/>
+                          <Position X="0" Y="0.7127828" Z="0"/>
+                          <Orientation X="0" Y="11625.5625" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13661,13 +13661,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>38546.086990049531</Time>
+                          <Time>38776.468720605597</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.315536857" Z="-0"/>
-                          <Orientation X="0" Y="-3887.26025" Z="0"/>
+                          <Position X="-0" Y="-0.398882926" Z="-0"/>
+                          <Orientation X="0" Y="-3910.86206" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13690,7 +13690,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15290.0098" Y="38337.1289" Z="0"/>
+                              <Orientation X="15384.417" Y="38578.6641" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -13762,13 +13762,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>38499.570343862186</Time>
+                          <Time>38729.952074418252</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.402718574" Z="-0"/>
-                          <Orientation X="0" Y="19526.6094" Z="0"/>
+                          <Position X="0" Y="0.0429702774" Z="0"/>
+                          <Orientation X="0" Y="19647.377" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13799,12 +13799,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13829,12 +13829,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13859,12 +13859,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13889,12 +13889,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13969,12 +13969,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -13999,12 +13999,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14029,12 +14029,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14059,12 +14059,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14102,13 +14102,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39616.386811172692</Time>
+                          <Time>39846.768541728758</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-2.71912718" Z="-0"/>
-                          <Orientation X="0" Y="20109.0879" Z="0"/>
+                          <Position X="0" Y="2.54733729" Z="0"/>
+                          <Orientation X="0" Y="20229.8555" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14134,13 +14134,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39662.903457360066</Time>
+                          <Time>39893.285187916132</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.483985722" Z="0"/>
-                          <Orientation X="0" Y="-3998.88818" Z="0"/>
+                          <Position X="0" Y="0.440122128" Z="0"/>
+                          <Orientation X="0" Y="-4022.48999" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14165,7 +14165,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15736.2881" Y="39515.6953" Z="0"/>
+                              <Orientation X="15830.6953" Y="39757.2305" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -14233,13 +14233,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>39510.453824066688</Time>
+                          <Time>39740.835554622754</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.331146896" Z="0"/>
-                          <Orientation X="0" Y="11883.9502" Z="0"/>
+                          <Position X="-0" Y="-3.29022455" Z="-0"/>
+                          <Orientation X="0" Y="11951.4609" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14286,13 +14286,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>39106.144024094858</Time>
+                          <Time>39336.525754650924</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.329350382" Z="-0"/>
-                          <Orientation X="0" Y="-3943.271" Z="0"/>
+                          <Position X="-0" Y="-0.409519732" Z="-0"/>
+                          <Orientation X="0" Y="-3966.8728" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14316,7 +14316,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15514.002" Y="38926.8281" Z="0"/>
+                              <Orientation X="15608.4092" Y="39168.3633" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -14380,13 +14380,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>39059.627377907571</Time>
+                          <Time>39290.009108463637</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.348915488" Z="-0"/>
-                          <Orientation X="0" Y="19821.3613" Z="0"/>
+                          <Position X="-0" Y="-0.00832962617" Z="-0"/>
+                          <Orientation X="0" Y="19942.1289" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14411,13 +14411,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38953.694390801975</Time>
+                          <Time>39184.076121358041</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.944518864" Z="0"/>
-                          <Orientation X="0" Y="11721.7129" Z="0"/>
+                          <Position X="0" Y="2.63720083" Z="0"/>
+                          <Orientation X="0" Y="11789.2236" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14447,12 +14447,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14477,12 +14477,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14507,12 +14507,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14537,12 +14537,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14591,13 +14591,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>20</Period>
-                          <Time>38499.570343862186</Time>
+                          <Time>38729.952074418252</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.402718574" Z="-0"/>
-                          <Orientation X="0" Y="19526.6094" Z="0"/>
+                          <Position X="0" Y="0.0429702774" Z="0"/>
+                          <Orientation X="0" Y="19647.377" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14622,13 +14622,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>10</Period>
-                          <Time>38546.086990049531</Time>
+                          <Time>38776.468720605597</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.315536857" Z="-0"/>
-                          <Orientation X="0" Y="-3887.26025" Z="0"/>
+                          <Position X="-0" Y="-0.398882926" Z="-0"/>
+                          <Orientation X="0" Y="-3910.86206" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14650,7 +14650,7 @@
                               <Axis X="0.400000006" Y="1" Z="0"/>
                             </c:RaptorCopter>
                             <c:Transform>
-                              <Orientation X="15290.0098" Y="38337.1289" Z="0"/>
+                              <Orientation X="15384.417" Y="38578.6641" Z="0"/>
                             </c:Transform>
                           </Components>
                           <Children>
@@ -14718,13 +14718,13 @@
                         </c:RaptorCopter>
                         <c:FloatingEffect>
                           <Period>30</Period>
-                          <Time>38393.637356756328</Time>
+                          <Time>38624.019087312394</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>3.5</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-3.40122914" Z="-0"/>
-                          <Orientation X="0" Y="11558.0518" Z="0"/>
+                          <Position X="0" Y="0.7127828" Z="0"/>
+                          <Orientation X="0" Y="11625.5625" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14754,12 +14754,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22604.990649908672</Time>
+                          <Time>22835.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="0" Y="0.00100196316" Z="0"/>
+                          <Position X="-0" Y="-0.0610581599" Z="-0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14783,12 +14783,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22605.990649908679</Time>
+                          <Time>22836.372380464782</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0860808045" Z="-0"/>
+                          <Position X="0" Y="0.0382068306" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14812,12 +14812,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22607.990649908672</Time>
+                          <Time>22838.372380464774</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.000903420558" Z="-0"/>
+                          <Position X="0" Y="0.0609800816" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14841,12 +14841,12 @@
                       <Components>
                         <c:FloatingEffect>
                           <Period>6</Period>
-                          <Time>22606.990649908686</Time>
+                          <Time>22837.372380464789</Time>
                           <Axis X="0" Y="1" Z="0"/>
                           <Amplitude>0.10000000149011612</Amplitude>
                         </c:FloatingEffect>
                         <c:Transform>
-                          <Position X="-0" Y="-0.0870348439" Z="-0"/>
+                          <Position X="0" Y="0.0991315395" Z="0"/>
                         </c:Transform>
                       </Components>
                       <Children>
@@ -14946,318 +14946,14 @@
     </Entity>
     <Entity name="ScoreScreens">
       <Components>
-        <c:Transform/>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/ScoreBoard_Main.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform>
+          <Position X="-61.1966972" Y="28.7568054" Z="3.05101919"/>
+        </c:Transform>
       </Components>
-      <Children>
-        <Entity name="ScoreBoard_Main_Origin">
-          <Components>
-            <c:NetworkComponent/>
-            <c:Transform>
-              <Position X="67.3209991" Y="44.0288353" Z="0"/>
-              <Orientation X="0" Y="4.71199989" Z="0"/>
-            </c:Transform>
-          </Components>
-          <Children>
-            <Entity name="ScoreBoard_Spectators">
-              <Components>
-                <c:Team/>
-                <c:ScoreScreen>
-                  <Offset X="0" Y="-2" Z="0"/>
-                </c:ScoreScreen>
-                <c:Transform>
-                  <Position X="0" Y="-15.7886772" Z="1.5"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="Spawner_2">
-              <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/ScoreBoard_Red.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform>
-                  <Position X="-16.5" Y="0" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity name="ScoreBoard_Red_Origin">
-                  <Components>
-                    <c:Transform/>
-                  </Components>
-                  <Children>
-                    <Entity name="RedSide">
-                      <Components>
-                        <c:Model>
-                          <Resource>Models/Core/UnitCube.mesh</Resource>
-                          <Color A="1" B="0" G="0.0862745121" R="1"/>
-                          <Shadow>false</Shadow>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="0" Y="0" Z="0.5"/>
-                          <Scale X="32" Y="23" Z="1"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                    <Entity name="ScoreBoard_Red">
-                      <Components>
-                        <c:Team>
-                          <Team>
-                            <Red/>
-                          </Team>
-                        </c:Team>
-                        <c:ScoreScreen>
-                          <Offset X="0" Y="-3" Z="0"/>
-                        </c:ScoreScreen>
-                        <c:Transform>
-                          <Position X="0" Y="7" Z="1.5"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="NameText">
-                          <Components>
-                            <c:Text>
-                              <Content>Name</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="-10" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="KillsText">
-                          <Components>
-                            <c:Text>
-                              <Content>Kills</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="4.6874299" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="KDText">
-                          <Components>
-                            <c:Text>
-                              <Content>KD</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="1.28838646" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="IDText">
-                          <Components>
-                            <c:Text>
-                              <Content>ID</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="-13" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="DeathsText">
-                          <Components>
-                            <c:Text>
-                              <Content>Deaths</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="8.9577198" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
-            <Entity name="Background_Main">
-              <Components>
-                <c:Model>
-                  <Resource>Models/Core/UnitCube.mesh</Resource>
-                  <Shadow>false</Shadow>
-                </c:Model>
-                <c:Transform>
-                  <Scale X="69" Y="25" Z="1"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="Background_Spectator">
-              <Components>
-                <c:Model>
-                  <Resource>Models/Core/UnitCube.mesh</Resource>
-                  <Shadow>false</Shadow>
-                </c:Model>
-                <c:Transform>
-                  <Position X="0" Y="-19" Z="0"/>
-                  <Scale X="30" Y="12" Z="1"/>
-                </c:Transform>
-              </Components>
-              <Children/>
-            </Entity>
-            <Entity name="Spawner_1">
-              <Components>
-                <c:Spawner>
-                  <EntityFile>Schema/Entities/ScoreBoard_Blue.xml</EntityFile>
-                </c:Spawner>
-                <c:Transform>
-                  <Position X="16.5" Y="0" Z="0"/>
-                </c:Transform>
-              </Components>
-              <Children>
-                <Entity name="ScoreBoard_Blue_Origin">
-                  <Components>
-                    <c:Transform/>
-                  </Components>
-                  <Children>
-                    <Entity name="ScoreBoard_Blue">
-                      <Components>
-                        <c:Team>
-                          <Team>
-                            <Blue/>
-                          </Team>
-                        </c:Team>
-                        <c:ScoreScreen>
-                          <Offset X="0" Y="-3" Z="0"/>
-                        </c:ScoreScreen>
-                        <c:Transform>
-                          <Position X="0" Y="7" Z="1.5"/>
-                        </c:Transform>
-                      </Components>
-                      <Children>
-                        <Entity name="KDText">
-                          <Components>
-                            <c:Text>
-                              <Content>KD</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="1.28838646" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="KillsText">
-                          <Components>
-                            <c:Text>
-                              <Content>Kills</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="4.6874299" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="DeathsText">
-                          <Components>
-                            <c:Text>
-                              <Content>Deaths</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="8.9577198" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="NameText">
-                          <Components>
-                            <c:Text>
-                              <Content>Name</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="-10" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                        <Entity name="IDText">
-                          <Components>
-                            <c:Text>
-                              <Content>ID</Content>
-                              <Resource>Fonts/DroidSans.ttf,64</Resource>
-                              <Alignment>
-                                <Left/>
-                              </Alignment>
-                            </c:Text>
-                            <c:Transform>
-                              <Position X="-13" Y="2.5" Z="0"/>
-                              <Scale X="2" Y="2" Z="2"/>
-                            </c:Transform>
-                          </Components>
-                          <Children/>
-                        </Entity>
-                      </Children>
-                    </Entity>
-                    <Entity name="BlueSide">
-                      <Components>
-                        <c:Model>
-                          <Resource>Models/Core/UnitCube.mesh</Resource>
-                          <Color A="1" B="1" G="0.505882382" R="0"/>
-                          <Shadow>false</Shadow>
-                        </c:Model>
-                        <c:Transform>
-                          <Position X="0" Y="0" Z="0.5"/>
-                          <Scale X="32" Y="23" Z="1"/>
-                        </c:Transform>
-                      </Components>
-                      <Children/>
-                    </Entity>
-                  </Children>
-                </Entity>
-              </Children>
-            </Entity>
-          </Children>
-        </Entity>
-      </Children>
+      <Children/>
     </Entity>
     <Entity name="OverwatchCamera">
       <Components>
@@ -15267,7 +14963,7 @@
         </c:RaptorCopter>
         <c:Transform>
           <Position X="0" Y="-4" Z="0"/>
-          <Orientation X="0" Y="3048.41162" Z="0"/>
+          <Orientation X="0" Y="3060.21338" Z="0"/>
         </c:Transform>
       </Components>
       <Children>
@@ -15926,7 +15622,7 @@
                     <Entity name="RespawnTimer">
                       <Components>
                         <c:Text>
-                          <Content>2</Content>
+                          <Content>5</Content>
                           <Resource>Fonts/DroidSans.ttf,64</Resource>
                           <Color A="1" B="0" G="1" R="0.784313738"/>
                         </c:Text>
