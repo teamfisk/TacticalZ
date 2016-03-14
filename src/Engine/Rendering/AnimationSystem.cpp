@@ -6,6 +6,7 @@ AnimationSystem::AnimationSystem(SystemParams params)
     EVENT_SUBSCRIBE_MEMBER(m_EAutoAnimationBlend, &AnimationSystem::OnAutoAnimationBlend);
     EVENT_SUBSCRIBE_MEMBER(m_EEntityDeleted, &AnimationSystem::OnEntityDeleted);
     EVENT_SUBSCRIBE_MEMBER(m_ESetBlendWeight, &AnimationSystem::OnSetBlendWeight);
+    EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &AnimationSystem::OnInputCommand);
 }
 
 void AnimationSystem::Update(double dt)
@@ -14,6 +15,19 @@ void AnimationSystem::Update(double dt)
     CreateBlendTrees();
     UpdateWeights(dt);
 
+    EntityWrapper aimEntity = m_World->GetFirstEntityByName("ThirdPerson").FirstChildByName("Aim");
+    (Field<double>)aimEntity["Animation"]["Time"] = glm::clamp((const double&)(Field<double>)aimEntity["Animation"]["Time"] + ((aimMove * 0.2f) * dt), 0.0, 1.0);
+
+
+    EntityWrapper aimTextEntity = m_World->GetFirstEntityByName("AimText");
+
+    if (aimMove > 0) {
+        (Field<std::string>)aimTextEntity["Text"]["Content"] = "Up";
+    } else if (aimMove < 0) {
+        (Field<std::string>)aimTextEntity["Text"]["Content"] = "Down";
+    } else {
+        (Field<std::string>)aimTextEntity["Text"]["Content"] = " ";
+    }
 
     for(auto& autoBlendQueue : m_AutoBlendQueues) {
         autoBlendQueue.second.UpdateTime(dt);
@@ -352,4 +366,358 @@ bool AnimationSystem::OnSetBlendWeight(Events::SetBlendWeight& e)
         return false;
     }
 
+}
+
+bool AnimationSystem::OnInputCommand(Events::InputCommand& e)
+{
+    EntityWrapper firstPerson = m_World->GetFirstEntityByName("FirstPerson");
+    EntityWrapper thirdPerson = m_World->GetFirstEntityByName("ThirdPerson");
+
+    EntityWrapper currentBlend = m_World->GetFirstEntityByName("CurrentBlend");
+    EntityWrapper queuedBlend = m_World->GetFirstEntityByName("QueuedBlend");
+    EntityWrapper MovementText = m_World->GetFirstEntityByName("MovementText");
+    
+    
+    if (e.Command == "ClearText") {
+        if (e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = " ";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = " ";
+        }
+    }
+
+    if(e.Command == "Jump") {
+        if(e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = "Jump";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = "Movement";
+
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.2f;
+            blendEvent.NodeName = "Jump";
+            blendEvent.Start = true;
+            blendEvent.Restart = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventQueued;
+            blendEventQueued.RootNode = thirdPerson;
+            blendEventQueued.Delay = -0.1;
+            blendEventQueued.Duration = 0.3f;
+            blendEventQueued.NodeName = "MovementBlend";
+            blendEventQueued.AnimationEntity = thirdPerson.FirstChildByName("Jump");
+            m_EventBroker->Publish(blendEventQueued);
+        }
+    }
+
+    if (e.Command == "DashL") {
+        if (e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = "Dash Left";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = "Movement";
+
+
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.2f;
+            blendEvent.NodeName = "DashLeft";
+            blendEvent.Start = true;
+            blendEvent.Restart = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventQueued;
+            blendEventQueued.RootNode = thirdPerson;
+            blendEventQueued.Delay = -0.1;
+            blendEventQueued.Duration = 0.3f;
+            blendEventQueued.NodeName = "MovementBlend";
+            blendEventQueued.AnimationEntity = thirdPerson.FirstChildByName("DashLeft");
+            m_EventBroker->Publish(blendEventQueued);
+        }
+    }
+
+    if (e.Command == "DashR") {
+        if (e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = "Dash Right";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = "Movement";
+
+
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.2f;
+            blendEvent.NodeName = "DashRight";
+            blendEvent.Start = true;
+            blendEvent.Restart = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventQueued;
+            blendEventQueued.RootNode = thirdPerson;
+            blendEventQueued.Delay = -0.1;
+            blendEventQueued.Duration = 0.3f;
+            blendEventQueued.NodeName = "MovementBlend";
+            blendEventQueued.AnimationEntity = thirdPerson.FirstChildByName("DashRight");
+            m_EventBroker->Publish(blendEventQueued);
+        }
+    }
+
+    if (e.Command == "DashF") {
+        if (e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = "Dash Forward";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = "Movement";
+
+
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.2f;
+            blendEvent.NodeName = "DashForward";
+            blendEvent.Start = true;
+            blendEvent.Restart = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventQueued;
+            blendEventQueued.RootNode = thirdPerson;
+            blendEventQueued.Delay = -0.1;
+            blendEventQueued.Duration = 0.3f;
+            blendEventQueued.NodeName = "MovementBlend";
+            blendEventQueued.AnimationEntity = thirdPerson.FirstChildByName("DashForward");
+            m_EventBroker->Publish(blendEventQueued);
+        }
+    }
+
+    if (e.Command == "DashB") {
+        if (e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = "Dash Backward";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = "Movement";
+
+
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.2f;
+            blendEvent.NodeName = "DashBackward";
+            blendEvent.Start = true;
+            blendEvent.Restart = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventQueued;
+            blendEventQueued.RootNode = thirdPerson;
+            blendEventQueued.Delay = -0.1;
+            blendEventQueued.Duration = 0.3f;
+            blendEventQueued.NodeName = "MovementBlend";
+            blendEventQueued.AnimationEntity = thirdPerson.FirstChildByName("DashBackward");
+            m_EventBroker->Publish(blendEventQueued);
+        }
+    }
+
+
+    if (e.Command == "Right") {
+        if (e.Value > 0) {
+            (Field<std::string>)MovementText["Text"]["Content"] = "Right";
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.3f;
+            blendEvent.NodeName = "Right";
+            blendEvent.Start = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventFP;
+            blendEventFP.RootNode = firstPerson;
+            blendEventFP.Duration = 0.3f;
+            blendEventFP.NodeName = "Run";
+            blendEventFP.Start = true;
+            m_EventBroker->Publish(blendEventFP);
+
+
+        } else if (e.Value < 0) {
+            (Field<std::string>)MovementText["Text"]["Content"] = "Left";
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.3f;
+            blendEvent.NodeName = "Left";
+            blendEvent.Start = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventFP;
+            blendEventFP.RootNode = firstPerson;
+            blendEventFP.Duration = 0.3f;
+            blendEventFP.NodeName = "Run";
+            blendEventFP.Reverse = true;
+            blendEventFP.Start = true;
+            m_EventBroker->Publish(blendEventFP);
+        }
+    }else if (e.Command == "Up") {
+        if (e.Value > 0) {
+            (Field<std::string>)MovementText["Text"]["Content"] = "Forward";
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.3f;
+            if (Crouch) {
+                blendEvent.NodeName = "Walk";
+
+                Events::AutoAnimationBlend blendEventFP;
+                blendEventFP.RootNode = firstPerson;
+                blendEventFP.Duration = 0.3f;
+                blendEventFP.NodeName = "Idle";
+                blendEventFP.Start = true;
+                m_EventBroker->Publish(blendEventFP);
+
+            } else {
+                blendEvent.NodeName = "Run";
+
+
+                Events::AutoAnimationBlend blendEventFP;
+                blendEventFP.RootNode = firstPerson;
+                blendEventFP.Duration = 0.3f;
+                blendEventFP.NodeName = "Run";
+                blendEventFP.Start = true;
+                m_EventBroker->Publish(blendEventFP);
+
+            }
+            blendEvent.Start = true;
+            m_EventBroker->Publish(blendEvent);
+        }else if (e.Value < 0) {
+            (Field<std::string>)MovementText["Text"]["Content"] = "Backward";
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.3f;
+            if(Crouch) {
+                blendEvent.NodeName = "Walk";
+
+                Events::AutoAnimationBlend blendEventFP;
+                blendEventFP.RootNode = firstPerson;
+                blendEventFP.Duration = 0.3f;
+                blendEventFP.NodeName = "Idle";
+                blendEventFP.Start = true;
+                m_EventBroker->Publish(blendEventFP);
+            } else {
+                blendEvent.NodeName = "Run";
+
+                Events::AutoAnimationBlend blendEventFP;
+                blendEventFP.RootNode = firstPerson;
+                blendEventFP.Duration = 0.3f;
+                blendEventFP.NodeName = "Run";
+                blendEventFP.Reverse = true;
+                blendEventFP.Start = true;
+                m_EventBroker->Publish(blendEventFP);
+            }
+            blendEvent.Start = true;
+            blendEvent.Reverse = true;
+            m_EventBroker->Publish(blendEvent);
+        }
+    }
+
+    if (e.Command == "Idle"){
+        if (e.Value > 0) {
+            (Field<std::string>)MovementText["Text"]["Content"] = "Idle";
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.5f;
+            blendEvent.NodeName = "Idle";
+            blendEvent.Start = true;
+            blendEvent.Reverse = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventFP;
+            blendEventFP.RootNode = firstPerson;
+            blendEventFP.Duration = 0.3f;
+            blendEventFP.NodeName = "Idle";
+            blendEventFP.Start = true;
+            m_EventBroker->Publish(blendEventFP);
+        }
+    }
+
+
+    if (e.Command == "Crouch") {
+        if (e.Value > 0) {
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.5f;
+            blendEvent.NodeName = "CrouchMovement";
+            blendEvent.Start = true;
+            blendEvent.Reverse = true;
+            m_EventBroker->Publish(blendEvent);
+            Crouch = true;
+        } else {
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.5f;
+            blendEvent.NodeName = "StandMovement";
+            blendEvent.Start = true;
+            blendEvent.Reverse = true;
+            m_EventBroker->Publish(blendEvent);
+            Crouch = false;
+        }
+    }
+
+    if (e.Command == "Aim") {
+        aimMove = e.Value;
+    } 
+
+    if (e.Command == "Shoot") {
+        if (e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = "Fire";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = "Idle";
+
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.1f;
+            blendEvent.NodeName = "Fire";
+            blendEvent.Start = true;
+            blendEvent.Restart = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventFP;
+            blendEventFP.RootNode = firstPerson;
+            blendEventFP.Duration = 0.1f;
+            blendEventFP.NodeName = "Fire";
+            blendEventFP.Start = true;
+            blendEventFP.Restart = true;
+            m_EventBroker->Publish(blendEventFP);
+        }
+    }
+
+
+    if (e.Command == "Reload") {
+        if (e.Value > 0) {
+            (Field<std::string>)currentBlend["Text"]["Content"] = "Reload";
+            (Field<std::string>)queuedBlend["Text"]["Content"] = "Idle";
+
+
+            Events::AutoAnimationBlend blendEvent;
+            blendEvent.RootNode = thirdPerson;
+            blendEvent.Duration = 0.1f;
+            blendEvent.NodeName = "Reload";
+            blendEvent.Start = true;
+            blendEvent.Restart = true;
+            m_EventBroker->Publish(blendEvent);
+
+            Events::AutoAnimationBlend blendEventQ;
+            blendEventQ.RootNode = thirdPerson;
+            blendEventQ.Duration = 0.2f;
+            blendEventQ.Delay = -0.1;
+            blendEventQ.NodeName = "Fire";
+            blendEventQ.Start = false;
+            blendEventQ.Restart = true;
+            blendEventQ.AnimationEntity = thirdPerson.FirstChildByName("Reload");
+            m_EventBroker->Publish(blendEventQ);
+
+
+
+            Events::AutoAnimationBlend blendEventFP;
+            blendEventFP.RootNode = firstPerson;
+            blendEventFP.Duration = 0.1f;
+            blendEventFP.NodeName = "Reload";
+            blendEventFP.Start = true;
+            blendEventFP.Restart = true;
+            m_EventBroker->Publish(blendEventFP);
+
+            Events::AutoAnimationBlend blendEventFPQ;
+            blendEventFPQ.RootNode = firstPerson;
+            blendEventFPQ.Duration = 0.2f;
+            blendEventFPQ.Delay = -0.1;
+            blendEventFPQ.NodeName = "Fire";
+            blendEventFPQ.Start = false;
+            blendEventFPQ.Restart = true;
+            blendEventFPQ.AnimationEntity = thirdPerson.FirstChildByName("Reload");
+            m_EventBroker->Publish(blendEventFPQ);
+
+        }
+    }
+
+    return true;
 }

@@ -16,6 +16,7 @@
 #include "../Core/EEntityDeleted.h"
 #include "Rendering/ESetBlendWeight.h"
 #include "imgui/imgui.h"
+#include "Input/EInputCommand.h"
 
 class AnimationSystem : public ImpureSystem
 {
@@ -37,7 +38,13 @@ private:
     EventRelay<AnimationSystem, Events::SetBlendWeight> m_ESetBlendWeight;
     bool OnSetBlendWeight(Events::SetBlendWeight& e);
 
+    EventRelay<AnimationSystem, Events::InputCommand> m_EInputCommand;
+    bool OnInputCommand(Events::InputCommand& e);
+
     std::unordered_map<EntityWrapper, AutoBlendQueue> m_AutoBlendQueues;
+
+    bool Crouch = false;
+    float aimMove = 0;
 };
 
 #endif
