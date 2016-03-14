@@ -515,12 +515,14 @@ void RawModelCustom::ReadCollisionFile(std::string filePath) {
 	delete[] fileData;
 }
 
-const RawModelCustom::Vertex* RawModelCustom::CollisionVertices() {
+const std::vector<glm::vec3>& RawModelCustom::CollisionVertices() {
 	if (hasCollisionMesh) {
-		return m_CollisionVertices.data();
+		return m_CollisionVertices;
 	}
 	else if (hasSkin) {
-		return nullptr;
+        // We don't do collisions against skinned meshes now.
+        m_CollisionVertices = std::vector<glm::vec3>();
+		return m_CollisionVertices;
 	}
 	else {
 		return ConstructCollisionList();
@@ -533,11 +535,11 @@ void RawModelCustom::ReadCollisionFileData(std::size_t& offset, char* fileData, 
 		m_CollisionIndices.resize(static_cast<std::size_t>(*(unsigned int*)(fileData + offset)));
 		offset += sizeof(unsigned int);
 
-		if (offset + m_CollisionVertices.size() * sizeof(Vertex) > fileByteSize) {
+		if (offset + m_CollisionVertices.size() * sizeof(glm::vec3) > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading collision vertices failed");
 		}
-		memcpy(&m_CollisionVertices[0], fileData + offset, m_CollisionVertices.size() * sizeof(Vertex));
-		offset += m_CollisionVertices.size() * sizeof(Vertex);
+		memcpy(&m_CollisionVertices[0], fileData + offset, m_CollisionVertices.size() * sizeof(glm::vec3));
+		offset += m_CollisionVertices.size() * sizeof(glm::vec3);
 
 		if (offset + m_CollisionIndices.size() * sizeof(unsigned int) > fileByteSize) {
 			throw Resource::FailedLoadingException("Reading collision indices failed");
@@ -546,28 +548,23 @@ void RawModelCustom::ReadCollisionFileData(std::size_t& offset, char* fileData, 
 		offset += m_CollisionIndices.size() * sizeof(unsigned int);
 }
 
-const RawModelCustom::Vertex* RawModelCustom::ConstructCollisionList()
+const std::vector<glm::vec3>& RawModelCustom::ConstructCollisionList()
 {
 	if (!hasCollisionMesh && m_CollisionVertices.size() == 0) {
-		if (hasSkin)
-		{
+		if (hasSkin) {
 			m_CollisionVertices.reserve(m_SkinedVertices.size());
-			for (auto vertex : m_SkinedVertices) {
-				Vertex tmp;
-				tmp.Position = vertex.Position;
-				m_CollisionVertices.push_back(tmp);
+			for (const auto& vertex : m_SkinedVertices) {
+				m_CollisionVertices.push_back(vertex.Position);
 			}
 		} else {
 			m_CollisionVertices.reserve(m_Vertices.size());
-			for (auto vertex : m_Vertices) {
-				Vertex tmp;
-				tmp.Position = vertex.Position;
-				m_CollisionVertices.push_back(tmp);
+			for (const auto& vertex : m_Vertices) {
+				m_CollisionVertices.push_back(vertex.Position);
 			}
 		}
 	}
 
-	return m_CollisionVertices.data();
+	return m_CollisionVertices;
 }
 
 RawModelCustom::~RawModelCustom()

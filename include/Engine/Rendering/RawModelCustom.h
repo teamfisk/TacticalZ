@@ -30,9 +30,6 @@ protected:
 
 public:
     ~RawModelCustom();
-	struct Vertex {
-		glm::vec3 Position;
-	};
 
 	struct RenderVertex {
 		glm::vec3 Position;
@@ -121,7 +118,7 @@ public:
 
 	bool IsSkinned() const { return hasSkin; };
 
-	const Vertex* CollisionVertices();
+	const std::vector<glm::vec3>& CollisionVertices();
 
 	size_t NumCollisionVertices() const {
 		return m_CollisionVertices.size();
@@ -146,7 +143,7 @@ private:
 	bool hasCollisionMesh = false;
 	std::vector<unsigned int> m_Indices;
 	std::vector<unsigned int> m_CollisionIndices;
-	std::vector<Vertex> m_CollisionVertices;
+	std::vector<glm::vec3> m_CollisionVertices;
 	std::vector<RenderVertex> m_Vertices;
 	std::vector<SkinedVertex> m_SkinedVertices;
 
@@ -175,7 +172,7 @@ private:
 	void ReadCollisionFile(std::string filePath);
 	void ReadCollisionFileData(std::size_t& offset, char* fileData, const unsigned int& fileByteSize);
 
-	const Vertex* ConstructCollisionList();
+	const std::vector<glm::vec3>& ConstructCollisionList();
     //void CreateSkeleton(std::vector<std::tuple<std::string, glm::mat4>> &boneInfo, std::map<std::string, int> &boneNameMapping, aiNode* node, int parentID);
 };
 
