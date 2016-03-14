@@ -472,7 +472,7 @@
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Icons/Boosts/Assault-01.png</DiffuseTexture>
-                              <Color A="0.392156869" B="0.352941185" G="0.196078435" R="0"/>
+                              <Color A="0.392156869" B="0.196078435" G="0.196078435" R="0.352941185"/>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0.0250000004" Y="0.0650000051" Z="0"/>
@@ -492,7 +492,7 @@
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Icons/Boosts/Defender-01.png</DiffuseTexture>
-                              <Color A="0.392156869" B="0.352941185" G="0.196078435" R="0"/>
+                              <Color A="0.392156869" B="0.196078435" G="0.196078435" R="0.352941185"/>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0.0240000002" Y="0.104000002" Z="0"/>
@@ -512,7 +512,7 @@
                               <Model>Models/Core/UnitQuad.mesh</Model>
                               <GlowMap></GlowMap>
                               <DiffuseTexture>Textures/Icons/Boosts/Sniper-01.png</DiffuseTexture>
-                              <Color A="0.392156869" B="0.352941185" G="0.196078435" R="0"/>
+                              <Color A="0.392156869" B="0.196078435" G="0.196078435" R="0.352941185"/>
                             </c:Sprite>
                             <c:Transform>
                               <Position X="0.0240000002" Y="0.145000011" Z="0"/>
@@ -890,40 +890,6 @@
                         <c:Transform/>
                       </Components>
                       <Children>
-                        <Entity name="ActionBlend">
-                          <Components>
-                            <c:Blend>
-                              <Pose1>Fire</Pose1>
-                              <Pose2>Reload</Pose2>
-                              <Weight>0</Weight>
-                            </c:Blend>
-                            <c:Transform/>
-                          </Components>
-                          <Children>
-                            <Entity name="Reload">
-                              <Components>
-                                <c:Animation>
-                                  <AnimationName>ShootgunReloadU</AnimationName>
-                                  <Time>0.14583822250136791</Time>
-                                  <Speed>0.5</Speed>
-                                </c:Animation>
-                                <c:Transform/>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                            <Entity name="Fire">
-                              <Components>
-                                <c:Animation>
-                                  <AnimationName>ShootRifleU</AnimationName>
-                                  <Time>1</Time>
-                                  <Loop>false</Loop>
-                                </c:Animation>
-                                <c:Transform/>
-                              </Components>
-                              <Children/>
-                            </Entity>
-                          </Children>
-                        </Entity>
                         <Entity name="ShieldBlend">
                           <Components>
                             <c:Blend>
@@ -952,6 +918,40 @@
                                   <AnimationName>ShieldFrontU</AnimationName>
                                   <Time>0.39092668139446118</Time>
                                   <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ActionBlend">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Fire</Pose1>
+                              <Pose2>Reload</Pose2>
+                              <Weight>0</Weight>
+                            </c:Blend>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="Reload">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootgunReloadU</AnimationName>
+                                  <Time>0.14583822250136791</Time>
+                                  <Speed>0.5</Speed>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Fire">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>ShootRifleU</AnimationName>
+                                  <Time>1</Time>
+                                  <Loop>false</Loop>
                                 </c:Animation>
                                 <c:Transform/>
                               </Components>
