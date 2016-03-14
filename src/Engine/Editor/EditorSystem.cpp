@@ -86,8 +86,13 @@ void EditorSystem::Update(double dt)
 
         ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
         Field<glm::vec3> ori = cameraTransform["Orientation"];
-        ori.x(m_EditorCameraInputController->Rotation().x);
-        ori.y(m_EditorCameraInputController->Rotation().y);
+        glm::vec3 newOri;
+        newOri.x = glm::mix(ori.x(), m_EditorCameraInputController->Rotation().x, 0.05f);
+        newOri.y = glm::mix(ori.y(), m_EditorCameraInputController->Rotation().y, 0.05f);
+        //ori.x(m_EditorCameraInputController->Rotation().x);
+        //ori.y(m_EditorCameraInputController->Rotation().y);
+        ori.x(newOri.x);
+        ori.y(newOri.y);
         Field<glm::vec3> pos = cameraTransform["Position"];
         pos += m_EditorCameraInputController->Movement() * glm::inverse(glm::quat(ori)) * (float)actualDelta;
     }
@@ -121,7 +126,7 @@ void EditorSystem::Disable()
     m_EventBroker->Publish(Events::LockMouse());
     Events::SetCamera e;
     e.CameraEntity = m_ActualCamera;
-    m_EventBroker->Publish(e);
+    //m_EventBroker->Publish(e);
     m_Enabled = false;
 }
 
