@@ -54,6 +54,7 @@ Source: "..\..\resources\DefaultConfig.ini"; DestDir: "{app}"; Flags: ignorevers
 Source: "..\..\resources\DefaultInput.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\glew32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\glfw3.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\OpenAL32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\imgui.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Input.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\libpng16.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -67,6 +68,8 @@ Source: "..\..\deps\redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteaf
 [Icons]
 Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{commonprograms}\{#MyAppName} Server"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--server"
+Name: "{commondesktop}\{#MyAppName} Server"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--server"; Tasks: desktopicon
 
 [INI]
 Filename: "{app}\Config.ini"; Section: "Networking"; Key: "Name"; String: "{%USERNAME}"; Flags: createkeyifdoesntexist
