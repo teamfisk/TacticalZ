@@ -55,6 +55,7 @@ target_link_libraries(Game
 
 add_executable(TacticalZ
 	main.cpp
+    ${CMAKE_SOURCE_DIR}/resources/TacticalZ.rc
 )
 target_link_libraries(TacticalZ
     Game
