@@ -86,53 +86,53 @@ void EditorSystem::Update(double dt)
         m_EditorWorldSystemPipeline->Update(actualDelta);
     }
 
-        ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
-        Field<glm::vec3> ori = cameraTransform["Orientation"];
-        glm::vec3 newOri;
-        newOri.x = glm::mix(ori.x(), m_EditorCameraInputController->Rotation().x, 0.05f);
-        newOri.y = glm::mix(ori.y(), m_EditorCameraInputController->Rotation().y, 0.05f);
-        //ori.x(m_EditorCameraInputController->Rotation().x);
-        //ori.y(m_EditorCameraInputController->Rotation().y);
-        ori.x(newOri.x);
-        ori.y(newOri.y);
-        Field<glm::vec3> pos = cameraTransform["Position"];
-        auto move = m_EditorCameraInputController->Movement();
-        const float decreaseAccelleration = 3.75f;
-        const float increaseAccelleration = 5.25f;
-        if (move.x == 0) {
-            m_CamVelocity.x -= m_CamVelocity.x * (float)actualDelta * decreaseAccelleration;
-            //m_CamVelocity.x -= glm::sign(m_CamVelocity.x) * (float)actualDelta * decreaseAccelleration;
-            if (glm::abs(m_CamVelocity.x) < 0.01f) {
-                m_CamVelocity.x = 0;
-            }
-        } else {
-            m_CamVelocity.x += glm::sign(move.x) * (float)actualDelta * increaseAccelleration;
-            m_CamVelocity.x = glm::max(m_CamVelocity.x, -glm::abs(move.x));
-            m_CamVelocity.x = glm::min(m_CamVelocity.x, glm::abs(move.x));
+    ComponentWrapper& cameraTransform = m_EditorCamera["Transform"];
+    Field<glm::vec3> ori = cameraTransform["Orientation"];
+    glm::vec3 newOri;
+    newOri.x = glm::mix(ori.x(), m_EditorCameraInputController->Rotation().x, 0.05f);
+    newOri.y = glm::mix(ori.y(), m_EditorCameraInputController->Rotation().y, 0.05f);
+    //ori.x(m_EditorCameraInputController->Rotation().x);
+    //ori.y(m_EditorCameraInputController->Rotation().y);
+    ori.x(newOri.x);
+    ori.y(newOri.y);
+    Field<glm::vec3> pos = cameraTransform["Position"];
+    auto move = m_EditorCameraInputController->Movement();
+    const float decreaseAccelleration = 3.75f;
+    const float increaseAccelleration = 5.25f;
+    if (move.x == 0) {
+        m_CamVelocity.x -= m_CamVelocity.x * (float)actualDelta * decreaseAccelleration;
+        //m_CamVelocity.x -= glm::sign(m_CamVelocity.x) * (float)actualDelta * decreaseAccelleration;
+        if (glm::abs(m_CamVelocity.x) < 0.01f) {
+            m_CamVelocity.x = 0;
         }
-        if (move.y == 0) {
-            m_CamVelocity.y -= m_CamVelocity.y * (float)actualDelta * decreaseAccelleration;
-            //m_CamVelocity.y -= glm::sign(m_CamVelocity.y) * (float)actualDelta * decreaseAccelleration;
-            if (glm::abs(m_CamVelocity.y) < 0.01f) {
-                m_CamVelocity.y = 0;
-            }
-        } else {
-            m_CamVelocity.y += glm::sign(move.y) * (float)actualDelta * increaseAccelleration;
-            m_CamVelocity.y = glm::max(m_CamVelocity.y, -glm::abs(move.y));
-            m_CamVelocity.y = glm::min(m_CamVelocity.y, glm::abs(move.y));
+    } else {
+        m_CamVelocity.x += glm::sign(move.x) * (float)actualDelta * increaseAccelleration;
+        m_CamVelocity.x = glm::max(m_CamVelocity.x, -glm::abs(move.x));
+        m_CamVelocity.x = glm::min(m_CamVelocity.x, glm::abs(move.x));
+    }
+    if (move.y == 0) {
+        m_CamVelocity.y -= m_CamVelocity.y * (float)actualDelta * decreaseAccelleration;
+        //m_CamVelocity.y -= glm::sign(m_CamVelocity.y) * (float)actualDelta * decreaseAccelleration;
+        if (glm::abs(m_CamVelocity.y) < 0.01f) {
+            m_CamVelocity.y = 0;
         }
-        if (move.z == 0) {
-            m_CamVelocity.z -= m_CamVelocity.z * (float)actualDelta * decreaseAccelleration;
-            //m_CamVelocity.z -= glm::sign(m_CamVelocity.z) * (float)actualDelta * decreaseAccelleration;
-            if (glm::abs(m_CamVelocity.z) < 0.01f) {
-                m_CamVelocity.z = 0;
-            }
-        } else {
-            m_CamVelocity.z += glm::sign(move.z) * (float)actualDelta * increaseAccelleration;
-            m_CamVelocity.z = glm::max(m_CamVelocity.z, -glm::abs(move.z));
-            m_CamVelocity.z = glm::min(m_CamVelocity.z, glm::abs(move.z));
+    } else {
+        m_CamVelocity.y += glm::sign(move.y) * (float)actualDelta * increaseAccelleration;
+        m_CamVelocity.y = glm::max(m_CamVelocity.y, -glm::abs(move.y));
+        m_CamVelocity.y = glm::min(m_CamVelocity.y, glm::abs(move.y));
+    }
+    if (move.z == 0) {
+        m_CamVelocity.z -= m_CamVelocity.z * (float)actualDelta * decreaseAccelleration;
+        //m_CamVelocity.z -= glm::sign(m_CamVelocity.z) * (float)actualDelta * decreaseAccelleration;
+        if (glm::abs(m_CamVelocity.z) < 0.01f) {
+            m_CamVelocity.z = 0;
         }
-        pos += m_CamVelocity * glm::inverse(glm::quat(ori)) * (float)actualDelta;
+    } else {
+        m_CamVelocity.z += glm::sign(move.z) * (float)actualDelta * increaseAccelleration;
+        m_CamVelocity.z = glm::max(m_CamVelocity.z, -glm::abs(move.z));
+        m_CamVelocity.z = glm::min(m_CamVelocity.z, glm::abs(move.z));
+    }
+    pos += m_CamVelocity * glm::inverse(glm::quat(ori)) * (float)actualDelta;
 }
 
 void EditorSystem::Enable()
