@@ -36,6 +36,7 @@
 #include "Network/ESearchForServers.h"
 #include "Network/EInterpolate.h"
 #include "Network/SnapshotFilter.h"
+#include "Core/EWin.h"
 
 class Client : public Network
 {
@@ -107,6 +108,7 @@ private:
     void parseAmmoPickup(Packet& packet);
     void parseRemoveWorld(Packet& packet);
     void parseKDEvent(Packet& packet);
+    void parseWin(Packet& packet);
     void InterpolateFields(Packet& packet, const ComponentInfo & componentInfo, const EntityID & entityID, const std::string & componentType);
     void parseSnapshot(Packet& packet);
     void identifyPacketLoss();

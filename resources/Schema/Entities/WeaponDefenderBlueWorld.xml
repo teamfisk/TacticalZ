@@ -2,6 +2,7 @@
 <Entity name="ThirdPersonWeaponModel" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
+    <c:Shielded/>
     <c:Model>
       <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
     </c:Model>
@@ -9,17 +10,6 @@
   </Components>
 
   <Children>
-    <Entity name="WeaponMuzzle">
-      <Components>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/DefenderRayBlue.xml</EntityFile>
-        </c:Spawner>
-        <c:Transform>
-          <Position X="0.000284185546" Y="0.0318552479" Z="-0.193328083"/>
-        </c:Transform>
-      </Components>
-      <Children/>
-    </Entity>
     <Entity name="ThirdPersonReloadSpawner">
       <Components>
         <c:Spawner>
@@ -28,6 +18,38 @@
         <c:Transform/>
       </Components>
       <Children/>
+    </Entity>
+    <Entity name="Muzzle">
+      <Components>
+        <c:Transform>
+          <Position X="-0.0100463303" Y="0.0624945536" Z="-0.372351319"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="WeaponMuzzleRay">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/RayDefenderBlue.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0.0180841181" Y="0.0252480619" Z="-0.135249734"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="WeaponMuzzleFlash">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/MuzzleFlashBlue.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0.0201820824" Y="0.0212024488" Z="-0.0305794869"/>
+              <Scale X="1.5" Y="1.5" Z="1"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
     </Entity>
   </Children>
 

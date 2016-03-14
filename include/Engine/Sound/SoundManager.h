@@ -81,6 +81,7 @@ private:
     void setSoundProperties(Source* source, ComponentWrapper* soundComponent);
     float getDurationSeconds(Source* source);
     float getTimeOffsetSeconds(Source* source);
+    void setTimeOffsetSeconds(Source* source, float timeOffset);
 
     // Specific logic
     void playSound(Source* source);
