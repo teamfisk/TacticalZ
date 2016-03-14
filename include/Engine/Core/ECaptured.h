@@ -1,5 +1,5 @@
-#ifndef ECaptured_h__
-#define ECaptured_h__
+#ifndef Events_Captured_h__
+#define Events_Captured_h__
 
 #include "EventBroker.h"
 #include "../Core/Entity.h"
@@ -12,7 +12,9 @@ namespace Events
 struct Captured : Event
 {
     int TeamNumberThatCapturedCapturePoint;
-    EntityID CapturePointID;
+    EntityID CapturePointTakenID;
+    EntityWrapper BlueTeamNextCapturePoint;
+    EntityWrapper RedTeamNextCapturePoint;
 };
 
 }

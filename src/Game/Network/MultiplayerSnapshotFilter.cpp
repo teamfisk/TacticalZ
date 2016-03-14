@@ -14,8 +14,11 @@ bool MultiplayerSnapshotFilter::FilterComponent(EntityWrapper entity, SharedComp
             || component.Info.Name == "Physics"
             || component.Info.Name == "AssaultWeapon"
             || component.Info.Name == "DefenderWeapon"
+            || component.Info.Name == "SidearmWeapon"
             || component.Info.Name == "Animation"
-            || component.Info.Name == "AnimationOffset"
+            || component.Info.Name == "Blend"
+            || component.Info.Name == "BlendAdditive"
+            || component.Info.Name == "BlendOverride"
             || entity.Name() == "PlayerName"
         ) {
             return false;

@@ -13,18 +13,32 @@
 class SSAOPass
 {
 public:
-	SSAOPass(IRenderer* rendere);
-	~SSAOPass() { 
-		delete m_DrawBloomPass;
-	};
+	SSAOPass(IRenderer* renderer, ConfigFile* config);
+	~SSAOPass();
+
+	void ChangeQuality(int quality);
 
 	void Draw(GLuint depthBuffer, Camera* camera);
-	void Setting(float radius, float bias, float contrast, float intensityScale, int numOfSamples, int NumOfTurns);
+	void Setting(float radius, float bias, float contrast, float intensityScale, int numOfSamples, int numOfTurns, int iterations, int quality);
 	void ClearBuffer();
 	void OnWindowResize();
 
 	//Return the SSAO of the texture sent to Draw
-	GLuint SSAOTexture() const { return m_DrawBloomPass->GaussianTexture(); }
+	GLuint SSAOTexture() const { 
+		if (m_Quality == 0) {
+			return m_WhiteTexture->m_Texture;
+		} else {
+			return m_Gaussian_vert;
+		}
+	}
+
+	int TextureQuality() const {
+		if (m_Quality == 0) {
+			return 13;
+		} else {
+			return m_TextureQuality;
+		}
+	}
 
 private:
 	void InitializeTexture();
@@ -32,14 +46,13 @@ private:
 	void InitializeShaderProgram();
 	void InitializeBuffer();
 
-	void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
-
 	//void blurHorizontal(GLuint depthBuffer);
 	//void blurVertical(GLuint depthBuffer);
 
 	Model* m_ScreenQuad;
 
 	const IRenderer* m_Renderer;
+	ConfigFile* m_Config;
 
 	float m_Radius;
 	float m_Bias;
@@ -47,17 +60,28 @@ private:
 	float m_IntensityScale;
 	int m_NumOfSamples;
 	int m_NumOfTurns;
+	int m_Iterations;
+	int m_TextureQuality;
+	int m_Quality = 0;
 
-	GLuint m_SSAOTexture;
+	Texture* m_WhiteTexture;
+
+	GLuint m_SSAOTexture = 0;
 	FrameBuffer m_SSAOFramBuffer;
 
-	GLuint m_SSAOViewSpaceZTexture;
+	GLuint m_SSAOViewSpaceZTexture = 0;
 	FrameBuffer m_SSAOViewSpaceZFramBuffer;
+
+	GLuint m_Gaussian_horiz = 0;
+	GLuint m_Gaussian_vert = 0;
+
+	FrameBuffer m_GaussianFrameBuffer_horiz;
+	FrameBuffer m_GaussianFrameBuffer_vert;
 
 	ShaderProgram* m_SSAOProgram;
 	ShaderProgram* m_SSAOViewSpaceZProgram;
-
-	DrawBloomPass* m_DrawBloomPass;
+	ShaderProgram* m_GaussianProgram_horiz;
+	ShaderProgram* m_GaussianProgram_vert;
 };
 
 #endif

@@ -20,7 +20,12 @@ enum class MessageType
     ComponentDeleted,
     PlayerTransform,
     OnDoubleJump,
+    OnDashEffect,
     ServerlistRequest,
+    AmmoPickup,
+    RemoveWorld,
+    KD,
+    Win,
     Invalid
 };
 

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="ScoreBoardOrigin" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:NetworkComponent/>
+    <c:Transform>
+      <Position X="66.4319992" Y="37.9560013" Z="0"/>
+      <Orientation X="0" Y="4.71199989" Z="0"/>
+    </c:Transform>
+  </Components>
+
+  <Children>
+    <Entity name="Background_Main">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Scale X="60" Y="30" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="BlueSide">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Color A="1" B="1" G="0.505882382" R="0"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="16" Y="0" Z="0.5"/>
+          <Scale X="25" Y="28" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="RedSide">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+          <Color A="1" B="0" G="0.219607845" R="1"/>
+        </c:Model>
+        <c:Transform>
+          <Position X="-16" Y="0" Z="0.5"/>
+          <Scale X="25" Y="28" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Background_Spectator">
+      <Components>
+        <c:Model>
+          <Resource>Models/Core/UnitCube.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="-20.5" Z="0"/>
+          <Scale X="20" Y="10" Z="1"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ScoreBoard_Blue">
+      <Components>
+        <c:ScoreScreen>
+          <Offset X="0" Y="-2" Z="0"/>
+        </c:ScoreScreen>
+        <c:Team>
+          <Team>
+            <Blue/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="16" Y="12" Z="1.5"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ScoreBoard_Red">
+      <Components>
+        <c:ScoreScreen>
+          <Offset X="0" Y="-2" Z="0"/>
+        </c:ScoreScreen>
+        <c:Team>
+          <Team>
+            <Red/>
+          </Team>
+        </c:Team>
+        <c:Transform>
+          <Position X="-16" Y="12" Z="1.5"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="ScoreBoard_Spectators">
+      <Components>
+        <c:ScoreScreen>
+          <Offset X="0" Y="-1" Z="0"/>
+        </c:ScoreScreen>
+        <c:Team/>
+        <c:Transform>
+          <Position X="0" Y="-17.5" Z="1.5"/>
+        </c:Transform>
+      </Components>
+      <Children/>
+    </Entity>
+  </Children>
+
+</Entity>

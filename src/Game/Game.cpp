@@ -10,13 +10,17 @@
 #include "Systems/SpawnerSystem.h"
 #include "Systems/PlayerSpawnSystem.h"
 #include "Systems/PlayerDeathSystem.h"
-#include "Core/EntityFileWriter.h"
+#include "Systems/FloatingEffectSystem.h"
+#include "Core/EntityFile.h"
+#include "Core/EntityXMLFileWriter.h"
 #include "Game/Systems/CapturePointSystem.h"
 #include "Game/Systems/CapturePointHUDSystem.h"
-#include "Game/Systems/HealthPickupSystem.h"
+#include "Game/Systems/PickupSpawnSystem.h"
 #include "Game/Systems/AmmoPickupSystem.h"
 #include "Game/Systems/DamageIndicatorSystem.h"
+#include "Game/Systems/Weapon/AssaultWeaponBehaviour.h"
 #include "Game/Systems/Weapon/DefenderWeaponBehaviour.h"
+#include "Game/Systems/Weapon/SidearmWeaponBehaviour.h"
 #include "Rendering/AnimationSystem.h"
 #include "Game/Systems/HealthHUDSystem.h"
 #include "Rendering/BoneAttachmentSystem.h"
@@ -24,10 +28,21 @@
 #include "../Engine/Core/UniformScaleSystem.h"
 #include "Rendering/AnimationSystem.h"
 #include "Network/MultiplayerSnapshotFilter.h"
-#include "Game/Systems/AmmunitionHUDSystem.h"
+#include "Game/Systems/TextFieldReader.h"
+#include "Game/Systems/AbilityCooldownHUDSystem.h"
+#include "Game/Systems/CapturePointArrowHUDSystem.h"
 #include "Game/Systems/KillFeedSystem.h"
+#include "Game/Systems/BoostSystem.h"
+#include "Game/Systems/BoostIconsHUDSystem.h"
+#include "Game/Systems/ScoreScreenSystem.h"
+#include "Game/Systems/SpectatorCameraSystem.h"
 #include "GUI/ButtonSystem.h"
-#include "GUI/MainMenuSystem.h"
+#include "Game/Systems/MainMenuSystem.h"
+#include "Game/Systems/ServerListSystem.h"
+#include "Game/Systems/StartSystem.h"
+#include "Game/Systems/EndScreenSystem.h"
+#include "Game/Systems/FadeSystem.h"
+#include "Rendering/TextureSprite.h"
 
 
 Game::Game(int argc, char* argv[])
@@ -39,22 +54,24 @@ Game::Game(int argc, char* argv[])
     ResourceManager::RegisterType<Model>("Model");
     ResourceManager::RegisterType<RawModel>("RawModel");
     ResourceManager::RegisterType<Texture>("Texture");
-    ResourceManager::RegisterType<PNG>("Png");
+    ResourceManager::RegisterType<PNG>("PNG");
+    ResourceManager::RegisterType<TextureSprite>("TextureSprite");
+    ResourceManager::RegisterType<DDS>("DDS");
     ResourceManager::RegisterType<ShaderProgram>("ShaderProgram");
     ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityXMLFile");
     ResourceManager::RegisterType<Font>("FontFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     ResourceManager::UseThreading = m_Config->Get<bool>("Multithreading.ResourceLoading", true);
     DisableMemoryPool::Value = m_Config->Get<bool>("Debug.DisableMemoryPool", false);
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
-    PlayerSpawnSystem::SetRespawnTime(m_Config->Get<float>("Debug.RespawnTime", 15.0f));
 
     // Create the core event broker
     m_EventBroker = new EventBroker();
 
     // Create the renderer
-    m_Renderer = new Renderer(m_EventBroker);
+    m_Renderer = new Renderer(m_EventBroker, m_Config);
     m_Renderer->SetFullscreen(m_Config->Get<bool>("Video.Fullscreen", false));
     m_Renderer->SetVSYNC(m_Config->Get<bool>("Video.VSYNC", false));
     m_Renderer->SetResolution(Rectangle::Rectangle(
@@ -79,10 +96,7 @@ Game::Game(int argc, char* argv[])
     std::string mapToLoad = m_Config->Get<std::string>("Debug.LoadMap", "");
     if (!mapToLoad.empty()) {
         auto file = ResourceManager::Load<EntityFile>(mapToLoad);
-        EntityFilePreprocessor fpp(file);
-        fpp.RegisterComponents(m_World);
-        EntityFileParser fp(file);
-        fp.MergeEntities(m_World);
+        file->MergeInto(m_World);
     }
 
     // Create the sound manager
@@ -106,7 +120,7 @@ Game::Game(int argc, char* argv[])
 
     // Create Octrees
     // TODO: Perhaps the world bounds should be set in some non-arbitrary way instead of this.
-    AABB boxContainingTheWorld(glm::vec3(-300), glm::vec3(300));
+    AABB boxContainingTheWorld = AABB::FromOriginSize(glm::vec3(0.f, 10.7f, 0.f), glm::vec3(140.f, 31.f, 190.f));
     m_OctreeCollision = new Octree<EntityAABB>(boxContainingTheWorld, 4);
     m_OctreeTrigger = new Octree<EntityAABB>(boxContainingTheWorld, 4);
     m_OctreeFrustrumCulling = new Octree<EntityAABB>(boxContainingTheWorld, 4);
@@ -116,25 +130,39 @@ Game::Game(int argc, char* argv[])
     // All systems with orderlevel 0 will be updated first.
     unsigned int updateOrderLevel = 0;
     m_SystemPipeline->AddSystem<InterpolationSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TransformSystem>(updateOrderLevel);
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<SoundSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<RaptorCopterSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<FloatingEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ExplosionEffectSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<HealthSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerMovementSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<SpawnerSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<PlayerSpawnSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AssaultWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<DefenderWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
+    m_SystemPipeline->AddSystem<SidearmWeaponBehaviour>(updateOrderLevel, m_Renderer, m_OctreeCollision);
     m_SystemPipeline->AddSystem<LifetimeSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<CapturePointHUDSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<HealthPickupSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<TextFieldReader>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<AbilityCooldownHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<CapturePointArrowHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<PickupSpawnSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<AmmoPickupSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<DamageIndicatorSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<AmmunitionHUDSystem>(updateOrderLevel);
-    m_SystemPipeline->AddSystem<KillFeedSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<BoostSystem>(updateOrderLevel);
     m_SystemPipeline->AddSystem<ButtonSystem>(updateOrderLevel, m_Renderer);
     m_SystemPipeline->AddSystem<MainMenuSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<BoostIconsHUDSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ScoreScreenSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<SpectatorCameraSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<ServerListSystem>(updateOrderLevel, m_Renderer);
+    m_SystemPipeline->AddSystem<StartSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<EndScreenSystem>(updateOrderLevel);
+    m_SystemPipeline->AddSystem<FadeSystem>(updateOrderLevel);
     // Populate Octree with collidables
     ++updateOrderLevel;
     m_SystemPipeline->AddSystem<FillOctreeSystem>(updateOrderLevel, m_OctreeCollision, "Collidable");
@@ -197,20 +225,22 @@ void Game::Tick()
     PerformanceTimer::StartTimerAndStopPrevious("InputProxy");
     m_InputProxy->Update(dt);
     m_EventBroker->Swap();
-    m_InputProxy->Process();
+    m_InputProxy->Process(ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse);
     m_EventBroker->Swap();
 
     PerformanceTimer::StartTimerAndStopPrevious("SoundManager");
-    m_SoundManager->Update(dt);
+    if (m_IsClient) {
+        m_SoundManager->Update(dt);
+    }
 
     // Update network
     PerformanceTimer::StartTimerAndStopPrevious("Network");
     m_EventBroker->Process<MultiplayerSnapshotFilter>();
     if (m_NetworkClient != nullptr) {
-        m_NetworkClient->Update();
+        m_NetworkClient->Update(dt);
     }
     if (m_NetworkServer != nullptr) {
-        m_NetworkServer->Update();
+        m_NetworkServer->Update(dt);
     }
     //m_SoundManager->Update(dt);
 
@@ -226,6 +256,13 @@ void Game::Tick()
     m_RenderFrame->Clear();
     m_EventBroker->Swap();
     m_EventBroker->Clear();
+
+    //LOG_DEBUG("Recalculated positions: %i", TransformSystem::RecalculatedPositions);
+    //LOG_DEBUG("Recalculated orientations: %i", TransformSystem::RecalculatedOrientations);
+    //LOG_DEBUG("Recalculated scales: %i", TransformSystem::RecalculatedScales);
+    TransformSystem::RecalculatedPositions = 0;
+    TransformSystem::RecalculatedOrientations = 0;
+    TransformSystem::RecalculatedScales = 0;
 }
 
 int Game::parseArgs(int argc, char* argv[])

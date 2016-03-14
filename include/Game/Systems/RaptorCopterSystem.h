@@ -1,6 +1,25 @@
 #include "Common.h"
 #include "Core/System.h"
 
+
+
+ //struct FSubscriptProxy
+ //   {
+ //       friend struct ComponentWrapper;
+ //       FSubscriptProxy(ComponentWrapper* component, std::string fieldName)
+ //           : m_Component(component)
+ //           , m_FieldName(fieldName)
+ //       { }
+
+ //       ComponentWrapper* m_Component;
+ //       std::string m_FieldName;
+
+ //   public:
+ //       template <typename T>
+ //       operator Field<T>() { return Field<T>(m_Component->Field<T>(m_FieldName)); }
+
+ //   };
+
 class RaptorCopterSystem : public PureSystem
 {
 public:
@@ -9,9 +28,11 @@ public:
         , PureSystem("RaptorCopter")
     { }
 
-    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& component, double dt) override
+    virtual void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cRaptorCopter, double dt) override
     {
-        ComponentWrapper& transform = m_World->GetComponent(component.EntityID, "Transform");
-        (glm::vec3&)transform["Orientation"] += (float)(double)component["Speed"] * (float)dt * (glm::vec3)component["Axis"];
+        ComponentWrapper& cTransform = entity["Transform"];
+        //FSubscriptProxy subOri(&cTransform, "Orientation");
+        //Field<glm::vec3> orientation = subOri;
+        (Field<glm::vec3>)cTransform["Orientation"] += (float)(const double&)cRaptorCopter["Speed"] * (float)dt * (glm::vec3)cRaptorCopter["Axis"];
     }
 };

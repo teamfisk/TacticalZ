@@ -1,29 +1,55 @@
 #include "Systems/PlayerSpawnSystem.h"
-
-//This should be set by the config anyway.
-float PlayerSpawnSystem::m_RespawnTime = 15.0f;
+#include "Core/ELockMouse.h"
 
 PlayerSpawnSystem::PlayerSpawnSystem(SystemParams params)
     : System(params)
-    , m_Timer(0.f)
+    , m_DbgConfigForceRespawn(false)
 {
     EVENT_SUBSCRIBE_MEMBER(m_OnInputCommand, &PlayerSpawnSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerSpawnerd, &PlayerSpawnSystem::OnPlayerSpawned);
     EVENT_SUBSCRIBE_MEMBER(m_OnPlayerDeath, &PlayerSpawnSystem::OnPlayerDeath);
-    m_NetworkEnabled = ResourceManager::Load<ConfigFile>("Config.ini")->Get("Networking.StartNetwork", false);
+    ConfigFile* config = ResourceManager::Load<ConfigFile>("Config.ini");
+    m_NetworkEnabled = config->Get("Networking.StartNetwork", false);
+    m_ForcedRespawnTime = config->Get("Debug.RespawnTime", -1.0f);
+    m_DbgConfigForceRespawn = m_ForcedRespawnTime > 0 && IsServer;
 }
 
 void PlayerSpawnSystem::Update(double dt)
 {
-    //Increase timer.
-    m_Timer += dt;
-    if (m_Timer < m_RespawnTime) {
-        return;
+    // If there are no CapturePointGameMode components we will just spawn immediately.
+    // Should be able to support older maps with this.
+    // TODO: In the future we might want to return instead, to avoid spawning in the menu for instance.
+    auto pool = m_World->GetComponents("CapturePointGameMode");
+    if (pool != nullptr && pool->size() > 0)
+    {
+        // Take the first CapturePointGameMode component found.
+        ComponentWrapper& modeComponent = *pool->begin();
+        // Increase timer.
+        Field<double> timer = modeComponent["RespawnTime"];
+        timer += dt;
+        if (m_DbgConfigForceRespawn) {
+            (Field<double>)modeComponent["MaxRespawnTime"] = m_ForcedRespawnTime;
+        }
+        double maxRespawnTime = (double)modeComponent["MaxRespawnTime"];
+        EntityWrapper spectatorCam = m_World->GetFirstEntityByName("SpectatorCamera");
+        if (spectatorCam.Valid()) {
+            EntityWrapper HUD = spectatorCam.FirstChildByName("SpectatorHUD");
+            if (HUD.Valid()) {
+                EntityWrapper respawnTimer = spectatorCam.FirstChildByName("RespawnTimer");
+                if (respawnTimer.Valid()) {
+                    //Update respawn time in the HUD element.
+                    respawnTimer["Text"]["Content"] = std::to_string(1 + (int)(maxRespawnTime - timer));
+                }
+            }
+        }
+        if (timer < maxRespawnTime) {
+            return;
+        }
+        // If respawn time has passed, we spawn all players that have requested to be spawned.
+        timer = 0;
     }
-    //If respawn time has passed, we spawn all players that have requested to be spawned.
-    m_Timer = 0.f;
 
-    //If there are no spawn requests, return immediately, if we are client the SpawnRequests should always be empty.
+    // If there are no spawn requests, return immediately, if we are client the SpawnRequests should always be empty.
     if (m_SpawnRequests.size() == 0) {
         return;
     }
@@ -34,7 +60,15 @@ void PlayerSpawnSystem::Update(double dt)
     }
 
     int numSpawnedPlayers = 0;
-    for (auto& req : m_SpawnRequests) {
+    int playersSpectating = 0;
+    const int numRequestsToHandle = (int)m_SpawnRequests.size();
+    for (auto it = m_SpawnRequests.begin(); it != m_SpawnRequests.end(); ++it) {
+        // It is valid if they didn't pick class yet
+        // but don't spawn anything, goto next spawnrequest.
+        if (it->Class == PlayerClass::None) {
+            ++playersSpectating;
+            continue;
+        }
         for (auto& cPlayerSpawn : *playerSpawns) {
             EntityWrapper spawner(m_World, cPlayerSpawn.EntityID);
             if (!spawner.HasComponent("Spawner")) {
@@ -43,37 +77,63 @@ void PlayerSpawnSystem::Update(double dt)
 
             // If the spawner has a team affiliation, check it
             if (spawner.HasComponent("Team")) {
-                if ((int)spawner["Team"]["Team"] != req.Team) {
-                    continue;
+                auto cSpawnerTeam = spawner["Team"];
+                if ((int)cSpawnerTeam["Team"] != it->Team) {
+                    // If they somehow has a valid class as spectator, don't spawn them.
+                    if (it->Team == cSpawnerTeam["Team"].Enum("Spectator")) {
+                        ++playersSpectating;
+                        break;
+                    } else {
+                        continue;
+                    }
                 }
             }
 
+            // TODO: Choose a different spawner depending on class picked?
+            std::string playerEntityFile;
+            if (it->Class == PlayerClass::Assault) {
+                playerEntityFile = (const std::string&)cPlayerSpawn["AssaultFile"];
+            } else if (it->Class == PlayerClass::Defender) {
+                playerEntityFile = (const std::string&)cPlayerSpawn["DefenderFile"];
+            } else if (it->Class == PlayerClass::Sniper) {
+                playerEntityFile = (const std::string&)cPlayerSpawn["SniperFile"];
+            }
+
             // Spawn the player!
-            EntityWrapper player = SpawnerSystem::Spawn(spawner, EntityWrapper::Invalid, "Player");
+            EntityWrapper player = SpawnerSystem::SpawnEntityFile(playerEntityFile, spawner, EntityWrapper::Invalid, "Player");
             // Set the player team affiliation
-            player["Team"]["Team"] = req.Team;
+            player["Team"]["Team"] = it->Team;
 
             // Publish a PlayerSpawned event
             Events::PlayerSpawned e;
-            e.PlayerID = req.PlayerID;
+            e.PlayerID = it->PlayerID;
             e.Player = player;
             e.Spawner = spawner;
             m_EventBroker->Publish(e);
             ++numSpawnedPlayers;
+            it = m_SpawnRequests.erase(it);
+            break;
+        }
+        if (it == m_SpawnRequests.end()) {
             break;
         }
     }
-    if (numSpawnedPlayers != (int)m_SpawnRequests.size()) {
-        LOG_DEBUG("%i players were supposed to be spawned, but %i was spawned.", (int)m_SpawnRequests.size(), numSpawnedPlayers);
+    if (numSpawnedPlayers != numRequestsToHandle - playersSpectating) {
+        LOG_DEBUG("%i players were supposed to be spawned, but only %i was successfully.", numRequestsToHandle - playersSpectating, numSpawnedPlayers);
     } else {
-        LOG_DEBUG("%i players were spawned.", numSpawnedPlayers);
+        std::string dbg = numSpawnedPlayers != 0 ? std::to_string(numSpawnedPlayers) + " players were spawned. " : "";
+        dbg += playersSpectating != 0 ? std::to_string(playersSpectating) + " players are spectating/picking class. " : "";
+        LOG_DEBUG(dbg.c_str());
     }
-    m_SpawnRequests.clear();
 }
 
 bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
 {
-    if (e.Command != "PickTeam") {
+    if (e.Command != "PickTeam" && e.Command != "PickClass" && e.Command != "SwapToTeamPick" && e.Command != "SwapToClassPick") {
+        return false;
+    }
+
+    if (e.Value == 0) {
         return false;
     }
 
@@ -83,34 +143,42 @@ bool PlayerSpawnSystem::OnInputCommand(Events::InputCommand& e)
         return false;
     }
 
-    if (e.Value == 0) {
-        return false;
-    }
-
-    //TODO: Spectating?
-    //Right now, return if someone picks spectator.
-    //1 signifies spectator here, could not get Playerteam component since it may be invalid or without team comp.
-    if ((ComponentInfo::EnumType)e.Value == 1) {
-        return false;
-    }
-
-    //Check if the player already requested spawn.
+    // Check if the player already requested spawn.
     auto iter = m_SpawnRequests.begin();
     for (; iter != m_SpawnRequests.end(); ++iter) {
         if (iter->PlayerID == e.PlayerID) {
+            // If player wants to switch team or class , remove their selected class so they don't spawn.
+            if (e.Command == "SwapToTeamPick" || e.Command == "SwapToClassPick") {
+                iter->Class = PlayerClass::None;
+                return true;
+            }
             break;
         }
     }
 
+    //If we get here we got a PickTeam or PickClass, so add or alter a spawn request.
+
     if (iter != m_SpawnRequests.end()) {
-        //If player is in queue to spawn, then change their team affiliation in the request.
-        iter->Team = (ComponentInfo::EnumType)e.Value;
+        // If player is in queue to spawn, then change their team affiliation or class in the request.
+        if (e.Command == "PickTeam") {
+            iter->Team = (ComponentInfo::EnumType)e.Value;
+        } else {
+            iter->Class = static_cast<PlayerClass>((int)e.Value);
+        }
     } else if (m_PlayerEntities.count(e.PlayerID) == 0 || !m_PlayerEntities[e.PlayerID].Valid()) {
-        //If player is not in queue to spawn, then create a spawn request, 
-        //but only if they are spectating and/or just connected.
+        // If player is not in queue to spawn, then create a spawn request, 
+        // but only if they are spectating and/or just connected.
         SpawnRequest req;
         req.PlayerID = e.PlayerID;
-        req.Team = (ComponentInfo::EnumType)e.Value;
+        if (e.Command == "PickTeam") {
+            req.Team = (ComponentInfo::EnumType)e.Value;
+            req.Class = PlayerClass::None;
+        } else {
+            // Should never get here, since you should have picked a team before you ever get a chance to pick class.
+            LOG_WARNING("Sequence error: Should not be able to pick class before team");
+            req.Team = 1;           // TODO: 1 Signifies spectator, should probably have real enum here later.
+            req.Class = static_cast<PlayerClass>((int)e.Value);
+        }
         m_SpawnRequests.push_back(req);
     } else {
         return false;
@@ -145,18 +213,8 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
         Events::SetCamera e;
         e.CameraEntity = cameraEntity;
         m_EventBroker->Publish(e);
-    }
-
-    // HACK: Set the player model color to team color
-    EntityWrapper playerModel = e.Player.FirstChildByName("PlayerModel");
-    if (playerModel.Valid() && e.Player.HasComponent("Team")) {
-        ComponentWrapper cTeam = e.Player["Team"];
-        ComponentWrapper cModel = playerModel["Model"];
-        if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Red")) {
-            cModel["Color"] = glm::vec3(1.f, 0.f, 0.f);
-        } else if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Blue")) {
-            cModel["Color"] = glm::vec3(0.f, 0.25f, 1.f);
-        }
+        Events::LockMouse lock;
+        m_EventBroker->Publish(lock);
     }
 
     return true;
@@ -164,7 +222,7 @@ bool PlayerSpawnSystem::OnPlayerSpawned(Events::PlayerSpawned& e)
 
 bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
 {
-    //Only spawn request if network is disabled or we are server.
+    // Only spawn request if network is disabled or we are server.
     if (!IsServer && m_NetworkEnabled) {
         return false;
     }
@@ -172,10 +230,6 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
         return false;
     }
     ComponentWrapper cTeam = e.Player["Team"];
-    //A spectator can't die anyway
-    if ((ComponentInfo::EnumType)cTeam["Team"] == cTeam["Team"].Enum("Spectator")) {
-        return false;
-    }
 
     if (m_PlayerIDs.count(e.Player.ID) == 0) {
         return false;
@@ -184,6 +238,16 @@ bool PlayerSpawnSystem::OnPlayerDeath(Events::PlayerDeath& e)
     SpawnRequest req;
     req.PlayerID = m_PlayerIDs.at(e.Player.ID);
     req.Team = cTeam["Team"];
+    // TODO: Something better than temp class state code, if we ever add class enums in .xml
+    if (e.Player.HasComponent("DashAbility")) {
+        req.Class = PlayerClass::Assault;
+    } else if (e.Player.HasComponent("SprintAbility")) {
+        req.Class = PlayerClass::Sniper;
+    } else if (e.Player.HasComponent("ShieldAbility")) {
+        req.Class = PlayerClass::Defender;
+    } else {
+        req.Class = PlayerClass::None;
+    }
     m_SpawnRequests.push_back(req);
 
     return true;

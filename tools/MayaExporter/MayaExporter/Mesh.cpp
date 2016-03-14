@@ -94,33 +94,37 @@ MeshClass::MeshClass()
 //    return weightMap;
 //}
 
-Mesh MeshClass::GetMeshData(MObjectArray object)
+Mesh MeshClass::GetMeshData(MObjectArray object, bool collision)
 {
     MS status;
     Mesh newMesh;
+	newMesh.isCollison = collision;
     vector<VertexLayout>& vertexList = newMesh.Vertices;
     map<string, vector<int>>& indexLists = newMesh.Indices;
     for (int ObjectID = 0; ObjectID < object.length(); ObjectID++) {
         if (!object[ObjectID].hasFn(MFn::kMesh))
             continue;
 
+		
         MObject node = object[ObjectID];
         MFnDependencyNode thisNode(node);
         MPlugArray connections;
         thisNode.findPlug("inMesh").connectedTo(connections, true, true);
         MPlug weightList, weights;
         MObject weightListObject;
-        for (unsigned int i = 0; i < connections.length(); i++) {
-            if (connections[i].node().apiType() == MFn::kSkinClusterFilter) {
-                MFnSkinCluster skinCluster(connections[i].node());
-                weightList = skinCluster.findPlug("weightList", &status);
-                weightListObject = weightList.attribute();
-                weights = skinCluster.findPlug("weights");
-				newMesh.hasSkin = true;
-                break;
-            }
-        }
 
+		if (!collision) {
+			for (unsigned int i = 0; i < connections.length(); i++) {
+				if (connections[i].node().apiType() == MFn::kSkinClusterFilter) {
+					MFnSkinCluster skinCluster(connections[i].node());
+					weightList = skinCluster.findPlug("weightList", &status);
+					weightListObject = weightList.attribute();
+					weights = skinCluster.findPlug("weights");
+					newMesh.hasSkin = true;
+					break;
+				}
+			}
+		}
 
         // In here, we retrieve triangulated polygons from the mesh
         MFnMesh mesh(object[ObjectID]);
@@ -257,62 +261,62 @@ Mesh MeshClass::GetMeshData(MObjectArray object)
                         thisVertex.Pos[0] = pos.x;
                         thisVertex.Pos[1] = pos.y;
                         thisVertex.Pos[2] = pos.z;
+						thisVertex.isCollision = collision;
 
-                        status = faceVert.getNormal(normal, MSpace::kObject);
-                        if (status != MS::kSuccess) {
-                            MGlobal::displayError(MString() + "faceVert.getNormal() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
-                            break;
-                        }
+						if (!collision) {
+							status = faceVert.getNormal(normal, MSpace::kObject);
+							if (status != MS::kSuccess) {
+								MGlobal::displayError(MString() + "faceVert.getNormal() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
+								break;
+							}
 
-                        thisVertex.Normal[0] = normal[0];
-                        thisVertex.Normal[1] = normal[1];
-                        thisVertex.Normal[2] = normal[2];
+							thisVertex.Normal[0] = normal[0];
+							thisVertex.Normal[1] = normal[1];
+							thisVertex.Normal[2] = normal[2];
 
-                        MFloatVector Tangent = Tangents[faceVert.tangentId()];
-                        //MVector tmp = faceVert.getTangent(MSpace::kObject, NULL);
-                        //tmp.get(biTangent);
-						thisVertex.Tangent[0] = Tangent[0];
-						thisVertex.Tangent[1] = Tangent[1];
-						thisVertex.Tangent[2] = Tangent[2];
+							MFloatVector Tangent = Tangents[faceVert.tangentId()];
+							//MVector tmp = faceVert.getTangent(MSpace::kObject, NULL);
+							//tmp.get(biTangent);
+							thisVertex.Tangent[0] = Tangent[0];
+							thisVertex.Tangent[1] = Tangent[1];
+							thisVertex.Tangent[2] = Tangent[2];
 
-                        MFloatVector biNormal = biNormals[faceVert.tangentId()];
-                        //faceVert.getBinormal().get(biNormal);
-                        thisVertex.BiNormal[0] = biNormal[0];
-                        thisVertex.BiNormal[1] = biNormal[1];
-                        thisVertex.BiNormal[2] = biNormal[2];
+							MFloatVector biNormal = biNormals[faceVert.tangentId()];
+							//faceVert.getBinormal().get(biNormal);
+							thisVertex.BiNormal[0] = biNormal[0];
+							thisVertex.BiNormal[1] = biNormal[1];
+							thisVertex.BiNormal[2] = biNormal[2];
 
-                        status = faceVert.getUV(UV);
-                        if (status != MS::kSuccess) {
-                            MGlobal::displayError(MString() + " faceVert.getUV() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
-                            break;
-                        }
-                        thisVertex.Uv[0] = UV[0];
-                        thisVertex.Uv[1] = UV[1];
+							status = faceVert.getUV(UV);
+							if (status != MS::kSuccess) {
+								MGlobal::displayError(MString() + " faceVert.getUV() ERROR: " + status.errorString() + "for local vertex " + i + " in " + faceID + " in mesh " + thisMeshPath.fullPathName());
+								break;
+							}
+							thisVertex.Uv[0] = UV[0];
+							thisVertex.Uv[1] = UV[1];
 
                         
-                        if (newMesh.hasSkin) {
-							thisVertex.useWeights = true;
-                            float totalWeight = 0.0f;
-                            unsigned int totalBones = 0;
-                            MIntArray jointIDs /* ??? */;
-                            weights.selectAncestorLogicalIndex(vertexIndex, weightListObject);
-                            weights.getExistingArrayAttributeIndices(jointIDs);
-                            for (unsigned int i = 0; i < jointIDs.length() && i < 4; i++) {
-                                if (weights[i].asFloat() > 0.001f) {
-                                    thisVertex.BoneIndices[totalBones] = jointIDs[i];
-                                    thisVertex.BoneWeights[totalBones] = weights[i].asFloat();
-                                    totalWeight = totalWeight + weights[i].asFloat();
-                                    totalBones++;
-                                }
-                            }
+							if (newMesh.hasSkin) {
+								thisVertex.useWeights = true;
+								float totalWeight = 0.0f;
+								unsigned int totalBones = 0;
+								MIntArray jointIDs /* ??? */;
+								weights.selectAncestorLogicalIndex(vertexIndex, weightListObject);
+								weights.getExistingArrayAttributeIndices(jointIDs);
+								for (unsigned int i = 0; i < jointIDs.length() && i < 4; i++) {
+									if (weights[i].asFloat() > 0.001f) {
+										thisVertex.BoneIndices[totalBones] = jointIDs[i];
+										thisVertex.BoneWeights[totalBones] = weights[i].asFloat();
+										totalWeight = totalWeight + weights[i].asFloat();
+										totalBones++;
+									}
+								}
                            
-                            for (unsigned int i = 0; i < 4; i++) {
-                                //thisVertex.BoneWeights[i] = thisVertex.BoneWeights[i] / totalWeight;
-                            }
-						} else {
-							thisVertex.useWeights = false;
+								for (unsigned int i = 0; i < 4; i++) {
+									//thisVertex.BoneWeights[i] = thisVertex.BoneWeights[i] / totalWeight;
+								}
+							}
 						}
-
                         //float totalWeight = thisVertex.BoneWeights[0] + thisVertex.BoneWeights[1] + thisVertex.BoneWeights[2] + thisVertex.BoneWeights[3];
                         //if (totalWeight > 0.0001f) {
                         //    thisVertex.BoneWeights[0] /= totalWeight;

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="AssaultWeapon" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:Shielded/>
+    <c:Model>
+      <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="ReloadSpawner">
+      <Components>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/ReloadEffectWorld.xml</EntityFile>
+        </c:Spawner>
+        <c:Transform/>
+      </Components>
+      <Children/>
+    </Entity>
+    <Entity name="Muzzle">
+      <Components>
+        <c:Transform>
+          <Position X="0.00728808995" Y="0.0896582007" Z="-0.643795013"/>
+          <Orientation X="6.27600002" Y="0.00499999989" Z="0.00600000005"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="WeaponMuzzleFlash">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/MuzzleFlashBlue.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="-8.41593719e-05" Y="-0.000816107844" Z="0.0612007342"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="WeaponMuzzleRay">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/RayAssaultBlue.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="0.00179657922" Y="-0.00304772682" Z="-0.334699303"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

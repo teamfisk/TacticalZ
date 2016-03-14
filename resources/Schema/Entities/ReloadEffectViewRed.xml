@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<Entity name="WeaponModel" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+<Entity name="ReloadEffect" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
     <c:Lifetime>
-      <Lifetime>2</Lifetime>
+      <Lifetime>1</Lifetime>
     </c:Lifetime>
     <c:ExplosionEffect>
-      <ColorByDistance>true</ColorByDistance>
-      <Velocity X="3.33300018" Y="0.0320000015" Z="0"/>
-      <ExplosionOrigin X="0" Y="0.0790000036" Z="-0.329000026"/>
-      <ExponentialAccelaration>true</ExponentialAccelaration>
-      <EndColor A="0" B="1" G="1" R="19.6078434"/>
+      <Velocity X="0" Y="1" Z="0"/>
+      <ExplosionOrigin X="-0.0450000018" Y="0.148000002" Z="-0.646000028"/>
+      <ExplosionDuration>1</ExplosionDuration>
+      <EndColor A="0" B="3.92156863" G="0.545098066" R="1"/>
       <Randomness>true</Randomness>
     </c:ExplosionEffect>
     <c:Model>
       <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+      <Transparent>true</Transparent>
     </c:Model>
     <c:Transform/>
   </Components>

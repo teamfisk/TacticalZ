@@ -9,32 +9,36 @@
 #include "OpenAL/al.h"
 #include "OpenAL/alc.h"
 
-#include "imgui/imgui.h"
-
-#include "Core/World.h"
-#include "Core/EventBroker.h"
+#include "../Engine/Core/World.h"
+#include "../Engine/Core/EventBroker.h"
 #include "../Engine/Core/ResourceManager.h"
 #include "../Engine/Core/ConfigFile.h"
-#include "Core/Transform.h" // Absolute transform
-#include "Sound/Sound.h"
+#include "../Engine/Core/TransformSystem.h"
+#include "../Engine/Sound/Sound.h"
 #include "../Engine/Sound/EPlayQueueOnEntity.h"
-#include "Sound/EPlaySoundOnEntity.h"
-#include "Sound/EPlaySoundOnPosition.h"
-#include "Sound/EPlayBackgroundMusic.h"
-#include "Sound/EPauseSound.h"
-#include "Sound/EContinueSound.h"
-#include "Sound/EStopSound.h"
-#include "Sound/ESetBGMGain.h"
-#include "Sound/ESetSFXGain.h"
-#include "Core/EPause.h"
-#include "Core/EComponentAttached.h"
+#include "../Engine/Sound/EPlaySoundOnEntity.h"
+#include "../Engine/Sound/EPlaySoundOnPosition.h"
+#include "../Engine/Sound/EPlayBackgroundMusic.h"
+#include "../Engine/Sound/EPlayAnnouncerVoice.h"
+#include "../Engine/Sound/EPauseSound.h"
+#include "../Engine/Sound/EContinueSound.h"
+#include "../Engine/Sound/EStopSound.h"
+#include "../Engine/Sound/ESetBGMGain.h"
+#include "../Engine/Sound/ESetSFXGain.h"
+#include "../Engine/Sound/ESetAnnouncerGain.h"
+#include "../Engine/Sound/EChangeBGM.h"
+#include "../Engine/Core/EPause.h"
+#include "../Engine/Core/EComponentAttached.h"
 #include "../Core/EPlayerSpawned.h"
+#include "../Rendering/ESetCamera.h"
+
 
 typedef std::pair<ALuint, std::vector<ALuint>> QueuedBuffers;
 
 enum class SoundType {
     SFX,
-    BGM
+    BGM,
+    Announcer
 };
 
 struct Source
@@ -43,6 +47,7 @@ struct Source
     Sound* SoundResource = nullptr;
     ALuint ALsource;
     SoundType Type;
+    float Duration;
 };
 
 class SoundManager
@@ -74,14 +79,20 @@ private:
     ALenum getSourceState(ALuint source);
     void setGain(Source* source, float gain);
     void setSoundProperties(Source* source, ComponentWrapper* soundComponent);
+    float getDurationSeconds(Source* source);
+    float getTimeOffsetSeconds(Source* source);
+    void setTimeOffsetSeconds(Source* source, float timeOffset);
 
     // Specific logic
     void playSound(Source* source);
-    // Need to be the same format (sample rate etc)
+    // Needs to be the same format (sample rate etc)
     void playQueue(QueuedBuffers qb);
     void stopSound(Source* source);
     Source* createSource(std::string filePath);
     std::unordered_map<EntityID, Source*> m_Sources;
+    void matchBGMLoop();
+    Source* m_CurrentBGM = nullptr;
+    Source* m_CurrentBGMCombo = nullptr;
 
     // Logic
     World* m_World = nullptr;
@@ -93,6 +104,7 @@ private:
 
     float m_BGMVolumeChannel = 1.0f;
     float m_SFXVolumeChannel = 1.0f;
+    float m_AnnouncerVolumeChannel = 1.0f;
     EntityWrapper m_LocalPlayer = EntityWrapper();
     
     // Events
@@ -102,6 +114,8 @@ private:
     bool OnPlaySoundOnPosition(const Events::PlaySoundOnPosition &e);
     EventRelay<SoundManager, Events::PlayBackgroundMusic> m_EPlayBackgroundMusic;
     bool OnPlayBackgroundMusic(const Events::PlayBackgroundMusic &e);
+    EventRelay<SoundManager, Events::PlayAnonuncerVoice> m_EPlayAnnouncerVoice;
+    bool OnPlayAnnouncerVoice(const Events::PlayAnonuncerVoice& e);
     EventRelay<SoundManager, Events::PauseSound> m_EPauseSound;
     bool OnPauseSound(const Events::PauseSound &e);
     EventRelay<SoundManager, Events::StopSound> m_EStopSound;
@@ -112,6 +126,8 @@ private:
     bool OnSetBGMGain(const Events::SetBGMGain &e);
     EventRelay<SoundManager, Events::SetSFXGain> m_ESetSFXGain; 
     bool OnSetSFXGain(const Events::SetSFXGain &e);
+    EventRelay<SoundManager, Events::SetAnnouncerGain> m_ESetAnnouncerGain;
+    bool OnSetAnnouncerGain(const Events::SetAnnouncerGain& e);
     EventRelay<SoundManager, Events::ComponentAttached> m_EComponentAttached;
     bool OnComponentAttached(const Events::ComponentAttached &e);
     EventRelay<SoundManager, Events::Pause> m_EPause;
@@ -122,6 +138,10 @@ private:
     bool OnPlayerSpawned(const Events::PlayerSpawned &e);
     EventRelay<SoundManager, Events::PlayQueueOnEntity> m_EPlayQueueOnEntity;
     bool OnPlayQueueOnEntity(const Events::PlayQueueOnEntity &e);
+    EventRelay<SoundManager, Events::ChangeBGM> m_EChangeBGM;
+    bool OnChangeBGM(const Events::ChangeBGM &e);
+    EventRelay<SoundManager, Events::SetCamera> m_ESetCamera;
+    bool OnSetCamera(const Events::SetCamera& e);
 
 
 };

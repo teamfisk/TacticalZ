@@ -28,15 +28,13 @@ public:
     const ShaderProgram& PickingProgram() const { return *m_PickingProgram; }
     //const std::unordered_map<glm::ivec2, EntityID>& PickingColorsToEntity() const { return m_PickingColorsToEntity; }
     GLuint PickingTexture() const { return m_PickingTexture; }
-    GLuint DepthBuffer() const { return m_DepthBuffer; }
+    GLuint* DepthBuffer() { return &m_DepthBuffer; }
     const FrameBuffer& PickingBuffer() const { return m_PickingBuffer; }
 
     
     PickData Pick(glm::vec2 screenCoord);
 
 private:
-    void GenerateTexture(GLuint* texture, GLenum wrapping, GLenum filtering, glm::vec2 dimensions, GLint internalFormat, GLint format, GLenum type) const;
-
     EventBroker* m_EventBroker;
 
     const IRenderer* m_Renderer;
@@ -54,8 +52,8 @@ private:
 
     std::unordered_map<glm::ivec2, PickingInfo> m_PickingColorsToEntity;
 
-    GLuint m_PickingTexture;
-    GLuint m_DepthBuffer;
+    GLuint m_PickingTexture = 0;
+    GLuint m_DepthBuffer = 0;
 
     FrameBuffer m_PickingBuffer;
 

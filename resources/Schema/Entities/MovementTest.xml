@@ -2,21 +2,31 @@
 <Entity xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
 
   <Components>
-    <c:Transform/>
+    <c:CapturePointGameMode>
+      <RespawnTime>0.10012471663946698</RespawnTime>
+      <MaxRespawnTime>0.5</MaxRespawnTime>
+    </c:CapturePointGameMode>
+    <c:Transform>
+      <Position X="0" Y="-0.872543275" Z="-2.49763942"/>
+    </c:Transform>
   </Components>
 
   <Children>
     <Entity name="RedSpawn">
       <Components>
-        <c:PlayerSpawn/>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/PlayerRed.xml</EntityFile>
-        </c:Spawner>
         <c:Team>
           <Team>
             <Red/>
           </Team>
         </c:Team>
+        <c:PlayerSpawn>
+          <AssaultFile>Schema/Entities/PlayerAssaultRed.xml</AssaultFile>
+          <DefenderFile>Schema/Entities/PlayerDefenderRed.xml</DefenderFile>
+          <SniperFile></SniperFile>
+        </c:PlayerSpawn>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/PlayerDefenderBlue.xml</EntityFile>
+        </c:Spawner>
         <c:Transform>
           <Position X="0.300000012" Y="0.0270000007" Z="0"/>
         </c:Transform>
@@ -26,7 +36,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultRed.mesh</Resource>
               <Color A="1" B="0" G="0" R="1"/>
             </c:Model>
             <c:Transform>
@@ -39,7 +49,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultRed.mesh</Resource>
               <Color A="1" B="0.0117647061" G="0" R="1"/>
             </c:Model>
             <c:Transform>
@@ -52,7 +62,10 @@
     </Entity>
     <Entity name="DirectionalLight">
       <Components>
-        <c:SceneLight/>
+        <c:SceneLight>
+          <Gamma>0.49999982118606567</Gamma>
+          <Exposure>2.5599997043609619</Exposure>
+        </c:SceneLight>
         <c:DirectionalLight/>
         <c:Model>
           <Resource>sModels/Widgets/Lights/DirectionalLightWidget.mesh</Resource>
@@ -76,15 +89,19 @@
     </Entity>
     <Entity name="BlueSpawn">
       <Components>
-        <c:PlayerSpawn/>
-        <c:Spawner>
-          <EntityFile>Schema/Entities/Player.xml</EntityFile>
-        </c:Spawner>
         <c:Team>
           <Team>
             <Blue/>
           </Team>
         </c:Team>
+        <c:PlayerSpawn>
+          <AssaultFile>Schema/Entities/PlayerAssaultBlue.xml</AssaultFile>
+          <DefenderFile>Schema/Entities/PlayerDefenderBlue.xml</DefenderFile>
+          <SniperFile></SniperFile>
+        </c:PlayerSpawn>
+        <c:Spawner>
+          <EntityFile>Schema/Entities/PlayerAssaultBlue.xml</EntityFile>
+        </c:Spawner>
         <c:Transform>
           <Position X="0.300000012" Y="0.0270000007" Z="6.67400026"/>
         </c:Transform>
@@ -94,7 +111,7 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>
@@ -107,14 +124,3313 @@
           <Components>
             <c:SpawnPoint/>
             <c:Model>
-              <Resource>Models/Characters/Assault/AssaultTPose.mesh</Resource>
+              <Resource>Models/Characters/Assault/AssaultBlue.mesh</Resource>
               <Color A="1" B="1" G="0.254901975" R="0"/>
             </c:Model>
             <c:Transform>
-              <Position X="-0.600000024" Y="0" Z="0"/>
+              <Position X="-0.600000024" Y="0" Z="0.549540162"/>
             </c:Transform>
           </Components>
           <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="Arms">
+      <Components>
+        <c:Blend>
+          <Pose1>ActivateDeactive</Pose1>
+          <Pose2></Pose2>
+        </c:Blend>
+        <c:Model>
+          <Resource>Models/Characters/Defender/FirstPersonDefenderBlue.mesh</Resource>
+        </c:Model>
+        <c:Transform>
+          <Position X="0" Y="1.30585015" Z="2.01450038"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="ActivateDeactive">
+          <Components>
+            <c:Animation>
+              <AnimationName>ActivateDeactiveShieldF</AnimationName>
+              <Time>0.44649605185380015</Time>
+              <Play>true</Play>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Weapon">
+          <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
+            <c:Model>
+              <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
+            </c:Model>
+            <c:Transform>
+              <Orientation X="0" Y="-0" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity>
+      <Components>
+        <c:Transform>
+          <Position X="0.870232701" Y="0.640069604" Z="4.07769537"/>
+          <Orientation X="0" Y="4.71238565" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="RayBlue">
+          <Components>
+            <c:Transform>
+              <Orientation X="0" Y="0.174532995" Z="0"/>
+              <Scale X="0" Y="1" Z="100"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+                  <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-0.5"/>
+                  <Orientation X="0" Y="-1.57099998" Z="0"/>
+                  <Scale X="1" Y="0.0260000005" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+                  <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-0.5"/>
+                  <Orientation X="0" Y="4.71218538" Z="3.14199996"/>
+                  <Scale X="1" Y="0.0260000005" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="RayBlue">
+          <Components>
+            <c:Transform>
+              <Scale X="0" Y="1" Z="100"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity>
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+                  <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-0.5"/>
+                  <Orientation X="0" Y="-1.57099998" Z="0"/>
+                  <Scale X="1" Y="0.0260000005" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity>
+              <Components>
+                <c:Sprite>
+                  <Model>Models/Core/UnitQuad.mesh</Model>
+                  <GlowMap></GlowMap>
+                  <DiffuseTexture>Textures/Effects/Ray.png</DiffuseTexture>
+                  <Color A="0.419607848" B="3.92156863" G="0.270588249" R="0"/>
+                </c:Sprite>
+                <c:Transform>
+                  <Position X="0" Y="0" Z="-0.5"/>
+                  <Orientation X="0" Y="4.71218538" Z="3.14199996"/>
+                  <Scale X="1" Y="0.0260000005" Z="0"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="OverwatchCamera">
+      <Components>
+        <c:RaptorCopter>
+          <Speed>0.014999999664723873</Speed>
+          <Axis X="0" Y="1" Z="0"/>
+        </c:RaptorCopter>
+        <c:Transform>
+          <Position X="0" Y="-30.6910019" Z="0"/>
+          <Orientation X="0" Y="43.4443054" Z="0"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="CameraAnchor">
+          <Components>
+            <c:Transform>
+              <Position X="66" Y="56.6180038" Z="0"/>
+              <Orientation X="5.89000034" Y="1.57079637" Z="0"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="PickClassCameraBlue">
+              <Components>
+                <c:Camera/>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="PickTeamHUD">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="-0.63500005"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="Assault">
+                      <Components>
+                        <c:InputCmdButton>
+                          <Command>PickTeam</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="-0.312000006" Y="0" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <Color A="0.666666687" B="0" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.291000009" Y="0.445000023" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="PlayerModel">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Blend</Pose1>
+                              <Pose2></Pose2>
+                            </c:Blend>
+                            <c:Unpickable/>
+                            <c:Model>
+                              <GlowIntensity>1.6000000238418579</GlowIntensity>
+                              <Resource>Models/Characters/Assault/AssaultBluePose.mesh</Resource>
+                              <Shadow>false</Shadow>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="0.0250000004" Y="-0.101000004" Z="0.0530000031"/>
+                              <Orientation X="0" Y="3.05800009" Z="0"/>
+                              <Scale X="0.163000003" Y="0.163000003" Z="0.163000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Blend">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>AssaultPoseF</AnimationName>
+                                  <Time>0.65905298965262915</Time>
+                                  <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Weapon">
+                              <Components>
+                                <c:BoneAttachment>
+                                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                                </c:BoneAttachment>
+                                <c:Model>
+                                  <Resource>Models/Weapons/Blue/AssaultWeaponBlue.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="0.160869107" Y="1.21468747" Z="-0.151224568"/>
+                                  <Orientation X="1.90465617" Y="-0.166544378" Z="0.0701896623"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Light">
+                              <Components>
+                                <c:Model>
+                                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                                  <Visible>false</Visible>
+                                </c:Model>
+                                <c:PointLight>
+                                  <Intensity>0.30000001192092896</Intensity>
+                                </c:PointLight>
+                                <c:Transform>
+                                  <Position X="0" Y="0.852000058" Z="-0.534000039"/>
+                                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TopText">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="0.186000004" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Icon">
+                              <Components>
+                                <c:Text>
+                                  <Content>\1</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.121000007" Y="0.00400000019" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Name">
+                              <Components>
+                                <c:Text>
+                                  <Content>Assault</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Alignment>
+                                    <Left/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="-0.131000012" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Health">
+                              <Components>
+                                <c:Text>
+                                  <Content>100</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Color A="1" B="0.376470596" G="1.09803927" R="0.564705908"/>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.103" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Abilities">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="-0.137000009" Z="0.00500000035"/>
+                              <Scale X="0.816999972" Y="0.817000031" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Boost">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.0920000076" Y="-0.0400000028" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Name">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>Team Speed Boost</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0200000014" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Icon">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\1</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1"/>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.00400000019" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Weapons">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.114000008" Y="-0.0690000057" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Primary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\4</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.029000001" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Secondary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\7</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.151000008" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Unique">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Dash">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="-0.0920000076" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>Dash</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.029000001" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Abilities/Square/Superman-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Orientation X="0" Y="0" Z="1.57000005"/>
+                                          <Scale X="0.0540000014" Y="0.0540000014" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                                <Entity name="Jump">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="0.00800000038" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Shoe-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>x2 Jump</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.0190000013" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Defender">
+                      <Components>
+                        <c:InputCmdButton>
+                          <Command>PickTeam</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <Color A="0.666666687" B="0" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>2</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.291000009" Y="0.445000023" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="PlayerModel">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Blend</Pose1>
+                              <Pose2></Pose2>
+                            </c:Blend>
+                            <c:Unpickable/>
+                            <c:Model>
+                              <GlowIntensity>1.6000000238418579</GlowIntensity>
+                              <Resource>Models/Characters/Defender/DefenderBluePose.mesh</Resource>
+                              <Shadow>false</Shadow>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="0" Y="-0.101000004" Z="0.0530000031"/>
+                              <Orientation X="0" Y="2.59800005" Z="0"/>
+                              <Scale X="0.163000003" Y="0.163000003" Z="0.163000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Blend">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>DefenderPoseF</AnimationName>
+                                  <Time>2.3258911684973569</Time>
+                                  <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Weapon">
+                              <Components>
+                                <c:BoneAttachment>
+                                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                                </c:BoneAttachment>
+                                <c:Model>
+                                  <Resource>Models/Weapons/Blue/DefenderWeaponBlue.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="0.195810497" Y="0.711551607" Z="0.0388058722"/>
+                                  <Orientation X="-1.3924278" Y="-0.0973876044" Z="0.332219511"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Light">
+                              <Components>
+                                <c:Model>
+                                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                                  <Visible>false</Visible>
+                                </c:Model>
+                                <c:PointLight>
+                                  <Intensity>0.30000001192092896</Intensity>
+                                </c:PointLight>
+                                <c:Transform>
+                                  <Position X="0" Y="0.852000058" Z="-0.534000039"/>
+                                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TopText">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="0.186000004" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Icon">
+                              <Components>
+                                <c:Text>
+                                  <Content>\2</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.121000007" Y="0.00400000019" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Name">
+                              <Components>
+                                <c:Text>
+                                  <Content>Defender</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Alignment>
+                                    <Left/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="-0.131000012" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Health">
+                              <Components>
+                                <c:Text>
+                                  <Content>150</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Color A="1" B="0.376470596" G="1.09803927" R="0.564705908"/>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.103000008" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Abilities">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="-0.137000009" Z="0.00500000035"/>
+                              <Scale X="0.816999972" Y="0.817000031" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Boost">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.0920000076" Y="-0.0400000028" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Name">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>Team Shield Boost</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0200000014" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Icon">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\2</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1"/>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.00400000019" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Weapons">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.114000008" Y="-0.0690000057" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Primary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\5</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0329999998" Y="-0.0170000009" Z="0.00499999989"/>
+                                      <Scale X="0.0370000005" Y="0.0370000005" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Secondary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\7</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.151000008" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Unique">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Shield">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="-0.077000007" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>Personal Shield</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.0200000014" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Abilities/Square/SheildDots-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Orientation X="0" Y="0" Z="1.57000005"/>
+                                          <Scale X="0.0240000002" Y="0.0240000002" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Sniper">
+                      <Components>
+                        <c:InputCmdButton>
+                          <Command>PickTeam</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="0.312000006" Y="0" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <Color A="0.666666687" B="0" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>3</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.291000009" Y="0.445000023" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="PlayerModel">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Blend</Pose1>
+                              <Pose2></Pose2>
+                            </c:Blend>
+                            <c:Unpickable/>
+                            <c:Model>
+                              <GlowIntensity>1.6000000238418579</GlowIntensity>
+                              <Resource>Models/Characters/Sniper/SniperBluePose.mesh</Resource>
+                              <Shadow>false</Shadow>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="-0.0300000012" Y="-0.101000004" Z="0.0530000031"/>
+                              <Orientation X="0" Y="2.19800019" Z="0"/>
+                              <Scale X="0.163000003" Y="0.163000003" Z="0.163000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Blend">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>SniperPoseF</AnimationName>
+                                  <Time>0.058984111921155602</Time>
+                                  <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Weapon">
+                              <Components>
+                                <c:BoneAttachment>
+                                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                                </c:BoneAttachment>
+                                <c:Model>
+                                  <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="-0.0454485416" Y="1.07162762" Z="-0.12548463"/>
+                                  <Orientation X="-1.50533807" Y="1.34000039" Z="-1.34724486"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Light">
+                              <Components>
+                                <c:Model>
+                                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                                  <Visible>false</Visible>
+                                </c:Model>
+                                <c:PointLight>
+                                  <Intensity>0.30000001192092896</Intensity>
+                                </c:PointLight>
+                                <c:Transform>
+                                  <Position X="0" Y="0.852000058" Z="-0.534000039"/>
+                                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TopText">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="0.186000004" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Icon">
+                              <Components>
+                                <c:Text>
+                                  <Content>\3</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.121000007" Y="0.00400000019" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Name">
+                              <Components>
+                                <c:Text>
+                                  <Content>Sniper</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Alignment>
+                                    <Left/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="-0.131000012" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Health">
+                              <Components>
+                                <c:Text>
+                                  <Content>100</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Color A="1" B="0.376470596" G="1.09803927" R="0.564705908"/>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.103000008" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Abilities">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="-0.137000009" Z="0.00500000035"/>
+                              <Scale X="0.816999972" Y="0.817000031" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Boost">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.122000009" Y="-0.0400000028" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Name">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>Team Accuracy Boost</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0200000014" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Icon">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\3</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1"/>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.00400000019" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Weapons">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.121000007" Y="-0.0690000057" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Primary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\6</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0350000001" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0210000016" Y="0.0209999997" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Secondary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\7</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.151000008" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Unique">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Sprint">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="-0.0480000004" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>Sprint</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.0200000014" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Abilities/Square/Dash-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Orientation X="0" Y="0" Z="1.57000005"/>
+                                          <Scale X="0.0240000002" Y="0.0240000002" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="PickTeamCamera">
+              <Components>
+                <c:Camera/>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="PickTeamHUD">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0" Y="0.0200000014" Z="-0.63500005"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="TeamBluePick">
+                      <Components>
+                        <c:Transform>
+                          <Position X="-0.131000012" Y="0.0190000013" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <BlurBackground>true</BlurBackground>
+                              <Color A="0.392156869" B="0.768627465" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickTeam</Command>
+                              <PressValue>3</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.24000001" Y="0.307000011" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.118000008" Y="-0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.118000008" Y="0.150000006" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.117000006" Y="-0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.117000006" Y="0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Blue</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Visible>false</Visible>
+                              <Alignment>
+                                <Left/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00900000054" Y="-0.105000004" Z="0.00499999989"/>
+                              <Scale X="0.0500000007" Y="0.0500000007" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity>
+                          <Components>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/HUD/BlueTeam.png</DiffuseTexture>
+                              <ClampToBorder>true</ClampToBorder>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="-0.00900000054" Z="0.00600000005"/>
+                              <Scale X="0.340000004" Y="0.340000004" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="TeamSpectatorPick">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0" Y="-0.184000015" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <BlurBackground>true</BlurBackground>
+                              <Color A="0.392156869" B="0" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickTeam_</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.502000034" Y="0.0530000031" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Spectator</Content>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-0.00800000038" Z="0.00499999989"/>
+                              <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.248000011" Y="-0.0230000019" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.247000009" Y="0.0240000002" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.247000009" Y="-0.023" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.247000009" Y="0.0240000002" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="TeamRedPick">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0.130999997" Y="0.0190000013" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <BlurBackground>true</BlurBackground>
+                              <Color A="0.392156869" B="0" G="0" R="0.90196079"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickTeam</Command>
+                              <PressValue>2</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.24000001" Y="0.307000011" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.118000008" Y="-0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.118000008" Y="0.150000006" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.117000006" Y="-0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                  <ClampToBorder>true</ClampToBorder>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.117000006" Y="0.150000006" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Text">
+                          <Components>
+                            <c:Text>
+                              <Content>Blue</Content>
+                              <Resource>Fonts/DroidSans.ttf,64</Resource>
+                              <Visible>false</Visible>
+                              <Alignment>
+                                <Left/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="-0.00900000054" Y="-0.105000004" Z="0.00499999989"/>
+                              <Scale X="0.0500000007" Y="0.0500000007" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity>
+                          <Components>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/HUD/RedTeam.png</DiffuseTexture>
+                              <ClampToBorder>true</ClampToBorder>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="-0.00900000054" Z="0.00600000005"/>
+                              <Scale X="0.340000004" Y="0.340000004" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="SpectatorCamera">
+              <Components>
+                <c:Camera/>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="SpectatorHUD">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="-0.5"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="RespawnTimer">
+                      <Components>
+                        <c:Text>
+                          <Content>1</Content>
+                          <Resource>Fonts/DroidSans.ttf,64</Resource>
+                          <Color A="1" B="0" G="1" R="0.784313738"/>
+                        </c:Text>
+                        <c:Transform>
+                          <Position X="0" Y="0.178199276" Z="0"/>
+                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                        </c:Transform>
+                      </Components>
+                      <Children/>
+                    </Entity>
+                    <Entity name="CapturePointHUD">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0" Y="0.190541431" Z="0"/>
+                          <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="BackgroundHexagon">
+                          <Components>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="0.300000012" B="1" G="1" R="1"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0.811270177" Y="0.440691769" Z="-0.100000001"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ProgressionHexagon">
+                              <Components>
+                                <c:Fill>
+                                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                </c:Fill>
+                                <c:CapturePointHUD>
+                                  <CapturePointNumber>3</CapturePointNumber>
+                                </c:CapturePointHUD>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00999999978"/>
+                                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="BackgroundHexagon">
+                          <Components>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="1.62788737" Y="0.919596612" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ProgressionHexagon">
+                              <Components>
+                                <c:Fill>
+                                  <Percentage>1</Percentage>
+                                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                </c:Fill>
+                                <c:CapturePointHUD>
+                                  <CapturePointNumber>4</CapturePointNumber>
+                                </c:CapturePointHUD>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00999999978"/>
+                                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="BackgroundHexagon">
+                          <Components>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="0.300000012" B="1" G="1" R="1"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="0" Y="0.919596612" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ProgressionHexagon">
+                              <Components>
+                                <c:Fill>
+                                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                </c:Fill>
+                                <c:CapturePointHUD>
+                                  <CapturePointNumber>2</CapturePointNumber>
+                                </c:CapturePointHUD>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00999999978"/>
+                                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="BackgroundHexagon">
+                          <Components>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="0.300000012" B="1" G="1" R="1"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="-0.820431828" Y="0.441878349" Z="-0.100000001"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ProgressionHexagon">
+                              <Components>
+                                <c:Fill>
+                                  <Color A="0.699999988" B="1" G="0.200000003" R="0"/>
+                                </c:Fill>
+                                <c:CapturePointHUD>
+                                  <CapturePointNumber>1</CapturePointNumber>
+                                </c:CapturePointHUD>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00999999978"/>
+                                  <Orientation X="0" Y="0" Z="1.57079637"/>
+                                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="BackgroundHexagon">
+                          <Components>
+                            <c:Sprite>
+                              <DepthSort>false</DepthSort>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+                              <Color A="0.699999988" B="0" G="0" R="1"/>
+                            </c:Sprite>
+                            <c:Transform>
+                              <Position X="-1.58304751" Y="0.919596612" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="ProgressionHexagon">
+                              <Components>
+                                <c:Fill>
+                                  <Percentage>1</Percentage>
+                                  <Color A="0.699999988" B="0" G="0" R="1"/>
+                                </c:Fill>
+                                <c:CapturePointHUD/>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/UnitHexagon_Rotated.png</DiffuseTexture>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0" Y="0" Z="0.00999999978"/>
+                                  <Orientation X="0" Y="0" Z="4.71238899"/>
+                                  <Scale X="0.800000012" Y="0.800000012" Z="0.800000012"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="SideButtons">
+                      <Components>
+                        <c:Transform>
+                          <Position X="0.00400000019" Y="-0.117000006" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="ChangeTeam">
+                          <Components>
+                            <c:Transform>
+                              <Position X="-0.443000019" Y="-0.0580000021" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Button_1">
+                              <Components>
+                                <c:Button/>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                                  <BlurBackground>true</BlurBackground>
+                                  <Color A="0.392156869" B="0" G="0" R="0"/>
+                                </c:Sprite>
+                                <c:InputCmdButton>
+                                  <Command>SwapToTeamPick</Command>
+                                  <PressValue>1</PressValue>
+                                </c:InputCmdButton>
+                                <c:Transform>
+                                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="ButtonCorner_Origin">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="BottomRight">
+                                  <Components>
+                                    <c:Sprite>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                      <Linear>false</Linear>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0.0970000029" Y="-0.0219999999" Z="0.000500000024"/>
+                                      <Orientation X="0" Y="0" Z="4.71199989"/>
+                                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="TopRight">
+                                  <Components>
+                                    <c:Sprite>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                      <Linear>false</Linear>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0.0970000029" Y="0.0220000017" Z="0.00100000005"/>
+                                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Text">
+                              <Components>
+                                <c:Text>
+                                  <Content>Change Team</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00499999989"/>
+                                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="ChangeClass">
+                          <Components>
+                            <c:Transform>
+                              <Position X="-0.443000019" Y="0" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Button_1">
+                              <Components>
+                                <c:Button/>
+                                <c:Sprite>
+                                  <DepthSort>false</DepthSort>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                                  <BlurBackground>true</BlurBackground>
+                                  <Color A="0.392156869" B="0" G="0" R="0"/>
+                                </c:Sprite>
+                                <c:InputCmdButton>
+                                  <Command>SwapToClassPick</Command>
+                                  <PressValue>1</PressValue>
+                                </c:InputCmdButton>
+                                <c:Transform>
+                                  <Scale X="0.200000003" Y="0.0500000007" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="ButtonCorner_Origin">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="BottomRight">
+                                  <Components>
+                                    <c:Sprite>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                      <Linear>false</Linear>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0.0970000029" Y="-0.0219999999" Z="0.000500000024"/>
+                                      <Orientation X="0" Y="0" Z="4.71199989"/>
+                                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="TopRight">
+                                  <Components>
+                                    <c:Sprite>
+                                      <Model>Models/Core/UnitQuad.mesh</Model>
+                                      <GlowMap></GlowMap>
+                                      <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                      <Linear>false</Linear>
+                                    </c:Sprite>
+                                    <c:Transform>
+                                      <Position X="0.0970000029" Y="0.0220000017" Z="0.00100000005"/>
+                                      <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Text">
+                              <Components>
+                                <c:Text>
+                                  <Content>Change Class</Content>
+                                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.0920000002" Y="-0.0150000006" Z="0.00499999989"/>
+                                  <Scale X="0.0199999996" Y="0.0199999996" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="KillFeed">
+                      <Components>
+                        <c:KillFeed/>
+                        <c:Transform>
+                          <Position X="0.494000018" Y="0.252000004" Z="0"/>
+                          <Scale X="0.0149999997" Y="0.0149999997" Z="0.0149999997"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="KillFeed1">
+                          <Components>
+                            <c:Text>
+                              <Content></Content>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                              <Alignment>
+                                <Right/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform/>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="KillFeed2">
+                          <Components>
+                            <c:Text>
+                              <Content></Content>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                              <Alignment>
+                                <Right/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-1" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="KillFeed3">
+                          <Components>
+                            <c:Text>
+                              <Content></Content>
+                              <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                              <Alignment>
+                                <Right/>
+                              </Alignment>
+                            </c:Text>
+                            <c:Transform>
+                              <Position X="0" Y="-2" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+            <Entity name="PickClassCameraRed">
+              <Components>
+                <c:Camera/>
+                <c:Transform/>
+              </Components>
+              <Children>
+                <Entity name="PickTeamHUD">
+                  <Components>
+                    <c:Transform>
+                      <Position X="0" Y="0" Z="-0.63500005"/>
+                    </c:Transform>
+                  </Components>
+                  <Children>
+                    <Entity name="Assault">
+                      <Components>
+                        <c:InputCmdButton>
+                          <Command>PickTeam</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="-0.312000006" Y="0" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <Color A="0.666666687" B="0" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>1</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.291000009" Y="0.445000023" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="PlayerModel">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Blend</Pose1>
+                              <Pose2></Pose2>
+                            </c:Blend>
+                            <c:Unpickable/>
+                            <c:Model>
+                              <GlowIntensity>1.6000000238418579</GlowIntensity>
+                              <Resource>Models/Characters/Assault/AssaultRedPose.mesh</Resource>
+                              <Shadow>false</Shadow>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="0.0250000004" Y="-0.101000004" Z="0.0530000031"/>
+                              <Orientation X="0" Y="3.05800009" Z="0"/>
+                              <Scale X="0.163000003" Y="0.163000003" Z="0.163000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Blend">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>AssaultPoseF</AnimationName>
+                                  <Time>1.8811652556773666</Time>
+                                  <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Weapon">
+                              <Components>
+                                <c:BoneAttachment>
+                                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                                </c:BoneAttachment>
+                                <c:Model>
+                                  <Resource>Models/Weapons/Red/AssaultWeaponRed.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="0.160869107" Y="1.21425688" Z="-0.151224568"/>
+                                  <Orientation X="1.90465617" Y="-0.166544378" Z="0.0701896623"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Light">
+                              <Components>
+                                <c:Model>
+                                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                                  <Visible>false</Visible>
+                                </c:Model>
+                                <c:PointLight>
+                                  <Intensity>0.30000001192092896</Intensity>
+                                </c:PointLight>
+                                <c:Transform>
+                                  <Position X="0" Y="0.852000058" Z="-0.534000039"/>
+                                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TopText">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="0.186000004" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Icon">
+                              <Components>
+                                <c:Text>
+                                  <Content>\1</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.121000007" Y="0.00400000019" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Name">
+                              <Components>
+                                <c:Text>
+                                  <Content>Assault</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Alignment>
+                                    <Left/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="-0.131000012" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Health">
+                              <Components>
+                                <c:Text>
+                                  <Content>100</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Color A="1" B="0.376470596" G="1.09803927" R="0.564705908"/>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.103" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Abilities">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="-0.137000009" Z="0.00500000035"/>
+                              <Scale X="0.816999972" Y="0.817000031" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Boost">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.0920000076" Y="-0.0400000028" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Name">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>Team Speed Boost</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1" G="1" R="1.56862748"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0200000014" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Icon">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\1</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1" G="1" R="1.56862748"/>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.00400000019" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Weapons">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.114000008" Y="-0.0690000057" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Primary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\4</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.029000001" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Secondary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\7</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.151000008" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Unique">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Dash">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="-0.0920000076" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>Dash</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.029000001" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Abilities/Square/Superman-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Orientation X="0" Y="0" Z="1.57000005"/>
+                                          <Scale X="0.0540000014" Y="0.0540000014" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                                <Entity name="Jump">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="0.00800000038" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Shoe-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Scale X="0.0250000004" Y="0.0250000004" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>x2 Jump</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.0190000013" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Defender">
+                      <Components>
+                        <c:InputCmdButton>
+                          <Command>PickTeam</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform/>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <Color A="0.666666687" B="0" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>2</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.291000009" Y="0.445000023" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="PlayerModel">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Blend</Pose1>
+                              <Pose2></Pose2>
+                            </c:Blend>
+                            <c:Unpickable/>
+                            <c:Model>
+                              <GlowIntensity>1.6000000238418579</GlowIntensity>
+                              <Resource>Models/Characters/Defender/DefenderRedPose.mesh</Resource>
+                              <Shadow>false</Shadow>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="0" Y="-0.101000004" Z="0.0530000031"/>
+                              <Orientation X="0" Y="2.59800005" Z="0"/>
+                              <Scale X="0.163000003" Y="0.163000003" Z="0.163000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Blend">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>DefenderPoseF</AnimationName>
+                                  <Time>1.9813738768539579</Time>
+                                  <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Weapon">
+                              <Components>
+                                <c:BoneAttachment>
+                                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                                </c:BoneAttachment>
+                                <c:Model>
+                                  <Resource>Models/Weapons/Red/DefenderWeaponRed.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="0.195940435" Y="0.708098531" Z="0.0331460983"/>
+                                  <Orientation X="-1.39242768" Y="-0.0973874852" Z="0.332219243"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Light">
+                              <Components>
+                                <c:Model>
+                                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                                  <Visible>false</Visible>
+                                </c:Model>
+                                <c:PointLight>
+                                  <Intensity>0.30000001192092896</Intensity>
+                                </c:PointLight>
+                                <c:Transform>
+                                  <Position X="0" Y="0.852000058" Z="-0.534000039"/>
+                                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TopText">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="0.186000004" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Icon">
+                              <Components>
+                                <c:Text>
+                                  <Content>\2</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.121000007" Y="0.00400000019" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Name">
+                              <Components>
+                                <c:Text>
+                                  <Content>Defender</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Alignment>
+                                    <Left/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="-0.131000012" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Health">
+                              <Components>
+                                <c:Text>
+                                  <Content>150</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Color A="1" B="0.376470596" G="1.09803927" R="0.564705908"/>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.103000008" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Abilities">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="-0.137000009" Z="0.00500000035"/>
+                              <Scale X="0.816999972" Y="0.817000031" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Boost">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.0920000076" Y="-0.0400000028" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Name">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>Team Shield Boost</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1" G="1" R="1.56862748"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0200000014" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Icon">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\2</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1" G="1" R="1.56862748"/>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.00400000019" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Weapons">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.114000008" Y="-0.0690000057" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Primary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\5</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0329999998" Y="-0.0170000009" Z="0.00499999989"/>
+                                      <Scale X="0.0370000005" Y="0.0370000005" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Secondary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\7</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.151000008" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Unique">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Shield">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="-0.077000007" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>Personal Shield</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.0200000014" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Abilities/Square/SheildDots-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Orientation X="0" Y="0" Z="1.57000005"/>
+                                          <Scale X="0.0240000002" Y="0.0240000002" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                    <Entity name="Sniper">
+                      <Components>
+                        <c:InputCmdButton>
+                          <Command>PickTeam</Command>
+                          <PressValue>1</PressValue>
+                        </c:InputCmdButton>
+                        <c:Transform>
+                          <Position X="0.312000006" Y="0" Z="0"/>
+                        </c:Transform>
+                      </Components>
+                      <Children>
+                        <Entity name="Button_1">
+                          <Components>
+                            <c:Button/>
+                            <c:Sprite>
+                              <Model>Models/Core/UnitQuad.mesh</Model>
+                              <GlowMap></GlowMap>
+                              <DiffuseTexture>Textures/Core/White.png</DiffuseTexture>
+                              <Color A="0.666666687" B="0" G="0" R="0"/>
+                            </c:Sprite>
+                            <c:InputCmdButton>
+                              <Command>PickClass</Command>
+                              <PressValue>3</PressValue>
+                            </c:InputCmdButton>
+                            <c:Transform>
+                              <Scale X="0.291000009" Y="0.445000023" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children/>
+                        </Entity>
+                        <Entity name="ButtonCorner_Origin">
+                          <Components>
+                            <c:Transform/>
+                          </Components>
+                          <Children>
+                            <Entity name="BottomLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="-0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="3.14900017"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="BottomRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="-0.21800001" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="4.71199989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopRight">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="TopLeft">
+                              <Components>
+                                <c:Sprite>
+                                  <Model>Models/Core/UnitQuad.mesh</Model>
+                                  <GlowMap></GlowMap>
+                                  <DiffuseTexture>Textures/HUD/ButtonCorner_16.png</DiffuseTexture>
+                                  <Linear>false</Linear>
+                                </c:Sprite>
+                                <c:Transform>
+                                  <Position X="-0.142000005" Y="0.217999995" Z="0.00499999989"/>
+                                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                                  <Scale X="0.00499999989" Y="0.00499999989" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="PlayerModel">
+                          <Components>
+                            <c:Blend>
+                              <Pose1>Blend</Pose1>
+                              <Pose2></Pose2>
+                            </c:Blend>
+                            <c:Unpickable/>
+                            <c:Model>
+                              <GlowIntensity>1.6000000238418579</GlowIntensity>
+                              <Resource>Models/Characters/Sniper/SniperRedPose.mesh</Resource>
+                              <Shadow>false</Shadow>
+                            </c:Model>
+                            <c:Transform>
+                              <Position X="-0.0300000012" Y="-0.101000004" Z="0.0530000031"/>
+                              <Orientation X="0" Y="2.19800019" Z="0"/>
+                              <Scale X="0.163000003" Y="0.163000003" Z="0.163000003"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Blend">
+                              <Components>
+                                <c:Animation>
+                                  <AnimationName>SniperPoseF</AnimationName>
+                                  <Time>1.89819787670897</Time>
+                                  <Play>true</Play>
+                                </c:Animation>
+                                <c:Transform/>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Weapon">
+                              <Components>
+                                <c:BoneAttachment>
+                                  <BoneName>R_Arm_Weapon_Joint</BoneName>
+                                </c:BoneAttachment>
+                                <c:Model>
+                                  <Resource>Models/Weapons/Red/SecondaryWeaponRed.mesh</Resource>
+                                </c:Model>
+                                <c:Transform>
+                                  <Position X="-0.0454485491" Y="1.06597364" Z="-0.125484616"/>
+                                  <Orientation X="-1.50533819" Y="1.34000039" Z="-1.34724486"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Light">
+                              <Components>
+                                <c:Model>
+                                  <Resource>Models/Core/UnitSphere.mesh</Resource>
+                                  <Visible>false</Visible>
+                                </c:Model>
+                                <c:PointLight>
+                                  <Intensity>0.30000001192092896</Intensity>
+                                </c:PointLight>
+                                <c:Transform>
+                                  <Position X="0" Y="0.852000058" Z="-0.534000039"/>
+                                  <Scale X="0.100000001" Y="0.100000001" Z="0.100000001"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="TopText">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="0.186000004" Z="0"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Icon">
+                              <Components>
+                                <c:Text>
+                                  <Content>\3</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.121000007" Y="0.00400000019" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Name">
+                              <Components>
+                                <c:Text>
+                                  <Content>Sniper</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Alignment>
+                                    <Left/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="-0.131000012" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                            <Entity name="Health">
+                              <Components>
+                                <c:Text>
+                                  <Content>100</Content>
+                                  <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                  <Color A="1" B="0.376470596" G="1.09803927" R="0.564705908"/>
+                                  <Alignment>
+                                    <Right/>
+                                  </Alignment>
+                                </c:Text>
+                                <c:Transform>
+                                  <Position X="0.103000008" Y="0" Z="0.00499999989"/>
+                                  <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                </c:Transform>
+                              </Components>
+                              <Children/>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                        <Entity name="Abilities">
+                          <Components>
+                            <c:Transform>
+                              <Position X="0" Y="-0.137000009" Z="0.00500000035"/>
+                              <Scale X="0.816999972" Y="0.817000031" Z="1"/>
+                            </c:Transform>
+                          </Components>
+                          <Children>
+                            <Entity name="Boost">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.122000009" Y="-0.0400000028" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Name">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>Team Accuracy Boost</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1" G="1" R="1.56862748"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0200000014" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Icon">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\3</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1" G="1" R="1.56862748"/>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.00400000019" Y="0" Z="0.00499999989"/>
+                                      <Scale X="0.0300000012" Y="0.0299999993" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Weapons">
+                              <Components>
+                                <c:Transform>
+                                  <Position X="-0.121000007" Y="-0.0690000057" Z="0"/>
+                                </c:Transform>
+                              </Components>
+                              <Children>
+                                <Entity name="Primary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\6</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.0350000001" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0210000016" Y="0.0209999997" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                                <Entity name="Secondary">
+                                  <Components>
+                                    <c:Text>
+                                      <Content>\7</Content>
+                                      <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                      <Color A="1" B="1.56862748" G="1" R="1.17647064"/>
+                                      <Alignment>
+                                        <Left/>
+                                      </Alignment>
+                                    </c:Text>
+                                    <c:Transform>
+                                      <Position X="0.151000008" Y="-0.00800000038" Z="0.00499999989"/>
+                                      <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children/>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                            <Entity name="Unique">
+                              <Components>
+                                <c:Transform/>
+                              </Components>
+                              <Children>
+                                <Entity name="Sprint">
+                                  <Components>
+                                    <c:Transform>
+                                      <Position X="-0.0480000004" Y="0" Z="0"/>
+                                    </c:Transform>
+                                  </Components>
+                                  <Children>
+                                    <Entity name="Name">
+                                      <Components>
+                                        <c:Text>
+                                          <Content>Sprint</Content>
+                                          <Resource>Fonts/Hind-Edited.otf,64</Resource>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                          <Alignment>
+                                            <Left/>
+                                          </Alignment>
+                                        </c:Text>
+                                        <c:Transform>
+                                          <Position X="0.0200000014" Y="-0.00600000005" Z="0.00499999989"/>
+                                          <Scale X="0.0209999997" Y="0.0210000016" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                    <Entity name="Icon">
+                                      <Components>
+                                        <c:Sprite>
+                                          <Model>Models/Core/UnitQuad.mesh</Model>
+                                          <GlowMap></GlowMap>
+                                          <DiffuseTexture>Textures/Icons/Abilities/Square/Dash-01.png</DiffuseTexture>
+                                          <Color A="1" B="1" G="1.17647064" R="1"/>
+                                        </c:Sprite>
+                                        <c:Transform>
+                                          <Orientation X="0" Y="0" Z="1.57000005"/>
+                                          <Scale X="0.0240000002" Y="0.0240000002" Z="1"/>
+                                        </c:Transform>
+                                      </Components>
+                                      <Children/>
+                                    </Entity>
+                                  </Children>
+                                </Entity>
+                              </Children>
+                            </Entity>
+                          </Children>
+                        </Entity>
+                      </Children>
+                    </Entity>
+                  </Children>
+                </Entity>
+              </Children>
+            </Entity>
+          </Children>
         </Entity>
       </Children>
     </Entity>

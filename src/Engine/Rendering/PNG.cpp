@@ -96,10 +96,10 @@ PNG::~PNG()
 
 void PNG::pngErrorFunction(png_structp png_ptr, png_const_charp error_msg)
 {
-	LOG_WARNING("%s", error_msg);
+	LOG_WARNING("libpng error: %s", error_msg);
 }
 
 void PNG::pngWarningFunction(png_structp png_ptr, png_const_charp warning_msg)
 {
-	LOG_WARNING("%s", warning_msg);
+	LOG_WARNING("libpng warning: %s", warning_msg);
 }

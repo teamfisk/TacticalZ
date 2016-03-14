@@ -42,6 +42,15 @@ void LightCullingPass::SetSSBOSizes()
 {
     m_NumberOfTiles = (int)(m_Renderer->GetViewportSize().Width/TILE_SIZE) * (int)(m_Renderer->GetViewportSize().Height/TILE_SIZE);
 
+	if (m_Frustums != nullptr) {
+		delete[] m_Frustums;
+	}
+	if (m_LightGrid != nullptr) {
+		delete[] m_LightGrid;
+	}
+	if (m_LightIndex != nullptr) {
+		delete[] m_LightIndex;
+	}
     m_Frustums = new Frustum[m_NumberOfTiles];
     m_LightGrid = new LightGrid[m_NumberOfTiles];
     m_LightIndex = new float[m_NumberOfTiles*MAX_LIGHTS_PER_TILE];

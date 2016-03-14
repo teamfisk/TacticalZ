@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="Fade">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="FadeTime" type="t:double" minOccurs="0"/>
+				<xs:element name="Time" type="t:double" minOccurs="0"/>
+				<xs:element name="Out" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If the entity should fade out or in.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Loop" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If the effect should loop when it is done.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Reverse" type="t:bool" minOccurs="0">
+					<xs:annotation><xs:documentation>If the entity should reverse the fade after finishing, this will double the speed.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

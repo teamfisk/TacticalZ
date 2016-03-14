@@ -13,14 +13,21 @@ public:
     PlayerSpawnSystem(SystemParams params);
 
     virtual void Update(double dt) override;
-    
-    static void SetRespawnTime(float respawnTime) { m_RespawnTime = respawnTime; };
 
 private:
+    // This enum must correspond to the command values for PickTeam buttons.
+    enum class PlayerClass
+    {
+        None = 0,
+        Assault = 1,
+        Defender = 2,
+        Sniper = 2
+    };
     struct SpawnRequest
     {
         int PlayerID;
         ComponentInfo::EnumType Team;
+        PlayerClass Class;
     };
 
     bool m_NetworkEnabled = false;
@@ -31,8 +38,8 @@ private:
     //EntityWrapper ID -> Player ID.
     std::map<EntityID, int> m_PlayerIDs;
 
-    static float m_RespawnTime;
-    float m_Timer;
+    float m_ForcedRespawnTime;
+    bool m_DbgConfigForceRespawn;
 
     EventRelay<PlayerSpawnSystem, Events::InputCommand> m_OnInputCommand;
     bool OnInputCommand(Events::InputCommand& e);

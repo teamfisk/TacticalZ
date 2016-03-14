@@ -1,47 +1,44 @@
 #ifndef AssaultWeaponBehaviour_h__
 #define AssaultWeaponBehaviour_h__
 
-#include "Sound/EPlaySoundOnEntity.h"
-#include "Collision/Collision.h"
-#include "Core/ConfigFile.h"
 #include "WeaponBehaviour.h"
-#include "../SpawnerSystem.h"
+#include "Collision/Collision.h"
 #include "Core/EPlayerDamage.h"
-#include "Core/EShoot.h"
+#include "Sound/EPlaySoundOnEntity.h"
+#include "Rendering/EAutoAnimationBlend.h"
 
 class AssaultWeaponBehaviour : public WeaponBehaviour<AssaultWeaponBehaviour>
 {
 public:
     AssaultWeaponBehaviour(SystemParams systemParams, IRenderer* renderer, Octree<EntityAABB>* collisionOctree)
-        : WeaponBehaviour(systemParams, "AssaultWeapon", renderer, collisionOctree) 
+        : System(systemParams)
+        , WeaponBehaviour(systemParams, "AssaultWeapon", renderer, collisionOctree)
+        , m_RandomEngine(m_RandomDevice())
     { }
 
-protected:
-    virtual void OnPrimaryFire(WeaponInfo& wi) override;
-    virtual void OnCeasePrimaryFire(WeaponInfo& wi) override;
-    virtual void OnReload(WeaponInfo& wi) override;
+    void UpdateComponent(EntityWrapper& entity, ComponentWrapper& cWeapon, double dt) override;
+    void UpdateWeapon(ComponentWrapper cWeapon, WeaponInfo& wi, double dt) override;
+    void OnPrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnCeasePrimaryFire(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnReload(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnEquip(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    void OnHolster(ComponentWrapper cWeapon, WeaponInfo& wi) override;
+    //bool OnInputCommand(ComponentWrapper cWeapon, WeaponInfo& wi, const Events::InputCommand& e) override;
 
 private:
-    // State
-    bool m_Firing = false;
-    bool m_Reloading = false;
-    double m_ReloadTimer = 0.0;
-    double m_TimeSinceLastFire = 0.0;
-    EntityWrapper m_FirstPersonReloadImpostor;
+    std::random_device m_RandomDevice;
+    std::mt19937 m_RandomEngine;
 
-    bool hasAmmo();
-    void fireRound();
-    void spawnTracer();
-    float traceRayDistance(glm::vec3 origin, glm::vec3 direction);
-    void playFireSound();
-    void playEmptySound();
-    void viewPunch();
-    void finishReload();
-    void playShootAnimation();
-    void playIdleAnimation();
-    void playReloadAnimation();
-    bool shoot(double damage);
-    void showHitMarker();
+    // Weapon functions
+    void fireBullet(ComponentWrapper cWeapon, WeaponInfo& wi);
+    bool canFire(ComponentWrapper cWeapon, WeaponInfo& wi);
+    bool dealDamage(ComponentWrapper cWeapon, WeaponInfo& wi);
+
+    // Utility
+    //Camera cameraFromEntity(EntityWrapper camera);
+
+    void CheckBoost(ComponentWrapper cWeapon, WeaponInfo& wi);
+
 };
 
 #endif

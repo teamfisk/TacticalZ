@@ -23,11 +23,13 @@ struct EntityWrapper
 
     static const EntityWrapper Invalid;
 
-    const std::string Name();
+    const std::string Name() const;
     bool HasComponent(const std::string& componentType);
     void AttachComponent(const char* componentName);
     EntityWrapper Parent();
+    EntityWrapper FirstParentByName(const std::string& parentEntityName);
     EntityWrapper FirstChildByName(const std::string& name);
+    EntityWrapper FirstLevelChildByName(const std::string& name);
     EntityWrapper FirstParentWithComponent(const std::string& componentType);
     EntityWrapper Clone(EntityWrapper parent = EntityWrapper::Invalid);
     std::vector<EntityWrapper> ChildrenWithComponent(const std::string& componentType);
@@ -43,8 +45,9 @@ struct EntityWrapper
 
 private:
     EntityWrapper firstChildByNameRecursive(const std::string& name, EntityID parent);
-    EntityWrapper cloneRecursive(EntityWrapper entity, EntityWrapper parent);
     void childrenWithComponentRecursive(const std::string& componentType, EntityWrapper& entity, std::vector<EntityWrapper>& childrenWithComponent);
+    static void fillRelationships(std::unordered_multimap<EntityWrapper, EntityWrapper>& relationMap, EntityWrapper entity);
+    static void recreateRelationships(const std::unordered_multimap<EntityWrapper, EntityWrapper>& relationMap, EntityWrapper templateEntity, EntityWrapper parent = EntityWrapper::Invalid);
 };
 
 namespace std

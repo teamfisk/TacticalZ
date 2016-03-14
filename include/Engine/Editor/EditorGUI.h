@@ -22,6 +22,7 @@
 #include "../Core/ELockMouse.h"
 #include "../Core/EFileDropped.h"
 #include "../Rendering/Texture.h"
+#include "Game/Events/ESpawnerSpawn.h"
 
 class EditorGUI
 {

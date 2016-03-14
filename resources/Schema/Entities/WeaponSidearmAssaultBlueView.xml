@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Entity name="Hands" xmlns:c="components" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../Types/Entity.xsd">
+
+  <Components>
+    <c:BlendAdditive>
+      <Adder>MovementBlend</Adder>
+      <Receiver>ActionBlend</Receiver>
+    </c:BlendAdditive>
+    <c:Model>
+      <Resource>Models/Characters/Assault/FirstPersonAssaultBlue.mesh</Resource>
+      <Shadow>false</Shadow>
+    </c:Model>
+    <c:Transform/>
+  </Components>
+
+  <Children>
+    <Entity name="MovementBlend">
+      <Components>
+        <c:Blend>
+          <Pose1>Idle</Pose1>
+          <Pose2>Run</Pose2>
+          <Weight>1</Weight>
+          <SubTreeRoot>true</SubTreeRoot>
+        </c:Blend>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Idle">
+          <Components>
+            <c:Animation>
+              <AnimationName>IdleSecF</AnimationName>
+              <Play>true</Play>
+              <Additive>true</Additive>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Run">
+          <Components>
+            <c:Animation>
+              <AnimationName>RunSecF</AnimationName>
+              <Play>true</Play>
+              <Additive>true</Additive>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="ActionBlend">
+      <Components>
+        <c:Blend>
+          <Pose1>Fire</Pose1>
+          <Pose2>Reload</Pose2>
+          <Weight>0</Weight>
+        </c:Blend>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="Fire">
+          <Components>
+            <c:Animation>
+              <AnimationName>ShootSecF</AnimationName>
+              <Loop>false</Loop>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="Reload">
+          <Components>
+            <c:Animation>
+              <AnimationName>ReloadSwitchSecF</AnimationName>
+              <Loop>false</Loop>
+            </c:Animation>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="AmmunitionHUD">
+      <Components>
+        <c:BoneAttachment>
+          <BoneName>R_Ammo_Joint</BoneName>
+        </c:BoneAttachment>
+        <c:Transform>
+          <Position X="0.109812237" Y="-0.0832184851" Z="-0.403451651"/>
+          <Orientation X="0.000778344634" Y="0.077423349" Z="0.0012426693"/>
+          <Scale X="0.400000006" Y="0.400000006" Z="0.400000006"/>
+        </c:Transform>
+      </Components>
+      <Children>
+        <Entity name="AmmunitionHUDBackground">
+          <Components>
+            <c:Sprite>
+              <Model>Models/Core/UnitQuad.mesh</Model>
+              <GlowMap></GlowMap>
+              <DiffuseTexture>Textures/Core/UnitHexagon.png</DiffuseTexture>
+              <Color A="0.588235319" B="0" G="0" R="0"/>
+            </c:Sprite>
+            <c:Transform>
+              <Position X="0" Y="0" Z="-0.00300000003"/>
+              <Scale X="0.119999997" Y="0.119999997" Z="0.119999997"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AmmunitionText">
+          <Components>
+            <c:Transform/>
+          </Components>
+          <Children>
+            <Entity name="MagazineAmmo">
+              <Components>
+                <c:Text>
+                  <Content>16</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+                </c:Text>
+                <c:TextFieldReader>
+                  <ParentEntityName></ParentEntityName>
+                  <ComponentType>SidearmWeapon</ComponentType>
+                  <Field>MagazineAmmo</Field>
+                </c:TextFieldReader>
+                <c:Transform>
+                  <Position X="0" Y="-0.00600000005" Z="0"/>
+                  <Scale X="0.0599999987" Y="0.0599999987" Z="0.0599999987"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="Infinity!">
+              <Components>
+                <c:Text>
+                  <Content>8</Content>
+                  <Resource>Fonts/DroidSans.ttf,64</Resource>
+                  <Color A="1" B="3.92156863" G="1.17647064" R="0"/>
+                </c:Text>
+                <c:Transform>
+                  <Position X="0.0150000006" Y="-0.029000001" Z="0"/>
+                  <Orientation X="0" Y="0" Z="1.5710001"/>
+                  <Scale X="0.0399999991" Y="0.0399999991" Z="0.0399999991"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="FriendlyAmmoAttachment">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/FriendlyAmmoHUD.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform>
+              <Position X="-0.000110394583" Y="-0.0891034827" Z="6.07890324e-05"/>
+            </c:Transform>
+          </Components>
+          <Children/>
+        </Entity>
+        <Entity name="AmmoShareEffectSpawner">
+          <Components>
+            <c:Spawner>
+              <EntityFile>Schema/Entities/AmmoShareEffectView.xml</EntityFile>
+            </c:Spawner>
+            <c:Transform/>
+          </Components>
+          <Children/>
+        </Entity>
+      </Children>
+    </Entity>
+    <Entity name="WeaponOrigin">
+      <Components>
+        <c:Transform/>
+      </Components>
+      <Children>
+        <Entity name="ViewModel">
+          <Components>
+            <c:BoneAttachment>
+              <BoneName>R_Arm_Weapon_Joint</BoneName>
+            </c:BoneAttachment>
+            <c:Model>
+              <GlowIntensity>1.2999999523162842</GlowIntensity>
+              <Resource>Models/Weapons/Blue/SecondaryWeaponBlue.mesh</Resource>
+              <Shadow>false</Shadow>
+            </c:Model>
+            <c:Transform>
+              <Position X="0.185786247" Y="-0.21622014" Z="-0.412707269"/>
+              <Orientation X="0.0102805095" Y="-0.00312478957" Z="0.0428138711"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="ReloadSpawner">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/WeaponSidearmReloadEffectView.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+        <Entity name="Muzzle">
+          <Components>
+            <c:Transform>
+              <Position X="0.189540595" Y="-0.114737265" Z="-0.681462705"/>
+            </c:Transform>
+          </Components>
+          <Children>
+            <Entity name="WeaponMuzzleRay">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/RaySideArmBlue.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform/>
+              </Components>
+              <Children/>
+            </Entity>
+            <Entity name="WeaponMuzzleFlash">
+              <Components>
+                <c:Spawner>
+                  <EntityFile>Schema/Entities/MuzzleFlashSideArmBlue.xml</EntityFile>
+                </c:Spawner>
+                <c:Transform>
+                  <Scale X="0.5" Y="0.5" Z="0.5"/>
+                </c:Transform>
+              </Components>
+              <Children/>
+            </Entity>
+          </Children>
+        </Entity>
+      </Children>
+    </Entity>
+  </Children>
+
+</Entity>

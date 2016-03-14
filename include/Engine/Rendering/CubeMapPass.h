@@ -3,6 +3,7 @@
 
 #include "IRenderer.h"
 #include "ShaderProgram.h"
+#include "PNG.h"
 
 class CubeMapPass
 {
@@ -15,13 +16,13 @@ public:
     void GenerateCubeMapTexture();
 
     //GLuint CubeMapTexture() const { return m_CubeMapTexture; }
-    GLuint m_CubeMapTexture = -1;
+    GLuint m_CubeMapTexture = 0;
 
 private:
     IRenderer* m_Renderer;
     std::string m_PreviusCubeMapTexture;
 
-    std::vector<Texture*> m_CubeMapTextures;
+    std::vector<std::string> m_CubeMapTextures;
 };
 
 #endif 

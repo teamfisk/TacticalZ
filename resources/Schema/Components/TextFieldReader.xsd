@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:t="types">
+	<xs:import schemaLocation="../Types.xsd" namespace="types"/>
+
+	<xs:element name="TextFieldReader">
+		<xs:annotation><xs:documentation>Reads a value from a specific field of a compoent of parent entity and writes it to the Text component on this entity.</xs:documentation></xs:annotation>
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="ParentEntityName" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>The name of the parent entity to read the component field from. Leave empty to read from this entity.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="ComponentType" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>The component type to read the field value from.</xs:documentation></xs:annotation>
+				</xs:element>
+				<xs:element name="Field" type="t:string" minOccurs="0">
+					<xs:annotation><xs:documentation>The field name to read the value from.</xs:documentation></xs:annotation>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

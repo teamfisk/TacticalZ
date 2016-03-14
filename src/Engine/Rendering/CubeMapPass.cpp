@@ -6,30 +6,37 @@ CubeMapPass::CubeMapPass(IRenderer* renderer)
     LoadTextures("Nevada");
 }
 
-void CubeMapPass::LoadTextures(std::string input)
+void CubeMapPass::LoadTextures(std::string cubemapName)
 {
-    if (m_PreviusCubeMapTexture != input) {
+    if (m_PreviusCubeMapTexture != cubemapName) {
         m_CubeMapTextures.clear();
         for (int i = 0; i < 6; i++) {
-            std::string str;
-            str = "Textures/Test/CubeMap/" + input + "/CubeMapTest0" + std::to_string(i) + ".png";
-            Texture* img = ResourceManager::Load<Texture>(str);
-            m_CubeMapTextures.push_back(img);
+            std::string path = "Textures/Test/CubeMap/" + cubemapName + "/CubeMapTest0" + std::to_string(i) + ".dds";
+            m_CubeMapTextures.push_back(path);
         }
         GenerateCubeMapTexture();
-        m_PreviusCubeMapTexture = input;
+        m_PreviusCubeMapTexture = cubemapName;
     }
 }
 
 void CubeMapPass::GenerateCubeMapTexture()
 {
-    if (m_CubeMapTexture == -1) {
+    if (m_CubeMapTexture == 0) {
         glGenTextures(1, &m_CubeMapTexture);
     }
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMapTexture);
 
     for (int i = 0; i < 6; i++) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, m_CubeMapTextures[0]->Width, m_CubeMapTextures[0]->Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_CubeMapTextures[i]->Data);
+        DDS* img = ResourceManager::Load<DDS>(m_CubeMapTextures[i]);
+		std::size_t bpe = 16;
+		std::size_t numBlocksWide = std::max<std::size_t>(1, (img->Width + 3) / 4);
+		std::size_t numBlocksHigh = std::max<std::size_t>(1, (img->Height + 3) / 4);
+		std::size_t rowBytes = numBlocksWide * bpe;
+		std::size_t numRows = numBlocksHigh;
+		std::size_t numBytes = rowBytes * numBlocksHigh;
+		glCompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, img->Width, img->Height, 0, numBytes, img->Data);
+        //glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, img->Width, img->Height, 0, GL_COMPRESSED_RGBA, GL_UNSIGNED_BYTE, img->Data);
+        ResourceManager::Release("DDS", m_CubeMapTextures[i]);
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

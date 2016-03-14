@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<CapturePointGameMode xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CapturePointGameMode.xsd">
+	<RespawnTime>0.0</RespawnTime>
+	<MaxRespawnTime>8.0</MaxRespawnTime>
+	<ResetCountdown>10.0</ResetCountdown>
+</CapturePointGameMode>

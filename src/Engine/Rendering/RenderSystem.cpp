@@ -9,10 +9,11 @@ RenderSystem::RenderSystem(SystemParams params, const IRenderer* renderer, Rende
     , m_Octree(frustumCullOctree)
 {
     EVENT_SUBSCRIBE_MEMBER(m_ESetCamera, &RenderSystem::OnSetCamera);
+    EVENT_SUBSCRIBE_MEMBER(m_EResolutionChanged, &RenderSystem::OnResolutionChanged);
     EVENT_SUBSCRIBE_MEMBER(m_EInputCommand, &RenderSystem::OnInputCommand);
     EVENT_SUBSCRIBE_MEMBER(m_EPlayerSpawned, &RenderSystem::OnPlayerSpawned);
 
-    m_Camera = new Camera((float)m_Renderer->Resolution().Width / m_Renderer->Resolution().Height, glm::radians(45.f), 0.01f, 5000.f);
+    m_Camera = new Camera((float)m_Renderer->GetViewportSize().Width / m_Renderer->GetViewportSize().Height, glm::radians(45.f), 0.01f, 5000.f);
 }
 
 RenderSystem::~RenderSystem()
@@ -20,11 +21,18 @@ RenderSystem::~RenderSystem()
     delete m_Camera;
 }
 
+bool RenderSystem::OnResolutionChanged(Events::ResolutionChanged& e)
+{
+    // Update camera aspect ration on resolution change
+    m_Camera->SetAspectRatio((float)e.NewResolution.Width / e.NewResolution.Height);
+    return true;
+}
+
 bool RenderSystem::OnSetCamera(Events::SetCamera& e)
 {
     ComponentWrapper cTransform = e.CameraEntity["Transform"];
     ComponentWrapper cCamera = e.CameraEntity["Camera"];
-    m_Camera->SetFOV((double)cCamera["FOV"]);
+    m_Camera->SetFOV(glm::radians((double)cCamera["FOV"]));
     m_Camera->SetNearClip((double)cCamera["NearClip"]);
     m_Camera->SetFarClip((double)cCamera["FarClip"]);
     m_Camera->SetPosition(cTransform["Position"]);
@@ -63,7 +71,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 			float minScale = (float)(double)indicator["MinScale"];
 			bool hasTeam = indicator["VisibleForSingleTeamOnly"];
 			isIndicator = true;
-			glm::vec3 pos = Transform::AbsolutePosition(entity);
+			glm::vec3 pos = TransformSystem::AbsolutePosition(entity);
 
 
 			EntityWrapper entityTeam;
@@ -130,7 +138,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 			modelMatrix[3][2] = pos.z;
 			modelMatrix[3][3] = 1.0f;
 
-			glm::mat4 tranformationMatrix = modelMatrix * glm::scale(Transform::AbsoluteScale(entity));
+			glm::mat4 tranformationMatrix = modelMatrix * glm::scale(TransformSystem::AbsoluteScale(entity));
 			glm::vec4 tmp = tranformationMatrix * glm::vec4(glm::vec3(0.5, 0.5, 0), 1.0f);
 			glm::vec2 projectedTopRight = m_Camera->WorldToScreen(glm::vec3(tmp), m_Renderer->GetViewportSize());
 			tmp = tranformationMatrix * glm::vec4(glm::vec3(-0.5, -0.5, 0), 1.0f);
@@ -143,7 +151,7 @@ void RenderSystem::fillSprites(std::list<std::shared_ptr<RenderJob>>& jobs, Worl
 			modelMatrix = tranformationMatrix;
 		}
 		else {
-			modelMatrix = Transform::ModelMatrix(entity.ID, world);
+			modelMatrix = TransformSystem::ModelMatrix(entity.ID, world);
 		}
 
 
@@ -176,7 +184,7 @@ bool RenderSystem::isEntityVisible(EntityWrapper& entity)
     }
 
     // Hide things parented to local player if they have the HiddenFromLocalPlayer component
-    bool outOfBodyExperience = ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
+    bool outOfBodyExperience = false; // ResourceManager::Load<ConfigFile>("Config.ini")->Get<bool>("Debug.OutOfBodyExperience", false);
     if (
         (entity.HasComponent("HiddenForLocalPlayer") || entity.FirstParentWithComponent("HiddenForLocalPlayer").Valid()) 
         && (entity == m_LocalPlayer || entity.IsChildOf(m_LocalPlayer)) 
@@ -240,7 +248,9 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
             fillColor = (glm::vec4)fillComponent["Color"];
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(cModel.EntityID, m_World);
+		bool isShielded = m_World->HasComponent(cModel.EntityID, "Shielded") || m_World->HasComponent(cModel.EntityID, "Player");
+
+        glm::mat4 modelMatrix = TransformSystem::ModelMatrix(cModel.EntityID, m_World);
         //Loop through all materialgroups of a model
         for (auto matGroup : model->MaterialGroups()) {
             //If the model has an explosioneffect component, we will add an explosioneffectjob
@@ -255,20 +265,20 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     cModel, 
                     m_World, 
                     fillColor, 
-                    fillPercentage
+                    fillPercentage,
+					isShielded,
+					false
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")){
                     explosionEffectJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(explosionEffectJob);
-                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
-                    || m_World->HasComponent(cModel.EntityID, "Player")) {
-
+                } else if (isShielded) {
                     if (explosionEffectJob->Color.a != 1.f || explosionEffectJob->EndColor.a != 1.f || explosionEffectJob->DiffuseColor.a != 1.f) {
                         cModel["Transparent"] = true;
                     }
 
                     if (cModel["Transparent"]) {
-                        Jobs.TransparentShieldedObjects.push_back(explosionEffectJob);
+                        Jobs.TransparentObjects.push_back(explosionEffectJob);
                     } else {
 					    explosionEffectJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(explosionEffectJob);
@@ -294,20 +304,21 @@ void RenderSystem::fillModels(RenderScene::Queues &Jobs)
                     cModel, 
                     m_World, 
                     fillColor, 
-                    fillPercentage
+                    fillPercentage,
+					isShielded,
+					(bool)cModel["Shadow"]
                 ));
                 if (m_World->HasComponent(cModel.EntityID, "Shield")) {
                     modelJob->CalculateHash();
                     Jobs.ShieldObjects.push_back(modelJob);
-                } else if (m_World->HasComponent(cModel.EntityID, "Shielded")
-                    || m_World->HasComponent(cModel.EntityID, "Player")) {
+                } else if (isShielded) {
 
                     if (modelJob->Color.a != 1.f || modelJob->DiffuseColor.a != 1.f) {
                         cModel["Transparent"] = true;
                     }
 
                     if (cModel["Transparent"]) {
-                        Jobs.TransparentShieldedObjects.push_back(modelJob);
+                        Jobs.TransparentObjects.push_back(modelJob);
                     } else {
 					    modelJob->CalculateHash();
                         Jobs.OpaqueShieldedObjects.push_back(modelJob);
@@ -348,6 +359,11 @@ void RenderSystem::fillPointLights(std::list<std::shared_ptr<RenderJob>>& jobs, 
             }
             auto transformC = world->GetComponent(pointlightC.EntityID, "Transform");
             if (&transformC == nullptr) {
+                continue;
+            }
+
+            EntityWrapper entity(world, pointlightC.EntityID);
+            if (!isEntityVisible(entity)) {
                 continue;
             }
 
@@ -411,7 +427,7 @@ void RenderSystem::fillText(std::list<std::shared_ptr<RenderJob>>& jobs, World* 
             }
         }
 
-        glm::mat4 modelMatrix = Transform::ModelMatrix(textComponent.EntityID, world);
+        glm::mat4 modelMatrix = TransformSystem::ModelMatrix(textComponent.EntityID, world);
         std::shared_ptr<TextJob> textJob = std::shared_ptr<TextJob>(new TextJob(modelMatrix, font, textComponent));
         jobs.push_back(textJob);
 
@@ -429,11 +445,12 @@ void RenderSystem::Update(double dt)
 
     // Update the current camera used for rendering
     if (m_CurrentCamera.Valid()) {
-        m_Camera->SetPosition(Transform::AbsolutePosition(m_CurrentCamera));
-        m_Camera->SetOrientation(Transform::AbsoluteOrientation(m_CurrentCamera));
+        m_Camera->SetPosition(TransformSystem::AbsolutePosition(m_CurrentCamera));
+        m_Camera->SetOrientation(TransformSystem::AbsoluteOrientation(m_CurrentCamera));
     }
 
     RenderScene scene;
+    scene.ShouldBlur = true;
     scene.Camera = m_Camera;
     scene.Viewport = Rectangle(1280, 720);
 
@@ -447,7 +464,7 @@ void RenderSystem::Update(double dt)
     fillModels(scene.Jobs);
     fillPointLights(scene.Jobs.PointLight, m_World);
     //TODO: Make sure all objects needed are also sorted.
-	scene.Jobs.OpaqueObjects.sort();
+	scene.Jobs.OpaqueObjects.sort([](auto& a, auto& b) {return *a < *b; });
     fillSprites(scene.Jobs.SpriteJob, m_World);
     fillDirectionalLights(scene.Jobs.DirectionalLight, m_World);
     fillText(scene.Jobs.Text, m_World);

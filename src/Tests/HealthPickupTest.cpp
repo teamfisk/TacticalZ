@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE_END()
 PickupSpawnTest::PickupSpawnTest(int runTestNumber)
 {
     ResourceManager::RegisterType<ConfigFile>("ConfigFile");
-    ResourceManager::RegisterType<EntityFile>("EntityFile");
+    ResourceManager::RegisterType<EntityXMLFile>("EntityFile");
 
     m_Config = ResourceManager::Load<ConfigFile>("Config.ini");
     LOG_LEVEL = static_cast<_LOG_LEVEL>(m_Config->Get<int>("Debug.LogLevel", 1));
@@ -44,10 +44,10 @@ PickupSpawnTest::PickupSpawnTest(int runTestNumber)
     m_SystemPipeline->AddSystem<HealthPickupSystem>(1);
 
     //must register components (Components.xsd), else you cant create entities. Easiest done by loading a test xsd file
-    auto file = ResourceManager::Load<EntityFile>("Schema/Entities/HealthPickup.xml");
-    EntityFilePreprocessor fpp(file);
+    auto file = ResourceManager::Load<EntityXMLFile>("Schema/Entities/HealthPickup.xml");
+    EntityXMLFilePreprocessor fpp(file);
     fpp.RegisterComponents(m_World);
-    EntityFileParser fp(file);
+    EntityXMLFileParser fp(file);
     //connect the healthpickup to the world
     m_HealthPickupID = fp.MergeEntities(m_World);
 
