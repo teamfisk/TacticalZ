@@ -50,16 +50,18 @@ Source: "..\..\bin\Schema\*"; DestDir: "{app}\Schema\"; Flags: ignoreversion cre
 Source: "..\..\bin\Shaders\*"; DestDir: "{app}\Shaders\"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\..\bin\Textures\*"; DestDir: "{app}\Textures\"; Flags: ignoreversion createallsubdirs recursesubdirs
 Source: "..\..\bin\assimp.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\DefaultConfig.ini"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\bin\DefaultInput.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\resources\DefaultConfig.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\resources\DefaultInput.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\glew32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\glfw3.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\imgui.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Input.ini"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\libpng16.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\Axyz.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\Server.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\xerces-c_3_1.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\bin\zlib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\resources\README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\deps\redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: deleteafterinstall
 
 [Icons]
