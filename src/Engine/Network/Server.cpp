@@ -747,7 +747,7 @@ void Server::resetMap()
     reliableBroadcast(removeMap);
     removeWorld();
     // Hardcoded for now.
-    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Rocky2.xml");
+    auto entityFile = ResourceManager::Load<EntityFile>("Schema/Entities/CP_Valhalla.xml");
     entityFile->MergeInto(m_World);
     Packet newWorld(MessageType::Snapshot);
     createWorldSnapshot(newWorld);
