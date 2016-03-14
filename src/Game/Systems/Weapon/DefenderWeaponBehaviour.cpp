@@ -162,6 +162,7 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
 
                 SpawnerSystem::Spawn(attachment, attachment);
                 
+/*
 
                 EntityWrapper backAttachment = attachment.FirstChildByName("Back");
                 if (backAttachment.Valid()) {
@@ -171,7 +172,11 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                     eDeployShieldAttachement.Restart = true;
                     eDeployShieldAttachement.Start = true;
                     m_EventBroker->Publish(eDeployShieldAttachement);
+                } else {
+                    LOG_ERROR("back shield invalid");
                 }
+
+
                 EntityWrapper frontAttachment = attachment.FirstChildByName("Front");
                 if (frontAttachment.Valid()) {
                     Events::AutoAnimationBlend eDeployShieldAttachement;
@@ -181,7 +186,10 @@ bool DefenderWeaponBehaviour::OnInputCommand(ComponentWrapper cWeapon, WeaponInf
                     eDeployShieldAttachement.Start = true;
                     m_EventBroker->Publish(eDeployShieldAttachement);
 
+                } else {
+                    LOG_ERROR("front shield invalid");
                 }
+*/
 
                 if (IsClient) {
                     EntityWrapper root = wi.FirstPersonEntity;

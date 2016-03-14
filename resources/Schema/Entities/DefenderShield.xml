@@ -31,17 +31,8 @@
           <Components>
             <c:Animation>
               <AnimationName>ActivateShieldU</AnimationName>
-              <Loop>false</Loop>
-            </c:Animation>
-            <c:Transform/>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="Idle">
-          <Components>
-            <c:Animation>
-              <AnimationName>ShieldFrontU</AnimationName>
               <Play>true</Play>
+              <Loop>false</Loop>
             </c:Animation>
             <c:Transform/>
           </Components>
@@ -74,16 +65,7 @@
           <Components>
             <c:Animation>
               <AnimationName>ActivateShieldU</AnimationName>
-              <Loop>false</Loop>
-            </c:Animation>
-            <c:Transform/>
-          </Components>
-          <Children/>
-        </Entity>
-        <Entity name="Idle">
-          <Components>
-            <c:Animation>
-              <AnimationName>ShieldFrontU</AnimationName>
+              <Play>true</Play>
               <Loop>false</Loop>
             </c:Animation>
             <c:Transform/>
