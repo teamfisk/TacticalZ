@@ -1,0 +1,38 @@
+﻿Build started 2016-01-27 12:36:51.
+     1>Project "C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\MayaExporter\MayaExporter.vcxproj" on node 2 (Build target(s)).
+     1>CustomBuild:
+         Uic'ing MayaExporter.ui...
+         Moc'ing Menu.h...
+         Rcc'ing leeeeel.qrc...
+     1>RCC : warning : No resources in 'C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\MayaExporter\leeeeel.qrc'.
+         
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Program Files\Autodesk\Maya2016\include" /I.\GeneratedFiles /I.\GeneratedFiles\Debug /Zi /nologo /W1 /WX- /Od /D QT_DLL /D QT_NO_IMPORT_QT47_QML /D UNICODE /D WIN32 /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt Export.cpp Material.cpp Menu.cpp GeneratedFiles\Debug\moc_Menu.cpp Main.cpp Mesh.cpp Skeleton.cpp WriteToFile.cpp
+         Export.cpp
+         Material.cpp
+         Menu.cpp
+         moc_Menu.cpp
+         Main.cpp
+         Mesh.cpp
+         Skeleton.cpp
+         WriteToFile.cpp
+         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Program Files\Autodesk\Maya2016\include" /I.\GeneratedFiles /I.\GeneratedFiles\Debug /Zi /nologo /W1 /WX- /Od /D QT_DLL /D QT_NO_IMPORT_QT47_QML /D UNICODE /D WIN32 /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt GeneratedFiles\qrc_leeeeel.cpp
+         qrc_leeeeel.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\x64\Debug\MayaExporter.mll" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files\Autodesk\Maya2016\lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\x64\Debug\MayaExporter.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\x64\Debug\MayaExporter.lib" /MACHINE:X64  /SUBSYSTEM:WINDOWS /DLL x64\Debug\Export.obj
+         x64\Debug\Material.obj
+         x64\Debug\Menu.obj
+         x64\Debug\moc_Menu.obj
+         x64\Debug\qrc_leeeeel.obj
+         x64\Debug\Main.obj
+         x64\Debug\Mesh.obj
+         x64\Debug\Skeleton.obj
+         x64\Debug\WriteToFile.obj
+            Creating library C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\x64\Debug\MayaExporter.lib and object C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\x64\Debug\MayaExporter.exp
+         MayaExporter.vcxproj -> C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\x64\Debug\MayaExporter.mll
+     1>Done Building Project "C:\Users\panda\Desktop\TacticalZ\tools\MayaExporter\MayaExporter\MayaExporter.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:14.13

@@ -1,0 +1,19 @@
+﻿Build started 2016-02-09 12:46:49.
+     1>Project "C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\mayaPluginRTT\mayaPluginRTT.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Program Files\Autodesk\Maya2016\include" /ZI /nologo /W3 /WX- /Od /D _DEBUG /D _WINDOWS /D _USRDLL /D MAYAPLUGINRTT_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt main.cpp
+         main.cpp
+     1>c:\users\panda\desktop\tacticalz\tools\livetexturing\mayapluginrtt\mayapluginrtt\main.cpp(348): warning C4244: 'argument': conversion from 'unsigned __int64' to 'double', possible loss of data
+     1>c:\users\panda\desktop\tacticalz\tools\livetexturing\mayapluginrtt\mayapluginrtt\main.cpp(366): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+     1>c:\users\panda\desktop\tacticalz\tools\livetexturing\mayapluginrtt\mayapluginrtt\main.cpp(379): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+     1>c:\users\panda\desktop\tacticalz\tools\livetexturing\mayapluginrtt\mayapluginrtt\main.cpp(394): warning C4305: 'argument': truncation from 'double' to 'float'
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\x64\Debug\mayaPluginRTT.mll" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files\Autodesk\Maya2016\lib" "libzmq-v120-mt-4_0_4.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\x64\Debug\mayaPluginRTT.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\x64\Debug\mayaPluginRTT.lib" /MACHINE:X64 /DLL x64\Debug\main.obj
+         LINK : C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\x64\Debug\mayaPluginRTT.mll not found or not built by the last incremental link; performing full link
+            Creating library C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\x64\Debug\mayaPluginRTT.lib and object C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\x64\Debug\mayaPluginRTT.exp
+         mayaPluginRTT.vcxproj -> C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\x64\Debug\mayaPluginRTT.mll
+     1>Done Building Project "C:\Users\panda\Desktop\TacticalZ\tools\LiveTexturing\mayaPluginRTT\mayaPluginRTT\mayaPluginRTT.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:34.69

@@ -1,0 +1,15 @@
+{
+  "name": "LiveTexturing",
+  "version": "1.0.0",
+  "description": "Send image from Photoshop to Maya",
+  "main": "main.js",
+  "generator-core-version": "~3",
+  "license": "",
+  "readmeFilename": "",
+  "scripts": {
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}
